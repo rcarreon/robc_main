@@ -1,0 +1,227 @@
+
+
+
+
+/////en PHP para que diga el usuario que usa el sistema ///////////
+
+
+$uname =$_SESSION['uname'];
+		//$name =$_SESSION2['uname'];
+		//echo "<a href=logout.php>Logout</a>";		
+	//echo "<p>usuario:<strong>$tipo</strong></p>";
+	echo "<p>Hola<strong> $uname !</strong></p>";
+
+
+///////////////////////////////////////////////
+
+
+/////////////Para traer valores al div print ///////////////
+
+
+<td class="uno" align="center" id="pfolio1" >
+
+
+
+
+
+
+$('#printeando').click(function(){
+		$('.print').show();
+		var pcliente = $('#a_cliente').val();
+		$.ajax({
+			type:"GET",
+			url:"ins.php?pclient=1&a_cliente="+pcliente,
+			dataType:"html",
+			success:function(response){
+				$("#pfolio1").append(response); 
+				$("#pfolio2").append(response); 
+			},
+		});						
+});
+
+function 	updateoutput(){
+			document.getElementById('detalles').innerHTML=document.getElementById('a_detalles').value;
+			document.getElementById('imei').innerHTML=document.getElementById('a_imei').value;
+			document.getElementById('equipo').innerHTML=document.getElementById('a_modelo').value;
+			document.getElementById('cliente').innerHTML=document.getElementById('a_cliente').value;
+			document.getElementById('contra').innerHTML=document.getElementById('a_password').value;					
+			document.getElementById('fecha').innerHTML=document.getElementById('a_fecha').value; 
+//// SEGUNDO 
+			document.getElementById('detalles2').innerHTML=document.getElementById('a_detalles').value;
+			document.getElementById('imei2').innerHTML=document.getElementById('a_imei').value;
+			document.getElementById('equipo2').innerHTML=document.getElementById('a_modelo').value;
+			document.getElementById('cliente2').innerHTML=document.getElementById('a_cliente').value;
+			document.getElementById('contra2').innerHTML=document.getElementById('a_password').value;					
+			document.getElementById('fecha2').innerHTML=document.getElementById('a_fecha').value; 
+
+			
+}
+
+
+function printArea(areaName){
+        var printContents = document.getElementById('print').innerHTML;
+        var segundo = document.getElementById('segundo').innerHTML;
+        var separador = document.getElementById('separator').innerHTML;
+        //var originalContents = document.body.innerHTML;
+        document.body.innerHTML = printContents + separador + segundo  ;
+        window.print();
+        document.body.innerHTML= "";
+        location.reload();        
+}  
+
+
+<div id="separator"><hr> </div>
+<div id="segundo" style="display:none;">
+			<hr>
+				<!-- SEGUNDO -->
+				<img id="logo" src="images/logo250x100cellcity.jpg" alt="Cell City logo" height="90" width="350">
+				<hr>
+				<table class="printt" style="width:35em;height:5em;">
+				
+					<tr>
+						<td class="uno" ><strong>Cliente</strong></td>
+						<td class="dos" id="cliente" name="cliente"></td>
+					</tr>
+						<strong><td class="uno"  ><strong>Equipo</strong></td></strong>
+						<td class="dos" id="equipo"  > </td>
+					</tr>
+						<strong><td class="uno"  ><strong>Imei</strong></td></strong>
+						<td class="dos" id="imei" ></td>
+					</tr>
+				
+				</table>
+				<br>
+				
+				<div style="position:relative;left:15%;">
+					<input type="checkbox"> SIM </input>
+					<input type="checkbox"> Bateria</input>
+					<input type="checkbox"> Tapa</input>
+					<input type="checkbox"> Memoria </input>
+				</div>
+				<table class="printt" id="pfolio">
+					<tr>
+						<strong><td class="uno" align="center"><strong>Folio</strong></td></strong>
+					</tr>
+					<tr>
+						<td class="uno" align="center" id="pfolio1" >
+
+						</td>
+					</tr>
+				</table>
+				<br>
+				<table class="printt" id="pfolio">
+					<tr>
+						<strong><td class="uno" align="center"><strong>Fecha</strong></td></strong>
+					</tr>
+					<tr>
+						<td class="uno" id="fecha"></td>
+					</tr>
+				</table>									
+				<table class="printt" style="width:35em;height:5em;bottom:10%;">
+					<thead>
+						<tr>
+							<th>DETALLES DE SERVICIO TECNICO</th>
+						</tr>
+						<tr>
+							<td>La contraseña es <label id="contra"></label></td>
+						</tr>
+						<tr>
+							<td rowspan="4" class="uno" id="detalles" ></td>
+						</tr>
+					</thead>
+					<br /><br/>																
+				</table>
+				<p class="alinea"><strong>EN CAMBIO DE CRISTAL EL CLIENTE ACEPTA EL RIESGO DE DANO DE PANTALLA</strong></p>	
+				<div style="width:550px;" class="alinea">
+					<p id="politicas" align="justify">Politicas: 1.Debe de presentar este comprobante para que se le haga entrrega del equipo.2.Despues de 15 dias no nos hacemos
+				responsables de su equipo.3.Si no recoge su equipo en 30 dias,pasa a ser propiedad de Cell City.4. No se hacen garantias en equipos golpeados
+				o mojados.5. No nos hacemos responsables de la perdida parcial o total de la informacion en su equipo. NO NOS HACEMOS RESPONSABLES EN CASO DE
+				ROBO O INCENDIO.</p>
+				</div>
+				<br><br><br><br>
+				
+								<div style="position:relative;left:5%;">
+									<p > ________________________________  <br/>                   
+									Recibio <?php echo $uname ?></p>
+								</div>
+								<br>
+								<div style="position:relative;left:55%;bottom:7%;">
+								<p > ________________________________  <br/>                   
+									Aceptacion de Cliente</p>
+								</div>
+								<p>
+				<div style="position:relative;bottom:50%;left:78%;">Patron:
+					<img src="images/cuadritocellcity2.jpg" width="120" height="120">
+				</div>
+				<div style="position:relative;bottom:20%;padding-left:20em;">
+					<button id="imp" TYPE="button" onClick="printArea('print');" >Imprimir
+					<button type="regresa" id="cancelar">Cancelar
+				</div>
+
+
+
+
+
+
+
+
+///// ins.php
+
+
+
+if(!empty($_GET['pclient'])){
+
+    $pcliente = $_GET['a_cliente'];
+
+    $sql2 = "SELECT folio from dispos where cliente = '$pcliente ' order by folio desc limit 1"; 
+    $rec2 = mysql_query($sql2,$con2) or die ("Query failed: ".mysql_error()."Actual query:".$query); 
+    $rows2 = mysql_fetch_row($rec2);
+     echo "$rows2[0]";
+
+}
+
+
+style.css
+
+
+@media print {
+  @page{margin:0;}
+
+  div#print {
+  	position:absolute;
+  	top:150px;
+  	height: 5px;
+  	width: 250px;
+  }
+
+  div#segundo {
+  	height: 10px;
+  	width: 250px;
+  	position: absolute;
+  	bottom: 15%;
+  }
+  body { 
+  		margin: -1.5cm 2cm;
+  		position:absolute;
+  		width: 90%;
+  		height: 50%;
+  		bottom:50%;
+  }
+  button {
+  	display:none;
+  }
+}
+
+
+////update.php
+
+
+Reemplazar en que esta en produccion por el que tengo en la maquina
+
+Practicamente reemplazar los archivos mainpage.php, update.php, style.css, index.php, ins.php....
+
+pero ser muy cuidadosos
+
+
+
+///////////////////////////////
