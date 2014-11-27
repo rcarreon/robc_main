@@ -224,4 +224,75 @@ pero ser muy cuidadosos
 
 
 
-///////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////
+
+Cambios al 26 Nov  
+
+
+##mainpage.php
+
+Linea 125
+
+case "sucursal":
+			$("#s_imei").val('').hide();
+			$("#s_folio").val('').hide();
+			$("#s_modelo").val('').hide();
+			$("#s_cliente").val('').hide();
+			$("#s_status").val('').hide();
+			$("#s_fecha").val('').hide();
+			$("#s_donde").show();
+			$("#s_todos").show();
+			$("#s_submit").show();
+			$("#s_table").show();
+			$('#sestatus').hide();
+		break;
+
+Linea 256
+
+<option value="sucursal"> Recibido en </option>	
+
+Linea 279
+
+
+<select name="s_status" id="s_status" style="display:none;width:110px;position:relative;left:18%;bottom:30px;" class="form-control"  >
+
+Linea 308
+
+<select name="s_donde" id="s_donde" style="display:none;width:110px;position:relative;left:19%;bottom:48px;" class="form-control"  >
+							<option selected="selected" disabled="disabled" value="">opcion</option>
+							<option name="s_donde" value="Matriz" > Matriz </option>
+							<option name="s_donde" value="Quiroga" > Quiroga </option> 
+						</select> 
+
+
+@ a_submit click 
+
+var adonde     = $('input:radio[name=a_donde]:checked').val();	
+url: "ins.php?s_sumito=1&a_imei="+aimei+"&a_cliente="+acliente+"&a_modelo="+amodelo+"&a_status="+astatus+"&a_conta="+aconta+"&a_fecha="+afecha+"&a_email="+aemail+"&a_rep="+repara+"&a_password="+apass+"&a_detalles="+adetalles+"&a_donde="+adonde,
+$('input:radio[name=a_donde]:checked').attr("disabled","disabled");
+
+
+###ins.php
+
+agregar 
+
+
+$sdonde   = $_GET['s_donde'];
+$adonde   = $_GET['a_donde'];
+
+if($sdonde){        
+        $resulta=mysql_query("SELECT dispos.*, cliente.email,cliente.telefono,cliente.nombre from dispos LEFT JOIN cliente  ON  cliente.nombre = dispos.cliente where dispos.sucursal = '$sdonde'",$con2);
+        echo $tr;
+        
+    }   
+
+echo "<td  align=center id=editdonde>$data[7]</td>";
+
+
+agregar campo extra en s_sumito para agregar
+
+ campo sucursal  en el INSERT y variable $adonde  en VALUES
+
+
+
