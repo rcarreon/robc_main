@@ -1,0 +1,372 @@
+
+body {
+	background-image: url("images/fondocellcity3.jpg");
+	background-repeat: no-repeat;
+
+	background-position:50% -5%!important;
+	/*background-size: 400px 400px;
+	background-repeat: repeat-x;
+	background-repeat: repeat-y;*/
+}
+#opsearch{
+	top:	300px;
+	width: 200px;
+	height:	25px;
+	display: inline-block;
+}
+#upo{
+	position: relative;
+	top:	20%;
+	width: 200px;
+	left: 10%;
+	display: inline-block;
+
+}
+#logout {
+	position: relative;
+	top:25px;
+}
+form#update{
+	position:relative;
+	border: 1px solid #DDDDDD;
+	font-family: sans-serif; 
+    margin: 0 auto; 
+    padding: 20px; 
+    width: 550px; 
+    height: 450px;
+    top: 80px;
+    background-color: #FFFFFF;
+    box-shadow:0px 0px 20px black; 
+    border-radius:10px; 
+
+}
+form#update div { 
+	top: 20px;
+    margin-bottom: 15px; 
+    overflow: hidden; 
+} 
+
+form#update a{
+	position:relative;
+	padding-right: 3em;
+	
+}
+form#update button{
+	position:relative;
+	left: 300px;
+}
+div#update a:first-child{
+	position:relative;
+	top: 15px;
+	left: 375px;
+}
+
+div#agregaf{
+	position:absolute;
+	top: 45px;
+	border: 1px solid #DDDDDD;
+	font-family: sans-serif; 
+    margin: 0 auto; 
+    padding: 20px; 
+    width: 550px; 
+    height: 450px; 
+    top:30%;
+    left:30%;
+    background-color: #FFFFFF;
+    box-shadow:0px 0px 20px black; 
+    border-radius:10px; 
+     z-index: 7;
+
+
+}
+div#agregac{
+	position:absolute;
+	border: 1px solid #DDDDDD;
+	font-family: sans-serif; 
+    margin: 0 auto; 
+    padding: 30px; 
+    width: 550px; 
+    height: 300px;
+    top: 35%;
+    left: 30%;
+    background-color: #FFFFFF;
+    box-shadow:0px 0px 20px black; 
+    border-radius:10px;
+    z-index: 7;
+}
+form#aagrega{
+	position:relative;
+	left:1%;
+}
+form#aagrega div { 
+	top: 20px;
+    margin-bottom: 15px; 
+    overflow: hidden; 
+} 
+form#aagrega a{
+	position:relative;
+	left:230px;
+}
+div#agregau{
+	position:relative;
+	border: 1px solid #DDDDDD;
+	font-family: sans-serif; 
+    margin: 0 auto; 
+    padding: 30px; 
+    width: 550px; 
+    height: 400px;
+    top: -15%;
+    background-color: #FFFFFF;
+    box-shadow:0px 0px 20px black; 
+    border-radius:10px;
+    z-index: 7;
+
+}
+form#uagrega div { 
+	position:relative;
+	left: 30%;	
+	top: 20px;
+    margin-bottom: 15px; 
+    overflow: hidden; 
+} 
+form#uagrega a{
+	position:relative;
+	left:300px;
+}
+
+hr{
+	top: 50%;
+	width: 100%;
+}
+.rcasos{
+	position:absolute;
+	left: 20%;
+	top:50%;	
+	box-shadow:0px 0px 20px black;
+	background-color: #E6E6E6;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #000000;
+	border-radius:10px;
+	width: 300px;
+	z-index: 7;
+	height: 300px
+}
+div#casos div{
+	position: relative;
+	top: 10%;
+	left: 10%;
+}
+table#respuestabla{
+	position:absolute;
+	left:1%;
+}
+td#editrepara{
+	width: 5px;
+
+}
+form#eedita td{
+	font-size: 15px;
+}
+
+#rcasoscont{
+	bottom:30%;
+	position: relative;
+	display: inline-block;
+	margin: 0 auto;
+}
+input#lrep{
+	position:relative;
+	left: 40%;
+}
+
+div#uupdate{
+	position:relative;
+	border: 1px solid #DDDDDD;
+	font-family: sans-serif; 
+    margin: 0 auto; 
+    padding: 20px; 
+    width: 550px; 
+    height: 300px;
+    top: 80px;
+    background-color: #FFFFFF;
+    box-shadow:0px 0px 20px black; 
+    border-radius:10px; 
+    z-index: 7;
+
+}
+div#uupdate div { 
+	top: 10px;
+    margin-bottom: 15px; 
+    overflow: hidden; 
+} 
+
+div#uupdate a{
+	position:relative;
+	
+}
+div#uupdate button{
+	position:relative;
+	left: 300px;
+}
+div#uupdate a:first-child{
+	position:relative;
+	top: 15px;
+	left: 375px;
+}
+
+
+div#botones {
+	position: relative;
+	margin: 0 auto; 
+	
+	top:20%;
+}
+#botones button{
+		height: 50px;
+		width: 150px;
+
+}
+
+div form#cagrega{
+	position: relative;
+	top: 1%;
+}
+
+.printt td,th{
+	border:1px solid black;
+    border-collapse:collapse ;
+}
+td.dos{
+	width: 600px;
+}
+td.uno{
+	width: 100px;
+}
+#pprint{
+	position: relative;
+	
+	top: 80%;
+}
+
+.print{
+	position:fixed;
+	display:none;
+	
+	top:10%;
+	left:22%;
+	box-shadow:0px 0px 20px black;
+	background-color: #FFFFFF;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #000000;
+	border-radius:10px;
+	width: 850px;
+	z-index: 8;
+	height: 750px
+}
+.printt{
+	position: relative;
+	left:5%;
+	
+}
+#wrapper{
+	 width: 1000px;
+     margin: 0 auto;
+}
+#logo{
+	position: relative;
+	margin: 0 auto;
+	left:10%;
+
+
+}
+#pfolio{
+	position: relative;
+	margin: 0 auto;
+	top:-19%;
+	left: 40%;
+}
+#politicas{
+	position:relative;
+	
+	font-size: 10px;
+}
+.alinea{
+	position: relative;
+	left:5%;
+}
+
+/* ESTO ES PARA QUITAR EL HEADER Y EL FOOTER AL MOMENTO DE IMPRESION  */
+@media print {
+  @page{margin:0;}
+
+  div#print {
+  	position:absolute;
+  	top:150px;
+  	height: 5px;
+  	width: 250px;
+  }
+
+  div#segundo {
+  	height: 10px;
+  	width: 250px;
+  	position: absolute;
+  	top:300px;
+  }
+  body { 
+  		margin: -1.5cm 2cm;
+  		position:absolute;
+  		width: 90%;
+  		height: 50%;
+  		bottom:50%;
+  		
+  }
+  button {
+  	display:none;
+
+  }
+}
+textarea{
+	resize: none;
+}
+/*
+
+table.gridtable {
+	font-family: verdana,arial,sans-serif;
+	font-size:11px;
+	color:#333333;
+	border-width: 1px;
+	border-color: #666666;
+	border-collapse: collapse;
+}
+table.gridtable th {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #dedede;
+}
+table.gridtable td {
+	border-width: 1px;
+	padding: 8px;
+	border-style: solid;
+	border-color: #666666;
+	background-color: #ffffff;
+}
+
+.datagrid table { border-collapse: collapse; text-align: left; width: 100%; }
+.datagrid {font: normal 12px/150% Arial, Helvetica, sans-serif; background: #fff; overflow: hidden; border: 1px solid #006699; -webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; }
+.datagrid table td, .datagrid table th { padding: 3px 10px; }
+.datagrid table thead th {background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; color:#ffffff; font-size: 15px; font-weight: bold; border-left: 1px solid #0070A8; } 
+.datagrid table thead th:first-child { border: none; }
+.datagrid table tbody td { color: #00496B; border-left: 1px solid #E1EEF4;font-size: 12px;font-weight: normal; }
+.datagrid table tbody .alt td { background: #E1EEF4; color: #00496B; }.datagrid table tbody td:first-child { border-left: none; }
+.datagrid table tbody tr:last-child td { border-bottom: none; }.datagrid table tfoot td div { border-top: 1px solid #006699;background: #E1EEF4;} 
+.datagrid table tfoot td { padding: 0; font-size: 12px } .datagrid table tfoot td div{ padding: 2px; }
+.datagrid table tfoot td ul { margin: 0; padding:0; list-style: none; text-align: right; }
+.datagrid table tfoot  li { display: inline; }
+.datagrid table tfoot li a { text-decoration: none; display: inline-block;  padding: 2px 8px; margin: 1px;color: #FFFFFF;border: 1px solid #006699;-webkit-border-radius: 3px; -moz-border-radius: 3px; border-radius: 3px; background:-webkit-gradient( linear, left top, left bottom, color-stop(0.05, #006699), color-stop(1, #00557F) );background:-moz-linear-gradient( center top, #006699 5%, #00557F 100% );filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#006699', endColorstr='#00557F');background-color:#006699; }
+.datagrid table tfoot ul.active, .datagrid table tfoot ul a:hover { text-decoration: none;border-color: #006699; color: #FFFFFF; background: none; background-color:#00557F;}
+div.dhtmlx_window_active, div.dhx_modal_cover_dv { position: fixed !important; }
+*/
