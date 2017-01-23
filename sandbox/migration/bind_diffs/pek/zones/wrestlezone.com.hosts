@@ -1,0 +1,78 @@
+$TTL 86400
+wrestlezone.com.    IN    SOA    wrestlezone.com. root.wrestlezone.com. (
+                                               2014071400     ; serial
+                                               28800          ; refresh
+                                               14400          ; retry
+                                               3600000        ; expire
+                                               86400 )        ; minimum
+
+wrestlezone.com.                               IN    NS       app3v-dns.tp.prd.lax.craveonline.com.
+wrestlezone.com.                               IN    NS       app4v-dns.tp.prd.lax.craveonline.com.
+wrestlezone.com.                               IN    NS       app1v-dns.tp.prd.lax.craveonline.com.
+wrestlezone.com.                               IN    NS       app2v-dns.tp.prd.lax.craveonline.com.
+wrestlezone.com.                               IN    MX 10    cluster9.us.messagelabs.com.
+wrestlezone.com.                               IN    MX 20    cluster9a.us.messagelabs.com.
+
+local                                          IN    A        127.0.0.1
+localhost                                      IN    A        127.0.0.1
+loghost                                        IN    A        127.0.0.1
+
+
+
+; #### wrestlezone TitanWP
+wrestlezone.com.                               IN    A        72.172.76.151
+
+bta.wrestlezone.com.                           IN    A        10.11.234.71
+dev.wrestlezone.com.                           IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.wrestlezone.com.                           IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.wrestlezone.com.                           IN    A        72.172.76.151
+www.wrestlezone.com.                           IN    A        72.172.76.151
+
+origin.bta.wrestlezone.com.                    IN    CNAME    bta.wrestlezone.com.
+cdn-bta.wrestlezone.com.                       IN    CNAME    bta.wrestlezone.com.
+cdn1-bta.wrestlezone.com.                      IN    CNAME    bta.wrestlezone.com.
+cdn2-bta.wrestlezone.com.                      IN    CNAME    bta.wrestlezone.com.
+cdn3-bta.wrestlezone.com.                      IN    CNAME    bta.wrestlezone.com.
+
+origin-dev.wrestlezone.com.                    IN    CNAME    dev.wrestlezone.com.
+cdn-dev.wrestlezone.com.                       IN    CNAME    dev.wrestlezone.com.
+cdn1-dev.wrestlezone.com.                      IN    CNAME    dev.wrestlezone.com.
+cdn2-dev.wrestlezone.com.                      IN    CNAME    dev.wrestlezone.com.
+cdn3-dev.wrestlezone.com.                      IN    CNAME    dev.wrestlezone.com.
+
+origin-stg.wrestlezone.com.                    IN    CNAME    stg.wrestlezone.com.
+cdn-stg.wrestlezone.com.                       IN    CNAME    pebblebed.edgesuite.net.
+cdn1-stg.wrestlezone.com.                      IN    CNAME    pebblebed.edgesuite.net.
+cdn2-stg.wrestlezone.com.                      IN    CNAME    pebblebed.edgesuite.net.
+cdn3-stg.wrestlezone.com.                      IN    CNAME    pebblebed.edgesuite.net.
+
+origin.wrestlezone.com.                        IN    CNAME    prd.wrestlezone.com.
+cdn.wrestlezone.com.                           IN    CNAME    pebblebed.edgesuite.net.
+cdn1.wrestlezone.com.                          IN    CNAME    pebblebed.edgesuite.net.
+cdn2.wrestlezone.com.                          IN    CNAME    pebblebed.edgesuite.net.
+cdn3.wrestlezone.com.                          IN    CNAME    pebblebed.edgesuite.net.
+cdn1-www.wrestlezone.com.                      IN    CNAME    pebblebed.edgesuite.net.
+cdn2-www.wrestlezone.com.                      IN    CNAME    pebblebed.edgesuite.net.
+cdn3-www.wrestlezone.com.                      IN    CNAME    pebblebed.edgesuite.net.
+
+dev.m.wrestlezone.com.                         IN    CNAME    dev.wrestlezone.com.
+stg.m.wrestlezone.com.                         IN    CNAME    stg.wrestlezone.com.
+www.m.wrestlezone.com.                         IN    CNAME    prd.wrestlezone.com.
+m.wrestlezone.com.                             IN    A        72.172.76.151
+; #### End TitanWP
+
+
+; #### VB-WZ (forums)
+dev.forums.wrestlezone.com.                    IN    A        10.11.234.113
+stg.forums.wrestlezone.com.              IN      A       72.172.76.20
+forums.wrestlezone.com.                        IN    A        72.172.76.113
+www.forums.wrestlezone.com.                    IN    CNAME    forums.wrestlezone.com.
+
+
+origin.microsites                              IN    CNAME    origin.campaigns.wrestlezone.com.
+cdn.microsites                                 IN    CNAME    cdn.campaigns.wrestlezone.com.edgesuite.net.
+
+microsites.wrestlezone.com.                    IN    CNAME    cdn.campaigns.wrestlezone.com.
+cdn.campaigns.wrestlezone.com.                 IN    CNAME    cdn.campaigns.wrestlezone.com.edgesuite.net.
+campaigns.wrestlezone.com.                     IN    CNAME    origin.campaigns.wrestlezone.com.
+origin.campaigns.wrestlezone.com.              IN    A        72.172.76.121

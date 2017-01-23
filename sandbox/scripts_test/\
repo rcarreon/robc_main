@@ -1,0 +1,7 @@
+#!/bin/bash
+
+echo " Server name : "
+read A 
+
+sed 's/\./\_/p' 
+ 

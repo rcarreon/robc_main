@@ -1,0 +1,64 @@
+#!/bin/bash
+
+
+get_date=$(date +%Y%m%d)
+serial=$(cat  "testing.net.db"| grep 'serial'| awk '{print $1}')
+serial_aux=$(echo `expr "$serial" : '\(........\)'`)
+x=$(printf $get_date"%02d")
+TR=$(echo $3 | tr [a-z] [A-Z] )
+responsetime=10
+usage(){
+	echo " usage; $0 -a  will add host"
+	echo "	    :-flag -hostname -record -ipaddr"
+	echo "	    : $0 -d 'name' will delete a host with the name "
+	exit 1 
+}
+
+if [ -z "$1" ];then
+	echo "no valid argument"
+	usage
+else
+	case $1 in 
+		-a)
+			if [ $# != 4 ];then
+				echo "not enough arguments"
+				usage
+			fi
+			case $3 in 
+			 	ns|NS)sed -i ' /)/a@   '$2'.            IN      '$3'     '$4'' testing.net.db;;
+				mx|MX)
+				printf "$2.\t\tIN\t$TR\t$responsetime\t$4\n" >> testing.net.db
+				sed -i ' /)/a   '$2'.            IN      '$TR'  '$responsetime'   '$4'' testing.net.db;;
+		 	 	*)printf  "$2.\t\tIN\t$TR\t$4\n" >> testing.net.db;;
+			esac
+			;;
+
+		-d) sed -i '/'$2'/d' testing.net.db;shift;;
+
+	 	 *) echo "not a valid option";usage;;
+	esac
+fi
+newserial (){
+
+if [ $serial_aux -gt $get_date ];then 
+	echo "Your serial is in the future"
+	sed -i 's/'$serial'/'$x'/' testing.net.db
+elif
+	[ $serial -eq $x ];then
+		x_aux=$(( x + 1 ))
+		sed -i 's/'$serial'/'$x_aux'/' testing.net.db
+elif	[ $x -lt $serial ]; then 
+		x_aux=$(( $serial + 1 ))
+		sed -i 's/'$serial'/'$x_aux'/' testing.net.db
+elif    [ $get_date -gt $serial_aux ];then
+		sed -i 's/'$serial'/'$x'/' testing.net.db
+	else
+		echo "Nothing to do "
+fi
+}
+		echo "Finishing "
+ 	        echo "Updating serial.."
+		echo "Done"
+newserial
+exit 0
+

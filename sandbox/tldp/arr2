@@ -1,0 +1,49 @@
+#!/bin/bash
+#     ${arr[*]}         # All of the items in the array
+#  ${!arr[*]}        # All of the indexes in the array
+#  ${#arr[*]}        # Number of items in the array
+#  ${#arr[0]}        # Length of item zero
+
+
+##---------FUCKING ARRAYS!!!!--------##
+###################### FOrm  an array and diplay it #1 #################
+FOO=( bar string 'some text')
+foonum=${#FOO}
+echo "There are $foonum items"
+ for ((i=0;i<$foonum;i++)); do
+
+   echo ${FOO[${i}]}
+done
+
+####################### Form  an array and diplay it #2 #################
+
+array=(one two three four [5]=five)
+
+echo "Array size: ${#array[*]}"
+
+echo "Array items:"
+for item in ${array[*]}
+do
+    printf "   %s\n" $item
+done
+######################### get data and form an array ######################
+echo -e  "Would you Give a bunch of numbers ?"
+read -a numbers
+items=${#numbers[*]}
+
+echo  "The numbers are "
+for ((x=0;x<$items;x++));do
+
+echo  " ${numbers[${x}]}"
+
+done 
+echo "there are $items numbers "
+
+###################### Array and  files ###################################
+
+#while read  line 
+#do 
+#echo `$line | wc -l `
+
+#done < $1
+

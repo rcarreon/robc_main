@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "name please"
+read name
+echo "your name is $name"

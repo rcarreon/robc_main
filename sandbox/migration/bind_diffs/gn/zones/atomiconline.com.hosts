@@ -1,0 +1,166 @@
+$TTL 86400
+atomiconline.com.	IN      SOA     atomiconline.com. root.atomiconline.com. (
+                        2015021800	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+atomiconline.com.	IN	NS		app3v-dns.tp.prd.lax.atomiconline.com.
+atomiconline.com.	IN	NS		app4v-dns.tp.prd.lax.atomiconline.com.
+atomiconline.com.	IN	NS		app1v-dns.tp.prd.lax.atomiconline.com.
+atomiconline.com.	IN	NS		app2v-dns.tp.prd.lax.atomiconline.com.
+atomiconline.com.	IN	MX	10	cluster9.us.messagelabs.com. 
+atomiconline.com.	IN	MX	20	cluster9a.us.messagelabs.com. 
+;
+; local host
+;
+local           IN      A       127.0.0.1
+localhost       IN      A       127.0.0.1
+loghost         IN      A       127.0.0.1
+;
+;
+; hosts
+;
+;
+; public DNS
+;
+ns3.atomiconline.com.		IN	A	67.15.66.42
+ns4.atomiconline.com.		IN	A	67.15.66.43
+ns5.atomiconline.com.		IN	A	64.34.172.209
+ns6.atomiconline.com.		IN	A	72.51.41.238
+;
+mail.atomiconline.com.		IN	A	63.139.86.10		
+
+atomiconline.com.		IN	A	72.172.76.177
+www	                        IN  CNAME   wac.14528.systemcdn.net.
+;www IN A 72.172.76.121
+
+
+staging				IN	CNAME	staging.microsites.craveonline.com.
+
+;
+origin.demo.thefashionspot.atomiconline.com.	IN	A	72.172.76.100
+*.origin.demo.thefashionspot.atomiconline.com.	IN	CNAME	origin.demo.thefashionspot.atomiconline.com.
+demo.thefashionspot.atomiconline.com.		IN	CNAME	origin.demo.thefashionspot.atomiconline.com.
+*.demo.thefashionspot.atomiconline.com.		IN	CNAME	origin.demo.thefashionspot.atomiconline.com.
+;
+origin.demo.teencrunch.atomiconline.com.	IN	A	72.172.76.101
+*.origin.demo.teencrunch.atomiconline.com.	IN	CNAME	origin.demo.teencrunch.atomiconline.com.
+demo.teencrunch.atomiconline.com.		IN	CNAME	origin.demo.teencrunch.atomiconline.com.
+*.demo.teencrunch.atomiconline.com.		IN	CNAME	origin.demo.teencrunch.atomiconline.com.
+;
+;origin.demo.sheknows.atomiconline.com.		IN	A	72.172.76.102
+;*.origin.demo.sheknows.atomiconline.com.	IN	CNAME	origin.demo.sheknows.atomiconline.com.
+;demo.sheknows.atomiconline.com.			IN	CNAME	origin.demo.sheknows.atomiconline.com.
+;*.demo.sheknows.atomiconline.com.		IN	CNAME	origin.demo.sheknows.atomiconline.com.
+;
+origin.demo.craveonline.atomiconline.com.		IN	A	72.172.76.103
+*.origin.demo.craveonline.atomiconline.com.		IN	CNAME	origin.demo.craveonline.atomiconline.com.
+demo.origin.demo.craveonline.atomiconline.com.	IN	CNAME	origin.demo.craveonline.atomiconline.com.
+*.demo.origin.demo.craveonline.atomiconline.com.	IN	CNAME	origin.demo.craveonline.atomiconline.com.
+
+
+;dev.atomiconline.com.		IN 	A	209.151.238.29
+dev.atomiconline.com.		IN	CNAME	trac-lax-001.gnmedia.net.
+cms.test.atomiconline.com.	IN	CNAME	test-lax-001v.springboard.gorillanation.com.
+helpdesk                    	IN      A       209.151.238.52
+phpmyadmin                    	IN      A       209.151.238.52
+newsletter              	IN      CNAME   www.atomiconline.com.
+;www.dev                         IN      A       192.168.1.81
+
+;clickheat
+heatmap.atomiconline.com.                IN      A       72.172.76.138
+
+; AO springboard staging
+;staging.cms.atomiconline.com.conf		IN	A 	10.2.10.213
+
+; AO Search cluster
+;
+; MEH - old
+;
+;admin.search.atomiconline.com.			IN	A	66.180.202.173
+;www.search.atomiconline.com.			IN	A	66.180.202.174
+;
+; MEH - new
+;
+admin.search.atomiconline.com.			IN	A	72.172.76.61
+www.search.atomiconline.com.			IN	A	72.172.76.60
+;
+origin.search                                   IN      CNAME   admin.search.atomiconline.com.
+cdn.search                                      IN      CNAME   wac.14528.systemcdn.net.
+search.atomiconline.com.        		IN      CNAME   www.search.atomiconline.com.
+
+*.dev.search                                    IN      CNAME   dev.search.atomiconline.com.
+*.dev.admin                                     IN      CNAME   dev.search.atomiconline.com.
+
+utility.atomiconline.com.       		IN      A       66.180.202.168
+;video-admin.atomiconline.com.   		IN      A       209.151.238.51
+video-admin.atomiconline.com.   		IN      A      	72.172.76.75	
+
+
+utils.atomiconline.com.                  IN      CNAME       utils.gorillanation.com.
+
+
+dev.cms.atomiconline.com.			IN	CNAME	www-lax-001v.cms.dev.atomiconline.com.
+sql.dev.cms.atomiconline.com.			IN	CNAME	sql-lax-001v.cms.dev.atomiconline.com.
+dev.sitebuilder.atomiconline.com.		IN	CNAME	www-lax-001v.sitebuilder.dev.atomiconline.com.
+int.dev.sitebuilder.atomiconline.com.		IN	CNAME	www-lax-001v.sitebuilder.dev.atomiconline.com.
+dev.front.atomiconline.com.			IN	CNAME	www-lax-001v.fe.dev.atomiconline.com.
+sql.dev.sitebuilder.atomiconline.com.		IN	CNAME	sql-lax-001v.sitebuilder.dev.atomiconline.com.
+ 
+
+int.cms.atomiconline.com.			IN	CNAME	www-lax-001v.cms.int.atomiconline.com.
+sql.int.cms.atomiconline.com.			IN	CNAME	sql-lax-001v.cms.int.atomiconline.com.
+int.sitebuilder.atomiconline.com.		IN	CNAME	www-lax-001v.sitebuilder.int.atomiconline.com.
+int.front.atomiconline.com.			IN	CNAME	www-lax-001v.fe.int.atomiconline.com.
+sql.int.sitebuilder.atomiconline.com.		IN	CNAME	sql-lax-001v.sitebuilder.int.atomiconline.com.
+
+analytics.atomiconline.com.			IN	A	72.172.76.22
+prod.analytics					IN	CNAME	analytics.atomiconline.com.
+
+; Prod sitebuilder 66.180.202.244-251
+sql.sitebuilder                                 IN      A       66.180.202.244      
+sql.prod.cms                                    IN      CNAME   sql.sitebuilder
+sql.prod.sitebuilder.atomiconline.com           IN      CNAME   sql.sitebuilder
+;sql-lax-001v.sitebuilder                        IN      A       66.180.202.246  
+;sql-lax-002v.sitebuilder                        IN      A       66.180.202.249  
+
+www.fe                                          IN      A       66.180.202.245  
+prod.front                                      IN      CNAME   www.fe
+;www-lax-001v.fe                                 IN      A       66.180.202.248  
+;www-lax-002v.fe                                 IN      A       66.180.202.251  
+
+;www-lax-001v.cms                                IN      A       66.180.202.247  
+prod.cms                                        IN      CNAME   publishers.springboard.gorillanation.com.
+; prod.cms                                        IN      CNAME   www-lax-001v.cms
+cms.dvdfile                                     IN      CNAME   www-lax-001v.cms
+cms.sitebuilder                                 IN      CNAME   www-lax-001v.cms
+prod.front1                                     IN      CNAME   www-lax-001v.fe
+prod.front2                                     IN      CNAME   www-lax-002v.fe
+;www-lax-001v.sitebuilder                        IN      A       66.180.202.250  
+prod.sitebuilder                                IN      CNAME   www-lax-001v.sitebuilder
+;sitebuilder	                                IN      CNAME   www-lax-001v.sitebuilder
+sitebuilder	                                IN      A       72.172.76.30
+
+; Net2Ez sitebuilder
+*.lax                                           IN      A   72.172.76.30
+
+; external records
+stg.forums					IN	A	72.172.76.205
+
+media.origin                                    IN      CNAME   prod.cms 
+
+
+;
+cms.upload.atomiconline.com.	IN	A	209.151.238.60
+;
+;sales integration digital asset management server
+;
+assetmanager.si         IN      A       72.172.76.94
+app1v-dns.tp.prd.lax.atomiconline.com.   IN      A       10.11.20.68
+app2v-dns.tp.prd.lax.atomiconline.com.   IN      A       10.11.20.69
+app3v-dns.tp.prd.lax.atomiconline.com.   IN      A       10.11.20.53
+app4v-dns.tp.prd.lax.atomiconline.com.   IN      A       10.11.20.88
+cms.atomiconline.com.                    IN      CNAME       publishers.springboardplatform.com.

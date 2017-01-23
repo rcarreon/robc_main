@@ -1,0 +1,40 @@
+$TTL 86400
+totallyhermedia.co.uk.  IN      SOA     totallyhermedia.co.uk. root.totallyhermedia.co.uk. (
+                                                  2014071100     ; serial
+                                                  28800          ; refresh
+                                                  14400          ; retry
+                                                  3600000        ; expire
+                                                  86400 )        ; minimum
+
+totallyhermedia.co.uk.                            IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+totallyhermedia.co.uk.                            IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+totallyhermedia.co.uk.                            IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+totallyhermedia.co.uk.                            IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+
+totallyhermedia.co.uk.                            IN    MX 10    cluster9.us.messagelabs.com.
+totallyhermedia.co.uk.                            IN    MX 20    cluster9a.us.messagelabs.com.
+
+;totallyhermedia.co.uk.                           IN    A        72.172.76.177
+;www.totallyhermedia.co.uk.                       IN    CNAME    www.evolvemediacorp.com.edgesuite.net.
+
+; #### TitanWP
+totallyhermedia.co.uk.                            IN    A        72.172.76.151
+bta.totallyhermedia.co.uk.                        IN    A        10.11.234.71
+dev.totallyhermedia.co.uk.                        IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.totallyhermedia.co.uk.                        IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.totallyhermedia.co.uk.                        IN    A        72.172.76.151
+www.totallyhermedia.co.uk.                        IN    A        72.172.76.151
+; #### End TitanWP
+
+; new FE infrastructure
+origin.campaigns                                  IN    A        72.172.76.121
+campaigns                                         IN    CNAME    origin.campaigns
+cdn.campaigns                                     IN    CNAME    www.evolvemediacorp.com.edgesuite.net.
+staging.campaigns                             IN    A        72.172.76.122
+
+origin.assets                                     IN    A        72.172.76.110
+cdn.assets                                        IN    CNAME    www.evolvemediacorp.com.edgesuite.net.
+assets                                            IN    CNAME    cdn.assets
+staging.assets                                    IN    CNAME    www.evolvemediacorp.com.edgesuite.net.
+demo.assets                                       IN    CNAME    www.evolvemediacorp.com.edgesuite.net.
+origin.staging.assets                             IN    A        72.172.76.111

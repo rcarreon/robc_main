@@ -1,0 +1,266 @@
+$TTL 3600 ; 1 day
+@      IN      SOA     gnmedia.net. root@gnmedia.net. (
+			2013100200	; Serial
+			36262		; Refresh
+			300		; Retry
+			3600000		; Expire
+			3600 )		; Minimum
+
+	IN	NS	app1v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app2v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app3v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app4v-dns.tp.prd.lax.gnmedia.net.
+
+;1      IN      PTR
+;2      IN      PTR
+;3      IN      PTR
+;4      IN      PTR
+;5      IN      PTR
+;6      IN      PTR
+;7      IN      PTR
+;8      IN      PTR
+;9      IN      PTR
+;10     IN      PTR
+;11     IN      PTR
+;12     IN      PTR
+;13     IN      PTR
+;14     IN      PTR
+;15     IN      PTR
+;16     IN      PTR
+;17     IN      PTR
+;18     IN      PTR
+;19     IN      PTR
+;22     IN      PTR
+;23     IN      PTR
+;24     IN      PTR
+;25     IN      PTR
+;26	IN	PTR	app1v-api.wuo.dev.lax.gnmedia.net. ;decomm
+;27	IN	PTR	app2v-api.wuo.dev.lax.gnmedia.net. ;decomm
+;28	IN	PTR	uid2v-thaber.wuo.dev.lax.gnmedia.net. ;decomm
+;29	IN	PTR	uid1v-jrainbow.wuo.dev.lax.gnmedia.net. ;decomm
+;30	IN	PTR	app1v-wp.wuo.dev.lax.gnmedia.net. ;decomm
+;31	IN	PTR	app1v-cms.wuo.dev.lax.gnmedia.net. ;decomm
+;32	IN	PTR	pxy1v-wp.wuo.dev.lax.gnmedia.net. ;decomm
+;33	IN	PTR	app1v-legacy.wuo.dev.lax.gnmedia.net. ;decomm
+;34     IN      PTR
+;35     IN      PTR
+;36     IN      PTR
+;37     IN      PTR
+;38     IN      PTR
+;39     IN      PTR
+;40     IN      PTR
+;41     IN      PTR
+;42     IN      PTR
+;43     IN      PTR
+;44     IN      PTR
+;45     IN      PTR
+;46     IN      PTR
+;47     IN      PTR
+;48     IN      PTR
+;49     IN      PTR
+;50     IN      PTR
+;51     IN      PTR
+;52     IN      PTR
+;53     IN      PTR
+;54     IN      PTR
+;55     IN      PTR
+;56     IN      PTR
+;57     IN      PTR
+;58     IN      PTR
+;59     IN      PTR
+;60     IN      PTR
+;61     IN      PTR
+;62     IN      PTR
+;63     IN      PTR
+;64     IN      PTR
+;65     IN      PTR
+;66     IN      PTR
+;67     IN      PTR
+;68     IN      PTR
+;69     IN      PTR
+;70     IN      PTR
+;71     IN      PTR
+;72     IN      PTR
+;73     IN      PTR
+;74     IN      PTR
+;75     IN      PTR
+;76     IN      PTR
+;77     IN      PTR
+;78     IN      PTR
+;79     IN      PTR
+;80     IN      PTR
+;81     IN      PTR
+;82     IN      PTR
+;83     IN      PTR
+;84     IN      PTR
+;85     IN      PTR
+;86     IN      PTR
+;87     IN      PTR
+;88     IN      PTR
+;89     IN      PTR
+;90     IN      PTR
+;91     IN      PTR
+;92     IN      PTR
+;93     IN      PTR
+;94     IN      PTR
+;95     IN      PTR
+;96     IN      PTR
+;97     IN      PTR
+;98     IN      PTR
+;99     IN      PTR
+;100    IN      PTR
+;101    IN      PTR
+;102    IN      PTR
+;103    IN      PTR
+;104    IN      PTR
+;105    IN      PTR
+;106    IN      PTR
+;107    IN      PTR
+;108    IN      PTR
+;109    IN      PTR
+;110    IN      PTR
+;111    IN      PTR
+;112    IN      PTR
+;113    IN      PTR
+;114    IN      PTR
+;115    IN      PTR
+;116    IN      PTR
+;117    IN      PTR
+;118    IN      PTR
+;119	IN	PTR	nfs1.netapp3.gnmedia.net.
+;120	IN	PTR	nfs2.netapp3.gnmedia.net.
+;121    IN      PTR
+;122    IN      PTR
+;123    IN      PTR
+;124    IN      PTR
+;125    IN      PTR
+;126    IN      PTR
+;127    IN      PTR
+;128    IN      PTR
+;129    IN      PTR
+;130    IN      PTR
+;131    IN      PTR
+;132    IN      PTR
+;133    IN      PTR
+;134    IN      PTR
+;135    IN      PTR
+;136    IN      PTR
+;137    IN      PTR
+;138    IN      PTR
+;139    IN      PTR
+;140    IN      PTR
+;141    IN      PTR
+;142    IN      PTR
+;143    IN      PTR
+;144    IN      PTR
+;145    IN      PTR
+;146    IN      PTR
+;147    IN      PTR
+;148    IN      PTR
+;149    IN      PTR
+;150    IN      PTR
+;151    IN      PTR
+;152    IN      PTR
+;153    IN      PTR
+;154    IN      PTR
+;155    IN      PTR
+;156    IN      PTR
+;157    IN      PTR
+;158    IN      PTR
+;159    IN      PTR
+;160    IN      PTR
+;161    IN      PTR
+;162    IN      PTR
+;163    IN      PTR
+;164    IN      PTR
+;165    IN      PTR
+;166    IN      PTR
+;167    IN      PTR
+;168    IN      PTR
+;169    IN      PTR
+;170    IN      PTR
+;171    IN      PTR
+;172    IN      PTR
+;173    IN      PTR
+;174    IN      PTR
+;175    IN      PTR
+;176    IN      PTR
+;177    IN      PTR
+;178    IN      PTR
+;179    IN      PTR
+;180    IN      PTR
+;181    IN      PTR
+;182    IN      PTR
+;183    IN      PTR
+;184    IN      PTR
+;185    IN      PTR
+;186    IN      PTR
+;187    IN      PTR
+;188    IN      PTR
+;189    IN      PTR
+;190    IN      PTR
+;191    IN      PTR
+;192    IN      PTR
+;193    IN      PTR
+;194    IN      PTR
+;195    IN      PTR
+;196    IN      PTR
+;197    IN      PTR
+;198    IN      PTR
+;199    IN      PTR
+;200    IN      PTR
+;201    IN      PTR
+;202    IN      PTR
+;203    IN      PTR
+;204    IN      PTR
+;205    IN      PTR
+;206    IN      PTR
+;207    IN      PTR
+;208    IN      PTR
+;209    IN      PTR
+;210    IN      PTR
+;211    IN      PTR
+;212    IN      PTR
+;213    IN      PTR
+;214    IN      PTR
+;215    IN      PTR
+;216    IN      PTR
+;217    IN      PTR
+;218    IN      PTR
+;219	IN	PTR	nfs1.netapp2.gnmedia.net.
+;220	IN	PTR	nfs2.netapp2.gnmedia.net.
+;221    IN      PTR
+;222    IN      PTR
+;223    IN      PTR
+;224    IN      PTR
+;225    IN      PTR
+;226    IN      PTR
+;227    IN      PTR
+;228    IN      PTR
+;229    IN      PTR
+;230    IN      PTR
+;231    IN      PTR
+;232    IN      PTR
+;233    IN      PTR
+;234    IN      PTR
+;235    IN      PTR
+;236    IN      PTR
+;237    IN      PTR
+;238    IN      PTR
+;239    IN      PTR
+;240    IN      PTR
+;241    IN      PTR
+;242    IN      PTR
+;243    IN      PTR
+;244    IN      PTR
+;245    IN      PTR
+;246    IN      PTR
+;247    IN      PTR
+;248    IN      PTR
+;249    IN      PTR
+;250    IN      PTR
+;251    IN      PTR
+;252    IN      PTR
+;253    IN      PTR
+;254    IN      PTR
+;255    IN      PTR

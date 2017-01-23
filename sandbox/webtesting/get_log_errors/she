@@ -1,0 +1,26 @@
+#!/bin/bash
+
+#while read line 
+#do 
+if  [ $# -eq 0 ]
+then 
+
+#GET_HOSTS=`curl -ls vipvisual.gnmedia.net/extractServer?value=$1 | tail -1 | sed 's/<[^>]*>//g;s/ //g;s/com/com\n/g;s/net/net\n/g'`
+#echo `echo $GET_HOSTS` > "$1.hosts"
+#exit 0
+#fi 
+
+for x in {11..15}; 
+do 
+	#for y in {1..2}
+	#do 
+	#SSH="app${x}v-sk.wuo.lax${y}.gnmedia.net"
+	SSH="app${x}v-cms.wuo.prd.lax.gnmedia.net"
+	echo "Log from $SSH"
+	echo   `ssh $SSH  'tail /app/log/fabulousfoods.com.error.log'`
+	
+	#done
+done
+#done < $1	
+fi
+

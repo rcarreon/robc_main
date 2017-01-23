@@ -1,0 +1,16 @@
+with curl we dont need cookie  to use REST interface for RT, we use this 
+
+curl  --data 'user=root&pass=password' --output inventory_result  http://inventory.gnmedia.net/REST/1.0/asset/726
+
+in case we needed it ( the cookie )  we use this
+
+curl --cookie-jar cjar --output /dev/null  http://inventory.gnmedia.net/
+
+
+
+
+and this is for https://rt.gorillanation.com
+curl -s   --data 'user=rt_svc_user&pass=FN#27?Pq' --output rt_result  https://rt.gorillanation.com/REST/1.0/ticket/41701
+
+
+http://requesttracker.wikia.com/wiki/REST

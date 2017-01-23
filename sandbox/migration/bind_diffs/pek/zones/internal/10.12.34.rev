@@ -1,0 +1,268 @@
+$TTL 3600 ; 1 day
+@      IN      SOA     gnmedia.net. root@gnmedia.net. (
+			2015012301	; Serial
+			36262		; Refresh
+			300		; Retry
+			3600000		; Expire
+			3600 )		; Minimum
+
+	IN	NS	app1v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app2v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app3v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app4v-dns.tp.prd.lax.gnmedia.net.
+
+;1	IN	PTR	
+;2      IN      PTR
+;3      IN      PTR
+;4      IN      PTR
+5	IN	PTR	int-vlan2034.admin.core1.gnmedia.net.
+6	IN	PTR	int-vlan2034.admin.core2.gnmedia.net.
+7	IN	PTR	int-vlan2034.gn1.core1.gnmedia.net.
+8	IN	PTR	int-vlan2034.gn1.core2.gnmedia.net.
+;9      IN      PTR
+;10	IN	PTR	int-vlan2034.sb.lax1.gnmedia.net.
+11	IN	PTR	natpool-1-vlan2034-1.admin.lax1.gnmedia.net.
+12	IN	PTR	natpool-2-vlan2034-1.admin.lax1.gnmedia.net.
+13	IN	PTR	int-vlan2034.admin.lax1.gnmedia.net.
+;14     IN      PTR
+15     IN      PTR	natpool-2-vlan2034-1.gn1.core.gnmedia.net.
+;16	IN	PTR	natpool-1-vlan2034-1.sb.lax1.gnmedia.net.
+17	IN	PTR	natpool-1-vlan2034-1.admin.lax1.gnmedia.net.
+18     IN      PTR	natpool-2-vlan2034-1.admin.core.gnmedia.net.
+19     IN      PTR	natpool-1-vlan2034-1.gn1.core.gnmedia.net.
+20	IN	PTR	nfsA-netapp1-int.ao.prd.lax.gnmedia.net.
+21	IN	PTR	nfsB-netapp1-int.ao.prd.lax.gnmedia.net.
+;22	IN	PTR	natpool-1-vlan2034-1.10g.lax1.gnmedia.net.
+;23	IN	PTR	natpool-2-vlan2034-1.10g.lax1.gnmedia.net.
+;24	IN	PTR	int-vlan2034.10g.lax1.gnmedia.net.
+25      IN      PTR     vip-sqlro-mal.ao.prd.lax.gnmedia.net.
+26	IN	PTR	sql1v-56-vb-bab.ao.prd.lax.gnmedia.net.
+27	IN	PTR	sql3v-56-ci.ci.prd.lax.gnmedia.net.
+28	IN	PTR	vip-sqlrw-mal.ao.prd.lax.gnmedia.net.
+29	IN	PTR	sql2v-56-vb-bab.ao.prd.lax.gnmedia.net.
+30	IN	PTR	sql1v-56-vb-sdc.ao.prd.lax.gnmedia.net.
+31	IN	PTR	vip-sqlrw-ci.ci.prd.lax.gnmedia.net.
+32	IN	PTR	vip-sqlro-api-cs.ao.prd.lax.gnmedia.net.
+33	IN	PTR	vip-sqlrw-api-cs.ao.prd.lax.gnmedia.net.
+34	IN	PTR	sql1v-api-cs.ao.prd.lax.gnmedia.net.
+35	IN	PTR	sql2v-api-cs.ao.prd.lax.gnmedia.net.
+36	IN	PTR	sql1v-xf-sdc.ao.prd.lax.gnmedia.net.
+37	IN	PTR	sql2v-xf-sdc.ao.prd.lax.gnmedia.net.
+;38	IN	PTR	sql5v-56-vb-sdc.ao.prd.lax.gnmedia.net. ;decomm
+;39	IN	PTR	sql6v-56-vb-sdc.ao.prd.lax.gnmedia.net. ;decomm
+40	IN	PTR	sql1v-56-xf-psl.ao.prd.lax.gnmedia.net.
+41	IN	PTR	sql2v-56-xf-psl.ao.prd.lax.gnmedia.net.
+42	IN	PTR	sql1v-56-atp.ao.prd.lax.gnmedia.net.
+43	IN	PTR	sql2v-56-atp.ao.prd.lax.gnmedia.net.
+44	IN	PTR	vip-sqlro-ci.ci.prd.lax.gnmedia.net.
+45	IN	PTR	sql7v-mal.ao.prd.lax.gnmedia.net.
+46	IN	PTR	vip-sqlro-vb-tfs.ao.prd.lax.gnmedia.net.
+47	IN	PTR	vip-sqlrw-vb-tfs.ao.prd.lax.gnmedia.net.
+48	IN	PTR	vip-sqlrw-dmr.ao.prd.lax.gnmedia.net.
+49	IN	PTR	sql2v-56-vb-sdc.ao.prd.lax.gnmedia.net.
+50	IN	PTR	sql3v-56-vb-sdc.ao.prd.lax.gnmedia.net.
+51	IN	PTR	vip-sqlrw-atp.ao.prd.lax.gnmedia.net.
+52	IN	PTR	sql2v-mal.ao.prd.lax.gnmedia.net.
+53	IN	PTR	vip-sqlro-atp.ao.prd.lax.gnmedia.net.
+54	IN	PTR	sql1v-56-vb-shh.ao.prd.lax.gnmedia.net.
+55	IN	PTR	app1v-vw.ci.prd.lax.gnmedia.net.
+56	IN	PTR	vip-sqlro-xf-sdc.ao.prd.lax.gnmedia.net.
+57	IN	PTR	vip-sqlrw-jm.ao.prd.lax.gnmedia.net.
+58	IN	PTR	vip-sqlrw-sdc.ao.prd.lax.gnmedia.net.
+59	IN	PTR	sql2v-56-vb-shh.ao.prd.lax.gnmedia.net.
+60	IN	PTR	sql1v-56-vb-tfs.ao.prd.lax.gnmedia.net.
+61	IN	PTR	sql2v-56-vb-tfs.ao.prd.lax.gnmedia.net.
+62	IN	PTR	sql2v-56-gr.ao.prd.lax.gnmedia.net.
+63	IN	PTR	vip-sqlro-jm.ao.prd.lax.gnmedia.net.
+64	IN	PTR	vip-sqlro-sdc.ao.prd.lax.gnmedia.net.
+65	IN	PTR	vip-sqlrw-vb-wz.ao.prd.lax.gnmedia.net.
+66	IN	PTR	vip-sqlro-vb-wz.ao.prd.lax.gnmedia.net.
+67	IN	PTR	vip-sqlrw-xf-sdc.ao.prd.lax.gnmedia.net.
+68	IN	PTR	vip-sqlro-wp.ao.prd.lax.gnmedia.net.
+69	IN	PTR	vip-sqlrw-wp.ao.prd.lax.gnmedia.net.
+70	IN	PTR	vip-sqlrw-bab.ao.prd.lax.gnmedia.net.
+71	IN	PTR	vip-sqlro-bab.ao.prd.lax.gnmedia.net.
+72	IN	PTR	sql1v-56-audit.ci.prd.lax.gnmedia.net.
+73	IN	PTR	sql2v-56-audit.ci.prd.lax.gnmedia.net.
+74	IN	PTR	sql1v-56-sdc.ao.prd.lax.gnmedia.net.
+75	IN	PTR	sql4v-56-vb-sdc.ao.prd.lax.gnmedia.net.
+76     IN      PTR	vip-sqlrw-gr.ao.prd.lax.gnmedia.net.
+77	IN	PTR	sql3v-mal.ao.prd.lax.gnmedia.net.
+78	IN	PTR	sql4v-mal.ao.prd.lax.gnmedia.net.
+79	IN	PTR	sql1v-mal.ao.prd.lax.gnmedia.net.
+80	IN	PTR	sql1v-56-gr.ao.prd.lax.gnmedia.net.
+81	IN	PTR	sql1v-56-mc.ao.prd.lax.gnmedia.net.
+82	IN	PTR	sql2v-56-mc.ao.prd.lax.gnmedia.net.
+83	IN	PTR	sql2v-56-sdc.ao.prd.lax.gnmedia.net.
+84	IN	PTR	vip-sqlro-hfb.ao.prd.lax.gnmedia.net.
+85	IN	PTR	vip-sqlrw-hfb.ao.prd.lax.gnmedia.net.
+86	IN	PTR	sql8v-mal.ao.prd.lax.gnmedia.net.
+87	IN	PTR	sql1v-56-xf-ae.ao.prd.lax.gnmedia.net.
+88	IN	PTR	sql2v-56-xf-ae.ao.prd.lax.gnmedia.net.
+;89	IN	PTR	sql1v-vb-sdc.ao.prd.lax.gnmedia.net. ;decomm
+;90	IN	PTR	sql2v-vb-sdc.ao.prd.lax.gnmedia.net. ;decomm
+91	IN	PTR	app2v-vw.ci.prd.lax.gnmedia.net.
+;92	IN	PTR	sql1v-vb-shh.ao.prd.lax.gnmedia.net. ;decomm
+;93	IN	PTR	vip-sqlro-tfs.ao.prd.lax.gnmedia.net. ;decomm
+;94	IN	PTR	vip-sqlrw-tfs.ao.prd.lax.gnmedia.net. ;decomm
+95	IN	PTR	vip-sqlro-xf-ae.ao.prd.lax.gnmedia.net.
+96	IN	PTR	vip-sqlrw-xf-ae.ao.prd.lax.gnmedia.net.
+;97	IN	PTR	vip-sqlro-wzf.ao.prd.lax.gnmedia.net.
+;98	IN	PTR	vip-sqlrw-wzf.ao.prd.lax.gnmedia.net.
+;99	IN	PTR	sql5v-ci.ci.prd.lax.gnmedia.net. ;decomm
+;100	IN	PTR	sql6v-ci.ci.prd.lax.gnmedia.net. ;decomm
+101	IN	PTR	sql4v-56-ci.ci.prd.lax.gnmedia.net.
+102	IN	PTR	sql3v-xf-sdc.ao.prd.lax.gnmedia.net.
+103	IN	PTR	sql4v-xf-sdc.ao.prd.lax.gnmedia.net.
+104	IN	PTR	vip-sqlrw-audit.ci.prd.lax.gnmedia.net.
+105	IN	PTR	vip-sqlro-audit.ci.prd.lax.gnmedia.net.
+;106	IN	PTR	sql1v-mc.ao.prd.lax.gnmedia.net. ;decomm
+107	IN	PTR	sql2v-mc.ao.prd.lax.gnmedia.net.
+108	IN	PTR	vip-sqlrw-mc.ao.prd.lax.gnmedia.net.
+109	IN	PTR	vip-sqlro-mc.ao.prd.lax.gnmedia.net.
+110	IN	PTR	sql1v-56-vb-wz.ao.prd.lax.gnmedia.net.
+111	IN	PTR	sql1v-56-wp.ao.prd.lax.gnmedia.net.
+112	IN	PTR	vip-sqlrw-dw.ci.prd.lax.gnmedia.net.
+113	IN	PTR	vip-sqlro-dw.ci.prd.lax.gnmedia.net.
+114	IN	PTR	sql2v-56-wp.ao.prd.lax.gnmedia.net.
+115	IN	PTR	sql3v-56-wp.ao.prd.lax.gnmedia.net.
+;116	IN	PTR	sql3v-wp.ao.prd.lax.gnmedia.net. ;decomm
+;117	IN	PTR	sql4v-wp.ao.prd.lax.gnmedia.net. ;decomm
+;118	IN	PTR	sql1v-archive.ci.prd.lax.gnmedia.net. ;decomm
+;119	IN	PTR	sql2v-vb-shh.ao.prd.lax.gnmedia.net. ;decomm
+120	IN	PTR	vip-sqlro-vb-shh.ao.prd.lax.gnmedia.net.
+121	IN	PTR	sql2v-56-dw.ci.prd.lax.gnmedia.net.
+122	IN	PTR	vip-sqlro-archive.ci.prd.lax.gnmedia.net.
+123	IN	PTR	vip-sqlrw-archive.ci.prd.lax.gnmedia.net.
+;124	IN	PTR	sql5v-hfb.ao.prd.lax.gnmedia.net. ;decomm
+;125	IN	PTR	sql6v-hfb.ao.prd.lax.gnmedia.net. ;decomm
+126	IN	PTR	vip-sqlrw-vb-shh.ao.prd.lax.gnmedia.net.
+;127	IN	PTR	sql3v-vb-sdc.ao.prd.lax.gnmedia.net. ;decomm
+;128	IN	PTR	sql4v-vb-sdc.ao.prd.lax.gnmedia.net. ;decomm
+129	IN	PTR	vip-sqlro-vb-psl.ao.prd.lax.gnmedia.net.
+130	IN	PTR	vip-sqlrw-vb-psl.ao.prd.lax.gnmedia.net.
+131	IN	PTR	vip-sqlrw-vb-sdc.ao.prd.lax.gnmedia.net.
+132	IN	PTR	vip-sqlro-vb-sdc.ao.prd.lax.gnmedia.net.
+133	IN	PTR	vip-sqlrw-xf-psl.ao.prd.lax.gnmedia.net.
+134	IN	PTR	vip-sqlro-xf-psl.ao.prd.lax.gnmedia.net.
+;135	IN	PTR	sql1v-xf-psl.ao.prd.lax.gnmedia.net. ;decomm
+;136	IN	PTR	sql2v-xf-psl.ao.prd.lax.gnmedia.net. ;decomm
+137	IN	PTR	sql1v-56-dw.ci.prd.lax.gnmedia.net.
+138	IN	PTR	sql3v-56-dw.ci.prd.lax.gnmedia.net.
+139	IN	PTR	sql4v-56-dw.ci.prd.lax.gnmedia.net.
+140	IN	PTR	sql5v-mal.ao.prd.lax.gnmedia.net.
+141	IN	PTR	sql6v-mal.ao.prd.lax.gnmedia.net.
+142	IN	PTR	sql1v-56-ci.ci.prd.lax.gnmedia.net.
+143	IN	PTR	sql2v-56-ci.ci.prd.lax.gnmedia.net.
+144	IN	PTR	sql5v-56-ci.ci.prd.lax.gnmedia.net.
+145	IN	PTR	sql6v-56-ci.ci.prd.lax.gnmedia.net.
+146	IN	PTR	sql4v-56-wp.ao.prd.lax.gnmedia.net.
+147	IN	PTR	sql5v-56-wp.ao.prd.lax.gnmedia.net.
+148	IN	PTR	sql6v-56-wp.ao.prd.lax.gnmedia.net.
+149	IN	PTR	sql2v-56-vb-wz.ao.prd.lax.gnmedia.net.
+150	IN	PTR	sql1v-56-vb-hfb.ao.prd.lax.gnmedia.net.
+151	IN	PTR	sql2v-56-vb-hfb.ao.prd.lax.gnmedia.net.
+152	IN	PTR	sql3v-56-vb-hfb.ao.prd.lax.gnmedia.net.
+153	IN	PTR	sql4v-56-vb-hfb.ao.prd.lax.gnmedia.net.
+154	IN	PTR	sql5v-56-vb-hfb.ao.prd.lax.gnmedia.net.
+155	IN	PTR	sql6v-56-vb-hfb.ao.prd.lax.gnmedia.net.
+;156    IN      PTR
+;157    IN      PTR
+;158    IN      PTR
+;159    IN      PTR
+;160    IN      PTR
+;161    IN      PTR
+;162    IN      PTR
+;163    IN      PTR
+;164    IN      PTR
+;165    IN      PTR
+;166    IN      PTR
+;167    IN      PTR
+;168    IN      PTR
+;169    IN      PTR
+170	IN	PTR	vip-app-vw.ci.prd.lax.gnmedia.net.
+;171    IN      PTR
+;172    IN      PTR
+;173    IN      PTR
+;174    IN      PTR
+;175    IN      PTR
+;176    IN      PTR
+;177    IN      PTR
+;178    IN      PTR
+;179    IN      PTR
+;180    IN      PTR
+;181    IN      PTR
+;182    IN      PTR
+;183    IN      PTR
+;184    IN      PTR
+;185    IN      PTR
+;186    IN      PTR
+;187    IN      PTR
+;188    IN      PTR
+;189    IN      PTR
+;190    IN      PTR
+;191    IN      PTR
+;192    IN      PTR
+;193    IN      PTR
+;194    IN      PTR
+;195    IN      PTR
+;196    IN      PTR
+;197    IN      PTR
+;198    IN      PTR
+;199    IN      PTR
+;200    IN      PTR
+;201    IN      PTR
+;202    IN      PTR
+;203    IN      PTR
+;204    IN      PTR
+;205    IN      PTR
+;206    IN      PTR
+;207    IN      PTR
+;208    IN      PTR
+;209    IN      PTR
+;210    IN      PTR
+;211    IN      PTR
+;212    IN      PTR
+;213    IN      PTR
+;214    IN      PTR
+;215    IN      PTR
+;216    IN      PTR
+;217    IN      PTR
+;218    IN      PTR
+;219	IN	PTR	nfs1.netapp2.gnmedia.net.
+;220	IN	PTR	nfs2.netapp2.gnmedia.net.
+;221    IN      PTR
+;222    IN      PTR
+;223    IN      PTR
+;224    IN      PTR
+;225    IN      PTR
+;226    IN      PTR
+;227    IN      PTR
+;228    IN      PTR
+;229    IN      PTR
+;230    IN      PTR
+;231    IN      PTR
+;232    IN      PTR
+;233    IN      PTR
+;234    IN      PTR
+;235    IN      PTR
+;236    IN      PTR
+;237    IN      PTR
+;238    IN      PTR
+;239    IN      PTR
+;240    IN      PTR
+;241    IN      PTR
+;242    IN      PTR
+;243    IN      PTR
+;244    IN      PTR
+;245    IN      PTR
+;246    IN      PTR
+;247    IN      PTR
+;248    IN      PTR
+;249    IN      PTR
+;250    IN      PTR
+;251    IN      PTR
+;252    IN      PTR
+;253    IN      PTR
+;254    IN      PTR
+;255    IN      PTR

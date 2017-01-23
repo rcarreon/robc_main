@@ -1,0 +1,170 @@
+$TTL 86400
+gamerevolution.com. IN SOA gamerevolution.com. root.gamerevolution.com. (
+                                                      2015011200     ; serial
+                                                      28800          ; refresh
+                                                      14400          ; retry
+                                                      3600000        ; expire
+                                                      86400 )        ; minimum
+
+
+gamerevolution.com.                                   IN    NS       app3v-dns.tp.prd.lax.craveonline.com.
+gamerevolution.com.                                   IN    NS       app4v-dns.tp.prd.lax.craveonline.com.
+gamerevolution.com.                                   IN    NS       app1v-dns.tp.prd.lax.craveonline.com.
+gamerevolution.com.                                   IN    NS       app2v-dns.tp.prd.lax.craveonline.com.
+gamerevolution.com.                                   IN    MX 10    cluster9.us.messagelabs.com.
+gamerevolution.com.                                   IN    MX 20    cluster9a.us.messagelabs.com.
+
+                                                      IN    TXT      "v=spf1 ip4:72.172.76.0/24 ip4:72.172.77.0/24 mx ptr ~all"
+
+
+local                                                 IN    A        127.0.0.1
+localhost                                             IN    A        127.0.0.1
+loghost                                               IN    A        127.0.0.1
+
+
+mail.gamerevolution.com.                              IN    CNAME    mail.gorillanation.com.
+;mail.gamerevolution.com.                             IN    CNAME    mta-lax-002.gnmedia.net.
+
+; Commented out for migration
+gamerevolution.com.                                   IN    A        72.172.76.27 
+;gamerevolution.com.                                  IN    A        66.180.202.144 
+www.gamerevolution.com.                               IN    CNAME    gamerevolution.com. 
+www2.gamerevolution.com.                              IN    CNAME    gamerevolution.com. 
+;beta.gamerevolution.com.                             IN    A        209.151.238.52
+beta.gamerevolution.com.                              IN    A        72.172.76.29 
+m.gamerevolution.com.                                 IN    A        72.172.76.27 
+
+; New servers puppetized (need VIP)
+;lax.gamerevolution.com.                              IN    A        72.172.76.106  
+admin.gamerevolution.com.                             IN    CNAME    gamerevolution.com.
+
+; QA vhost
+;qa.gamerevolution.com.                               IN    CNAME    gamerevolution.com.
+;m-qa.gamerevolution.com.                             IN    CNAME    gamerevolution.com.
+;admin-qa.gamerevolution.com.                         IN    CNAME    gamerevolution.com.
+
+; Shop (it has an ssl cert attached)
+shop.gamerevolution.com.                              IN    A        209.67.179.166
+
+; CrowdIgnite
+crowdignite.gamerevolution.com.                    IN    A        72.172.76.148
+stg.crowdignite.gamerevolution.com.             86400 IN    A        10.11.134.66
+dev.crowdignite.gamerevolution.com.             86400 IN    A        10.11.234.44
+;chaggstrom.sbx.crowdignite.gamerevolution.com.   IN    CNAME    uid1v-chaggstrom.ci.dev.lax.gnmedia.net. ;decomm
+ddurand.sbx.crowdignite.gamerevolution.com.       IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+;fdavis.sbx.crowdignite.gamerevolution.com.        IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+fgonzalez.sbx.crowdignite.gamerevolution.com.     IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+jcortes.sbx.crowdignite.gamerevolution.com.       IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.crowdignite.gamerevolution.com.     IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.crowdignite.gamerevolution.com.    IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.crowdignite.gamerevolution.com.   IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+;mpatino.sbx.crowdignite.gamerevolution.com.      IN    CNAME    uid1v-mpatino.ci.dev.lax.gnmedia.net. ;decomm
+;rvicchiullo.sbx.crowdignite.gamerevolution.com.   IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net. ;decomm
+ssalazar.sbx.crowdignite.gamerevolution.com.      IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+uacosta.sbx.crowdignite.gamerevolution.com.       IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+
+
+;cpanel.gamerevolution.com.                           IN    A        67.15.178.70    
+;ensim.gamerevolution.com.                            IN    A        67.15.178.70    
+;ftp.gamerevolution.com.                              IN    A        67.15.178.62    
+;lists.gamerevolution.com.                            IN    A        67.15.178.70    
+;plesk.gamerevolution.com.                            IN    A        67.15.178.70    
+;webmail.gamerevolution.com                           IN    CNAME    mail
+;www-lax-001.gamerevolution.com.                      IN    A        10.2.12.26
+;www-lax-001.gamerevolution.com.                      IN    A        66.180.202.146
+;www-lax-002.gamerevolution.com.                      IN    A        10.2.12.27      
+;www-lax-002.gamerevolution.com.                      IN    A        66.180.202.147
+;sql-lax-001.gamerevolution.com.                      IN    A        10.2.12.24
+;sql-lax-001.gamerevolution.com.                      IN    A        66.180.202.37   
+;sql-lax-002.gamerevolution.com.                      IN    A        10.2.12.25
+;sql-lax-002.gamerevolution.com.                      IN    A        66.180.202.145
+media.origin                                          IN    CNAME    www.gamerevolution.com.
+;media.cdn                                            IN    CNAME    gr.atomiconline.com.c.footprint.net.
+media.cdn                                             IN    CNAME    media.gamerevolution.com.edgesuite.net.
+media                                                 IN    CNAME    media.cdn
+origin.assets                                         IN    A        72.172.76.110
+cdn.assets                                            IN    CNAME    cdn.assets.gamerevolution.com.edgesuite.net.
+assets                                                IN    CNAME    cdn.assets
+
+staging.assets                                        IN    CNAME    staging.assets.gamerevolution.com.edgesuite.net.
+demo.assets                                           IN    CNAME    demo.assets.gamerevolution.com.edgesuite.net.
+origin.staging.assets                                 IN    A        72.172.76.111
+
+launch                                                IN    A        72.172.76.151
+
+
+; microsites SI standard
+microsites.gamerevolution.com.                        IN    CNAME    cdn.campaigns.gamerevolution.com.
+microsites.staging.gamerevolution.com.            IN    A        72.172.76.122
+staging.microsites.gamerevolution.com.                IN    CNAME    staging.campaigns.gamerevolution.com.
+
+; new FE infrastructure -jsj
+origin.campaigns                                      IN    A        72.172.76.121
+campaigns                                             IN    CNAME    origin.campaigns
+cdn.campaigns                                         IN    CNAME    cdn.campaigns.gamerevolution.com.edgesuite.net.
+staging.campaigns                                 IN    A        72.172.76.122
+
+ghostbusterspsp.gamerevolution.com.                   IN    CNAME    microsites.gamerevolution.com.
+staging.ghostbusterspsp.gamerevolution.com.           IN    CNAME    microsites.staging.gamerevolution.com.
+
+; e3.gamerevolution.com entries 
+; Created on 20100513 by jrottenberg
+e3.gamerevolution.com.                                IN    CNAME    cdn.campaigns.gamerevolution.com.
+staging.e3.gamerevolution.com.                        IN    CNAME    staging.campaigns.gamerevolution.com.
+demo.e3.gamerevolution.com.                           IN    CNAME    demo.si.evolvemediallc.com.
+
+; giftguide.gamerevolution.com entries 
+; Created on 20101109 by jolmeda
+;giftguide.gamerevolution.com.                        IN    CNAME    campaigns.edgesuite.net.
+;staging.giftguide.gamerevolution.com.                IN    CNAME    staging.campaigns.gamerevolution.com.
+;demo.giftguide.gamerevolution.com.                   IN    CNAME    demo.campaigns.craveonline.com.
+
+; ultimateexperience.gamerevolution.com entries ; Created on 20110303 by wfu
+ultimateexperience.gamerevolution.com.                IN    CNAME    cdn.campaigns.gamerevolution.com.
+staging.ultimateexperience.gamerevolution.com.        IN    CNAME    staging.campaigns.gamerevolution.com.
+demo.ultimateexperience.gamerevolution.com.           IN    CNAME    demo.si.evolvemediallc.com.
+
+; supermonkeyball3d.gamerevolution.com entries ; Created on 20110316 by mcarino
+supermonkeyball3d.gamerevolution.com.                 IN    CNAME    cdn.campaigns.gamerevolution.com.
+staging.supermonkeyball3d.gamerevolution.com.         IN    CNAME    staging.campaigns.gamerevolution.com.
+;demo.supermonkeyball3d.gamerevolution.com.            IN    CNAME    demo.campaigns.gamerevolution.com.
+
+; rmdemo tool
+rmdemo                                                IN    CNAME    campaigns
+staging.rmdemo                                        IN    CNAME    staging.campaigns.evolvemediacorp.com.
+files                                                 IN    CNAME    cdn.assets
+
+sonicandsegasweeps.gamerevolution.com.                IN    CNAME    sonicandsegasweeps.gamerevolution.com.edgesuite.net.
+;
+; currently using evolve VIP - should change to GameRev VIP when created
+;
+origin.demo                                           IN    A        72.172.76.99
+demo                                                  IN    CNAME    demo.gamerevolution.com.edgesuite.net.
+
+; microsites CDN
+cdn.microsites.gamerevolution.com.                    IN    CNAME    cdn.campaigns.gamerevolution.com.edgesuite.net.
+origin.microsites.gamerevolution.com.                 IN    CNAME    origin.campaigns.gamerevolution.com.
+*.origin.gamerevolution.com.                          IN    CNAME    origin.campaigns.gamerevolution.com.
+*.demo.gamerevolution.com.                            IN    CNAME    origin.demo.gamerevolution.com.
+*.origin.demo.gamerevolution.com.                     IN    CNAME    origin.demo.gamerevolution.com.
+*.staging.gamerevolution.com.                         IN    CNAME    staging.campaigns.gamerevolution.com.
+
+
+giftguide2010.gamerevolution.com.                     IN    CNAME    cdn.campaigns.gamerevolution.com.
+;staging.giftguide2010.gamerevolution.com.            IN    CNAME    staging.campaigns.gamerevolution.com.
+;demo.giftguide2010.gamerevolution.com.               IN    CNAME    cdn.campaigns.gamerevolution.com.
+giftguide2011.gamerevolution.com.                     IN    CNAME    cdn.campaigns.gamerevolution.com.
+staging.giftguide2011.gamerevolution.com.             IN    CNAME    staging.campaigns.gamerevolution.com.
+demo.alanwake.gamerevolution.com.                     IN    CNAME    cdn.campaigns.gamerevolution.com.
+demo.aspartanwillrise.gamerevolution.com.             IN    CNAME    cdn.campaigns.gamerevolution.com.
+demo.giftguide2010.gamerevolution.com.                IN    CNAME    demo.si.evolvemediallc.com.
+
+;dev.gamerevolution.com.                              IN    CNAME    app1v-gr.ao.dev.lax.gnmedia.net. ;decomm
+;admin-dev.gamerevolution.com.                        IN    CNAME    app1v-gr.ao.dev.lax.gnmedia.net. ;decomm
+stg.gamerevolution.com.                               IN    A        72.172.76.160
+admin-stg.gamerevolution.com.                         IN    CNAME    stg.gamerevolution.com.
+m-stg.gamerevolution.com.                             IN    CNAME    stg.gamerevolution.com.
+
+; Testing for mostcraved
+dex.gamerevolution.com.                               IN    A        10.11.234.33
+peak.crowdignite.gamerevolution.com.		IN CNAME	peak.crowdignite.com.

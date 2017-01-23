@@ -1,0 +1,124 @@
+$TTL 86400
+totallyher.com.	IN      SOA     totallyher.com. root.totallyher.com. (
+                                                   2015011200      ; serial
+                                                   28800           ; refresh
+                                                   14400           ; retry
+                                                   3600000         ; expire
+                                                   86400 )         ; minimum
+
+; name servers
+totallyher.com.                                    IN    NS       app1v-dns.tp.prd.lax.totallyher.com.
+totallyher.com.                                    IN    NS       app2v-dns.tp.prd.lax.totallyher.com.
+totallyher.com.                                    IN    NS       app3v-dns.tp.prd.lax.totallyher.com.
+totallyher.com.                                    IN    NS       app4v-dns.tp.prd.lax.totallyher.com.
+app1v-dns.tp.prd.lax.totallyher.com.               IN    A        10.11.20.68
+app2v-dns.tp.prd.lax.totallyher.com.               IN    A        10.11.20.69
+app3v-dns.tp.prd.lax.totallyher.com.               IN    A        10.11.20.53
+app4v-dns.tp.prd.lax.totallyher.com.               IN    A        10.11.20.88
+ns3.totallyher.com.                                IN    A        67.15.66.42
+ns4.totallyher.com.                                IN    A        67.15.66.43
+ns5.totallyher.com.                                IN    A        64.34.172.209
+ns6.totallyher.com.                                IN    A        72.51.41.238
+
+
+; mail servers
+totallyher.com.                                    IN    MX 20    cluster9a.us.messagelabs.com.
+totallyher.com.                                    IN    MX 10    cluster9.us.messagelabs.com.
+
+
+; #### PBWP ####
+totallyher.com.                                    IN    A        72.172.76.151
+
+bta.totallyher.com.                                IN    A        10.11.234.71
+dev.totallyher.com.                                IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+dev.wp.totallyher.com.                             IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.totallyher.com.                                IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.totallyher.com.                                IN    A        72.172.76.151
+www.totallyher.com.                                IN    A        72.172.76.151
+
+origin.bta.totallyher.com.                         IN    CNAME    bta.totallyher.com.
+cdn1-bta.totallyher.com.                           IN    CNAME    bta.totallyher.com.
+cdn2-bta.totallyher.com.                           IN    CNAME    bta.totallyher.com.
+cdn3-bta.totallyher.com.                           IN    CNAME    bta.totallyher.com.
+
+origin-dev.totallyher.com.                         IN    CNAME    dev.totallyher.com.
+cdn1-dev.totallyher.com.                           IN    CNAME    dev.totallyher.com.
+cdn2-dev.totallyher.com.                           IN    CNAME    dev.totallyher.com.
+cdn3-dev.totallyher.com.                           IN    CNAME    dev.totallyher.com.
+
+origin-dev.wp.totallyher.com.                      IN    CNAME    dev.totallyher.com.
+cdn1-dev.wp.totallyher.com.                        IN    CNAME    dev.totallyher.com.
+cdn2-dev.wp.totallyher.com.                        IN    CNAME    dev.totallyher.com.
+cdn3-dev.wp.totallyher.com.                        IN    CNAME    dev.totallyher.com.
+
+origin-stg.totallyher.com.                         IN    CNAME    stg.totallyher.com.
+cdn1-stg.totallyher.com.                           IN    CNAME    pebblebed.edgesuite.net.
+cdn2-stg.totallyher.com.                           IN    CNAME    pebblebed.edgesuite.net.
+cdn3-stg.totallyher.com.                           IN    CNAME    pebblebed.edgesuite.net.
+
+origin.totallyher.com.                             IN    CNAME    prd.totallyher.com.
+cdn1-www.totallyher.com.                           IN    CNAME    pebblebed.edgesuite.net.
+cdn2-www.totallyher.com.                           IN    CNAME    pebblebed.edgesuite.net.
+cdn3-www.totallyher.com.                           IN    CNAME    pebblebed.edgesuite.net.
+
+dev.m.totallyher.com.                              IN    CNAME    dev.totallyher.com.
+stg.m.totallyher.com.                              IN    CNAME    stg.totallyher.com.
+;m.totallyher.com.                                 IN    CNAME    prd.totallyher.com.
+; #### End PBWP ####
+
+
+
+; new FE infrastructure -jsj
+origin.campaigns                                   IN    A        72.172.76.121
+campaigns                                          IN    CNAME    origin.campaigns
+cdn.campaigns                                      IN    CNAME    cdn.campaigns.totallyher.com.edgesuite.net.
+staging.campaigns                              IN    A        72.172.76.122
+
+origin.assets                                      IN    A        72.172.76.110
+cdn.assets                                         IN    CNAME    cdn.assets.totallyher.com.edgesuite.net.
+assets                                             IN    CNAME    cdn.assets
+staging.assets			                   IN    CNAME    staging.assets.totallyher.com.edgesuite.net.
+demo.assets                                        IN    CNAME    demo.assets.totallyher.com.edgesuite.net.
+origin.staging.assets                              IN    A        72.172.76.111
+
+; rmdemo tool
+rmdemo                                             IN    CNAME    campaigns
+staging.rmdemo                                     IN    CNAME    staging.campaigns
+files                                              IN    CNAME    cdn.assets
+
+; crowdignite
+crowdignite                                        IN    A        72.172.76.148
+crowd-ignite                                        IN   CNAME    crowdignite.totallyher.com.
+stg.crowdignite.totallyher.com.              86400 IN    A        10.11.134.66
+stg.crowd-ignite.totallyher.com.              86400 IN   CNAME    stg.crowdignite.totallyher.com.
+dev.crowdignite.totallyher.com.              86400 IN    A        10.11.234.44
+dev.crowd-ignite.totallyher.com.              86400 IN   CNAME    dev.crowdignite.totallyher.com.
+;chaggstrom.sbx.crowdignite.totallyher.com.     IN    CNAME    uid1v-chaggstrom.ci.dev.lax.gnmedia.net. ;decomm
+ddurand.sbx.crowdignite.totallyher.com.        IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+ddurand.sbx.crowd-ignite.totallyher.com.        IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+;fdavis.sbx.crowdignite.totallyher.com.         IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+;fdavis.sbx.crowd-ignite.totallyher.com.         IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+fgonzalez.sbx.crowdignite.totallyher.com.      IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+fgonzalez.sbx.crowd-ignite.totallyher.com.      IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+jcortes.sbx.crowdignite.totallyher.com.        IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcortes.sbx.crowd-ignite.totallyher.com.        IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.crowdignite.totallyher.com.      IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.crowd-ignite.totallyher.com.      IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.crowdignite.totallyher.com.     IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.crowd-ignite.totallyher.com.     IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.crowdignite.totallyher.com.    IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.crowd-ignite.totallyher.com.    IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+;mpatino.sbx.crowdignite.totallyher.com.        IN    CNAME    uid1v-mpatino.ci.dev.lax.gnmedia.net. ;decomm
+;rvicchiullo.sbx.crowd-ignite.totallyher.com.    IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net. ;decomm
+;rvicchiullo.sbx.crowdignite.totallyher.com.    IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net. ;decomm
+ssalazar.sbx.crowd-ignite.totallyher.com.       IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+ssalazar.sbx.crowdignite.totallyher.com.       IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+uacosta.sbx.crowd-ignite.totallyher.com.        IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+uacosta.sbx.crowdignite.totallyher.com.        IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+
+puzzlematch.totallyher.com.                        IN    CNAME    cdn.campaigns.totallyher.com.
+staging.puzzlematch.totallyher.com.                IN    CNAME    staging.campaigns.totallyher.com.
+demo.puzzlematch.totallyher.com.                   IN    CNAME    demo.si.evolvemediallc.com.
+dev.puzzlematch.totallyher.com.                    IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+
+peak.crowdignite.totallyher.com.		IN	CNAME	peak.crowdignite.com.

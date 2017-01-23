@@ -1,0 +1,1194 @@
+$ORIGIN craveonline.com.
+$TTL 86400
+craveonline.com.        IN      SOA     craveonline.com. root.craveonline.com. (
+                                                          2014090900     ; serial
+                                                          28800          ; refresh
+                                                          14400          ; retry
+                                                          3600000        ; expire
+                                                          86400 )        ; minimum
+
+
+
+craveonline.com.                                          IN    NS       app3v-dns.tp.prd.lax.craveonline.com.
+craveonline.com.                                          IN    NS       app4v-dns.tp.prd.lax.craveonline.com.
+craveonline.com.                                          IN    NS       app1v-dns.tp.prd.lax.craveonline.com.
+craveonline.com.                                          IN    NS       app2v-dns.tp.prd.lax.craveonline.com.
+
+craveonline.com.                                          IN    MX 10    cluster9.us.messagelabs.com.
+craveonline.com.                                          IN    MX 20    cluster9a.us.messagelabs.com.
+
+
+local                                                     IN    A        127.0.0.1
+localhost                                                 IN    A        127.0.0.1
+loghost                                                   IN    A        127.0.0.1
+
+
+mail.craveonline.com.                                     IN    A        63.139.86.10 
+
+ns3.craveonline.com.                                      IN    A        67.15.66.42
+ns4.craveonline.com.                                      IN    A        67.15.66.43
+ns5.craveonline.com.                                      IN    A        64.34.172.209
+ns6.craveonline.com.                                      IN    A        72.51.41.238
+
+wap.craveonline.com.                                      IN    CNAME    crave.qwapi.com.
+client.craveonline.com.                                   IN    A        63.139.86.13    
+;
+;sql-lax-001.craveonline.com.                             IN    A        10.2.12.124  ;decomm
+;
+fs.craveonline.com.                                       IN    A        72.172.76.66
+;
+;mediaads.craveonline.com.                                 IN    A        72.172.76.77
+;
+;file1.craveonline.com.                                   IN    A        10.2.12.111
+;file2.craveonline.com.                                   IN    A        10.2.12.112
+;file3.craveonline.com.                                   IN    A        10.2.12.113
+
+;file5.craveonline.com.                                   IN    CNAME    fs-lax-001.gorillanation.com.
+;file6.craveonline.com.                                   IN    CNAME    fs-lax-002.gorillanation.com.
+;
+;beta2.craveonline.com.                                   IN    A        10.2.12.127 
+;sync.craveonline.com.                                    IN    A        10.2.12.127 
+;syncvideos.craveonline.com.                              IN    A        10.2.12.140
+;admin-lax-001.craveonline.com.                           IN    A        10.2.12.42
+admin.craveonline.com.                                    IN    A        72.172.76.75
+;
+speakeasy.craveonline.com.                                IN    A        72.172.76.70
+;
+mp3masher.craveonline.com.                                IN    A        66.180.202.72
+;
+;img-lax-001.craveonline.com.                             IN    A        10.2.12.117
+;img-lax-002.craveonline.com.                             IN    A        10.2.12.118
+;
+upload.craveonline.com.                                   IN    CNAME    upl-lax-001.craveonline.com.
+conversiondemo1.craveonline.com.                          IN    CNAME    upl-lax-001.craveonline.com.
+conversiondemo2.craveonline.com.                          IN    CNAME    upl-lax-001.craveonline.com.
+;
+;nfs-lax-001.craveonline.com.                             IN    A        10.2.12.120 ;decomm
+
+;dev-lax-001.craveonline.com.                             IN    A        10.2.12.128 
+;
+;dev.joomla-test                                          IN    CNAME    dev-lax-001.craveonline.com.
+;dev-lax-002.craveonline.com.                             IN    A        192.168.1.81
+;
+;www-lax-001.craveonline.com.                             IN    A        10.2.12.121 ;decomm
+;www-lax-002.craveonline.com.                             IN    A        10.2.12.122 ;decomm
+;www-lax-003.craveonline.com.                             IN    A        10.2.12.123 ;decomm
+;
+images.craveonline.com.                                   IN    A        72.172.76.68
+;
+;themeps3.craveonline.com.                                IN    A        72.172.76.107
+;themepsp.craveonline.com.                                IN    A        72.172.76.107
+;themewii.craveonline.com.                                IN    A        72.172.76.107
+;themexbox360.craveonline.com.                            IN    A        72.172.76.107
+;
+;
+video.craveonline.com.                                    IN    CNAME    vids.craveonline.com.
+;
+;video2.craveonline.com.                                  IN    A        10.2.12.105
+;video3.craveonline.com.                                  IN    A        10.2.12.106
+;video4.craveonline.com.                                  IN    A        10.2.12.107
+;video5.craveonline.com.                                  IN    A        10.2.12.108
+;video6.craveonline.com.                                  IN    A        10.2.12.119
+;video8.craveonline.com.                                  IN    A        10.2.12.109
+;video10.craveonline.com.                                 IN    A        10.2.12.110
+;
+beta.craveonline.com.                                     IN    A        66.180.193.30
+ul.craveonline.com.                                       IN    A        66.180.193.14
+;
+ftp.craveonline.com.                                      IN    CNAME    client.gorillanation.com.
+;sheknows.craveonline.com.                                IN    A        10.2.12.127     
+;
+microsites.craveonline.com.                               IN    CNAME    cdn.campaigns.craveonline.com.
+microsites-misc.craveonline.com.                          IN    A        72.172.76.92
+origin.microsites.craveonline.com.                        IN    CNAME    origin.campaigns.craveonline.com.
+cdn.microsites.craveonline.com.                           IN    CNAME    cdn.campaigns.craveonline.com.edgesuite.net.
+;
+; assets.craveonline.com.                                 IN    CNAME    microsites.craveonline.com.
+origin.assets.craveonline.com.                            IN    A        72.172.76.110
+cdn.assets.craveonline.com.                               IN    CNAME    cdn.assets.craveonline.com.edgesuite.net.
+assets.craveonline.com.                                   IN    CNAME    cdn.assets.craveonline.com.
+staging.assets                                            IN    CNAME    staging.assets.craveonline.com.edgesuite.net.
+demo.assets                                               IN    CNAME    demo.assets.craveonline.com.edgesuite.net.
+origin.staging.assets                                     IN    A        72.172.76.111
+upgrade.assets.craveonline.com.                           IN    A        72.172.76.105
+
+; new FE infrastructure -jsj
+origin.campaigns.craveonline.com.                         IN    A        72.172.76.121
+campaigns.craveonline.com.                                IN    CNAME    origin.campaigns.craveonline.com.
+cdn.campaigns.craveonline.com.                            IN    CNAME    cdn.campaigns.craveonline.com.edgesuite.net.
+staging.campaigns.craveonline.com.                        IN    A        72.172.76.122
+
+
+;
+; Custom hubs
+;
+headsup.craveonline.com.                                  IN    CNAME    cdn.campaigns.craveonline.com.
+staging.headsup.craveonline.com.                          IN    CNAME    staging.campaigns.craveonline.com.
+staging.streetfighter.craveonline.com.                    IN    CNAME    staging.microsites.craveonline.com.
+streetfightermashup.craveonline.com.                      IN    CNAME    microsites.craveonline.com.
+staging.fightnight.craveonline.com.                       IN    CNAME    staging.microsites.craveonline.com.
+staging.dragonball.craveonline.com.                       IN    CNAME    staging.microsites.craveonline.com.
+fastandfurious.craveonline.com.                           IN    CNAME    cdn.campaigns.craveonline.com.
+staging.fastandfurious.craveonline.com.                   IN    CNAME    staging.campaigns.craveonline.com.
+demo.battlestargalactica.craveonline.com.                 IN    CNAME    demo.campaigns.craveonline.com.
+staging.airforce.craveonline.com.                         IN    CNAME    staging.campaigns.craveonline.com.
+theultimatefighter.craveonline.com.                       IN    CNAME    microsites.craveonline.com.
+staging.theultimatefighter.craveonline.com.               IN    CNAME    staging.microsites.craveonline.com.
+staging.lasthouseontheleftdvd.craveonline.com.            IN    CNAME    staging.campaigns.craveonline.com.
+;wolverine.craveonline.com.                               IN    CNAME    microsites.craveonline.com.
+;staging.wolverine.craveonline.com.                       IN    CNAME    staging.microsites.craveonline.com.
+;halo3odst.craveonline.com.                               IN    CNAME    microsites.craveonline.com.
+;staging.halo3odst.craveonline.com.                       IN    CNAME    staging.microsites.craveonline.com.
+;zombieland.craveonline.com.                              IN    CNAME    microsites.craveonline.com.
+;staging.zombieland.craveonline.com.                      IN    CNAME    staging.microsites.craveonline.com.
+deadspace.craveonline.com.                                IN    CNAME    cdn.campaigns.craveonline.com.
+staging.deadspace.craveonline.com.                        IN    CNAME    staging.campaigns.craveonline.com.
+;sawthegame.craveonline.com.                              IN    CNAME    microsites.craveonline.com.
+;staging.sawthegame.craveonline.com.                      IN    CNAME    staging.microsites.craveonline.com.
+
+;silenthill.craveonline.com.                              IN    CNAME    microsites.craveonline.com.
+;staging.silenthill.craveonline.com.                      IN    CNAME    staging.microsites.craveonline.com.
+
+demo.dragmetohelldvd.craveonline.com.                     IN    CNAME    demo.campaigns.craveonline.com.
+dragmetohelldvd.craveonline.com.                          IN    CNAME    demo.campaigns.craveonline.com.
+staging.dragmetohelldvd.craveonline.com.                  IN    CNAME    demo.campaigns.craveonline.com.
+
+demo.coralinedvd.craveonline.com.                         IN    CNAME    demo.campaigns.craveonline.com.
+demo.quarantinedvd.craveonline.com.                       IN    CNAME    demo.campaigns.craveonline.com.
+
+;2012themovie.craveonline.com.                            IN    CNAME    microsites.craveonline.com.
+;staging.2012themovie.craveonline.com.                    IN    CNAME    staging.microsites.craveonline.com.
+
+;tekken.bufferzone.craveonline.com.                       IN    CNAME    microsites.craveonline.com.
+;staging.tekken.bufferzone.craveonline.com.               IN    CNAME    staging.microsites.craveonline.com.
+
+;metallica.craveonline.com.                               IN    CNAME    microsites.craveonline.com.
+;staging.metallica.craveonline.com.                       IN    CNAME    staging.microsites.craveonline.com.
+
+;armored.craveonline.com.                                 IN    CNAME    microsites.craveonline.com.
+;staging.armored.craveonline.com.                         IN    CNAME    staging.microsites.craveonline.com.
+
+; holidaygiftguide.craveonline.com entries 
+; Created on 20101116 by jjohnson
+holidaygiftguide.craveonline.com.                         IN    CNAME    campaigns.edgesuite.net.
+staging.holidaygiftguide.craveonline.com.                 IN    CNAME    staging.campaigns.craveonline.com.
+demo.holidaygiftguide.craveonline.com.                    IN    CNAME    demo.si.evolvemediallc.com.
+
+
+;mpsweeps.craveonline.com.                                IN    CNAME    microsites.craveonline.com.
+;staging.mpsweeps.craveonline.com.                        IN    CNAME    staging.microsites.craveonline.com.
+
+demo.smokinaces2.craveonline.com.                         IN    CNAME    demo.campaigns.craveonline.com.
+
+
+nightmareonelm.craveonline.com.                           IN    CNAME    nightmareonelm.craveonline.com.edgesuite.net.
+staging.nightmareonelm.craveonline.com.                   IN    CNAME    staging.microsites.craveonline.com.
+origin.nightmareonelm.craveonline.com.                    IN    CNAME    microsites.craveonline.com.
+
+chuck.craveonline.com.                                    IN    CNAME    cdn.campaigns.craveonline.com.
+;pandorumdvdsweeps.craveonline.com.                       IN    CNAME    pandorumdvdsweeps.craveonline.com.edgesuite.net.
+shutterisland.craveonline.com.                            IN    CNAME    cdn.campaigns.craveonline.com.
+stepfatherdvd.craveonline.com.                            IN    CNAME    cdn.campaigns.craveonline.com.
+jimmyjohns.craveonline.com.                               IN    CNAME    jimmyjohns.craveonline.com.edgesuite.net.
+demo.bullrun.craveonline.com.                             IN    CNAME    demo.campaigns.craveonline.com.
+bullrun.craveonline.com.                                  IN    CNAME    demo.campaigns.craveonline.com.
+;armoreddvd.craveonline.com.                              IN    CNAME    armoreddvd.craveonline.com.edgesuite.net.
+demo.humantarget.craveonline.com.                         IN    CNAME    demo.campaigns.craveonline.com.
+;alienware.craveonline.com.                               IN    CNAME    alienware.craveonline.com.edgesuite.net.
+
+
+; smirnoffbluepad.craveonline.com entries
+; Created on 20100429 by jrottenberg
+smirnoffbluepad.craveonline.com.                          IN    CNAME    cdn.campaigns.craveonline.com.
+staging.smirnoffbluepad.craveonline.com.                  IN    CNAME    staging.campaigns.craveonline.com.
+demo.smirnoffbluepad.craveonline.com.                     IN    CNAME    demo.si.evolvemediallc.com.
+
+;hopkinsvsjones.craveonline.com.                          IN    CNAME    hopkinsvsjones.craveonline.com.edgesuite.net.
+
+
+; oldspice.craveonline.com
+demo.oldspice.craveonline.com.                            IN    CNAME    demo.campaigns.craveonline.com.
+
+;mousasi.craveonline.com
+;;mousasi.craveonline.com.                                IN    CNAME    mousasi.craveonline.com.edgesuite.net.
+;mousasi.craveonline.com.                                 IN    CNAME    microsites.craveonline.com.
+;origin.mousasi.craveonline.com.                          IN    CNAME    microsites.craveonline.com.
+;staging.mousasi.craveonline.com.                         IN    CNAME    staging.microsites.craveonline.com.
+;demo.mousasi.craveonline.com.                            IN    CNAME    demo.campaigns.craveonline.com.
+
+; bigmovienight.craveonline.com entries 
+; Created on 20100517 by jrottenberg
+bigmovienight.craveonline.com.                            IN    CNAME    cdn.campaigns.craveonline.com.
+staging.bigmovienight.craveonline.com.                    IN    CNAME    staging.campaigns.craveonline.com.
+demo.bigmovienight.craveonline.com.                       IN    CNAME    cdn.campaigns.craveonline.com.
+
+; bjpenn.craveonline.com entries 
+; Created on 20100419 by jrottenberg
+;;bjpenn.craveonline.com.                                 IN    CNAME    campaigns.edgesuite.net.
+;bjpenn.craveonline.com.                                  IN    CNAME    microsites.craveonline.com.
+;staging.bjpenn.craveonline.com.                          IN    CNAME    staging.microsites.craveonline.com.
+;demo.bjpenn.craveonline.com.                             IN    CNAME    demo.campaigns.craveonline.com.
+
+; mayweathermosley.craveonline.com entries 
+; Created on 20100419 by jrottenberg
+;mayweathermosley.craveonline.com.                        IN    CNAME    campaigns.edgesuite.net.
+;staging.mayweathermosley.craveonline.com.                IN    CNAME    staging.microsites.craveonline.com.
+;demo.mayweathermosley.craveonline.com.                   IN    CNAME    demo.campaigns.craveonline.com.
+
+; strikeforcesweeps.craveonline.com entries 
+; Created on 20100513 by jrottenberg
+strikeforcesweeps.craveonline.com.                        IN    CNAME    campaigns.edgesuite.net.
+staging.strikeforcesweeps.craveonline.com.                IN    CNAME    staging.microsites.craveonline.com.
+demo.strikeforcesweeps.craveonline.com.                   IN    CNAME    demo.campaigns.craveonline.com.
+
+; macgruber.craveonline.com  entries
+; Created on 20100419 by jrottenberg
+macgruber.craveonline.com.                                IN    CNAME    cdn.campaigns.craveonline.com.
+staging.macgruber.craveonline.com.                        IN    CNAME    staging.campaigns.craveonline.com.
+demo.macgruber.craveonline.com.                           IN    CNAME    demo.si.evolvemediallc.com.
+
+; daybreakersdvdsweeps.craveonline.com entries 
+; Created on 20100430 by jrottenberg
+daybreakersdvdsweeps.craveonline.com.                     IN    CNAME    campaigns.edgesuite.net.
+staging.daybreakersdvdsweeps.craveonline.com.             IN    CNAME    staging.microsites.craveonline.com.
+demo.daybreakersdvdsweeps.craveonline.com.                IN    CNAME    demo.campaigns.craveonline.com.
+
+
+demo.americanpie.craveonline.com.                         IN    CNAME    demo.campaigns.craveonline.com.
+
+; upgradeyourdad.craveonline.com entries 
+; Created on 20100519 by jjohnson
+;upgradeyourdad.craveonline.com.                          IN    CNAME    campaigns.edgesuite.net.
+;staging.upgradeyourdad.craveonline.com.                  IN    CNAME    staging.microsites.craveonline.com.
+;demo.upgradeyourdad.craveonline.com.                     IN    CNAME    demo.campaigns.craveonline.com.
+
+; mwbigmovienight.craveonline.com entries 
+; Created on 20100520 by jrottenberg
+mwbigmovienight.craveonline.com.                          IN    CNAME    cdn.campaigns.craveonline.com.
+staging.mwbigmovienight.craveonline.com.                  IN    CNAME    staging.campaigns.craveonline.com.
+demo.mwbigmovienight.craveonline.com.                     IN    CNAME    demo.si.evolvemediallc.com.
+
+; babalusweeps.craveonline.com entries 
+; Created on 20100525 by jjohnson
+;babalusweeps.craveonline.com.                            IN    CNAME    campaigns.edgesuite.net.
+;staging.babalusweeps.craveonline.com.                    IN    CNAME    staging.microsites.craveonline.com.
+;demo.babalusweeps.craveonline.com.                       IN    CNAME    demo.campaigns.craveonline.com.
+
+; preludetothedream.craveonline.com entries 
+; Created on 20100525 by jjohnson
+;preludetothedream.craveonline.com.                       IN    CNAME    campaigns.edgesuite.net.
+;staging.preludetothedream.craveonline.com.               IN    CNAME    staging.microsites.craveonline.com.
+;demo.preludetothedream.craveonline.com.                  IN    CNAME    demo.campaigns.craveonline.com.
+
+; summerhub.craveonline.com entries 
+; Created on 20100526 by jjohnson
+summerhub.craveonline.com.                                IN    CNAME    cdn.campaigns.craveonline.com.
+staging.summerhub.craveonline.com.                        IN    CNAME    staging.campaigns.craveonline.com.
+demo.summerhub.craveonline.com.                           IN    A        72.172.76.14
+
+; e3.craveonline.com entries
+; Created on 20110126 by wfu
+demo.e3.craveonline.com.                                  IN    CNAME    cdn.campaigns.craveonline.com.
+
+
+; mwmostcraved.craveonline.com entries 
+; Created on 20100610 by jjohnson
+;mwmostcraved.craveonline.com.                            IN    CNAME    campaigns.edgesuite.net.
+;staging.mwmostcraved.craveonline.com.                    IN    CNAME    staging.microsites.craveonline.com.
+;demo.mwmostcraved.craveonline.com.                       IN    CNAME    demo.campaigns.craveonline.com.
+
+; jadriantest.craveonline.com entries 
+; Created on 20100614 by jjohnson
+jadriantest.craveonline.com.                              IN    CNAME    cdn.campaigns.craveonline.com.
+staging.jadriantest.craveonline.com.                      IN    CNAME    staging.campaigns.craveonline.com.
+demo.jadriantest.craveonline.com.                         IN    CNAME    demo.si.evolvemediallc.com.
+
+; silverstar.bufferzone.craveonline.com entries 
+; Created on 20100618 by jjohnson
+;silverstar.bufferzone.craveonline.com.                   IN    CNAME    campaigns.edgesuite.net.
+;staging.silverstar.bufferzone.craveonline.com.           IN    CNAME    staging.microsites.craveonline.com.
+;demo.silverstar.bufferzone.craveonline.com.              IN    CNAME    demo.campaigns.craveonline.com.
+
+; summerwithkfc.craveonline.com entries 
+; Created on 20100624 by jjohnson
+;summerwithkfc.craveonline.com.                           IN    CNAME    campaigns.edgesuite.net.
+;staging.summerwithkfc.craveonline.com.                   IN    CNAME    staging.microsites.craveonline.com.
+;demo.summerwithkfc.craveonline.com.                      IN    CNAME    demo.campaigns.craveonline.com.
+
+; werdumrevgear.craveonline.com entries 
+; Created on 20100629 by jjohnson
+;werdumrevgear.craveonline.com.                           IN    CNAME    campaigns.edgesuite.net.
+;staging.werdumrevgear.craveonline.com.                   IN    CNAME    staging.microsites.craveonline.com.
+;demo.werdumrevgear.craveonline.com.                      IN    CNAME    demo.campaigns.craveonline.com.
+
+; ikea.craveonline.com entries 
+; Created on 20100707 by jjohnson
+ikea.craveonline.com.                                     IN    CNAME    campaigns.edgesuite.net.
+staging.ikea.craveonline.com.                             IN    CNAME    staging.microsites.craveonline.com.
+demo.ikea.craveonline.com.                                IN    CNAME    demo.campaigns.craveonline.com.
+
+; bestfaceofrussia.craveonline.com entries 
+; Created on 20100708 by jjohnson
+bestfaceofrussia.craveonline.com.                         IN    CNAME    campaigns.edgesuite.net.
+staging.bestfaceofrussia.craveonline.com.                 IN    CNAME    staging.microsites.craveonline.com.
+demo.bestfaceofrussia.craveonline.com.                    IN    CNAME    demo.campaigns.craveonline.com.
+
+; marquezvsdiazglovegiveaway.craveonline.com entries 
+; Created on 20100712 by jjohnson
+;marquezvsdiazglovegiveaway.craveonline.com.              IN    CNAME    campaigns.edgesuite.net.
+;staging.marquezvsdiazglovegiveaway.craveonline.com.      IN    CNAME    staging.microsites.craveonline.com.
+;demo.marquezvsdiazglovegiveaway.craveonline.com.         IN    CNAME    demo.campaigns.craveonline.com.
+
+; fallentertainment.craveonline.com entries 
+; Created on 20100721 by jjohnson
+;fallentertainment.craveonline.com.                       IN    CNAME    campaigns.edgesuite.net.
+;staging.fallentertainment.craveonline.com.               IN    CNAME    staging.microsites.craveonline.com.
+;demo.fallentertainment.craveonline.com.                  IN    CNAME    demo.campaigns.craveonline.com.
+
+; kickassdvd-sweeps.craveonline.com entries 
+; Created on 20100721 by jjohnson
+;kickassdvd-sweeps.craveonline.com.                       IN    CNAME    campaigns.edgesuite.net.
+;staging.kickassdvd-sweeps.craveonline.com.               IN    CNAME    staging.microsites.craveonline.com.
+;demo.kickassdvd-sweeps.craveonline.com.                  IN    CNAME    demo.campaigns.craveonline.com.
+
+; fallgadgetguide.craveonline.com entries 
+; Created on 20100729 by jjohnson
+;fallgadgetguide.craveonline.com.                         IN    CNAME    campaigns.edgesuite.net.
+;staging.fallgadgetguide.craveonline.com.                 IN    CNAME    staging.microsites.craveonline.com.
+;demo.fallgadgetguide.craveonline.com.                    IN    CNAME    demo.campaigns.craveonline.com.
+
+
+; residentevilmovie.craveonline.com entries 
+; Created on 20100803 by jolmeda
+;residentevilmovie.craveonline.com.                       IN    CNAME    campaigns.edgesuite.net.
+;staging.residentevilmovie.craveonline.com.               IN    CNAME    staging.microsites.craveonline.com.
+;demo.residentevilmovie.craveonline.com.                  IN    CNAME    demo.campaigns.craveonline.com.
+
+; hardknocksnyj.craveonline.com entries 
+; Created on 20100805 by jolmeda
+;hardknocksnyj.craveonline.com.                           IN    CNAME    campaigns.edgesuite.net.
+;staging.hardknocksnyj.craveonline.com.                   IN    CNAME    staging.microsites.craveonline.com.
+;demo.hardknocksnyj.craveonline.com.                      IN    CNAME    demo.campaigns.craveonline.com.
+
+; musicawards.craveonline.com entries 
+; Created on 20100816 by jolmeda
+musicawards.craveonline.com.                              IN    CNAME    cdn.campaigns.craveonline.com.
+staging.musicawards.craveonline.com.                      IN    CNAME    staging.campaigns.craveonline.com.
+demo.musicawards.craveonline.com.                         IN    CNAME    demo.si.evolvemediallc.com.
+
+; mwmusicawards.craveonline.com entries 
+; Created on 20100816 by jolmeda
+mwmusicawards.craveonline.com.                            IN    CNAME    cdn.campaigns.craveonline.com.
+staging.mwmusicawards.craveonline.com.                    IN    CNAME    staging.campaigns.craveonline.com.
+demo.mwmusicawards.craveonline.com.                       IN    CNAME    demo.si.evolvemediallc.com.
+
+; craveher.craveonline.com entries 
+; Created on 20100817 by jjohnson
+craveher.craveonline.com.                                 IN    CNAME    cdn.campaigns.craveonline.com.
+staging.craveher.craveonline.com.                         IN    CNAME    staging.campaigns.craveonline.com.
+demo.craveher.craveonline.com.                            IN    CNAME    demo.si.evolvemediallc.com.
+
+; blackxs.craveonline.com entries 
+; Created on 20100823 by jjohnson
+blackxs.craveonline.com.                                  IN    CNAME    cdn.campaigns.craveonline.com.
+staging.blackxs.craveonline.com.                          IN    CNAME    staging.campaigns.craveonline.com.
+demo.blackxs.craveonline.com.                             IN    CNAME    demo.si.evolvemediallc.com.
+
+; backtoschool.craveonline.com entries 
+; Created on 20100823 by jjohnson
+
+; princeofpersiadvd.craveonline.com entries 
+; Created on 20100824 by jjohnson
+;princeofpersiadvd.craveonline.com.                       IN    CNAME    campaigns.edgesuite.net.
+;staging.princeofpersiadvd.craveonline.com.               IN    CNAME    staging.microsites.craveonline.com.
+;demo.princeofpersiadvd.craveonline.com.                  IN    CNAME    demo.campaigns.craveonline.com.
+
+; nhl11.craveonline.com entries 
+; Created on 20100824 by jjohnson
+nhl11.craveonline.com.                                    IN    CNAME    campaigns.edgesuite.net.
+staging.nhl11.craveonline.com.                            IN    CNAME    staging.microsites.craveonline.com.
+demo.nhl11.craveonline.com.                               IN    CNAME    demo.campaigns.craveonline.com.
+
+; mosleymora.craveonline.com entries 
+; Created on 20100825 by jjohnson
+;mosleymora.craveonline.com.                              IN    CNAME    campaigns.edgesuite.net.
+;staging.mosleymora.craveonline.com.                      IN    CNAME    staging.microsites.craveonline.com.
+;demo.mosleymora.craveonline.com.                         IN    CNAME    demo.campaigns.craveonline.com.
+
+; the-event.craveonline.com entries 
+; Created on 20100826 by jjohnson
+the-event.craveonline.com.                                IN    CNAME    cdn.campaigns.craveonline.com.
+staging.the-event.craveonline.com.                        IN    CNAME    staging.campaigns.craveonline.com.
+demo.the-event.craveonline.com.                           IN    CNAME    demo.si.evolvemediallc.com.
+
+; mjlockerroom.craveonline.com entries 
+; Created on 20100920 by jjohnson
+mjlockerroom.craveonline.com.                             IN    CNAME    cdn.campaigns.craveonline.com.
+staging.mjlockerroom.craveonline.com.                     IN    CNAME    staging.campaigns.craveonline.com.
+demo.mjlockerroom.craveonline.com.                        IN    CNAME    demo.si.evolvemediallc.com.
+
+; comiccon.craveonline.com entries
+; Created on 20110126 by wfu
+
+; pizzahutandcravesfallfavorites.craveonline.com entries 
+; Created on 20100924 by jjohnson
+
+; uglyamericans.craveonline.com entries 
+; Created on 20100929 by jjohnson
+uglyamericans.craveonline.com.                            IN    CNAME    cdn.campaigns.craveonline.com.
+staging.uglyamericans.craveonline.com.                    IN    CNAME    staging.campaigns.craveonline.com.
+demo.uglyamericans.craveonline.com.                       IN    CNAME    demo.si.evolvemediallc.com.
+
+; deathrace2.craveonline.com entries 
+; Created on 20101004 by jjohnson
+deathrace2.craveonline.com.                               IN    CNAME    campaigns.edgesuite.net.
+staging.deathrace2.craveonline.com.                       IN    CNAME    staging.microsites.craveonline.com.
+demo.deathrace2.craveonline.com.                          IN    CNAME    demo.si.evolvemediallc.com.
+
+; weeklychunk.craveonline.com entries 
+; Created on 20101006 by jjohnson
+weeklychunk.craveonline.com.                              IN    CNAME    cdn.campaigns.craveonline.com.
+staging.weeklychunk.craveonline.com.                      IN    CNAME    staging.campaigns.craveonline.com.
+demo.weeklychunk.craveonline.com.                         IN    CNAME    demo.si.evolvemediallc.com.
+
+; duedate.craveonline.com entries 
+; Created on 20101012 by jolmeda
+duedate.craveonline.com.                                  IN    CNAME    cdn.campaigns.craveonline.com.
+staging.duedate.craveonline.com.                          IN    CNAME    staging.campaigns.craveonline.com.
+demo.duedate.craveonline.com.                             IN    CNAME    demo.si.evolvemediallc.com.
+
+; lockeddowndvd.craveonline.com entries 
+; Created on 20101025 by jjohnson
+;lockeddowndvd.craveonline.com.                           IN    CNAME    campaigns.edgesuite.net.
+;staging.lockeddowndvd.craveonline.com.                   IN    CNAME    staging.microsites.craveonline.com.
+;demo.lockeddowndvd.craveonline.com.                      IN    CNAME    demo.campaigns.craveonline.com.
+
+; martinezvswilliams2.craveonline.com entries 
+; Created on 20101026 by jjohnson
+;martinezvswilliams2.craveonline.com.                     IN    CNAME    campaigns.edgesuite.net.
+;staging.martinezvswilliams2.craveonline.com.             IN    CNAME    staging.microsites.craveonline.com.
+;demo.martinezvswilliams2.craveonline.com.                IN    CNAME    demo.campaigns.craveonline.com.
+
+; pacquiaovsmargarito.craveonline.com entries 
+; Created on 20101026 by jjohnson
+;pacquiaovsmargarito.craveonline.com.                     IN    CNAME    campaigns.edgesuite.net.
+;staging.pacquiaovsmargarito.craveonline.com.             IN    CNAME    staging.microsites.craveonline.com.
+;demo.pacquiaovsmargarito.craveonline.com.                IN    CNAME    demo.campaigns.craveonline.com.
+
+; holidayconnectivityguide.craveonline.com entries 
+; Created on 20101118 by mcarino
+holidayconnectivityguide.craveonline.com.                 IN    CNAME    cdn.campaigns.craveonline.com.
+staging.holidayconnectivityguide.craveonline.com.         IN    CNAME    staging.campaigns.craveonline.com.
+demo.holidayconnectivityguide.craveonline.com.            IN    CNAME    demo.si.evolvemediallc.com.
+
+;
+; New SI mircosites infrastructure =======================================================
+;
+
+; whatdoyoubelieve.craveonline.com entries 
+; Created on 20110105 by csabani
+whatdoyoubelieve.craveonline.com.                         IN    CNAME    cdn.campaigns.craveonline.com.
+staging.whatdoyoubelieve.craveonline.com.                 IN    CNAME    staging.campaigns.craveonline.com.
+demo.whatdoyoubelieve.craveonline.com.                    IN    CNAME    demo.si.evolvemediallc.com.
+
+
+; sawthefinalchapterdvd.craveonline.com entries
+; Created on 20110118 by wfu
+sawthefinalchapterdvd.craveonline.com.                    IN    CNAME    cdn.campaigns.craveonline.com.
+staging.sawthefinalchapterdvd.craveonline.com.            IN    CNAME    staging.campaigns.craveonline.com.
+demo.sawthefinalchapterdvd.craveonline.com.               IN    CNAME    demo.si.evolvemediallc.com.
+
+; fedorvssilva.craveonline.com entries
+; Created on 20110120 by wfu
+fedorvssilva.craveonline.com.                             IN    CNAME    cdn.campaigns.craveonline.com.
+staging.fedorvssilva.craveonline.com.                     IN    CNAME    staging.campaigns.craveonline.com.
+demo.fedorvssilva.craveonline.com.                        IN    CNAME    demo.si.evolvemediallc.com.
+
+; mobileappreviews.craveonline.com entries
+; Created on 20110120 by wfu
+mobileappreviews.craveonline.com.                         IN    CNAME    cdn.campaigns.craveonline.com.
+staging.mobileappreviews.craveonline.com.                 IN    CNAME    staging.campaigns.craveonline.com.
+demo.mobileappreviews.craveonline.com.                    IN    CNAME    demo.si.evolvemediallc.com.
+
+; sanctum.craveonline.com entries
+; Created on 20110121 by jjohnson
+sanctum.craveonline.com.                                  IN    CNAME    cdn.campaigns.craveonline.com.
+staging.sanctum.craveonline.com.                          IN    CNAME    staging.campaigns.craveonline.com.
+demo.sanctum.craveonline.com.                             IN    CNAME    demo.si.evolvemediallc.com.
+
+; demodeploy.craveonline.com entries
+; Created on 20110125 by jjohnson
+demodeploy.craveonline.com.                               IN    CNAME    cdn.campaigns.craveonline.com.
+staging.demodeploy.craveonline.com.                       IN    CNAME    staging.campaigns.craveonline.com.
+demo.demodeploy.craveonline.com.                          IN    CNAME    demo.si.evolvemediallc.com.
+
+; paxeast.craveonline.com entries
+; Created on 20110126 by wfu
+paxeast.craveonline.com.                                  IN    CNAME    cdn.campaigns.craveonline.com.
+staging.paxeast.craveonline.com.                          IN    CNAME    staging.campaigns.craveonline.com.
+demo.paxeast.craveonline.com.                             IN    CNAME    demo.si.evolvemediallc.com.
+
+; lollapalooza2011.craveonline.com entries
+; Created on 20110126 by wfu
+demo.lollapalooza2011.craveonline.com.                    IN    CNAME    demo.si.evolvemediallc.com.
+
+; 3d.craveonline.com entries 
+; Created on 20110307 by wfu
+3d.craveonline.com.                                       IN    CNAME    cdn.campaigns.craveonline.com.
+staging.3d.craveonline.com.                               IN    CNAME    staging.campaigns.craveonline.com.
+demo.3d.craveonline.com.                                  IN    CNAME    demo.si.evolvemediallc.com.
+
+; shogun_revgearprize.craveonline.com entries 
+; Created on 20110307 by pweygand
+shogun_revgearprize.craveonline.com.                      IN    CNAME    cdn.campaigns.craveonline.com.
+staging.shogun_revgearprize.craveonline.com.              IN    CNAME    staging.campaigns.craveonline.com.
+demo.shogun_revgearprize.craveonline.com.                 IN    CNAME    demo.si.evolvemediallc.com.
+
+; rmdemo tool
+rmdemo                                                    IN    CNAME    campaigns.craveonline.com.
+staging.rmdemo                                            IN    CNAME    staging.campaigns.evolvemediacorp.com.
+files                                                     IN    CNAME    cdn.assets.craveonline.com.
+
+; priestcontest.craveonline.com entries 
+; Created on 20110321 by aduro
+priestcontest.craveonline.com.                            IN    CNAME    cdn.campaigns.craveonline.com.
+staging.priestcontest.craveonline.com.                    IN    CNAME    staging.campaigns.craveonline.com.
+demo.priestcontest.craveonline.com.                       IN    CNAME    demo.si.evolvemediallc.com.
+
+; yourhighness.craveonline.com entries 
+; Created on 20110322 by csabani
+yourhighness.craveonline.com.                             IN    CNAME    cdn.campaigns.craveonline.com.
+staging.yourhighness.craveonline.com.                     IN    CNAME    staging.campaigns.craveonline.com.
+demo.yourhighness.craveonline.com.                        IN    CNAME    demo.si.evolvemediallc.com.
+
+; lexusct.craveonline.com entries 
+; Created on 20110404 by wfu
+lexusct.craveonline.com.                                  IN    CNAME    cdn.campaigns.craveonline.com.
+staging.lexusct.craveonline.com.                          IN    CNAME    staging.campaigns.craveonline.com.
+demo.lexusct.craveonline.com.                             IN    CNAME    demo.si.evolvemediallc.com.
+
+; jeremiahweed.craveonline.com entries 
+; Created on 20110418 by wfu
+jeremiahweed.craveonline.com.                             IN    CNAME    cdn.campaigns.craveonline.com.
+staging.jeremiahweed.craveonline.com.                     IN    CNAME    staging.campaigns.craveonline.com.
+demo.jeremiahweed.craveonline.com.                        IN    CNAME    demo.si.evolvemediallc.com.
+
+; fanboyfunhouse.craveonline.com entries 
+; Created on 20110425 by aib
+fanboyfunhouse.craveonline.com.                           IN    CNAME    fanboyfunhouse.craveonline.com.edgesuite.net.
+staging.fanboyfunhouse.craveonline.com.                   IN    CNAME    staging.campaigns.craveonline.com.
+demo.fanboyfunhouse.craveonline.com.                      IN    CNAME    demo.si.evolvemediallc.com.
+
+; icravenos.craveonline.com entries 
+; Created on 20110504 by aibarra
+icravenos.craveonline.com.                                IN    CNAME    cdn.campaigns.craveonline.com.
+staging.icravenos.craveonline.com.                        IN    CNAME    staging.campaigns.craveonline.com.
+demo.icravenos.craveonline.com.                           IN    CNAME    demo.si.evolvemediallc.com.
+
+; travelguide.craveonline.com entries 
+; Created on 20110504 by wfu
+
+; getmoreaction.craveonline.com entries
+; Created on 20110512 by wfu
+getmoreaction.craveonline.com.                            IN    CNAME    cdn.campaigns.craveonline.com.
+staging.getmoreaction.craveonline.com.                    IN    CNAME    staging.campaigns.craveonline.com.
+demo.getmoreaction.craveonline.com.                       IN    CNAME    demo.si.evolvemediallc.com.
+
+; ccmixdrinks.craveonline.com entries 
+; Created on 20110517 by aibarra
+demo.ccmixdrinks.craveonline.com.                         IN    CNAME    demo.si.evolvemediallc.com.
+
+; fear3.craveonline.com entries 
+; Created on 20110519 by aibarra
+fear3.craveonline.com.                                    IN    CNAME    cdn.campaigns.craveonline.com.
+staging.fear3.craveonline.com.                            IN    CNAME    staging.campaigns.craveonline.com.
+demo.fear3.craveonline.com.                               IN    CNAME    demo.si.evolvemediallc.com.
+
+; fear33d.craveonline.com entries 
+; Created on 20110519 by aibarra
+demo.fear33d.craveonline.com.                             IN    CNAME    demo.si.evolvemediallc.com.
+
+; gamingblast.craveonline.com entries 
+; Created on 20110524 by aibarra
+;gamingblast.craveonline.com.                             IN    CNAME    cdn.campaigns.craveonline.com.
+;staging.gamingblast.craveonline.com.                     IN    CNAME    staging.campaigns.craveonline.com.
+demo.gamingblast.craveonline.com.                         IN    CNAME    demo.si.evolvemediallc.com.
+
+; dukenukemforever.craveonline.com entries
+; Created on 20110524 by aibarra
+dukenukemforever.craveonline.com.                         IN    CNAME    cdn.campaigns.craveonline.com.
+staging.dukenukemforever.craveonline.com.                 IN    CNAME    staging.campaigns.craveonline.com.
+demo.dukenukemforever.craveonline.com.                    IN    CNAME    demo.si.evolvemediallc.com.
+
+; malibusummernights.craveonline.com entries 
+; Created on 20110607 by wfu
+malibusummernights.craveonline.com.                       IN    CNAME    cdn.campaigns.craveonline.com.
+staging.malibusummernights.craveonline.com.               IN    CNAME    staging.campaigns.craveonline.com.
+demo.malibusummernights.craveonline.com.                  IN    CNAME    demo.si.evolvemediallc.com.
+
+; breakingbad.craveonline.com entries 
+; Created on 20110621 by aibarra
+breakingbad.craveonline.com.                              IN    CNAME    cdn.campaigns.craveonline.com.
+staging.breakingbad.craveonline.com.                      IN    CNAME    staging.campaigns.craveonline.com.
+demo.breakingbad.craveonline.com.                         IN    CNAME    demo.si.evolvemediallc.com.
+
+; backtocollege.craveonline.com entries 
+; Created on 20100708 by jjohnson
+; Migrating to new infrastructure by aibarra
+backtocollege.craveonline.com.                            IN    CNAME    campaigns.edgesuite.net.
+staging.backtocollege.craveonline.com.                    IN    CNAME    staging.campaigns.craveonline.com.
+demo.backtocollege.craveonline.com.                       IN    CNAME    demo.si.evolvemediallc.com.
+
+
+;
+; _si_ Microsite list ends here
+;
+; gstaples commenting this out, I think it should have gone with r10035
+;origin.campaigns.craveonline.com.                        IN  A   72.172.76.14
+demo.campaigns.craveonline.com.                           IN  A   72.172.76.99
+
+;
+; Demo Server
+;
+origin.demo.craveonline.com.                              IN    A        72.172.76.103
+demo.craveonline.com.                                     IN    CNAME    demo.craveonline.com.edgesuite.net.
+; temp for sweepstakes collection until 25 Sep 2009
+;12rounds.craveonline.com.                                IN    CNAME    microsites.craveonline.com.
+airforce.craveonline.com.                                 IN    CNAME    cdn.campaigns.craveonline.com.
+lasthouseontheleftdvd.craveonline.com.                    IN    CNAME    cdn.campaigns.craveonline.com.
+;playboy.craveonline.com.                                 IN    CNAME    microsites.craveonline.com.
+streetfighter.craveonline.com.                            IN    CNAME    microsites.craveonline.com.
+;
+assetmanager.si                                           IN    A        72.172.76.94
+;
+gb-srv-001.craveonline.com.                               IN    A        64.34.172.209
+gb-srv-002.craveonline.com.                               IN    A        72.51.41.238
+;
+; CDN stuff
+images.origin.craveonline.com.                            IN    CNAME    images.craveonline.com.
+audio.origin.craveonline.com.                             IN    CNAME    images.craveonline.com.
+images.cdn.craveonline.com.                               IN    CNAME    images.cdn.craveonline.com.edgesuite.net.
+audio.cdn.craveonline.com.                                IN    CNAME    audio.cdn.craveonline.com.edgesuite.net.
+www.cdn.craveonline.com.                                  IN    CNAME    www.cdn.craveonline.com.edgesuite.net.
+; springboard front end entries
+
+; Sitebuilder / Springboard entries
+preview.craveonline.com.                                  IN    CNAME    sitebuilder.atomiconline.com.
+
+
+
+
+staging.craveonline.com.                                  IN    CNAME    staging.campaigns.craveonline.com.
+staging.microsites.craveonline.com.                       IN    CNAME    staging.campaigns.craveonline.com.
+
+wrestlezone.craveonline.com.                              IN    A        72.172.76.30
+hfboards.craveonline.com.                                 IN    A        72.172.76.31
+sherdognet.craveonline.com.                               IN    A        72.172.76.39
+crowdignite.craveonline.com.                          IN    A        72.172.76.148
+news.crowdignite.craveonline.com.                     IN    A        72.172.76.148
+es.crowdignite.craveonline.com.                     IN    A        72.172.76.148
+sherdogblog.craveonline.com.                              IN    CNAME    sherdog.com.
+qa.sherdogblog.craveonline.com.                           IN    CNAME    qa.sherdog.com.
+
+;
+; crowdignite
+;
+
+stg.crowdignite.craveonline.com.                      IN    A        10.11.134.66
+dev.crowdignite.craveonline.com.                      IN    A        10.11.234.44
+stg.news.crowdignite.craveonline.com.                 IN    A        10.11.134.66
+stg.es.crowdignite.craveonline.com.                 IN    A        10.11.134.66
+dev.news.crowdignite.craveonline.com.                 IN    A        10.11.234.44
+dev.es.crowdignite.craveonline.com.                 IN    A        10.11.234.44
+;chaggstrom.sbx.crowdignite.craveonline.com.          IN    CNAME    uid1v-chaggstrom.ci.dev.lax.gnmedia.net. ;decomm
+ddurand.sbx.crowdignite.craveonline.com.              IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+;fdavis.sbx.crowdignite.craveonline.com.               IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+fgonzalez.sbx.crowdignite.craveonline.com.            IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+jcortes.sbx.crowdignite.craveonline.com.              IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.crowdignite.craveonline.com.            IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.crowdignite.craveonline.com.           IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.crowdignite.craveonline.com.          IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+;mpatino.sbx.crowdignite.craveonline.com.             IN    CNAME    uid1v-mpatino.ci.dev.lax.gnmedia.net. ;decomm
+rvicchiullo.sbx.crowdignite.craveonline.com.          IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net.
+ssalazar.sbx.crowdignite.craveonline.com.             IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+uacosta.sbx.crowdignite.craveonline.com.              IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+
+ddurand.sbx.news.crowdignite.craveonline.com.              IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+;fdavis.sbx.news.crowdignite.craveonline.com.               IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+fgonzalez.sbx.news.crowdignite.craveonline.com.            IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+jcortes.sbx.news.crowdignite.craveonline.com.              IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.news.crowdignite.craveonline.com.            IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.news.crowdignite.craveonline.com.           IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.news.crowdignite.craveonline.com.          IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+rvicchiullo.sbx.news.crowdignite.craveonline.com.          IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net.
+ssalazar.sbx.news.crowdignite.craveonline.com.             IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+uacosta.sbx.news.crowdignite.craveonline.com.              IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+
+ddurand.sbx.es.crowdignite.craveonline.com.              IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+;fdavis.sbx.es.crowdignite.craveonline.com.               IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+fgonzalez.sbx.es.crowdignite.craveonline.com.            IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+jcortes.sbx.es.crowdignite.craveonline.com.              IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.es.crowdignite.craveonline.com.            IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.es.crowdignite.craveonline.com.           IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.es.crowdignite.craveonline.com.          IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+rvicchiullo.sbx.es.crowdignite.craveonline.com.          IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net.
+ssalazar.sbx.es.crowdignite.craveonline.com.             IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+uacosta.sbx.es.crowdignite.craveonline.com.              IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+
+; Net2Ez env
+preview.lax                                               IN    A        72.172.76.22
+;
+;concerts                                                 IN    A        72.172.76.85
+
+; moving to pebblebed entries
+lax                                                       IN    A        72.172.76.151
+origin-lax                                                IN    CNAME    lax.craveonline.com.
+cdn-lax                                                   IN    CNAME    pebblebed.edgesuite.net.
+
+
+cdn.craveonline.com.                                      IN    CNAME    cdn.craveonline.com.edgesuite.net.
+cdn1.craveonline.com.                                     IN    CNAME    cdn.craveonline.com.edgesuite.net.
+cdn2.craveonline.com.                                     IN    CNAME    cdn.craveonline.com.edgesuite.net.
+cdn3.craveonline.com.                                     IN    CNAME    cdn.craveonline.com.edgesuite.net.
+
+dev.craveonline.com.                                      IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.craveonline.com.                                      IN    CNAME    stg.pbwordpress.gnmedia.net.
+craveonline.com.                                          IN    A        72.172.76.151
+prd.craveonline.com.                                      IN    CNAME    craveonline.com.
+www.craveonline.com.                                      IN    CNAME    craveonline.com.
+
+bta.craveonline.com.                                      IN    A        10.11.234.71
+origin.bta.craveonline.com.                               IN    CNAME    bta.craveonline.com.
+cdn-bta.craveonline.com.                                  IN    CNAME    bta.craveonline.com.
+cdn1-bta.craveonline.com.                                 IN    CNAME    bta.craveonline.com.
+cdn2-bta.craveonline.com.                                 IN    CNAME    bta.craveonline.com.
+cdn3-bta.craveonline.com.                                 IN    CNAME    bta.craveonline.com.
+
+origin-dev.craveonline.com.                               IN    CNAME    dev.craveonline.com.
+cdn-dev.craveonline.com.                                  IN    CNAME    dev.craveonline.com.
+cdn1-dev.craveonline.com.                                 IN    CNAME    dev.craveonline.com.
+cdn2-dev.craveonline.com.                                 IN    CNAME    dev.craveonline.com.
+cdn3-dev.craveonline.com.                                 IN    CNAME    dev.craveonline.com.
+
+origin-stg.craveonline.com.                               IN    CNAME    stg.craveonline.com.
+cdn-stg.craveonline.com.                                  IN    CNAME    pebblebed.edgesuite.net.
+cdn1-stg.craveonline.com.                                 IN    CNAME    pebblebed.edgesuite.net.
+cdn2-stg.craveonline.com.                                 IN    CNAME    pebblebed.edgesuite.net.
+cdn3-stg.craveonline.com.                                 IN    CNAME    pebblebed.edgesuite.net.
+
+origin.craveonline.com.                                   IN    CNAME    prd.craveonline.com.
+cdn-www.craveonline.com.                                  IN    CNAME    pebblebed.edgesuite.net.
+cdn1-www.craveonline.com.                                 IN    CNAME    pebblebed.edgesuite.net.
+cdn2-www.craveonline.com.                                 IN    CNAME    pebblebed.edgesuite.net.
+cdn3-www.craveonline.com.                                 IN    CNAME    pebblebed.edgesuite.net.
+
+dev.m.craveonline.com.                                    IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.m.craveonline.com.                                    IN    CNAME    stg.pbwordpress.gnmedia.net.
+m.craveonline.com.                                        IN    A        72.172.76.151
+prd.m.craveonline.com.                                    IN    A        72.172.76.151
+www.m.craveonline.com.                                    IN    A        72.172.76.151
+
+
+; MostCraved
+dev.mostcraved.craveonline.com.                           IN    CNAME    app1v-mc.ao.dev.lax.gnmedia.net.
+stg.mostcraved.craveonline.com.                           IN    CNAME    vip-app-mc.ao.stg.lax.gnmedia.net.
+mostcraved.craveonline.com.                               IN    CNAME    vip-app-mc.ao.prd.lax.gnmedia.net.
+www.mostcraved.craveonline.com.                           IN    CNAME    mostcraved.craveonline.com.
+
+
+; IDLYITW
+idly.craveonline.com.                                     IN    A        72.172.76.151
+dev.idly.craveonline.com.                                 IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.idly.craveonline.com.                                 IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.idly.craveonline.com.                                 IN    CNAME    idly.craveonline.com.
+www.idly.craveonline.com.                                 IN    CNAME    idly.craveonline.com.
+
+bta.idly.craveonline.com.                                 IN    A        10.11.234.71
+origin.bta.idly.craveonline.com.                          IN    CNAME    bta.craveonline.com.
+cdn1-bta.idly.craveonline.com.                            IN    CNAME    bta.craveonline.com.
+cdn2-bta.idly.craveonline.com.                            IN    CNAME    bta.craveonline.com.
+cdn3-bta.idly.craveonline.com.                            IN    CNAME    bta.craveonline.com.
+
+origin-dev.idly.craveonline.com.                          IN    CNAME    dev.idly.craveonline.com.
+cdn1-dev.idly.craveonline.com.                            IN    CNAME    dev.idly.craveonline.com.
+cdn2-dev.idly.craveonline.com.                            IN    CNAME    dev.idly.craveonline.com.
+cdn3-dev.idly.craveonline.com.                            IN    CNAME    dev.idly.craveonline.com.
+
+origin-stg.idly.craveonline.com.                          IN    CNAME    stg.idly.craveonline.com.
+cdn1-stg.idly.craveonline.com.                            IN    CNAME    pebblebed.edgesuite.net.
+cdn2-stg.idly.craveonline.com.                            IN    CNAME    pebblebed.edgesuite.net.
+cdn3-stg.idly.craveonline.com.                            IN    CNAME    pebblebed.edgesuite.net.
+
+origin.idly.craveonline.com.                              IN    CNAME    idly.craveonline.com.
+origin-prd.idly.craveonline.com.                          IN    CNAME    idly.craveonline.com.
+cdn1-www.idly.craveonline.com.                            IN    CNAME    pebblebed.edgesuite.net.
+cdn2-www.idly.craveonline.com.                            IN    CNAME    pebblebed.edgesuite.net.
+cdn3-www.idly.craveonline.com.                            IN    CNAME    pebblebed.edgesuite.net.
+
+dev.m.idly.craveonline.com.                               IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.m.idly.craveonline.com.                               IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.m.idly.craveonline.com.                               IN    CNAME    idly.craveonline.com.
+;m.idly.craveonline.com.                                  IN    CNAME    prd.m.idly.craveonline.com.
+
+
+; speedtv.craveonline.com
+speedtv.craveonline.com.                                  IN    CNAME    lax.speedtv.craveonline.com.
+lax.speedtv.craveonline.com.                              IN    A        72.172.76.30
+preview.speedtv.craveonline.com.                          IN    CNAME    preview.lax.speedtv.craveonline.com.
+preview.lax.speedtv.craveonline.com.                      IN    A        72.172.76.22
+
+; pax.craveonline.com
+pax.craveonline.com.                                      IN    CNAME    lax.pax.craveonline.com.
+lax.pax.craveonline.com.                                  IN    A        72.172.76.30
+preview.pax.craveonline.com.                              IN    CNAME    preview.lax.pax.craveonline.com.
+preview.lax.pax.craveonline.com.                          IN    A        72.172.76.22
+
+; hockeysfuture.craveonline.com
+hockeysfuture.craveonline.com.                            IN    A        72.172.76.26 
+lax.hockeysfuture.craveonline.com.                        IN    A        72.172.76.30
+preview.hockeysfuture.craveonline.com.                    IN    CNAME    preview.lax.hockeysfuture.craveonline.com.
+preview.lax.hockeysfuture.craveonline.com.                IN    A        72.172.76.22
+
+; bufferzone
+bufferzone.craveonline.com.                               IN    A        72.172.76.151
+
+bta.bufferzone.craveonline.com.                           IN    A        10.11.234.71
+dev.bufferzone.craveonline.com.                           IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.bufferzone.craveonline.com.                           IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.bufferzone.craveonline.com.                           IN    A        72.172.76.151
+www.bufferzone.craveonline.com.                           IN    A        72.172.76.151
+
+origin-dev.bufferzone.craveonline.com.                    IN    CNAME    dev.bufferzone.craveonline.com.
+cdn-dev.bufferzone.craveonline.com.                       IN    CNAME    dev.bufferzone.craveonline.com.
+cdn1-dev.bufferzone.craveonline.com.                      IN    CNAME    dev.bufferzone.craveonline.com.
+cdn2-dev.bufferzone.craveonline.com.                      IN    CNAME    dev.bufferzone.craveonline.com.
+cdn3-dev.bufferzone.craveonline.com.                      IN    CNAME    dev.bufferzone.craveonline.com.
+
+origin-stg.bufferzone.craveonline.com.                    IN    CNAME    stg.bufferzone.craveonline.com.
+cdn-stg.bufferzone.craveonline.com.                       IN    CNAME    pebblebed.edgesuite.net.
+cdn1-stg.bufferzone.craveonline.com.                      IN    CNAME    pebblebed.edgesuite.net.
+cdn2-stg.bufferzone.craveonline.com.                      IN    CNAME    pebblebed.edgesuite.net.
+cdn3-stg.bufferzone.craveonline.com.                      IN    CNAME    pebblebed.edgesuite.net.
+
+origin.bufferzone.craveonline.com.                        IN    CNAME    bufferzone.craveonline.com.
+cdn.bufferzone.craveonline.com.                           IN    CNAME    pebblebed.edgesuite.net.
+cdn1.bufferzone.craveonline.com.                          IN    CNAME    pebblebed.edgesuite.net.
+cdn2.bufferzone.craveonline.com.                          IN    CNAME    pebblebed.edgesuite.net.
+cdn3.bufferzone.craveonline.com.                          IN    CNAME    pebblebed.edgesuite.net.
+cdn1-www.bufferzone.craveonline.com.                      IN    CNAME    pebblebed.edgesuite.net.
+cdn2-www.bufferzone.craveonline.com.                      IN    CNAME    pebblebed.edgesuite.net.
+cdn3-www.bufferzone.craveonline.com.                      IN    CNAME    pebblebed.edgesuite.net.
+
+
+pacman.craveonline.com                                    IN    A        72.172.76.151
+
+; #### ringtv TitanWP
+ringtv.craveonline.com.                                   IN    A        72.172.76.151
+
+bta.ringtv.craveonline.com.                               IN    A        10.11.234.71
+dev.ringtv.craveonline.com.                               IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.ringtv.craveonline.com.                               IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.ringtv.craveonline.com.                               IN    A        72.172.76.151
+www.ringtv.craveonline.com.                               IN    A        72.172.76.151
+
+origin.bta.ringtv.craveonline.com.                        IN    CNAME    bta.ringtv.craveonline.com.
+cdn1-bta.ringtv.craveonline.com.                          IN    CNAME    bta.ringtv.craveonline.com.
+cdn2-bta.ringtv.craveonline.com.                          IN    CNAME    bta.ringtv.craveonline.com.
+cdn3-bta.ringtv.craveonline.com.                          IN    CNAME    bta.ringtv.craveonline.com.
+
+origin-dev.ringtv.craveonline.com.                        IN    CNAME    dev.ringtv.craveonline.com.
+cdn1-dev.ringtv.craveonline.com.                          IN    CNAME    dev.ringtv.craveonline.com.
+cdn2-dev.ringtv.craveonline.com.                          IN    CNAME    dev.ringtv.craveonline.com.
+cdn3-dev.ringtv.craveonline.com.                          IN    CNAME    dev.ringtv.craveonline.com.
+
+origin-stg.ringtv.craveonline.com.                        IN    CNAME    stg.ringtv.craveonline.com.
+cdn1-stg.ringtv.craveonline.com.                          IN    CNAME    pebblebed.edgesuite.net.
+cdn2-stg.ringtv.craveonline.com.                          IN    CNAME    pebblebed.edgesuite.net.
+cdn3-stg.ringtv.craveonline.com.                          IN    CNAME    pebblebed.edgesuite.net.
+
+origin.ringtv.craveonline.com.                            IN    CNAME    prd.ringtv.craveonline.com.
+cdn1-www.ringtv.craveonline.com.                          IN    CNAME    pebblebed.edgesuite.net.
+cdn2-www.ringtv.craveonline.com.                          IN    CNAME    pebblebed.edgesuite.net.
+cdn3-www.ringtv.craveonline.com.                          IN    CNAME    pebblebed.edgesuite.net.
+
+dev.m.ringtv.craveonline.com.                             IN    CNAME    dev.ringtv.craveonline.com.
+stg.m.ringtv.craveonline.com.                             IN    CNAME    stg.ringtv.craveonline.com.
+www.m.ringtv.craveonline.com.                             IN    CNAME    prd.ringtv.craveonline.com.
+m.ringtv.craveonline.com.                                 IN    CNAME    prd.ringtv.craveonline.com.
+; #### End TitanWP
+
+
+; craveonline microsite catch-all
+*.origin.craveonline.com.                                 IN    CNAME    cdn.campaigns.craveonline.com.
+*.staging.craveonline.com.                                IN    CNAME    staging.campaigns.craveonline.com.
+
+
+*.craveonline.com.                                        IN    CNAME    cdn.campaigns.craveonline.com.
+*.demo.craveonline.com.                                   IN    CNAME    origin.demo.craveonline.com.
+
+*.origin.demo.craveonline.com.                            IN    CNAME    origin.demo.craveonline.com.
+gradgiftguide.craveonline.com.                            IN    CNAME    cdn.campaigns.craveonline.com.
+staging.gradgiftguide.craveonline.com.                    IN    CNAME    staging.campaigns.craveonline.com.
+demo.gradgiftguide.craveonline.com.                       IN    CNAME    demo.si.evolvemediallc.com.
+manifesto.craveonline.com.                                IN    CNAME    cdn.campaigns.craveonline.com.
+staging.manifesto.craveonline.com.                        IN    CNAME    staging.campaigns.craveonline.com.
+demo.manifesto.craveonline.com.                           IN    CNAME    demo.si.evolvemediallc.com.
+thecarshow.craveonline.com.                               IN    CNAME    cdn.campaigns.craveonline.com.
+staging.thecarshow.craveonline.com.                       IN    CNAME    staging.campaigns.craveonline.com.
+demo.thecarshow.craveonline.com.                          IN    CNAME    demo.si.evolvemediallc.com.
+cravedmovies.craveonline.com.                             IN    CNAME    cdn.campaigns.craveonline.com.
+staging.cravedmovies.craveonline.com.                     IN    CNAME    staging.campaigns.craveonline.com.
+demo.cravedmovies.craveonline.com.                        IN    CNAME    demo.si.evolvemediallc.com.
+mechanicalmonsters.craveonline.com.                       IN    CNAME    cdn.campaigns.craveonline.com.
+staging.mechanicalmonsters.craveonline.com.               IN    CNAME    staging.campaigns.craveonline.com.
+demo.mechanicalmonsters.craveonline.com.                  IN    CNAME    demo.si.evolvemediallc.com.
+hotrs_royalrumble.craveonline.com.                        IN    CNAME    cdn.campaigns.craveonline.com.
+staging.hotrs_royalrumble.craveonline.com.                IN    CNAME    staging.campaigns.craveonline.com.
+demo.hotrs_royalrumble.craveonline.com.                   IN    CNAME    demo.si.evolvemediallc.com.
+walmartbacktoschool.craveonline.com.                      IN    CNAME    cdn.campaigns.craveonline.com.
+staging.walmartbacktoschool.craveonline.com.              IN    CNAME    staging.campaigns.craveonline.com.
+demo.walmartbacktoschool.craveonline.com.                 IN    CNAME    demo.si.evolvemediallc.com.
+triptorumble.craveonline.com.                             IN    CNAME    cdn.campaigns.craveonline.com.
+staging.triptorumble.craveonline.com.                     IN    CNAME    staging.campaigns.craveonline.com.
+demo.triptorumble.craveonline.com.                        IN    CNAME    demo.si.evolvemediallc.com.
+smoothsummerconcerts.craveonline.com.                     IN    CNAME    cdn.campaigns.craveonline.com.
+staging.smoothsummerconcerts.craveonline.com.             IN    CNAME    staging.campaigns.craveonline.com.
+demo.smoothsummerconcerts.craveonline.com.                IN    CNAME    demo.si.evolvemediallc.com.
+top10guides.craveonline.com.                              IN    CNAME    cdn.campaigns.craveonline.com.
+staging.top10guides.craveonline.com.                      IN    CNAME    staging.campaigns.craveonline.com.
+demo.top10guides.craveonline.com.                         IN    CNAME    demo.si.evolvemediallc.com.
+paxprime2011.craveonline.com.                             IN    CNAME    cdn.campaigns.craveonline.com.
+staging.paxprime2011.craveonline.com.                     IN    CNAME    staging.campaigns.craveonline.com.
+demo.paxprime2011.craveonline.com.                        IN    CNAME    demo.si.evolvemediallc.com.
+musicsummerblast.craveonline.com.                         IN    CNAME    cdn.campaigns.craveonline.com.
+staging.musicsummerblast.craveonline.com.                 IN    CNAME    staging.campaigns.craveonline.com.
+demo.musicsummerblast.craveonline.com.                    IN    CNAME    demo.si.evolvemediallc.com.
+thordvd3d.craveonline.com.                                IN    CNAME    cdn.campaigns.craveonline.com.
+staging.thordvd3d.craveonline.com.                        IN    CNAME    staging.campaigns.craveonline.com.
+demo.thordvd3d.craveonline.com.                           IN    CNAME    demo.si.evolvemediallc.com.
+;perfectroom.craveonline.com.                             IN    CNAME    cdn.campaigns.craveonline.com.
+;staging.perfectroom.craveonline.com.                     IN    CNAME    staging.campaigns.craveonline.com.
+demo.perfectroom.craveonline.com.                         IN    CNAME    demo.si.evolvemediallc.com.
+jimbeamdevilscut.craveonline.com.                         IN    CNAME    cdn.campaigns.craveonline.com.
+staging.jimbeamdevilscut.craveonline.com.                 IN    CNAME    staging.campaigns.craveonline.com.
+demo.jimbeamdevilscut.craveonline.com.                    IN    CNAME    demo.si.evolvemediallc.com.
+;musicblast.craveonline.com.                              IN    CNAME    cdn.campaigns.craveonline.com.
+;staging.musicblast.craveonline.com.                      IN    CNAME    staging.campaigns.craveonline.com.
+demo.musicblast.craveonline.com.         IN      CNAME       demo.si.evolvemediallc.com.
+thesetupsweepstakes.craveonline.com.                      IN    CNAME    cdn.campaigns.craveonline.com.
+staging.thesetupsweepstakes.craveonline.com.              IN    CNAME    staging.campaigns.craveonline.com.
+demo.thesetupsweepstakes.craveonline.com.                 IN    CNAME    demo.si.evolvemediallc.com.
+blitzmovie.craveonline.com.                               IN    CNAME    cdn.campaigns.craveonline.com.
+staging.blitzmovie.craveonline.com.                       IN    CNAME    staging.campaigns.craveonline.com.
+demo.blitzmovie.craveonline.com.                          IN    CNAME    demo.si.evolvemediallc.com.
+tf3thenet.craveonline.com.                                IN    CNAME    cdn.campaigns.craveonline.com.
+staging.tf3thenet.craveonline.com.                        IN    CNAME    staging.campaigns.craveonline.com.
+demo.tf3thenet.craveonline.com.                           IN    CNAME    demo.si.evolvemediallc.com.
+primeyourpad.craveonline.com.                             IN    CNAME    cdn.campaigns.craveonline.com.
+staging.primeyourpad.craveonline.com.                     IN    CNAME    staging.campaigns.craveonline.com.
+demo.primeyourpad.craveonline.com.                        IN    CNAME    demo.si.evolvemediallc.com.
+;blitz.craveonline.com.                                   IN    CNAME    cdn.campaigns.craveonline.com.
+;staging.blitz.craveonline.com.                           IN    CNAME    staging.campaigns.craveonline.com.
+;demo.blitz.craveonline.com.                              IN    CNAME    cdn.campaigns.craveonline.com.
+spiceupyournights.craveonline.com.                        IN    CNAME    cdn.campaigns.craveonline.com.
+staging.spiceupyournights.craveonline.com.                IN    CNAME    staging.campaigns.craveonline.com.
+demo.spiceupyournights.craveonline.com.                   IN    CNAME    demo.si.evolvemediallc.com.
+sailacross.craveonline.com.                               IN    CNAME    cdn.campaigns.craveonline.com.
+staging.sailacross.craveonline.com.                       IN    CNAME    staging.campaigns.craveonline.com.
+demo.sailacross.craveonline.com.                          IN    CNAME    demo.si.evolvemediallc.com.
+nycomiccon.craveonline.com.                               IN    CNAME    cdn.campaigns.craveonline.com.
+demo.nycomiccon.craveonline.com.                          IN    CNAME    demo.si.evolvemediallc.com.
+staging.nycomiccon.craveonline.com.                       IN    CNAME    staging.campaigns.craveonline.com.
+;getcloser.craveonline.com.                               IN    CNAME    cdn.campaigns.craveonline.com.
+staging.getcloser.craveonline.com.                        IN    CNAME    staging.campaigns.craveonline.com.
+;curvephoto.craveonline.com.                              IN    CNAME    cdn.campaigns.craveonline.com.
+;staging.curvephoto.craveonline.com.                      IN    CNAME    staging.campaigns.craveonline.com.
+demo.curvephoto.craveonline.com.                          IN    CNAME    demo.si.evolvemediallc.com.
+;conandvd3d.craveonline.com.                              IN    CNAME    cdn.campaigns.craveonline.com.
+;staging.conandvd3d.craveonline.com.                      IN    CNAME    staging.campaigns.craveonline.com.
+demo.conandvd3d.craveonline.com.                          IN    CNAME    demo.si.evolvemediallc.com.
+smirnoffholidays2011.craveonline.com.                     IN    CNAME    cdn.campaigns.craveonline.com.
+staging.smirnoffholidays2011.craveonline.com.             IN    CNAME    staging.campaigns.craveonline.com.
+demo.smirnoffholidays2011.craveonline.com.                IN    CNAME    demo.si.evolvemediallc.com.
+;frightnightdvd.craveonline.com.                          IN    CNAME    cdn.campaigns.craveonline.com.
+;staging.frightnightdvd.craveonline.com.                  IN    CNAME    staging.campaigns.craveonline.com.
+demo.frightnightdvd.craveonline.com.                      IN    CNAME    demo.si.evolvemediallc.com.
+holidaygiftguide2010.craveonline.com.                     IN    CNAME    cdn.campaigns.craveonline.com.
+;winterdewtour.craveonline.com.                           IN    CNAME    cdn.campaigns.craveonline.com.
+;staging.winterdewtour.craveonline.com.                   IN    CNAME    staging.campaigns.craveonline.com.
+demo.winterdewtour.craveonline.com.                       IN    CNAME    demo.si.evolvemediallc.com.
+homestorage.craveonline.com.                              IN    CNAME    cdn.campaigns.craveonline.com.
+staging.homestorage.craveonline.com.                      IN    CNAME    staging.campaigns.craveonline.com.
+;cheatdeath_fd5.craveonline.com.                          IN    CNAME    cdn.campaigns.craveonline.com.
+;staging.cheatdeath_fd5.craveonline.com.                  IN    CNAME    staging.campaigns.craveonline.com.
+;demo.cheatdeath_fd5.craveonline.com.                     IN    CNAME    cdn.campaigns.craveonline.com.
+demo.getcloser.craveonline.com.          IN      CNAME       demo.si.evolvemediallc.com.
+heymanhustle.craveonline.com.                             IN    A        72.172.76.151
+*.heymanhustle.craveonline.com.                           IN    A        72.172.76.151
+demo.fastandfurious.craveonline.com.                      IN    CNAME    demo.si.evolvemediallc.com.
+demo.lasthouseontheleftdvd.craveonline.com.               IN    CNAME    demo.si.evolvemediallc.com.
+staging.shutterisland.craveonline.com.                    IN    CNAME    staging.campaigns.craveonline.com.
+demo.shutterisland.craveonline.com.                       IN    CNAME    demo.si.evolvemediallc.com.
+demo.airforce.craveonline.com.                            IN    CNAME    demo.si.evolvemediallc.com.
+demo.deadspace.craveonline.com.                           IN    CNAME    demo.si.evolvemediallc.com.
+demo.headsup.craveonline.com.                             IN    CNAME    demo.si.evolvemediallc.com.
+staging.stepfatherdvd.craveonline.com.                    IN    CNAME    staging.campaigns.craveonline.com.
+demo.stepfatherdvd.craveonline.com.                       IN    CNAME    demo.si.evolvemediallc.com.
+staging.chuck.craveonline.com.                            IN    CNAME    staging.campaigns.craveonline.com.
+demo.chuck.craveonline.com.                               IN    CNAME    demo.si.evolvemediallc.com.
+;bobsburger.craveonline.com.                              IN    CNAME    campaings.craveonline.com.
+smirnoffblueplad.craveonline.com.                         IN    CNAME    cdn.campaigns.craveonline.com.
+staging.smirnoffblueplad.craveonline.com.                 IN    CNAME    staging.cdn.campaigns.craveonline.com.
+demo.smirnoffblueplad.craveonline.com.                    IN    CNAME    cdn.campaigns.craveonline.com.
+themepsp.craveonline.com.                                 IN    CNAME    cdn.campaigns.craveonline.com.
+staging.themepsp.craveonline.com.                         IN    CNAME    staging.campaigns.craveonline.com.
+demo.themepsp.craveonline.com.                            IN    CNAME    cdn.campaigns.craveonline.com.
+spartacusvengence.craveonline.com.                        IN    CNAME    cdn.campaigns.craveonline.com.
+staging.spartacusvengence.craveonline.com.                IN    CNAME    staging.campaigns.craveonline.com.
+demo.spartacusvengence.craveonline.com.                   IN    CNAME    demo.si.evolvemediallc.com.
+spartacusvengeance.craveonline.com.                       IN    CNAME    cdn.campaigns.craveonline.com.
+staging.spartacusvengeance.craveonline.com.               IN    CNAME    staging.campaigns.craveonline.com.
+demo.spartacusvengeance.craveonline.com.                  IN    CNAME    demo.si.evolvemediallc.com.
+miownworld.craveonline.com.                               IN    CNAME    cdn.campaigns.craveonline.com.
+staging.miownworld.craveonline.com.                       IN    CNAME    staging.campaigns.craveonline.com.
+demo.miownworld.craveonline.com.                          IN    CNAME    demo.si.evolvemediallc.com.
+drutest.craveonline.com.                                  IN    CNAME    cdn.campaigns.craveonline.com.
+staging.drutest.craveonline.com.                          IN    CNAME    staging.campaigns.craveonline.com.
+demo.drutest.craveonline.com.                             IN    CNAME    cdn.campaigns.craveonline.com.
+paxeast2011.craveonline.com.                              IN    CNAME    cdn.campaigns.craveonline.com.
+demo.paxeast2011.craveonline.com.                         IN    CNAME    demo.si.evolvemediallc.com.
+gadgetgiveaway.craveonline.com.                           IN    CNAME    cdn.campaigns.craveonline.com.
+staging.gadgetgiveaway.craveonline.com.                   IN    CNAME    staging.campaigns.craveonline.com.
+demo.gadgetgiveaway.craveonline.com.                      IN    CNAME    demo.si.evolvemediallc.com.
+terrortrip.craveonline.com.                               IN    CNAME    cdn.campaigns.craveonline.com.
+staging.terrortrip.craveonline.com.                       IN    CNAME    staging.campaigns.craveonline.com.
+demo.terrortrip.craveonline.com.                          IN    CNAME    demo.si.evolvemediallc.com.
+mi4sweeps.craveonline.com.                                IN    CNAME    cdn.campaigns.craveonline.com.
+staging.mi4sweeps.craveonline.com.                        IN    CNAME    staging.campaigns.craveonline.com.
+demo.mi4sweeps.craveonline.com.                           IN    CNAME    demo.si.evolvemediallc.com.
+mi4destruction.craveonline.com.                           IN    CNAME    cdn.campaigns.craveonline.com.
+staging.mi4destruction.craveonline.com.                   IN    CNAME    staging.campaigns.craveonline.com.
+demo.mi4destruction.craveonline.com.                      IN    CNAME    demo.si.evolvemediallc.com.
+lockoutmugshot.craveonline.com.                           IN    CNAME    cdn.campaigns.craveonline.com.
+staging.lockoutmugshot.craveonline.com.                   IN    CNAME    staging.campaigns.craveonline.com.
+demo.lockoutmugshot.craveonline.com.                      IN    CNAME    demo.si.evolvemediallc.com.
+survivethecabin.craveonline.com.                          IN    CNAME    cdn.campaigns.craveonline.com.
+staging.survivethecabin.craveonline.com.                  IN    CNAME    staging.campaigns.craveonline.com.
+demo.survivethecabin.craveonline.com.                     IN    CNAME    demo.si.evolvemediallc.com.
+demo.coachella2011.craveonline.com.                       IN    CNAME    demo.si.evolvemediallc.com.
+demo.coachella2012.craveonline.com.      IN      CNAME       demo.si.evolvemediallc.com.
+dreammachines.craveonline.com.                            IN    CNAME    cdn.campaigns.craveonline.com.
+staging.dreammachines.craveonline.com.                    IN    CNAME    staging.campaigns.craveonline.com.
+demo.dreammachines.craveonline.com.                       IN    CNAME    demo.si.evolvemediallc.com.
+springcravings.craveonline.com.                           IN    CNAME    cdn.campaigns.craveonline.com.
+staging.springcravings.craveonline.com.                   IN    CNAME    staging.campaigns.craveonline.com.
+demo.springcravings.craveonline.com.                      IN    CNAME    demo.si.evolvemediallc.com.
+demo.mio.craveonline.com.                IN      CNAME       demo.si.evolvemediallc.com.
+americanninja.craveonline.com.                            IN    CNAME    cdn.campaigns.craveonline.com.
+staging.americanninja.craveonline.com.                    IN    CNAME    staging.campaigns.craveonline.com.
+demo.americanninja.craveonline.com.                       IN    CNAME    demo.si.evolvemediallc.com.
+theriver.craveonline.com.                                 IN    CNAME    cdn.campaigns.craveonline.com.
+staging.theriver.craveonline.com.                         IN    CNAME    staging.campaigns.craveonline.com.
+demo.theriver.craveonline.com.                            IN    CNAME    demo.si.evolvemediallc.com.
+demo.comiccon2011.craveonline.com.                        IN    CNAME    demo.si.evolvemediallc.com.
+actofvalor.craveonline.com.                               IN    CNAME    cdn.campaigns.craveonline.com.
+staging.actofvalor.craveonline.com.                       IN    CNAME    staging.campaigns.craveonline.com.
+demo.actofvalor.craveonline.com.                          IN    CNAME    demo.si.evolvemediallc.com.
+lizardlickphoto.craveonline.com.                          IN    CNAME    cdn.campaigns.craveonline.com.
+staging.lizardlickphoto.craveonline.com.                  IN    CNAME    staging.campaigns.craveonline.com.
+demo.lizardlickphoto.craveonline.com.                     IN    CNAME    demo.si.evolvemediallc.com.
+e3craveisland.craveonline.com.                            IN    CNAME    cdn.campaigns.craveonline.com.
+demo.e3craveisland.craveonline.com.      IN      CNAME       demo.si.evolvemediallc.com.
+e3.craveonline.com.                                       IN    CNAME    cdn.campaigns.craveonline.com.
+demo.e3-2012.craveonline.com.                             IN    CNAME    demo.si.evolvemediallc.com.
+staging.e3.craveonline.com.                               IN    CNAME    staging.campaigns.craveonline.com.
+21jumpstreet.craveonline.com.                             IN    CNAME    cdn.campaigns.craveonline.com.
+staging.21jumpstreet.craveonline.com.                     IN    CNAME    staging.campaigns.craveonline.com.
+demo.21jumpstreet.craveonline.com.                        IN    CNAME    demo.si.evolvemediallc.com.
+app1v-dns.tp.prd.lax.craveonline.com.                     IN    A        10.11.20.68
+app2v-dns.tp.prd.lax.craveonline.com.                     IN    A        10.11.20.69
+app3v-dns.tp.prd.lax.craveonline.com.                     IN    A        10.11.20.53
+app4v-dns.tp.prd.lax.craveonline.com.                     IN    A        10.11.20.88
+residentevil.craveonline.com.                             IN    CNAME    cdn.campaigns.craveonline.com.
+staging.residentevil.craveonline.com.                     IN    CNAME    staging.campaigns.craveonline.com.
+demo.residentevil.craveonline.com.       IN      CNAME       demo.si.evolvemediallc.com.
+scionfr-s.craveonline.com.                                IN    CNAME    cdn.campaigns.craveonline.com.
+staging.scionfr-s.craveonline.com.                        IN    CNAME    staging.campaigns.craveonline.com.
+demo.scionfr-s.craveonline.com.          IN      CNAME       demo.si.evolvemediallc.com.
+scionfr-s.gtchannel.craveonline.com.                      IN    CNAME    cdn.campaigns.craveonline.com.
+staging.scionfr-s.gtchannel.craveonline.com.              IN    CNAME    staging.campaigns.craveonline.com.
+demo.scionfr-s.gtchannel.craveonline.com. IN      CNAME       demo.si.evolvemediallc.com.
+scionfr-s.fastfever.craveonline.com.                      IN    CNAME    cdn.campaigns.craveonline.com.
+staging.scionfr-s.fastfever.craveonline.com.              IN    CNAME    staging.campaigns.craveonline.com.
+demo.scionfr-s.fastfever.craveonline.com.                 IN    CNAME    demo.si.evolvemediallc.com.
+residentevil-canada.craveonline.com.                      IN    CNAME    cdn.campaigns.craveonline.com.
+staging.residentevil-canada.craveonline.com.              IN    CNAME    staging.campaigns.craveonline.com.
+demo.residentevil-canada.craveonline.com.                 IN    CNAME    demo.si.evolvemediallc.com.
+dev.residentevil-canada.craveonline.com.                  IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+cdn.pb-assets.craveonline.com.                            IN    CNAME    cdn.campaigns.craveonline.com.
+origin.pb-assets.craveonline.com.                         IN    CNAME    origin.campaigns.craveonline.com.
+pb-assets.craveonline.com.                                IN    CNAME    cdn.campaigns.craveonline.com.
+frequency.cdn.craveonline.com.                            IN    CNAME    frequency.cdn.craveonline.com.edgesuite.net.
+dev.mio.craveonline.com.                                  IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+demo.bellator.craveonline.com.                            IN    CNAME    demo.si.evolvemediallc.com.
+dev.bellator.craveonline.com.                             IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+spartacus.craveonline.com.                                IN    CNAME    cdn.campaigns.craveonline.com.
+staging.spartacus.craveonline.com.                        IN    CNAME    staging.campaigns.craveonline.com.
+demo.spartacus.craveonline.com.                           IN    CNAME    demo.si.evolvemediallc.com.
+dev.spartacus.craveonline.com.                            IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+ozthegreatandpowerful.craveonline.com.                    IN    CNAME    cdn.campaigns.craveonline.com.
+staging.ozthegreatandpowerful.craveonline.com.            IN    CNAME    staging.campaigns.craveonline.com.
+demo.ozthegreatandpowerful.craveonline.com.               IN    CNAME    demo.si.evolvemediallc.com.
+dev.ozthegreatandpowerful.craveonline.com.                IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+ozthegreatandpowerful.movieweb.craveonline.com.           IN    CNAME    cdn.campaigns.craveonline.com.
+staging.ozthegreatandpowerful.movieweb.craveonline.com.   IN    CNAME    staging.campaigns.craveonline.com.
+demo.ozthegreatandpowerful.movieweb.craveonline.com.      IN    CNAME    demo.si.evolvemediallc.com.
+dev.ozthegreatandpowerful.movieweb.craveonline.com.       IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+pepsilfn.craveonline.com.                                 IN    CNAME    cdn.campaigns.craveonline.com.
+staging.pepsilfn.craveonline.com.                         IN    CNAME    staging.campaigns.craveonline.com.
+demo.pepsilfn.craveonline.com.           IN      CNAME       demo.si.evolvemediallc.com.
+dev.pepsilfn.craveonline.com.                             IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+reddawnredrisk.craveonline.com.                           IN    CNAME    cdn.campaigns.craveonline.com.
+staging.reddawnredrisk.craveonline.com.                   IN    CNAME    staging.campaigns.craveonline.com.
+demo.reddawnredrisk.craveonline.com.                      IN    CNAME    demo.si.evolvemediallc.com.
+dev.reddawnredrisk.craveonline.com.                       IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+moneymart.craveonline.com.                                IN    CNAME    cdn.campaigns.craveonline.com.
+staging.moneymart.craveonline.com.                        IN    CNAME    staging.campaigns.craveonline.com.
+demo.moneymart.craveonline.com.                           IN    CNAME    demo.si.evolvemediallc.com.
+dev.moneymart.craveonline.com.                            IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+e3raffle.craveonline.com.                                 IN    CNAME    cdn.campaigns.craveonline.com.
+staging.e3raffle.craveonline.com.                         IN    CNAME    staging.campaigns.craveonline.com.
+demo.e3raffle.craveonline.com.                            IN    CNAME    demo.si.evolvemediallc.com.
+dev.e3raffle.craveonline.com.                             IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+graveencounters2.craveonline.com.                         IN    CNAME    cdn.campaigns.craveonline.com.
+staging.graveencounters2.craveonline.com.                 IN    CNAME    staging.campaigns.craveonline.com.
+demo.graveencounters2.craveonline.com.                    IN    CNAME    demo.si.evolvemediallc.com.
+dev.graveencounters2.craveonline.com.                     IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+companyofheroes2.craveonline.com.                         IN    CNAME    cdn.campaigns.craveonline.com.
+staging.companyofheroes2.craveonline.com.                 IN    CNAME    staging.campaigns.craveonline.com.
+demo.companyofheroes2.craveonline.com.                    IN    CNAME    demo.si.evolvemediallc.com.
+dev.companyofheroes2.craveonline.com.                     IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+dev.sdccraffle.craveonline.com.                           IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+endlessrunner.craveonline.com.                            IN    CNAME    cdn.campaigns.craveonline.com.
+staging.endlessrunner.craveonline.com.                    IN    CNAME    staging.campaigns.craveonline.com.
+demo.endlessrunner.craveonline.com.                       IN    CNAME    demo.si.evolvemediallc.com.
+dev.endlessrunner.craveonline.com.                        IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+rktest.craveonline.com.                                   IN    CNAME    cdn.assets.craveonline.com.
+totalwar.craveonline.com.                                 IN    CNAME    cdn.campaigns.craveonline.com.
+staging.totalwar.craveonline.com.                         IN    CNAME    staging.campaigns.craveonline.com.
+demo.totalwar.craveonline.com.                            IN    CNAME    demo.si.evolvemediallc.com.
+dev.totalwar.craveonline.com.                             IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+demo.gamedaypartyguide.craveonline.com.                   IN    CNAME    demo.si.evolvemediallc.com.
+jackassbadgrandpacompetition.craveonline.com.             IN    CNAME    cdn.campaigns.craveonline.com.
+staging.jackassbadgrandpacompetition.craveonline.com.     IN    CNAME    staging.campaigns.craveonline.com.
+demo.jackassbadgrandpacompetition.craveonline.com.        IN    CNAME    demo.si.evolvemediallc.com.
+dev.jackassbadgrandpacompetition.craveonline.com.         IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+mediaads.craveonline.com.                                 IN    CNAME    mediaads.evolvemediallc.com.
+demo.thisistheendsurvivalguyd.craveonline.com. IN      CNAME       demo.si.evolvemediallc.com.
+soulsuspect.craveonline.com.             IN      CNAME       cdn.campaigns.craveonline.com.
+staging.soulsuspect.craveonline.com.     IN      CNAME       staging.campaigns.craveonline.com.
+demo.soulsuspect.craveonline.com.        IN      CNAME       cdn.campaigns.craveonline.com.
+dev.soulsuspect.craveonline.com.         IN      CNAME       app1v-dh.si.dev.lax.gnmedia.net.
+peak.crowdignite.craveonline.com.	IN CNAME 	peak.crowdignite.com.
+peak.news.crowdignite.craveonline.com.	IN CNAME        peak.crowdignite.com.
+peak.es.crowdignite.craveonline.com.	IN CNAME        peak.crowdignite.com.

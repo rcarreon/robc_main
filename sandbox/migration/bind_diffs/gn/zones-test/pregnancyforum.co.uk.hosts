@@ -1,0 +1,27 @@
+$TTL 86400
+pregnancyforum.co.uk.   IN      SOA     pregnancyforum.co.uk. root.pregnancyforum.co.uk. (
+                                   2014061900     ; serial
+                                   28800          ; refresh
+                                   14400          ; retry
+                                   3600000        ; expire
+                                   86400 )        ; minimum
+
+pregnancyforum.co.uk.              IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+pregnancyforum.co.uk.              IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+pregnancyforum.co.uk.              IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+pregnancyforum.co.uk.              IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+pregnancyforum.co.uk.              IN    MX 0     pregnancyforum.co.uk.
+
+pregnancyforum.co.uk.              IN    A        70.87.155.226
+www.pregnancyforum.co.uk.          IN    A        70.87.155.226
+localhost.pregnancyforum.co.uk.    IN    A        127.0.0.1
+
+mail.pregnancyforum.co.uk.         IN    CNAME    pregnancyforum.co.uk.
+ftp.pregnancyforum.co.uk.          IN    CNAME    pregnancyforum.co.uk.    
+whm.pregnancyforum.co.uk.          IN    CNAME    pregnancyforum.co.uk.
+cpanel.pregnancyforum.co.uk.       IN    CNAME    pregnancyforum.co.uk.
+webdisk.pregnancyforum.co.uk.      IN    CNAME    pregnancyforum.co.uk.
+webmail.pregnancyforum.co.uk.      IN    CNAME    pregnancyforum.co.uk.
+www2.pregnancyforum.co.uk.         IN    CNAME    redirect.skimlinks.com.
+cdn.pregnancyforum.co.uk.          IN    CNAME    pregnancyforum.webbymedialtd.netdna-cdn.com.

@@ -1,0 +1,45 @@
+yum remove php    php-common-5.3.3-27.el6_5.x86_64 php-tidy-5.3.3-27.el6_5.x86_64  php-cli-5.3.3-27.el6_5.x86_64 php-mysql-5.3.3-27.el6_5.x86_64  php-mbstring-5.3.3-27.el6_5.x86_64  php-mcrypt-5.3.3-3.el6.x86_64  php-pdo-5.3.3-27.el6_5.x86_64 php-xml-5.3.3-27.el6_5.x86_64 php-gd-5.3.3-27.el6_5.x86_64 
+
+sudo rpm -e php-phpunit-PHPUnit-3.7.29-1.el6.noarch php-phpunit-PHPUnit-MockObject-1.2.3-1.el6.noarch php-cli.x86_64 php-phpunit-PHP-Invoker-1.1.3-2.el6.noarch php-phpunit-PHPUnit-3.7.29-1.el6.noarch  php-mbstring.x86_64  php-symfony-yaml-2.3.9-1.el6.noarch 
+
+
+
+
+for x in $(yum list installed | grep php| awk '{print $1}');do sudo rpm -e $x;done
+
+
+
+sudo yum install   --enablerepo=updates-wildwest php56u php56u-cli php56u-common php56u-gd php56u-mbstring php56u-mcrypt php56u-mysqlnd php56u-pdo php56u-soap php56u-tidy php56u-xml 
+
+
+Remove       29 Package(s)
+Install      16 Package(s)
+
+Remove       29 Package(s)
+
+Done 
+
+uid1v-tnguyen.ao.dev.lax.gnmedia.net
+uid1v-ccastro.ao.dev.lax.gnmedia.net
+uid1v-wfort.ao.dev.lax.gnmedia.net
+uid1v-bmireles.ao.dev.lax.gnmedia.net
+uid1v-dgarcia.ao.dev.lax.gnmedia.net
+uid1v-vgilton.ao.dev.lax.gnmedia.net
+uid1v-vtella.ao.dev.lax.gnmedia.net
+uid1v-jbecerra.ao.dev.lax.gnmedia.net
+uid1v-dgrbavcic.ao.dev.lax.gnmedia.net
+uid1v-efelix.ao.dev.lax.gnmedia.net
+uid1v-smireles.ao.dev.lax.gnmedia.net
+uid1v-igonzalez.ao.dev.lax.gnmedia.net
+uid1v-hbeltran.ao.dev.lax.gnmedia.net
+uid1v-omiranda.ao.dev.lax.gnmedia.net
+uid1v-fgonzalez.ao.dev.lax.gnmedia.net
+uid1v-cchavez.ao.dev.lax.gnmedia.net
+uid1v-orivera.ao.dev.lax.gnmedia.net
+uid1v-aosuna.ao.dev.lax.gnmedia.net
+uid1v-vzacharia.ao.dev.lax.gnmedia.net
+uid1v-jespinosa.ao.dev.lax.gnmedia.net
+uid3v-efelix.ao.dev.lax.gnmedia.net
+uid2v-igonzalez.ao.dev.lax.gnmedia.net
+uid2v-dgarcia.ao.dev.lax.gnmedia.net
+

@@ -1,0 +1,14 @@
+#!/usr/bin/perl
+
+print "Give me a work || sentence \n";
+my $userinput = <STDIN>;
+
+my @values = split('/',$userinput ) ;
+
+#print @values;
+
+foreach my $val (@values){
+
+print "$val\t";
+}
+

@@ -1,0 +1,8 @@
+must install php-mysql, php-xml
+must have openssl  to make it 
+
+
+---config---
+need to config Virtualhost with port 443
+need to uncomment de deafault ssl.conf virtualhost lines 
+need to write NameVirtualHost *:443 in http.conf

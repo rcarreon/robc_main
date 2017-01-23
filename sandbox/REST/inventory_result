@@ -1,0 +1,21 @@
+RT/3.8.13 200 Ok
+
+id: asset/726
+Type: Site
+Creator: kenneth.park
+Name: www.sherdog.net
+Description: none
+Status: production
+Admin:
+Owner:
+Created: Tue Jan 05 16:14:28 2010
+LastUpdated: Wed May 07 15:20:49 2014
+CF.{MonitorURLPath}: /
+CF.{MonitorPriority}: High
+CF.{BusinessUnit}: Sherdog
+CF.{MonitorPortNumber}: 80
+CF.{MonitorProtocol}: 
+CF.{MonitorResultString}: is a property of
+CF.{Vertical}: Atomic_Online
+CF.{NotificationGroups}: Atlas@evolvemediallc.com,Helios@evolvemediallc.com
+

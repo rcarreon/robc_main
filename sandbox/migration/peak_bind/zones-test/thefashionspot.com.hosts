@@ -1,0 +1,276 @@
+$TTL 86400
+thefashionspot.com.            IN      SOA     thefashionspot.com. root.thefashionspot.com. (
+                                                       2014081200     ; serial
+                                                       28800          ; refresh
+                                                       14400          ; retry
+                                                       3600000        ; expire
+                                                       86400 )        ; minimum
+
+; name servers and mail servers
+                                                       IN    NS       app3v-dns.tp.prd.lax.thefashionspot.com.
+                                                       IN    NS       app4v-dns.tp.prd.lax.thefashionspot.com.
+                                                       IN    NS       app1v-dns.tp.prd.lax.thefashionspot.com.
+                                                       IN    NS       app2v-dns.tp.prd.lax.thefashionspot.com.
+thefashionspot.com.                                    IN    MX 10    cluster9.us.messagelabs.com.
+thefashionspot.com.                                    IN    MX 20    cluster9a.us.messagelabs.com.
+                                                       IN    TXT      "v=spf1 ip4:66.180.202.0/24 ip4:209.151.238.0/24 ip4:72.172.76.3 mx ptr ~all"
+;
+; local host
+;
+local                                                  IN    A        127.0.0.1
+localhost                                              IN    A        127.0.0.1
+loghost                                                IN    A        127.0.0.1
+;
+;
+; hosts
+; 
+; public DNS
+;
+ns3.thefashionspot.com.                                IN    A        67.15.66.42
+ns4.thefashionspot.com.                                IN    A        67.15.66.43
+ns5.thefashionspot.com.                                IN    A        64.34.172.209
+ns6.thefashionspot.com.                                IN    A        72.51.41.238
+
+
+; #### TitanWP
+thefashionspot.com.                                    IN    A        72.172.76.151
+bta.thefashionspot.com.                                IN    A        10.11.234.71
+dev.thefashionspot.com.                                IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.thefashionspot.com.                                IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.thefashionspot.com.                                IN    A        72.172.76.151
+www.thefashionspot.com.                                IN    A        72.172.76.151
+
+origin.bta.thefashionspot.com.                         IN    CNAME    bta.thefashionspot.com.
+cdn-bta.thefashionspot.com.                            IN    CNAME    bta.thefashionspot.com.
+cdn1-bta.thefashionspot.com.                           IN    CNAME    bta.thefashionspot.com.
+cdn2-bta.thefashionspot.com.                           IN    CNAME    bta.thefashionspot.com.
+cdn3-bta.thefashionspot.com.                           IN    CNAME    bta.thefashionspot.com.
+
+origin-dev.thefashionspot.com.                         IN    CNAME    dev.thefashionspot.com.
+cdn-dev.thefashionspot.com.                            IN    CNAME    dev.thefashionspot.com.
+cdn1-dev.thefashionspot.com.                           IN    CNAME    dev.thefashionspot.com.
+cdn2-dev.thefashionspot.com.                           IN    CNAME    dev.thefashionspot.com.
+cdn3-dev.thefashionspot.com.                           IN    CNAME    dev.thefashionspot.com.
+
+origin-stg.thefashionspot.com.                         IN    CNAME    stg.thefashionspot.com.
+cdn-stg.thefashionspot.com.                            IN    CNAME    pebblebed.edgesuite.net.
+cdn1-stg.thefashionspot.com.                           IN    CNAME    pebblebed.edgesuite.net.
+cdn2-stg.thefashionspot.com.                           IN    CNAME    pebblebed.edgesuite.net.
+cdn3-stg.thefashionspot.com.                           IN    CNAME    pebblebed.edgesuite.net.
+
+origin.thefashionspot.com.                             IN    CNAME    prd.thefashionspot.com.
+cdn1-www.thefashionspot.com.                           IN    CNAME    pebblebed.edgesuite.net.
+cdn2-www.thefashionspot.com.                           IN    CNAME    pebblebed.edgesuite.net.
+cdn3-www.thefashionspot.com.                           IN    CNAME    pebblebed.edgesuite.net.
+
+dev.m.thefashionspot.com.                              IN    CNAME    dev.thefashionspot.com.
+stg.m.thefashionspot.com.                              IN    CNAME    stg.thefashionspot.com.
+;m.thefashionspot.com.                                 IN    CNAME    prd.thefashionspot.com.
+; #### End TitanWP
+
+
+; strucr.com verificaion for ddenton
+strucr3dedbf4320cdf21a0fac49318546c1a47abbe96b.www.thefashionspot.com.    IN    CNAME    verify.strucr.com.
+
+
+; new 
+helpdesk                                               IN    A        72.172.76.29
+support                                                IN    CNAME    helpdesk
+
+; crowdignite
+crowdignite.thefashionspot.com.                        IN    A        72.172.76.148
+stg.crowdignite.thefashionspot.com.              86400 IN    A        10.11.134.66
+dev.crowdignite.thefashionspot.com.              86400 IN    A        10.11.234.44
+;chaggstrom.sbx.crowdignite.thefashionspot.com.    IN    CNAME    uid1v-chaggstrom.ci.dev.lax.gnmedia.net. ;decomm
+ddurand.sbx.crowdignite.thefashionspot.com.        IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+;fdavis.sbx.crowdignite.thefashionspot.com.        IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+fgonzalez.sbx.crowdignite.thefashionspot.com.      IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+jcortes.sbx.crowdignite.thefashionspot.com.        IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.crowdignite.thefashionspot.com.      IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.crowdignite.thefashionspot.com.     IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.crowdignite.thefashionspot.com.    IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+;mpatino.sbx.crowdignite.thefashionspot.com.       IN    CNAME    uid1v-mpatino.ci.dev.lax.gnmedia.net. ;decomm
+rvicchiullo.sbx.crowdignite.thefashionspot.com.    IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net.
+ssalazar.sbx.crowdignite.thefashionspot.com.       IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+uacosta.sbx.crowdignite.thefashionspot.com.        IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+
+staging.microsites                                 IN    A        72.172.76.122
+microsites.staging                                 IN    A        72.172.76.122
+origin.microsites                                      IN    A        72.172.76.121
+microsites.origin                                      IN    A        72.172.76.121
+microsites-misc                                        IN    A        72.172.76.92
+cdn.microsites                                         IN    CNAME    cdn.campaigns.thefashionspot.com.edgesuite.net.
+
+; vb-tfs (forums)
+dev.forums.thefashionspot.com.                         IN    A        10.11.234.94
+stg.forums.thefashionspot.com.                         IN    A        72.172.76.29
+forums                                                 IN    A        72.172.76.32
+
+origin.campaigns                                       IN    A        72.172.76.121
+campaigns                                              IN    CNAME    origin.campaigns
+cdn.campaigns                                          IN    CNAME    cdn.campaigns.thefashionspot.com.edgesuite.net.
+staging.campaigns                                  IN    A        72.172.76.122
+
+origin.assets                                          IN    A        72.172.76.110
+cdn.assets                                             IN    CNAME    cdn.assets.thefashionspot.com.edgesuite.net.
+assets                                                 IN    CNAME    cdn.assets
+staging.assets                                         IN    CNAME    staging.assets.thefashionspot.com.edgesuite.net.
+demo.assets                                            IN    CNAME    demo.assets.thefashionspot.com.edgesuite.net.
+origin.staging.assets                                  IN    A        72.172.76.111
+
+
+demo.herbalessences                                    IN    CNAME    origin.demo.gorillanation.com.
+
+;
+; TFS Demo uses TFS VIP
+;
+origin.demo                                            IN    A        72.172.76.100
+demo                                                   IN    CNAME    demo.thefashionspot.com.edgesuite.net.
+
+; thefashionspot microsite catch-all, and demo
+*.origin.thefashionspot.com.                           IN    CNAME    origin.campaigns.thefashionspot.com.
+*.staging.thefashionspot.com.                          IN    CNAME    staging.campaigns.thefashionspot.com.
+*.thefashionspot.com.                                  IN    CNAME    origin.campaigns.thefashionspot.com.
+*.demo.thefashionspot.com.                             IN    CNAME    origin.demo.thefashionspot.com.
+*.origin.demo.thefashionspot.com.                      IN    CNAME    origin.demo.thefashionspot.com.
+
+
+; maxfactorcompetition.thefashionspot.com entries 
+; Created on 20100423 by jrottenberg
+maxfactorcompetition.thefashionspot.com.               IN    CNAME    campaigns.edgesuite.net.
+staging.maxfactorcompetition.thefashionspot.com.       IN    CNAME    staging.campaigns.craveonline.com.
+demo.maxfactorcompetition.thefashionspot.com.          IN    CNAME    demo.campaigns.craveonline.com.
+
+demo.payless.thefashionspot.com.                       IN    CNAME    demo.campaigns.craveonline.com.
+
+switchbabymaker.thefashionspot.com.                    IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.switchbabymaker.thefashionspot.com.            IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.switchbabymaker.thefashionspot.com.               IN    CNAME    demo.si.evolvemediallc.com.
+
+
+; giftguide.thefashionspot.com entries 
+; Created on 20101109 by jjohnson
+giftguide.thefashionspot.com.                          IN    CNAME    campaigns.edgesuite.net.
+staging.giftguide.thefashionspot.com.                  IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.giftguide.thefashionspot.com.                     IN    CNAME    demo.si.evolvemediallc.com.
+
+
+; summerstyleguide.thefashionspot.com entries 
+; Created on 20110523 by wfu
+summerstyleguide.thefashionspot.com.                   IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.summerstyleguide.thefashionspot.com.           IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.summerstyleguide.thefashionspot.com.              IN    CNAME    demo.si.evolvemediallc.com.
+
+
+; rmdemo tool
+rmdemo                                                 IN    CNAME    campaigns
+staging.rmdemo                                         IN    CNAME    staging.campaigns
+files                                                  IN    CNAME    cdn.assets
+
+
+gradgiftguide.thefashionspot.com.                      IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.gradgiftguide.thefashionspot.com.              IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.gradgiftguide.thefashionspot.com.                 IN    CNAME    demo.si.evolvemediallc.com.
+mashups.thefashionspot.com.                            IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.mashups.thefashionspot.com.                    IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.mashups.thefashionspot.com.         IN      CNAME       demo.si.evolvemediallc.com.
+daytonightmusthaves.thefashionspot.com.                IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.daytonightmusthaves.thefashionspot.com.        IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.daytonightmusthaves.thefashionspot.com.           IN    CNAME    demo.si.evolvemediallc.com.
+demo.thepulse.thefashionspot.com.                      IN    CNAME    demo.si.evolvemediallc.com.
+giftguide2010.thefashionspot.com.                      IN    CNAME    cdn.campaigns.thefashionspot.com.
+;staging.giftguide2010.thefashionspot.com.             IN    CNAME    staging.campaigns.thefashionspot.com.
+;demo.giftguide2010.thefashionspot.com.                IN    CNAME    cdn.campaigns.thefashionspot.com.
+;ultimatebeautyguide.thefashionspot.com.               IN    CNAME    cdn.campaigns.thefashionspot.com.
+;staging.ultimatebeautyguide.thefashionspot.com.       IN    CNAME    staging.campaigns.thefashionspot.com.
+;winterbeautyguide.thefashionspot.com.                 IN    CNAME    cdn.campaigns.thefashionspot.com.
+dailydelights.thefashionspot.com.                      IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.dailydelights.thefashionspot.com.              IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.dailydelights.thefashionspot.com.                 IN    CNAME    demo.si.evolvemediallc.com.
+demo.ultimatebeautyguide.thefashionspot.com.           IN    CNAME    demo.si.evolvemediallc.com.
+beautybook.thefashionspot.com.                         IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.beautybook.thefashionspot.com.                 IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.beautybook.thefashionspot.com.                    IN    CNAME    demo.si.evolvemediallc.com.
+staging.localtrends.thefashionspot.com.                IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.localtrends.thefashionspot.com.                   IN    CNAME    demo.si.evolvemediallc.com.
+rsvp.thefashionspot.com.                               IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.rsvp.thefashionspot.com.                       IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.rsvp.thefashionspot.com.                          IN    CNAME    demo.si.evolvemediallc.com.
+microsites.thefashionspot.com.                         IN    CNAME    cdn.campaigns.thefashionspot.com.
+demo.giftguide2010.thefashionspot.com.                 IN    CNAME    demo.si.evolvemediallc.com.
+ultimatecloset.thefashionspot.com.                     IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.ultimatecloset.thefashionspot.com.             IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.ultimatecloset.thefashionspot.com.                IN    CNAME    demo.si.evolvemediallc.com.
+demo.flipbook.thefashionspot.com.        IN      CNAME       demo.si.evolvemediallc.com.
+beautifullybare.thefashionspot.com.                    IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.beautifullybare.thefashionspot.com.            IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.beautifullybare.thefashionspot.com.               IN    CNAME    demo.si.evolvemediallc.com.
+demo.runwaytosummer.thefashionspot.com.  IN      CNAME       demo.si.evolvemediallc.com.
+app1v-dns.tp.prd.lax.thefashionspot.com.               IN    A        10.11.20.68
+app2v-dns.tp.prd.lax.thefashionspot.com.               IN    A        10.11.20.69
+app3v-dns.tp.prd.lax.thefashionspot.com.               IN    A        10.11.20.53
+app4v-dns.tp.prd.lax.thefashionspot.com.               IN    A        10.11.20.88
+demo.whitehotsummer.thefashionspot.com.  IN      CNAME       demo.si.evolvemediallc.com.
+demo.beautyconfessions.thefashionspot.com. IN      CNAME       demo.si.evolvemediallc.com.
+dev.beautyconfessions.thefashionspot.com.              IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+demo.beimpulsive.thefashionspot.com.     IN      CNAME       demo.si.evolvemediallc.com.
+dev.beimpulsive.thefashionspot.com.                    IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+holidayflipbook.thefashionspot.com.                    IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.holidayflipbook.thefashionspot.com.            IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.holidayflipbook.thefashionspot.com.               IN    CNAME    cdn.campaigns.thefashionspot.com.
+dev.holidayflipbook.thefashionspot.com.                IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+holidaystyleguide.thefashionspot.com.                  IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.holidaystyleguide.thefashionspot.com.          IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.holidaystyleguide.thefashionspot.com.             IN    CNAME    cdn.campaigns.thefashionspot.com.
+dev.holidaystyleguide.thefashionspot.com.              IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+holidaygiftguide.thefashionspot.com.                   IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.holidaygiftguide.thefashionspot.com.           IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.holidaygiftguide.thefashionspot.com.              IN    CNAME    demo.si.evolvemediallc.com.
+dev.holidaygiftguide.thefashionspot.com.               IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+denimstyles.thefashionspot.com.                        IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.denimstyles.thefashionspot.com.                IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.denimstyles.thefashionspot.com.                   IN    CNAME    demo.si.evolvemediallc.com.
+dev.denimstyles.thefashionspot.com.                    IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+ultimatestyleguide.thefashionspot.com.                 IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.ultimatestyleguide.thefashionspot.com.         IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.ultimatestyleguide.thefashionspot.com.            IN    CNAME    demo.si.evolvemediallc.com.
+dev.ultimatestyleguide.thefashionspot.com.             IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+ozthegreatandpowerful.thefashionspot.com.              IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.ozthegreatandpowerful.thefashionspot.com.      IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.ozthegreatandpowerful.thefashionspot.com.         IN    CNAME    demo.si.evolvemediallc.com.
+dev.ozthegreatandpowerful.thefashionspot.com.          IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+dresscode.thefashionspot.com.                          IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.dresscode.thefashionspot.com.                  IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.dresscode.thefashionspot.com.                     IN    CNAME    demo.si.evolvemediallc.com.
+dev.dresscode.thefashionspot.com.                      IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+demo.revampyourlife.thefashionspot.com.                IN    CNAME    demo.si.evolvemediallc.com.
+dev.revampyourlife.thefashionspot.com.                 IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+digitalstylemagazine.thefashionspot.com.               IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.digitalstylemagazine.thefashionspot.com.       IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.digitalstylemagazine.thefashionspot.com. IN      CNAME       demo.si.evolvemediallc.com.
+dev.digitalstylemagazine.thefashionspot.com.           IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+pandora.thefashionspot.com.                            IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.pandora.thefashionspot.com.                    IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.pandora.thefashionspot.com.                       IN    CNAME    demo.si.evolvemediallc.com.
+dev.pandora.thefashionspot.com.                        IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+denimdiaries.thefashionspot.com.                       IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.denimdiaries.thefashionspot.com.               IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.denimdiaries.thefashionspot.com.                  IN    CNAME    demo.si.evolvemediallc.com.
+dev.denimdiaries.thefashionspot.com.                   IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+hartofdixiecompetition.thefashionspot.com.             IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.hartofdixiecompetition.thefashionspot.com.     IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.hartofdixiecompetition.thefashionspot.com.        IN    CNAME    demo.si.evolvemediallc.com.
+dev.hartofdixiecompetition.thefashionspot.com.         IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+smoothstylessweepstakes.thefashionspot.com.            IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.smoothstylessweepstakes.thefashionspot.com.    IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.smoothstylessweepstakes.thefashionspot.com.       IN    CNAME    demo.si.evolvemediallc.com.
+dev.smoothstylessweepstakes.thefashionspot.com.        IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+holidayhitlist.thefashionspot.com.                     IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.holidayhitlist.thefashionspot.com.             IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.holidayhitlist.thefashionspot.com.                IN    CNAME    cdn.campaigns.thefashionspot.com.
+dev.holidayhitlist.thefashionspot.com.                 IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+simplybeautiful.thefashionspot.com.                    IN    CNAME    cdn.campaigns.thefashionspot.com.
+staging.simplybeautiful.thefashionspot.com.            IN    CNAME    staging.campaigns.thefashionspot.com.
+demo.simplybeautiful.thefashionspot.com.               IN    CNAME    cdn.campaigns.thefashionspot.com.
+dev.simplybeautiful.thefashionspot.com.                IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+peak.crowdignite.thefashionspot.com.		       IN    CNAME    peak.crowdignite.com.

@@ -1,0 +1,87 @@
+$TTL 86400
+actiontrip.com.		IN      SOA     actiontrip.com. root.actiontrip.com. (
+                        2014071100	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+actiontrip.com.		IN	NS		app3v-dns.tp.prd.lax.craveonline.com.
+actiontrip.com.		IN	NS		app4v-dns.tp.prd.lax.craveonline.com.
+actiontrip.com.		IN	NS		app1v-dns.tp.prd.lax.craveonline.com.
+actiontrip.com.		IN	NS		app2v-dns.tp.prd.lax.craveonline.com.
+actiontrip.com.		IN	MX	10	cluster9.us.messagelabs.com.
+actiontrip.com.		IN	MX	20	cluster9a.us.messagelabs.com.
+
+;
+; local host
+;
+local           IN      A       127.0.0.1
+localhost       IN      A       127.0.0.1
+loghost         IN      A       127.0.0.1
+;
+;
+; hosts
+;actiontrip.com.		IN      A       67.18.93.162 
+;atrip01.actiontrip.com.	IN      A       67.18.93.162 
+;atmain.actiontrip.com.		IN      A       67.18.93.162 
+actiontrip.com.                 IN      A       72.172.76.21
+www.actiontrip.com.             IN      A       72.172.76.21
+;new.actiontrip.com.             IN      A       10.2.10.194
+crowdignite.actiontrip.com.	     IN      A       72.172.76.148 
+;newqa.actiontrip.com.           IN      A       10.2.10.194
+wap.actiontrip.com.		IN	CNAME	at.qwapi.com.
+atrip01.actiontrip.com.         IN      A	72.172.76.21
+atmain.actiontrip.com. 		IN      A       67.18.93.162
+ftp.actiontrip.com.		IN      CNAME	actiontrip.com.
+; mail.actiontrip.com.		IN	A	209.151.238.8
+;www2.actiontrip.com.		IN	A	209.151.238.118
+www2.actiontrip.com.		IN	A	72.172.76.21
+upload.actiontrip.com.		IN	A	209.151.238.60
+;sql-lax-001.actiontrip.com.     IN      A       10.2.12.22 ;decomm
+;www-lax-001.actiontrip.com.	IN	A	10.2.12.20 ;decomm
+;www-lax-002.actiontrip.com.	IN	A	10.2.12.21 ;decomm
+;nfs-lax-001.actiontrip.com.	IN	A	66.180.202.70
+
+
+;qa              IN  A   10.2.10.194
+; CDN
+www.origin.actiontrip.com.	IN	CNAME	www.actiontrip.com.
+;www.cdn.actiontrip.com.		IN	CNAME	cdn.gorillanation.com.c.footprint.net.
+www.cdn.actiontrip.com.		IN	CNAME	www.cdn.actiontrip.com.edgesuite.net.
+
+; new FE infrastructure -jsj
+origin.campaigns		IN	A	72.172.76.121
+campaigns               IN  CNAME   origin.campaigns
+cdn.campaigns			IN	CNAME	cdn.campaigns.actiontrip.com.edgesuite.net.
+staging.campaigns		 IN  A   72.172.76.122
+
+origin.assets			IN	A	72.172.76.110
+cdn.assets				IN	CNAME	cdn.assets.actiontrip.com.edgesuite.net.
+assets					IN	CNAME	cdn.assets
+staging.assets			IN  CNAME   staging.assets.actiontrip.com.edgesuite.net.
+demo.assets                      IN  CNAME   demo.assets.actiontrip.com.edgesuite.net.
+origin.staging.assets	IN	A	72.172.76.111
+
+; paxeast.actiontrip.com entries 
+; Created on 20110218 by wfu
+paxeast.actiontrip.com.           IN  CNAME   cdn.campaigns.actiontrip.com.
+staging.paxeast.actiontrip.com.   IN  CNAME   staging.campaigns.actiontrip.com.
+;demo.paxeast.actiontrip.com.      IN  CNAME   demo.campaigns.actiontrip.com.
+
+; rmdemo tool
+rmdemo          IN CNAME campaigns
+staging.rmdemo  IN CNAME staging.campaigns.evolvemediacorp.com.
+files           IN CNAME cdn.assets
+
+terrortrip.actiontrip.com.               IN      CNAME       cdn.campaigns.actiontrip.com.
+staging.terrortrip.actiontrip.com.       IN      CNAME       staging.campaigns.actiontrip.com.
+demo.terrortrip.actiontrip.com.          IN      CNAME       demo.si.evolvemediallc.com.
+e3.actiontrip.com.                       IN      CNAME       cdn.campaigns.actiontrip.com.
+staging.e3.actiontrip.com.               IN      CNAME       staging.campaigns.actiontrip.com.
+demo.e3.actiontrip.com.                  IN      CNAME       demo.si.evolvemediallc.com.
+;dev.actiontrip.com.                      IN      CNAME       app1v-atp.ao.dev.lax.gnmedia.net. ;decomm
+stg.actiontrip.com.                      IN      CNAME       app1v-atp.ao.stg.lax.gnmedia.net.
+m-stg.actiontrip.com.                    IN      CNAME       stg.actiontrip.com.
+m.actiontrip.com.                        IN      CNAME       actiontrip.com.

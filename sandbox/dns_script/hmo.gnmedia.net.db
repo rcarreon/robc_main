@@ -1,0 +1,39 @@
+$TTL 300
+@ IN SOA hmo.gnmedia.net. noc.gorillanation.com. (
+	2012013100	; serial
+	36000		; refresh
+	3600		; retry
+	3600000		; expire
+	36000 )		; defautl ttl
+
+@	IN NS	nochmo1.hmo.gnmedia.net.
+apache  	IN 	A 	192.168.12.41
+nagios          IN 	A 	192.168.12.41
+nochmo1		IN 	A	192.168.12.45
+wiki01.n1 	IN 	A	192.168.99.10
+mailer.n1     	IN 	A 	192.168.12.46
+svn1.n1		IN 	A	192.168.99.5
+svn             CNAME		svn1.n1
+sql01.n1	IN	A	192.168.99.30
+nocwiki    	IN 	A 	192.168.12.47
+puppet.n1 	IN 	A	192.168.99.6
+puppet		CNAME	puppet.n1
+varnish.n1	IN 	A	192.168.99.7
+varnish		CNAME	varnish.n1
+wiki		CNAME   varnish.n1
+;wiki		IN	A	192.168.99.40
+blog 		CNAME	varnish.n1
+nochmo2    	IN 	A 	192.168.12.49
+fedora 		IN 	A	192.168.12.242
+rangel  	IN 	A    	192.168.12.101
+orivera2        IN      A       192.168.12.109
+deepspace2      IN      A       192.168.12.116
+ripvisual	IN 	A	192.168.10.35
+blog01.n1	IN	A	192.168.99.12
+squid.n1	IN 	A 	192.168.12.200
+squid		CNAME 	squid.n1
+nfs01.n1	IN	A	192.168.99.20
+reports		IN	A	192.168.99.161
+reports.stg	CNAME	reports
+nginx.n1	IN	A	192.168.99.40
+nginx		CNAME	nginx.n1

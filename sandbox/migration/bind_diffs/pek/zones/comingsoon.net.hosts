@@ -1,0 +1,143 @@
+$TTL 86400
+comingsoon.net.         IN      SOA     comingsoon.net. root.comingsoon.net. (
+                                                       2015012700     ; serial
+                                                       28800          ; refresh
+                                                       14400          ; retry
+                                                       3600000        ; expire
+                                                       86400 )        ; minimum
+
+
+; name servers and mail servers
+;
+comingsoon.net.                                        IN    NS       app3v-dns.tp.prd.lax.craveonline.com.
+comingsoon.net.                                        IN    NS       app4v-dns.tp.prd.lax.craveonline.com.
+comingsoon.net.                                        IN    NS       app1v-dns.tp.prd.lax.craveonline.com.
+comingsoon.net.                                        IN    NS       app2v-dns.tp.prd.lax.craveonline.com.
+
+comingsoon.net.                                        IN    MX 10    cluster9.us.messagelabs.com.
+comingsoon.net.                                        IN    MX 20    cluster9a.us.messagelabs.com.
+comingsoon.net.				                           IN    TXT      "G0O0R34839"
+comingsoon.net.                                        IN    TXT      "v=spf1 a mx ~all"
+
+; local host
+local                                                  IN    A        127.0.0.1
+localhost                                              IN    A        127.0.0.1
+loghost                                                IN    A        127.0.0.1
+
+; hosts
+m.comingsoon.net.                                      IN    CNAME    comingsoon.net.
+ftp                                                    IN    CNAME    comingsoon.net.
+downloads                                              IN    CNAME    comingsoon.net.
+mail                                                   IN    A        208.86.255.82
+forums                                                 IN    A        208.69.123.104
+
+; #### comingsoon PBWP
+comingsoon.net.                                        IN    A        72.172.76.151
+
+bta.comingsoon.net.                                    IN    A        10.11.234.71
+dev.comingsoon.net.                                    IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.comingsoon.net.                                    IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.comingsoon.net.                                    IN    A        72.172.76.151
+www.comingsoon.net.                                    IN    CNAME    prd.comingsoon.net.
+
+origin.bta.comingsoon.net.                             IN    CNAME    bta.comingsoon.net.
+cdn1-bta.comingsoon.net.                               IN    CNAME    bta.comingsoon.net.
+cdn2-bta.comingsoon.net.                               IN    CNAME    bta.comingsoon.net.
+cdn3-bta.comingsoon.net.                               IN    CNAME    bta.comingsoon.net.
+
+origin-dev.comingsoon.net.                             IN    CNAME    dev.comingsoon.net.
+cdn1-dev.comingsoon.net.                               IN    CNAME    dev.comingsoon.net.
+cdn2-dev.comingsoon.net.                               IN    CNAME    dev.comingsoon.net.
+cdn3-dev.comingsoon.net.                               IN    CNAME    dev.comingsoon.net.
+
+origin-stg.comingsoon.net.                             IN    CNAME    stg.comingsoon.net.
+cdn1-stg.comingsoon.net.                               IN    CNAME    pebblebed.edgesuite.net.
+cdn2-stg.comingsoon.net.                               IN    CNAME    pebblebed.edgesuite.net.
+cdn3-stg.comingsoon.net.                               IN    CNAME    pebblebed.edgesuite.net.
+
+origin.comingsoon.net.                                 IN    CNAME    prd.comingsoon.net.
+cdn1-www.comingsoon.net.                               IN    CNAME    pebblebed.edgesuite.net.
+cdn2-www.comingsoon.net.                               IN    CNAME    pebblebed.edgesuite.net.
+cdn3-www.comingsoon.net.                               IN    CNAME    pebblebed.edgesuite.net.
+
+dev.m.comingsoon.net.                                  IN    CNAME    dev.comingsoon.net.
+stg.m.comingsoon.net.                                  IN    CNAME    stg.comingsoon.net.
+www.m.comingsoon.net.                                  IN    CNAME    prd.comingsoon.net.
+; #### End PBWP 
+
+
+; API
+dev.api.comingsoon.net.                                IN    CNAME    vip-app-api-cs.ao.dev.lax.gnmedia.net.
+origin-dev.api.comingsoon.net.                         IN    CNAME    dev.api.comingsoon.net.
+
+stg.api.comingsoon.net.                                IN    CNAME    pebblebed.edgesuite.net.
+origin-stg.api.comingsoon.net.                         IN    A        72.172.76.37
+
+api.comingsoon.net.                                    IN    CNAME    pebblebed.edgesuite.net.
+origin.api.comingsoon.net.                             IN    A        72.172.76.36
+; End API
+
+
+
+holidaygiftguide.origin                                IN    A        72.172.76.121
+holidaygiftguide.staging                               IN    A        72.172.76.122
+holidaygiftguide                                       IN    CNAME    holidaygiftguide.comingsoon.net.edgesuite.net.
+
+; residentevil.comingsoon.net entries 
+; Created on 20101220 by jjohnson
+residentevil.comingsoon.net.                           IN    CNAME    cdn.campaigns.comingsoon.net.
+staging.residentevil.comingsoon.net.                   IN    CNAME    staging.campaigns.comingsoon.net.
+demo.residentevil.comingsoon.net.                      IN    CNAME    demo.si.evolvemediallc.com.
+
+; bobsburgers.comingsoon.net entries 
+; Created on 20101223 by jjohnson
+bobsburgers.comingsoon.net.                            IN    CNAME    cdn.campaigns.comingsoon.net.
+staging.bobsburgers.comingsoon.net.                    IN    CNAME    staging.campaigns.comingsoon.net.
+demo.bobsburgers.comingsoon.net.                       IN    CNAME    demo.si.evolvemediallc.com.
+
+; new FE infrastructure -dib
+origin.campaigns                                       IN    A        72.172.76.121
+campaigns                                              IN    CNAME    origin.campaigns
+cdn.campaigns                                          IN    CNAME    cdn.campaigns.comingsoon.net.edgesuite.net.
+staging.campaigns                                      IN    A        72.172.76.122
+
+origin.assets                                          IN    A        72.172.76.110
+cdn.assets                                             IN    CNAME    cdn.assets.comingsoon.net.edgesuite.net.
+assets                                                 IN    CNAME    cdn.assets
+staging.assets                                         IN    CNAME    staging.assets.comingsoon.net.edgesuite.net.
+demo.assets                                            IN    CNAME    demo.assets.comingsoon.net.edgesuite.net.
+origin.staging.assets                                  IN    A        72.172.76.111
+
+; priest.comingsoon.net entries 
+; Created on 20110324 by wfu
+priest.comingsoon.net.                                 IN    CNAME    cdn.campaigns.comingsoon.net.
+staging.priest.comingsoon.net.                         IN    CNAME    staging.campaigns.comingsoon.net.
+;demo.priest.comingsoon.net.                           IN    CNAME    demo.campaigns.comingsoon.net.
+
+; rmdemo tool
+rmdemo                                                 IN    CNAME    campaigns
+files                                                  IN    CNAME    cdn.assets
+
+tf3thenet.comingsoon.net.                              IN    CNAME    cdn.campaigns.comingsoon.net.
+staging.tf3thenet.comingsoon.net.                      IN    CNAME    staging.campaigns.comingsoon.net.
+demo.tf3thenet.comingsoon.net.                         IN    CNAME    demo.si.evolvemediallc.com.
+sailacross.comingsoon.net.                             IN    CNAME    cdn.campaigns.comingsoon.net.
+staging.sailacross.comingsoon.net.                     IN    CNAME    staging.campaigns.comingsoon.net.
+demo.sailacross.comingsoon.net.                        IN    CNAME    demo.si.evolvemediallc.com.
+;moviseek.comingsoon.net.                              IN    CNAME    cdn.campaigns.comingsoon.net.
+;staging.moviseek.comingsoon.net.                      IN    CNAME    staging.campaigns.comingsoon.net.
+;demo.moviseek.comingsoon.net.                         IN    CNAME    cdn.campaigns.comingsoon.net.
+movieseek.comingsoon.net.                              IN    CNAME    cdn.campaigns.comingsoon.net.
+staging.movieseek.comingsoon.net.                      IN    CNAME    staging.campaigns.comingsoon.net.
+demo.movieseek.comingsoon.net.                         IN    CNAME    demo.si.evolvemediallc.com.
+fallingskies.comingsoon.net.                           IN    CNAME    cdn.campaigns.comingsoon.net.
+staging.fallingskies.comingsoon.net.                   IN    CNAME    staging.campaigns.comingsoon.net.
+demo.fallingskies.comingsoon.net.                      IN    CNAME    demo.si.evolvemediallc.com.
+ozthegreatandpowerful.comingsoon.net.                  IN    CNAME    cdn.campaigns.comingsoon.net.
+staging.ozthegreatandpowerful.comingsoon.net.          IN    CNAME    staging.campaigns.comingsoon.net.
+demo.ozthegreatandpowerful.comingsoon.net.             IN    CNAME    demo.si.evolvemediallc.com.
+dev.ozthegreatandpowerful.comingsoon.net.              IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+survivesandiegolikeacaptain.comingsoon.net.            IN    CNAME    cdn.campaigns.comingsoon.net.
+staging.survivesandiegolikeacaptain.comingsoon.net.    IN    CNAME    staging.campaigns.comingsoon.net.
+demo.survivesandiegolikeacaptain.comingsoon.net.       IN    CNAME    cdn.campaigns.comingsoon.net.
+dev.survivesandiegolikeacaptain.comingsoon.net.        IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.

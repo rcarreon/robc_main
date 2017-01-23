@@ -1,0 +1,113 @@
+#!/bin/bash
+# $Id: deploy_sherdog 916 2011-12-06 19:12:13Z jcamou $
+#set -e 
+set -u
+#set -x  #for debug infos
+
+# sherdog.com are legacy servers, no ldap, no nfs mount...
+# Adjust here with your user 
+USER="deploy"
+
+#CONTACTS="jesus.camou@gorillanation.com"
+CONTACTS="atomicSitesHermosillo@gorillanation.com dejan.grbavcic@gorillanation.com"
+SVN_PREFIX="https://svn.gnmedia.net"
+PROJECT="www.sherdog.com"
+OBJ="trunk"
+DATE=`date +%Y%m%d`
+DOCROOT_PREFIX="/var/www/html"
+LOG_FILE="/tmp/deploy.log"
+
+# Sanity checks
+if [ "$(id -u)" != "0" ]; then
+  echo  "You must use sudo to run this script"
+  exit 2
+fi
+
+# Sanity checks
+if [ $# -lt 1 ] ; then
+  echo "Please enter the environment you want to deploy to (dev, stg, prd, qa, cdn or lax)"
+  echo "NOTE: prd will deploy to the new world (app{1..5}v-fe-sdc.ao.prd.lax.gnmedia.net) servers"
+  echo "while lax deploys to legacy boxes (www-lax-{001..005}.sherdog.com)."
+  echo "followed by the revision number.  If not specified will use the latest."
+  echo "ex: $0 qa 1003"
+  exit 1
+fi
+
+ENVIRONMENT="$1"
+
+case "${ENVIRONMENT}" in 
+  dev)
+    SERVERS="app1v-fe-sdc.ao.dev.lax.gnmedia.net"
+    DOCROOT_PREFIX="/app/shared/docroots"
+    DOCROOT_SUFFIX="sherdog.com"
+  ;;
+
+  stg)
+    SERVERS="app1v-fe-sdc.ao.stg.lax.gnmedia.net"
+    DOCROOT_PREFIX="/app/shared/docroots"
+    DOCROOT_SUFFIX="sherdog.com"
+  ;;
+
+  prd)
+    SERVERS="app1v-fe-sdc.ao.prd.lax.gnmedia.net"
+    DOCROOT_PREFIX="/app/shared/docroots"
+    DOCROOT_SUFFIX="sherdog.com"
+  ;;
+
+  qa)
+    SERVERS="www-lax-001.sherdog.com"
+    DOCROOT_SUFFIX="qa.sherdog.com_trunk/trunk"
+  ;;
+
+  lax)    
+    SERVERS="www-lax-001.sherdog.com www-lax-002.sherdog.com www-lax-003.sherdog.com www-lax-004.sherdog.com www-lax-005.sherdog.com"
+    DOCROOT_SUFFIX="/sherdog.com-trunk"
+  ;;
+
+  cdn)    
+    SERVERS="10.2.12.93"
+    DOCROOT_SUFFIX="media.sherdog.com/misc"
+    OBJ="branches/media-cdn/misc"
+  ;;
+
+  *)
+    echo "Enter a valid environment (ex: prd, stg, qa, cdn or lax)"
+    exit 1
+  ;;
+esac
+
+URL=${SVN_PREFIX}/${PROJECT}/${OBJ}
+
+
+if [ $# -lt 2 ]; then
+    # No explicit revision, using HEAD then  
+    REVISION=$(svn info ${URL} | grep "Last Changed Rev:" | sed s/Last\ Changed\ Rev:\ //g)
+  else
+    REVISION="$2"
+fi
+
+
+TARGET="${DOCROOT_PREFIX}/${DOCROOT_SUFFIX}/"
+SERVER_LIST=$(for server in ${SERVERS}; do echo -n " " ${USER}@${server}; done)
+
+if [ "${ENVIRONMENT}" = "cdn" ]; then
+    TO_RUN="svn up -qr ${REVISION} ${TARGET} && echo ${REVISION} > ${TARGET}/version.txt"
+  else    
+    TO_RUN="svn up -qr ${REVISION} ${TARGET} && echo ${REVISION} > ${TARGET}/version.txt && cp ${TARGET}/app/global/global_config_${ENVIRONMENT}.inc ${TARGET}/app/global/global_config.inc"
+fi
+
+su - deploy -c "shmux -sB -c \"${TO_RUN}\" ${SERVER_LIST}"
+
+MSG="[$(date +%Y%m%d\ %H:%M)]: ${PROJECT}: r${REVISION} deployed by ${SUDO_USER} on ${ENVIRONMENT}."
+    
+# log
+echo $MSG >> $LOG_FILE
+
+## email
+for contact in ${CONTACTS};
+do 
+  echo -e "${MSG}\n\n" | mail ${contact} -s "[sherdog.com] code deployed to r${REVISION} on ${ENVIRONMENT} by ${SUDO_USER}"
+done
+
+exit 0;
+

@@ -1,0 +1,9 @@
+first create a cookie  with curl 
+
+
+  --cookie-jar cjar --output /dev/null  http://inventory.gnmedia.net/AssetTracker/Search/Results.html
+we  do this just to initialize the cookie jar
+
+curl --cookie cjar --cookie-jar cjar --data 'user=roberto.carreon' --data 'pass=rOBERTALEX1' --data 'form id=Login'  --location  --output ~/tmp/loginresult.html http://inventory.gnmedia.net/AssetTracker/Search/Results.html 
+
+

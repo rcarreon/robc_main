@@ -1,0 +1,96 @@
+#!/bin/bash
+
+function pause(){
+   read -p "$*"
+}
+DNS_FILE=/home/rcarreon/sandbox/dns/zones/gnmedia.net.hosts
+DNS_DIR=/home/rcarreon/sandbox/dns/zones
+REV_FILE=/home/rcarreon/sandbox/dns/zones/10.64.75.rev
+REV_FILE2=/home/rcarreon/sandbox/dns/zones/10.64.74.rev
+REV_FILE3=/home/rcarreon/sandbox/dns/zones/97.64.84.rev
+UPDATESERIAL=`which dnsupdateserial`
+svn up $DNS_DIR
+function out(){
+	rm -rf $DNS_FILE  
+	rm -rf $REV_FILE $REV_FILE2 $REV_FILE3
+	svn up  $DNS_DIR > /dev/null 2>&1
+	exit 1
+}
+echo -e "Changing  STG  lax records for old andn peak records for lax "
+echo -e "enviroments option [si],[og],[ap],[ci],[sbv]"
+read env
+#set -x  
+#echo -e "`sed 's/.$env.stg.peak/.$env.stg.lax/g' $DNS_FILE | grep '\.$env'| grep 'stg'| egrep -v 'nfs|decom'|grep '10\.64'`\n"
+echo -e "`cat $DNS_FILE| grep ''$env'\.stg.peak'| egrep -v 'nfs|decom'| sort -u `\n"
+echo -e "Records Found:`cat $DNS_FILE| grep ''$env'\.stg\.peak'| egrep -v 'nfs|decom'|sort -u| wc -l `\n"
+echo -e "Continue? y/n"
+read ans
+if [[ $ans == y ]];then 
+	`sed -i -e '/^nfs/! s/.'$env'.stg.lax/.'$env'.stg.old/g' $DNS_FILE`
+	echo -e "New old records:\n"
+	echo -e "`cat $DNS_FILE | grep ".$env.stg.old"| egrep -v '^\;|decom|nfs'| sort -u`\n"
+	echo -e "Records changed:\t `cat $DNS_FILE | grep ".$env.stg.old"| egrep -v '^\;|decom|nfs' | sort -u | wc -l `\n"
+	pause 'Press [Enter] key to continue...'
+	`sed -i 's/.'$env'.stg.peak/.'$env'.stg.lax/g' $DNS_FILE`
+	echo -e "New lax records:\n"
+	echo -e "`cat $DNS_FILE|grep ".$env.stg.lax"| egrep -v 'nfs|decom|nfs' |egrep '10.64.7[4-5]|97.64'|sort -u`\n"
+	echo -e "Records changed:\t `cat $DNS_FILE|grep ".$env.stg.lax"| egrep -v 'nfs|decom|nfs'| egrep '10.64.7[4-5]|97.64' | sort -u |wc -l`\n"
+	pause 'Press [Enter] key to continue...' 
+	echo -e "Rev records: \n"
+	REVS_75=`cat $REV_FILE| grep "$env.stg.peak"`
+	REVS_74=`cat $REV_FILE2| grep "$env.stg.peak"`
+	REVS_97=`cat $REV_FILE3| grep "$env.stg.peak"`
+		echo -e "10.64.75.rev\n"	
+	if [[ !$REVS_75  ]];then
+                echo -e "`cat $DNS_FILE|grep ".$env.stg.lax"| egrep -v 'nfs|decom'|egrep '10.64.75'|sort -u|sed 's/A/PTR/g'| sed '/^$/d' |awk '{print $4,$2,$3,$1}' | grep 10.64.75  | sed  -r "s/10\.64\.75.([0-9])/\1/"| sed 's/\ IN\ PTR/\ \ \ \ \ IN\ \ \ \ \ \ PTR\ \ \ \ /g'`\n"
+		echo -e "`cat $DNS_FILE|grep ".$env.stg.lax"| egrep -v 'nfs|decom'|egrep '10.64.75'|sort -u|sed 's/A/PTR/g'| sed '/^$/d' |awk '{print $4,$2,$3,$1}' | grep 10.64.75  | sed  -r "s/10\.64\.75.([0-9])/\1/"| sed 's/\ IN\ PTR/\ \ \ \ \ IN\ \ \ \ \ \ PTR\ \ \ \ /g'`\n" >> $REV_FILE
+
+	else
+		echo -e "10.64.75.rev\n"	
+		`sed -i 's/.'$env'.stg.peak/.'$env'.stg.lax/g' $REV_FILE`
+		echo -e "`cat $REV_FILE| grep "$env.stg.lax"`\n"
+	       	echo -e "Records to modify: `cat $REV_FILE| grep "$env.stg.lax"|sort -u | wc -l`\n"
+	fi 
+	if [[ !$REVS_74  ]];then
+	        echo -e "10.64.74.rev\n"  
+                echo -e "`cat $DNS_FILE|grep ".$env.stg.lax"| egrep -v 'nfs|decom'|egrep '10.64.74'|sort -u|sed 's/A/PTR/g'| sed '/^$/d' |awk '{print $4,$2,$3,$1}' | grep 10.64.74  | sed  -r "s/10\.64\.74.([0-9])/\1/"| sed 's/\ IN\ PTR/\ \ \ \ \ IN\ \ \ \ \ \ PTR\ \ \ \ /g'`\n"
+                echo -e "`cat $DNS_FILE|grep ".$env.stg.lax"| egrep -v 'nfs|decom'|egrep '10.64.74'|sort -u|sed 's/A/PTR/g'| sed '/^$/d' |awk '{print $4,$2,$3,$1}' | grep 10.64.74  | sed  -r "s/10\.64\.74.([0-9])/\1/"| sed 's/\ IN\ PTR/\ \ \ \ \ IN\ \ \ \ \ \ PTR\ \ \ \ /g'`\n" >> $REV_FILE2
+	else	
+	        echo -e "10.64.74.rev\n"  
+        	`sed -i 's/.'$env'.stg.peak/.'$env'.stg.lax/g' $REV_FILE2`
+	        echo -e "`cat $REV_FILE2| grep "$env.stg.lax"`\n"
+	       	echo -e "Records to modify:`cat $REV_FILE2| grep "$env.stg.lax"| sort -u | wc -l`\n"
+        fi
+	if [[ !$REVS_97 ]];then
+         	echo -e "97.64.84.rev\n" 
+                echo -e "`cat $DNS_FILE|grep ".$env.stg.lax"| egrep -v 'nfs|decom'|egrep '97.64.84'|sort -u|sed 's/A/PTR/g'| sed '/^$/d' |awk '{print $4,$2,$3,$1}' | grep 97.64.84  | sed  -r "s/97\.64\.84.([0-9])/\1/"| sed 's/\ IN\ PTR/\ \ \ \ \ IN\ \ \ \ \ \ PTR\ \ \ \ /g'`\n" 
+                echo -e "`cat $DNS_FILE|grep ".$env.stg.lax"| egrep -v 'nfs|decom'|egrep '97.64.84'|sort -u|sed 's/A/PTR/g'| sed '/^$/d' |awk '{print $4,$2,$3,$1}' | grep 97.64.84  | sed  -r "s/97\.64\.84.([0-9])/\1/"| sed 's/\ IN\ PTR/\ \ \ \ \ IN\ \ \ \ \ \ PTR\ \ \ \ /g'`\n" >> $REV_FILE3
+	else
+         	echo -e "97.64.84.rev\n"  
+	        `sed -i 's/.'$env'.stg.peak/.'$env'.stg.lax/g' $REV_FILE3`
+	       	echo -e "`cat $REV_FILE3| grep "$env.stg.lax"`\n"
+	       	echo -e "Records to modify:`cat $REV_FILE3| grep "$env.stg.lax"| sort -u | wc -l`\n"
+	fi
+	
+##we need to change rev zone lines 
+	##### The following 2 lines is to add ptr records from  from previous records wont be used, for now ,this script needs to improve for that. DO NOT erase them
+
+	pause 'Press [Enter] key to continue...'
+        echo "DNS_FILE:`$UPDATESERIAL $DNS_FILE`"
+        echo "REV_FILE:`$UPDATESERIAL $REV_FILE`"
+        echo "REV_FILE2:`$UPDATESERIAL $REV_FILE2`"
+        echo "REV_FILE3:`$UPDATESERIAL $REV_FILE3`"
+	svn diff  $DNS_DIR | less 
+	echo -e "Like what you see ? commit it then y/n?"
+	read ans2
+	if [[ $ans2 == y ]];then 
+		svn ci -m "Changing ns records for SI STG, and PEAK records" $DNS_DIR
+	else
+		echo -e "Changes were not commited, Exiting now.\n"
+		out
+	fi
+else 
+	echo -e "Exiting then\n"
+	out
+fi
+	

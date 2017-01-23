@@ -1,0 +1,15 @@
+#! /usr/bin/perl -w 
+
+use strict;
+use warnings;
+
+my $domain="v-wp.ao.prd.lax.gnmedia.net";
+#my $box = 3;
+#while ($box <= 3){
+for (my $box = 3;$box<=4;$box ++){
+my @apps = ("app$box");
+#chomp ($domain,@apps);
+#print "@apps$domain\n";
+system("ssh @apps$domain tail /app/log/craveonline.ca_access_log");
+#$box = $box + 1;
+}

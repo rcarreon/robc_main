@@ -1,0 +1,41 @@
+VIP-APP-CI.CI.PRD.LAX
+  2 match virtual-address 10.2.8.86 tcp eq 80
+VIP-APP-CI.CI.STG.LAX
+  2 match virtual-address 10.2.8.68 tcp eq 80
+VIP-APP-MGMT.CI.PRD.LAX
+  2 match virtual-address 10.2.8.135 tcp eq 80
+VIP-APP-VW.CI.PRD.LAX
+  4 match virtual-address 10.12.34.170 tcp eq 26542
+  5 match virtual-address 10.12.34.170 tcp eq 26545
+VIP-APP-VW.CI.STG.LAX
+  2 match virtual-address 10.11.134.170 tcp eq 26542
+  3 match virtual-address 10.11.134.170 tcp eq 26545
+  4 match virtual-address 10.11.134.170 tcp eq 26546
+VIP-NGX-CI.CI.PRD.LAX
+  2 match virtual-address 10.2.8.85 tcp eq 80
+VIP-NGX-CI.CI.STG.LAX
+  2 match virtual-address 10.2.8.125 tcp eq 80
+VIP-SQLRO-AUDIT.CI.PRD.LAX
+  3 match virtual-address 10.12.34.105 tcp eq 3306
+VIP-SQLRO-AUDIT.CI.STG.LAX
+  2 match virtual-address 10.12.134.69 tcp eq 3306
+VIP-SQLRO-CI.CI.PRD.LAX
+  2 match virtual-address 10.12.34.44 tcp eq 3306
+VIP-SQLRO-CI.CI.STG.LAX
+  2 match virtual-address 10.12.134.58 tcp eq 3306
+VIP-SQLRO-DW.CI.PRD.LAX
+  2 match virtual-address 10.12.34.113 tcp eq 3306
+VIP-SQLRO-DW.CI.STG.LAX
+  2 match virtual-address 10.12.134.77 tcp eq 3306
+VIP-SQLRW-AUDIT.CI.PRD.LAX
+  3 match virtual-address 10.12.34.104 tcp eq 3306
+VIP-SQLRW-AUDIT.CI.STG.LAX
+  2 match virtual-address 10.12.134.67 tcp eq 3306
+VIP-SQLRW-CI.CI.PRD.LAX
+  2 match virtual-address 10.12.34.31 tcp eq 3306
+VIP-SQLRW-CI.CI.STG.LAX
+  2 match virtual-address 10.12.134.59 tcp eq 3306
+VIP-SQLRW-DW.CI.PRD.LAX
+  2 match virtual-address 10.12.34.112 tcp eq 3306
+VIP-SQLRW-DW.CI.STG.LAX
+  2 match virtual-address 10.12.134.76 tcp eq 3306

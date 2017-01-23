@@ -1,0 +1,53 @@
+$TTL 3600 ; 1 day
+@      IN      SOA     gnmedia.net. root@gnmedia.net. (
+                        2015022600      ; Serial
+                        36262           ; Refresh
+                        300             ; Retry
+                        3600000         ; Expire
+                        3600 )          ; Minimum
+
+        IN      NS      app1v-dns.tp.prd.lax.gnmedia.net.
+        IN      NS      app2v-dns.tp.prd.lax.gnmedia.net.
+        IN      NS      app3v-dns.tp.prd.lax.gnmedia.net.
+        IN      NS      app4v-dns.tp.prd.lax.gnmedia.net.
+
+
+67	IN	PTR	sql1v-56-puppet.tp.prd.lax.gnmedia.net.
+30	IN	PTR	app7v-puppet.tp.prd.lax.gnmedia.net.
+6	IN	PTR	app1v-inv.tp.prd.lax.gnmedia.net.
+31	IN	PTR	app8v-puppet.tp.prd.lax.gnmedia.net.
+29	IN	PTR	app6v-puppet.tp.prd.lax.gnmedia.net.
+61	IN	PTR	sql1v-56-inv.tp.prd.lax.gnmedia.net.
+62	IN	PTR	sql2v-56-inv.tp.prd.lax.gnmedia.net.
+27	IN	PTR	app1v-puppet.tp.prd.lax.gnmedia.net.
+68	IN	PTR	sql2v-56-puppet.tp.prd.lax.gnmedia.net.
+7	IN	PTR	app2v-inv.tp.prd.lax.gnmedia.net.
+28	IN	PTR	app5v-puppet.tp.prd.lax.gnmedia.net.
+72	IN	PTR	vip-sqlrw-vaquita.tp.prd.lax.
+72	IN	PTR	vip-sqlrw-vaquita.tp.prd.lax.gnmedia.net.
+64	IN	PTR	sql1v-phab.tp.prd.lax.gnmedia.net.
+65	IN	PTR	sql2v-phab.tp.prd.lax.gnmedia.net.
+58	IN	PTR	sql1v-56-dashboards.tp.prd.lax.gnmedia.net.
+59	IN	PTR	sql2v-56-dashboards.tp.prd.lax.gnmedia.net.
+15	IN	PTR	app100v-logstash.tp.prd.lax.gnmedia.net
+16	IN 	PTR	app101v-logstash.tp.prd.lax.gnmedia.net
+52	IN	PTR	app1v-carbon.tp.prd.lax.gnmedia.net
+21	IN	PTR	app1v-mta.tp.prd.lax.gnmedia.net
+37	IN	PTR	app1v-yum.tp.prd.lax.gnmedia.net
+18	IN	PTR	app200v-logstash.tp.prd.lax.gnmedia.net
+19	IN	PTR	app201v-logstash.tp.prd.lax.gnmedia.net
+53	IN	PTR	app2v-carbon.tp.prd.lax.gnmedia.net
+22	IN	PTR	app2v-mta.tp.prd.lax.gnmedia.net
+38	IN	PTR	app2v-yum.tp.prd.lax.gnmedia.net
+9	IN	PTR	app300v-logstash.tp.prd.lax.gnmedia.net
+10	IN	PTR	app301v-logstash.tp.prd.lax.gnmedia.net
+54	IN	PTR	app3v-carbon.tp.prd.lax.gnmedia.net
+55	IN	PTR	app4v-carbon.tp.prd.lax.gnmedia.net
+56	IN	PTR	app5v-carbon.tp.prd.lax.gnmedia.net
+46	IN	PTR	rds100v-logstash.tp.prd.lax.gnmedia.net
+47	IN	PTR	rds101v-logstash.tp.prd.lax.gnmedia.net
+49	IN	PTR	rds200v-logstash.tp.prd.lax.gnmedia.net
+50	IN	PTR	rds201v-logstash.tp.prd.lax.gnmedia.net
+43	IN	PTR	rds300v-logstash.tp.prd.lax.gnmedia.net
+44	IN	PTR	rds301v-logstash.tp.prd.lax.gnmedia.net
+

@@ -1,0 +1,34 @@
+$TTL 86400
+webecoist.com.  IN      SOA     webecoist.com. root.webecoist.com. (
+                                      2014062500     ; serial
+                                      28800          ; refresh
+                                      14400          ; retry
+                                      3600000        ; expire
+                                      86400 )        ; minimum
+
+webecoist.com.                        IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+webecoist.com.                        IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+webecoist.com.                        IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+webecoist.com.                        IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+webecoist.com.                        IN    MX 10    mail.webecoist.com.
+                                      IN    TXT      "v=spf1 +a +mx -all"
+
+webecoist.com.                        IN    A        72.172.76.151
+dev.webecoist.com.                    IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.webecoist.com.                    IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.webecoist.com.                    IN    A        72.172.76.151
+www.webecoist.com.                    IN    A        72.172.76.151
+
+
+
+
+;webecoist.com.                       IN    A        198.57.231.180
+;www.webecoist.com.                   IN    A        198.57.231.180
+ftp.webecoist.com.                    IN    CNAME    webecoist.com.
+web.webecoist.com.                    IN    CNAME    webecoist.com.
+cdn.webecoist.com.                    IN    CNAME    webecoist.com.
+ipv4.webecoist.com.                   IN    CNAME    webecoist.com.
+mail.webecoist.com.                   IN    A        72.172.76.78
+webmail.webecoist.com.                IN    CNAME    webecoist.com.
+*.webmail.webecoist.com.              IN    CNAME    webecoist.com.

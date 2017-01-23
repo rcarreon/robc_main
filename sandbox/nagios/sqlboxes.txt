@@ -1,0 +1,16 @@
+sql1v-56-vaquita.tp.prd.lax.gnmedia.net
+sql2v-56-vaquita.tp.prd.lax.gnmedia.net
+sql2v-56-test.tp.dev.lax.gnmedia.net
+sql1v-56-puppet.tp.dev.lax.gnmedia.net
+sql1v-56-dashboards.tp.dev.lax.gnmedia.net
+sql1v-56-dbops.tp.prd.lax.gnmedia.net
+sql1v-56-inv.tp.prd.lax.gnmedia.net
+sql2v-56-inv.tp.prd.lax.gnmedia.net
+sql1v-56-dashboards.tp.prd.lax.gnmedia.net
+sql2v-56-dashboards.tp.prd.lax.gnmedia.net
+sql1v-56-puppet.tp.prd.lax.gnmedia.net
+sql1v-phab.tp.prd.lax.gnmedia.net
+sql2v-56-puppet.tp.prd.lax.gnmedia.net
+sql2v-phab.tp.prd.lax.gnmedia.net
+sql1v-56-vaquita.tp.dev.lax.gnmedia.net
+app1v-noc.tp.prd.lax.gnmedia.net

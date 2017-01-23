@@ -1,0 +1,6 @@
+#!/bin/bash
+
+tab=echo "$(printf "\t")"
+#echo "here $tab here"
+
+ sed -i '  /)/ahere.     IN      '$tab'   here.' revzonetemplate 

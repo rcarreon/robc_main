@@ -1,0 +1,24 @@
+$TTL 300
+@ IN    SOA nochmo1.hmo.gnmedia.net admin.nochmo1.gnmedia.net (
+        2014030401      ; serial
+        36000           ; refresh
+        3600            ; retry
+        3600000         ; expire
+        36000
+       ; defautl ttl
+        )  
+rrobc.	IN	NS	192.168.12.12.
+robotote.	IN	NS	ns1.robotote.robc.net.
+robooo.	IN	NS	192.168.12.2.
+rob.            IN      NS     robc.rcarreon.net.
+testing.            IN      NS     robc.net.hmo.
+       
+
+
+
+rob.		IN	A	192.168.2.3
+testeando.		IN	PTR	192.168.1.2
+robooot.		IN	PTR	192.168.12.117
+robooot.		IN	PTR	192.168.12.117
+robooot.		IN	PTR	192.168.12.118
+rrobc.		IN	PTR	192.168.12.12

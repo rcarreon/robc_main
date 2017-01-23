@@ -1,0 +1,16 @@
+#!/bin/bash
+for shard in $(curl -sXGET  http://app100v-elasticsearch.tp.prd.lax.gnmedia.net:9200/_cat/shards | grep UNASS | awk '{print $2}')
+do 
+curl -XPOST 'app100v-elasticsearch.tp.prd.lax.gnmedia.net:9200/_cluster/reroute' -d '{
+        "commands" : [ {
+              "allocate" : {
+                  "index" : "origin_si_access-2016.06.10", 
+                  "shard" : $shard, 
+                  "node" : "app100v-elasticsearch.tp.prd.lax.gnmedia.net", 
+                  "allow_primary" : true
+              }
+            }
+        ]
+    }'
+    sleep 5
+done

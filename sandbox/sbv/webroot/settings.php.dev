@@ -1,0 +1,42 @@
+<?php
+
+	$CURRENT_DIR = dirname(__FILE__);
+	$UPLOAD_DIR = realpath($CURRENT_DIR.'/../tmp/uploads/').'/';
+	$LOG_DIR = realpath($CURRENT_DIR.'/../tmp/logs/').'/';
+	$strFileStorageDir = '/mnt/nfs';
+	
+	$debug_email = 'sb.debug@gmail.com';
+	$email_headers = 'From: uploadDebug@gorillanation.com' . "\r\n" .
+				'Reply-To: uploadDebug@gorillanation.com' . "\r\n";
+	$email_headers .= 'MIME-Version: 1.0'."\n";
+	$email_headers .= 'Content-type: text/html; charset=utf-8';
+	
+	$db_host = 'dev1v.lax3.gnmedia.net';
+	$db_user = 'dejan';
+	$db_pass = 'st@pl3s';
+	$db_name = 'springboard';
+	//Checkout videos_controller.php
+	$ageGate = array(0=>'All',1=>'17+ (ESRB - Mature rated)',2=>'18+ (ESRB - Adults only)',3=>'21+ (Alcohol)');
+
+	function sendDebugEmail($strMessage)
+	{
+		global $debug_email, $email_headers;
+		@mail ( $debug_email, 'Upload MYSQL failed', str_replace ( "\n", '<br>', $strMessage ), $email_headers );
+	}
+	$central_db = mysql_connect($db_host, $db_user, $db_pass,true) or die(mysql_error());
+	if($central_db===FALSE)
+	{
+		die("Could not connect to db:" .mysql_error());
+		sendDebugEmail("Could not connect to db:" .mysql_error());
+	}
+	if (mysql_select_db($db_name, $central_db) === FALSE) {
+       
+		die("Could not select db:" .mysql_error());
+		sendDebugEmail("Could not select db:" .mysql_error());
+    }
+	
+	function db_connect(){
+		// database config
+		
+	}
+?>

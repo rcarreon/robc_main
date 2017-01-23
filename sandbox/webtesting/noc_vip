@@ -1,0 +1,78 @@
+#!/bin/bash
+function ex_err {
+	exit 1
+}
+
+function ex_noer {
+	exit 0
+}
+#function host2site {
+#while [ $HOST ]
+#do 
+#	if [ "$1" == "*mal*" ]
+#	then
+#		echo "myanimelist.net"
+#		shift
+#	elif [ "$1" == "*ci*" ]
+#	then 
+#		echo "crowdignite.com"
+#	else
+#		echo "Site Does not recognized"
+#	fi
+#done
+
+#}
+
+#echo "Dime el host para econtrar el site "
+#HOST=$1
+#read
+#host2site
+#ex_noer
+
+#function get_apps {
+
+#APP=`ssh xcat.gnmedia.net 'sudo aceman -c gn1@core1 sfarm  VIP-APP-MAL.AO.PRD.LAX | tr '[A-Z] [a-z]' | sed 's/rserver\://g| grep app''`
+#        echo "$APP"
+#}
+
+if [ $# -eq 1 ]
+then 
+SITE=$1
+#SHEKNOWS="advertising.sheknows.com|ca.sheknows.com|chefmom.sheknows.com|cityguide.sheknows.com|dailydelights.sheknows.com|fabulousfoods.com|fabulousliving.com|fb.sheknows.com|geoparent.sheknows.com|hairstylelounge.sheknows.com|healthyhead2toe.sheknows.com|pregnancyandbaby.sheknows.com|smile.sheknows.com|soaps.sheknows.com|wherestheothersock.sheknows.com|wheretheothersockwent.sheknows.com|www.sheknows.ca|www.sheknows.com.au|www.sheknows.co.uk"
+#VIP="VIP-APP-MAL.AO.PRD.LAX"
+	case $SITE in 
+		myanimelist.net)     	
+APP_MAL=`ssh xcat.gnmedia.net 'sudo aceman -c 10G@lax1 sfarm VIP-APP-MAL.AO.PRD.LAX  | tr '[A-Z] [a-z]' | sed 's/rserver\://g'| grep app | sed '/serverfarm/d' '`;
+SQL_MAL=`ssh xcat.gnmedia.net 'sudo aceman -c 10G@lax1 sfarm  VIP-SQLRO-MAL.AO.PRD.LAX | tr '[A-Z] [a-z]' | sed 's/rserver\://g'| grep sql | sed '/serverfarm/d' '`; 
+		echo -e "$APP_MAL \n $SQL_MAL";;
+		crowdignite.com) 
+APP_CROW=`ssh xcat.gnmedia.net 'sudo aceman -c gn1@core1 sfarm  VIP-APP-CI.CI.PRD.LAX | tr '[A-Z] [a-z]' | sed 's/rserver\://g'| grep app | sed '/serverfarm/d' '`;
+SQL_CROW=`ssh xcat.gnmedia.net 'sudo aceman -c gn1@core1 sfarm  VIP-SQLRO-CI.CI.PRD.LAX | tr '[A-Z] [a-z]' | sed 's/rserver\://g'| grep sql | sed '/serverfarm/d' '`;
+		echo -e "$APP_CROW \n $SQL_CROW";;
+		forums.superherohype.com)
+APP_SHH=`ssh xcat.gnmedia.net 'sudo aceman -c prod@lax2 sfarm  APP-SHHFORUMS | tr '[A-Z] [a-z]'| sed 's/rserver\://g'| grep app| sed '/serverfarm/d' '`; 
+SQL_SHH=`ssh xcat.gnmedia.net 'sudo aceman -c prod@lax2 sfarm  SQL-SHHFORUMS-W | tr '[A-Z] [a-z]'| sed 's/rserver\://g'| grep sql | sed '/serverfarm/d''`; 
+		echo -e "$APP_SHH \n $SQL_SHH";;
+		#[advertising.sheknows.com|geoparent.sheknows.com])
+#APP_SHE=`ssh xcat.gnmedia.net 'sudo aceman -c prod@lax1 sfarm  APP_SK | tr '[A-Z] [a-z]'| sed 's/rserver\://g'| grep app| sed '/serverfarm/d' '`;
+#APP2_SHE=`ssh xcat.gnmedia.net 'sudo aceman -c prod@lax2 sfarm  APP_SK | tr '[A-Z] [a-z]'| sed 's/rserver\://g'| grep app| sed '/serverfarm/d' '`;
+
+#SQL_SHH=`ssh xcat.gnmedia.net 'sudo aceman -c prod@lax2 sfarm  SQL-SHHFORUMS-W | tr '[A-Z] [a-z]'| sed 's/rserver\://g'| grep sql | sed '/serverfarm/d''`;
+#                echo -e "$APP2_SHE  ";;
+		
+		*)	echo "This site is either a third party or we just don't host such site"
+		ex_noer ;;
+	esac
+else
+	echo "You must  to provide  a valid website"
+	echo "Usage $0 - website"
+	ex_err
+fi 
+
+#Declaration of variables it can be improved a lot , feel free to do so find the pattern 
+
+function getting_vip{	
+VIP= `ssh xcat.gnmedia.net 'sudo aceman rserver APP10V-JM.AO.PRD.LAX  | tr [A-Z] [a-z] | grep serverfarm | awk '{print $2}''`
+echo $VIP 
+}
+ 

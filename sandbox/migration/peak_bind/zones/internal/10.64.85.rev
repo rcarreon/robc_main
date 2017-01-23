@@ -1,0 +1,32 @@
+$TTL 3600 ; 1 day
+@      IN      SOA     gnmedia.net. root@gnmedia.net. (
+                        2015022301      ; Serial
+                        36262           ; Refresh
+                        300             ; Retry
+                        3600000         ; Expire
+                        3600 )          ; Minimum
+
+        IN      NS      app1v-dns.tp.prd.lax.gnmedia.net.
+        IN      NS      app2v-dns.tp.prd.lax.gnmedia.net.
+        IN      NS      app3v-dns.tp.prd.lax.gnmedia.net.
+        IN      NS      app4v-dns.tp.prd.lax.gnmedia.net.
+
+
+67	IN	PTR	sql1v-56-puppet.tp.prd.lax.gnmedia.net.
+30	IN	PTR	app7v-puppet.tp.prd.lax.gnmedia.net.
+6	IN	PTR	app1v-inv.tp.prd.lax.gnmedia.net.
+31	IN	PTR	app8v-puppet.tp.prd.lax.gnmedia.net.
+29	IN	PTR	app6v-puppet.tp.prd.lax.gnmedia.net.
+61	IN	PTR	sql1v-56-inv.tp.prd.lax.gnmedia.net.
+62	IN	PTR	sql2v-56-inv.tp.prd.lax.gnmedia.net.
+27	IN	PTR	app1v-puppet.tp.prd.lax.gnmedia.net.
+68	IN	PTR	sql2v-56-puppet.tp.prd.lax.gnmedia.net.
+7	IN	PTR	app2v-inv.tp.prd.lax.gnmedia.net.
+28	IN	PTR	app5v-puppet.tp.prd.lax.gnmedia.net.
+72	IN	PTR	vip-sqlrw-vaquita.tp.prd.lax.
+72	IN	PTR	vip-sqlrw-vaquita.tp.prd.lax.gnmedia.net.
+64	IN	PTR	sql1v-phab.tp.prd.lax.gnmedia.net.
+65	IN	PTR	sql2v-phab.tp.prd.lax.gnmedia.net.
+58	IN	PTR	sql1v-56-dashboards.tp.prd.lax.gnmedia.net.
+59	IN	PTR	sql2v-56-dashboards.tp.prd.lax.gnmedia.net.
+

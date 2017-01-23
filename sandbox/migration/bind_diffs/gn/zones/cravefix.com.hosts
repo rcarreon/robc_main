@@ -1,0 +1,29 @@
+$TTL 86400
+cravefix.com.	IN      SOA     cravefix.com. root.cravefix.com. (
+                        2014061900; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+cravefix.com.     IN      NS      app3v-dns.tp.prd.lax.craveonline.com.
+cravefix.com.     IN      NS      app4v-dns.tp.prd.lax.craveonline.com.
+cravefix.com.     IN      NS      app1v-dns.tp.prd.lax.craveonline.com.
+cravefix.com.     IN      NS      app2v-dns.tp.prd.lax.craveonline.com.
+cravefix.com.     IN      MX      1       mail.craveonline.com.
+;
+; local host
+;
+local           IN      A       127.0.0.1
+localhost       IN      A       127.0.0.1
+loghost         IN      A       127.0.0.1
+;
+;
+; hosts
+www.cravefix.com.      IN      A       209.151.238.229
+cravefix.com.		IN	A	209.151.238.229
+;www.cravefix.com.	IN	A	66.180.193.15
+;cravefix.com.		IN	A	66.180.193.15	
+;www.cravefix.com.	IN	A	67.15.66.45	
+;cravefix.com.		IN	A	67.15.66.45	

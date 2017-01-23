@@ -1,0 +1,26 @@
+#! /bin/bash
+
+while :
+  do 
+    clear
+    echo "----------------------------------------------"
+    echo "------------Main menu-------------------------"
+    echo "[1]shows todays date '' "
+    echo "[2]shows current director"
+    echo "[3] show calendar "
+    echo "[4] starts vim editor"
+    echo "[5] exit"
+    echo -n "so now choose... whats gonna b "
+    echo ""
+    read choi
+    case $choi in 
+    1) echo "Today is `date`, press a key...";  read ;;
+    2) echo "Current directory is `pwd`, press a key ..."; read ;;
+    3) echo "Current month is `cal`, press a key ..."; read ;;
+    4) echo "Starting vim `vim`, press a key ...";; 
+    5) echo "Going out `exit 0`" ;;
+    *) echo "Wey...! tiene que ser a webo de las 5 opciones..  "; read ;;
+esac
+done
+
+

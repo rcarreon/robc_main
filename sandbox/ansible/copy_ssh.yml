@@ -1,0 +1,10 @@
+---
+- name: copy ssh file
+  hosts: '{{ host| default("all") }}'
+  become: yes
+  gather_facts: no
+  tasks:
+  - name: copy ssh file
+    copy: src={{key}} dest=/etc/ssh/keys/{{key}}
+    #mode: 0444
+    #owner: root                  

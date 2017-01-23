@@ -1,0 +1,466 @@
+# Enable URL rewriting
+RewriteEngine On
+
+
+RewriteCond %{SERVER_PORT} ^80$
+RewriteRule ^(accounts/(fbconnect|tbconnect|securimage(.*)|register|basic_information|edit|reset|signout|post_signup)|shops/(checkout|complete)|shop_cms(/.*)|tbm\/amp\/(check_promo|complete|confirm\/(.*))|mobile\/accounts(.*)) "https://%{HTTP_HOST}/$1" [R=301,L]
+
+#RewriteCond %{SERVER_PORT} ^80$
+#RewriteRule "^(accounts\/(fbconnect(\/)?|tbconnect(\/)?|securimage(.*)|register(.*)?|basic_information(\/)?|edit(\/)?|reset|signout|post_signup))|buyguide\/(.*)|shops\/(checkout|complete)|shop_cms\/(.*)|collection\/(purchase|complete|print|check_code)$" "https://%{HTTP_HOST}/$1" [R=301,L]
+
+RewriteCond %{SERVER_PORT} ^443$
+RewriteRule "^((?!img\/(.*)|favicon\.ico|uploads\/editorial(.*)|css\/(.*)|community\/alert\/(.*)|community\/left_nav|buyguide\/(.*)|shops\/(checkout|complete)|shop_cms\/(.*)|mobile\/accounts(.*)|tbm\/amp\/(check_promo|complete|confirm\/(.*))|cart\/(set_promo_code|remove_promo_code|add_cart_product|get_cart_size|get_cart_summary|set_cart_quantity)|newsletter(\/)?|scrollerpop(.*)|js\/(.*)|accounts\/(fbconnect|profile_image_upload|edit_password|basic_information|signout|tbconnect|register|edit|setheader|securimage|checksum|give_points\/(.*)|reset|post_signup)).*)$" "http://%{HTTP_HOST}/$1" [R,L]
+
+
+
+
+# RewriteRule ^/TYPO3root/(typo3|typo3temp|typo3conf|t3lib|tslib|fileadmin|uploads|showpic\.php)/ - [L]
+RewriteRule ^(typo3|typo3temp|typo3conf|t3lib|tslib|fileadmin|uploads|showpic\.php)/ - [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp
+RewriteRule ^(/)?$ /cakeapp/ [L]
+
+#total beauty live
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^live$ /content/article/tb-live/$1 [L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^soniakashuk/(.*)$ /content/article/soniakashuk-$1 [L]
+
+#Aveeno hair advisor
+RewriteRule ^your-healthy-hair-questions-answered /cakeapp/your-healthy-hair-questions-answered [L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^(profile|community/(topic|list_topic|list_post))(.*)?$ / [R=301,L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^neutrogenanaturals$ /cakeapp/content/series/mind-body-beauty-140707 [L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^content/series/mind-body-beauty-140707$ /neutrogenanaturals [R=301,L]
+
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^clairol/rules$ /cakeapp/clairol [L]
+RewriteRule ^how-tos(/)?$ /beauty-tips [R=301,L]
+RewriteRule ^how_tos(/)?$ /beauty-tips [R=301,L]
+#redirect 301 /how-tos /beauty-tips
+#redirect 301 /how_tos /beauty-tips
+#RewriteRule ^samples_contests$ /samples/lancome-samples [R=302,L]
+#My Beauty Life
+
+redirect /nyx http://www.totalbeauty.com/go/deals/nyx
+
+#package page rewrite
+RewriteRule ^content/package/(.*) /beauty-tips [R=301,L]
+
+RewriteRule ^my-beauty-life/(.*) /cakeapp/mbl_article/$1 [L]
+RewriteRule ^my-beauty-life(.*) /cakeapp/mbl_article$1 [L]
+RewriteRule ^mobile/my-beauty-life/(.*) /cakeapp/mobile/mbl_article/$1 [L]
+RewriteRule ^mobile/my-beauty-life(.*) /cakeapp/mobile/mbl$1 [L]
+
+#RewriteRule ^wedding/(.*) /cakeapp/bridal_beauty/$1 [L]
+#RewriteRule ^wedding(.*) /cakeapp/bridal_beauty$1 [L]
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^wedding(/)?$ /content/series/bridal-beauty [R=301,L]
+
+#Beauty Buzz
+RewriteRule ^beauty-buzz/(.*) /cakeapp/beauty_buzz/$1 [L]
+RewriteRule ^beauty-buzz(.*) /cakeapp/beauty_buzz$1 [L]
+
+### newsletter ###
+#Redirect 301 /how_tos /how-tos [L]
+RewriteRule ^newsletter(.*) /cakeapp/newsletter/$1 [L]
+RewriteRule ^news_get(.*) /cakeapp/newsletter/news_get$1 [L]
+
+#redirect 301 /how_tos /how-tos
+RewriteRule ^beauty-tips$ /cakeapp/how-tos [L]
+RewriteRule ^mobile/beauty-tips$ /cakeapp/mobile/advice [L]
+
+#TBM
+RewriteRule ^tbm/(.*) /cakeapp/tbm/$1 [L]
+RewriteRule ^tbm(/)?$ /cakeapp/tbm [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^how-tos/(.*) /cakeapp/how-tos/$1 [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^search/(.*) /cakeapp/search/$1 [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^search$ /cakeapp/search/$1 [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^search2/(.*) /cakeapp/search2/$1 [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^search2$ /cakeapp/search2/$1 [L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^adage-signup$ /cakeapp/ddf_video/adage/$1 [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^editors_blogs/(.*) /cakeapp/editors_blogs/$1 [L]
+RewriteRule ^editors_blogs /cakeapp/editors_blogs [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^news/(.*) /cakeapp/news/$1 [L]
+RewriteRule ^news$ /cakeapp/news [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^diet-health(/)?$ /cakeapp/diet_health [L]
+RewriteRule ^diet-health/(.*) /cakeapp/diet_health/$1 [L]
+RewriteRule ^mobile/diet-health(/)?$ /cakeapp/diet_health [L]
+RewriteRule ^mobile/diet-health/(.*) /cakeapp/diet_health/$1 [L]
+
+#flashes
+RewriteRule ^content/flash/(.*) /cakeapp/flashes/flash/$1 [L]
+RewriteRule ^content/drag-drop/(.*) /cakeapp/flashes/drag-drop/$1 [L]
+RewriteRule ^content/info-gallery/(.*) /cakeapp/flashes/info-gallery/$1 [L]
+RewriteRule ^content/multi-quiz/(.*) /cakeapp/flashes/multi-quiz/$1 [L]
+RewriteRule ^content/charticle/(.*) /cakeapp/flashes/charticle/$1 [L]
+RewriteRule ^content/interactive/(.*) /cakeapp/flashes/interactive/$1 [L]
+
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^samples/(.*) /cakeapp/samples/$1 [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^contests/(.*) /cakeapp/contests/$1 [L]
+
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^community(/)?$ /cakeapp/community/$1 [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^community/comment/(.*)$ /cakeapp/community_comment/$1 [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^community(.*)$ /cakeapp/community/$1 [L]
+
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^community/elite-and-allstar-members(/.*)?$ /cakeapp/community/community_elite_members/$1 [L]
+
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^community/members/(.*)$ /cakeapp/community/members/$1 [L]
+
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^community/members/([a-zA-Z0-9_]+)/reviews(/page[0-9]+)?$ /cakeapp/community/community_elite_reviews/$1 [L]
+
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^community/about-badges(/)?$ /cakeapp/community/about_badges/$1 [L]
+
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^community/become_fan$ /cakeapp/community/become_fan/$i [L]
+
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^community/(allstar|elite)(/page[0-9]+)$ /cakeapp/community/elite_allstar_page/$i [L]
+
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^community/search(/)?$ /cakeapp/community/search_proxy/$i [L]
+
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^community/left_nav$ /cakeapp/community/left_nav/$i [L]
+
+RewriteRule ^mobile/content/quizzes/(.*) /cakeapp/quizzes/$1 [L]
+RewriteRule ^content/quizzes/(.*) /cakeapp/quizzes/$1 [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^content/gallery/(.*) /cakeapp/galleries/$1 [L]
+
+#exception for live neutrogena page
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^content/article/neutrogena-dr-will-kirby-event/live-questions$  /cakeapp/article/flat_article/neutrogena-dr-will-kirby-event-live [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^content/article/(.*) /cakeapp/article/flat_article/$1 [L]
+
+RewriteRule ^accounts/(.*) /cakeapp/accounts/$1 [L]
+RewriteRule ^mobile/accounts/(.*) /cakeapp/accounts/$1 [L]
+
+#Product detail
+RewriteRule ^mobile/reviews/product/(.*) /cakeapp/products/$1 [L]
+RewriteRule ^reviews/product/(.*) /cakeapp/products/$1 [L]
+#RewriteRule ^products/submit_review/(.*) /cakeapp/products/submit_review/$1 [L]
+#RewriteRule ^products/helpful(/)? /cakeapp/products/helpful [L]
+#RewriteRule ^products/manufacturer/(.*) /cakeapp/products/manufacturer/$1 [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^feeds/(.*) /cakeapp/feeds/$1 [L]
+
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^feeds/general/(.*) /cakeapp/feeds/general/$1 [L]
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^feeds/verizon /cakeapp/feeds/verizon [L]
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^feeds/associatedcontent /cakeapp/feeds/associatedcontent [L]
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^feeds/rr-archive /cakeapp/feeds/rr-archive [L]
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^feeds/rr /cakeapp/feeds/rr [L]
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^feeds/ob-archive /cakeapp/feeds/ob-archive [L]
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^feeds/earthlink /cakeapp/feeds/earthlink [L]
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^video-sitemap /cakeapp/feeds/video-sitemap [L]
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^feeds/totalbeauty.xml /cakeapp/feeds/main_feed [L]
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^feeds/people /cakeapp/feeds/people [L]
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^feeds/myyahoo /cakeapp/feeds/myyahoo [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^mobile-reviews-app/(.*) /cakeapp/mobile_reviews/$1 [L]
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^mobile-reviews-app /cakeapp/mobile_reviews [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^mobile-apps /cakeapp/mobile/mobileapps [L]
+
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^mobile/(.*) /cakeapp/mobile/$1 [L]
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^mobile /cakeapp/mobile [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^native-mobile-app-offers /cakeapp/mobile/newsletter [L]
+
+#rewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule ^clairol http://www.totalbeauty.com/content/gallery/p_clairol_winners [L]
+
+# Best in Beauty Contest
+RewriteRule ^samples_contests/best_in_beauty_product_giveaway_sweeps/free_entry$ /cakeapp/contest/index/best_in_beauty_product_giveaway_sweeps [L]
+
+# MyYahoo Contest
+RewriteRule ^samples_contests/ultimate_hair_makeover_sweeps/submit/(.*) /cakeapp/myyahoo/$1 [L]
+
+RewriteRule ^samples_contests$ /cakeapp/samples_contests [L]
+RewriteRule ^samples_contests/(.*) /cakeapp/samples_contests/$1 [L]
+
+# my beauty life
+RewriteRule ^my-beauty-life/(.*) /cakeapp/mbl_article/$1 [L]
+RewriteRule ^my-beauty-life(.*) /cakeapp/mbl_article$1 [L]
+
+# Flat article page template redirects
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^advertise(/)?$ /cakeapp/content/blog/advertise-150327 [L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^content/blog/advertise-150327$ /advertise [R=301,L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^about_us(/)?$ /cakeapp/content/blog/about_us-140512 [L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^content/blog/about_us-140512$ /about_us [R=301,L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^about-ads(/)?$ /cakeapp/content/blog/about-ads-140512 [L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^content/blog/about-ads-140512$ /about-ads [R=301,L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^faq(/)?$ /cakeapp/content/blog/faq-140512 [L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^content/blog/faq-140512$ /faq [R=301,L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^privacy(/)?$ /cakeapp/content/blog/privacy-140512 [L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^content/blog/privacy-140512$ /privacy [R=301,L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^terms(/)?$ /cakeapp/content/blog/terms-140512 [L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^content/blog/terms-140512$ /terms [R=301,L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^cookie-technology(/)?$ /cakeapp/content/blog/cookie-technology-140512 [L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^content/blog/cookie-technology-14051$ /cookie-technology [R=301,L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^third-party(/)?$ /cakeapp/content/blog/third-party-140512 [L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^content/blog/third-party-140512$ /third-party [R=301,L]
+
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^review_standards(/)?$ /cakeapp/content/blog/reviews-150401 [L]
+RewriteRule ^content/blog/reviews-150401$ /review_standards [R=301,L]
+
+#RewriteRule ^advertise(/)?$ /content/blog/advertise-150327 [L]
+#RewriteRule ^about_us(/)?$ /content/blog/about_us-140512 [L]
+#RewriteRule ^about-ads(/)?$ /content/blog/about-ads-140512 [L]
+RewriteRule ^contact(/)?$ /cakeapp/article/contact/$1 [L]
+#RewriteRule ^advertise(/)?$ /cakeapp/article/advertise/$1 [L]
+RewriteRule ^management_team(/)?$ /content/blog/management_team-140512 [L]
+RewriteRule ^board_of_directors(/)?$ /cakeapp/article/board_of_directors/$1 [L]
+RewriteRule ^investors(/)?$ /content/blog/investors-140512 [L]
+RewriteRule ^advisors(/)?$ /content/blog/advisors-140512 [L]
+RewriteRule ^expert_panel(/)?$ /content/blog/expert_panel-140512 [L]
+RewriteRule ^press(/)?$ /content/blog/press-140512 [L]
+RewriteRule ^jobs(/)?$ /content/blog/jobs-140512 [L]
+#RewriteRule ^faq(/)?$ /content/blog/faq-140512 [L]
+#RewriteRule ^privacy(/)?$ /content/blog/privacy-140512 [L]
+#RewriteRule ^terms(/)?$ /content/blog/terms-140512 [L]
+#RewriteRule ^cookie-technology(/)?$ /content/blog/cookie-technology-140512 [L]
+#RewriteRule ^third-party(/)?$ /content/blog/third-party-140512 [L]
+RewriteRule ^review_standards(/)?$ /cakeapp/article/review_standards/$1 [L]
+RewriteRule ^add-us-to-your-safe-sender-list(/[a-z0-9_]*\-(com|net|info))?$ /cakeapp/article/email_instructions/$1 [L]
+#RewriteRule ^video/comment/(.*)$ /cakeapp/video_comment/$1 [L]
+RewriteRule ^article/comment/(.*)$ /cakeapp/article_comment/$1 [L]
+RewriteRule ^garnier_calculator$ /cakeapp/article/garnier/$1 [L]
+
+### beauty awards ###
+RewriteRule ^mobile/awards(.*)?$ /cakeapp/awards$1 [L]
+RewriteRule ^awards(.*)?$ /cakeapp/awards$1 [L]
+
+### reviews page ###
+RewriteRule ^reviews(/)?$ /cakeapp/review/$1 [L]
+RewriteRule ^reviews/(.*) /cakeapp/review/$1 [L]
+RewriteRule ^reviews/brandscroller$ /cakeapp/review/brandscroller/$1 [L]
+RewriteRule ^reviews/top100(.*)$ /cakeapp/review/top100/$i [L]
+RewriteRule ^reviews/bottom100(.*)$ /cakeapp/review/bottom100/$i [L]
+RewriteRule ^scrollerpop(.*)$ /cakeapp/review/popup_scroller/$i [L]
+RewriteRule ^reviews/(face|makeup|hair|body)(/)?$ /cakeapp/review/parent_cat/$1 [L]
+RewriteRule ^reviews/(brands|face|makeup|hair|body)/[-_/a-z0-9]+$ /cakeapp/review/brand_cat_list/$1 [L]
+
+#RewriteRule ^deals-samples-newsletter /cakeapp/welcome/deals_samples_newsletter [L]
+RewriteRule ^welcome(.*)$ /cakeapp/welcome/$1 [L]
+RewriteRule ^stay-connected(.*)$ /cakeapp/welcome/stay_connected/$1 [L]
+### kateluxe and other email popup optins ###
+RewriteRule ^kateluxe/popup(/)?$ /cakeapp/kateluxe_optin/popup/$1 [L]
+RewriteRule ^anti_aging/popup(/)?$ /cakeapp/newsletter/popup_antiaging/$1 [L]
+RewriteRule ^deals/popup(/)?$ /cakeapp/newsletter/popup_deals/$1 [L]
+
+### Wen message board ###
+redirect 301 /community/message/5541/wen-haircare http://www.totalbeauty.com/content/gallery/p-wen-products
+
+RewriteRule ^/community/message/(.*) /community [R=301,L]
+
+
+### nexxus ###
+RewriteRule ^nexxus-fab-hair-thursday(/)?$ /cakeapp/nexxus_hair/$1 [L]
+
+### poll ###
+RewriteRule ^poll/submit(/)?$ /cakeapp/poll/submit/$1 [L]
+RewriteRule ^poll/question(/)?$ /cakeapp/poll/question/$1 [L]
+
+### video contract ###
+RewriteRule ^ddf-video-release-form$ /cakeapp/ddf_video/$1 [L]
+RewriteRule ^neutrogena-product-sample-release-form(/)?$ /cakeapp/ddf_video/index/neutrogena-product-sample-release-form [L]
+
+### chapstick contest rules ###
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^lights-camera-smile-official-sweepstakes-rules$ /cakeapp/contests/chapstick_rules [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^sitemap(/)?$ /cakeapp/sitemap/$1 [L]
+RewriteRule ^sitemap/brands(.*) /cakeapp/sitemap/index/brands/$1 [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^video(.*)$ /cakeapp/video/$1 [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^blogs_we_love(.*) /cakeapp/blogs_we_love/$1 [L]
+
+rewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^webinar(.*)$ /cakeapp/webinar/$1 [L]
+
+#turning off shops
+RewriteCond %{REQUEST_URI} !^/cakeapp$
+RewriteRule ^((shop(s|)(\/.*)?)|cart(\/.*)|beauty-gems(\/(.*))?|collection(s|)?)$ /reviews [R=301,L]
+
+### temporary go redirect
+#redirect 301 /go/deals/elf http://zstaging.totalbeauty.com/deals-samples-newsletter
+#redirect 301 /go/deals/elf/ http://zstaging.totalbeauty.com/deals-samples-newsletter
+
+### press page redirects ###
+redirect 301 /press_advertising_age_121409 http://adage.com/digital/article?article_id=141061
+redirect 301 /content/article/press_advertising_age_121409 http://adage.com/digital/article?article_id=141061
+redirect 301 /press_smartplanet_090109 http://www.smartplanet.com/people/blog/pure-genius/turning-your-employer-into-your-customer/527/?tag=content;col1
+redirect 301 /content/article/press_smartplanet_090109 http://www.smartplanet.com/people/blog/pure-genius/turning-your-employer-into-your-customer/527/?tag=content;col1
+redirect 301 /press_pitts_tribune_061808 http://www.pittsburghlive.com/x/pittsburghtrib/lifestyles/fashion/s_578142.html
+redirect 301 /content/article/press_pitts_tribune_061808 http://www.pittsburghlive.com/x/pittsburghtrib/lifestyles/fashion/s_578142.html
+redirect 301 /press_timeout_newyork_061908 http://newyork.timeout.com/articles/spas-sport/31331/makeup-meltdown
+redirect 301 /content/article/press_timeout_newyork_061908 http://newyork.timeout.com/articles/spas-sport/31331/makeup-meltdown
+redirect 301 /press_the_economist_052508 http://www.economist.com/daily/columns/businessview/displaystory.cfm?story_id=10908345
+redirect 301 /content/article/press_the_economist_052508 http://www.economist.com/daily/columns/businessview/displaystory.cfm?story_id=10908345
+redirect 301 /press_american_salon_0408 http://www.americansalonmag.com/salon-business/all-about-beauty
+redirect 301 /content/article/press_american_salon_0408 http://www.americansalonmag.com/salon-business/all-about-beauty
+redirect 301 /press_us_news_031208 http://www.usnews.com/money/blogs/alpha-consumer/2008/03/12/making-beauty-affordable.html
+redirect 301 /content/article/press_us_news_031208 http://www.usnews.com/money/blogs/alpha-consumer/2008/03/12/making-beauty-affordable.html
+redirect 301 /press_advertising_age_080707 http://adage.com/article?article_id=119272
+redirect 301 /content/article/press_advertising_age_080707 http://adage.com/article?article_id=119272
+redirect 301 /go /shops
+redirect 301 /deals-samples-newsletter /collection
+# Allow fonts to be served cross-domain, FF security issue
+<FilesMatch "\.(ttf|otf|eot|woff|svg)$">
+  <IfModule mod_headers.c>
+    Header set Access-Control-Allow-Origin "*"
+  </IfModule>
+</FilesMatch>
+
+# Old Mobile URLS
+RewriteRule ^mobile/brandletters /mobile/reviews/brands-a-z [R=301,L]
+RewriteRule ^mobile/productcategories /mobile/reviews [R=301,L]
+RewriteRule ^mobile/attributes/(.*) /mobile/reviews [R=301,L]
+#RewriteRule ^mobile/catproducts/(.*) /mobile/reviews [R=301,L]
+RewriteRule ^mobile/product/(.*) /mobile/reviews/product/$1 [R=301,L]
+RewriteRule ^mobile/advice_sub/11 /mobile/how-tos/hair-care [R=301,L]
+RewriteRule ^mobile/advice_sub/1 /mobile/how-tos/hairstyles [R=301,L]
+RewriteRule ^mobile/advice_sub/21 /mobile/how-tos/skin-care [R=301,L]
+RewriteRule ^mobile/diethealth_sub/1682 /mobile/diet-health/health [R=301,L]
+RewriteRule ^mobile/diethealth_sub/1592 /mobile/diet-health/diet [R=301,L]
+RewriteRule ^mobile/diethealth_sub/1772 /mobile/diet-health/fitness [R=301,L]
+RewriteRule ^mobile/diethealth /mobile/diet-health [R=301,L]
+RewriteRule ^mobile/advice /mobile/how-tos [R=301,L]
+
+# Templates
+RewriteRule ^mobile/sitemap(/)?$ /cakeapp/sitemap/$1 [L]
+RewriteRule ^mobile/about_us(/)?$ mobile/content/blog/about_us-140512 [L]
+RewriteRule ^mobile/about-ads(/)?$ mobile/content/blog/about-ads-140512 [L]
+RewriteRule ^mobile/faq(/)?$ mobile/content/blog/faq-140512 [L]
+RewriteRule ^mobile/privacy(/)?$ mobile//content/blog/privacy-140512 [L]
+RewriteRule ^mobile/terms(/)?$ mobile/content/blog/terms-140512 [L]
+RewriteRule ^mobile/contact(/)?$ /cakeapp/article/contact/$1 [L]
+RewriteRule ^mobile/about_ads(/)?$ /cakeapp/article/about_ads/$1 [L]
+RewriteRule ^mobile/sitemap/brands(.*) /cakeapp/sitemap/index/brands/$1 [L]
+
+# Content
+RewriteRule ^mobile/reviews(/)?$ /cakeapp/review/$1 [L]
+RewriteRule ^mobile/reviews/(.*) /cakeapp/review/$1 [L]
+RewriteRule ^mobile/content/article/(.*) /cakeapp/article/flat_article/$1 [L]
+RewriteRule ^mobile/content/quizzes/(.*) /cakeapp/quizzes/$1 [L]
+RewriteRule ^mobile/content/gallery/(.*) /cakeapp/galleries/$1 [L]
+RewriteRule ^mobile/reviews/product/(.*) /cakeapp/products/$1 [L]
+RewriteRule ^mobile/products/manufacturer/(.*) /cakeapp/products/manufacturer/$1 [L]
+
+# Search
+RewriteRule ^mobile/search/(.*) /cakeapp/search/$1 [L]
+
+#404
+RewriteRule ^mobile/page_not_found /cakeapp/pages/page_not_found [L]
+RewriteRule ^page_not_found /cakeapp/pages/page_not_found [L]
+
+#Mobile Fallback
+RewriteRule ^mobile/(.*) /cakeapp/$1 [L]
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteCond %{REQUEST_FILENAME} !-l
+
+#RewriteRule .* index.php
+#redirect for 404 pages
+#RewriteCond %{REQUEST_URI} !^/cakeapp$
+#RewriteRule .* /cakeapp/404
+
+#Everything now point to cake. and redirect to page_not_found
+
+RewriteRule (.*) /cakeapp/$1 [L]

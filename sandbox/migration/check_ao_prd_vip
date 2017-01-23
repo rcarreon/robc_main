@@ -1,0 +1,68 @@
+bot-vip-app-vb.ao.prd.lax.gnmedia.net.	10.11.34.66		10.64.85.219
+bot-vip-app-wp.ao.prd.lax.gnmedia.net.	10.11.34.129		10.64.85.223
+bot-vip-pxy-vb.ao.prd.lax.gnmedia.net.	10.2.8.55	72.172.76.39	97.64.84.132
+bot-vip-pxy-wp.ao.prd.lax.gnmedia.net.		72.172.76.151	97.64.84.133
+vip-admin-clickheat.ao.prd.lax.gnmedia.net.	10.2.8.74		10.64.85.231
+vip-app-api-cs.ao.prd.lax.gnmedia.net.	10.2.8.97	72.172.76.36	97.64.84.135
+vip-app-atp.ao.prd.lax.gnmedia.net.	10.2.8.51	72.172.76.21	97.64.84.137
+vip-app-be-sdc.ao.prd.lax.gnmedia.net.	10.2.8.73	72.172.76.202	97.64.84.138
+vip-app-clickheat.ao.prd.lax.gnmedia.net.		72.172.76.138	97.64.84.140
+vip-app-gr.ao.prd.lax.gnmedia.net.	10.2.8.120	72.172.76.27	97.64.84.141
+vip-app-mal.ao.prd.lax.gnmedia.net.	10.2.8.53	72.172.76.43	97.64.84.143
+vip-app-mc.ao.prd.lax.gnmedia.net.	10.11.34.178		10.64.85.253
+vip-app-sdc.ao.prd.lax.gnmedia.net.	10.11.34.170		10.64.86.2
+vip-app-sdvideos.ao.prd.lax.gnmedia.net.	10.2.8.63	72.172.76.82	97.64.84.145
+vip-app-vb-shh.ao.prd.lax.gnmedia.net.	10.2.8.83	72.172.76.114	97.64.84.149
+vip-app-vb-tfs.ao.prd.lax.gnmedia.net.	10.2.8.82	72.172.76.32	97.64.84.151
+vip-app-vb-wz.ao.prd.lax.gnmedia.net.	10.2.8.145		10.64.86.22
+vip-app-vb.ao.prd.lax.gnmedia.net.	10.11.34.66		10.64.86.25
+vip-app-wbf.ao.prd.lax.gnmedia.net.	10.2.8.147	72.172.76.176	97.64.84.154
+vip-app-wp.ao.prd.lax.gnmedia.net.	10.11.34.129		10.64.86.45
+vip-app-wzf.ao.prd.lax.gnmedia.net.	10.2.8.118	72.172.76.113	97.64.84.155
+vip-app-xf-ae.ao.prd.lax.gnmedia.net.	10.2.8.152	72.172.76.96	97.64.84.156
+vip-app-xf-psl.ao.prd.lax.gnmedia.net.	10.2.8.112	72.172.76.180	97.64.84.158
+vip-app-xf-sdc.ao.prd.lax.gnmedia.net.	10.2.8.92	72.172.76.22	97.64.84.160
+vip-els-xf.ao.prd.lax.gnmedia.net.	10.11.34.38		10.64.86.64
+vip-pxy-sdc.ao.prd.lax.gnmedia.net.	10.2.8.71	72.172.76.198	97.64.84.162
+vip-pxy-vb.ao.prd.lax.gnmedia.net.	10.2.8.57		10.64.86.71
+vip-pxy-wp.ao.prd.lax.gnmedia.net.	10.2.8.93		10.64.86.76
+vip-spx-vb-3312.ao.prd.lax.gnmedia.net.	10.11.20.68		10.64.86.81
+vip-spx-vb-3313.ao.prd.lax.gnmedia.net.			10.64.86.84
+vip-spx-vb-3314.ao.prd.lax.gnmedia.net.			10.64.86.87
+vip-spx-vb-3315.ao.prd.lax.gnmedia.net.			10.64.86.90
+vip-spx-vb-3316.ao.prd.lax.gnmedia.net.			10.64.86.93
+vip-spx-vb-3317.ao.prd.lax.gnmedia.net.			10.64.86.96
+vip-spx-vb-3318.ao.prd.lax.gnmedia.net.			10.64.86.99
+vip-spx-vb-tfs.ao.prd.lax.gnmedia.net.	10.11.34.192		10.64.86.102
+vip-sqlro-api-cs.ao.prd.lax.gnmedia.net.	10.12.34.32		10.64.86.106
+vip-sqlro-atp.ao.prd.lax.gnmedia.net.	10.12.34.53		10.64.86.109
+vip-sqlro-bab.ao.prd.lax.gnmedia.net.	10.12.34.71		10.64.86.112
+vip-sqlro-hfb.ao.prd.lax.gnmedia.net.	10.12.34.84		10.64.86.115
+vip-sqlro-mal.ao.prd.lax.gnmedia.net.	10.12.34.25		10.64.86.122
+vip-sqlro-sdc.ao.prd.lax.gnmedia.net.	10.12.34.64		10.64.86.131
+vip-sqlro-vb-psl.ao.prd.lax.gnmedia.net.	10.12.34.129		10.64.86.134
+vip-sqlro-vb-sdc.ao.prd.lax.gnmedia.net.	10.12.34.132		10.64.86.137
+vip-sqlro-vb-shh.ao.prd.lax.gnmedia.net.	10.12.34.120		10.64.86.144
+vip-sqlro-vb-tfs.ao.prd.lax.gnmedia.net.	10.12.34.46		10.64.86.147
+vip-sqlro-vb-wz.ao.prd.lax.gnmedia.net.	10.12.34.66		10.64.86.150
+vip-sqlro-wp.ao.prd.lax.gnmedia.net.	10.12.34.68		10.64.86.153
+vip-sqlro-xf-ae.ao.prd.lax.gnmedia.net.	10.12.34.95		10.64.86.160
+vip-sqlro-xf-psl.ao.prd.lax.gnmedia.net.	10.12.34.134		10.64.86.163
+vip-sqlro-xf-sdc.ao.prd.lax.gnmedia.net.	10.12.34.56		10.64.86.166
+vip-sqlrw-api-cs.ao.prd.lax.gnmedia.net.	10.12.34.33		10.64.86.171
+vip-sqlrw-atp.ao.prd.lax.gnmedia.net.	10.12.34.51		10.64.86.174
+vip-sqlrw-bab.ao.prd.lax.gnmedia.net.	10.12.34.70		10.64.86.177
+vip-sqlrw-gr.ao.prd.lax.gnmedia.net.	10.12.34.76		10.64.86.180
+vip-sqlrw-hfb.ao.prd.lax.gnmedia.net.	10.12.34.85		10.64.86.183
+vip-sqlrw-mal.ao.prd.lax.gnmedia.net.	10.12.34.28		10.64.86.186
+vip-sqlrw-mc.ao.prd.lax.gnmedia.net.	10.12.34.108		10.64.86.189
+vip-sqlrw-sdc.ao.prd.lax.gnmedia.net.	10.12.34.58		10.64.86.192
+vip-sqlrw-vb-sdc.ao.prd.lax.gnmedia.net.	10.12.34.131		10.64.86.195
+vip-sqlrw-vb-shh.ao.prd.lax.gnmedia.net.	10.12.34.126		10.64.86.198
+vip-sqlrw-vb-tfs.ao.prd.lax.gnmedia.net.	10.12.34.47		10.64.86.201
+vip-sqlrw-vb-wz.ao.prd.lax.gnmedia.net.	10.12.34.65		10.64.86.204
+vip-sqlrw-wp.ao.prd.lax.gnmedia.net.	10.12.34.69		10.64.86.207
+vip-sqlrw-xf-ae.ao.prd.lax.gnmedia.net.	10.12.34.96		10.64.86.210
+vip-sqlrw-xf-psl.ao.prd.lax.gnmedia.net.	10.12.34.133		10.64.86.213
+vip-sqlrw-xf-sdc.ao.prd.lax.gnmedia.net.	10.12.34.67		10.64.86.216
+vip-test-vb.ao.prd.lax.gnmedia.net.	10.2.8.96	72.172.76.50	97.64.84.164

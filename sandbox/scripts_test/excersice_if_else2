@@ -1,0 +1,30 @@
+#!/bin/bash
+
+osch=0
+
+echo "1. Unix (Sun Os)"
+echo "2. Linux (Red Hat)"
+echo "3. Windows (any)"
+echo -n "Select your os choice [1 , 2 or 3 ]? "
+read osch
+
+if [ $osch -eq 1 ] ; then
+
+     echo -e "\n You Pick up Unix (Sun Os)"
+
+else #### nested if i.e. if within if ######
+            
+       if [ $osch -eq 2 ] ; then
+             echo "You Pick up Linux `cat /etc/*release | uniq` "
+       else
+             if [ $osch -eq 3 ] ; then 
+		echo -e  "\n Your pick is Windows :("
+	     else
+		if [ $osch -gt 3 ] ; then 
+		echo -e  "\n Why you don't like Unix/Linux OS."
+		fi
+	     fi 
+       fi
+fi
+
+

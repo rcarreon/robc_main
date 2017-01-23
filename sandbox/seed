@@ -1,0 +1,26 @@
+#!/bin/bash
+
+sed -e 'N;s/.*/[&]/' << EOF  #nmap_testing 
+line1
+line2
+EOF
+# OUTPUT:
+# [line1
+# line2]
+
+
+
+echo
+
+awk '{ $0=$1 "\n" $2; if (/line.1/) {print}}' << EOF
+line 1
+line 2
+EOF
+# OUTPUT:
+# line
+# 1
+
+
+# Thanks, S.C.
+
+exit 0

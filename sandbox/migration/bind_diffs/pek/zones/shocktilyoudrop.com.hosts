@@ -1,0 +1,27 @@
+$TTL 86400
+shocktilyoudrop.com. IN SOA shocktilyoudrop.com. root.shocktilyoudrop.com. (
+                            2014061600     ; serial
+                            28800          ; refresh
+                            14400          ; retry
+                            3600000        ; expire
+                            86400 )        ; minimum
+
+
+shocktilyoudrop.com.        IN    NS       app3v-dns.tp.prd.lax.craveonline.com.
+shocktilyoudrop.com.        IN    NS       app4v-dns.tp.prd.lax.craveonline.com.
+shocktilyoudrop.com.        IN    NS       app1v-dns.tp.prd.lax.craveonline.com.
+shocktilyoudrop.com.        IN    NS       app2v-dns.tp.prd.lax.craveonline.com.
+
+shocktilyoudrop.com.        IN    MX 10    mail.shocktilyoudrop.com.
+
+
+local                       IN    A        127.0.0.1
+localhost                   IN    A        127.0.0.1
+loghost                     IN    A        127.0.0.1
+
+
+shocktilyoudrop.com.        IN    A        72.172.76.151 
+www                         IN    CNAME    shocktilyoudrop.com.
+
+mail                        IN    A        72.172.76.78
+

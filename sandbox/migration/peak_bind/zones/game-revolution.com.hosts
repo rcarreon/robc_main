@@ -1,0 +1,40 @@
+$TTL 86400
+game-revolution.com.		IN      SOA     game-revolution.com. root.game-revolution.com. (
+                        2014061700; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+game-revolution.com.     	IN      NS              app3v-dns.tp.prd.lax.craveonline.com.
+game-revolution.com.     	IN      NS              app4v-dns.tp.prd.lax.craveonline.com.
+game-revolution.com.     	IN      NS              app1v-dns.tp.prd.lax.craveonline.com.
+game-revolution.com.     	IN      NS              app2v-dns.tp.prd.lax.craveonline.com.
+game-revolution.com.            IN      MX      10      cluster9.us.messagelabs.com.
+game-revolution.com.            IN      MX      20      cluster9a.us.messagelabs.com.
+;
+; local host
+;
+local           IN      A       127.0.0.1
+localhost       IN      A       127.0.0.1
+loghost         IN      A       127.0.0.1
+;
+;
+; hosts
+mail.game-revolution.com.	IN	CNAME	mail.gorillanation.com.
+;mail.game-revolution.com.	IN	CNAME   mta-lax-002.gnmedia.net.
+
+; Commented out for migration
+;game-revolution.com.		IN      A	67.15.178.70 
+;www.game-revolution.com.	IN	A	67.15.178.70
+game-revolution.com.        	IN      A       72.172.76.27 
+;game-revolution.com.        	IN      A       66.180.202.144
+*.game-revolution.com.          IN      CNAME	game-revolution.com.
+
+;cpanel.game-revolution.com.	IN	A	67.15.178.70	
+;ensim.game-revolution.com.	IN	A	67.15.178.70	
+;ftp.game-revolution.com.	IN	A	67.15.178.62	
+;lists.game-revolution.com.	IN	A	67.15.178.70	
+;plesk.game-revolution.com.	IN	A	67.15.178.70	
+webmail.game-revolution.com.	IN	A	67.15.178.62

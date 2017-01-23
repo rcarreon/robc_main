@@ -1,0 +1,58 @@
+options {
+
+	directory "/etc/bind/zones";
+
+	// forward Internet queries to internal cache servers, no cache locally
+	// forwarders { 10.2.10.33;};
+
+	// auth-nxdomain no; # conform to RFC1035
+
+	version "not currently available"; // Don't be too verbose about that...
+
+	allow-query {
+		localhost;
+		// office
+		192.168.0.0/16;
+		// colo
+		10.0.0.0/8;
+		// public dns
+		67.15.66.42;
+		67.15.66.43;
+		64.34.172.209;
+		72.51.41.238;
+	};
+
+	allow-recursion {
+		localhost;
+		// office
+		192.168.0.0/16;
+		// colo
+		10.0.0.0/8;
+		// public dns
+		67.15.66.42;
+		67.15.66.43;
+		64.34.172.209;
+		72.51.41.238;
+	};
+
+
+	allow-transfer {
+		127.0.0.1; // localhost
+		10.64.81.86; // app1v-dns.tp.prd.lax
+		10.64.81.160; // app2v-dns.tp.prd.lax
+		10.64.81.189; // app3v-dns.tp.prd.lax
+		10.64.81.168; // app4v-dns.tp.prd.lax
+	};
+
+	also-notify {
+		10.11.20.68; // app1v-dns.tp.prd.lax
+		10.11.20.69; // app2v-dns.tp.prd.lax
+		10.11.20.53; // app3v-dns.tp.prd.lax
+		10.11.20.88; // app4v-dns.tp.prd.lax
+	};
+
+	additional-from-auth yes;
+	additional-from-cache yes;
+
+};
+
