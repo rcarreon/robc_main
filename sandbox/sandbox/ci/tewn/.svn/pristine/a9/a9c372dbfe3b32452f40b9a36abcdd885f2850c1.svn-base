@@ -1,0 +1,435 @@
+<?php
+
+namespace Test\CPC;
+
+/**
+ * @group CPC
+ * @group CPC_Analytic
+ */
+class AnalyticTest extends \PHPUnit_Framework_TestCase
+{
+    public function testCreateShouldPass()
+    {
+        $oAnalytic = $this->getMockBuilder('\CI\CPC\Analytic')
+                          ->setMethods(
+                                array(
+                                    'getInstanceLandinPageEngineController',
+                                    'getDatabase'
+                                )
+                            )
+                          ->getMock();
+
+        $oLandingPageEngineMock = $this->getLandingPageEngineControllerMock();
+
+        $oAnalytic->expects($this->any())
+                  ->method('getInstanceLandinPageEngineController')
+                  ->will($this->returnValue($oLandingPageEngineMock));
+
+        $oDatabaseMock = $this->getMockBuilder('\CI\Database\Engine')
+                              ->disableOriginalConstructor()
+                              ->getMock();
+
+        $oDatabaseMock->expects($this->exactly(4))
+                      ->method('query')
+                      ->will(
+                            $this->onConsecutiveCalls(
+                                array (
+                                    array (
+                                        'domain_bitfield' => '12',
+                                        'account_id'      => '230',
+                                    ),
+                                ),
+                                array(
+                                    array (
+                                        'id' => 0,
+                                    ),
+                                ),
+                                array(
+                                    array (
+                                        'id' => 0,
+                                    ),
+                                ),
+                                array(
+                                    array (
+                                        'id' => 0,
+                                    ),
+                                )
+                            )
+                        );
+
+        $oAnalytic->expects($this->any())
+                  ->method('getDatabase')
+                  ->will($this->returnValue($oDatabaseMock));
+
+        $this->assertInstanceOf('CI\CPC\Analytic', $oAnalytic->create(0, array(1)));
+    }
+
+    /**
+     * @expectedException \CI\CPC\Exception
+     * @expectedExceptionCode \CI\CPC\Exception::REQUIRED_FIELD
+     */
+    public function testCreateShouldThrowExceptionForWebsite()
+    {
+        $oAnalytic = $this->getMockBuilder('\CI\CPC\Analytic')
+                          ->setMethods(
+                                array(
+                                    'getInstanceLandinPageEngineController',
+                                    'getDatabase'
+                                )
+                            )
+                          ->getMock();
+
+        $oLandingPageEngineMock = $this->getLandingPageEngineControllerMock();
+
+        $oAnalytic->expects($this->any())
+                  ->method('getInstanceLandinPageEngineController')
+                  ->will($this->returnValue($oLandingPageEngineMock));
+
+        $oDatabaseMock = $this->getMockBuilder('\CI\Database\Engine')
+                              ->disableOriginalConstructor()
+                              ->getMock();
+
+        $oDatabaseMock->expects($this->once())
+                      ->method('query')
+                      ->will($this->returnValue(array()));
+
+        $oAnalytic->expects($this->any())
+                  ->method('getDatabase')
+                  ->will($this->returnValue($oDatabaseMock));
+
+        $oAnalytic->create(0, array(1));
+    }
+
+    /**
+     * @expectedException \CI\CPC\Exception
+     * @expectedExceptionCode \CI\CPC\Exception::REQUIRED_FIELD
+     */
+    public function testCreateShouldThrowExceptionForWebsiteOnDomain()
+    {
+        $oAnalytic = $this->getMockBuilder('\CI\CPC\Analytic')
+                          ->setMethods(
+                                array(
+                                    'getInstanceLandinPageEngineController',
+                                    'getDatabase'
+                                )
+                            )
+                          ->getMock();
+
+        $oLandingPageEngineMock = $this->getLandingPageEngineControllerMock();
+
+        $oAnalytic->expects($this->any())
+                  ->method('getInstanceLandinPageEngineController')
+                  ->will($this->returnValue($oLandingPageEngineMock));
+
+        $oDatabaseMock = $this->getMockBuilder('\CI\Database\Engine')
+                              ->disableOriginalConstructor()
+                              ->getMock();
+
+        $oDatabaseMock->expects($this->once())
+                      ->method('query')
+                      ->will(
+                            $this->returnValue(
+                                array (
+                                    array (
+                                        'account_id'      => '230',
+                                    ),
+                                )
+                            )
+                        );
+
+        $oAnalytic->expects($this->any())
+                  ->method('getDatabase')
+                  ->will($this->returnValue($oDatabaseMock));
+
+        $oAnalytic->create(0, array(1));
+    }
+
+    /**
+     * @expectedException \CI\CPC\Exception
+     * @expectedExceptionCode \CI\CPC\Exception::REQUIRED_FIELD
+     */
+    public function testCreateShouldThrowExceptionForAccounts()
+    {
+        $oAnalytic = $this->getMockBuilder('\CI\CPC\Analytic')
+                          ->setMethods(
+                                array(
+                                    'getInstanceLandinPageEngineController',
+                                    'getDatabase'
+                                )
+                            )
+                          ->getMock();
+
+        $oLandingPageEngineMock = $this->getLandingPageEngineControllerMock();
+
+        $oAnalytic->expects($this->any())
+                  ->method('getInstanceLandinPageEngineController')
+                  ->will($this->returnValue($oLandingPageEngineMock));
+
+        $oDatabaseMock = $this->getMockBuilder('\CI\Database\Engine')
+                              ->disableOriginalConstructor()
+                              ->getMock();
+
+        $oDatabaseMock->expects($this->exactly(2))
+                      ->method('query')
+                      ->will(
+                            $this->onConsecutiveCalls(
+                                array (
+                                    array (
+                                        'domain_bitfield' => '12',
+                                        'account_id'      => '230',
+                                    ),
+                                ),
+                                array()
+                            )
+                        );
+
+        $oAnalytic->expects($this->any())
+                  ->method('getDatabase')
+                  ->will($this->returnValue($oDatabaseMock));
+
+        $oAnalytic->create(0, array(1));
+    }
+
+    public function testTurnOffShouldPass()
+    {
+        $oAnalytic = $this->getMockBuilder('\CI\CPC\Analytic')
+                          ->setMethods(
+                                array(
+                                    'getInstanceLandinPageEngineController',
+                                    'getDatabase'
+                                )
+                            )
+                          ->getMock();
+
+        $oLandingPageEngineMock = $this->getLandingPageEngineControllerMock();
+
+        $oAnalytic->expects($this->any())
+                  ->method('getInstanceLandinPageEngineController')
+                  ->will($this->returnValue($oLandingPageEngineMock));
+
+        $oDatabaseMock = $this->getMockBuilder('\CI\Database\Engine')
+                              ->disableOriginalConstructor()
+                              ->getMock();
+
+        $oDatabaseMock->expects($this->exactly(2))
+                      ->method('query')
+                      ->will(
+                          $this->onConsecutiveCalls(
+                              array(
+                                  array(
+                                      'domain_bitfield'     => '12',
+                                      'account_id'          => '230',
+                                      'transfer_account_id' => '230',
+                                      'incoming'            => 1516,
+                                      'featured'            => 0,
+                                  )
+                              ),
+                              array()
+                          )
+                      );
+
+        $oDatabaseMock->expects($this->once())
+                      ->method('execute')
+                      ->will($this->returnValue(true));
+
+        $oAnalytic->expects($this->any())
+                  ->method('getDatabase')
+                  ->will($this->returnValue($oDatabaseMock));
+
+        $this->assertInstanceOf('CI\CPC\Analytic', $oAnalytic->turnOff(0, array(1)));
+    }
+
+    public function testTurnOnShouldPass()
+    {
+        $oAnalytic = $this->getMockBuilder('\CI\CPC\Analytic')
+                          ->setMethods(
+                                array(
+                                    'getInstanceLandinPageEngineController',
+                                    'getDatabase'
+                                )
+                            )
+                          ->getMock();
+
+        $oLandingPageEngineMock = $this->getLandingPageEngineControllerMock();
+
+        $oAnalytic->expects($this->any())
+                  ->method('getInstanceLandinPageEngineController')
+                  ->will($this->returnValue($oLandingPageEngineMock));
+
+        $oDatabaseMock = $this->getMockBuilder('\CI\Database\Engine')
+                              ->disableOriginalConstructor()
+                              ->getMock();
+
+        $oDatabaseMock->expects($this->once())
+                      ->method('execute')
+                      ->will($this->returnValue(true));
+
+        $oAnalytic->expects($this->any())
+                  ->method('getDatabase')
+                  ->will($this->returnValue($oDatabaseMock));
+
+        $this->assertInstanceOf('CI\CPC\Analytic', $oAnalytic->turnOn(array(1)));
+    }
+
+    public function testUpdateByStatus()
+    {
+        $oAnalytic = $this->getMockBuilder('\CI\CPC\Analytic')
+                          ->setMethods(
+                                array(
+                                    'getInstanceLandinPageEngineController',
+                                    'getDatabase'
+                                )
+                            )
+                          ->getMock();
+
+        $oLandingPageEngineMock = $this->getLandingPageEngineControllerMock();
+
+        $oAnalytic->expects($this->any())
+                  ->method('getInstanceLandinPageEngineController')
+                  ->will($this->returnValue($oLandingPageEngineMock));
+
+        $oDatabaseMock = $this->getMockBuilder('\CI\Database\Engine')
+                              ->disableOriginalConstructor()
+                              ->getMock();
+
+        $oDatabaseMock->expects($this->once())
+                      ->method('query')
+                      ->will(
+                            $this->onConsecutiveCalls(
+                                array (
+                                    array (
+                                        'page_id' => '230',
+                                    ),
+                                )
+                            )
+                        );
+
+        $oAnalytic->expects($this->any())
+                  ->method('getDatabase')
+                  ->will($this->returnValue($oDatabaseMock));
+
+        $this->assertInstanceOf('CI\CPC\Analytic', $oAnalytic->updateByStatus(0, 7));
+    }
+
+    /**
+     * @expectedException \CI\CPC\Exception
+     * @expectedExceptionCode \CI\CPC\Exception::INVALID_STATUS
+     */
+    public function testUpdateByStatusThrowExceptionInvalidStatus()
+    {
+        $oAnalytic = $this->getMockBuilder('\CI\CPC\Analytic')
+                          ->setMethods(
+                                array(
+                                    'getInstanceLandinPageEngineController',
+                                    'getDatabase'
+                                )
+                            )
+                          ->getMock();
+
+        $oLandingPageEngineMock = $this->getLandingPageEngineControllerMock();
+
+        $oAnalytic->expects($this->any())
+                  ->method('getInstanceLandinPageEngineController')
+                  ->will($this->returnValue($oLandingPageEngineMock));
+
+        $oDatabaseMock = $this->getMockBuilder('\CI\Database\Engine')
+                              ->disableOriginalConstructor()
+                              ->getMock();
+
+        $oDatabaseMock->expects($this->once())
+                      ->method('query')
+                      ->will(
+                            $this->onConsecutiveCalls(
+                                array (
+                                    array (
+                                        'page_id' => '230',
+                                    ),
+                                )
+                            )
+                        );
+
+         $oAnalytic->expects($this->any())
+                  ->method('getDatabase')
+                  ->will($this->returnValue($oDatabaseMock));
+
+        $oAnalytic->updateByStatus(5, 7);
+    }
+
+    public function testUpdateByStatusPause()
+    {
+        $oAnalytic = $this->getMockBuilder('\CI\CPC\Analytic')
+                          ->setMethods(
+                                array(
+                                    'getInstanceLandinPageEngineController',
+                                    'getDatabase',
+                                    'filterPagesOnAnotherActiveCampaign'
+                                )
+                            )
+                          ->getMock();
+
+        $oLandingPageEngineMock = $this->getLandingPageEngineControllerMock();
+
+        $oAnalytic->expects($this->any())
+                  ->method('getInstanceLandinPageEngineController')
+                  ->will($this->returnValue($oLandingPageEngineMock));
+
+        $oAnalytic->expects($this->any())
+                  ->method('filterPagesOnAnotherActiveCampaign')
+                  ->will($this->returnValue(array('page_id' => '230')));
+
+        $oDatabaseMock = $this->getMockBuilder('\CI\Database\Engine')
+                              ->disableOriginalConstructor()
+                              ->getMock();
+
+        $oDatabaseMock->expects($this->exactly(3))
+                      ->method('query')
+                      ->will(
+                            $this->onConsecutiveCalls(
+                                array(
+                                    array(
+                                        'page_id' => '230',
+                                    ),
+                                ),
+                                array(
+                                    array(
+                                        'website_id' => '230',
+                                    ),
+                                ),
+                                array(
+                                    array(
+                                        'domain_bitfield'     => '12',
+                                        'account_id'          => '230',
+                                        'transfer_account_id' => '230',
+                                        'incoming'            => 1516,
+                                        'featured'            => 0,
+                                    ),
+                                )
+                            )
+                        );
+
+        $oDatabaseMock->expects($this->once())
+                      ->method('execute')
+                      ->will($this->returnValue(true));
+
+        $oAnalytic->expects($this->any())
+                  ->method('getDatabase')
+                  ->will($this->returnValue($oDatabaseMock));
+
+        $this->assertInstanceOf('CI\CPC\Analytic', $oAnalytic->updateByStatus(1, 7));
+    }
+
+    protected function getLandingPageEngineControllerMock()
+    {
+        $oLandingPageEngineMock = $this->getMockBuilder('\LandingPageEngineController')
+                                       ->disableOriginalConstructor()
+                                       ->setMethods(
+                                            array(
+                                                'constructClasses',
+                                                'page_new'
+                                            )
+                                        )
+                                        ->getMock();
+
+        return $oLandingPageEngineMock;
+    }
+}

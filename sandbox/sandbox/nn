@@ -1,0 +1,11 @@
+#!/usr/bin/perl -w   
+
+
+my $hkey="Authorization: Basic VGVjaG5vbG9neXBsYXRmb3JtQGdvcmlsbGFuYXRpb24uY29tOk5AZ2lvNUI0";
+my $h2="App-Key:000mhi2gky9570lx6clk2y6uh412tgdy";
+my $data="https://api.pingdom.com/api/2.0/checks";
+
+
+#curl -H "Authorization: Basic VGVjaG5vbG9neXBsYXRmb3JtQGdvcmlsbGFuYXRpb24uY29tOk5AZ2lvNUI0"  -H "App-Key:000mhi2gky9570lx6clk2y6uh412tgdy" -G "https://api.pingdom.com/api/2.0/checks"
+my $CURL=`curl -H $hkey -H $h2 -G $data`;
+print   "$CURL";

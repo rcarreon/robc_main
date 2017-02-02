@@ -1,0 +1,126 @@
+<script id="tpl-full-stats" type="text/x-handlebars-template">
+    <div class="row">
+        <div class="col-md-12">
+            <table class="table table-hover table-condensed">
+                <tbody>
+                    <tr>
+                        <td>Website Name</td>
+                        <td>
+                            <a href="http://{{url}}" target="_blank">{{name}}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Website Page Log</td>
+                        <td>
+                            <a href="/management/website_log/{{id}}">Log</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Needs Attention</td>
+                        <td>
+                            {{#if is_needs_attention}}
+                                Yes
+                            {{else}}
+                                No
+                            {{/if}}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Email</td>
+                        <td>
+                            <a href="mailto:{{email}}">{{email}}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Page Active</td>
+                        <td>
+                            <a href="/management/pages/{{id}}">{{formatNumber page_active}}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Page Pending</td>
+                        <td>
+                            <a href="/pages/moderate/{{id}}">{{formatNumber page_pending}}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Page Pending Moderate</td>
+                        <td>
+                            <a href="/pages/moderate/{{id}}">{{formatNumber page_moderate}}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Credits</td>
+                        <td>
+                            <a href="/accounts/credit/{{id}}">{{formatNumber credits}}</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Traffic to {{name}}</td>
+                        <td>{{formatNumber outgoing}}</td>
+                    </tr>
+                    <tr>
+                        <td>Traffic from {{name}}</td>
+                        <td>{{formatNumber incoming}}</td>
+                    </tr>
+                    <tr>
+                        <td>Return Rate</td>
+                        <td>{{formatNumber rr "percentage"}}</td>
+                    </tr>
+                    <tr>
+                        <td>Yestarday traffic to {{name}}</td>
+                        <td>{{formatNumber y_outgoing}}</td>
+                    </tr>
+                    <tr>
+                        <td>Yestarday traffic from {{name}}</td>
+                        <td>{{formatNumber y_incoming}}</td>
+                    </tr>
+                    <tr>
+                        <td>Yestarday Return Rate</td>
+                        <td>{{formatNumber y_rr "percentage"}}</td>
+                    </tr>
+                    <tr>
+                        <td>Yestarday LP impressions</td>
+                        <td>{{formatNumber y_lp_impression}}</td>
+                    </tr>
+                    <tr>
+                        <td>Yestarday LP CTR</td>
+                        <td>{{formatNumber y_lp_ctr "percentage"}}</td>
+                    </tr>
+                    <tr>
+                        <td>Yestarday widget impressions</td>
+                        <td>{{formatNumber y_w_impression}}</td>
+                    </tr>
+                    <tr>
+                        <td>Yestarday widget CTR</td>
+                        <td>{{formatNumber y_w_ctr "percentage"}}</td>
+                    </tr>
+                    <tr>
+                        <td>Approx traffic from LP</td>
+                        <td>{{formatNumber aprox_lp_traffic}}</td>
+                    </tr>
+                    <tr>
+                        <td>Approx traffic from widget</td>
+                        <td>{{formatNumber aprox_w_traffic}}</td>
+                    </tr>
+                    <tr>
+                        <td>Average page age</td>
+                        <td>{{formatNumber refreshness}} days</td>
+                    </tr>
+                    <tr>
+                        <td>Add page manually</td>
+                        <td>
+                            <a href="/pages/add/{{id}}">Add</a>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Ranker Eligible</td>
+                        <td>
+                            <a href="/websites/moderate/{{id}}">{{ranked}}</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</script>

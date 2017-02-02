@@ -1,0 +1,17 @@
+<?php
+
+class StatsWidgetPages extends AppModel
+{
+    public $useTable    = 'stats_widget';
+    public $useDbConfig = 'warehouse';
+
+    public function key_websites_ids_with_non_zero_clicks()
+    {
+        $oKeyGen = new \CI\Memcached\KeyGen(
+            array(),
+            'widget_pages_ids_non_zero_click'
+        );
+
+        return $oKeyGen->generate();
+    }
+}

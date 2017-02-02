@@ -1,0 +1,80 @@
+<?php
+namespace Test;
+use CI\ArrayManipulator;
+
+/**
+ * @group tools
+ * @group array
+ */
+class ArrayManipulatorTest extends \PHPUnit_Framework_TestCase
+{
+	protected $oArrayManipulator;
+
+	public function setup()
+	{
+		$this->oArrayManipulator = new ArrayManipulator(
+			array(
+				'empty_string' => '',
+				'string'       => 'hello world',
+				'number'       => 15,
+			)
+		);
+	}
+
+	public function testArrayManipulatorOnGetWithTypeIsSetShouldReturnDefault()
+	{
+		$sNotSet = 'not set string';
+
+		$mResult = $this->oArrayManipulator->get(
+			'not_set',
+			$sNotSet,
+			ArrayManipulator::ARRAY_ISSET
+		);
+
+		$this->assertEquals($sNotSet, $mResult);
+	}
+
+	public function testArrayManipulatorOnGetWithTypeIsSetShouldReturnTheValue()
+	{
+		$sExpected = 'hello world';
+
+		$mResult = $this->oArrayManipulator->get(
+			'string',
+			'',
+			ArrayManipulator::ARRAY_ISSET
+		);
+
+		$this->assertEquals($sExpected, $mResult);
+	}
+
+	public function testArrayManipulatorOnGetWithTypeEmptyShouldReturnDefault()
+	{
+		$sEmptyString = 'empty string';
+
+		$mResult = $this->oArrayManipulator->get(
+			'empty_String',
+			$sEmptyString,
+			ArrayManipulator::ARRAY_EMPTY
+		);
+
+		$this->assertEquals($sEmptyString, $mResult);
+	}
+
+	public function testArrayManipulatorOnGetWithTypeEmptyShouldReturnTheValue()
+	{
+		$nExpected = 15;
+
+		$mResult = $this->oArrayManipulator->get(
+			'number',
+			'',
+			ArrayManipulator::ARRAY_EMPTY
+		);
+
+		$this->assertEquals($nExpected, $mResult);
+	}
+
+	public function tearDown()
+	{
+		unset($this->oArrayManipulator);
+	}
+}

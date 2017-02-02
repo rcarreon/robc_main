@@ -1,0 +1,17 @@
+<?php
+App::import('Component', 'CIAbstract');
+
+class CIBreadCrumbsComponent extends CIAbstractComponent
+{
+    public function initView()
+    {
+        $this->view = 'components/bread_crumbs';
+    }
+
+    public function process()
+    {
+        return array(
+                'crumbs' => $this->options->get('crumbs', array())
+        );
+    }
+}

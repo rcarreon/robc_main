@@ -1,0 +1,27 @@
+
+
+<div id="footer">
+
+<a href="http://www.gamerevolution.com/staff" class="footer" rel="nofollow">STAFF</a> | <a href="http://www.gamerevolution.com/contact" class="footer" rel="nofollow">CONTACT GR</a> | <a href="http://www.gamerevolution.com/advertising" class="footer" rel="nofollow">ADVERTISING</a> | <a href="http://www.gamerevolution.com/grades" class="footer" rel="nofollow">GRADING SYSTEM</a> | <a href="http://www.craveonline.com/privacy.php?site=www.gamerevolution.com" class="footer" rel="nofollow">PRIVACY POLICY</a> | <a href="http://www.craveonline.com/termsofuse.php?site=www.gamerevolution.com" class="footer" rel="nofollow">TERMS OF USE</a><br />GameRevolution.com, A property of AtomicOnline, LLC. &copy; 2011 AtomicOnline, LLC. All Rights Reserved.<br/><br/>
+
+<a href="http://crowdignite.com">Powered by Crowd Ignite</a><br>
+<a href="http://crowdignite.com"><img height=35 src="http://<?=CDN_URL?>/img/crowdignite/logo_small.jpg"></a><br><br>
+
+<a target="_blank" class="footer" href="http://www.gamereplays.org/">GameReplays</a> | 
+<a target="_blank" class="footer" href="http://www.gamewinners.com/">GameWinners</a> | 
+<a target="_blank" class="footer" href="http://www.videogamesblogger.com/">VideoGamesBlogger</a> | 
+<a target="_blank" class="footer" href="http://www.loot-ninja.com/">Loot-Ninja</a> | 
+<a target="_blank" class="footer" href="http://www.destructoid.com/">Destructoid</a> | 
+
+<a target="_blank" class="footer" href="http://www.ripten.com/">Ripten</a> | 
+<a target="_blank" class="footer" href="http://www.gameanyone.com/">GameAnyone</a>
+
+</div>	<!-- / FOOTER -->
+</div>
+<?
+	echo $this->element(DOMAIN."/comscore");
+	echo $this->element("chartbeat_end");
+	echo "<!-- ".php_uname()." -->";
+?>
+</body>
+</html>

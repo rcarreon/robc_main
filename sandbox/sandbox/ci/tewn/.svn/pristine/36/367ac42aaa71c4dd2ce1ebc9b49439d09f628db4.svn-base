@@ -1,0 +1,17 @@
+<?php
+
+class CpcLandingPageImpression extends AppModel
+{
+    public $useTable = 'landing_page_cpc_impression';
+    public $useDbConfig = 'audit_server';
+
+    public function increment($country, $device, $campaign_id, $page_id, $ip_address, $created, $user_agent, $website_id)
+    {
+        $long_ip = ip2long($ip_address);
+
+        $sql = "INSERT INTO landing_page_cpc_impression (country, device, campaign_id, page_id, ip_address, created, user_agent, website_id)
+                VALUES ('{$country}', '{$device}', {$campaign_id}, {$page_id}, {$long_ip}, {$created}, '{$user_agent}', {$website_id})";
+
+        return $this->query($sql);
+    }
+}

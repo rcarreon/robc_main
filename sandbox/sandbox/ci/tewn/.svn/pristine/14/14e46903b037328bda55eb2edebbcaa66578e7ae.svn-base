@@ -1,0 +1,12 @@
+<?php
+
+namespace CI\Date;
+
+class Exception extends CI\Exception
+{
+    const TIME_UNIT_NOT_ALLOWED = 0;
+
+    protected $aErrors = array(
+        self::TIME_UNIT_NOT_ALLOWED => 'Time unit %s not allowed',
+    );
+}

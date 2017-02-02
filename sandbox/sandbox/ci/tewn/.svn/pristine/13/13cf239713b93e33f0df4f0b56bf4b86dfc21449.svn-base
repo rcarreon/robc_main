@@ -1,0 +1,298 @@
+var hb_templates_subcategories = {};
+
+// create a function like class
+function CategoryContext() {
+    var categories = [];
+
+    function search(name, callback) {
+        for (var index in categories) {
+            if (categories[index].name === name) {
+                if (typeof callback === 'function') {
+                    callback(index);
+                }
+                return true;
+            }
+        }
+        return false;
+    }
+
+    function exists(category) {
+        if (category && category.hasOwnProperty('name')) {
+            return search(category.name);
+        }
+        return false;
+    }
+
+    this.add = function(category) {
+        if (!exists(category)) {
+            categories.push(category);
+        }
+    };
+
+    this.replace = function(name, subcategories) {
+        return search(name, function (index) {
+            categories[index]['subcategories'] = subcategories;
+        });
+    };
+
+    this.remove = function(name) {
+        if (categories.length > 1) {
+            return search(name, function (index) {
+                categories.splice(index, 1);
+            });
+        }
+        return false;
+    };
+
+    this.removeSubcategory = function(name, subcategory_name) {
+        return search(name, function (index) {
+            var subcategories = categories[index].subcategories;
+            for (var i in subcategories) {
+                if (subcategories[i].name === subcategory_name) {
+                    categories[index].subcategories.splice(i, 1);
+                    break;
+                }
+            }
+        });
+    };
+
+    this.get = function() {
+        var category_list = [], subcategory_list = [];
+        for (var i in categories) {
+            category_list.push(categories[i].id);
+            for (var j in categories[i].subcategories) {
+                subcategory_list.push(categories[i].subcategories[j].id);
+            }
+        }
+        return {
+            categories: categories,
+            ids: {
+                categories: category_list.join(','),
+                subcategories: subcategory_list.join(',')
+            }
+        };
+    }
+
+    this.getSubcategories = function(category_name) {
+        var subcategories = [];
+        search(category_name, function (index) {
+            subcategories = categories[index].subcategories;
+        });
+        return subcategories;
+    }
+};
+
+var initTemplates = function() {
+    hb_templates_subcategories['subcategories_list']     = Handlebars.compile(jQuery('#tpl-subcategories-selected-list').html());
+    hb_templates_subcategories['subcategories_checkbox'] = Handlebars.compile(jQuery('#tpl-subcategories-checkbox').html());
+};
+
+var getCategoryContext = function($container) {
+    return $container.data('context') || new CategoryContext();
+}
+
+var updateCategoryContext = function($container, category_context) {
+    $container.data('context', category_context);
+    $container.html(hb_templates_subcategories.subcategories_list(category_context.get()));
+}
+
+var initSelectedSubcategories = function(category, page_id) {
+    var parent_id         = 'subcategories-' + page_id;
+    var container         = 'selected-subcategories-' + page_id;
+    var subcategory_label = 'subcategory-label-' + page_id;
+    var $container        = jQuery('#' + container);
+    var subcategory_data  = jQuery('#' + subcategory_label).data('subcategories');
+    var category_context  = getCategoryContext($container);
+
+    for(var key in subcategory_data) {
+        jQuery('#' + parent_id + ' input[type=checkbox][value='  + subcategory_data[key].id + ']').attr('checked', true);
+    }
+
+    jQuery('#' + subcategory_label).data('subcategories', []);
+
+    category_context.add({
+        id: category.id,
+        name: category.name,
+        parent_id: parent_id,
+        subcategories: subcategory_data
+    });
+
+    updateCategoryContext($container, category_context);
+};
+
+var loadSubcategories = function() {
+    var page_id           = $(this).data('page');
+    var category_id       = $(this).val();
+    var category_name     = $(this).find('option:selected').text();
+    var parent_id         = 'subcategories-' + page_id;
+    var container         = 'selected-subcategories-' + page_id;
+    var $container        = $('#' + container);
+    var category_context  = getCategoryContext($container);
+
+    jQuery('#' + parent_id + ', #' + container).hide();
+
+    if (category_id != '') {
+        jQuery('#loading-subcategories-' + page_id).show();
+
+        $.ajax({
+            type: "POST",
+            url: "/websites/subcategories_by_category",
+            data: {
+                category: category_id
+            },
+            dataType: "json",
+            success: function(data) {
+                var context = {subcategories: []};
+                for (var name in data) {
+                    context.subcategories.push({
+                        category_name: category_name,
+                        id: data[name],
+                        name: name,
+                        page_id: page_id,
+                    });
+                }
+
+                jQuery('#loading-subcategories-' + page_id).fadeOut(function () {
+                    jQuery('#' + parent_id).html(hb_templates_subcategories.subcategories_checkbox(context));
+                    jQuery('#' + parent_id + ', #' + container).fadeIn();
+                    var subcategories = category_context.getSubcategories(category_name);
+                    if (subcategories.length) {
+                        jQuery('#subcategory-label-' + page_id).data('subcategories', subcategories);
+                    }
+                    initSelectedSubcategories({id: category_id, name: category_name}, page_id);
+                });
+            }
+        });
+    } else {
+        jQuery('#' + parent_id).html(hb_templates_subcategories.subcategories_checkbox({}));
+    }
+};
+
+var loadPageCategorySubcategories = function() {
+    var page_id           = $(this).data('page');
+    var category_id       = $(this).val();
+    var category_name     = $(this).find('option:selected').text();
+    var parent_id         = 'subcategories-' + page_id;
+    var container         = 'selected-subcategories-' + page_id;
+    var subcategory_label = 'subcategory-label-' + page_id;
+    var $container        = jQuery('#' + container);
+    var category_context  = getCategoryContext($container);
+
+    jQuery('#' + parent_id + ', #' + container).hide();
+
+    if (category_id != '') {
+        jQuery('#loading-subcategories-' + page_id).show();
+
+        $.ajax({
+            type: "POST",
+            url: "/websites/subcategories_by_category",
+            data: {
+                category: category_id
+            },
+            dataType: "json",
+            success: function(data) {
+                var context = {subcategories: []};
+                for (var name in data) {
+                    context.subcategories.push({
+                        category_name: category_name,
+                        id: data[name],
+                        name: name,
+                        page_id: page_id,
+                    });
+                }
+
+                jQuery('#loading-subcategories-' + page_id).fadeOut(function () {
+                    jQuery('#' + parent_id).html(hb_templates_subcategories.subcategories_checkbox(context));
+                    jQuery('#' + parent_id + ', #' + container).fadeIn();
+                    $.post('/pages/action/get_category_subcategories/' + page_id, function (data) {
+                        if (data.length) {
+                            jQuery.each(data, function (index, category) {
+                                category_context.add(category);
+                                var subcategory_data  = category.subcategories;
+                                for(var key in subcategory_data) {
+                                    jQuery('#' + parent_id + ' input[type=checkbox][value='  + subcategory_data[key].id + ']').attr('checked', true);
+                                }
+                                jQuery('#' + subcategory_label).data('subcategories', []);
+                            });
+                            updateCategoryContext($container, category_context);
+                        } else {
+                            initSelectedSubcategories({id: category_id, name: category_name}, page_id);
+                        }
+                    }, 'json');
+                });
+            }
+        });
+    } else {
+        jQuery('#' + parent_id).html(hb_templates_subcategories.subcategories_checkbox({}));
+    }
+};
+
+var initPageCategorySubcategories = function() {
+    jQuery('.page_category').each(loadPageCategorySubcategories);
+};
+
+var subcategoryCheckboxChange = function() {
+    var $checkbox         = jQuery(this);
+    var $container        = jQuery('#' + $checkbox.data('container'));
+    var parent_id         = $checkbox.parent().parent().attr('id');
+    var page_id           = $checkbox.data('page_id');
+    var subcategory_label = 'subcategory-label-' + page_id;
+    var $parent           = jQuery('#' + parent_id);
+    var category          = jQuery(this).data('category');
+    var category_context  = getCategoryContext($container);
+
+    var subcategories = [];
+    $parent.find('input:checked').each(function () {
+        subcategories.push({
+            category_name: category,
+            id: jQuery(this).val(),
+            name: jQuery(this).data('name'),
+            page_id: page_id
+        });
+    });
+
+    category_context.replace(category, subcategories);
+    updateCategoryContext($container, category_context);
+};
+
+var selectedCategoryClick = function () {
+    var $this            = jQuery(this);
+    var $container       = jQuery('#selected-' + $this.data('parent'));
+    var current_category = jQuery('#PageCategory option:selected').text();
+    var category_context = getCategoryContext($container);
+
+    // Not remove the category thas is actually selected
+    if ($this.data('name') != current_category) {
+        if (category_context.remove($this.data('name'))) {
+            updateCategoryContext($container, category_context);
+        }
+    } else {
+        if (window.toErrorMessage) clearTimeout(window.toErrorMessage);
+        jQuery('td.error_message').show('slow', function () {
+            window.toErrorMessage = setTimeout(function () {
+                jQuery('td.error_message').hide('slow');
+            }, 5000);
+        });
+    }
+};
+
+var selectedSubcategoryClick = function () {
+    var $this            = jQuery(this);
+    var $container       = jQuery('#selected-' + $this.data('parent'));
+    var $checkbox        = jQuery('#' + $this.data('parent') + ' input[type=checkbox][value='  + $this.data('id') + ']');
+    var category_context = getCategoryContext($container);
+
+    category_context.removeSubcategory($this.data('category'), $this.data('name'));
+    if ($checkbox.length) $checkbox.removeAttr('checked');
+    updateCategoryContext($container, category_context);
+};
+
+jQuery(document).ready(function () {
+    initTemplates();
+    initPageCategorySubcategories();
+
+    jQuery('.page_category').change(loadSubcategories);
+    jQuery('.checkbox-container').delegate('input[type=checkbox]', 'click', subcategoryCheckboxChange);
+    jQuery('.selected-subcategories').delegate('li[data-type=category]', 'click', selectedCategoryClick);
+    jQuery('.selected-subcategories').delegate('li[data-type=subcategory]', 'click', selectedSubcategoryClick);
+});

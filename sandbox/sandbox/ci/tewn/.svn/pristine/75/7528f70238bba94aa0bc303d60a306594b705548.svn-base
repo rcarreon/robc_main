@@ -1,0 +1,154 @@
+<?php
+/**
+ * IO Image File
+ *
+ * PHP Version 5.3
+ *
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+
+namespace CI\IO\File;
+
+/**
+ * IO Image Class
+ *
+ * PHP Version 5.3
+ *
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+class Image extends \CI\IO\File
+{
+    /**
+     * Valid mimetypes for the images files
+     *
+     * @var array
+     */
+    protected $aMimeTypes = array(
+        'png'  => 'image/png',
+        'jpg'  => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'jpe'  => 'image/jpeg',
+        'gif'  => 'image/gif',
+        'bmp'  => 'image/bmp',
+        'ico'  => 'image/vnd.microsoft.icon',
+        'tiff' => 'image/tiff',
+        'tif'  => 'image/tiff',
+        'svg'  => 'image/svg+xml',
+        'svgz' => 'image/svg+xml',
+    );
+
+    protected $aSize;
+    protected $sMimeType;
+
+    public function __construct(\CI\IO\File $oFile)
+    {
+        $this->getImageInfo($oFile->getContent());
+        $this->validateMimeType();
+        parent::__construct($oFile->getPath(), $oFile->getContent());
+    }
+
+    /**
+     * Compares the mimeType of the file against the
+     * valid ones for the image object.
+     *
+     * @param  \CI\IO\File $oFile File to validate
+     */
+    protected function validateMimeType()
+    {
+        if (!in_array($this->sMimeType, $this->aMimeTypes)) {
+            throw new \CI\IO\File\Image\Exception(
+                \CI\IO\File\Image\Exception::NOT_VALID_IMAGE,
+                $this->sMimeType
+            );
+        }
+
+        return $this;
+    }
+
+    protected function getImageInfo($mContent)
+    {
+        $aInfo = getimagesizefromstring($mContent);
+
+        if (false === $aInfo) {
+            throw new \CI\IO\File\Image\Exception(
+                \CI\IO\File\Image\Exception::SIZE_FAILURE
+            );
+        }
+
+        $this->validateGetSizes($aInfo);
+        $this->validateGetMimeType($aInfo);
+
+        $this->aSize = array(
+            'width'  => $aInfo[0],
+            'height' => $aInfo[1],
+        );
+
+        $this->sMimeType = image_type_to_mime_type($aInfo[2]);
+
+        return $this;
+    }
+
+    protected function validateGetSizes($aInfo)
+    {
+        if (!is_array($aInfo)) {
+            throw new \CI\IO\File\Image\Exception(
+                \CI\IO\File\Image\Exception::INVALID_TYPE,
+                'expecting: Array, recived: ' . gettype($aInfo)
+            );
+        }
+
+        if ($aInfo[0] == 0 || $aInfo[1] == 0) {
+            throw new \CI\IO\File\Image\Exception(
+                \CI\IO\File\Image\Exception::SIZE_FAILURE
+            );
+        }
+    }
+
+    protected function validateGetMimeType($aInfo)
+    {
+        if (!is_array($aInfo)) {
+            throw new \CI\IO\File\Image\Exception(
+                \CI\IO\File\Image\Exception::INVALID_TYPE,
+                'expecting: Array, recived: ' . gettype($aInfo)
+            );
+        }
+
+        if (!isset($aInfo[2])) {
+            throw new \CI\IO\File\Image\Exception(
+                \CI\IO\File\Image\Exception::UNABLE_TO_GET_MIMETYPE
+            );
+        }
+    }
+
+    public function getSize()
+    {
+        return $this->aSize;
+    }
+
+    public function getExtension()
+    {
+        $sExtension = parent::getExtension();
+        if (empty($sExtension) || !$this->isVaildExtension($sExtension)) {
+            $sExtension = array_search($this->sMimeType, $this->aMimeTypes);
+        }
+
+        return $sExtension;
+    }
+
+    /**
+     * Validate that the extension of the file is a valid one
+     * from the aMimeTypes array.
+     *
+     * @param  string $sExtension Extension to validate
+     *
+     * @return boolean is a valid extension
+     */
+    protected function isVaildExtension($sExtension)
+    {
+        return array_key_exists($sExtension, $this->aMimeTypes);
+    }
+}

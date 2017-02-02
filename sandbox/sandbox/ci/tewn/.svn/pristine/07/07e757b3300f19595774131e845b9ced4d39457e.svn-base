@@ -1,0 +1,63 @@
+<style>
+body { background:#eee; }
+#interior_content { margin:0!important;}
+#header {
+    background: #fff;
+    height:60px;
+}
+#header a.logo {
+    background: url(/img/sheknows/logo_small.jpg) no-repeat;
+    display: block;
+    height: 45px!important;
+    margin: 5px 0 0 0;
+    width: 225px!important;
+    position: absolute;
+    top: 0;
+    left: 15px;
+}
+.ad_leaderboard {
+    display: none;
+}
+.poweredby {
+    color:#777;
+    display:inline-block!important;
+    font-family:"Open Sans", Arial, sans-serif;
+    font-size:12px;
+    position:absolute;
+    left:240px;
+    letter-spacing: -0.01em;
+    top:27px;
+}
+.poweredby span {
+    line-height: 25px;
+    float:left;
+}
+.poweredby a {
+    background:url(/img/craveonline/ci_small_logo_pinterest.png) 0 bottom no-repeat;
+    color:transparent!important;
+    display: inline-block;    
+    height:21px;
+    margin:0 0 0 5px;
+    text-decoration: none;
+    text-indent: -9999px;
+    width:60px;
+}
+.poweredby a:hover {
+    background-position: 0 top;
+    text-decoration: underline;
+}
+#navbar ul li { border:none; display:none; }
+#navbar ul li a { color:#666;}
+#navbar ul li a:hover { color:#444; background: none;}
+#navbar ul li:last-child { border-right:none;}
+#header #navbar { 
+    background:none;
+    left:auto; right:30px;
+    top:10px;
+    height:40px;
+    margin:0;
+    position: absolute;
+    width:auto;
+}
+#navbar ul li.join { display:block;}
+</style>

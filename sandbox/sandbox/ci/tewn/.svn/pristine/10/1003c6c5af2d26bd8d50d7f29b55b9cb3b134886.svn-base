@@ -1,0 +1,213 @@
+<?php
+namespace Test\Image;
+use \CI\Image\Manipulator;
+
+/**
+ * @group image
+ */
+class ManipulatorTest extends \PHPUnit_Framework_TestCase
+{
+    protected $oManipulator;
+    protected $sPath = '/tmp/';
+
+    public function setUp()
+    {
+        $this->oManipulator = new ManipulatorMock();
+    }
+
+    public function testSetUploadPath()
+    {
+        $this->oManipulator->setUploadPath($this->sPath);
+        $this->assertEquals($this->sPath, $this->oManipulator->getUploadPath(), 'The upload path is not correct');
+    }
+
+    public function testSetUploadTmpPath()
+    {
+        $this->oManipulator->setUploadTmpPath($this->sPath);
+        $this->assertEquals($this->sPath, $this->oManipulator->getUploadTmpPath(), 'The upload tmp path is not correct');
+    }
+
+    public function testSetImagesPath()
+    {
+        $this->oManipulator->setImagesPath($this->sPath);
+        $this->assertEquals($this->sPath, $this->oManipulator->getImagesPath(), 'The images path is not correct');
+    }
+
+    public function testValidator()
+    {
+        $oValidator = $this->getMockBuilder('\CI\Validator\Image\Size')
+                           ->disableOriginalConstructor()
+                           ->getMock();
+
+        $oValidator->expects($this->any())
+                   ->method('isValid')
+                   ->will($this->returnValue(true));
+
+        $this->oManipulator->setValidatorSize($oValidator);
+
+        $this->assertTrue($this->oManipulator->validateSize(array(0,0)), 'The validator failed');
+    }
+
+    public function testImport()
+    {
+        $this->oManipulator->setUploadPath($this->sPath);
+        $sPath = 'file://' . __DIR__ . '/../../resources/image.png';
+        $this->oManipulator->setMininalSizes(10, 10);
+        $sPath = $this->oManipulator->import($sPath);
+        $this->assertInternalType('string', $sPath);
+    }
+
+    /**
+     * @expectedException \CI\Image\Exception
+     * @expectedExceptionCode \CI\Image\Exception::ERROR_VALIDATOR
+     */
+    public function testImportThrowSizeException()
+    {
+        $oValidator = new \CI\Validator\Image\Size(400, 400, \CI\Validator\Image\Size::BIGGER_EQUAL_THAN);
+        $this->oManipulator->setValidatorSize($oValidator);
+
+        $this->oManipulator->setUploadPath($this->sPath);
+        $sPath = 'file://' . __DIR__ . '/../../resources/image.png';
+        $sPath = $this->oManipulator->import($sPath);
+    }
+
+    /**
+     * @expectedException \CI\Image\Exception
+     * @expectedExceptionCode \CI\Image\Exception::INVALID_PATH_TYPE
+     */
+    public function testSetPathShouldThrowException()
+    {
+        $this->oManipulator->setImagesPath(1234);
+    }
+
+    /**
+     * @expectedException \CI\Image\Exception
+     * @expectedExceptionCode \CI\Image\Exception::INVALID_TYPE
+     */
+    public function testSetMinimalSizesWidthShouldThrowException()
+    {
+        $this->oManipulator->setMininalSizes('100a', 500);
+    }
+
+    /**
+     * @expectedException \CI\Image\Exception
+     * @expectedExceptionCode \CI\Image\Exception::INVALID_TYPE
+     */
+    public function testSetMinimalSizesHeightShouldThrowException()
+    {
+        $this->oManipulator->setMininalSizes(100, '500s');
+    }
+
+    /**
+     * @expectedException \CI\Image\Exception
+     * @expectedExceptionCode \CI\Image\Exception::UNDEFINED_PATH
+     */
+    public function testValidatePathShouldThrowException()
+    {
+        $this->oManipulator->validatePath(10);
+    }
+
+    public function testSetImageDriver()
+    {
+      $sExpected = '\CI\Image\Drivers\IMagick';
+      $oDriver = new \CI\Image\Drivers\IMagick(__DIR__ . '/../../resources/image.png');
+      $this->oManipulator->setImageDriver($oDriver);
+      $oResult = $this->oManipulator->getImageDriver();
+
+      $this->assertInstanceOf($sExpected, $oResult);
+    }
+
+    public function testExistPathTrue()
+    {
+        $bResult = $this->oManipulator->existPath(__DIR__ . '/../../resources/image.png');
+        $this->assertTrue($bResult);
+    }
+
+    public function testExistPathFalse()
+    {
+        $bResult = $this->oManipulator->existPath(__DIR__ . '/../../resources/y1/x2/image.png');
+        $this->assertFalse($bResult);
+    }
+
+    public function testGetNewPath()
+    {
+        $sExpected = './7/G/T/jth89mnju_pedrop87GT.ext';
+        $sResult = $this->oManipulator->getNewPath('jth89mnju_pedrop87GT.ext');
+
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetNewPathWithFullPath()
+    {
+        $sExpected = '/home/test/ever/7/G/T/jth89mnju_pedrop87GT.ext';
+        $sResult = $this->oManipulator->getNewPath('/home/test/ever/jth89mnju_pedrop87GT.ext');
+
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testProcessImageUrl()
+    {
+        $oManipulator = new ManipulatorMockImport();
+        $sExpected    = 'upload/a/c/f/testimage.png';
+        $sResult      = $oManipulator->processImage(
+            '/img/upload/a/c/f/testimage.png',
+            array(
+                'x1' => 1,
+                'x2' => 10,
+                'y1' => 2,
+                'y2' => 20,
+            )
+        );
+
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testProcessImageLocal()
+    {
+        $oManipulator = new ManipulatorMockImport();
+        $sExpected    = 'upload/a/c/f/testimage.png';
+        $sResult      = $oManipulator->processImage(
+            'http://www.somewebsite.com/img/upload/a/c/f/testimage.png',
+            array(
+                'x1' => 1,
+                'x2' => 10,
+                'y1' => 2,
+                'y2' => 20,
+            )
+        );
+
+        $this->assertEquals($sExpected, $sResult);
+    }
+}
+
+class ManipulatorMock extends \CI\Image\Manipulator
+{
+    public function validateSize($aSize)
+    {
+        return parent::validateSize($aSize);
+    }
+
+    public function validatePath($sPathIndex)
+    {
+        return parent::validatePath($sPathIndex);
+    }
+
+    public function existPath($sPath, $bCreate = false)
+    {
+        return parent::existPath($sPath, $bCreate);
+    }
+}
+
+
+class ManipulatorMockImport extends \CI\Image\Manipulator
+{
+    public function import($sUrl, $bOverwrite = false)
+    {
+        return 'upload/a/c/f/testimage.png';
+    }
+
+    public function cropImage($sImagePath, $nX1, $nX2, $nY1, $nY2)
+    {
+        return true;
+    }
+}

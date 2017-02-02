@@ -1,0 +1,48 @@
+<?php
+
+namespace CI\Filter\String;
+use \CI\String\Exception as StringException;
+
+class Md5 implements \CI\Filter
+{
+    private $_bRawOutput = false;
+
+    /**
+     * Sets if the output should returned in raw binary format
+     *
+     * @param boolean $bRawOutput If true the out put will be a raw binary,
+     * false otherwise.
+     */
+    public function setRawOutput($bRawOutput)
+    {
+        $this->_bRawOutput = $bRawOutput;
+        return $this;
+    }
+
+    /**
+     * Check if the output should returned in raw binary format
+     *
+     * @return boolean Returns true if the out put will be a raw binary or false
+     * otherwise.
+     */
+    public function isRawOutput()
+    {
+        return $this->_bRawOutput;
+    }
+
+    /**
+     * Filters a string into a md5 hash
+     *
+     * @param string $value The value to apply this filter
+     *
+     * @return string The filtered $value
+     */
+    public function filter($sValue)
+    {
+        if (false === is_string($sValue)) {
+            throw new StringException(StringException::NOT_VALID, gettype($sValue));
+        }
+
+        return md5($sValue, $this->isRawOutput());
+    }
+}

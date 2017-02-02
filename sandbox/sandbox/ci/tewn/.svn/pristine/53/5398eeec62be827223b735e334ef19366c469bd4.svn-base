@@ -1,0 +1,38 @@
+<?php
+/**
+ * Exception of Inexistent file
+ *
+ * PHP Version 5.3
+ *
+ * @category CI
+ * @package  CI_File
+ * @author   Julio Rodriguez <julio.rodriguez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+namespace CI\File;
+
+/**
+ * Exception of Inexistent file
+ *
+ * PHP Version 5.3
+ *
+ * @category CI
+ * @package  CI_File
+ * @author   Julio Rodriguez <julio.rodriguez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+class Exception extends \CI\Exception
+{
+    const FILE_NOT_FOUND = 1;
+    const DIRS_NOT_FOUND = 2;
+
+    protected $aErrors = array(
+        self::FILE_NOT_FOUND => 'File not found %s',
+        self::DIRS_NOT_FOUND => 'Dirs not found %s',
+    );
+
+}

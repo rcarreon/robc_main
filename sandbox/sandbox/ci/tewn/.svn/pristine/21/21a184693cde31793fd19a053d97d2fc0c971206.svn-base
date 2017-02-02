@@ -1,0 +1,1219 @@
+<link href="/js/qtip2/jquery.qtip.min.css" rel="stylesheet" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/tablesort.css">
+<script src="/js/jquery.blockUI.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="/js/highcharts.src.js"></script>
+<script type="text/javascript" src="/js/chartify.js"></script>
+<script type="text/javascript" src="/js/jquery.tablesorter.js"></script>
+<script type="text/javascript" src="/js/jquery.sparkline.min.js"></script>
+<script type="text/javascript" src="/js/qtip2/jquery.qtip.min.js"></script>
+
+
+<script type="text/javascript" src="/js/jquery-1.8.2.min.js"></script>
+<script type="text/javascript" src="/js/jquery-ui-1.8.17.custom.min.js"></script>
+<script type="text/javascript" src="/js/jquery.Jcrop.js"></script>
+<script type="text/javascript" src="/js/jquery.inputmask.js"></script>
+<script type="text/javascript" src="/js/fileuploader/fileuploader.js"></script>
+<script type="text/javascript" src="/js/moment.js"></script>
+<script type="text/javascript" src="/js/jquery.tablesorter.js"></script>
+<link rel="stylesheet" href="/css/jquery.Jcrop.css" type="text/css" />
+<link rel="stylesheet" type="text/css" href="/css/smoothness/jquery-ui-1.8.17.custom.css" />
+<script>$new = $.noConflict(true);</script>
+<script type="text/javascript" src="/js/website_cpc.js"></script>
+
+<?
+    echo $this->element('crowdignite/analytics');
+?>
+<script>
+
+/**
+ * Gets the size of an object (how many properties do it have)
+ * usefull when creating objects from json associative objects
+ *
+ * @param  object obj The object
+ *
+ * @return integer The size in properties
+ */
+Object.size = function(obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
+
+jQuery(document).ready(function() {
+  window.tpl_custom_articles = Handlebars.compile(jQuery('#custom_articles').html());
+  website_id = "<?php echo $website_id; ?>";
+
+  jQuery.blockUI.defaults.overlayCSS = {};
+  jQuery.blockUI.defaults.css = {};
+
+  jQuery("#timeChoices").change(function(){
+    load_campaigns();
+    update_export_campaigns();
+    /* refresh chart and stats */
+    jQuery(".graphed").removeClass("graphed");
+    getGraphData();
+    top_referrers(website_id);
+    website_stats_by_date(website_id);
+    websites_stats();
+
+    /* refresh pages list */
+    var page_tab = jQuery('.ptab.active').data("number");
+    jQuery('.page_pane').removeAttr("data-loaded").removeAttr("data-pagenum");
+    jQuery('tr.page_line:not(.titles)').remove();
+    page_listing(website_id, page_tab, 0);
+  });
+
+  jQuery(".tooltip").qtip({
+    position: {
+      my:'bottom center',
+      at:'top center'
+    },
+    style: {
+      classes: 'ui-tooltip-plain'
+    }
+  });
+
+  jQuery.tablesorter.addParser({
+    id: "commaDigit",
+    is: function(s, table) {
+    var c = table.config;
+    return jQuery.tablesorter.isDigit(s.replace(/,/g, ""), c);
+    },
+    format: function(s) {
+      return jQuery.tablesorter.formatFloat(s.replace(/,/g, ""));
+    },
+    type: "numeric"
+  });
+
+  jQuery('.maintab').click( function(){
+    var tab=jQuery(this).data('number');
+    jQuery('.maintab').removeClass('active');
+    jQuery(this).addClass('active');
+
+    jQuery('.main-tab').hide();
+    switch(tab) {
+        case 1:
+            jQuery('#website_area').show();
+            jQuery('#page_area').show();
+            break;
+        case 2:
+            jQuery('#visitor_area').show();
+            jQuery('#page_area').show();
+            break;
+        case 3:
+            jQuery('#cpc_area').show();
+            jQuery('#page_area').hide();
+            break;
+    }
+    return false;
+  });
+
+  jQuery('.stab').click( function(){
+    var tab  = jQuery(this).data('number');
+    var pane = jQuery(this).data('pane');
+
+    jQuery('.' + pane + '_tabs .stab').removeClass('active');
+    jQuery(this).addClass('active');
+    jQuery('.' + pane + '').hide();
+    jQuery('#' + pane + '_'+tab).show();
+
+    if (pane == 'website_pane') {
+        getGraphData(tab-1);
+    }
+    return false;
+  });
+
+  jQuery('.ptab').click( function() {
+    var tab = jQuery(this).data('number') || 1;
+    more_links_check('#page_pane_' + tab);
+    if( !jQuery(this).hasClass("empty") ) {
+      jQuery('.ptab').removeClass('active');
+      jQuery(this).addClass('active');
+      jQuery('.page_pane').hide();
+      jQuery('#page_pane_'+tab).show();
+      jQuery('.more_link').data('number', tab);
+      if( jQuery('#page_pane_'+tab).attr("data-loaded") != "true" ) {
+        article_page = undefined;
+        page_listing(website_id, tab);
+      }
+    }
+    return false;
+  });
+
+  jQuery('.more_link').live('click', function() {
+    var tab = jQuery(this).data('number') || 1;
+    var all_pages = jQuery(this).hasClass("all_pages") ? 1 : 0;
+    if(all_pages) {
+      jQuery('#page_pane_' + tab).find('tr.page_line:not(.titles)').remove();
+    }
+    page_listing(website_id, tab, all_pages);
+    return false;
+  });
+
+  jQuery('.delete_link').live('click', function() {
+    var page_line = jQuery(this).parent().parent();
+    var page_id = page_line.attr("data-page-id");
+    var allIDs = [];
+    allIDs.push(page_id);
+    if( confirm("Delete the page?") ) {
+      $.ajax({
+          type: "POST",
+          url: "/pages/deny_in_bulk/"+allIDs,
+          cache: false,
+          success: function(html){
+            alert("The page has been deleted.");
+            page_line.fadeOut();
+          }
+      });
+    }
+    return false;
+  });
+
+  jQuery('.infobox .left').live('click', function() {
+    if( !jQuery(this).hasClass('left_selected') ){
+      jQuery(this).animate({ width:470 }, 500, function() {
+        jQuery(this).addClass('left_selected');
+        jQuery(this).find('.time_stats').fadeIn(200);
+      });
+    } else {
+      jQuery(this).find('.time_stats').fadeOut(200);
+      jQuery(this).animate({ width:100 }, 500, function() {
+        jQuery(this).removeClass('left_selected');
+      });
+    }
+  });
+
+  getGraphData(0);
+  page_listing(website_id, 1, 0);
+  top_referrers(website_id);
+  website_stats_by_date(website_id);
+  websites_stats();
+});
+
+function digits(number, thousands){ // adds comas to number
+  thousands = thousands || false;
+  if (typeof number === "undefined") {
+    return 0;
+  } else {
+    if (number === null||number == "null") {
+      return 0;
+    }
+    if (number == 0) {
+      return 0;
+    }
+    if (thousands) number = parseInt(number / 1000);
+    return number.toString().replace(/(\d)(?=(\d\d\d)+(?!\d))/g, "$1,") + (thousands ? 'k' : '');
+  }
+}
+
+function page_traffic(page_id) {
+     jQuery.ajax({
+        type: "POST",
+        url: "/history_pages/page_stats_chart/"+page_id,
+        data: {
+          page_id:page_id
+        },
+        success: function(data){
+          jQuery("#p"+ page_id + " td.ptraffic:visible").html(data).sparkline();
+        }
+    });
+}
+
+function page_widgetctr(page_id) {
+     jQuery.ajax({
+        type: "POST",
+        url: "/history_widget_analytics/page_widget_ctr_range/"+page_id,
+        data: {
+          page_id:page_id
+        },
+        success: function(data){
+          jQuery("#p"+ page_id + " td.pwidgetctr:visible").html(data).sparkline('html', { type:'line', lineColor:'#DF6330', fillColor:'#FFE5DB' });
+        }
+    });
+}
+
+function page_lp_stats(page_id, date) {
+     jQuery.ajax({
+        type: "POST",
+        dataType: 'json',
+        url: "/history_landing_page_analytics/stats_page_time/"+page_id+'/'+date,
+        success: function(data){
+          var ctr = (0 == data.num_ctr) ? 0 : (data.num_ctr / data.num_display) * 100;
+          jQuery("#p"+ page_id + " td.lpctr:visible").html(ctr.toFixed(2) + '%');
+          jQuery("#p"+ page_id + " td.lpimp:visible").html(digits(data.num_display));
+        }
+    });
+}
+
+function page_widget_stats(page_id, date) {
+     jQuery.ajax({
+        type: "POST",
+        dataType: 'json',
+        url: "/history_widget_analytics/stats_page_time/"+page_id+'/'+date,
+        success: function(data) {
+          var ctr = (0 == data.num_ctr) ? 0 : (data.num_ctr / data.num_display) * 100;
+          jQuery("#p"+ page_id + " td.wctr:visible").html(ctr.toFixed(4) + '%');
+          jQuery("#p"+ page_id + " td.wimp:visible").html(digits(data.num_display));
+          jQuery("#p"+ page_id + " td.wlpt:visible").html(digits(data.num_ctr_traffic));
+        }
+    });
+}
+
+function page_impressions(page_id, date) {
+     jQuery.ajax({
+        type: "POST",
+        dataType: 'json',
+        url: "/history_pages/stats_page_time/"+page_id+'/'+date,
+        success: function(data) {
+          jQuery("#p"+ page_id + " td.pimpressions:visible").html(digits(data.impressions));
+        }
+    });
+}
+
+function website_stats_by_date(website_id) {
+   var date = jQuery("#timeChoices").val();
+   var preloader = '<img src="http://cdn.crowdignite.com/img/crowdignite/website_ajax_loader_2.gif"/>';
+   $('.site_stats li.incoming span,.site_stats li.outgoing span,.site_stats li.credits span,.site_stats li.return_rate span').html(preloader);
+   jQuery.ajax({
+      url: "/history_credits/website_stats_by_date/" + website_id + '/' + date,
+      success: function(data){
+        var stats_data = jQuery.parseJSON(data);
+        if(stats_data != false) {
+          var ret_rate = 0;
+          if(stats_data.incoming > 0) {
+            ret_rate = roundNumber(stats_data.outgoing/stats_data.incoming * 100, 2) + '%';
+          } else {
+            ret_rate = 0;
+          }
+          $('.site_stats li.incoming span').html(digits(stats_data.incoming));
+          $('.site_stats li.outgoing span').html(digits(stats_data.outgoing));
+          $('.site_stats li.credits span').html(stats_data.current_credits);
+          $('.site_stats li.return_rate span').html(ret_rate);
+          jQuery('.infobox .time_stats_incoming').html(stats_data.incoming);
+          jQuery('.infobox .time_stats_outgoing').html(stats_data.outgoing);
+          jQuery('.infobox .time_stats_credits').html(stats_data.credits);
+          jQuery('.infobox .time_stats_retrate').html(ret_rate);
+          jQuery('.infobox .time_stats_gen_return_rate').html(stats_data.gen_return_rate + '%');
+        }
+      }
+  });
+  jQuery.ajax({
+      url: "/history_widgets/website_stats_by_date/" + website_id + '/' + date,
+      success: function(data) {
+        var stats_data = jQuery.parseJSON(data);
+        if(stats_data != false) {
+          var ctr = 0;
+          if(stats_data.incoming > 0) {
+            ctr = (stats_data.incoming / stats_data.display * 100).toFixed(4) + '%';
+          } else {
+            ctr = 0;
+          }
+          $('.site_stats li.wincoming span').html(digits(stats_data.incoming));
+          $('.site_stats li.wdisplay span').html(digits(stats_data.display));
+          $('.site_stats li.wctr span').html(ctr);
+        }
+      }
+  });
+}
+
+function roundNumber(num, dec) {
+  return Math.round(num*Math.pow(10,dec))/Math.pow(10,dec);
+}
+
+function top_referrers(website_id) {
+   var date = jQuery("#timeChoices").val();
+   jQuery('.referrers_preloader').show();
+   $("ul.referrers li").remove();
+   jQuery.ajax({
+      type: "POST",
+      url: "/management/website_top_referrers_by_date/" + website_id + '/' + date,
+      success: function(data){
+        var referrers_data = jQuery.parseJSON(data);
+        if(referrers_data.length == 0) {
+          $("ul.referrers").append('<li>No referrers</li>');
+        } else {
+          var c = 0;
+          $("ul.referrers li").remove();
+          $.each(referrers_data, function(index, referral) {
+            $("ul.referrers").append('<li><img src="http://crowdignite.com/favicon.ico"/>' + referral.name + '<span>' + referral.num_ctr + '</span></li>');
+          });
+        }
+        jQuery('.referrers_preloader').hide();
+      }
+  });
+}
+
+function websites_stats() {
+  var date = jQuery("#timeChoices").val();
+  var preloader = '<img src="http://cdn.crowdignite.com/img/crowdignite/website_ajax_loader_2.gif"/>';
+
+  $('.hub_stats li span, .category_stats li span').html(preloader);
+  //hub stats
+  jQuery.ajax({
+      type: "POST",
+      url: "/websites_stats/hubcat_stats_average/<?=$hub?>/N/N/"+date,
+      data: { },
+      success: function(data){
+        var stats_data = jQuery.parseJSON(data);
+        jQuery('.hub_stats li.incoming span').html(digits(stats_data.Account.incoming));
+        jQuery('.hub_stats li.outgoing span').html(digits(stats_data.Account.outgoing));
+        jQuery('.hub_stats li.credits span').html(digits(stats_data.Account.credits));
+        jQuery('.hub_stats li.return_rate span').html((stats_data.Account.return_rate * 100).toFixed(2) + '%');
+        jQuery('.hub_stats li.wincoming span').html(digits(stats_data.Widget.incoming));
+        jQuery('.hub_stats li.wdisplay span').html(digits(stats_data.Widget.display));
+        jQuery('.hub_stats li.wctr span').html((stats_data.Widget.ctr * 100).toFixed(4) + "%");
+      }
+  });
+  //category stats
+  jQuery.ajax({
+      type: "POST",
+      url: "/websites_stats/hubcat_stats_average/<?=$hub?>/<?=$category?>/N/"+date,
+      data: { },
+      success: function(data){
+        var stats_data = jQuery.parseJSON(data);
+        jQuery('.category_stats li.incoming span').html(digits(stats_data.Account.incoming));
+        jQuery('.category_stats li.outgoing span').html(digits(stats_data.Account.outgoing));
+        jQuery('.category_stats li.credits span').html(digits(stats_data.Account.credits));
+        jQuery('.category_stats li.return_rate span').html((stats_data.Account.return_rate * 100).toFixed(2) + '%');
+        jQuery('.category_stats li.wincoming span').html(digits(stats_data.Widget.incoming));
+        jQuery('.category_stats li.wdisplay span').html(digits(stats_data.Widget.display));
+        jQuery('.category_stats li.wctr span').html((stats_data.Widget.ctr * 100).toFixed(4) + "%");
+      }
+  });
+}
+
+/* Get pages and add them to their list pane */
+function page_listing ( website_id, type_of_post, all_pages ) {
+    switch(type_of_post) {
+      case 5:
+          var ajax_url =  "/custom_landing_page/action/get_stats_by_website?website_id=" + website_id;
+          var page_pane = '#page_pane_5';
+          break;
+      case 4:
+          var ajax_url =  "/social_pages/website_social_pages";
+          var page_pane = '#page_pane_4';
+          break;
+      case 3:
+          var ajax_url =  "/pages/moderate_user_pages";
+          var page_pane = '#page_pane_3';
+          break;
+      case 2:
+          var ajax_url =  "/pages/moderate_pending_pages";
+          var page_pane = '#page_pane_2';
+          break;
+      case 1: default:
+          var ajax_url = "/management/active_pages";
+          var page_pane = '#page_pane_1';
+          break;
+    }
+
+    var page = jQuery(page_pane).attr('data-pagenum');
+    var date = jQuery("#timeChoices").val();
+
+    more_links_check(page_pane);
+
+    if(page!="end") {
+      if( page=="" || page==0 || page===undefined || page===null ) {
+        page=1;
+      } else {
+        page++;
+      }
+      jQuery("#page_area").block({ message:jQuery("#waitingDiv3"), css: {width:'210px', height:'50px'}  });
+      //jQuery('.more_line').remove();
+
+      if (5 == type_of_post) {
+        if(typeof article_page === "undefined"){
+          article_page = 1;
+        } else {
+          article_page++;
+        }
+
+        limit_page = 10;
+
+        if(all_pages) {
+          jQuery('#tbody_5').html("");
+          page = 1;
+          limit_page = 999999;
+        }
+
+        ajax_url = ajax_url + "&page=" + article_page+"&limit=" + limit_page;
+
+        jQuery.get(ajax_url, function(data){
+          if (data.status == "ok"){
+            if (article_page == 1) {
+                jQuery('#tbody_5').html(window.tpl_custom_articles(data.data));
+            } else {
+                jQuery('#tbody_5').append(window.tpl_custom_articles(data.data));
+            }
+
+            if (false === data.data.have_more_results) {
+              $('.more_line').hide();
+            }
+          }
+
+          jQuery("#page_area").unblock();
+        }, 'json');
+        return;
+      }
+
+      jQuery.ajax({
+        type: "POST",
+        url: ajax_url,
+        data: {
+          website_id:website_id,
+          page:page,
+          date:date,
+          all_pages:all_pages
+        },
+        success: function(data){
+
+            var pages_data = jQuery.parseJSON(data);
+            var count = Object.size(pages_data);
+            var preloader = '<img src="http://cdn.crowdignite.com/img/crowdignite/website_ajax_loader_2.gif"/>';
+
+            $.each(pages_data, function() {
+                var title = this.Page.title;
+                var img_url = this.Page.image;
+                var created = "Created on " + this.Page.created;
+
+                if(type_of_post=="1") {
+                  created = "Created on " + this.Page.created_date;
+                  if (this.Page.moderator_username) {
+                    created += " by " + this.Page.moderator_username;
+                  }
+                }
+                if(title == "" || title === null) title = this.Page.url;
+                if(img_url === null) {
+                  img_url = '<img src="/img/crowdignite/page_image_not_found.jpg"/>';
+                } else {
+                  img_url = '<img src="/img/'+img_url+'"/>';
+                }
+
+                var page_line = '<tr id="p'+this.Page.id+'" class="page_line" data-page-id="'+this.Page.id+'"><td class="pimage"><a href="'+this.Page.url+'" target="_blank">'+img_url+'</a></td><td class="ptitle"><a href="'+this.Page.url+'" target="_blank">'+title+'</a><b class="pinfo">'+created+'</b></td>';
+
+                if(1 == type_of_post) {
+                  page_line += '<td class="pcategory">'+this.Page.category_name+'</td>';
+                  page_line += '<td class="psubcategory">'+this.Page.subcategory_name+'</td>';
+                }
+
+                page_line += '<td class="ptraffic">'+preloader+'</td>';
+
+                if (1 == type_of_post) {
+                  page_line += '<td class="pwidgetctr">'+preloader+'</td>';
+                  page_line += '<td class="lpctr">'+preloader+'</td>';
+                  page_line += '<td class="lpimp">'+preloader+'</td>';
+                  page_line += '<td class="wctr">'+preloader+'</td>';
+                  page_line += '<td class="wimp">'+preloader+'</td>';
+                  page_line += '<td class="wlpt">'+preloader+'</td>';
+                }
+
+                page_line += '<td class="pimpressions">'+preloader+'</td>';
+
+                if (1 == type_of_post) {
+                  page_line += '<td class="poutclicks">'+digits(this.Page.out_clicks)+'</td>';
+                }
+
+                // if social tab, add these cells
+                if(4 == type_of_post) {
+                  page_line += '<td class="plikes_fb">'+digits(this.social.likes_fb)+'</td>';
+                  page_line += '<td class="pshares_fb">'+digits(this.social.shares_fb)+'</td>';
+                  page_line += '<td class="pcomments_fb">'+digits(this.social.comments_fb)+'</td>';
+                }
+
+                if(type_of_post > 1) {
+                  var trending = (4 == type_of_post) ? roundNumber(this.social.trending, 3) : (this.Page.rank - this.Page.rank_prior).toFixed(3);
+                  page_line += '<td class="ptrending">'+trending+'</td>';
+                }
+
+                // Add the actions
+                page_line += '<td class="pactions"><a title="Edit page" href="/pages/moderate/'+this.Page.website_id+'/'+this.Page.id+'"><img src="/img/crowdignite/page_edit.png"/></a><a title="Deny page" href="#" class="delete_link"><img src="/img/crowdignite/icon_deny.png"/></a></td></tr>';
+
+                jQuery(page_pane + " tbody").append(page_line);
+                page_traffic(this.Page.id);
+                page_impressions(this.Page.id, date);
+                if (1 == type_of_post) {
+                  page_widgetctr(this.Page.id);
+                  page_lp_stats(this.Page.id, date);
+                  page_widget_stats(this.Page.id, date);
+                }
+            });
+
+            if(count < 8 || all_pages == 1 ) {
+              page = 'end';
+            }
+
+            //jQuery(page_pane).parent().append(more_line);
+            jQuery(page_pane).attr('data-pagenum', page); //store current page
+            jQuery(page_pane).attr('data-loaded', true); //store current page
+
+            more_links_check(page_pane);
+
+            $("#page_pane_1, #page_pane_4").tablesorter({
+              headers:
+              {
+                0: { sorter: false },
+                3: { sorter: false },
+                4: { sorter: false },
+                5: { sorter: false },
+                6: { sorter: 'commaDigit' },
+                7: { sorter: 'commaDigit' },
+                8: { sorter: 'commaDigit' },
+                9: { sorter: false }
+              }
+            });
+            $("#page_pane_2, #page_pane_3").tablesorter({
+              headers:
+              {
+                0: { sorter: false },
+                2: { sorter: false },
+                3: { sorter: false },
+                4: { sorter: false },
+                5: { sorter: 'commaDigit' },
+                6: { sorter: 'commaDigit' },
+                7: { sorter: false }
+              }
+            });
+            jQuery("#page_area").unblock();
+        } //success
+    }); // .ajax
+  } // if (page!=end)
+}
+
+function more_links_check(page_pane) {
+  $('.more_line')[$(page_pane).attr('data-pagenum') == 'end' ? 'hide' : 'show']();
+}
+
+var graph1;
+var graph2;
+var options;
+var options2;
+var updateLegendTimeout = null;
+var latestPosition = null;
+var updateLegendTimeout2 = null;
+var latestPosition2 = null;
+var colors = new Array();
+colors[0] = "rgb(255,0,0)";
+colors[1] = "rgb(0,255,0)";
+colors[2] = "rgb(0,0,255)";
+colors[3] = "rgb(255,255,0)";
+colors[4] = "rgb(255,0,255)";
+colors[5] = "rgb(0,255,255)";
+colors[6] = "rgb(255,128,0)";
+colors[7] = "rgb(255,0,128)";
+colors[8] = "rgb(0,255,128)";
+colors[9] = "rgb(0,128,255)";
+colors[10] = "rgb(128,0,128)";
+colors[11] = "rgb(255,128,128)";
+colors[12] = "rgb(128,128,128)";
+colors[13] = "rgb(0,0,0)";
+colors[14] = "rgb(23,76,228)";
+colors[15] = "rgb(255,23,128)";
+
+
+function getGraphData(type)
+{
+    var website_id = "<?php echo $website_id; ?>";
+
+    if ( website_id.length == "") {
+
+    } else {
+	    jQuery("#website_area").block({ message:jQuery("#waitingDiv1"), css: {width:'210px', height:'50px'}  });
+
+
+	    var time = jQuery("#timeChoices").val();
+
+	    var now = new Date();
+	    now.setHours(0);
+	    now.setMinutes(0);
+
+	    var endTime = Math.ceil(now.getTime()/1000);
+
+      switch (type) {
+        case 5:
+          /* Chart TPM */
+          if( !jQuery("#graph_tpm").hasClass("graphed") ) {
+          chartify('graph_tpm', time, endTime, '/history_stats/chart', "TPM", "Impressions", "line", website_id, 0, "tpm", false,  <?=TIME_UNIT_DAY?>, function(){ jQuery("#website_area").unblock(); jQuery("#graph_tpm").addClass('graphed'); });
+          } else {
+            jQuery("#website_area").unblock();
+          }
+          break;
+        case 4:
+          /* Chart Credits */
+          if( !jQuery("#creds").hasClass("graphed") ) {
+            chartify('creds', time, endTime, '/history_credits/chart', "Credits", "Credits", "line", website_id, 0, "credits", false,  <?=TIME_UNIT_DAY?>, function(){ jQuery("#website_area").unblock(); jQuery("#creds").addClass('graphed'); });
+          } else {
+            jQuery("#website_area").unblock();
+          }
+          break;
+
+        case 3:
+           /* Chart Widget Impressions */
+          if( !jQuery("#widget_imp").hasClass("graphed") ) {
+            chartify('widget_imp', time, endTime, '/history_widgets/chart', "Widget Impressions", "Impressions", "line", website_id, 0, "display", false,  <?=TIME_UNIT_DAY?>,function(){ jQuery("#website_area").unblock(); jQuery("#widget_imp").addClass('graphed'); });
+          } else {
+            jQuery("#website_area").unblock();
+          }
+          break;
+
+        case 2:
+          /* Chart Widget Click Through Rate */
+          if( !jQuery("#widget_ctr").hasClass("graphed") ) {
+            chartify('widget_ctr', time, endTime, '/history_widgets/chart', "Widget Click Through Rate", "Rate", "line", website_id, 0, "ctr", false,  <?=TIME_UNIT_DAY?>, function(){ jQuery("#website_area").unblock(); jQuery("#widget_ctr").addClass('graphed'); });
+          } else {
+            jQuery("#website_area").unblock();
+          }
+          break;
+
+        case 1:
+          /* Chart Return Rate */
+          if( !jQuery("#ret_rate").hasClass("graphed") ) {
+            chartify('ret_rate', time, endTime, '/history_credits/chart', "Return Rate", "Rate", "line", website_id, 0, "return_rate", false,  <?=TIME_UNIT_DAY?>, function(){ jQuery("#website_area").unblock(); jQuery("#ret_rate").addClass('graphed'); });
+          } else {
+            jQuery("#website_area").unblock();
+          }
+          break;
+
+        case 0:
+        default:
+           /* Chart I/O */
+          if( !jQuery("#in_out").hasClass("graphed") ) {
+            chartify('in_out', time, endTime, '/history_credits/chart', "Traffic From/To", "Traffic From/To", "lineLegend", website_id, 0, "incoming,outgoing", true, <?=TIME_UNIT_DAY?>, function(){ jQuery("#website_area").unblock(); jQuery("#in_out").addClass('graphed'); });
+          } else {
+            jQuery("#website_area").unblock();
+          }
+          break;
+      }
+    }
+}
+
+</script>
+<div class="overlay"></div>
+<div class="row main website_manage">
+<div id="content" class="column grid_12">
+
+<script id="custom_articles" type="text/x-handlebars-template">
+{{#each results}}
+  <tr class="custom">
+    <td><img src="{{image}}" /></td>
+    <td class="title">{{title}} </td>
+    <td>{{category_name}}</td>
+    <td>{{impressions}}</td>
+    <td>{{clicks}}</td>
+    <td>{{ctr}}%</td>
+    <td><a href="/page/custom/{{website_id}}/{{article_id}}"><img src="/img/crowdignite/page_edit.png"/></a></td>
+  </tr>
+{{/each}}
+</script>
+<?
+echo $this->element("management_toolbar", array("tab" => "websites", "user" => $user));
+?>
+<div class="row">
+
+  <div class="column grid_12">
+
+	<h3 class="topContent">Websites</h3>
+
+
+	 <div class="row" id="content_area">
+
+      <div class="grid_12 tabholder title_area">
+
+          <div class="title">
+            <a class="title_url" href="http://<?php echo $website['url']; ?>" target="_blank"><h2><?php echo $website['name']; ?></h2></a>
+            <div class="buttons">
+              <?
+              if(!$is_curator_user || $is_admin_user) {
+              ?>
+              <a href="/websites/moderate/<?php echo $website_id; ?>" class="button tooltip" title="Edit Website">  <span class="label">Edit Website</span>
+              </a>
+              <a href="#" class="button tooltip" title="Edit Widgets">
+                <span class="label">Edit Widgets</span>
+              </a>
+              <? } ?>
+            </div>
+            <a class="url" href="http://<?php echo $website['url']; ?>" target="_blank"><?php echo $website['url']; ?></a>
+          </div>
+          <div class="tooltip" id="time_choices" style="text-align:right; margin-right:20px;" title="Select the time window to chart.">
+            <span>Time Range:&nbsp;&nbsp;&nbsp;</span>
+            <select id="timeChoices">
+              <!--<option value="<?=strtotime("midnight today")?>">Today</option>-->
+              <!--<option value="<?=strtotime("midnight yesterday")?>">Yesterday</option>-->
+              <option value="<?=strtotime("midnight -3 days")?>">Last 3 Days</option>
+              <option value="<?=strtotime("midnight -7 days")?>">Last 7 Days</option>
+              <option selected value="<?=strtotime("midnight -14 days")?>">Last 2 Weeks</option>
+              <option value="<?=strtotime("midnight -30 days")?>">Last 30 days</option>
+              <option value="<?=mktime(0, 0, 0, date("n"), 1, date("Y"))?>">This Month</option>
+              <option value="<?=strtotime("midnight first day -2 month")?>">Last 2 Months</option>
+              <!--<option value="<?=strtotime("midnight first day last month")?>">Last Month</option>-->
+              <option value="<?=strtotime("midnight first day -3 month")?>">Last 3 Months</option>
+              <!--<option value="0">All Time</option>-->
+            </select>
+          </div>
+
+      </div>
+
+      <div class="grid_12 tabholder">
+          <ul class="tabnav maintabs">
+            <li class="maintab active" data-number="1"><a href="#">Stats</a></li>
+            <li class="maintab" data-number="2"><a href="#">Visitors</a></li>
+            <li class="maintab" data-number="3"><a href="#">CPC</a></li>
+          </ul>
+      </div>
+
+        <div id="cpc_area" class="main-tab" style="display:none;">
+            <div class="grid_12 tabholder">
+                <ul class="tabnav tabnav_small cpc_pane_tabs">
+                    <li class="stab active" data-pane="cpc_pane" data-number="1"><a href="#">Campaigns</a></li>
+                    <li class="stab"  data-pane="cpc_pane" data-number="2"><a href="#">Add Campaign</a></li>
+                </ul>
+                </div>
+            <div id="cpc_panes">
+
+                <div id="cpc_pane_1" class="cpc_pane">
+                    <?php echo $this->element('crowdignite/cpc/campaign'); ?>
+                </div>
+
+                <div id="cpc_pane_2" class="cpc_pane hide">
+                    <?php echo $this->element('crowdignite/cpc/add_campaign', array('providers' => $providers)); ?>
+                </div>
+
+            </div>
+        </div>
+
+      <div id="visitor_area" class="main-tab" style="display:none;">
+        <div class="grid_12 tabholder">
+            <ul class="tabnav tabnav_small">
+              <li class="vtab active" data-number="1"><a href="#">Top Referrers</a></li>
+            </ul>
+        </div>
+        <div id="visitor_panes">
+            <div id="visitor_pane_1" class="visitor_pane">
+              <div class="column grid_7">
+                <h2 class="referrers_title">Top Referrers</h2><span class="referrers_preloader"></span>
+                <ul class="referrers">
+                </ul>
+              </div>
+              <div class="column grid_5">
+
+              </div>
+               <br class="clearfloat"/>
+           </div>
+        </div>
+      </div>
+
+      <div id="website_area" class="main-tab">
+        <div class="grid_12 tabholder">
+            <ul class="tabnav tabnav_small website_pane_tabs">
+              <li class="stab active" data-pane="website_pane" data-number="1"><a href="#">Traffic From/To</a></li>
+              <li class="stab"  data-pane="website_pane" data-number="2"><a href="#">Return Rate</a></li>
+              <li class="stab"  data-pane="website_pane" data-number="3"><a href="#">Widget CTR</a></li>
+              <li class="stab"  data-pane="website_pane" data-number="4"><a href="#">Widget Impressions</a></li>
+              <li class="stab"  data-pane="website_pane" data-number="5"><a href="#">Credits</a></li>
+            </ul>
+        </div>
+
+        <div id="website_panes">
+          <div id="website_pane_1" class="website_pane">
+      	    <div class="column grid_7">
+                <div class="graphs">
+                  <div id="in_out" style="width:540px;height:400px;margin-top:12px;"></div>
+                </div>
+                <div class="infobox">
+                    <div class="header_stats">
+                        <h2 class="stats_title">Time Range</h2>
+                    </div>
+                    <hr/>
+                    <div class="left">
+                      <div class="time_stats" style="display:none;">
+                        <p>Total Click Through Rate <b><?php echo $website['ctr']; ?></b></p>
+                        <p>Total traffic from <?php echo $website['name']; ?> <b><?php echo $website['total_incoming']; ?></b></p>
+                        <p>Current Credits <b><?php echo $credits; ?></b></p>
+                        <p>Active Pages <b><?php echo $page_active; ?></b></p>
+                      </div>
+                      <div class="return_rate">
+                        Return Rate
+                        <h2><?php echo $website['return_rate']; ?></h2>
+                      </div>
+                    </div>
+                    <div class="right">
+                        <p>Traffic from <?php echo $website['name']; ?><b class="time_stats_incoming"></b></p>
+                        <p>Traffic to <?php echo $website['name']; ?><b class="time_stats_outgoing"></b></p>
+                        <p>Generated Credits<b class="time_stats_credits"></b></p>
+                        <p>Return Rate<b class="time_stats_retrate"></b></p>
+                        <p>Generated Return Rate<b class="time_stats_gen_return_rate"></b></p>
+                    </div>
+                </div>
+
+            </div>
+            <div class="column grid_5">
+              <h2 class="stats_title">Current Stats</h2>
+              <ul class="site_stats websites_stats">
+                <li class="incoming">Traffic from <?php echo $website['name']; ?><span></span></li>
+                <li class="outgoing">Traffic to <?php echo $website['name']; ?><span></span></li>
+              </ul>
+              <br/>
+              <h2 class="stats_title">Hub Stats (<?php echo $convert->domain_name($hub); ?>)</h2>
+              <ul class="hub_stats websites_stats">
+                <li class="incoming">Traffic from <?php echo $website['name']; ?><span></span></li>
+                <li class="outgoing">Traffic to <?php echo $website['name']; ?><span></span></li>
+              </ul>
+              <br/>
+              <h2 class="stats_title">Category <?php echo $convert->category($category); ?> Stats</h2>
+              <ul class="category_stats websites_stats">
+                <li class="incoming">Traffic from <?php echo $website['name']; ?><span></span></li>
+                <li class="outgoing">Traffic to <?php echo $website['name']; ?><span></span></li>
+              </ul>
+            </div>
+          </div><!-- website_page_1 -->
+
+          <div id="website_pane_2" class="website_pane" style="display:none;">
+            <div class="column grid_7">
+                <div class="graphs">
+                  <div id="ret_rate" style="width:540px;height:400px;margin-top:12px;"></div>
+                </div>
+                <div class="infobox">
+                    <div class="header_stats">
+                        <h2 class="stats_title">Time Range</h2>
+                    </div>
+                    <hr/>
+                    <div class="left">
+                      <div class="time_stats" style="display:none;">
+                        <p>Total Click Through Rate <b><?php echo $website['ctr']; ?></b></p>
+                        <p>Total traffic from <?php echo $website['name']; ?> <b><?php echo $website['total_incoming']; ?></b></p>
+                        <p>Current Credits <b><?php echo $credits; ?></b></p>
+                        <p>Active Pages <b><?php echo $page_active; ?></b></p>
+                      </div>
+                      <div class="return_rate">
+                        Return Rate
+                        <h2><?php echo $website['return_rate']; ?></h2>
+                      </div>
+                    </div>
+                    <div class="right">
+                        <p>Traffic from <?php echo $website['name']; ?><b class="time_stats_incoming"></b></p>
+                        <p>Traffic to <?php echo $website['name']; ?><b class="time_stats_outgoing"></b></p>
+                        <p>Generated Credits<b class="time_stats_credits"></b></p>
+                        <p>Return Rate<b class="time_stats_retrate"></b></p>
+                        <p>Generated Return Rate<b class="time_stats_gen_return_rate"></b></p>
+                    </div>
+                </div>
+            </div>
+            <div class="column grid_5">
+              <h2 class="stats_title">Current Stats</h2>
+              <ul class="site_stats websites_stats">
+                <li class="return_rate">Return Rate<span></span></li>
+              </ul>
+              <br/>
+              <h2 class="stats_title">Hub Stats (<?php echo $convert->domain_name($hub); ?>)</h2>
+              <ul class="hub_stats websites_stats">
+                <li class="return_rate">Return Rate<span></span></li>
+              </ul>
+              <br/>
+              <h2 class="stats_title">Category <?php echo $convert->category($category); ?> Stats</h2>
+              <ul class="category_stats websites_stats">
+                <li class="return_rate">Return Rate<span></span></li>
+              </ul>
+            </div>
+          </div><!-- website_page_2 -->
+
+          <div id="website_pane_3" class="website_pane" style="display:none;">
+            <div class="column grid_7">
+                <div class="graphs">
+                  <div id="widget_ctr" style="width:540px;height:400px;margin-top:12px;"></div>
+                </div>
+                <div class="infobox">
+                    <div class="header_stats">
+                        <h2 class="stats_title">Time Range</h2>
+                    </div>
+                    <hr/>
+                    <div class="left">
+                      <div class="time_stats" style="display:none;">
+                        <p>Total Click Through Rate <b><?php echo $website['ctr']; ?></b></p>
+                        <p>Total Traffic from <?php echo $website['name']; ?><b><?php echo $website['total_incoming']; ?></b></p>
+                        <p>Current Credits <b><?php echo $credits; ?></b></p>
+                        <p>Active Pages <b><?php echo $page_active; ?></b></p>
+                      </div>
+                      <div class="return_rate">
+                        Return Rate
+                        <h2><?php echo $website['return_rate']; ?></h2>
+                      </div>
+                    </div>
+                    <div class="right">
+                        <p>Traffic from <?php echo $website['name']; ?><b class="time_stats_incoming"></b></p>
+                        <p>Traffic to <?php echo $website['name']; ?><b class="time_stats_outgoing"></b></p>
+                        <p>Generated Credits<b class="time_stats_credits"></b></p>
+                        <p>Return Rate<b class="time_stats_retrate"></b></p>
+                        <p>Generated Return Rate<b class="time_stats_gen_return_rate"></b></p>
+                    </div>
+                </div>
+            </div>
+            <div class="column grid_5">
+              <h2 class="stats_title">Current Stats</h2>
+              <ul class="site_stats websites_stats">
+                <li class="wincoming">Widget Incoming<span></span></li>
+                <li class="wctr">Widget CTR<span></span></li>
+              </ul>
+              <br/>
+              <h2 class="stats_title">Hub Stats (<?php echo $convert->domain_name($hub); ?>)</h2>
+              <ul class="hub_stats websites_stats">
+                <li class="wincoming">Widget Incoming<span></span></li>
+                <li class="wctr">Widget CTR<span></span></li>
+              </ul>
+              <br/>
+              <h2 class="stats_title">Category <?php echo $convert->category($category); ?> Stats</h2>
+              <ul class="category_stats websites_stats">
+                <li class="wincoming">Widget Incoming<span></span></li>
+                <li class="wctr">Widget CTR<span></span></li>
+              </ul>
+            </div>
+          </div><!-- website_page_3 -->
+
+          <div id="website_pane_4" class="website_pane" style="display:none;">
+            <div class="column grid_7">
+                <div class="graphs">
+                  <div id="widget_imp" style="width:540px;height:400px;margin-top:12px;"></div>
+                </div>
+                <div class="infobox">
+                    <div class="header_stats">
+                        <h2 class="stats_title">Time Range</h2>
+                    </div>
+                    <hr/>
+                    <div class="left">
+                      <div class="time_stats" style="display:none;">
+                        <p>Total Click Through Rate <b><?php echo $website['ctr']; ?></b></p>
+                        <p>Total traffic from <?php echo $website['name']; ?> <b><?php echo $website['total_incoming']; ?></b></p>
+                        <p>Current Credits <b><?php echo $credits; ?></b></p>
+                        <p>Active Pages <b><?php echo $page_active; ?></b></p>
+                      </div>
+                      <div class="return_rate">
+                        Return Rate
+                        <h2><?php echo $website['return_rate']; ?></h2>
+                      </div>
+                    </div>
+                    <div class="right">
+                        <p>Traffic from <?php echo $website['name']; ?><b class="time_stats_incoming"></b></p>
+                        <p>Traffic to <?php echo $website['name']; ?><b class="time_stats_outgoing"></b></p>
+                        <p>Generated Credits<b class="time_stats_credits"></b></p>
+                        <p>Return Rate<b class="time_stats_retrate"></b></p>
+                        <p>Generated Return Rate<b class="time_stats_gen_return_rate"></b></p>
+                    </div>
+                </div>
+            </div>
+            <div class="column grid_5">
+              <h2 class="stats_title">Current Stats</h2>
+              <ul class="site_stats websites_stats">
+                <li class="wdisplay">Widget Impressions<span></span></li>
+              </ul>
+              <br/>
+              <h2 class="stats_title">Hub Stats (<?php echo $convert->domain_name($hub); ?>)</h2>
+              <ul class="hub_stats websites_stats">
+                <li class="wdisplay">Widget Impressions<span></span></li>
+              </ul>
+              <br/>
+              <h2 class="stats_title">Category <?php echo $convert->category($category); ?> Stats</h2>
+              <ul class="category_stats websites_stats">
+                <li class="wdisplay">Widget Impressions<span></span></li>
+              </ul>
+            </div>
+          </div><!-- website_page_4 -->
+
+          <div id="website_pane_5" class="website_pane" style="display:none;">
+            <div class="column grid_7">
+                <div class="graphs">
+                  <div id="creds" style="width:540px;height:400px;margin-top:12px;"></div>
+                </div>
+                <div class="infobox">
+                    <div class="header_stats">
+                        <h2 class="stats_title">Time Range</h2>
+                    </div>
+                    <hr/>
+                    <div class="left">
+                      <div class="time_stats" style="display:none;">
+                        <p>Total Click Through Rate <b><?php echo $website['ctr']; ?></b></p>
+                        <p>Total traffic from <?php echo $website['name']; ?><b><?php echo $website['total_incoming']; ?></b></p>
+                        <p>Current Credits <b><?php echo $credits; ?></b></p>
+                        <p>Active Pages <b><?php echo $page_active; ?></b></p>
+                      </div>
+                      <div class="return_rate">
+                        Return Rate
+                        <h2><?php echo $website['return_rate']; ?></h2>
+                      </div>
+                    </div>
+                    <div class="right">
+                        <p>Traffic from <?php echo $website['name']; ?><b class="time_stats_incoming"></b></p>
+                        <p>Traffic to <?php echo $website['name']; ?><b class="time_stats_outgoing"></b></p>
+                        <p>Generated Credits<b class="time_stats_credits"></b></p>
+                        <p>Return Rate<b class="time_stats_retrate"></b></p>
+                        <p>Generated Return Rate<b class="time_stats_gen_return_rate"></b></p>
+                    </div>
+                </div>
+            </div>
+            <div class="column grid_5">
+              <h2 class="stats_title">Current Stats</h2>
+              <ul class="site_stats websites_stats">
+                <li class="credits">Credits<span></span></li>
+              </ul>
+              <br/>
+              <h2 class="stats_title">Hub Stats (<?php echo $convert->domain_name($hub); ?>)</h2>
+              <ul class="hub_stats websites_stats">
+                <li class="credits">Credits<span></span></li>
+              </ul>
+              <br/>
+              <h2 class="stats_title">Category <?php echo $convert->category($category); ?> Stats</h2>
+              <ul class="category_stats websites_stats">
+                <li class="credits">Credits<span></span></li>
+              </ul>
+            </div>
+
+          </div><!-- website_page_5 -->
+          <br class="clearfloat"/>
+
+        </div><!--website_panes-->
+
+      </div><!--websites_area-->
+
+     <div id="page_area">
+        <div class="grid_12 tabholder">
+          <div class="buttons page_buttons">
+            <a href="/pages/add/<?php echo $website_id; ?>" class="button tooltip" title="Add a new page"><span class="label">Add Page</span></a>
+          </div>
+          <div class="buttons page_buttons">
+            <a href="/page/custom/<?php echo $website_id; ?>" class="button tooltip" title="Add a new custom landing page">
+                <span class="label">Add Custom Landing Page</span>
+            </a>
+          </div>
+          <ul class="tabnav">
+            <li class="ptab <?php if($page_active=="0") echo 'empty'; ?> active" data-number="1"><a href="#" title="Pages that have been approved and are active.">Active <span>(<?php echo $page_active; ?>)</span></a></li>
+            <li class="ptab <?php if($page_pending=="0") echo 'empty'; ?>" data-number="2"><a href="#" title="Pages added by the system that need to be moderated.">Pending <span>(<?php echo $page_pending; ?>)</span></a></li>
+            <li class="ptab <?php if($page_pending_moderation=="0") echo 'empty'; ?>" data-number="3"><a href="#" title="Pages requested to be added by the publisher.">To Be <span>(<?php echo $page_pending_moderation; ?>)</span></a></li>
+            <li class="ptab <?php if($page_social_trending=="0") echo 'empty'; ?>" data-number="4"><a href="#" title="Pages that show social trending.">Social Trending <span>(<?php echo $page_social_trending; ?>)</span></a></li>
+            <li class="ptab" data-number="5"><a href="#" title="Custom">Custom <span>(<?php echo $total_articles; ?>)</span></a></li>
+          </ul>
+        </div>
+
+        <div id="page_panes">
+          <table id="page_pane_1" class="page_pane">
+            <thead>
+              <tr class="page_line titles">
+                <th class="pimage">&nbsp;</th>
+                <th class="ptitle">Page Title</th>
+                <th class="pcategory">Category</th>
+                <th class="psubcategory">Sub<br/>Category</th>
+                <th class="ptraffic">Traffic</th>
+                <th class="pwidgetctr">Widget CTR</th>
+                <th class="lpctr">LP<br/>CTR</th>
+                <th class="lpimp">LP<br/>Imp</th>
+                <th class="wctr">W<br/>CTR</th>
+                <th class="wimp">W<br/>Imp</th>
+                <th class="wlpt">W<br/>Traffic</th>
+                <th class="pimpressions">Page<br/>Imp</th>
+                <th class="poutclicks">Out<br/>Clicks</th>
+                <th class="pactions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table><!-- page_pane_1 -->
+
+          <table id="page_pane_2" class="page_pane" style="display:none;">
+             <thead>
+              <tr class="page_line titles">
+                <th class="pimage">&nbsp;</th>
+                <th class="ptitle">Page Title</th>
+                <th class="ptraffic">Traffic</th>
+                <th class="pimpressions">Impressions</th>
+                <th class="ptrending">Trending</th>
+                <th class="pactions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table><!-- page_pane_2 -->
+
+          <table id="page_pane_3" class="page_pane" style="display:none;">
+             <thead>
+              <tr class="page_line titles">
+                <th class="pimage">&nbsp;</th>
+                <th class="ptitle">Page Title</th>
+                <th class="ptraffic">Traffic</th>
+                <th class="pimpressions">Impressions</th>
+                <th class="ptrending">Trending</th>
+                <th class="pactions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table><!-- page_pane_3 -->
+
+            <table id="page_pane_4" class="page_pane" style="display:none;">
+             <thead>
+              <tr class="page_line titles">
+                <th class="pimage">&nbsp;</th>
+                <th class="ptitle">Page Title</th>
+                <th class="ptraffic">Traffic</th>
+                <th class="pimpressions">Page<br/>Imp</th>
+                <th class="plikes_fb">Facebook<br/>Likes</th>
+                <th class="pshares_fb">Facebook<br/>Shares</th>
+                <th class="pshares_fb">Facebook<br/>Comments</th>
+                <th class="ptrending">Trending</th>
+                <th class="pactions">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table><!-- page_pane_4 -->
+            <table id="page_pane_5" class="page_pane" style="display:none;">
+             <thead>
+              <tr class="page_line titles">
+                <th class="pimage">&nbsp;</th>
+                <th class="ptitle">Title</th>
+                <th class="pcategory">Category</th>
+                <th class="pimpressions">Impressions</th>
+                <th class="preadmore">Read More (Clicks)</th>
+                <th class="pctr">CTR</th>
+                <th class="pctr">Edit</th>
+              </tr>
+            </thead>
+            <tbody id="tbody_5">
+            </tbody>
+          </table><!-- page_pane_5 -->
+          <br class="clearfloat"/>
+          <div class="page_line more_line"><span><a class="more_link" data-number="1" href="#">MORE PAGES</a></span><span><a class="more_link all_pages" data-number="1" href="#">ALL PAGES</a></span></div>
+        </div><!--page_panes-->
+      </div><!--page_area-->
+
+	 </div>
+
+
+	<h3 class="bottomContent"></h3>
+
+</div> <!--  end of content column -->
+
+</div> <!--  end of content row -->
+
+
+<div id="waitingDiv1" style="display:none;cursor:default;">
+Refreshing...
+<p><img src="/img/progress2.gif" width="180">
+</div>
+
+<div id="waitingDiv2" style="display:none;cursor:default;">
+Refreshing...
+<p><img src="/img/progress2.gif" width="180">
+</div>
+
+<div id="waitingDiv3" style="display:none;cursor:default;">
+Refreshing...
+<p><img src="/img/progress2.gif" width="180">
+</div>
+
+<div id="waitingDiv4" style="display:none;cursor:default;">
+Refreshing...
+<p><img src="/img/progress2.gif" width="180">
+</div>
+
+<div id="waitingDiv5" style="display:none;cursor:default;">
+Refreshing...
+<p><img src="/img/progress2.gif" width="180">
+</div>

@@ -1,0 +1,40 @@
+<?php
+/**
+ * Logger Storage Exception File
+ *
+ * PHP Version 5.3
+ *
+ * @category Exception
+ * @package  Logger_Storage_Exception
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+require_once LIBRARY_DIR . 'ciexception.php';
+/**
+ * Logger Storage Exception File
+ *
+ * PHP Version 5.3
+ *
+ * @category Exception
+ * @package  Logger_Storage_Exception
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+class Logger_Storage_Exception_File extends CIException
+{
+    const NON_EXIST = 0;
+    const NO_WRITE  = 1;
+    const NO_OPEN   = 2;
+
+    /**
+     * Error Messages
+     * @var array
+     */
+    protected $errors = array(
+        self::NON_EXIST => 'The path "%s" doesn\'t exist',
+        self::NO_WRITE  => 'No write permissions on path "%s"',
+        self::NO_OPEN   => 'The file "%s" could not be open for write',
+    );
+}

@@ -1,0 +1,176 @@
+<?php
+
+namespace Test\Validator;
+use CI\Validator\Options as OptionsValidator;
+
+/**
+ * @group validator
+ * @group validator_array
+ */
+class ValidatorOptionsTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * @var OptionsValidator
+     */
+    protected $oValidator;
+
+    /**
+     * Creates a new instance of OptionsValidator
+     *
+     * @return void
+     */
+    public function setUp()
+    {
+        $aOptions = array('var_numeric' => 'numeric');
+        $this->oValidator = new OptionsValidator($aOptions);
+    }
+
+    /**
+     * Test the basic behaviour
+     *
+     * @return void
+     */
+    public function testValid()
+    {
+        $aValue = array('var_numeric' => 1);
+        $bExpected = true;
+
+        $this->assertEquals($bExpected, $this->oValidator->isValid($aValue));
+    }
+
+    /**
+     * Test when not equal
+     * @return void
+     */
+    public function testNotValid()
+    {
+        $aValue = array('var_numeric' => 1);
+        $bExpected = false;
+
+        $this->oValidator->setOptions(array('var' => 'required|numeric'));
+
+        $this->assertEquals($bExpected, $this->oValidator->isValid($aValue));
+    }
+
+    /**
+     * Test when is not numeric
+     * @return void
+     */
+    public function testNotNumeric()
+    {
+        $aValue = array('var_numeric' => 'hello world');
+        $bExpected = false;
+
+        $this->assertEquals($bExpected, $this->oValidator->isValid($aValue));
+    }
+
+    public function testString()
+    {
+        $aValue = array('string_value' => 'Hola Mundo');
+        $bExpected = true;
+
+        $this->oValidator->setOptions(array(
+            'string_value' => 'required|string'
+        ));
+        $bResult = $this->oValidator->isValid($aValue);
+
+        $this->assertEquals($bExpected, $bResult);
+    }
+
+    public function testNotString()
+    {
+        $aValue = array('string_value' => true);
+        $bExpected = false;
+
+        $this->oValidator->setOptions(array(
+            'string_value' => 'required|string'
+        ));
+        $bResult = $this->oValidator->isValid($aValue);
+
+        $this->assertEquals($bExpected, $bResult);
+    }
+
+    public function testGreater()
+    {
+        $aValue = array('greater' => 5);
+        $bExpected = true;
+
+        $this->oValidator->setOptions(array(
+            'greater' => 'required|numeric|gt=4'
+        ));
+
+        $this->assertEquals($bExpected, $this->oValidator->isValid($aValue));
+    }
+
+    public function testNotGreater()
+    {
+        $aValue = array('greater' => 3);
+        $bExpected = false;
+
+        $this->oValidator->setOptions(array(
+            'greater' => 'required|numeric|gt=4'
+        ));
+
+        $this->assertEquals($bExpected, $this->oValidator->isValid($aValue));
+    }
+
+    public function testStringDate()
+    {
+        $aValue = array('date' => '2013-05-23');
+        $bExpected = true;
+
+        $this->oValidator->setOptions(array(
+            'date' => 'required|string|string_date=Y-m-d'
+        ));
+
+        $this->assertEquals($bExpected, $this->oValidator->isValid($aValue));
+    }
+
+    public function testNotStringDate()
+    {
+        $aValue = array('date' => '2013');
+        $bExpected = false;
+
+        $this->oValidator->setOptions(array(
+            'date' => 'required|string|string_date=Y-m-d'
+        ));
+
+        $this->assertEquals($bExpected, $this->oValidator->isValid($aValue));
+    }
+
+    public function testArray()
+    {
+        $aValue    = array('var' => array('2013'));
+        $aOptions  = array('var' => 'array');
+        $bExpected = true;
+
+        $this->oValidator->setOptions($aOptions);
+
+        $this->assertEquals($bExpected, $this->oValidator->isValid($aValue));
+    }
+
+    public function testNotArray()
+    {
+        $aValue    = array('var' => '2013');
+        $aOptions  = array('var' => 'array');
+        $bExpected = false;
+
+        $this->oValidator->setOptions($aOptions);
+
+        $this->assertEquals($bExpected, $this->oValidator->isValid($aValue));
+    }
+
+    /**
+     * Test when not an option
+     * @return void
+     */
+    public function testNotOption()
+    {
+        $aValue = array('var' => 1);
+        $bExpected = false;
+
+        $this->oValidator->setOptions(array('var' => 'none'));
+
+        $this->assertEquals($bExpected, $this->oValidator->isValid($aValue));
+    }
+}

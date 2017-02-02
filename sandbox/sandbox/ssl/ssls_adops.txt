@@ -1,0 +1,395 @@
+app1v-adops.ap.dev.lax.gnmedia.net: depth=0 C = --, ST = SomeState, L = SomeCity, O = SomeOrganization, OU = SomeOrganizationalUnit, CN = app1v-adops.ap.dev.lax.gnmedia.net, emailAddress = root@app1v-adops.ap.dev.lax.gnmedia.net
+app1v-adops.ap.dev.lax.gnmedia.net: verify error:num=18:self signed certificate
+app1v-adops.ap.dev.lax.gnmedia.net: verify return:1
+app1v-adops.ap.dev.lax.gnmedia.net: depth=0 C = --, ST = SomeState, L = SomeCity, O = SomeOrganization, OU = SomeOrganizationalUnit, CN = app1v-adops.ap.dev.lax.gnmedia.net, emailAddress = root@app1v-adops.ap.dev.lax.gnmedia.net
+app1v-adops.ap.dev.lax.gnmedia.net: verify error:num=10:certificate has expired
+app1v-adops.ap.dev.lax.gnmedia.net: notAfter=Dec 11 20:28:23 2014 GMT
+app1v-adops.ap.dev.lax.gnmedia.net: verify return:1
+app1v-adops.ap.dev.lax.gnmedia.net: depth=0 C = --, ST = SomeState, L = SomeCity, O = SomeOrganization, OU = SomeOrganizationalUnit, CN = app1v-adops.ap.dev.lax.gnmedia.net, emailAddress = root@app1v-adops.ap.dev.lax.gnmedia.net
+app1v-adops.ap.dev.lax.gnmedia.net: notAfter=Dec 11 20:28:23 2014 GMT
+app1v-adops.ap.dev.lax.gnmedia.net: verify return:1
+app1v-adops.ap.dev.lax.gnmedia.net: CONNECTED(00000003)
+app1v-adops.ap.dev.lax.gnmedia.net: ---
+app1v-adops.ap.dev.lax.gnmedia.net: Certificate chain
+app1v-adops.ap.dev.lax.gnmedia.net:  0 s:/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app1v-adops.ap.dev.lax.gnmedia.net/emailAddress=root@app1v-adops.ap.dev.lax.gnmedia.net
+app1v-adops.ap.dev.lax.gnmedia.net:    i:/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app1v-adops.ap.dev.lax.gnmedia.net/emailAddress=root@app1v-adops.ap.dev.lax.gnmedia.net
+app1v-adops.ap.dev.lax.gnmedia.net: -----BEGIN CERTIFICATE-----
+app1v-adops.ap.dev.lax.gnmedia.net: MIIDczCCAtygAwIBAgICd48wDQYJKoZIhvcNAQEFBQAwgdUxCzAJBgNVBAYTAi0t
+app1v-adops.ap.dev.lax.gnmedia.net: MRIwEAYDVQQIDAlTb21lU3RhdGUxETAPBgNVBAcMCFNvbWVDaXR5MRkwFwYDVQQK
+app1v-adops.ap.dev.lax.gnmedia.net: DBBTb21lT3JnYW5pemF0aW9uMR8wHQYDVQQLDBZTb21lT3JnYW5pemF0aW9uYWxV
+app1v-adops.ap.dev.lax.gnmedia.net: bml0MSswKQYDVQQDDCJhcHAxdi1hZG9wcy5hcC5kZXYubGF4LmdubWVkaWEubmV0
+app1v-adops.ap.dev.lax.gnmedia.net: MTYwNAYJKoZIhvcNAQkBFidyb290QGFwcDF2LWFkb3BzLmFwLmRldi5sYXguZ25t
+app1v-adops.ap.dev.lax.gnmedia.net: ZWRpYS5uZXQwHhcNMTMxMjExMjAyODIzWhcNMTQxMjExMjAyODIzWjCB1TELMAkG
+app1v-adops.ap.dev.lax.gnmedia.net: A1UEBhMCLS0xEjAQBgNVBAgMCVNvbWVTdGF0ZTERMA8GA1UEBwwIU29tZUNpdHkx
+app1v-adops.ap.dev.lax.gnmedia.net: GTAXBgNVBAoMEFNvbWVPcmdhbml6YXRpb24xHzAdBgNVBAsMFlNvbWVPcmdhbml6
+app1v-adops.ap.dev.lax.gnmedia.net: YXRpb25hbFVuaXQxKzApBgNVBAMMImFwcDF2LWFkb3BzLmFwLmRldi5sYXguZ25t
+app1v-adops.ap.dev.lax.gnmedia.net: ZWRpYS5uZXQxNjA0BgkqhkiG9w0BCQEWJ3Jvb3RAYXBwMXYtYWRvcHMuYXAuZGV2
+app1v-adops.ap.dev.lax.gnmedia.net: LmxheC5nbm1lZGlhLm5ldDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEA5Q8U
+app1v-adops.ap.dev.lax.gnmedia.net: hbyg9hNr7LrLRnJAZej5eWYevTVjDmeKNXAwyw2yanRZkCq1mfjDdxrFDwVarOZo
+app1v-adops.ap.dev.lax.gnmedia.net: TTTU0ceRhUmghaVRZJxqzj1iGZl7hkPZMA3hQaXJfkiSxAAJaamyqOfB2FDfF+lo
+app1v-adops.ap.dev.lax.gnmedia.net: KT+ZLc2Jqx1VRdSOIk5poeqnS9j2W/a9uFwmvHkCAwEAAaNQME4wHQYDVR0OBBYE
+app1v-adops.ap.dev.lax.gnmedia.net: FO0Ux3cMCQZ50tguIUAMdfifAi1TMB8GA1UdIwQYMBaAFO0Ux3cMCQZ50tguIUAM
+app1v-adops.ap.dev.lax.gnmedia.net: dfifAi1TMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADgYEAroMQGVofCgVC
+app1v-adops.ap.dev.lax.gnmedia.net: M+PC0G0SXtHQFd8UGslZ7Vvyi4U97lCum7U0fVgO7FOe8uUMpdble8TReVGlzGdA
+app1v-adops.ap.dev.lax.gnmedia.net: yx4DV+Mq4vL+zqGqlyeSbhF6wJsTck0DDYqHp+kRF2G4msvi9uWnJSOUcSe8er+Z
+app1v-adops.ap.dev.lax.gnmedia.net: yNGWMQe3fNBKCa0jrC8YdYMGeYEG/rk=
+app1v-adops.ap.dev.lax.gnmedia.net: -----END CERTIFICATE-----
+app1v-adops.ap.dev.lax.gnmedia.net: ---
+app1v-adops.ap.dev.lax.gnmedia.net: Server certificate
+app1v-adops.ap.dev.lax.gnmedia.net: subject=/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app1v-adops.ap.dev.lax.gnmedia.net/emailAddress=root@app1v-adops.ap.dev.lax.gnmedia.net
+app1v-adops.ap.dev.lax.gnmedia.net: issuer=/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app1v-adops.ap.dev.lax.gnmedia.net/emailAddress=root@app1v-adops.ap.dev.lax.gnmedia.net
+app1v-adops.ap.dev.lax.gnmedia.net: ---
+app1v-adops.ap.dev.lax.gnmedia.net: No client certificate CA names sent
+app1v-adops.ap.dev.lax.gnmedia.net: ---
+app1v-adops.ap.dev.lax.gnmedia.net: SSL handshake has read 1637 bytes and written 310 bytes
+app1v-adops.ap.dev.lax.gnmedia.net: ---
+app1v-adops.ap.dev.lax.gnmedia.net: New, TLSv1/SSLv3, Cipher is DHE-RSA-AES256-SHA
+app1v-adops.ap.dev.lax.gnmedia.net: Server public key is 1024 bit
+app1v-adops.ap.dev.lax.gnmedia.net: Secure Renegotiation IS supported
+app1v-adops.ap.dev.lax.gnmedia.net: Compression: NONE
+app1v-adops.ap.dev.lax.gnmedia.net: Expansion: NONE
+app1v-adops.ap.dev.lax.gnmedia.net: SSL-Session:
+app1v-adops.ap.dev.lax.gnmedia.net:     Protocol  : TLSv1
+app1v-adops.ap.dev.lax.gnmedia.net:     Cipher    : DHE-RSA-AES256-SHA
+app1v-adops.ap.dev.lax.gnmedia.net:     Session-ID: 70A21C101371A9BA714A39C4E56E943A524E5EA013BCA0797194016D90D130B0
+app1v-adops.ap.dev.lax.gnmedia.net:     Session-ID-ctx: 
+app1v-adops.ap.dev.lax.gnmedia.net:     Master-Key: DA1E350F785EF1BA6F75144DBCEFDEF46C590022651F29AED7D3883B57E8829AC4F180D43DFCF4908A0D5A66D90758B0
+app1v-adops.ap.dev.lax.gnmedia.net:     Key-Arg   : None
+app1v-adops.ap.dev.lax.gnmedia.net:     Krb5 Principal: None
+app1v-adops.ap.dev.lax.gnmedia.net:     PSK identity: None
+app1v-adops.ap.dev.lax.gnmedia.net:     PSK identity hint: None
+app1v-adops.ap.dev.lax.gnmedia.net:     TLS session ticket:
+app1v-adops.ap.dev.lax.gnmedia.net:     0000 - 3b d6 11 5f e9 21 7a 6c-9d 60 d8 ca bc 4e 0e 7c   ;.._.!zl.`...N.|
+app1v-adops.ap.dev.lax.gnmedia.net:     0010 - 06 6a 21 7c 0a 63 ac 5c-e5 ed ef d3 78 c8 5b 47   .j!|.c.\....x.[G
+app1v-adops.ap.dev.lax.gnmedia.net:     0020 - ec 73 c5 92 89 5e 41 25-9d 23 86 c4 e3 68 53 07   .s...^A%.#...hS.
+app1v-adops.ap.dev.lax.gnmedia.net:     0030 - 1b a3 7e 4d ce f9 16 0f-27 d6 65 f6 9a a0 e7 cb   ..~M....'.e.....
+app1v-adops.ap.dev.lax.gnmedia.net:     0040 - 73 c2 4b 32 0a cc 7d 59-29 08 71 b6 e8 0b ec 59   s.K2..}Y).q....Y
+app1v-adops.ap.dev.lax.gnmedia.net:     0050 - e2 a6 67 d8 37 51 35 07-c7 44 a9 72 5b e9 ab ee   ..g.7Q5..D.r[...
+app1v-adops.ap.dev.lax.gnmedia.net:     0060 - 58 fb 92 1e d9 63 20 d7-b0 db 5c b9 7f 6f b8 f5   X....c ...\..o..
+app1v-adops.ap.dev.lax.gnmedia.net:     0070 - 3f 7a 1c ce 75 58 c8 cc-50 68 1a 32 89 89 bf e4   ?z..uX..Ph.2....
+app1v-adops.ap.dev.lax.gnmedia.net:     0080 - 64 a6 8f 60 92 fa 23 91-b3 1c 04 6b 1d b4 fb 13   d..`..#....k....
+app1v-adops.ap.dev.lax.gnmedia.net:     0090 - 33 98 a9 60 35 2d d5 55-91 7c f7 79 60 ab da 86   3..`5-.U.|.y`...
+app1v-adops.ap.dev.lax.gnmedia.net:     00a0 - 09 ba 17 ec 34 b9 cd 8a-fd 2b 2e 5f 1d 39 6f 6e   ....4....+._.9on
+app1v-adops.ap.dev.lax.gnmedia.net:     00b0 - 97 64 6c b0 4d 93 25 e2-dc c8 6d bd 6f 98 d0 cf   .dl.M.%...m.o...
+app1v-adops.ap.dev.lax.gnmedia.net: 
+app1v-adops.ap.dev.lax.gnmedia.net:     Start Time: 1421290669
+app1v-adops.ap.dev.lax.gnmedia.net:     Timeout   : 300 (sec)
+app1v-adops.ap.dev.lax.gnmedia.net:     Verify return code: 10 (certificate has expired)
+app1v-adops.ap.dev.lax.gnmedia.net: ---
+app1v-adops.ap.dev.lax.gnmedia.net: DONE
+app1v-adops.ap.prd.lax.gnmedia.net: depth=0 C = --, ST = SomeState, L = SomeCity, O = SomeOrganization, OU = SomeOrganizationalUnit, CN = app1v-adops.ap.prd.lax.gnmedia.net, emailAddress = root@app1v-adops.ap.prd.lax.gnmedia.net
+app1v-adops.ap.prd.lax.gnmedia.net: verify error:num=18:self signed certificate
+app1v-adops.ap.prd.lax.gnmedia.net: verify return:1
+app1v-adops.ap.prd.lax.gnmedia.net: depth=0 C = --, ST = SomeState, L = SomeCity, O = SomeOrganization, OU = SomeOrganizationalUnit, CN = app1v-adops.ap.prd.lax.gnmedia.net, emailAddress = root@app1v-adops.ap.prd.lax.gnmedia.net
+app1v-adops.ap.prd.lax.gnmedia.net: verify error:num=10:certificate has expired
+app1v-adops.ap.prd.lax.gnmedia.net: notAfter=Jan  7 23:46:21 2015 GMT
+app1v-adops.ap.prd.lax.gnmedia.net: verify return:1
+app1v-adops.ap.prd.lax.gnmedia.net: depth=0 C = --, ST = SomeState, L = SomeCity, O = SomeOrganization, OU = SomeOrganizationalUnit, CN = app1v-adops.ap.prd.lax.gnmedia.net, emailAddress = root@app1v-adops.ap.prd.lax.gnmedia.net
+app1v-adops.ap.prd.lax.gnmedia.net: notAfter=Jan  7 23:46:21 2015 GMT
+app1v-adops.ap.prd.lax.gnmedia.net: verify return:1
+app1v-adops.ap.prd.lax.gnmedia.net: CONNECTED(00000003)
+app1v-adops.ap.prd.lax.gnmedia.net: ---
+app1v-adops.ap.prd.lax.gnmedia.net: Certificate chain
+app1v-adops.ap.prd.lax.gnmedia.net:  0 s:/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app1v-adops.ap.prd.lax.gnmedia.net/emailAddress=root@app1v-adops.ap.prd.lax.gnmedia.net
+app1v-adops.ap.prd.lax.gnmedia.net:    i:/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app1v-adops.ap.prd.lax.gnmedia.net/emailAddress=root@app1v-adops.ap.prd.lax.gnmedia.net
+app1v-adops.ap.prd.lax.gnmedia.net: -----BEGIN CERTIFICATE-----
+app1v-adops.ap.prd.lax.gnmedia.net: MIIDczCCAtygAwIBAgICVJIwDQYJKoZIhvcNAQEFBQAwgdUxCzAJBgNVBAYTAi0t
+app1v-adops.ap.prd.lax.gnmedia.net: MRIwEAYDVQQIDAlTb21lU3RhdGUxETAPBgNVBAcMCFNvbWVDaXR5MRkwFwYDVQQK
+app1v-adops.ap.prd.lax.gnmedia.net: DBBTb21lT3JnYW5pemF0aW9uMR8wHQYDVQQLDBZTb21lT3JnYW5pemF0aW9uYWxV
+app1v-adops.ap.prd.lax.gnmedia.net: bml0MSswKQYDVQQDDCJhcHAxdi1hZG9wcy5hcC5wcmQubGF4LmdubWVkaWEubmV0
+app1v-adops.ap.prd.lax.gnmedia.net: MTYwNAYJKoZIhvcNAQkBFidyb290QGFwcDF2LWFkb3BzLmFwLnByZC5sYXguZ25t
+app1v-adops.ap.prd.lax.gnmedia.net: ZWRpYS5uZXQwHhcNMTQwMTA3MjM0NjIxWhcNMTUwMTA3MjM0NjIxWjCB1TELMAkG
+app1v-adops.ap.prd.lax.gnmedia.net: A1UEBhMCLS0xEjAQBgNVBAgMCVNvbWVTdGF0ZTERMA8GA1UEBwwIU29tZUNpdHkx
+app1v-adops.ap.prd.lax.gnmedia.net: GTAXBgNVBAoMEFNvbWVPcmdhbml6YXRpb24xHzAdBgNVBAsMFlNvbWVPcmdhbml6
+app1v-adops.ap.prd.lax.gnmedia.net: YXRpb25hbFVuaXQxKzApBgNVBAMMImFwcDF2LWFkb3BzLmFwLnByZC5sYXguZ25t
+app1v-adops.ap.prd.lax.gnmedia.net: ZWRpYS5uZXQxNjA0BgkqhkiG9w0BCQEWJ3Jvb3RAYXBwMXYtYWRvcHMuYXAucHJk
+app1v-adops.ap.prd.lax.gnmedia.net: LmxheC5nbm1lZGlhLm5ldDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAyCNX
+app1v-adops.ap.prd.lax.gnmedia.net: bOYBwFvOMj4nu/Ow7LOBXUo/Hgr0mrRJ6UxQARBnbO9UGLFcQik5uH3Ym+xdG572
+app1v-adops.ap.prd.lax.gnmedia.net: ArWVbnGWvuFXqEF3G+k3+BKrVQ7OilLv5GNiCLp298+z9rPSL3nMoiaiNLLekFkh
+app1v-adops.ap.prd.lax.gnmedia.net: SUVg1zDv5vbnX7DROuU9E7RFM+Ts/Op+IR5XYwkCAwEAAaNQME4wHQYDVR0OBBYE
+app1v-adops.ap.prd.lax.gnmedia.net: FPJ1sDetOk1dxMUfhQI41L43hudwMB8GA1UdIwQYMBaAFPJ1sDetOk1dxMUfhQI4
+app1v-adops.ap.prd.lax.gnmedia.net: 1L43hudwMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADgYEArHNZLaZz4zYO
+app1v-adops.ap.prd.lax.gnmedia.net: yQ7b85ubs5n9A5N8nBL+CDQ1ukhJEJUZEoe+vyaIy+kXVyjJDxD0DanN5Wo5TDvd
+app1v-adops.ap.prd.lax.gnmedia.net: L9hx3R6EntJu8MnDv2Smrk4pq2PKYSTiFlytRGCDlO/rgUIynA2dujr8UEUYT7M9
+app1v-adops.ap.prd.lax.gnmedia.net: CnXOJbG8lhXr555uh08OnIWdGrMDLiI=
+app1v-adops.ap.prd.lax.gnmedia.net: -----END CERTIFICATE-----
+app1v-adops.ap.prd.lax.gnmedia.net: ---
+app1v-adops.ap.prd.lax.gnmedia.net: Server certificate
+app1v-adops.ap.prd.lax.gnmedia.net: subject=/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app1v-adops.ap.prd.lax.gnmedia.net/emailAddress=root@app1v-adops.ap.prd.lax.gnmedia.net
+app1v-adops.ap.prd.lax.gnmedia.net: issuer=/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app1v-adops.ap.prd.lax.gnmedia.net/emailAddress=root@app1v-adops.ap.prd.lax.gnmedia.net
+app1v-adops.ap.prd.lax.gnmedia.net: ---
+app1v-adops.ap.prd.lax.gnmedia.net: No client certificate CA names sent
+app1v-adops.ap.prd.lax.gnmedia.net: ---
+app1v-adops.ap.prd.lax.gnmedia.net: SSL handshake has read 1637 bytes and written 310 bytes
+app1v-adops.ap.prd.lax.gnmedia.net: ---
+app1v-adops.ap.prd.lax.gnmedia.net: New, TLSv1/SSLv3, Cipher is DHE-RSA-AES256-SHA
+app1v-adops.ap.prd.lax.gnmedia.net: Server public key is 1024 bit
+app1v-adops.ap.prd.lax.gnmedia.net: Secure Renegotiation IS supported
+app1v-adops.ap.prd.lax.gnmedia.net: Compression: NONE
+app1v-adops.ap.prd.lax.gnmedia.net: Expansion: NONE
+app1v-adops.ap.prd.lax.gnmedia.net: SSL-Session:
+app1v-adops.ap.prd.lax.gnmedia.net:     Protocol  : TLSv1
+app1v-adops.ap.prd.lax.gnmedia.net:     Cipher    : DHE-RSA-AES256-SHA
+app1v-adops.ap.prd.lax.gnmedia.net:     Session-ID: EE0E61BD0C8C72AA2617DB33EC7D0E75A37F5C96774D100CCCB7A366AF08DD8E
+app1v-adops.ap.prd.lax.gnmedia.net:     Session-ID-ctx: 
+app1v-adops.ap.prd.lax.gnmedia.net:     Master-Key: 0D800E12401B8DE2C638AA30609E8AEA263FDC73E62CE861ECDD1577A03304A18AF5187780ED3356BB8B617411B57D38
+app1v-adops.ap.prd.lax.gnmedia.net:     Key-Arg   : None
+app1v-adops.ap.prd.lax.gnmedia.net:     Krb5 Principal: None
+app1v-adops.ap.prd.lax.gnmedia.net:     PSK identity: None
+app1v-adops.ap.prd.lax.gnmedia.net:     PSK identity hint: None
+app1v-adops.ap.prd.lax.gnmedia.net:     TLS session ticket:
+app1v-adops.ap.prd.lax.gnmedia.net:     0000 - ee ed 0d 90 14 1f bc 46-cd 1e 5a 54 68 2f ef 38   .......F..ZTh/.8
+app1v-adops.ap.prd.lax.gnmedia.net:     0010 - ff 29 21 23 24 6b 4f 47-23 a2 d9 ef 65 b6 75 35   .)!#$kOG#...e.u5
+app1v-adops.ap.prd.lax.gnmedia.net:     0020 - 31 bf 72 58 7b da 36 21-b6 9f dd d6 34 33 dc b9   1.rX{.6!....43..
+app1v-adops.ap.prd.lax.gnmedia.net:     0030 - 3e bd 88 d7 04 f2 1b ae-21 2e cf 1d 40 87 56 60   >.......!...@.V`
+app1v-adops.ap.prd.lax.gnmedia.net:     0040 - 54 45 8c f1 c1 58 fd a1-ca ca e7 71 8f 7b 96 f9   TE...X.....q.{..
+app1v-adops.ap.prd.lax.gnmedia.net:     0050 - 19 bf ce b8 7f 8b 05 b9-d0 b2 6a f7 73 77 56 8f   ..........j.swV.
+app1v-adops.ap.prd.lax.gnmedia.net:     0060 - dd a1 77 87 58 34 52 e0-df ff c1 59 c2 ce ab 11   ..w.X4R....Y....
+app1v-adops.ap.prd.lax.gnmedia.net:     0070 - e8 89 e3 5d ae 62 fc d4-d9 8c fc 07 84 36 f2 07   ...].b.......6..
+app1v-adops.ap.prd.lax.gnmedia.net:     0080 - 9c 70 3d 1d c0 57 53 40-23 36 69 41 c9 0e b2 f2   .p=..WS@#6iA....
+app1v-adops.ap.prd.lax.gnmedia.net:     0090 - b1 63 76 f3 ad 13 e5 49-c5 4e 91 ba 87 3a c8 c4   .cv....I.N...:..
+app1v-adops.ap.prd.lax.gnmedia.net:     00a0 - 6d 69 f0 c3 a8 b8 ef 1a-ec 27 6c 19 af c8 d8 58   mi.......'l....X
+app1v-adops.ap.prd.lax.gnmedia.net:     00b0 - 15 db 65 1c ca 96 ac c1-a5 e4 52 a4 09 3b 0a 89   ..e.......R..;..
+app1v-adops.ap.prd.lax.gnmedia.net: 
+app1v-adops.ap.prd.lax.gnmedia.net:     Start Time: 1421290670
+app1v-adops.ap.prd.lax.gnmedia.net:     Timeout   : 300 (sec)
+app1v-adops.ap.prd.lax.gnmedia.net:     Verify return code: 10 (certificate has expired)
+app1v-adops.ap.prd.lax.gnmedia.net: ---
+app1v-adops.ap.prd.lax.gnmedia.net: DONE
+app1v-adops.ap.stg.lax.gnmedia.net: depth=0 C = --, ST = SomeState, L = SomeCity, O = SomeOrganization, OU = SomeOrganizationalUnit, CN = app1v-adops.ap.stg.lax.gnmedia.net, emailAddress = root@app1v-adops.ap.stg.lax.gnmedia.net
+app1v-adops.ap.stg.lax.gnmedia.net: verify error:num=18:self signed certificate
+app1v-adops.ap.stg.lax.gnmedia.net: verify return:1
+app1v-adops.ap.stg.lax.gnmedia.net: depth=0 C = --, ST = SomeState, L = SomeCity, O = SomeOrganization, OU = SomeOrganizationalUnit, CN = app1v-adops.ap.stg.lax.gnmedia.net, emailAddress = root@app1v-adops.ap.stg.lax.gnmedia.net
+app1v-adops.ap.stg.lax.gnmedia.net: verify error:num=10:certificate has expired
+app1v-adops.ap.stg.lax.gnmedia.net: notAfter=Jan  7 21:54:45 2015 GMT
+app1v-adops.ap.stg.lax.gnmedia.net: verify return:1
+app1v-adops.ap.stg.lax.gnmedia.net: depth=0 C = --, ST = SomeState, L = SomeCity, O = SomeOrganization, OU = SomeOrganizationalUnit, CN = app1v-adops.ap.stg.lax.gnmedia.net, emailAddress = root@app1v-adops.ap.stg.lax.gnmedia.net
+app1v-adops.ap.stg.lax.gnmedia.net: notAfter=Jan  7 21:54:45 2015 GMT
+app1v-adops.ap.stg.lax.gnmedia.net: verify return:1
+app1v-adops.ap.stg.lax.gnmedia.net: CONNECTED(00000003)
+app1v-adops.ap.stg.lax.gnmedia.net: ---
+app1v-adops.ap.stg.lax.gnmedia.net: Certificate chain
+app1v-adops.ap.stg.lax.gnmedia.net:  0 s:/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app1v-adops.ap.stg.lax.gnmedia.net/emailAddress=root@app1v-adops.ap.stg.lax.gnmedia.net
+app1v-adops.ap.stg.lax.gnmedia.net:    i:/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app1v-adops.ap.stg.lax.gnmedia.net/emailAddress=root@app1v-adops.ap.stg.lax.gnmedia.net
+app1v-adops.ap.stg.lax.gnmedia.net: -----BEGIN CERTIFICATE-----
+app1v-adops.ap.stg.lax.gnmedia.net: MIIDczCCAtygAwIBAgICLYcwDQYJKoZIhvcNAQEFBQAwgdUxCzAJBgNVBAYTAi0t
+app1v-adops.ap.stg.lax.gnmedia.net: MRIwEAYDVQQIDAlTb21lU3RhdGUxETAPBgNVBAcMCFNvbWVDaXR5MRkwFwYDVQQK
+app1v-adops.ap.stg.lax.gnmedia.net: DBBTb21lT3JnYW5pemF0aW9uMR8wHQYDVQQLDBZTb21lT3JnYW5pemF0aW9uYWxV
+app1v-adops.ap.stg.lax.gnmedia.net: bml0MSswKQYDVQQDDCJhcHAxdi1hZG9wcy5hcC5zdGcubGF4LmdubWVkaWEubmV0
+app1v-adops.ap.stg.lax.gnmedia.net: MTYwNAYJKoZIhvcNAQkBFidyb290QGFwcDF2LWFkb3BzLmFwLnN0Zy5sYXguZ25t
+app1v-adops.ap.stg.lax.gnmedia.net: ZWRpYS5uZXQwHhcNMTQwMTA3MjE1NDQ1WhcNMTUwMTA3MjE1NDQ1WjCB1TELMAkG
+app1v-adops.ap.stg.lax.gnmedia.net: A1UEBhMCLS0xEjAQBgNVBAgMCVNvbWVTdGF0ZTERMA8GA1UEBwwIU29tZUNpdHkx
+app1v-adops.ap.stg.lax.gnmedia.net: GTAXBgNVBAoMEFNvbWVPcmdhbml6YXRpb24xHzAdBgNVBAsMFlNvbWVPcmdhbml6
+app1v-adops.ap.stg.lax.gnmedia.net: YXRpb25hbFVuaXQxKzApBgNVBAMMImFwcDF2LWFkb3BzLmFwLnN0Zy5sYXguZ25t
+app1v-adops.ap.stg.lax.gnmedia.net: ZWRpYS5uZXQxNjA0BgkqhkiG9w0BCQEWJ3Jvb3RAYXBwMXYtYWRvcHMuYXAuc3Rn
+app1v-adops.ap.stg.lax.gnmedia.net: LmxheC5nbm1lZGlhLm5ldDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAwu44
+app1v-adops.ap.stg.lax.gnmedia.net: W1h1sLkRzW7uVtved8tRb0aagbHqPoeof4xJwF0p4h/IP8C8cQ7v5Tua+a4DtF4v
+app1v-adops.ap.stg.lax.gnmedia.net: Jvytlpw56SH3Xoja73jZKjgBMySxfPRfLJy8LU36lGInz9Ieqw50T9GWp3X5td5y
+app1v-adops.ap.stg.lax.gnmedia.net: x8rdTwrrO5WK5qga4umf9KHG5RjlTxP4/ITWACcCAwEAAaNQME4wHQYDVR0OBBYE
+app1v-adops.ap.stg.lax.gnmedia.net: FBDE/kKYWDZJkykpHdgWuLdECreuMB8GA1UdIwQYMBaAFBDE/kKYWDZJkykpHdgW
+app1v-adops.ap.stg.lax.gnmedia.net: uLdECreuMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADgYEAeFvQEuAf35i1
+app1v-adops.ap.stg.lax.gnmedia.net: 5BHqEfVQyVuPdCVsYALWE1DEGlLSZ1j3VB9tTn2DyZDWSfAELdDf+6J/+ptPzZxe
+app1v-adops.ap.stg.lax.gnmedia.net: E4nr9+d5rqO9fXPLgvgpeJVAETyH1dUa5ciT0ZQSjBYtplmwZpAGBDRpO7xWcu2i
+app1v-adops.ap.stg.lax.gnmedia.net: /JXt0WjbWweolOqaybyPY9Pf0S0m9Ug=
+app1v-adops.ap.stg.lax.gnmedia.net: -----END CERTIFICATE-----
+app1v-adops.ap.stg.lax.gnmedia.net: ---
+app1v-adops.ap.stg.lax.gnmedia.net: Server certificate
+app1v-adops.ap.stg.lax.gnmedia.net: subject=/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app1v-adops.ap.stg.lax.gnmedia.net/emailAddress=root@app1v-adops.ap.stg.lax.gnmedia.net
+app1v-adops.ap.stg.lax.gnmedia.net: issuer=/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app1v-adops.ap.stg.lax.gnmedia.net/emailAddress=root@app1v-adops.ap.stg.lax.gnmedia.net
+app1v-adops.ap.stg.lax.gnmedia.net: ---
+app1v-adops.ap.stg.lax.gnmedia.net: No client certificate CA names sent
+app1v-adops.ap.stg.lax.gnmedia.net: ---
+app1v-adops.ap.stg.lax.gnmedia.net: SSL handshake has read 1637 bytes and written 310 bytes
+app1v-adops.ap.stg.lax.gnmedia.net: ---
+app1v-adops.ap.stg.lax.gnmedia.net: New, TLSv1/SSLv3, Cipher is DHE-RSA-AES256-SHA
+app1v-adops.ap.stg.lax.gnmedia.net: Server public key is 1024 bit
+app1v-adops.ap.stg.lax.gnmedia.net: Secure Renegotiation IS supported
+app1v-adops.ap.stg.lax.gnmedia.net: Compression: NONE
+app1v-adops.ap.stg.lax.gnmedia.net: Expansion: NONE
+app1v-adops.ap.stg.lax.gnmedia.net: SSL-Session:
+app1v-adops.ap.stg.lax.gnmedia.net:     Protocol  : TLSv1
+app1v-adops.ap.stg.lax.gnmedia.net:     Cipher    : DHE-RSA-AES256-SHA
+app1v-adops.ap.stg.lax.gnmedia.net:     Session-ID: 2288BDD057F111E3EE6FB771B80259716C5EFF6742FE76F8D20436A2E09BFD81
+app1v-adops.ap.stg.lax.gnmedia.net:     Session-ID-ctx: 
+app1v-adops.ap.stg.lax.gnmedia.net:     Master-Key: 429E827DE18C0706E153D663F9ED3F84C2EC2C65AF3306BA1A9D389B018526CE82EC0B2EA522F5A002C5EEA5B8569CED
+app1v-adops.ap.stg.lax.gnmedia.net:     Key-Arg   : None
+app1v-adops.ap.stg.lax.gnmedia.net:     Krb5 Principal: None
+app1v-adops.ap.stg.lax.gnmedia.net:     PSK identity: None
+app1v-adops.ap.stg.lax.gnmedia.net:     PSK identity hint: None
+app1v-adops.ap.stg.lax.gnmedia.net:     TLS session ticket:
+app1v-adops.ap.stg.lax.gnmedia.net:     0000 - fc 65 eb 6d c5 32 fa 8e-99 6f 03 c7 22 5c a4 05   .e.m.2...o.."\..
+app1v-adops.ap.stg.lax.gnmedia.net:     0010 - 98 02 cb c0 68 f6 3c d8-76 be ce 0e 3f bf fb 69   ....h.<.v...?..i
+app1v-adops.ap.stg.lax.gnmedia.net:     0020 - 83 b0 70 3f e2 02 8a ec-16 e0 d6 eb 30 26 72 4c   ..p?........0&rL
+app1v-adops.ap.stg.lax.gnmedia.net:     0030 - 04 51 a7 f7 08 74 9a 93-83 c2 24 42 30 92 07 cc   .Q...t....$B0...
+app1v-adops.ap.stg.lax.gnmedia.net:     0040 - a2 23 cd 79 4c 74 ca 67-cd 00 ca 5e 06 00 b0 a8   .#.yLt.g...^....
+app1v-adops.ap.stg.lax.gnmedia.net:     0050 - 61 dc 19 d6 ec b6 a4 d7-f1 49 3e ed 12 15 6e e3   a........I>...n.
+app1v-adops.ap.stg.lax.gnmedia.net:     0060 - d7 6a 08 a1 fe 49 08 ee-10 ff 7c b7 a3 7c 63 9b   .j...I....|..|c.
+app1v-adops.ap.stg.lax.gnmedia.net:     0070 - de f3 e7 07 7e 2e 9f 0f-39 7a 18 99 2f 16 53 12   ....~...9z../.S.
+app1v-adops.ap.stg.lax.gnmedia.net:     0080 - b7 29 2c 03 49 5b fc 50-5b b0 b7 2a 6e 24 af f3   .),.I[.P[..*n$..
+app1v-adops.ap.stg.lax.gnmedia.net:     0090 - 00 23 9a ed 24 9d 16 9b-c0 f2 b7 67 97 97 49 0a   .#..$......g..I.
+app1v-adops.ap.stg.lax.gnmedia.net:     00a0 - 14 90 70 ca 26 fa b1 e9-59 30 01 0d eb 0c d1 ae   ..p.&...Y0......
+app1v-adops.ap.stg.lax.gnmedia.net:     00b0 - e4 36 10 df 24 d8 13 b9-0b da f4 af d0 df 92 4d   .6..$..........M
+app1v-adops.ap.stg.lax.gnmedia.net: 
+app1v-adops.ap.stg.lax.gnmedia.net:     Start Time: 1421290670
+app1v-adops.ap.stg.lax.gnmedia.net:     Timeout   : 300 (sec)
+app1v-adops.ap.stg.lax.gnmedia.net:     Verify return code: 10 (certificate has expired)
+app1v-adops.ap.stg.lax.gnmedia.net: ---
+app1v-adops.ap.stg.lax.gnmedia.net: DONE
+app2v-adops.ap.prd.lax.gnmedia.net: depth=0 C = --, ST = SomeState, L = SomeCity, O = SomeOrganization, OU = SomeOrganizationalUnit, CN = app2v-adops.ap.prd.lax.gnmedia.net, emailAddress = root@app2v-adops.ap.prd.lax.gnmedia.net
+app2v-adops.ap.prd.lax.gnmedia.net: verify error:num=18:self signed certificate
+app2v-adops.ap.prd.lax.gnmedia.net: verify return:1
+app2v-adops.ap.prd.lax.gnmedia.net: depth=0 C = --, ST = SomeState, L = SomeCity, O = SomeOrganization, OU = SomeOrganizationalUnit, CN = app2v-adops.ap.prd.lax.gnmedia.net, emailAddress = root@app2v-adops.ap.prd.lax.gnmedia.net
+app2v-adops.ap.prd.lax.gnmedia.net: verify error:num=10:certificate has expired
+app2v-adops.ap.prd.lax.gnmedia.net: notAfter=Jan  8 00:23:29 2015 GMT
+app2v-adops.ap.prd.lax.gnmedia.net: verify return:1
+app2v-adops.ap.prd.lax.gnmedia.net: depth=0 C = --, ST = SomeState, L = SomeCity, O = SomeOrganization, OU = SomeOrganizationalUnit, CN = app2v-adops.ap.prd.lax.gnmedia.net, emailAddress = root@app2v-adops.ap.prd.lax.gnmedia.net
+app2v-adops.ap.prd.lax.gnmedia.net: notAfter=Jan  8 00:23:29 2015 GMT
+app2v-adops.ap.prd.lax.gnmedia.net: verify return:1
+app2v-adops.ap.prd.lax.gnmedia.net: CONNECTED(00000003)
+app2v-adops.ap.prd.lax.gnmedia.net: ---
+app2v-adops.ap.prd.lax.gnmedia.net: Certificate chain
+app2v-adops.ap.prd.lax.gnmedia.net:  0 s:/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app2v-adops.ap.prd.lax.gnmedia.net/emailAddress=root@app2v-adops.ap.prd.lax.gnmedia.net
+app2v-adops.ap.prd.lax.gnmedia.net:    i:/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app2v-adops.ap.prd.lax.gnmedia.net/emailAddress=root@app2v-adops.ap.prd.lax.gnmedia.net
+app2v-adops.ap.prd.lax.gnmedia.net: -----BEGIN CERTIFICATE-----
+app2v-adops.ap.prd.lax.gnmedia.net: MIIDczCCAtygAwIBAgICcGgwDQYJKoZIhvcNAQEFBQAwgdUxCzAJBgNVBAYTAi0t
+app2v-adops.ap.prd.lax.gnmedia.net: MRIwEAYDVQQIDAlTb21lU3RhdGUxETAPBgNVBAcMCFNvbWVDaXR5MRkwFwYDVQQK
+app2v-adops.ap.prd.lax.gnmedia.net: DBBTb21lT3JnYW5pemF0aW9uMR8wHQYDVQQLDBZTb21lT3JnYW5pemF0aW9uYWxV
+app2v-adops.ap.prd.lax.gnmedia.net: bml0MSswKQYDVQQDDCJhcHAydi1hZG9wcy5hcC5wcmQubGF4LmdubWVkaWEubmV0
+app2v-adops.ap.prd.lax.gnmedia.net: MTYwNAYJKoZIhvcNAQkBFidyb290QGFwcDJ2LWFkb3BzLmFwLnByZC5sYXguZ25t
+app2v-adops.ap.prd.lax.gnmedia.net: ZWRpYS5uZXQwHhcNMTQwMTA4MDAyMzI5WhcNMTUwMTA4MDAyMzI5WjCB1TELMAkG
+app2v-adops.ap.prd.lax.gnmedia.net: A1UEBhMCLS0xEjAQBgNVBAgMCVNvbWVTdGF0ZTERMA8GA1UEBwwIU29tZUNpdHkx
+app2v-adops.ap.prd.lax.gnmedia.net: GTAXBgNVBAoMEFNvbWVPcmdhbml6YXRpb24xHzAdBgNVBAsMFlNvbWVPcmdhbml6
+app2v-adops.ap.prd.lax.gnmedia.net: YXRpb25hbFVuaXQxKzApBgNVBAMMImFwcDJ2LWFkb3BzLmFwLnByZC5sYXguZ25t
+app2v-adops.ap.prd.lax.gnmedia.net: ZWRpYS5uZXQxNjA0BgkqhkiG9w0BCQEWJ3Jvb3RAYXBwMnYtYWRvcHMuYXAucHJk
+app2v-adops.ap.prd.lax.gnmedia.net: LmxheC5nbm1lZGlhLm5ldDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAyY8L
+app2v-adops.ap.prd.lax.gnmedia.net: uCp6LWVCUx2A088KWtM+mAg4Qv9jg0jaovgOGrxpPi/URsSF1r3j8UX1IfIVRoCm
+app2v-adops.ap.prd.lax.gnmedia.net: OZhyX7qd1wj/mJOWOrPlG9ly4zPqlragSqDVIRqJgTH1CmKQ3SX52rdFC7B7OXPG
+app2v-adops.ap.prd.lax.gnmedia.net: +6RafoludUtkuPt+uyzpvu6Vda2GhiVwd4KhdkkCAwEAAaNQME4wHQYDVR0OBBYE
+app2v-adops.ap.prd.lax.gnmedia.net: FMhVLq61NO6+gZJHCqBorvXZksW3MB8GA1UdIwQYMBaAFMhVLq61NO6+gZJHCqBo
+app2v-adops.ap.prd.lax.gnmedia.net: rvXZksW3MAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADgYEAxHcv1XnWWLeL
+app2v-adops.ap.prd.lax.gnmedia.net: OsdUFTZECXjxmUXYQkdqLPuVOxDVOPSqh95qD9rclL/3BB51m+dZpMwTdLiDhCGw
+app2v-adops.ap.prd.lax.gnmedia.net: lNyrXcsOW03CtFy7EgeU104w3pdTYTp6YiFIvFjHDyz/AyCmCvp6iP5MaaFHFYHR
+app2v-adops.ap.prd.lax.gnmedia.net: OU7ECPmUjIDd2cMDDq3h8LzAAleAi5s=
+app2v-adops.ap.prd.lax.gnmedia.net: -----END CERTIFICATE-----
+app2v-adops.ap.prd.lax.gnmedia.net: ---
+app2v-adops.ap.prd.lax.gnmedia.net: Server certificate
+app2v-adops.ap.prd.lax.gnmedia.net: subject=/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app2v-adops.ap.prd.lax.gnmedia.net/emailAddress=root@app2v-adops.ap.prd.lax.gnmedia.net
+app2v-adops.ap.prd.lax.gnmedia.net: issuer=/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app2v-adops.ap.prd.lax.gnmedia.net/emailAddress=root@app2v-adops.ap.prd.lax.gnmedia.net
+app2v-adops.ap.prd.lax.gnmedia.net: ---
+app2v-adops.ap.prd.lax.gnmedia.net: No client certificate CA names sent
+app2v-adops.ap.prd.lax.gnmedia.net: ---
+app2v-adops.ap.prd.lax.gnmedia.net: SSL handshake has read 1637 bytes and written 310 bytes
+app2v-adops.ap.prd.lax.gnmedia.net: ---
+app2v-adops.ap.prd.lax.gnmedia.net: New, TLSv1/SSLv3, Cipher is DHE-RSA-AES256-SHA
+app2v-adops.ap.prd.lax.gnmedia.net: Server public key is 1024 bit
+app2v-adops.ap.prd.lax.gnmedia.net: Secure Renegotiation IS supported
+app2v-adops.ap.prd.lax.gnmedia.net: Compression: NONE
+app2v-adops.ap.prd.lax.gnmedia.net: Expansion: NONE
+app2v-adops.ap.prd.lax.gnmedia.net: SSL-Session:
+app2v-adops.ap.prd.lax.gnmedia.net:     Protocol  : TLSv1
+app2v-adops.ap.prd.lax.gnmedia.net:     Cipher    : DHE-RSA-AES256-SHA
+app2v-adops.ap.prd.lax.gnmedia.net:     Session-ID: AF42B6FDA0606DD5DBFE27F84E735847271DB24EFCBB2452775067CCD6BAB16C
+app2v-adops.ap.prd.lax.gnmedia.net:     Session-ID-ctx: 
+app2v-adops.ap.prd.lax.gnmedia.net:     Master-Key: 7973F253E8878225CCE374698F90A6AB4B8548CAD3C988DC8C0DFF7018775CA6F4796853F260899F2DA7FB587B48614C
+app2v-adops.ap.prd.lax.gnmedia.net:     Key-Arg   : None
+app2v-adops.ap.prd.lax.gnmedia.net:     Krb5 Principal: None
+app2v-adops.ap.prd.lax.gnmedia.net:     PSK identity: None
+app2v-adops.ap.prd.lax.gnmedia.net:     PSK identity hint: None
+app2v-adops.ap.prd.lax.gnmedia.net:     TLS session ticket:
+app2v-adops.ap.prd.lax.gnmedia.net:     0000 - 25 32 ae 3a 06 28 16 21-90 b2 80 db e1 58 2a c1   %2.:.(.!.....X*.
+app2v-adops.ap.prd.lax.gnmedia.net:     0010 - a5 ec 70 06 1d 10 7b d5-cc 44 88 f3 40 00 2c bc   ..p...{..D..@.,.
+app2v-adops.ap.prd.lax.gnmedia.net:     0020 - cf 87 58 4c 13 e2 40 83-69 03 f7 72 15 25 d2 8a   ..XL..@.i..r.%..
+app2v-adops.ap.prd.lax.gnmedia.net:     0030 - e0 bc 6a 44 92 18 23 03-ac 0e 05 55 93 ed a9 d3   ..jD..#....U....
+app2v-adops.ap.prd.lax.gnmedia.net:     0040 - a0 28 7d a6 f3 81 07 94-df ab 70 16 de 85 34 07   .(}.......p...4.
+app2v-adops.ap.prd.lax.gnmedia.net:     0050 - bf 0d 89 7a a8 ca 64 fe-13 b1 c7 50 a7 ff c8 4c   ...z..d....P...L
+app2v-adops.ap.prd.lax.gnmedia.net:     0060 - a6 18 15 98 84 76 bd a4-40 11 21 5f 47 37 f5 18   .....v..@.!_G7..
+app2v-adops.ap.prd.lax.gnmedia.net:     0070 - 73 44 57 51 58 1c 0d 38-ab e7 b0 9d 23 d9 21 a2   sDWQX..8....#.!.
+app2v-adops.ap.prd.lax.gnmedia.net:     0080 - 8b 8d d7 f0 16 9b fe 14-ba a3 ff 20 4c e1 30 10   ........... L.0.
+app2v-adops.ap.prd.lax.gnmedia.net:     0090 - f3 2a bf 51 db a5 6a f1-49 c5 68 0a 58 75 c0 5e   .*.Q..j.I.h.Xu.^
+app2v-adops.ap.prd.lax.gnmedia.net:     00a0 - ff fb aa 44 e6 5b 2f cf-98 17 2f f1 8f 9c b5 c5   ...D.[/.../.....
+app2v-adops.ap.prd.lax.gnmedia.net:     00b0 - fb 9e 63 09 e6 ac 97 81-e8 bb c3 cd 23 ac 6f 8c   ..c.........#.o.
+app2v-adops.ap.prd.lax.gnmedia.net: 
+app2v-adops.ap.prd.lax.gnmedia.net:     Start Time: 1421290790
+app2v-adops.ap.prd.lax.gnmedia.net:     Timeout   : 300 (sec)
+app2v-adops.ap.prd.lax.gnmedia.net:     Verify return code: 10 (certificate has expired)
+app2v-adops.ap.prd.lax.gnmedia.net: ---
+app2v-adops.ap.prd.lax.gnmedia.net: DONE
+app2v-adops.ap.stg.lax.gnmedia.net: depth=0 C = --, ST = SomeState, L = SomeCity, O = SomeOrganization, OU = SomeOrganizationalUnit, CN = app2v-adops.ap.stg.lax.gnmedia.net, emailAddress = root@app2v-adops.ap.stg.lax.gnmedia.net
+app2v-adops.ap.stg.lax.gnmedia.net: verify error:num=18:self signed certificate
+app2v-adops.ap.stg.lax.gnmedia.net: verify return:1
+app2v-adops.ap.stg.lax.gnmedia.net: depth=0 C = --, ST = SomeState, L = SomeCity, O = SomeOrganization, OU = SomeOrganizationalUnit, CN = app2v-adops.ap.stg.lax.gnmedia.net, emailAddress = root@app2v-adops.ap.stg.lax.gnmedia.net
+app2v-adops.ap.stg.lax.gnmedia.net: verify error:num=10:certificate has expired
+app2v-adops.ap.stg.lax.gnmedia.net: notAfter=Jan  7 22:22:49 2015 GMT
+app2v-adops.ap.stg.lax.gnmedia.net: verify return:1
+app2v-adops.ap.stg.lax.gnmedia.net: depth=0 C = --, ST = SomeState, L = SomeCity, O = SomeOrganization, OU = SomeOrganizationalUnit, CN = app2v-adops.ap.stg.lax.gnmedia.net, emailAddress = root@app2v-adops.ap.stg.lax.gnmedia.net
+app2v-adops.ap.stg.lax.gnmedia.net: notAfter=Jan  7 22:22:49 2015 GMT
+app2v-adops.ap.stg.lax.gnmedia.net: verify return:1
+app2v-adops.ap.stg.lax.gnmedia.net: CONNECTED(00000003)
+app2v-adops.ap.stg.lax.gnmedia.net: ---
+app2v-adops.ap.stg.lax.gnmedia.net: Certificate chain
+app2v-adops.ap.stg.lax.gnmedia.net:  0 s:/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app2v-adops.ap.stg.lax.gnmedia.net/emailAddress=root@app2v-adops.ap.stg.lax.gnmedia.net
+app2v-adops.ap.stg.lax.gnmedia.net:    i:/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app2v-adops.ap.stg.lax.gnmedia.net/emailAddress=root@app2v-adops.ap.stg.lax.gnmedia.net
+app2v-adops.ap.stg.lax.gnmedia.net: -----BEGIN CERTIFICATE-----
+app2v-adops.ap.stg.lax.gnmedia.net: MIIDczCCAtygAwIBAgICFh8wDQYJKoZIhvcNAQEFBQAwgdUxCzAJBgNVBAYTAi0t
+app2v-adops.ap.stg.lax.gnmedia.net: MRIwEAYDVQQIDAlTb21lU3RhdGUxETAPBgNVBAcMCFNvbWVDaXR5MRkwFwYDVQQK
+app2v-adops.ap.stg.lax.gnmedia.net: DBBTb21lT3JnYW5pemF0aW9uMR8wHQYDVQQLDBZTb21lT3JnYW5pemF0aW9uYWxV
+app2v-adops.ap.stg.lax.gnmedia.net: bml0MSswKQYDVQQDDCJhcHAydi1hZG9wcy5hcC5zdGcubGF4LmdubWVkaWEubmV0
+app2v-adops.ap.stg.lax.gnmedia.net: MTYwNAYJKoZIhvcNAQkBFidyb290QGFwcDJ2LWFkb3BzLmFwLnN0Zy5sYXguZ25t
+app2v-adops.ap.stg.lax.gnmedia.net: ZWRpYS5uZXQwHhcNMTQwMTA3MjIyMjQ5WhcNMTUwMTA3MjIyMjQ5WjCB1TELMAkG
+app2v-adops.ap.stg.lax.gnmedia.net: A1UEBhMCLS0xEjAQBgNVBAgMCVNvbWVTdGF0ZTERMA8GA1UEBwwIU29tZUNpdHkx
+app2v-adops.ap.stg.lax.gnmedia.net: GTAXBgNVBAoMEFNvbWVPcmdhbml6YXRpb24xHzAdBgNVBAsMFlNvbWVPcmdhbml6
+app2v-adops.ap.stg.lax.gnmedia.net: YXRpb25hbFVuaXQxKzApBgNVBAMMImFwcDJ2LWFkb3BzLmFwLnN0Zy5sYXguZ25t
+app2v-adops.ap.stg.lax.gnmedia.net: ZWRpYS5uZXQxNjA0BgkqhkiG9w0BCQEWJ3Jvb3RAYXBwMnYtYWRvcHMuYXAuc3Rn
+app2v-adops.ap.stg.lax.gnmedia.net: LmxheC5nbm1lZGlhLm5ldDCBnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAqntX
+app2v-adops.ap.stg.lax.gnmedia.net: BDXlOivvuttCR057prbCtCskN8+aqh5kF8GuYB0qzeB74rBl8T0i+Bxn8AWm1gZf
+app2v-adops.ap.stg.lax.gnmedia.net: 9JCo3laNQEJkwuncsXE105lsvraMKjfu0vAiV/zUhM9CVbrUcisNeP+lkGPkzZ5C
+app2v-adops.ap.stg.lax.gnmedia.net: wO/0xSJJVQY+QW7eIJkAdSDY6xHsgHAd9K8QD/sCAwEAAaNQME4wHQYDVR0OBBYE
+app2v-adops.ap.stg.lax.gnmedia.net: FIVrdRxII3kHKt9wMo2XH/Fh/kpzMB8GA1UdIwQYMBaAFIVrdRxII3kHKt9wMo2X
+app2v-adops.ap.stg.lax.gnmedia.net: H/Fh/kpzMAwGA1UdEwQFMAMBAf8wDQYJKoZIhvcNAQEFBQADgYEAVKN3bVHMYZUX
+app2v-adops.ap.stg.lax.gnmedia.net: M+apI4j6elZ39+BtrXDSRtgeH7/34sbGJWa2MHROTOa1yRHRwOsZb7/PkAyP1bSm
+app2v-adops.ap.stg.lax.gnmedia.net: NRnAWF5Ghs/AcnaCLhBoABPXVe30/GoPY4FCck1HINtS4tNY94xeuix65aAuL9m8
+app2v-adops.ap.stg.lax.gnmedia.net: lVEhP3FKdoo6G+56XjHwgklK5Dkg1hk=
+app2v-adops.ap.stg.lax.gnmedia.net: -----END CERTIFICATE-----
+app2v-adops.ap.stg.lax.gnmedia.net: ---
+app2v-adops.ap.stg.lax.gnmedia.net: Server certificate
+app2v-adops.ap.stg.lax.gnmedia.net: subject=/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app2v-adops.ap.stg.lax.gnmedia.net/emailAddress=root@app2v-adops.ap.stg.lax.gnmedia.net
+app2v-adops.ap.stg.lax.gnmedia.net: issuer=/C=--/ST=SomeState/L=SomeCity/O=SomeOrganization/OU=SomeOrganizationalUnit/CN=app2v-adops.ap.stg.lax.gnmedia.net/emailAddress=root@app2v-adops.ap.stg.lax.gnmedia.net
+app2v-adops.ap.stg.lax.gnmedia.net: ---
+app2v-adops.ap.stg.lax.gnmedia.net: No client certificate CA names sent
+app2v-adops.ap.stg.lax.gnmedia.net: ---
+app2v-adops.ap.stg.lax.gnmedia.net: SSL handshake has read 1637 bytes and written 310 bytes
+app2v-adops.ap.stg.lax.gnmedia.net: ---
+app2v-adops.ap.stg.lax.gnmedia.net: New, TLSv1/SSLv3, Cipher is DHE-RSA-AES256-SHA
+app2v-adops.ap.stg.lax.gnmedia.net: Server public key is 1024 bit
+app2v-adops.ap.stg.lax.gnmedia.net: Secure Renegotiation IS supported
+app2v-adops.ap.stg.lax.gnmedia.net: Compression: NONE
+app2v-adops.ap.stg.lax.gnmedia.net: Expansion: NONE
+app2v-adops.ap.stg.lax.gnmedia.net: SSL-Session:
+app2v-adops.ap.stg.lax.gnmedia.net:     Protocol  : TLSv1
+app2v-adops.ap.stg.lax.gnmedia.net:     Cipher    : DHE-RSA-AES256-SHA
+app2v-adops.ap.stg.lax.gnmedia.net:     Session-ID: DA6B99718FC643390E479192ADA350BDEEDFADF16A483D99963FCAA0106E9D2F
+app2v-adops.ap.stg.lax.gnmedia.net:     Session-ID-ctx: 
+app2v-adops.ap.stg.lax.gnmedia.net:     Master-Key: B801CE22AAAF3237CAF656503D901833CB48DE15084343C20EA3F31FDE5DC72F5913ECD1D42FE228D310938E8C7A1C74
+app2v-adops.ap.stg.lax.gnmedia.net:     Key-Arg   : None
+app2v-adops.ap.stg.lax.gnmedia.net:     Krb5 Principal: None
+app2v-adops.ap.stg.lax.gnmedia.net:     PSK identity: None
+app2v-adops.ap.stg.lax.gnmedia.net:     PSK identity hint: None
+app2v-adops.ap.stg.lax.gnmedia.net:     TLS session ticket:
+app2v-adops.ap.stg.lax.gnmedia.net:     0000 - 45 ab 6d 28 93 90 a3 5d-e2 db d6 75 60 c1 8b 5e   E.m(...]...u`..^
+app2v-adops.ap.stg.lax.gnmedia.net:     0010 - de 29 59 83 e3 56 15 10-ac 0e ea e8 29 3c c8 5e   .)Y..V......)<.^
+app2v-adops.ap.stg.lax.gnmedia.net:     0020 - fb 1e 5e 3f 82 b9 5d b5-01 f7 4c d5 c5 be 87 ca   ..^?..]...L.....
+app2v-adops.ap.stg.lax.gnmedia.net:     0030 - f4 59 83 ef c3 25 df b3-f1 a1 a3 30 e4 6f 5f a7   .Y...%.....0.o_.
+app2v-adops.ap.stg.lax.gnmedia.net:     0040 - 9e 02 3d 59 94 13 4e ed-04 cb 50 7c fb e0 81 1c   ..=Y..N...P|....
+app2v-adops.ap.stg.lax.gnmedia.net:     0050 - 99 af 26 2e 3c eb 49 f3-23 30 f2 9f 01 3d a6 12   ..&.<.I.#0...=..
+app2v-adops.ap.stg.lax.gnmedia.net:     0060 - 80 e6 71 fd ac ed 0d b6-a8 8e 20 db 88 ea 4b 32   ..q....... ...K2
+app2v-adops.ap.stg.lax.gnmedia.net:     0070 - 9c 47 22 98 39 b5 85 b9-ba 87 d2 73 e4 55 f9 a0   .G".9......s.U..
+app2v-adops.ap.stg.lax.gnmedia.net:     0080 - b1 7e b3 67 6d fe 47 47-fe f1 32 a5 98 af 6d f8   .~.gm.GG..2...m.
+app2v-adops.ap.stg.lax.gnmedia.net:     0090 - 04 a7 db be 6e 64 59 99-37 f0 2b c2 b8 b1 5d 4f   ....ndY.7.+...]O
+app2v-adops.ap.stg.lax.gnmedia.net:     00a0 - a4 93 a3 06 04 cc 94 69-8d d2 e4 62 b5 36 19 f0   .......i...b.6..
+app2v-adops.ap.stg.lax.gnmedia.net:     00b0 - a1 a9 02 98 8e b6 e3 85-75 2c 22 40 1e fb be 7f   ........u,"@....
+app2v-adops.ap.stg.lax.gnmedia.net: 
+app2v-adops.ap.stg.lax.gnmedia.net:     Start Time: 1421290791
+app2v-adops.ap.stg.lax.gnmedia.net:     Timeout   : 300 (sec)
+app2v-adops.ap.stg.lax.gnmedia.net:     Verify return code: 10 (certificate has expired)
+app2v-adops.ap.stg.lax.gnmedia.net: ---
+app2v-adops.ap.stg.lax.gnmedia.net: DONE

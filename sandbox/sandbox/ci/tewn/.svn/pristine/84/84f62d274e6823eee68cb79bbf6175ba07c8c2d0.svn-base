@@ -1,0 +1,181 @@
+<?php
+namespace CI\Excel;
+
+class Settings
+{
+    const DEFAULT_CREATOR     = 'Crowdignite';
+    const DEFAULT_TITLE       = 'Title';
+    const DEFAULT_SHEET_TITLE = 'Sheet';
+    const DEFAULT_FONT_STYLE  = 'Arial';
+    const DEFAULT_FONT_SIZE   = 12;
+
+    const OPTION_CREATOR    = 'creator';
+    const OPTION_TITLE      = 'title';
+    const OPTION_FONT_STYLE = 'font_style';
+    const OPTION_FONT_SIZE  = 'font_size';
+    const OPTION_FORMAT     = 'format';
+    const OPTION_COLUMNS    = 'Columns';
+    const OPTION_ALIGNMENT  = 'alignment';
+
+    const OPTION_ALIGNMENT_HORIZONTAL = 'horizontal';
+    const OPTION_ALIGNMENT_VERTICAL   = 'vertical';
+
+    const HORIZONTAL_RIGHT = 'right';
+    const VERTICAL_CENTER  = 'center';
+
+    const DOCUMENT        = 'Document';
+    const SHEETS          = 'Sheets';
+
+    const FORMAT_PERCENTAGE_00                       = '0.00%';
+    const FORMAT_NUMBER_COMMA_SEPARATED1             = '#,##0.00';
+    const FORMAT_NUMBER_COMMA_SEPARATED1_NO_DECIMALS = '#,##0';
+
+    protected $aSettings;
+
+    public function __construct($aSettings = array())
+    {
+        $oValidator = new \CI\Validator\Excel\Settings();
+
+        if (!$oValidator->isValid($aSettings)) {
+            throw new \CI\Excel\Exception(\CI\Excel\Exception::INVALID_FORMAT);
+        }
+
+        $oSettings = new \CI\ArrayManipulator($aSettings);
+        $aDocument = $oSettings->get(self::DOCUMENT, array());
+        $this->aSettings[self::DOCUMENT] = array_merge(
+            $this->defaultDocumentSettings(), $aDocument
+        );
+        $aSheets = $oSettings->get(self::SHEETS, array());
+
+        foreach ($aSheets as $nIndex => $aSheet) {
+            $aSheet = array_merge($this->defaultSheetSettings($nIndex+1), $aSheet);
+            $aSheets[$nIndex] = $aSheet;
+
+        }
+
+        $this->aSettings[self::SHEETS] = $aSheets;
+    }
+
+    public function columnAllowed($sSheetName, $sName)
+    {
+        $bReturn = true;
+
+        if (isset($this->aSettings[self::SHEETS][$sSheetName][self::OPTION_COLUMNS]) && !isset($this->aSettings[self::SHEETS][$sSheetName][self::OPTION_COLUMNS][$sName])) {
+            $bReturn = false;
+        }
+
+        return $bReturn;
+    }
+
+    protected function defaultDocumentSettings()
+    {
+        return array(
+            self::OPTION_TITLE      => self::DEFAULT_TITLE,
+            self::OPTION_CREATOR    => self::DEFAULT_CREATOR,
+            self::OPTION_FONT_SIZE  => self::DEFAULT_FONT_SIZE,
+            self::OPTION_FONT_STYLE => self::DEFAULT_FONT_STYLE
+        );
+    }
+
+    protected function defaultSheetSettings($nSheetNumber = 1)
+    {
+        return array(
+            self::OPTION_TITLE => self::DEFAULT_SHEET_TITLE . $nSheetNumber,
+        );
+    }
+
+    protected function defaultColumnSettings($nColumnNumber = 1)
+    {
+        return array(
+            self::OPTION_TITLE => self::DEFAULT_TITLE . $nColumnNumber
+        );
+    }
+
+    public function getDocumentTitle()
+    {
+        return $this->getDocumentOption(self::OPTION_TITLE);
+    }
+
+    public function getDocumentCreator()
+    {
+        return $this->getDocumentOption(self::OPTION_CREATOR);
+    }
+
+    public function getDocumentFontSize()
+    {
+        return $this->getDocumentOption(self::OPTION_FONT_SIZE);
+    }
+
+    public function getDocumentFontStyle()
+    {
+        return $this->getDocumentOption(self::OPTION_FONT_STYLE);
+    }
+
+    public function getSheetName($mName = 1)
+    {
+        $sReturn = $this->getSheetOption(self::OPTION_TITLE, $mName);
+
+        if (empty($sReturn)){
+            if (is_int($mName)) {
+                $sReturn = self::DEFAULT_SHEET_TITLE . $mName;
+            } else {
+                $sReturn = $mName;
+            }
+        }
+
+        return $sReturn;
+    }
+
+    public function getColumTitleByName($sSheetName, $sName)
+    {
+        $mReturn = $sName;
+        if (isset($this->aSettings[self::SHEETS][$sSheetName][self::OPTION_COLUMNS][$sName][self::OPTION_TITLE])) {
+            $mReturn =  $this->aSettings[self::SHEETS][$sSheetName][self::OPTION_COLUMNS][$sName][self::OPTION_TITLE];
+        }
+
+        return $mReturn;
+    }
+
+    public function getColumFormatByName($sSheetName, $sName)
+      {
+        $mReturn = null;;
+
+        if (isset($this->aSettings[self::SHEETS][$sSheetName][self::OPTION_COLUMNS][$sName][self::OPTION_FORMAT])) {
+            $mReturn =  $this->aSettings[self::SHEETS][$sSheetName][self::OPTION_COLUMNS][$sName][self::OPTION_FORMAT];
+        }
+
+        return $mReturn;
+    }
+
+     public function getColumAlignmentByName($sSheetName, $sName)
+      {
+        $mReturn = null;;
+
+        if (isset($this->aSettings[self::SHEETS][$sSheetName][self::OPTION_COLUMNS][$sName][self::OPTION_ALIGNMENT])) {
+            $mReturn =  $this->aSettings[self::SHEETS][$sSheetName][self::OPTION_COLUMNS][$sName][self::OPTION_ALIGNMENT];
+        }
+
+        return $mReturn;
+    }
+
+    public function getOrderedColums($sSheetName)
+    {
+        $aReturn = array();
+
+        if (!empty($this->aSettings[self::SHEETS][$sSheetName][self::OPTION_COLUMNS]) && is_array($this->aSettings[self::SHEETS][$sSheetName][self::OPTION_COLUMNS])) {
+            $aReturn = array_keys($this->aSettings[self::SHEETS][$sSheetName][self::OPTION_COLUMNS]);
+        }
+
+        return $aReturn;
+    }
+
+    protected function getDocumentOption($sName)
+    {
+        return $this->aSettings[self::DOCUMENT][$sName];
+    }
+
+    protected function getSheetOption($sName, $sSheetName)
+    {
+        return $this->aSettings[self::SHEETS][$sSheetName][$sName];
+    }
+}

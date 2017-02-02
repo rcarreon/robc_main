@@ -1,0 +1,587 @@
+<?php
+include_once (ROOT . DS . APP_DIR . DS . "global_defines.php");
+
+class SocialPagesController extends AppController {
+
+    var $name = 'SocialPages';
+    var $uses = array("Website", "Page", "Log", 'SocialPage', 'Widget', 'Setting');
+    var $helpers = array("Html", "Ajax", "Form", "Convert", "Javascript");
+    var $components = array("RequestHandler", "Intersects", "Timer", "Date", "Statistic");
+    var $pageTitle = SITE_NAME;
+
+    function beforeFilter() {
+        App::import('Controller', 'ContextualEngine');
+        global $ContextualEngine;
+        $ContextualEngine = new ContextualEngineController;
+        $ContextualEngine->constructClasses();
+
+        App::import('Controller', 'HistoryCredits');
+        global $HistoryCredits;
+        $HistoryCredits = new HistoryCreditsController;
+        $HistoryCredits->constructClasses();
+
+        App::import('Controller', 'HistorySocial');
+        global $HistorySocial;
+        $HistorySocial = new HistorySocialController;
+        $HistorySocial->constructClasses();
+
+        App::import('Controller', 'Pages');
+        global $Pages;
+        $Pages = new PagesController;
+        $Pages->constructClasses();
+
+        $this->layout = 'none';
+    }
+
+    function engine($domain_id = DOMAIN_ID_ALL) {
+        $this->Timer->start(TIMER_SOCIAL_ENGINE);
+        set_time_limit(TIME_LIMIT_SOCIAL_ENGINE);
+        ini_set('memory_limit', MEMORY_LIMIT_SOCIAL_ENGINE.'M');
+
+        $conditions = array("visible" => 1,
+            "status" => WEBSITE_STATUS_ACTIVE);
+        if ($domain_id != DOMAIN_ID_ALL) {
+            $conditions['domain_primary'] = $domain_id;
+        }
+
+        $websites = $this->Website->find("all", array("conditions" => $conditions));
+
+        $script_count = 0;
+        $script_total = count($websites);
+        $this->Timer->progress_set(0);
+        $this->Timer->running_set();
+
+        foreach ($websites as $website) {
+            $social_widgets = $this->Widget->get_social($website['Website']['id']);
+
+            if (!empty($social_widgets)) {
+                $scrape_info = 1;
+            } else {
+                $scrape_info = 0;
+                $script_count++;
+                $this->Timer->progress_set($script_count, $script_total);
+                $this->Timer->running_set();
+                continue;
+            }
+
+            debug_message("Website: ".$website['Website']['name']);
+
+            $pages = $this->get_website_pages_by_social($website['Website']['id']);
+
+            $count = count($pages);
+            $max_trend_dev = 0;
+            $max_total_dev = 0;
+
+            // Zero out weights in case a page got deleted
+            $this->SocialPage->zero_trending($website['Website']['id']);
+
+            for ($i = 0; $i < $count; $i++) {
+                if (!isset($pages[$i]['SocialPage'])) {
+                    continue;
+                }
+
+                echo "Page: ".$pages[$i]['Page']['url']."<br>\n";
+
+                if ($scrape_info) {
+                    $rc = $this->scrape_info($pages[$i], 1 /* Canonical only */);
+                    if ($rc) {
+                        // This page is not elgible as we don't have enough info
+                        if (isset($pages[$i]['SocialPage']['id'])) {
+                            $this->SocialPage->id = $pages[$i]['SocialPage']['id'];
+                            plat_assert($this->SocialPage->id);
+                            $this->SocialPage->saveField('trending', 0);
+                        }
+                        continue;
+                    }
+                }
+
+                $trend_dev = $pages[$i]['social_trend_dev'];
+                $total_dev = $pages[$i]['social_total_dev'];
+                $social_trend_total = $pages[$i]['social_trend_total'];
+
+                // These should be ordered so doing max here will work
+                if ($social_trend_total == 0) {
+                    $max_total_dev = max($total_dev, $max_total_dev);
+                }
+
+                if ($max_total_dev) {
+                    $trend = $total_dev / $max_total_dev;
+                } else {
+                    $trend = 0;
+                }
+
+                //echo "Total Trend: ".$trend."\n";
+
+                if ($social_trend_total) {
+                    // These should be ordered so doing max here will work
+                    $max_trend_dev = max($trend_dev, $max_trend_dev);
+
+                    $trending = $trend_dev / $max_trend_dev;
+
+                    /*
+                    echo "trending: ".$trend_dev." / ".$max_trend_dev." = ".$trending."\n";
+                    $max_trend_dev = max($social_trend_total, $max_trend_dev);
+                    $trending = $social_trend_total / $max_trend_dev;
+                    echo "trending: ".$social_trend_total." / ".$max_trend_dev." = ".$trending."\n";
+                    */
+
+                    $trend = max($this->Setting->get('SOCIAL_TRENDING_BONUS'), $trend) + $trending;
+                }
+
+                if (isset($pages[$i]['SocialPage']['id'])) {
+                    $this->SocialPage->id = $pages[$i]['SocialPage']['id'];
+                    plat_assert($this->SocialPage->id);
+                    echo "Trending: ".$trend."\n";
+                    $this->SocialPage->saveField('trending', $trend);
+                }
+            }
+
+            $script_count++;
+            $this->Timer->progress_set($script_count, $script_total);
+            $this->Timer->running_set();
+        }
+
+        $data = $this->Timer->set_memory_limit();
+        $this->Timer->stop_save($data);
+    }
+
+    function scrape_info($page, $canonical_only = 0) {
+        global $Pages;
+
+        if (isset($page['Page']['title']) &&
+            isset($page['Page']['image']) &&
+            isset($page['Page']['canonical'])) {
+            if ($canonical_only &&
+                $page['Page']['canonical'] != $page['Page']['url']) {
+                return 1;
+            }
+
+            return 0;
+        }
+
+        $info = $Pages->scrape_info($page);
+
+        if (!isset($page['Page']['canonical'])) {
+            if ($info['url']) {
+                echo "Saving canonical\n";
+                $this->Page->id = $page['Page']['id'];
+                $this->Page->saveField('canonical', $info['url']);
+            } else {
+                return 1;
+            }
+        }
+
+        if ($canonical_only) {
+            if ($info['url'] != $page['Page']['url']) {
+                return 1;
+            }
+        }
+
+        if (!isset($page['Page']['image'])) {
+            if ($info['image']) {
+                $image_url = $info['image'];
+                $image_manipulator = new \CI\Image\Manipulator();
+                $image = '';
+
+                try {
+                    $image = $image_manipulator->import($image_url);
+                } catch(Exception $e) {
+                    error_log(
+                        __METHOD__ . 'Something happen when the image was imported ' . $e->getMessage()
+                    );
+                }
+
+                $this->Page->id = $page['Page']['id'];
+                $this->Page->saveField('image', $image);
+            } else {
+                return 1;
+            }
+        }
+
+        if (!isset($page['Page']['title'])) {
+            if ($info['title']) {
+                $this->Page->id = $page['Page']['id'];
+                $this->Page->saveField('title', $info['title']);
+            } else {
+                return 1;
+            }
+        }
+
+        return 0;
+    }
+
+    function update_pages($domain_id = NULL, $pending = 0, $website_id = 0) {
+        if ($pending) {
+            $page_status = PAGE_STATUS_PENDING;
+
+            $this->Timer->start(TIMER_SOCIAL_UPDATE_PAGES_PENDING);
+            set_time_limit(TIME_LIMIT_SOCIAL_UPDATE_PAGES_PENDING);
+            ini_set('memory_limit', MEMORY_LIMIT_SOCIAL_UPDATE_PAGES_PENDING.'M');
+        } else {
+            $page_status = PAGE_STATUS_APPROVED;
+
+            $this->Timer->start(TIMER_SOCIAL_UPDATE_PAGES_ACTIVE);
+            set_time_limit(TIME_LIMIT_SOCIAL_UPDATE_PAGES_ACTIVE);
+            ini_set('memory_limit', MEMORY_LIMIT_SOCIAL_UPDATE_PAGES_ACTIVE.'M');
+        }
+
+        $conditions = array(
+            'visible' => 1,
+            'status' => WEBSITE_STATUS_ACTIVE
+        );
+
+        if ($domain_id) {
+            $conditions['domain_primary'] = $domain_id;
+        }
+
+        if ($website_id) {
+            $conditions['id'] = $website_id;
+        }
+
+        $websites = $this->Website->find("all", array(
+                'conditions' => $conditions,
+                'order' => 'Website.last_social_rebalance ASC',
+                'fields' => array('Website.id, Website.name')
+            )
+        );
+
+        $script_count = 0;
+        $script_total = count($websites);
+        $this->Timer->progress_set(0);
+        $this->Timer->running_set();
+
+        foreach ($websites as $website) {
+            echo "Website: ".$website['Website']['name']."<br>\n";
+
+            $cutoff = $this->Date->day_start($this->Date->days_ago($this->Setting->get('SOCIAL_TRAFFIC_HISTORY')));
+
+            $pages = $this->Page->get_social($website['Website']['id'], $cutoff, $page_status);
+
+            $this->update_pages_batch($pages);
+            $this->Website->social_rebalance_update($website['Website']['id']);
+
+            $script_count++;
+            $this->Timer->progress_set($script_count, $script_total);
+            $this->Timer->running_set();
+
+        }
+
+        $data = $this->Timer->set_memory_limit();
+        $this->Timer->stop_save($data);
+    }
+
+    function test() {
+        $websites = array(4, 5615);
+
+        $pages = $this->Page->find("all", array("conditions" => array("website_id" => $websites)));
+
+        $this->update_pages_batch($pages);
+    }
+
+    function update_pages_batch($pages) {
+        $batch_size = 35;
+
+        $count = count($pages);
+
+        for ($i = 0; $i < $count; $i += $batch_size) {
+            $batch = array();
+
+            for ($j = 0; $j < $batch_size; $j++) {
+                if (isset($pages[$i+$j])) {
+                    $batch[] = $pages[$i+$j];
+                }
+            }
+            $this->update_page($batch);
+        }
+    }
+
+    function update_page($pages) {
+        if (is_array($pages)) {
+            $page_url = "";
+            $query_type = "url in (";
+            $count = count($pages);
+            for ($i = 0; $i < $count; $i++) {
+                $page = $pages[$i];
+                $page_id = $page['Page']['id'];
+                $page = $this->Page->findById($page_id);
+                plat_assert($page);
+                $page_url .= '"'.$page['Page']['url'].'"';
+                if ($i+1 < $count) {
+                    $page_url .= ",";
+                }
+            }
+            $query = "url in (".$page_url.")";
+            $query = urlencode($query);
+        } else {
+            $page_id = $pages['Page']['id'];
+            $page = $this->Page->findById($page_id);
+            plat_assert($page);
+            $page_url = $page['Page']['url'];
+
+            $query = "url=%22".urlencode($page_url)."%22";
+        }
+
+        $url = "https://api.facebook.com/method/fql.query?query=select+url%2C+normalized_url%2C+share_count%2C+like_count%2C+comment_count%2C+total_count%2C+commentsbox_count%2C+comments_fbid%2C+click_count+from%20link_stat%20where%20".$query."&format=json";
+
+        // Max number of retries
+        for ($i = 0; $i < 10; $i++) {
+            $web_page = $this->get_web_page($url);
+
+            $json = $web_page['content'];
+
+            $decoded = json_decode($json, 1);
+            $data = (array) $decoded;
+
+            if (isset($data['error_code'])) {
+                $sleep_time = pow(2, ($i + 1));
+                switch ($data['error_code']) {
+                    case 4:
+                    case 2:
+                        echo "Sleeping ".$sleep_time."\n";
+                        sleep($sleep_time);
+                        break;
+                    default:
+                        break 2;
+                }
+            } else {
+                break;
+            }
+        }
+
+        if (isset($data[0]['total_count'])) {
+            $count = count($data);
+            for ($i = 0; $i < $count; $i++) {
+                $page = $pages[$i];
+                $this->process($data[$i], $page);
+            }
+        } else {
+            echo "Error: ".$json."   ".$url."<br>\n";
+            print_r($data);
+            exit();
+        }
+    }
+
+    function process($data, $page) {
+        $page_id = $page['Page']['id'];
+
+        // Get likes
+        $likes_fb = $data['like_count'];
+        $share_fb = $data['share_count'];
+        $comments_fb = $data['comment_count'];
+        //$clicks_fb = $data['click_count'];
+
+        echo $page['Page']['url']." - Likes: ".$likes_fb." Shares: ".$share_fb." Comments: ".$comments_fb." <br>\n";
+
+        $this->data = array();
+        $this->SocialPage->create();
+
+        $this->data['SocialPage']['page_id'] = $page_id;
+        $this->data['SocialPage']['website_id'] = $page['Page']['website_id'];
+        $this->data['SocialPage']['likes_fb'] = $likes_fb;
+        $this->data['SocialPage']['shares_fb'] = $share_fb;
+        $this->data['SocialPage']['comments_fb'] = $comments_fb;
+
+        $social_page = $this->SocialPage->findByPageId($page_id);
+        if ($social_page) {
+            $this->data['SocialPage']['id'] = $social_page['SocialPage']['id'];
+            $this->data['SocialPage']['trending'] = $social_page['SocialPage']['trending'];
+        }
+
+        $this->SocialPage->save($this->data);
+    }
+
+    function get_website_pages_by_social($website_id, $page_status = -1, $limit = 0, $canonical_only = 0) {
+        global $HistorySocial;
+
+        $cutoff = $this->Date->day_start($this->Date->days_ago($this->Setting->get('SOCIAL_TRAFFIC_HISTORY')));
+
+        $datetime_start = $cutoff;
+        $datetime_end = $this->Date->now();
+
+        $pages = $this->Page->get_social($website_id, $cutoff, $page_status, 0 /* limit */, $canonical_only);
+        if (!$pages) {
+            return array();
+        }
+
+        $count = count($pages);
+
+        $trend_population = array();
+        $total_population = array();
+
+        for ($i = 0; $i < $count; $i++) {
+            $page_id = $pages[$i]['Page']['id'];
+            $stats = $HistorySocial->stats_range($page_id, $datetime_start, $datetime_end);
+            $total = $this->SocialPage->calc_total($stats);
+            $pages[$i]['social_trend_total'] = $total;
+
+            $trend_population[] = $total;
+
+            $social = $this->SocialPage->get($pages[$i]['Page']['id']);
+            if (!$social) {
+                $pages[$i]['social_total'] = 0;
+
+                continue;
+            }
+
+            $pages[$i]['SocialPage'] = $social['SocialPage'];
+            $total = $this->SocialPage->calc_total($social);
+            $pages[$i]['social_total'] = $total;
+
+            $total_population[] = $total;
+        }
+
+        // Get the stats
+        $trend_deviation = $this->Statistic->standard_deviation_population($trend_population);
+        $total_deviation = $this->Statistic->standard_deviation_population($total_population);
+
+        if (count($trend_population)) {
+            $trend_mean = array_sum($trend_population) / count($trend_population);
+        } else {
+            $trend_mean = 0;
+        }
+        if (count($total_population)) {
+            $total_mean = array_sum($total_population) / count($total_population);
+        } else {
+            $total_mean = 0;
+        }
+
+        for ($i = 0; $i < $count; $i++) {
+            if ($trend_deviation) {
+                $pages[$i]['social_trend_dev'] = ($pages[$i]['social_trend_total'] - $trend_mean) / $trend_deviation;
+            } else {
+                $pages[$i]['social_trend_dev'] = 0;
+            }
+
+            if ($total_deviation) {
+                $pages[$i]['social_total_dev'] = ($pages[$i]['social_total'] - $total_mean) / $total_deviation;
+            } else {
+                $pages[$i]['social_total_dev'] = 0;
+            }
+        }
+
+        uasort($pages, "social_stats");
+        $out_pages = array();
+
+        $count = 0;
+
+        // Reindex so indexed for loops work
+        foreach ($pages as $page) {
+            if ($limit && $limit < $count++) {
+                break;
+            }
+            $out_pages[] = $page;
+        }
+
+        return $out_pages;
+    }
+
+    function get_web_page($url) {
+        app::import ('vendor','Webservice');
+
+        $W = new Webservice();
+
+        try {
+            $content = $W->getResponse($url);
+        } Catch (Exception $e) {
+            return;
+        }
+
+        $header = $W->getInfo();
+        $header['content'] = $content;
+
+        return $header;
+    }
+
+    function index($website_id, $num_days = 3) {
+        global $HistorySocial;
+
+        $this->layout = DOMAIN.'/default';
+
+        set_time_limit(TIME_LIMIT_SOCIAL_ENGINE);
+        ini_set('memory_limit', MEMORY_LIMIT_SOCIAL_ENGINE.'M');
+
+        $cutoff = $this->Date->day_start($this->Date->days_ago($num_days));
+
+        $pages = $this->Page->get_social($website_id, $cutoff, -1 /* page_status */, 0 /* limit */, 1 /* canonical_only */);
+        if (!$pages) {
+            return array();
+        }
+
+        $count = count($pages);
+
+        for ($j = 0; $j < $num_days; $j++) {
+            $day = $this->Date->date_add($cutoff, $j);
+
+            $total[$day]['likes_fb'] = 0;
+            $total[$day]['shares_fb'] = 0;
+            $total[$day]['comments_fb'] = 0;
+        }
+
+        for ($i = 0; $i < $count; $i++) {
+            $page_id = $pages[$i]['Page']['id'];
+            $page = $this->Page->findById($page_id);
+
+            $data[$page_id]['Page'] = $page['Page'];
+
+            $lifetime = $this->SocialPage->get($page_id);
+            $data[$page_id]['SocialPage'] = $lifetime['SocialPage'];
+
+            for ($j = 0; $j < $num_days; $j++) {
+                $day = $this->Date->date_add($cutoff, $j);
+
+                $datetime_start = $this->Date->day_start($day);
+                $datetime_end = $this->Date->day_end($day);
+
+                $stats = $HistorySocial->stats_range($page_id, $datetime_start, $datetime_end);
+
+                $data[$page_id][$day] = $stats;
+
+                $total[$day]['likes_fb'] += $stats['likes_fb'];
+                $total[$day]['shares_fb'] += $stats['shares_fb'];
+                $total[$day]['comments_fb'] += $stats['comments_fb'];
+
+            }
+        }
+
+        $website = $this->Website->findById($website_id);
+
+        $this->set("num_days", $num_days);
+        $this->set("pages", $data);
+        $this->set("website", $website);
+        $this->set("date", $this->Date);
+        $this->set("total", $total);
+    }
+
+    /* Return a website pages with social info */
+    function website_social_pages() {
+        Configure::write('debug', 0);
+        $this->autoRender = false;
+
+        $website_id = $_POST['website_id'];
+        $date = $_POST['date'];
+        $page = $_POST['page'];
+
+        $pages = $this->SocialPage->website_social_pages($website_id, $date, $page);
+        echo json_encode($pages);
+    }
+    /* Return the count of the website's pages with social info */
+    function website_social_pages_count($website_id) {
+        $count = $this->SocialPage->website_social_pages_count($website_id);
+        return $count;
+    }
+}
+
+function social_stats($a, $b) {
+    if ($a['social_trend_total'] == $b['social_trend_total']) {
+        // Fall back to the total
+        if ($a['social_total'] == $b['social_total']) {
+            return 0;
+        }
+
+        return ($a['social_total'] < $b['social_total']) ? 1 : -1;
+    }
+    return ($a['social_trend_total'] < $b['social_trend_total']) ? 1 : -1;
+}
+
+
+?>

@@ -1,0 +1,213 @@
+
+<link rel="stylesheet" type="text/css" href="/js/fancybox/jquery.fancybox-1.2.6.css" media="screen" />
+<link rel="stylesheet" type="text/css" href="/css/stickynotes.css">
+<script type="text/javascript" src="/js/fancybox/jquery.fancybox-1.2.6.pack.js"></script>
+<script type="text/javascript" src="/js/stickynotes.js"></script>
+
+<?php
+echo $this->element('crowdignite/backend2_toolbar', array("tab" => "personal", "user" => $user));
+?>
+
+     <div class="row supercontainer" id="content_area">
+
+        <div class="hubs_column"> <!-- left col -->
+            <ul class="hub_list">
+                <li class="title t_personal">Personal Board</li>
+                <li><a class="notes" href="#">Your Notes</a></li>
+                <li><a class="flagged_websites" href="#">Flagged Websites</a></li>
+                <li><a class="moderated_websites" href="#">Last Moderated Websites</a></li>
+                <li><a class="moderated_pages" href="#">Last Moderated Pages</a></li>
+
+            </ul>
+        </div>
+
+        <div class="websites_column"> <!-- right col -->
+
+            <div id="status_bar">
+                <div class="ddown_container">
+                    <!--  <a id="add_website_button" href="#" onclick="show_user_notes(<?= $user['User']['id'];?>); return false;"> -->
+                    <a id="add_note_button" class="add_note button" href="/users/add_note/<?= $user['User']['id'];?>">
+                        <span>Add a Personal Note</span>
+                    </a>
+                </div>
+            </div>
+            <div class="table_container">
+
+                <div id="notes" class="pane">
+                    <?
+                    $session->activate();
+                    if ($session->check('Message.flash')) {
+                        $session->flash();
+                    }
+                    ?>
+                    <div id="notes-area">
+                        <ul>
+                            <li>Your notes should appear here</li>
+                            <li>You can send notes to other users as well</li>
+                            <li>Close a note to remove it</li>
+                        </ul>
+                        <?php
+                            foreach($notes as $note) {
+                                $row = $note['Note'];
+                                list($left,$top,$zindex) = explode('x',$row['xyz']);
+                                echo '<div class="note '.$row['color'].'" style="left:'.$left.'px;top:'.$top.'px;z-index:'.$zindex.'">
+                                     <button class="close">×</button>'.htmlspecialchars($row['text']).'
+                                     <div class="author">'.htmlspecialchars($row['from']).'</div>
+                                     <span class="data">'.$row['id'].'</span>
+                                     </div>', PHP_EOL;
+                            }
+                        ?>
+                    </div>
+                </div>
+
+                <div id="flagged_websites" class="pane">
+                    <h4>Flagged Websites</h4>
+                    <? if(sizeof($Flagged_Websites) < 1 ){
+                        echo "<h3>No results were found.</h3>";
+                    }else{
+                    ?>
+                    <table id="flagged_websites_table" class="tablesorter">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Website</th>
+                                <th>YTo</th>
+                                <th>YFrom</th>
+                                <th>YRR</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <?
+                            foreach($Flagged_Websites as $website){
+                                if($website['Website']['name'] == NULL){
+                                    $website_name = $website['Website']['url'];
+                                }else{
+                                    $website_name = $website['Website']['name'];
+                                }
+                            echo "<tr>
+                                <td><a href='/websites/moderate/".$website['Website']['id']."'>".$website['Website']['id']."</a></td>
+                                <td><a href='#".$website_name."' onclick='show_pages(".$website['Website']['id'].", ".$user['User']['id'].", 1); return false'>"
+                                .$website_name."</a>&nbsp;
+                                <a id='show_notes_link' href='#' onclick='show_notes(".$website['Website']['id']."); return false;'>
+                                <img src='/img/crowdignite/";
+                                if( $website['Website']['notes'] == "" || is_null($website['Website']['notes']) ){
+                                     echo "icon_page_edit_off.png";
+                                }else{
+                                     echo "icon_page_edit.png";
+                                }
+                                echo "' width='16' height='16' alt='Add Notes'></a>&nbsp;";
+                                $convert->user_flagged_websites($user['User'], $website['Website']['id']);
+                                echo "</td>
+                                <td>".number_format($website['Website']['youtgoing'])."</td>
+                                <td>".number_format($website['Website']['yincoming'])."</td>";
+                                if ($website['Website']['yincoming']) {
+                                    echo "<td>".round(($website['Website']['youtgoing']/$website['Website']['yincoming']) * 100, 0)."%</td>";
+                                } else {
+                                    echo "<td>0%</td>";
+                                }
+                                echo "</tr>";
+                                echo "<tr id='fw_top_5_pages_".$website['Website']['id']."' class='top_5_pages'><td colspan='5'></td></tr>";
+                            } ?>
+                        </tbody>
+                    </table>
+                    <? } ?>
+                </div>
+                <div id="moderated_websites" class="pane">
+                    <h4>Last Moderated Websites</h4>
+                    <? if(sizeof($Websites) < 1 ){
+                        echo "<h3>No results were found.</h3>";
+                    }else{
+                    ?>
+                    <table id="websites_table" class="tablesorter">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Website</th>
+                                <th>YTo</th>
+                                <th>YFrom</th>
+                                <th>YRR</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <? foreach($Websites as $website) { ?>
+                            <tr>
+                                <td><a href='/websites/moderate/<?=$website['Website']['id']?>'><?=$website['Website']['id']?></a></td>
+
+                                <td><a href='#<?=$website['Website']['name']?>' onclick='show_pages(<?=$website['Website']['id']?>, <?=$user['User']['id']?>, 0); return false;'><?=$website['Website']['name']?></a>&nbsp;
+                          <a id='show_notes_link' href='#' onclick='show_notes(<?=$website['Website']['id']?>); return false;'>
+                            <img src='/img/crowdignite/<? if($website['Website']['notes'] == "" || is_null($website['Website']['notes'])){ echo "icon_page_edit_off.png"; }else{ echo "icon_page_edit.png"; }?>' width='16' height='16' alt='Add Notes'></a>
+
+                                &nbsp;
+                                <?
+                                $convert->user_flagged_websites($user['User'], $website['Website']['id']);
+                                ?>
+                                <td><?=number_format($website['Website']['youtgoing'])?></td>
+                                <td><?=number_format($website['Website']['yincoming'])?></td>
+                            <?
+                                if ($website['Website']['yincoming']) {
+                                    echo "<td>".round(($website['Website']['youtgoing']/$website['Website']['yincoming']) * 100, 0)."%</td>";
+                                } else {
+                                    echo "<td>0%</td>";
+                                }
+                                echo "</tr>";
+                                echo "<tr id='top_5_pages_".$website['Website']['id']."' class='top_5_pages'><td colspan='5'></td></tr>";
+                            } ?>
+                        </tbody>
+                    </table>
+                    <? } ?>
+                </div>
+                <div id="moderated_pages" class="pane">
+                    <h4>Last Moderated Pages</h4>
+                    <? if(sizeof($Pages) < 1 ){
+                        echo "<h3>No results were found.</h3>";
+                    }else{ ?>
+                    <table id="pages_table" class="tablesorter">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Page</th>
+                                <th>LP CTR</th>
+                                <th>LP Impr.</th>
+                                <th>Wgt CTR</th>
+                                <th>W Impr.</th>
+                                <th>Image</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <?php
+                            $image_asset = new \CI\Asset\Image();
+
+                            foreach($Pages as $page){
+                                $image_html = $image_asset->getUrl(
+                                    array(
+                                        'page_id' => $page['Page']['id'],
+                                        'type' => \CI\Asset\Image::URL_CROP_RELATIVE,
+                                        'image' => $page['Page']['image'],
+                                        'width' => 140,
+                                        'height' => 80,
+                                    )
+                                );
+
+                            echo "<tr>
+                                <td><a href='/pages/moderate/".$page['Page']['website_id']."/".$page['Page']['id']."'>".$page['Page']['id']."</a></td>
+                                <td><a href='/pages/moderate/".$page['Page']['website_id']."/".$page['Page']['id']."'>".$page['Page']['title']."</a></td>
+                                <td>".round(($page['Page']['lp_rolling_ctr']*100), 2)."%</td>
+                                <td>".number_format($page['Page']['lp_rolling_impressions'])."</td>
+                                <td>".round(($page['Page']['widget_rolling_ctr']*100), 2)."%</td>
+                                <td>".number_format($page['Page']['widget_rolling_impressions'])."</td>
+                                <td><div class='smallimage' style='background-image:url(".$image_html.");'></div></td>
+                            </tr>";
+                            } ?>
+                        </tbody>
+                    </table>
+                    <? } ?>
+                </div>
+                <div id="show_notes" style="display:none;color:black; align:center;"></div>
+                <div id="show_user_notes" style="display:none;color:black; align:center;"></div>
+
+            </div>
+        </div>
+    </div>

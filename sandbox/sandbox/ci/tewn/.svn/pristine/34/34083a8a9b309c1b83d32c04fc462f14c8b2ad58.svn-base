@@ -1,0 +1,186 @@
+<?php
+class Account extends AppModel {
+
+	var $name = 'Account';
+	var $base = 10;
+
+	function top($domain_bit = DOMAIN_BIT) {
+		$accounts = $this->find("all", array("conditions" =>
+						     array("status" => ACCOUNT_STATUS_RUNNING,
+							   "domain_bitfield & ".$domain_bit,
+							   "transfer_account_id" => 0,
+							   "visible" => TRUE),
+						     "fields" => array("website_id", "id", "credits", "buying", "paid", "featured"),
+						     "order" => "credits DESC"));
+		return $accounts;
+	}
+
+    function top_by_primary($domain_id = -1) {
+        $query = "SELECT website_id, id, credits, buying, paid, featured
+                   FROM accounts AS Account
+                   WHERE
+                       transfer_account_id = 0 AND
+                       visible = 1 AND
+                       status = " . ACCOUNT_STATUS_RUNNING . "
+                       AND id IN (SELECT account_id FROM websites WHERE domain_primary = {$domain_id})
+                   ORDER BY credits DESC";
+
+        $accounts = $this->query_read($query, false);
+
+        return $accounts;
+    }
+
+	function incoming_click($account_id) {
+		if (!$account_id) {
+			return;
+		}
+
+		/* Get the account */
+		$account = $this->find("first", array("conditions" => array(
+							      "id" => $account_id)));
+		if (!$account) {
+			$this->log("account_id: ".$account_id, "incoming_click_account_miss");
+			return;
+		}
+		plat_assert($account);
+		$stats_account = ClassRegistry::init('StatsAccount');
+
+		/* Update the incoming count */
+		$stats_account->increment_stats(date('Y-m-d H:00:00'), $account['Account'], array('incoming' => 1));
+		$query = "UPDATE accounts SET incoming = incoming + 1 WHERE id = '".$account_id."'";
+		$this->query($query);
+
+		/* See if we have a refer transfer account */
+		if ($account['Account']['refer_transfer_rate']) {
+			if ($account['Account']['refer_id']) {
+				$transfer_account = $this->find("first", array("conditions" => array("id" => $account['Account']['refer_id'])));
+				if (isset($transfer_account['Account'])) {
+					$credit = $this->base * $account['Account']['refer_transfer_rate'];
+					$stats_account->increment_stats(
+						date('Y-m-d H:00:00'), $transfer_account['Account'], array('credits' => $credit)
+					);
+					$query = "UPDATE accounts SET credits = credits + ".$credit." WHERE id = '".$account['Account']['refer_id']."'";
+					$this->query($query);
+				}
+			}
+		}
+
+		/* See if we have a transfer account */
+		if ($account['Account']['transfer_account_id']) {
+			// We do, need to switch
+			$account = $this->find("first", array("conditions" => array(
+								      "id" => $account['Account']['transfer_account_id'])));
+
+            // Fall back
+            if (!$account) {
+                $account = $this->find("first", array("conditions" => array(
+                                                          "id" => $account_id)));
+            }
+		}
+
+		/*
+		 * Figure out how much to update credit and make the
+		 * update
+		 */
+		$credit = $this->base * $account['Account']['rate'];
+		$stats_account->increment_stats(
+			date('Y-m-d H:00:00'), $account['Account'], array('credits' => $credit)
+		);
+		$query = "UPDATE accounts SET credits = credits + ".$credit." WHERE id = '".$account['Account']['id']."'";
+		$this->query($query);
+	}
+
+	function outgoing_click($account_id) {
+		$credit = $this->base;
+		/* Get the account */
+		$account = $this->find("first", array(
+			"fields" => array('id', 'domain_bitfield', 'credits', 'website_id'),
+			"conditions" => array("id" => $account_id)
+		));
+
+		// if the account exists increment the outgoing and decrement credits stats
+		if ($account) {
+			// if credits its below 0 dont decrement
+			$delta_credits = $this->base * -1;
+			if ($account['Account']['credits'] <= 0) {
+				$delta_credits = 0;
+			}
+			ClassRegistry::init('StatsAccount')->increment_stats(
+				date('Y-m-d H:00:00'), $account['Account'], array('outgoing' => 1, 'credits' => $delta_credits)
+			);
+			/* Update the outgoing count */
+			$query = "UPDATE accounts SET outgoing = outgoing + 1 WHERE id = '".$account_id."'";
+			$this->query($query);
+
+			/* Update the account count */
+			$query = "UPDATE accounts SET credits = credits - ".$credit." WHERE id = '".$account_id."' AND credits > 0";
+			$this->query($query);
+		}
+
+	}
+
+	function credits_add($account_id, $credits_in) {
+		$credit = $this->base * $credits_in;
+		$account = $this->find("first", array(
+			"fields" => array('id', 'domain_bitfield', 'credits', 'website_id'),
+			"conditions" => array("id" => $account_id)
+		));
+		if ($account) {
+			ClassRegistry::init('StatsAccount')->increment_stats(
+				date('Y-m-d H:00:00'), $account['Account'], array('credits' => $credit)
+			);
+			$query = "UPDATE accounts SET credits = credits + ".$credit." WHERE id = '".$account_id."'";
+			$this->query($query);
+		}
+	}
+
+	function point($id) {
+		$conditions = array(
+			"id" => $id
+							);
+
+		$point = $this->find("first", array("conditions" => $conditions,
+										  "order" => "created DESC"));
+
+		$stats['credits'] = $point['Account']['credits'];
+		$stats['incoming'] = $point['Account']['incoming'];
+		$stats['outgoing'] = $point['Account']['outgoing'];
+
+		return $stats;
+	}
+
+	function last_rebalance($website_id) {
+		$account = $this->findByWebsiteId($website_id);
+
+		return $account['Account']['widget_rebalance'];
+	}
+
+	function get_by_refer($accounts) {
+		foreach ($accounts as $account) {
+			$refers[] = $account['Account']['id'];
+		}
+
+		$conditions = array("refer_id" => $refers,
+							"refer_transfer_rate >" => 0
+							);
+		$refers = $this->find("all", array("conditions" => $conditions));
+
+		return $refers;
+	}
+
+    public function get_by_id($account_id)
+    {
+        $key_gen = new CI\Memcached\KeyGen($account_id, __METHOD__);
+        $cache_key = $key_gen->generate();
+        $account = $this->memcached_get_json($cache_key);
+
+        if (0 === $account) {
+            $account = $this->findById($account_id);
+            if (!empty($account)) {
+                $this->memcached_set_json($cache_key, $account, 5 * MINUTES);
+            }
+        }
+        return $account;
+    }
+}
+?>

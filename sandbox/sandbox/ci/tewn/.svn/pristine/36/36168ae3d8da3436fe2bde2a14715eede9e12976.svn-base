@@ -1,0 +1,15 @@
+<div class="row">
+    <div class="col-md-12">
+        <ol class="breadcrumb">
+        <?php foreach ($component_data['crumbs'] as $crumb): ?>
+            <?php if(empty($crumb['href'])): ?>
+                <li class="active"><?php echo $crumb['name']; ?></li>
+            <?php else: ?>
+                <li>
+                    <a href="<?php echo $crumb['href']; ?>" ><?php echo $crumb['name']; ?></a>
+                </li>
+            <?php endif; ?>
+        <?php endforeach; ?>
+        </ol>
+    </div>
+</div>

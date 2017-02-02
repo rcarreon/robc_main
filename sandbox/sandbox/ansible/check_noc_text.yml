@@ -1,0 +1,5 @@
+- name: checking if http is running
+  command: service httpd status
+  ignore_errors: no
+  changed_when: false
+  register: service_httpd_status

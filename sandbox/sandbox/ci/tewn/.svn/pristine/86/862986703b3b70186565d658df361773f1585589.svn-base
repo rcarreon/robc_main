@@ -1,0 +1,59 @@
+<?php
+
+namespace CI\Cron;
+
+class Controller
+{
+    const DEFAULT_CRON    = '';
+    const DEFAULT_COMMAND = 'indexCommand';
+    const COMMAND_TRIGGER = 'Command';
+
+    protected $sCron     = self::DEFAULT_CRON;
+    protected $sCommand  = self::DEFAULT_COMMAND;
+    protected $aParams   = array();
+
+    public function __construct(array $aOptions)
+    {
+        if (isset($aOptions["cron"])) {
+            $this->setCron($aOptions["cron"]);
+        }
+        if (isset($aOptions["command"])) {
+            $this->setAction($aOptions["command"]);
+        }
+        if (isset($aOptions["params"])) {
+            $this->setParams($aOptions["params"]);
+        }
+    }
+
+    public function setCron($sCron)
+    {
+        $sCron = str_replace(' ', '', ucwords(str_replace('_', ' ', $sCron)));
+        $sCron = 'CI\Cron\\'.$sCron;
+        if (!class_exists($sCron)) {
+            throw new Exception(Exception::CRON_MISSING, $sCron);
+        }
+        $this->sCron = $sCron;
+        return $this;
+    }
+
+    public function setAction($sCommand)
+    {
+        $sCommand = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $sCommand))));
+        $this->sCommand = $sCommand.self::COMMAND_TRIGGER;
+        return $this;
+    }
+
+    public function setParams(array $aParams)
+    {
+        $this->aParams = $aParams;
+        return $this;
+    }
+
+    public function run()
+    {
+        call_user_func_array(
+            array(new $this->sCron, $this->sCommand),
+            $this->aParams
+        );
+    }
+}

@@ -1,0 +1,161 @@
+<?php
+
+class DomainComponentTestController extends Controller
+{
+    var $components = array('Domain');
+}
+
+class DomainComponentTest extends CakeTestCase
+{
+    private $oController;
+
+    private $nBitfield = 2113;
+    private $nBit = 8;
+
+    private $aDomainIds = array();
+    private $aDomainsArray = array();
+
+    function start()
+    {
+        $this->oController = new DomainComponentTestController();
+        $this->oController->constructClasses();
+        $this->oController->Component->initialize($this->oController);
+        $this->oController->beforeFilter();
+        $this->oController->Component->startup($this->oController);
+
+        $this->aDomainIds = array(
+            DOMAIN_ID_CROWD_IGNITE,
+            DOMAIN_ID_GAME_REVOLUTION,
+            DOMAIN_ID_CRAVE_ONLINE,
+        );
+
+        $this->aDomainsArray = array (
+            'domain_crowdignite'      => 1 << DOMAIN_ID_CROWD_IGNITE ,
+            'domain_gamerevolution'   => 1 << DOMAIN_ID_GAME_REVOLUTION,
+            'domain_craveonline'      => 1 << DOMAIN_ID_CRAVE_ONLINE,
+            'domain_sheknows'         => 1 << 4,
+            'domain_momtastic'        => 1 << DOMAIN_ID_MOMTASTIC,
+            'domain_thefashionspot'   => 1 << DOMAIN_ID_THEFASHIONSPOT,
+            'domain_teenspot'         => 1 << 7,
+            'domain_globetrotting'    => 1 << 8,
+            'domain_thecelebritycafe' => 1 << 9,
+            'domain_liveoutdoors'     => 1 << 10,
+            'domain_totallyher'       => 1 << DOMAIN_ID_TOTALLYHER,
+            'domain_news'             => 1 << DOMAIN_ID_NEWS,
+            'domain_español'          => 1 << DOMAIN_ID_ES,
+        );
+    }
+
+    function testGetAllBitsWithAll()
+    {
+        $sExpected = "[1,4,8,32,64,2048,4096,8192]";
+        $aBits = $this->oController->Domain->getAllBits(DOMAIN_ID_ALL);
+        $sResult = json_encode($aBits);
+        $this->assertEqual($sExpected, $sResult);
+    }
+
+    function testGetAllBitsWithDomain()
+    {
+        $sExpected = "[1,64,2048]";
+        $aBits = $this->oController->Domain->getAllBits($this->nBitfield);
+        $sResult = json_encode($aBits);
+        $this->assertEqual($sExpected, $sResult);
+    }
+
+    function testGetAllActiveBits()
+    {
+        $sExpected = "[1,4,8,32,64,2048,4096,8192]";
+        $aActiveBits = $this->oController->Domain->getAllActiveBits();
+        $sResult = json_encode($aActiveBits);
+        $this->assertEqual($sExpected, $sResult);
+    }
+
+    function testName()
+    {
+        $sExpected = 'craveonline';
+        $sResult = $this->oController->Domain->name(DOMAIN_ID_CRAVE_ONLINE);
+        $this->assertEqual($sExpected, $sResult);
+    }
+
+    function testGetAllIds()
+    {
+        $sExpected = "[0,2,3,5,6,11,12,13]";
+        $aAllIds = $this->oController->Domain->getAllIds();
+        $sResult = json_encode($aAllIds);
+        $this->assertEqual($sExpected, $sResult);
+    }
+
+    function testGetBitsDomainArray()
+    {
+        $sExpected = 14445;
+        $sResult = $this->oController->Domain->getBitsDomainArray($this->aDomainsArray);
+        $this->assertEqual($sExpected, $sResult);
+    }
+
+    function testGetIdsDomainArray()
+    {
+        $sExpected = '[0,2,3,5,6,11,12,13]';
+        $aIdsDomain = $this->oController->Domain->getIdsDomainArray($this->aDomainsArray);
+        $sResult = json_encode($aIdsDomain);
+        $this->assertEqual($sExpected, $sResult);
+    }
+
+    function testBitsToIdArray()
+    {
+        $sExpected = '[0,6,11]';
+        $aBits = $this->oController->Domain->bitsToIdArray($this->nBitfield);
+        $sResult = json_encode($aBits);
+        $this->assertEqual($sExpected, $sResult);
+    }
+
+    function testIdArrayToBits()
+    {
+        $sExpected = 13;
+        $sResult = $this->oController->Domain->idArrayToBits($this->aDomainIds);
+        $this->assertEqual($sExpected, $sResult);
+    }
+
+    function testIdArrayToBitsArray()
+    {
+        $sExpected = '[1,4,8]';
+        $aBitsArray = $this->oController->Domain->idArrayToBitsArray($this->aDomainIds);
+        $sResult = json_encode($aBitsArray);
+        $this->assertEqual($sExpected, $sResult);
+    }
+
+    function testBitsToBitsArray()
+    {
+        $sExpected = '[1,64,2048]';
+        $aBitsArray = $this->oController->Domain->bitsToBitsArray($this->nBitfield);
+        $sResult = json_encode($aBitsArray);
+        $this->assertEqual($sExpected, $sResult);
+    }
+
+    function testIdToBit()
+    {
+        $sExpected = 8;
+        $sResult = $this->oController->Domain->idToBit(DOMAIN_ID_CRAVE_ONLINE);
+        $this->assertEqual($sExpected, $sResult);
+    }
+
+    function testBitToId()
+    {
+        $sExpected = DOMAIN_ID_CRAVE_ONLINE;
+        $sResult = $this->oController->Domain->bitToId($this->nBit);
+        $this->assertEqual($sExpected, $sResult);
+    }
+
+    function testIdToLandingpage()
+    {
+        $sExpected = 'crowdignite.craveonline.com';
+        $sResult = $this->oController->Domain->idToLandingpage(DOMAIN_ID_CRAVE_ONLINE);
+        $this->assertEqual($sExpected, $sResult);
+    }
+
+    function testIdToTimer()
+    {
+        $sExpected = 50;
+        $sResult = $this->oController->Domain->id_to_timer(TIMER_SIMILAR_ENGINE, DOMAIN_ID_CRAVE_ONLINE);
+        $this->assertEqual($sExpected, $sResult);
+    }
+}

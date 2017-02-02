@@ -1,0 +1,7 @@
+<div id="nav-sidebar" class="col-sm-2 col-md-2 sidebar">
+    <ul class="nav nav-sidebar">
+        <li class="title"><h2><span class="fa fa-th-list"></span> Reports</h2></li>
+        <li><a href="/developers_reports/website_widget_analytics">Website widget analytics</a></li>
+        <li><a href="/developers_reports/wrong_widget_analytics">Wrong widget analytics</a></li>
+    </ul>
+</div>

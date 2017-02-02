@@ -1,0 +1,301 @@
+<?
+
+class CategoryComponent extends Object {
+
+	function main() {
+		return array(CATEGORY_OFFBEAT,
+					 CATEGORY_SPORTS,
+					 CATEGORY_GAMING,
+					 CATEGORY_LIFESTYLE,
+					 CATEGORY_MEDIA,
+					 CATEGORY_CELEBRITIES,
+					 CATEGORY_TECHNOLOGY,
+					 CATEGORY_MENS_ENTERTAINMENT,
+					 CATEGORY_BEAUTY,
+					 CATEGORY_FOOD,
+					 CATEGORY_PARENTING,
+					 CATEGORY_DEALS,
+					 CATEGORY_MUSIC,
+					 CATEGORY_TRAVEL,
+					 CATEGORY_CASUAL_GAMES,
+					 CATEGORY_PETS,
+					 CATEGORY_HOME,
+					 CATEGORY_HEALTH,
+					 CATEGORY_DIY,
+					 CATEGORY_OUTDOORS,
+					 CATEGORY_ANIME,
+					 CATEGORY_AUTOMOTIVE,
+					 CATEGORY_URBAN,
+                     CATEGORY_NEWS);
+	}
+
+	function domains($domain_ids) {
+		if (!is_array($domain_ids)) {
+			$domain_ids = array($domain_ids);
+		}
+
+		$categories = array();
+
+		foreach ($domain_ids as $id) {
+			$categories = array_unique(array_merge($categories, $this->domain($id)));
+		}
+
+		sort($categories);
+
+		return $categories;
+	}
+
+	/* These are the categories that are supported in each domain */
+	function domain($domain_id) {
+		switch ($domain_id) {
+		case DOMAIN_ID_RAAZE:
+		case DOMAIN_ID_CROWD_IGNITE:
+		case DOMAIN_ID_ES:
+        default:
+			$categories = $this->main();
+			break;
+		case DOMAIN_ID_GAME_REVOLUTION:
+			$categories = array(CATEGORY_GAMING,
+								CATEGORY_CASUAL_GAMES);
+			break;
+		case DOMAIN_ID_CRAVE_ONLINE:
+			$categories = array(CATEGORY_OFFBEAT,
+								CATEGORY_SPORTS,
+								CATEGORY_GAMING,
+								CATEGORY_LIFESTYLE,
+								CATEGORY_MEDIA,
+								CATEGORY_CELEBRITIES,
+								CATEGORY_TECHNOLOGY,
+								CATEGORY_MENS_ENTERTAINMENT,
+								CATEGORY_DEALS,
+								CATEGORY_MUSIC,
+								CATEGORY_CASUAL_GAMES,
+								CATEGORY_PETS,
+								CATEGORY_HOME,
+								CATEGORY_HEALTH,
+								CATEGORY_DIY,
+								CATEGORY_ANIME,
+								CATEGORY_AUTOMOTIVE,
+								CATEGORY_URBAN);
+
+			break;
+		case DOMAIN_ID_MOMTASTIC:
+			$categories = array(CATEGORY_LIFESTYLE,
+								CATEGORY_MEDIA,
+								CATEGORY_CELEBRITIES,
+								CATEGORY_TECHNOLOGY,
+								CATEGORY_BEAUTY,
+								CATEGORY_FOOD,
+								CATEGORY_PARENTING,
+								CATEGORY_DEALS,
+								CATEGORY_MUSIC,
+								CATEGORY_TRAVEL,
+								CATEGORY_PETS,
+								CATEGORY_HOME,
+								CATEGORY_HEALTH,
+								CATEGORY_DIY,
+								CATEGORY_URBAN);
+
+			break;
+		case DOMAIN_ID_THEFASHIONSPOT:
+			$categories = array(CATEGORY_MEDIA,
+								CATEGORY_CELEBRITIES,
+								CATEGORY_LIFESTYLE,
+								CATEGORY_BEAUTY);
+
+			break;
+		case DOMAIN_ID_TOTALLYHER:
+			$categories = array(CATEGORY_OFFBEAT,
+								CATEGORY_LIFESTYLE,
+								CATEGORY_MEDIA,
+								CATEGORY_CELEBRITIES,
+								CATEGORY_TECHNOLOGY,
+								CATEGORY_BEAUTY,
+								CATEGORY_FOOD,
+								CATEGORY_PARENTING,
+								CATEGORY_DEALS,
+								CATEGORY_MUSIC,
+								CATEGORY_TRAVEL,
+								CATEGORY_CASUAL_GAMES,
+								CATEGORY_PETS,
+								CATEGORY_HOME,
+								CATEGORY_HEALTH,
+								CATEGORY_DIY,
+								CATEGORY_URBAN);
+			break;
+        case DOMAIN_ID_NEWS:
+            $categories = array(CATEGORY_NEWS);
+            break;
+		}
+
+		// Add All on
+		$categories[] = CATEGORY_ALL;
+
+		sort($categories);
+
+		return $categories;
+	}
+
+	/* Find the closest category for domain */
+	function translate($category, $domain_id) {
+		$categories = $this->domain($domain_id);
+
+		// See if we even need to translate
+		if (in_array($category, $categories)) {
+			return $category;
+		}
+
+		/* We need to translate to something */
+
+		// If we have no other options (besides CATEGORY_ALL), then just go w/ what we have
+		if (count($categories) == 2) {
+			return $categories[1];
+		}
+
+		$alt = array();
+
+		switch ($category) {
+		case CATEGORY_OFFBEAT:
+			$alt = array(CATEGORY_MEDIA,
+						 CATEGORY_TECHNOLOGY,
+						 CATEGORY_CELEBRITIES,
+						 CATEGORY_GAMING);
+			break;
+		case CATEGORY_SPORTS:
+			$alt = array(CATEGORY_MEDIA,
+						 CATEGORY_CELEBRITIES);
+			break;
+		case CATEGORY_GAMING:
+			$alt = array(CATEGORY_CASUAL_GAMES,
+						 CATEGORY_MEDIA,
+						 CATEGORY_TECHNOLOGY,
+						 CATEGORY_ANIME);
+			break;
+		case CATEGORY_LIFESTYLE:
+			$alt = array(CATEGORY_CELEBRITIES,
+						 CATEGORY_MEDIA,
+						 CATEGORY_PARENTING,
+						 CATEGORY_HOME,
+						 CATEGORY_TECHNOLOGY);
+			break;
+		case CATEGORY_MEDIA:
+			$alt = array(CATEGORY_CELEBRITIES,
+						 CATEGORY_LIFESTYLE,
+						 CATEGORY_HOME,
+						 CATEGORY_TECHNOLOGY);
+			break;
+		case CATEGORY_CELEBRITIES:
+			$alt = array(CATEGORY_MEDIA,
+						 CATEGORY_LIFESTYLE,
+						 CATEGORY_HOME,
+						 CATEGORY_TECHNOLOGY);
+			break;
+		case CATEGORY_TECHNOLOGY:
+			$alt = array(CATEGORY_GAMING,
+						 CATEGORY_CASUAL_GAMES,
+						 CATEGORY_HOME,
+						 CATEGORY_TECHNOLOGY);
+			break;
+		case CATEGORY_MENS_ENTERTAINMENT:
+			$alt = array(CATEGORY_CELEBRITIES,
+						 CATEGORY_MEDIA,
+						 CATEGORY_OFFBEAT);
+			break;
+		case CATEGORY_BEAUTY:
+			$alt = array(CATEGORY_CELEBRITIES,
+						 CATEGORY_MEDIA,
+						 CATEGORY_LIFESTYLE);
+			break;
+		case CATEGORY_FOOD:
+			$alt = array(CATEGORY_PARENTING,
+						 CATEGORY_HOME);
+			break;
+		case CATEGORY_PARENTING:
+			$alt = array(CATEGORY_HOME,
+						 CATEGORY_DIY,
+						 CATEGORY_DEALS);
+			break;
+		case CATEGORY_DEALS:
+			$alt = array(CATEGORY_HOME,
+						 CATEGORY_DIY,
+						 CATEGORY_TRAVEL);
+			break;
+		case CATEGORY_MUSIC:
+			$alt = array(CATEGORY_URBAN,
+						 CATEGORY_MEDIA,
+						 CATEGORY_TECHNOLOGY);
+			break;
+		case CATEGORY_TRAVEL:
+			$alt = array(CATEGORY_HOME,
+						 CATEGORY_TECHNOLOGY);
+			break;
+		case CATEGORY_CASUAL_GAMES:
+			$alt = array(CATEGORY_GAMING,
+						 CATEGORY_TECHNOLOGY,
+						 CATEGORY_MEDIA);
+			break;
+		case CATEGORY_PETS:
+			$alt = array(CATEGORY_OFFBEAT,
+						 CATEGORY_PARENTING,
+						 CATEGORY_MEDIA);
+			break;
+		case CATEGORY_HOME:
+			$alt = array(CATEGORY_LIFESTYLE,
+						 CATEGORY_TRAVEL,
+						 CATEGORY_MEDIA);
+			break;
+		case CATEGORY_HEALTH:
+			$alt = array(CATEGORY_LIFESTYLE,
+						 CATEGORY_CELEBRITIES,
+						 CATEGORY_MEDIA);
+			break;
+		case CATEGORY_DIY:
+			$alt = array(CATEGORY_HOME,
+						 CATEGORY_LIFESTYLE,
+						 CATEGORY_DEALS);
+			break;
+		case CATEGORY_OUTDOORS:
+			$alt = array(CATEGORY_TRAVEL,
+						 CATEGORY_OFFBEAT);
+			break;
+		case CATEGORY_ANIME:
+			$alt = array(CATEGORY_MEDIA,
+						 CATEGORY_OFFBEAT);
+			break;
+		case CATEGORY_AUTOMOTIVE:
+			$alt = array(CATEGORY_TECHNOLOGY,
+						 CATEGORY_LIFESTYLE);
+			break;
+
+		case CATEGORY_URBAN:
+			$alt = array(CATEGORY_CELEBRITIES,
+						 CATEGORY_MEDIA,
+						 CATEGORY_LIFESTYLE);
+			break;
+		}
+
+		// See if anything in this list works
+		$count = count($alt);
+		for ($i = 0; $i < $count; $i++) {
+			if (in_array($alt[$i], $categories)) {
+				return $alt[$i];
+			}
+		}
+
+		// Fall back to everything
+		return CATEGORY_ALL;
+	}
+
+	public function get_ids_from_bitfield($bitfield)
+	{
+        $ids = array();
+        for ($i = 0; $i < CATEGORY_NUMBER; $i++) {
+            $bit = 1 << $i;
+            if ($bit & $bitfield) {
+                $ids[] = $i;
+            }
+        }
+        return $ids;
+    }
+}
+?>

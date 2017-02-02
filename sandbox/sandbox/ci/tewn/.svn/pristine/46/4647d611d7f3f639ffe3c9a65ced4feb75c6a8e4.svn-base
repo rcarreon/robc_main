@@ -1,0 +1,108 @@
+<?php
+namespace Test\Validator;
+use CI\Validator\Container as ValidatorContainer;
+use CI\Validator\Rule as RuleValidator;
+
+/**
+ * @group validator
+ * @group validator_container
+ */
+class ContainerTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * @var Validator
+     */
+    protected $oValidator;
+
+    /**
+     * Creates a new instance of Validator
+     *
+     * @return void
+     */
+    public function setUp()
+    {
+        $this->oValidator = new ValidatorContainer();
+    }
+
+    /**
+     * Test for empty values
+     *
+     * @return void
+     */
+    public function testEmpty()
+    {
+        $this->assertEquals(array(), $this->oValidator->getMessages());
+        $this->assertEquals(array(), $this->oValidator->getErrors());
+        $this->assertTrue($this->oValidator->isValid('something'));
+        $this->assertEquals(array(), $this->oValidator->getErrors());
+    }
+
+    /**
+     * Ensures expected behavior from a validator known to succeed
+     *
+     * @return void
+     */
+    public function testTrue()
+    {
+        $this->oValidator->addRule(new TestValidatorTrue());
+        $this->assertTrue($this->oValidator->isValid(null));
+        $this->assertEquals(array(), $this->oValidator->getMessages());
+        $this->assertEquals(array(), $this->oValidator->getErrors());
+    }
+
+    /**
+     * Ensures expected behavior from a validator known to fail
+     *
+     * @return void
+     */
+    public function testFalse()
+    {
+        $this->oValidator->addRule(new TestValidatorFalse());
+        $this->assertFalse($this->oValidator->isValid(null));
+        $this->assertEquals(
+            array('error' => 'validation failed'),
+            $this->oValidator->getMessages()
+        );
+    }
+
+    /**
+     * Ensures that a validator may break the chain
+     *
+     * @return void
+     */
+    public function testBreakChainOnFailure()
+    {
+        $this->oValidator
+            ->addRule(new TestValidatorFalse(), true)
+            ->addRule(new TestValidatorFalse());
+        $this->assertFalse($this->oValidator->isValid(null));
+        $this->assertEquals(
+            array('error' => 'validation failed'),
+            $this->oValidator->getMessages()
+        );
+    }
+}
+
+/**
+ * Validator to return true to any input.
+ */
+class TestValidatorTrue extends RuleValidator
+{
+    public function isValid($mValue)
+    {
+        return true;
+    }
+}
+
+
+/**
+ * Validator to return false to any input.
+ */
+class TestValidatorFalse extends RuleValidator
+{
+    public function isValid($mValue)
+    {
+        $this->aMessages = array('error' => 'validation failed');
+        return false;
+    }
+}

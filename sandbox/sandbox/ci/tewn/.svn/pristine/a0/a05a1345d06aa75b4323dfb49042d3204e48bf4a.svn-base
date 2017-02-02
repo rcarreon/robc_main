@@ -1,0 +1,74 @@
+<?php
+/**
+ * Basic queuing mechanism on top of memcached
+ *
+ * Author: Jake Moilanen (http://jakem.net/)
+ * updated by: Ulises Acosta
+ *
+ * Using kestrel instead of memcached
+ *
+ * BSD License
+ */
+
+class QueueKestrelComponent {
+	var $CakeKestrel;
+	var $name;
+
+	function startup(&$controller) {
+
+	}
+
+	/**
+	 * Connect to the memcached server(s)
+	 */
+	//function _connect() {
+	function QueueKestrelComponent($queue_name = '') {
+		App::import('Component', 'CakeKestrel');
+		$this->CakeKestrel =& new CakeKestrelComponent(null);
+		$this->name = $queue_name;
+	}
+
+	function push($value) {
+		$this->CakeKestrel->set($this->name, $value);
+	}
+
+	function pop($batch_number = 1) {
+		$values = array();
+		for ($i = 0; $i < $batch_number; $i++) {
+			$value = $this->CakeKestrel->get($this->name, 10/*millis timeout*/);
+			if($value !== false) {
+				$values[] = $value;
+			} else {
+				break;
+			}
+		}
+
+		if ($values) {
+			if ($batch_number == 1) {
+				return array_pop($values);
+			} else {
+				return $values;
+			}
+		}
+
+		return 0;
+	}
+
+	function size($queue = null) {
+		if ($queue !== null) {
+			$this->name = $queue;
+		}
+
+		return $this->CakeKestrel->size($this->name);
+	}
+
+	function lock($relock = 0) {
+		return 0;
+	}
+
+	function unlock() {
+
+	}
+}
+
+?>

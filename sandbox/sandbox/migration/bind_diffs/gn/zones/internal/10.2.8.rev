@@ -1,0 +1,268 @@
+$TTL 3600 ; 1 day
+@      IN      SOA     gnmedia.net. root@gnmedia.net. (
+			2015021901	; Serial
+			36262		; Refresh
+			300		; Retry
+			3600000		; Expire
+			3600 )		; Minimum
+
+	IN	NS	app1v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app2v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app3v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app4v-dns.tp.prd.lax.gnmedia.net.
+
+1	IN	PTR	reserved-1.vlan8.gnmedia.net.
+2	IN	PTR	reserved-2.vlan8.gnmedia.net.
+3	IN	PTR	reserved-3.vlan8.gnmedia.net.
+4	IN	PTR	reserved-4.vlan8.gnmedia.net.
+5	IN	PTR	reserved-5.vlan8.gnmedia.net.
+6	IN	PTR	reserved-6.vlan8.gnmedia.net.
+7	IN	PTR	int-vlan8.admin.core1.gnmedia.net.
+8	IN	PTR	int-vlan8.admin.core2.gnmedia.net.
+9	IN	PTR	int-vlan8.gn1.core1.gnmedia.net.
+10	IN	PTR	int-vlan8.gn1.core2.gnmedia.net.
+11	IN	PTR	reserved-11.vlan8.gnmedia.net.
+12	IN	PTR	reserved-12.vlan8.gnmedia.net.
+13	IN	PTR	reserved-13.vlan8.gnmedia.net.
+14	IN	PTR	reserved-14.vlan8.gnmedia.net.
+15	IN	PTR	reserved-15.vlan8.gnmedia.net.
+16	IN	PTR	reserved-16.vlan8.gnmedia.net.
+17	IN	PTR	reserved-17.vlan8.gnmedia.net.
+18	IN	PTR	reserved-18.vlan8.gnmedia.net.
+19	IN	PTR	reserved-19.vlan8.gnmedia.net.
+20	IN	PTR	reserved-20.vlan8.gnmedia.net.
+21	IN	PTR	reserved-21.vlan8.gnmedia.net.
+22	IN	PTR	reserved-22.vlan8.gnmedia.net.
+23	IN	PTR	reserved-23.vlan8.gnmedia.net.
+24	IN	PTR	reserved-24.vlan8.gnmedia.net.
+25	IN	PTR	reserved-25.vlan8.gnmedia.net.
+26	IN	PTR	reserved-26.vlan8.gnmedia.net.
+27	IN	PTR	reserved-27.vlan8.gnmedia.net.
+28	IN	PTR	reserved-28.vlan8.gnmedia.net.
+29	IN	PTR	reserved-29.vlan8.gnmedia.net.
+30	IN	PTR	reserved-30.vlan8.gnmedia.net.
+31	IN	PTR	reserved-31.vlan8.gnmedia.net.
+32	IN	PTR	reserved-32.vlan8.gnmedia.net.
+33	IN	PTR	reserved-33.vlan8.gnmedia.net.
+34	IN	PTR	reserved-34.vlan8.gnmedia.net.
+35	IN	PTR	reserved-35.vlan8.gnmedia.net.
+36	IN	PTR	reserved-36.vlan8.gnmedia.net.
+37	IN	PTR	reserved-37.vlan8.gnmedia.net.
+38	IN	PTR	reserved-38.vlan8.gnmedia.net.
+39	IN	PTR	reserved-39.vlan8.gnmedia.net.
+40	IN	PTR	reserved-40.vlan8.gnmedia.net.
+41	IN	PTR	reserved-41.vlan8.gnmedia.net.
+42	IN	PTR	reserved-42.vlan8.gnmedia.net.
+43	IN	PTR	reserved-43.vlan8.gnmedia.net.
+44	IN	PTR	reserved-44.vlan8.gnmedia.net.
+45	IN	PTR	reserved-45.vlan8.gnmedia.net.
+46	IN	PTR	reserved-46.vlan8.gnmedia.net.
+47	IN	PTR	reserved-47.vlan8.gnmedia.net.
+48	IN	PTR	reserved-48.vlan8.gnmedia.net.
+49	IN	PTR	reserved-49.vlan8.gnmedia.net.
+50	IN	PTR	reserved-50.vlan8.gnmedia.net.
+51	IN	PTR	vip-app-atp.ao.prd.lax.gnmedia.net.
+52	IN	PTR	vip-app-mgmt.og.prd.lax.gnmedia.net.
+53	IN	PTR	vip-app-mal.ao.prd.lax.gnmedia.net.
+54	IN	PTR	vip-app-stats-cms.sbv.prd.lax.gnmedia.net.
+55	IN	PTR	vip-pxy-bnb-vb.ao.prd.lax.gnmedia.net.
+56	IN	PTR	vip-app-be-sdc.ao.stg.lax.gnmedia.net.
+57	IN	PTR	vip-pxy-vb.ao.prd.lax.gnmedia.net.
+58	IN	PTR	vip-app-mb-dc.ao.stg.lax.gnmedia.net.
+59	IN	PTR	vip-app-sdc.ao.stg.lax.gnmedia.net.
+60	IN	PTR	vip-app-mgmt.og.stg.lax.gnmedia.net.
+61	IN	PTR	stg.cms.gears.upload.lax.springboard.gorillanation.com.
+62	IN	PTR	vip-app-ap.ap.prd.lax.gnmedia.net.
+63	IN	PTR	vip-app-sdvideos.ao.prd.lax.gnmedia.net.
+64	IN	PTR	vip-app-mediaads.ap.prd.lax.gnmedia.net.
+;65	IN	PTR	vip-app-demo.si.prd.lax.gnmedia.net.
+66	IN	PTR	vip-app-geoip.ap.prd.lax.gnmedia.net.
+67	IN	PTR	vip-pxy-hfb.vb.ao.prd.lax.gnmedia.net.
+68	IN	PTR	vip-app-ci.ci.stg.lax.gnmedia.net.
+69	IN	PTR	vip-app-vb-tfs.ao.stg.lax.gnmedia.net.
+70	IN	PTR	vip-app-origin.og.stg.lax.gnmedia.net.
+71     IN      PTR	vip-pxy-sdc.ao.prd.lax.gnmedia.net.
+72     IN      PTR	vip-pxy-sdc.ao.stg.lax.gnmedia.net.
+73     IN      PTR	vip-app-be-sdc.ao.prd.lax.gnmedia.net.
+74	IN	PTR	clickheat.gnmedia.net.
+75     IN      PTR	vip-app-dmr.ao.stg.lax.gnmedia.net.
+76     IN      PTR	vip-app-dmr.ao.prd.lax.gnmedia.net.
+77	IN	PTR	vip-app-stats-cms.sbv.stg.lax.gnmedia.net.
+78	IN	PTR	vip-app-ews.si.prd.lax.gnmedia.net.
+79	IN	PTR	vip-app-ews.si.stg.lax.gnmedia.net.
+80	IN	PTR	vip-app-dh.si.prd.lax.gnmedia.net.
+81	IN	PTR	vip-app-dh.si.stg.lax.gnmedia.net.
+82	IN	PTR	vip-app-vb-tfs.ao.prd.lax.gnmedia.net.
+83	IN	PTR	vip-app-vb-shh.ao.prd.lax.gnmedia.net.
+84	IN	PTR	vip-app-cms.sbv.prd.lax.gnmedia.net.
+85	IN	PTR	vip-ngx-ci.ci.prd.lax.gnmedia.net.
+86	IN	PTR	vip-app-ci.ci.prd.lax.gnmedia.net.
+87	IN	PTR	vip-app-media.sbv.prd.lax.gnmedia.net.
+88	IN	PTR	vip-app-xf-sdc.ao.stg.lax.gnmedia.net.
+89	IN	PTR	vip-app-assets.si.stg.lax.gnmedia.net.
+90	IN	PTR	vip-app-assets.si.prd.lax.gnmedia.net.
+91	IN	PTR	vip-app-vb-bab.ao.stg.lax.gnmedia.net.
+92	IN	PTR	vip-app-xf-sdc.ao.prd.lax.gnmedia.net.
+93     IN      PTR	vip-pxy-wp.ao.prd.lax.gnmedia.net.
+;94	IN	PTR	vip-app-wp.sbv.prd.lax.gnmedia.net.
+95	IN	PTR	vip-app-origin.og.prd.lax.gnmedia.net.
+96	IN	PTR	vip-test-vb.ao.prd.lax.gnmedia.net.
+97	IN	PTR	vip-app-api-cs.ao.prd.lax.gnmedia.net.
+98	IN	PTR	vip-app-api-cs.ao.stg.lax.gnmedia.net.
+99	IN	PTR	vip-app-tags.ap.stg.lax.gnmedia.net.
+100	IN	PTR	vip-app-tags.ap.prd.lax.gnmedia.net.
+101	IN	PTR	vip-app-vb-hfb.ao.stg.lax.gnmedia.net.
+102	IN	PTR	vip-app-vb-sdc.ao.stg.lax.gnmedia.net.
+103	IN	PTR	vip-pxy-wp.ao.stg.lax.gnmedia.net.
+104	IN	PTR	vip-app-vb-shh.ao.stg.lax.gnmedia.net.
+105	IN	PTR	vip-app-vb-wz.ao.stg.lax.gnmedia.net.
+106	IN	PTR	vip-app-tt.ap.stg.lax.gnmedia.net.
+107	IN	PTR	vip-app-tt.ap.prd.lax.gnmedia.net.
+108    IN      PTR  vip-app-tfs.ao.prd.lax.gnmedia.net.
+;109	IN	PTR	vip-pxy-wp.wuo.stg.lax.gnmedia.net.
+;110	IN	PTR	vip-pxy-wp.wuo.prd.lax.gnmedia.net.
+111	IN	PTR	vip-app-preroll.sbv.prd.lax.gnmedia.net.
+112	IN	PTR	vip-app-xf-psl.ao.prd.lax.gnmedia.net.
+113    IN      PTR  vip-pxy-hf.ao.prd.lax.gnmedia.net.
+;114	IN	PTR	vip-app-vb.wuo.prd.lax.gnmedia.net.
+115    IN      PTR  vip-app-shh.ao.prd.lax.gnmedia.net.
+;116	IN	PTR	vip-app-vb.wuo.stg.lax.gnmedia.net.
+117	IN	PTR	vip-app-cta.ap.prd.lax.gnmedia.net.
+118    IN      PTR  vip-app-wzf.ao.prd.lax.gnmedia.net.
+119	IN	PTR	stg.cta.pubops.gorillanation.com.
+120    IN      PTR  vip-app-gr.ao.prd.lax.gnmedia.net.
+121	IN	PTR	vip-app-webdav.tp.prd.lax.gnmedia.net.
+122	IN	PTR	vip-app-extutils.tp.dev.lax.gnmedia.net.
+123	IN	PTR	vip-app-extutils.tp.prd.lax.gnmedia.net.
+124    IN      PTR  vip-app-gr.ao.stg.lax.gnmedia.net.
+125    IN      PTR  vip-ngx-ci.ci.stg.lax.gnmedia.net.
+;126	IN	PTR	vip-pxy-api.wuo.prd.lax.gnmedia.net.
+;127	IN	PTR	vip-pxy-cms.wuo.prd.lax.gnmedia.net.
+;128	IN	PTR	vip-pxy-cms-hi.wuo.prd.lax.gnmedia.net.
+;129	IN	PTR	vip-pxy-cms-med.wuo.prd.lax.gnmedia.net.
+130    IN      PTR	vip-pxy-vb.ao.stg.lax.gnmedia.net.
+131	IN	PTR	vip-app-idlyitw.ao.prd.lax.gnmedia.net.
+;132	IN	PTR	vip-app-logstash.tp.dev.lax.gnmedia.net.
+133	IN	PTR	vip-app-yourls.sbv.prd.lax.gnmedia.net.
+134	IN	PTR	stg.springboardplatform.com.
+135	IN	PTR	vip-app-mgmt.ci.prd.lax.gnmedia.net.
+;;136	IN	PTR	vip-app-mc.ao.stg.lax.gnmedia.net.
+;137	IN	PTR	vip-app-mc.ao.prd.lax.gnmedia.net.
+;138	IN	PTR	vip-app-archive.ap.prd.lax.gnmedia.net.
+139	IN	PTR	vip-app-adops.ap.prd.lax.gnmedia.net.
+140	IN	PTR	vip-app-pubops.ap.prd.lax.gnmedia.net.
+;141	IN	PTR	vip-app-new-cta.ap.prd.lax.gnmedia.net.
+142	IN	PTR	vip-app-adops.ap.stg.lax.gnmedia.net.
+143	IN	PTR	vip-app-pubops.ap.stg.lax.gnmedia.net.
+144	IN	PTR	vip-app-cms.sbv.stg.lax.gnmedia.net.
+145    IN      PTR vip-app-vb-wz.ao.prd.lax.gnmedia.net.
+146    IN      PTR vip-app-mal.ao.stg.lax.gnmedia.net.
+147	IN	PTR	vip-app-wbf.ao.prd.lax.gnmedia.net.
+;148    IN      PTR vip-app-vb-psl.ao.prd.lax.gnmedia.net.
+149    IN      PTR vip-app-xf-psl.ao.stg.lax.gnmedia.net.
+150	IN	PTR	vip-app-corp.si.prd.lax.gnmedia.net.
+151	IN 	PTR vip-app-xf-ae.ao.stg.lax.gnmedia.net.
+152	IN	PTR	vip-app-xf-ae.ao.prd.lax.gnmedia.net.
+153	IN	PTR	vip-app-55-dh.si.stg.lax.gnmedia.net.
+154	IN	PTR	vip-app-flow.si.prd.lax.gnmedia.net.
+155	IN	PTR	vip-app-55-dh.si.prd.lax.gnmedia.net.
+156	IN	PTR	vip-app-yourls.sbv.stg.lax.gnmedia.net.
+;157    IN      PTR
+;158    IN      PTR
+;159    IN      PTR
+;160    IN      PTR
+;161    IN      PTR
+;162    IN      PTR
+;163    IN      PTR
+;164    IN      PTR
+;165    IN      PTR
+;166    IN      PTR
+;167    IN      PTR
+;168    IN      PTR
+;169    IN      PTR
+;170    IN      PTR
+;171    IN      PTR
+;172    IN      PTR
+;173    IN      PTR
+;174    IN      PTR
+;175    IN      PTR
+;176    IN      PTR
+;177    IN      PTR
+;178    IN      PTR
+;179    IN      PTR
+;180    IN      PTR
+;181    IN      PTR
+;182    IN      PTR
+;183    IN      PTR
+;184    IN      PTR
+;185    IN      PTR
+;186    IN      PTR
+;187    IN      PTR
+;188    IN      PTR
+;189    IN      PTR
+;190    IN      PTR
+;191    IN      PTR
+;192    IN      PTR
+;193    IN      PTR
+;194    IN      PTR
+;195    IN      PTR
+;196    IN      PTR
+;197    IN      PTR
+;198    IN      PTR
+;199    IN      PTR
+;200    IN      PTR
+201	IN	PTR	external-bigip.tp.prd.lax.gnmedia.net.
+;202    IN      PTR
+;203    IN      PTR
+;204    IN      PTR
+;205    IN      PTR
+;206    IN      PTR
+;207    IN      PTR
+;208    IN      PTR
+;209    IN      PTR
+;210    IN      PTR
+;211    IN      PTR
+;212    IN      PTR
+;213    IN      PTR
+;214    IN      PTR
+;215    IN      PTR
+;216    IN      PTR
+;217    IN      PTR
+;218    IN      PTR
+;219    IN      PTR
+;220    IN      PTR
+;221    IN      PTR
+;222    IN      PTR
+;223    IN      PTR
+;224    IN      PTR
+;225    IN      PTR
+;226    IN      PTR
+;227    IN      PTR
+;228    IN      PTR
+;229    IN      PTR
+;230	IN	PTR	esxi-test.gnmedia.net.
+;231    IN      PTR
+;232    IN      PTR
+;233    IN      PTR
+;234    IN      PTR
+;235    IN      PTR
+;236    IN      PTR
+;237    IN      PTR
+;238    IN      PTR
+;239    IN      PTR
+;240    IN      PTR
+;241    IN      PTR
+;242    IN      PTR
+;243    IN      PTR
+;244    IN      PTR
+;245    IN      PTR
+;246    IN      PTR
+;247    IN      PTR
+;248    IN      PTR
+;249    IN      PTR
+;250    IN      PTR
+;251    IN      PTR
+;252    IN      PTR
+;253    IN      PTR
+;254    IN      PTR
+;255    IN      PTR

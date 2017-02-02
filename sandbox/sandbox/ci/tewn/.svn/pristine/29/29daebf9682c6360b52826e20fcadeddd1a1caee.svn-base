@@ -1,0 +1,38 @@
+<?php
+/**
+ * Logger Analytic Element TimeStamp
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger_Analytic
+ * @package  Logger_Analytic_Element
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+/**
+ * Logger Analytic Element TimeStamp
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger_Analytic
+ * @package  Logger_Analytic_Element
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+class Logger_Analytic_Element_TimeStamp extends Logger_Analytic_Element_Abstract
+{
+    /**
+     * Register a new timestamp value
+     *
+     * @param integer $value TimeStamp value
+     *
+     * @return void
+     */
+    public function registerValue($value)
+    {
+        $this->value = is_null($value) ? ''.time() : $value;
+    }
+}

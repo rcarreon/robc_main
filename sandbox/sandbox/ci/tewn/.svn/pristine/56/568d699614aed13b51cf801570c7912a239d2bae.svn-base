@@ -1,0 +1,1595 @@
+<?php
+
+include_once (ROOT . DS . APP_DIR . DS . "global_defines.php");
+include_once (ROOT . DS . APP_DIR . DS . "controllers/engine_controller.php");
+
+/*
+ * The normal operation flow is have the Engine do all the
+ * calculations on what relevant content is out there and set that
+ * information in a quickly consumable way for the widgets & homepage.
+ */
+
+class WidgetEngineController extends EngineController {
+	var $name = 'WidgetEngine';
+
+	var $uses = array('Account', 'Website', 'WidgetAnalytic', 'Page', 'Widget', "WidgetRebalance", 'MetricLog', 'SocialPage', 'WebsiteAllowedTag', 'Tag', 'Stats', 'Setting');
+	var $components = array('Trace', 'Timer', 'Date', 'Rule', 'Intersects', 'Category');
+	var $helpers = array('Html', 'Javascript', 'Ajax', 'Convert');
+	var $layout = "none";
+	var $debug = 0;
+
+	var $arrSubcategories = array();
+	var $arrAccounts = array();
+	var $save_item_count = 0;
+
+    var $rebalance_processed = 0;
+    var $rebalance_total = 0;
+
+    public $delta_stats = false;
+    protected $peer_websites = array();
+    protected $widget_num_links = 0;
+
+	function beforeFilter() {
+		/* HistoryWidgetAnalytics import */
+		App::import('Controller', 'HistoryWidgetAnalytics');
+		global $HistoryWidgetAnalytics;
+		$HistoryWidgetAnalytics = new HistoryWidgetAnalyticsController;
+		$HistoryWidgetAnalytics->constructClasses();
+
+		/* History Widget import */
+		App::import('Controller', 'HistoryWidgets');
+		global $HistoryWidgets;
+		$HistoryWidgets = new HistoryWidgetsController;
+		$HistoryWidgets->constructClasses();
+
+		/* History Credits import */
+		App::import('Controller', 'HistoryCredits');
+		global $HistoryCredits;
+		$HistoryCredits = new HistoryCreditsController;
+		$HistoryCredits->constructClasses();
+
+		// Cake test suit resets error reporting
+		// for some reason.  Here's a workaround
+		if (Configure::read('debug')) {
+            error_reporting(E_ALL & ~E_DEPRECATED & ~E_STRICT);
+        }
+	}
+
+	/*
+	 * Recalculates the widgets for all sites
+	 *
+	 * Does the following:
+	 *
+	 * 1.) Get all the active sites
+	 * 2.) Get the accounts we need to send traffic to
+	 * 3.) Update the weights in our widget analytics table
+	 * 4.) Get links to use in widget
+	 * 5.) Create widget instances based off those links
+	 * 6.) Put those widget instances into Memcached
+	 * 7.) Retire the old widget instances
+	 *
+	 */
+	public function rebalance($website_id = 0, $full = 0) {
+		/* Setup timers and limits */
+		if ($full) {
+			$this->Timer->start(TIMER_WIDGET_ENGINE_FULL_REBALANCE);
+
+			set_time_limit(TIME_LIMIT_WIDGET_FULL_REBALANCE);
+			ini_set('memory_limit', MEMORY_LIMIT_WIDGET_FULL_REBALANCE.'M');
+		} else {
+			$this->Timer->start(TIMER_WIDGET_ENGINE_REBALANCE);
+
+			set_time_limit(TIME_LIMIT_WIDGET_REBALANCE);
+			ini_set('memory_limit', MEMORY_LIMIT_WIDGET_REBALANCE.'M');
+		}
+
+		if ($full) {
+			// Setting website_id & full is contradictory
+			plat_assert($website_id == 0);
+			// Get active websites
+			$websites = $this->Website->get_rebalance_websites_full();
+		} elseif ($website_id) {
+			$websites = $this->Website->get_rebalance_website($website_id);
+		} else {
+			$websites = $this->get_just_in_time_websites();
+		}
+
+        // Rebalance websites
+        $this->rebalance_websites($websites);
+
+		$data = $this->Timer->set_memory_limit();
+		$this->Timer->stop_save($data);
+
+		return;
+	}
+
+    public function get_websites_chunk($chunk_number)
+    {
+        $number_of_chunks = 8;
+
+        $websites = $this->Website->get_rebalance_websites_chunk();
+
+        $chunks = array_fill(0, $number_of_chunks, array('total_pages' => 0, 'websites' => array()));
+
+        foreach ($websites as $website) {
+            $index = $this->get_chunk_index_with_less_pages($chunks);
+            $chunks[$index]['websites'][] = array('Website' => $website['Website']);
+            $chunks[$index]['total_pages'] += intval($website[0]['total_pages']);
+        }
+        unset($websites);
+
+        $chunk = array();
+        if (isset($chunks[$chunk_number - 1])) {
+            $chunk = $chunks[$chunk_number - 1]['websites'];
+        }
+        return  $chunk;
+    }
+
+    protected function get_chunk_index_with_less_pages($chunks)
+    {
+        $index_less_busy = 0;
+        $less_pages = $chunks[0]['total_pages'];
+        foreach ($chunks as $index => $chunk) {
+            if ($chunk['total_pages'] < $less_pages) {
+                $index_less_busy = $index;
+                $less_pages = $chunk['total_pages'];
+            }
+        }
+        return $index_less_busy;
+    }
+
+    public function rebalance_website_chunks($chunk_number)
+    {
+		$websites = $this->get_websites_chunk($chunk_number);
+
+        /* Setup timers and limits */
+        $this->set_chunk_limits($chunk_number);
+
+        $this->rebalance_websites($websites);
+
+		$data = $this->Timer->set_memory_limit();
+		$this->Timer->stop_save($data);
+
+    }
+
+    private function chunkify_websites($websites, $num_chunks) {
+        $chunks = array();
+        $i = 0;
+
+        foreach ($websites as $website) {
+            $chunks[$i % $num_chunks][] = $website;
+            $i++;
+        }
+
+        return $chunks;
+    }
+
+    private function rebalance_websites($websites) {
+        $script_total = count($websites);
+        $this->rebalance_total = $script_total;
+        echo "\n[Total websites to rebalance: ".$this->rebalance_total."]<br>\n\n";
+
+        $script_count = 0;
+        $this->Timer->progress_set(0);
+        $this->Timer->running_set();
+
+        $oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+        foreach ($websites as $website) {
+            $time_start = microtime(true);
+            $this->log("Website: ".$website['Website']['id'], "widget_engine");
+            echo "[Rebalancing: ".$website['Website']['name']."] [id: ".$website['Website']['id']."] " . "[Percentage: " . number_format(($this->rebalance_processed/$this->rebalance_total)*100, 2) . "%]<br>\n";
+
+            if (is_null($website['Website']['demographic_sex'])) {
+                $website['Website']['demographic_sex'] = 0;
+            }
+
+            // Validation of a website
+            if ($this->is_valid_for_rebalance($website)) {
+                // Get accounts we need to send traffic to
+                $accounts = $this->accounts_get($oHub->idToBit($website['Website']['domain_primary']), $website);
+
+                // Rebalance the weight on widget analytics
+                $this->widget_analytics_weight_rebalance($website, $accounts);
+            } else {
+                plat_assert(false, $website, false);
+                echo "Skip... not valid!<br>\n";
+            }
+
+            // Update websites last balance time
+            $this->website_balance_time_update($website);
+
+            // Update the rebalance count
+            $this->WidgetRebalance->reset($website['Website']['id']);
+
+            $this->MetricLog->log(LOG_TYPE_WEBSITE_REBALANCE, $website['Website']['id']);
+
+            $script_count++;
+            $this->Timer->progress_set($script_count, $script_total);
+            $this->Timer->running_set();
+        }
+    }
+
+    public function is_valid_for_rebalance($website)
+    {
+        if (is_null($website['Website']['category'])) {
+            return false;
+        }
+
+        if (is_null($website['Website']['content_rating'])) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /* Rebalance the website which has the most impressions since last rebalance */
+	public function rebalance_top_impressions() {
+        $this->autoRender = false;
+
+		$websites = $this->Website->active();
+		foreach ($websites as $website) {
+			$number_impressions = $this->website_impressions_since_rebalance($website);
+
+			$website_impressions[$website['Website']['id']] = $number_impressions;
+		}
+
+		arsort($website_impressions);
+
+		$website_id = key($website_impressions);
+		$impressions = $website_impressions[$website_id];
+
+		$website = $this->Website->findById($website_id);
+
+		echo "Rebalancing: ".$website['Website']['name']. " impressions: ".$impressions."<br>\n";
+
+        $this->rebalance($website_id);
+	}
+
+	/*
+	 * Find all websites which have had WIDGET_REBALANCE_IMPRESSION_THRESHOLD
+	 * amount of clicks since last rebalance
+	 */
+	private function get_just_in_time_websites() {
+		$out_websites = array();
+
+		$rebalances = $this->WidgetRebalance->find(
+            "all",
+            array(
+                "conditions" => array(
+                    "num_display >" => $this->Setting->get('WIDGET_REBALANCE_IMPRESSION_THRESHOLD')
+                ),
+				"order" => "num_display DESC",
+            )
+        );
+
+		foreach ($rebalances as $rebalance) {
+            $website = $this->Website->findById($rebalance['WidgetRebalance']['website_id']);
+            if (!empty($website)) {
+			    $out_websites[] = $website;
+            }
+		}
+
+		return $out_websites;
+	}
+
+	public function website_impressions_since_rebalance($website) {
+		return $this->WidgetRebalance->impressions($website['Website']['id']);
+	}
+
+    private function get_base_pages($website, $accounts)
+    {
+        $this->remove_pages_from_widget_analytics($website);
+
+        $oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+        $website_id = $website['Website']['id'];
+
+        $analytics = $this->WidgetAnalytic->website_pages_top_trait($website);
+
+        $out_analytics = $analytics;
+        $count = count($analytics);
+
+        $peer_websites = $this->Website->get_peer_websites_trait($website);
+        if (isset($peer_websites[0][0]['id'])) {
+            $this->peer_websites = explode(',', $peer_websites[0][0]['id']);
+        }
+
+        if ($count) {
+
+            $out_analytics = array();
+            for ($i = 0; $i < $count; $i++) {
+                if ($this->business_rules_allowed($website, $analytics[$i], 0)) {
+                    $out_analytics[] = $analytics[$i];
+                } else {
+                    $this->WidgetAnalytic->remove_page_from_widget($analytics[$i]['WidgetAnalytic']['id']);
+                }
+            }
+        }
+
+        /*
+         * Put all pages into rank order by their
+         * click through rate for a website
+         */
+        $pages         = $out_analytics;
+        $page_count    = count($pages);
+        $account_count = count($accounts);
+        $pages_out     = array();
+
+        // Get the website ID for all the pages
+        // and check to make sure account is in good
+        // standing (ie passed into our function)
+        $widget_instance_max_pages = $this->Setting->get('WIDGET_INSTANCE_MAX_PAGES');
+        for ($i = 0; $i < $page_count; $i++) {
+            $account_id = $pages[$i]['Website']['account_id'];
+
+            // Guilty until proven innocent
+            $pages[$i]['WidgetAnalytic']['account_good'] = 0;
+            for ($j = 0; $j < $account_count; $j++) {
+                if ($accounts[$j]['Account']['id'] == $account_id) {
+                    $pages[$i]['WidgetAnalytic']['account_good'] = 1;
+
+                    if ($pages[$i]['WidgetAnalytic']['type'] == LINK_TYPE_BASIC) {
+                        // Make sure we don't put too many pages in for a particular account
+                        if (isset($pages_count[$account_id])) {
+                            $pages_count[$account_id]++;
+                            if ($pages_count[$account_id] > $widget_instance_max_pages) {
+                                break;
+                            }
+                        } else {
+                            $pages_count[$account_id] = 1;
+                        }
+                    }
+
+                    $pages_out[] = $pages[$i];
+                    break;
+                }
+            }
+        }
+
+        return $pages_out;
+    }
+
+    protected function remove_pages_from_widget_analytics($website)
+    {
+        $this->WidgetAnalytic->remove_bulk_page_from_widget($website);
+    }
+
+    private function set_chunk_limits($chunk_number) {
+        switch ($chunk_number) {
+        case 1:
+            $timer = TIMER_WIDGET_REBALANCE_CHUNK1;
+            $time_limit = TIME_LIMIT_WIDGET_REBALANCE_CHUNK1;
+            $memory_limit = MEMORY_LIMIT_WIDGET_REBALANCE_CHUNK1;
+            break;
+        case 2:
+            $timer = TIMER_WIDGET_REBALANCE_CHUNK2;
+            $time_limit = TIME_LIMIT_WIDGET_REBALANCE_CHUNK2;
+            $memory_limit = MEMORY_LIMIT_WIDGET_REBALANCE_CHUNK2;
+            break;
+        case 3:
+            $timer = TIMER_WIDGET_REBALANCE_CHUNK3;
+            $time_limit = TIME_LIMIT_WIDGET_REBALANCE_CHUNK3;
+            $memory_limit = MEMORY_LIMIT_WIDGET_REBALANCE_CHUNK3;
+            break;
+        case 4:
+            $timer = TIMER_WIDGET_REBALANCE_CHUNK4;
+            $time_limit = TIME_LIMIT_WIDGET_REBALANCE_CHUNK4;
+            $memory_limit = MEMORY_LIMIT_WIDGET_REBALANCE_CHUNK4;
+            break;
+        case 5:
+            $timer = TIMER_WIDGET_REBALANCE_CHUNK5;
+            $time_limit = TIME_LIMIT_WIDGET_REBALANCE_CHUNK5;
+            $memory_limit = MEMORY_LIMIT_WIDGET_REBALANCE_CHUNK5;
+            break;
+        case 6:
+            $timer = TIMER_WIDGET_REBALANCE_CHUNK6;
+            $time_limit = TIME_LIMIT_WIDGET_REBALANCE_CHUNK6;
+            $memory_limit = MEMORY_LIMIT_WIDGET_REBALANCE_CHUNK6;
+            break;
+        case 7:
+            $timer = TIMER_WIDGET_REBALANCE_CHUNK7;
+            $time_limit = TIME_LIMIT_WIDGET_REBALANCE_CHUNK7;
+            $memory_limit = MEMORY_LIMIT_WIDGET_REBALANCE_CHUNK7;
+            break;
+        case 8:
+            $timer = TIMER_WIDGET_REBALANCE_CHUNK8;
+            $time_limit = TIME_LIMIT_WIDGET_REBALANCE_CHUNK8;
+            $memory_limit = MEMORY_LIMIT_WIDGET_REBALANCE_CHUNK8;
+            break;
+
+        default:
+            plat_assert(0);
+        }
+
+        $this->Timer->start($timer);
+        set_time_limit($time_limit);
+        ini_set('memory_limit', $memory_limit.'M');
+    }
+
+	/********************************************
+	 * Widget Rebalance
+	 *******************************************/
+
+	/*
+	 * Update weights in widget analytics
+	 */
+    private function widget_analytics_weight_rebalance($website, $accounts)
+    {
+        // invalidate website information cache
+        $this->Website->invalidate_website_cache($website['Website']['id']);
+
+        // invalidate subcategories tag ids
+        $this->WebsiteAllowedTag->invalidate_cache_get_by_website_id($website['Website']['id']);
+
+        $this->remove_blacklisted($website);
+
+        $this->calculate_min_widget_links($website);
+
+        $account_count = count($accounts);
+
+        $pages_to_add = array();
+
+        // Find out if we are paying this website, and
+        // if so, we need to make sure their traffic
+        // goes towards who we're selling to
+        $website_account = $this->Account->get_by_id($website['Website']['id']);
+        $paid = $website_account['Account']['paid'];
+
+        // Get the base pages for this website
+        $pages = $this->get_base_pages($website, $accounts);
+
+        $page_count = count($pages);
+
+        $analytic_page_add_count = 0;
+
+        $domain_id = $website['Website']['domain_primary'];
+
+        $widget_number_good_performers = $this->Setting->get('WIDGET_NUMBER_GOOD_PERFORMERS');
+        $widget_good_performer = $this->Setting->get('WIDGET_GOOD_PERFORMER');
+
+        /*
+         * Modify weight based on account rank and
+         * add new pages if an account needs more pages
+         */
+
+        for ($i = 0; $i < $account_count; $i++) {
+
+            $buyer = $accounts[$i]['Account']['buying'];
+
+            $add_page = $widget_number_good_performers;
+
+            if ($this->penalize_account($accounts[$i], $i, $domain_id)) {
+                $add_page = 0;
+            }
+
+            $weight_modifier = $this->get_weight_modifier($accounts[$i], $i, $account_count, $domain_id, $paid);
+
+            // Decrement if account ranks low
+            for ($j = 0; $j < $page_count; $j++) {
+                $website_id = $pages[$j]['Website']['id'];
+                plat_assert($website_id, $pages[$j]);
+
+                if ($website_id == $accounts[$i]['Account']['website_id']) {
+                    $pages[$j]['WidgetAnalytic']['weight_modifier'] = $weight_modifier;
+
+                    // If we have a good performer for this account, then we don't need a page
+                    if ($pages[$j]['WidgetAnalytic']['type'] == LINK_TYPE_BASIC && (($j + 1) / $page_count) < $widget_good_performer) {
+                        $add_page--;
+                    }
+                }
+            }
+
+            /* If a paid site & a buyer match,
+             * make sure we get as many links in
+             * there as possible
+             */
+            if ($paid && $buyer) {
+                $add_page = 1;
+            }
+
+            // Add a page because:
+            // 1.) account doesn't have a page on
+            //     this website
+            // 2.) There's a low performing one
+            // 3.) It's the top account ($i == 0)
+            // 4.) It's a featured account
+            if ($add_page > 0 ||
+                $i == 0 ||
+                $accounts[$i]['Account']['featured']) {
+                $rc = $this->widget_analytic_page_add($accounts[$i], $website);
+                if ($rc) {
+                    $rc['WidgetAnalytic']['weight_modifier'] = $weight_modifier;
+                    array_push($pages_to_add, $rc);
+                    $analytic_page_add_count++;
+                }
+            }
+        }
+
+
+
+        // Set all the pages weight to 0 and we'll
+        // have to use the account updates to over
+        // write that.  This fills the hole where an
+        // account goes inactive or deleted and makes
+        // sure we still don't send them traffic
+        $this->WidgetAnalytic->zero_weight($website['Website']['id']);
+
+        // Save the weights
+        for ($j = 0; $j < $page_count; $j++) {
+            $this->WidgetAnalytic->save_weight($pages[$j]);
+        }
+
+        // If we don't have enough to make a single widget, we need to blindly add
+        // some more
+        $total_links = $analytic_page_add_count + $page_count;
+        $k = 0;
+        for ($i = $total_links; $i <= $this->widget_num_links; $i++) {
+            for ($j = 0; $j < $account_count; $j++) {
+                $rc = $this->widget_analytic_page_add($accounts[(($k+$j) % $account_count)], $website, $pages_to_add);
+
+                if ($rc) {
+                    array_push($pages_to_add, $rc);
+                }
+            }
+        }
+
+        // check all the pages to add if they are not duplicates
+        for ($i = 0, $total = count($pages_to_add); $i < $total; $i++) {
+            $page = $pages_to_add[$i];
+            if ($this->WidgetAnalytic->does_exist($website['Website']['id'], $page['WidgetAnalytic']['page_id'], LINK_TYPE_BASIC)) {
+                unset($pages_to_add[$i]);
+            }
+        }
+
+        // Save off the new pages
+        if (!empty($pages_to_add)) {
+            $this->WidgetAnalytic->save_pages($pages_to_add);
+        }
+
+        return array("reused_pages" => $pages, "new_pages" => $pages_to_add);
+    }
+
+    private function penalize_account($account, $rank, $domain_id) {
+		if ($account['Account']['featured'] != 0) {
+			return 0;
+		}
+
+		// Make sure we have enough sites to populate a widget
+		if ($rank < $this->Setting->get('WIDGET_MINIMUM_ACCOUNTS')) {
+			return 0;
+		}
+
+		if ($this->Setting->tunable('WIDGET_PENALIZE_SMALL_SITE', $domain_id) &&
+			isset($account['incoming']) &&
+			$account['incoming'] < $this->Setting->tunable('WIDGET_PENALIZE_SMALL_SITE_THRESHOLD', $domain_id) &&
+			$account['Account']['credits'] < $this->Setting->tunable('WIDGET_PENALIZE_THRESHOLD', $domain_id)) {
+			return 1;
+		}
+
+		if ($this->Setting->tunable('WIDGET_PENALIZE', $domain_id) &&
+			$account['Account']['credits'] < $this->Setting->tunable('WIDGET_PENALIZE_THRESHOLD', $domain_id)) {
+			return 1;
+		}
+
+		return 0;
+	}
+
+	function account_skip($account, $website) {
+		// Skip the account for this website
+		if ($website && $website['Website']['account_id'] == $account['Account']['id']) {
+			return 1;
+		}
+
+		// Check to see if account is blacklisted by site
+		if ($website && $this->blacklisted($website, $account['Account']['website_id'])) {
+			return 1;
+		}
+
+		// Check to see if account is not whitelisted by site
+		if ($website && !$this->whitelisted($website, $account['Account']['website_id'])) {
+			return 1;
+		}
+
+		return 0;
+	}
+
+	/* Sites can blacklist other sites from showing up in their widget */
+	function blacklisted($website, $website_id_check) {
+		if ($website['Website']['blacklist']) {
+			$list = explode(",", $website['Website']['blacklist']);
+
+			if (in_array($website_id_check, $list)) {
+				return 1;
+			}
+		}
+
+		return 0;
+	}
+
+	/* Sites can whitelist only the sites they want to show up in their widget */
+	function whitelisted($website, $website_id_check) {
+		if ($website['Website']['whitelist']) {
+			$list = explode(",", $website['Website']['whitelist']);
+
+			if (in_array($website_id_check, $list)) {
+				return 1;
+			}
+			// here means if the website has a whitelist
+			// only accepts links from those websites
+			return 0;
+		}
+		// if the website doesn't have a whitelist let
+		// pass all the websites
+		return 1;
+	}
+
+	/*
+	 * Update the time when this website last had a rebalance
+	 */
+	private function website_balance_time_update($website) {
+		$date = $this->Date->now();
+
+		echo $website['Website']['account_id']." last rebalance: ".$date."<br>\n";
+
+        $this->rebalance_processed++;
+
+		$this->Account->id = $website['Website']['account_id'];
+		$this->Account->saveField("widget_rebalance", $date);
+	}
+
+	/*
+	 * Find and add a page to this widget analytic
+	 *
+	 * Parameters:
+	 *
+	 * - Account: the account which needs to get the pages from
+	 * - Website: the website which the pages are going to be
+	 *            shown on
+	 *
+	 */
+	private function widget_analytic_page_add($account, $shown_website, $page_array = 0) {
+		$match_ranking = array();
+
+		// Make sure we don't add a link into the website which owns the link
+		plat_assert($account['Account']['website_id'] != $shown_website['Website']['id'], print_r(array($account, $shown_website), 1));
+
+		// Get the website account id
+		$website_account = $this->Account->get_by_id($shown_website['Website']['account_id']);
+		$paid = $website_account['Account']['paid'];
+		$buying = $account['Account']['buying'];
+
+        // Get elgible subcategories
+		$categories = null;
+		$subcategory_ids = null;
+        $subcategories = $this->WebsiteAllowedTag->get_subcategories_by_website_id(
+            $shown_website['Website']['id']
+        );
+        if (false === empty($subcategories)) {
+            $subcategory_ids = $this->WebsiteAllowedTag->convert_ids($subcategories);
+        }
+
+        // Get elgible categories
+        $categories = $this->get_allowed_categories($shown_website, $subcategory_ids);
+
+        // Find all elgible pages
+        $oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+        $pages = $this->Page->get_active_by_website_id(
+            $account['Account']['website_id'],
+            $oHub->idToBit($shown_website['Website']['domain_primary']),
+            $categories,
+            $subcategory_ids
+        );
+
+        $pages_ids = array();
+		foreach ($pages as $page) {
+		    $pages_ids[] = $page['Page']['id'];
+		}
+		$pages_ids = implode(',', $pages_ids);
+		$existent_analytics_ids = array();
+		if (false === empty($pages_ids)) {
+
+		    $query = sprintf(
+                'SELECT page_id
+                FROM widget_analytics
+                WHERE shown_website_id = %d
+                    AND visible = 1
+                    AND type = %d
+                    AND page_id IN (%s)',
+                $shown_website['Website']['id'],
+                LINK_TYPE_BASIC,
+                $pages_ids
+            );
+		    $existent_analytics = $this->WidgetAnalytic->query_read($query, false);
+
+		    foreach ($existent_analytics as $analytics) {
+		        $existent_analytics_ids[] = $analytics['widget_analytics']['page_id'];
+		    }
+		}
+
+        foreach ($pages as $page) {
+			// See if we already have it in the analytic
+            if (in_array($page['Page']['id'], $existent_analytics_ids)) {
+                continue;
+            }
+
+			// See if we have it in our page array
+			if ($page_array) {
+				$in_array = 0;
+				foreach ($page_array as $element) {
+					if ($element['WidgetAnalytic']['page_id'] == $page['Page']['id']) {
+						$in_array = 1;
+						break;
+					}
+				}
+				if ($in_array) {
+                    continue;
+				}
+			}
+
+			// Figure out how good of a match this page to the website is
+			$match_rate = $this->page_to_website_match_rate($page, $shown_website, $paid, $buying);
+
+			if ($match_rate) {
+				$page['match_rate'] = $match_rate;
+				array_push($match_ranking, $page);
+			}
+		}
+
+		// See if could find a page
+		if (empty($match_ranking)) {
+			return;
+		}
+
+		// Sort and find the best match
+		uasort($match_ranking, "w_cmp_match_rate");
+		$last = end($match_ranking);
+		$page_id = $last['Page']['id'];
+
+        // Create data structure
+        $rc = $this->WidgetAnalytic->_create_wa($shown_website, $last['Page']['domain_bitfield'], $page_id);
+
+		return $rc;
+	}
+
+	private function get_allowed_categories($website, $subcategories_ids) {
+		$subcategories = $this->Tag->get_by_ids($subcategories_ids);
+
+		$parents = $this->Tag->convert_parents($subcategories);
+
+        $categories = array();
+        for ($i = 0; $i < CATEGORY_NUMBER; $i++) {
+            if ($website['Website']['allowed_categories_bitfield'] & (1 << $i) || $website['Website']['allowed_categories_bitfield'] == (1 << CATEGORY_ALL)) {
+            	if (!in_array($i, $parents)) {
+            		$categories[] = $i;
+            	}
+            }
+        }
+
+        return $categories;
+    }
+
+    protected function business_rules_allowed($website, $page, $legal = 0)
+    {
+        // we need to check if the page  is approved if not we are accepting another type of pages on widgets
+        if (isset($page['Page']['status']) && $page['Page']['status'] != PAGE_STATUS_APPROVED) {
+            return 0;
+        }
+
+        /* Check on everything else */
+        $rate = $this->page_to_website_match_rate($page, $website, 0, 0, $legal);
+        if ($rate) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+	/*
+	 * Figures out how good of a match based on category and
+	 * demographic a page is to a website
+	 *
+	 * To start off with this is a very basic algorithm
+	 * Just looks for matches in category & demographics
+	 */
+    protected function page_to_website_match_rate($page, $website, $paid = 0, $buying = 0, $legal = 0)
+    {
+        $paid_buyer = 100;
+        $rate_category = 65;
+        $rate_subcategory = 45;
+        $rate_sex = 35;
+        $rate_peers = 50;
+        $rate = 0;
+
+        // Always show paid / buying match first
+        if ($paid && $buying) {
+            $rate += $paid_buyer;
+        }
+
+        // Enforce strict categories on some sites
+        if ($website['Website']['strict_category'] &&
+            $page['Page']['category'] != $website['Website']['category']) {
+            return 0;
+        }
+
+        // Category
+        if ($page['Page']['category'] == $website['Website']['category']) {
+            $rate += $rate_category;
+        }
+
+        // Subcategory
+        if (!empty($page['Page']['subcategories'])
+            && is_array($page['Page']['subcategories'])
+            && in_array($website['Website']['subcategory'], $page['Page']['subcategories'])) {
+            $rate += $rate_subcategory;
+        }
+
+        // Demographic sex - Now it has to be a match
+        if ($website['Website']['demographic_sex'] != DEMOGRAPHIC_SEX_BOTH
+            && $page['Page']['demographic_sex'] != $website['Website']['demographic_sex']) {
+            return 0;
+        }
+
+        // Add a rate by sex if it pass the validation
+        if ($page['Page']['demographic_sex'] == $website['Website']['demographic_sex']) {
+            $rate += $rate_sex;
+        } else if ($page['Page']['demographic_sex'] == DEMOGRAPHIC_SEX_BOTH) {
+            $rate += intval($rate_sex / 2);
+        } else if ($website['Website']['demographic_sex'] == DEMOGRAPHIC_SEX_BOTH) {
+            $rate += intval($rate_sex / 2);
+        }
+
+        $website['Website']['content_rating'] = intval($website['Website']['content_rating']);
+
+        // Check the content rating
+        if (!$this->Rule->content_rating($website['Website']['content_rating'],
+                                          $page['Page']['content_rating'])) {
+            return 0;
+        }
+
+        // Make sure that pages from other hubs match the category
+        if ($page['Website']['allowed_categories_bitfield'] == -1 &&
+            ($page['Website']['domain_primary'] != $website['Website']['domain_primary']) &&
+            ($page['Page']['category'] != $website['Website']['category'])) {
+            return 0;
+        }
+
+        // This is used as a tie breaker
+        if (!$legal) {
+            $ctr = $this->get_peer_ctr($page, $website);
+            if ($ctr == 0) {
+                // Give the new guy a chance to run somewhere first
+                $ctr = 1;
+            }
+            $rate += $rate_peers * $ctr;
+
+            return $rate;
+        } else {
+            // We are only testing if this is legal to use or not
+            return 1;
+        }
+    }
+
+    protected function calculate_min_widget_links($website)
+    {
+        $num_links = $this->Widget->get_max_links_by_website($website['Website']['id']);
+        $num_links *= 2;
+        $this->widget_num_links = $num_links;
+    }
+
+    protected function remove_blacklisted($website)
+    {
+        /* removing pages that are blacklisted before rebalancing */
+        if ($website['Website']['blacklist']) {
+            $query = sprintf("UPDATE widget_analytics wa
+                INNER JOIN pages ON pages.id = wa.page_id
+                SET wa.visible = 0 WHERE wa.visible = 1
+                AND pages.website_id IN (%s)
+                AND shown_website_id = %d;", $website['Website']['blacklist'], $website['Website']['id']);
+            $this->WidgetAnalytic->query($query, false);
+        }
+    }
+
+    private function get_peer_ctr($page, $website)
+    {
+        global $HistoryWidgetAnalytics;
+
+        $total_stats['num_ctr'] = 0;
+        $total_stats['num_display'] = 0;
+
+        foreach ($this->peer_websites as $peer_website_id) {
+            $stats = $HistoryWidgetAnalytics->stats_days($page['Page']['id'], $peer_website_id, MANAGEMENT_WIDGET_ROLLING_DAYS);
+            $total_stats['num_ctr'] += $stats['num_ctr'];
+            $total_stats['num_display'] += $stats['num_display'];
+        }
+
+        if ($total_stats['num_display'] < $this->Setting->get('WIDGET_SIGNIFICANCE_IMPRESSION_THRESHOLD')) {
+            return 0;
+        }
+
+        return $total_stats['num_ctr'] / $total_stats['num_display'];
+    }
+
+	protected function get_weight_modifier($account, $rank, $account_count, $domain_id, $paid = 0) {
+		// Heavily penalize widgets w/
+		// negative credits
+		if ($this->penalize_account($account, $rank, $domain_id)) {
+			return 0;
+		}
+
+		// Decrementer weight depending on how
+		// this account ranks
+		if ($account_count) {
+			$numer = pow(($account_count - $rank), $this->Setting->get('WIDGET_ACCOUNT_FALLOFF_RATE'));
+			$denom = pow($account_count, $this->Setting->get('WIDGET_ACCOUNT_FALLOFF_RATE'));
+
+			$account_weight = 1 - ($numer/$denom);
+		} else {
+			$account_weight = 1;
+		}
+
+		// Click-Through to Service
+		// Level Agreement Ratio is a
+		// tunable for how much we
+		// care about meeting SLA
+		// requirements vs getting
+		// visitors into Crowd Ignite
+		$weight_modifier = (1 - ($account_weight * $this->Setting->get('WIDGET_SLA_TO_CTR_RATIO')));
+
+		if ($rank == 0) {
+			// The top account gets a
+			// bonus and gets an "increment"
+			$weight_modifier += $this->Setting->get('WIDGET_ACCOUNT_TOP_BONUS');
+		}
+
+		// Featured accounts get a bonus
+		if ($account['Account']['featured'] && $this->Setting->get('WIDGET_GIVE_FEATURED_BONUS')) {
+			$weight_modifier += $account['Account']['featured'];
+		}
+
+		// Find out if website which is going to show the
+		// page's is buying traffic
+		$buyer = $account['Account']['buying'];
+		if ($buyer) {
+			$weight_modifier += $this->Setting->get('WIDGET_BUYER_BONUS');
+		}
+
+		// If we have a buyer & seller match,
+		// give more bonuses
+		if ($paid && $buyer) {
+			$weight_modifier += $this->Setting->get('WIDGET_PAID_MATCH_BONUS');
+		}
+
+		return $weight_modifier;
+	}
+
+	/* Add a page into eligible widgets */
+	public function widgets_add($page_id, $type = LINK_TYPE_BASIC, $key = 0)
+    {
+		$joins = array(
+            array(
+                'table' => 'websites',
+                'alias' => 'Website',
+                'type' => 'INNER',
+                'conditions' => array(
+                    'Website.id = Page.website_id',
+                )
+            )
+		);
+
+		$page = $this->Page->find(
+            "first",
+            array(
+                "conditions" => array(
+                    "Page.id" => $page_id
+                ),
+                "joins" => $joins,
+                "fields" => array(
+                    'Page.*',
+                    'Website.*',
+                )
+            )
+		);
+
+        $this->loadModel('PageSubcategory');
+        $page['Page']['subcategories'] = $this->PageSubcategory->get_ids_by_page_id($page_id);
+
+		$domain_bitfield = $page['Website']['domain_bitfield'];
+
+		$page_intersect = $this->Intersects->get_by_page($page);
+
+		// See if we can put this link on everything in a domain or just a specific website
+		switch ($type) {
+			case LINK_TYPE_BASIC:
+			$websites = $this->Website->running(DOMAIN_ID_ALL, $domain_bitfield, $page_intersect);
+			break;
+			case LINK_TYPE_CONTEXTUAL:
+			case LINK_TYPE_SIMILAR:
+				$page_key = $this->Page->findById($key);
+				$websites = $this->Website->findAllById($page_key['Page']['website_id']);
+			break;
+			default:
+			plat_assert(0);
+		}
+
+		/* Go through all the websites which could run this page */
+		foreach ($websites as $website) {
+			$website_id = $website['Website']['id'];
+
+			/* Don't add this page into it's own site's widget */
+			if ($website_id == $page['Page']['website_id']) {
+				continue;
+			}
+
+			/* Get the account ranking for a website if we don't have it already */
+			if (!isset($this->accounts_widget[$website_id])) {
+				$website = $this->Website->findById($website_id);
+
+				$accounts = $this->accounts_get($domain_bitfield, $website);
+
+				$this->accounts_widget[$website_id] = $accounts;
+			}
+
+			$this->page_new($this->accounts_widget[$website_id], $website, $page, $type, $key);
+		}
+	}
+
+	function widgets_add_similar($page, $page_key) {
+	    $page_intersect = $this->Intersects->get_by_page($page);
+
+	    $website = $page_key;
+        $website_id = $website['Website']['id'];
+
+        /* Don't add this page into it's own site's widget */
+        if ($website_id == $page['Page']['website_id']) {
+            return;
+        }
+
+        $this->loadModel('PageSubcategory');
+        $page['Page']['subcategories'] = $this->PageSubcategory->get_ids_by_page_id($page_id);
+
+        // TODO: Verify the array accounts the key is the domain_bitfield???????
+
+        /* Get the account ranking for a website if we don't have it already */
+        if (!isset($this->accounts_widget[$website_id])) {
+
+            if (empty($this->arrAccounts[$page['Website']['domain_bitfield']])) {
+                $this->arrAccounts[$page['Website']['domain_bitfield']] = $this->accounts_get($page['Website']['domain_bitfield'], $website);
+            }
+            $accounts = $this->arrAccounts[$page['Website']['domain_bitfield']];
+
+            $this->accounts_widget[$website_id] = $accounts;
+        }
+
+        $this->page_new($this->accounts_widget[$website_id], $website, $page, LINK_TYPE_SIMILAR, $page_key['Page']['id']);
+	}
+
+	/*
+	 * Push a page into widgets
+	 */
+	public function page_new($accounts, $shown_website, $page, $type = LINK_TYPE_BASIC, $key = 0) {
+		$page_id = $page['Page']['id'];
+
+		$account_count = count($accounts);
+		$domain_id = $page['Website']['domain_primary']; // XXXX this correct?
+
+		if ($this->business_rules_allowed($shown_website, $page, 1) == 0) {
+			return;
+		}
+
+		/* Get the account index */
+		$count = 0;
+		foreach ($accounts as $account) {
+			if ($account['Account']['website_id'] == $page['Website']['id']) {
+				break;
+			}
+
+			$count++;
+		}
+
+		/* Check if account is even elgible to add a page in */
+		if ($count == $account_count) {
+//			echo "Not elgible in widget either\n";
+//			plat_assert(0);
+			return 0;
+		}
+
+		plat_assert($count < $account_count, print_r(array($page, $page, $accounts), 1));
+
+		/* Get weight */
+		$weight_modifier = $this->get_weight_modifier($accounts[$count], $count, $account_count, $domain_id);
+
+		/* Create Widget Analytics */
+		$wa = array();
+		$wa[] = $this->WidgetAnalytic->_create_wa($shown_website, $page['Page']['domain_bitfield'], $page_id, $type, $key);
+
+        /* Save it off */
+        $rc = $this->WidgetAnalytic->save_pages($wa);
+        plat_assert($rc, $wa);
+	}
+
+	public function timer_start() {
+		$this->Timer->start(TIMER_WIDGET_UPDATE_DISPLAY_COUNTS);
+		set_time_limit(TIME_LIMIT_WIDGET_UPDATE_DISPLAY_COUNTS);
+		ini_set('memory_limit', MEMORY_LIMIT_WIDGET_UPDATE_DISPLAY_COUNTS.'M');
+	}
+
+	public function timer_stop() {
+		$data = $this->Timer->set_memory_limit();
+		$this->Timer->stop_save($data);
+	}
+
+	// Initialize if necessary
+	private function batch_initialize($batch, $widget_id, $url) {
+		if (!isset($batch['widgets'][$widget_id])) {
+			$batch['widgets'][$widget_id] = 0;
+		}
+
+		if (!isset($batch['widget_javascript'][$widget_id])) {
+			$batch['widget_javascript'][$widget_id] = 0;
+		}
+
+		if (!isset($batch['widget_rss'][$widget_id])) {
+			$batch['widget_rss'][$widget_id] = 0;
+		}
+
+		if (!isset($batch['widget_xml'][$widget_id])) {
+			$batch['widget_xml'][$widget_id] = 0;
+        }
+
+        if (!isset($batch['widget_xml_live'][$widget_id])) {
+            $batch['widget_xml_live'][$widget_id] = 0;
+        }
+
+		if (!isset($batch['url'][$widget_id][$url])) {
+			$batch['url'][$widget_id][$url] = 0;
+		}
+
+		return $batch;
+	}
+
+	/**
+	 * Validate and remove the campaing knowing params from
+	 * the url to be save in the system.
+	 *
+	 * @param string $url Url to be cleaned
+	 *
+	 * @return string cleaned url
+	 */
+	protected function remove_utm_from_url($url) {
+		$filter = new CI\Filter\Container();
+        $filter->addFilter(new CI\Filter\Url\Fixer());
+        $filter->addFilter(new CI\Filter\Url\Utm());
+        $url = $filter->filter($url);
+
+		return $url;
+	}
+
+	public function batch_data($batch, $json) {
+		$data = json_decode($json, true);
+
+		if (!$this->delta_stats) {
+			// Count the widget
+			$widget_id = $data['id'];
+
+			// Get the URL
+			if (isset($data['url'])) {
+				$url = $this->remove_utm_from_url($data['url']);
+			} else {
+				$url = "http://-";
+			}
+
+			// Initialize if necessary
+			$batch = $this->batch_initialize($batch, $widget_id, $url);
+
+			$batch['widgets'][$widget_id]++;
+			$batch['url'][$widget_id][$url]++;
+
+			switch ($data['type']) {
+				case WIDGET_TYPE_JAVASCRIPT:
+					$batch['widget_javascript'][$widget_id]++;
+					break;
+				case WIDGET_TYPE_RSS:
+					$batch['widget_rss'][$widget_id]++;
+					break;
+				case WIDGET_TYPE_XML:
+					$batch['widget_xml'][$widget_id]++;
+                    break;
+                case WIDGET_TYPE_XML_LIVE:
+                    $batch['widget_xml_live'][$widget_id]++;
+                    break;
+				default:
+                    // make this widget impression as widget_xml
+                    $batch['widget_xml'][$widget_id]++;
+				    plat_assert(0, $data, false); // don't exit
+                    break;
+			}
+
+
+			/* Count all the different link types */
+			$link_types = array("basic", "contextual", "similar", "tag", "subcategory");
+			foreach ($link_types as $link_type) {
+				$links = $data[$link_type];
+
+				foreach ($links as $analytic_id => $page_id) {
+					$widget_name = $link_type."_widget_links";
+					$analytic_name = "analytics";
+
+					// Initialize
+					if (!isset($batch[$analytic_name][$analytic_id])) {
+						$batch[$analytic_name][$analytic_id] = 0;
+					}
+					if (!isset($batch[$widget_name][$widget_id])) {
+						$batch[$widget_name][$widget_id] = 0;
+					}
+
+					$batch[$widget_name][$widget_id]++;
+					$batch[$analytic_name][$analytic_id]++;
+				}
+			}
+		} else {
+			// New way to storage stadistic data
+			$created = date('Y-m-d 00:00:00', $data['date']);
+			$shown_website_id = $data['swid'];
+			$links = $data['stats'];
+			foreach ($links as $link) {
+				$type = isset($link['t']) ? $link['t'] : 0;
+				$key = isset($link['k']) ? $link['k'] : 0;
+				$id = md5(implode('_', array($link['i'], $link['w'], $link['d'], $shown_website_id, $type, $key, $created)));
+				if (isset($batch['stats_widget_links'][$id])) {
+					$batch['stats_widget_links'][$id]['impressions']++;
+				} else {
+					$batch['stats_widget_links'][$id] = array(
+						'created'          => $created,
+						'page_id'          => $link['i'],
+						'website_id'       => $link['w'],
+						'domain'           => $link['d'],
+						'shown_website_id' => $shown_website_id,
+						'type'             => $type,
+						'key'              => $key,
+						'impressions'      => 1
+					);
+				}
+			}
+			//////////////////////////////////////
+		}
+
+		return $batch;
+	}
+
+	public function save_item($identifier, $item) {
+		$this->save_item_count++;
+
+		switch ($identifier) {
+			case 'widgets':
+				$this->update_display_count_widgets($item);
+				break;
+			case 'widget_javascript':
+			case 'widget_rss':
+			case 'widget_xml':
+                        case 'widget_xml_live':
+				// not tracking this today
+				break;
+			case 'basic_widget_links':
+				$this->update_display_count_widget_links($item, LINK_TYPE_BASIC);
+				break;
+			case 'contextual_widget_links':
+				$this->update_display_count_widget_links($item, LINK_TYPE_CONTEXTUAL);
+				break;
+			case 'similar_widget_links':
+				$this->update_display_count_widget_links($item, LINK_TYPE_SIMILAR);
+				break;
+			case 'tag_widget_links':
+				$this->update_display_count_widget_links($item, LINK_TYPE_TAG);
+				break;
+			case 'subcategory_widget_links':
+				$this->update_display_count_widget_links($item, LINK_TYPE_SUBCATEGORY);
+				break;
+			case 'stats_widget_links':
+				$this->update_display_count_stats_links($item);
+				break;
+			case 'analytics':
+				$this->update_display_count_analytics($item);
+				break;
+			case 'url':
+				$this->update_display_count_urls($item);
+				break;
+
+			default:
+			plat_assert(0);
+		}
+	}
+
+    private function update_display_count_widgets($widgets) {
+		foreach ($widgets as $widget_id => $count) {
+			$widget = $this->Widget->findById($widget_id);
+
+			$this->WidgetRebalance->increment($widget['Widget']['website_id'], $count);
+
+			// Increment the impression count & mark is used
+			$this->Widget->increment_impressions($widget_id, $count);
+
+			// See if we need to make this widget active again
+			if ($widget['Widget']['status'] == WIDGET_STATUS_INACTIVE && $count > 20) {
+				$this->Widget->id = $widget_id;
+				$this->Widget->saveField("status", WIDGET_STATUS_ACTIVE);
+			}
+		}
+	}
+
+    private function update_stats_type_counts($types)
+    {
+        foreach ($types as $type => $widgets) {
+            $this->update_display_count_widget_links($widgets, $type);
+        }
+    }
+
+	private function update_display_count_widget_links($widgets, $link_type) {
+		foreach ($widgets as $widget_id => $count) {
+			// Increment the impression count
+			$this->Widget->increment_impression_type($widget_id, $count, $link_type);
+		}
+	}
+
+	private function update_display_count_stats_links($links) {
+		foreach ($links as $link) {
+			// Increment the impression count
+			$this->Stats->increment_widget_stats(
+				$link['created'],
+				$link['page_id'],
+				$link['website_id'],
+				$link['domain'],
+				$link['shown_website_id'],
+				$link['type'],
+				$link['key'],
+				0, $link['impressions'], 0
+			);
+		}
+	}
+
+	private function update_display_count_analytics($analytics) {
+		foreach ($analytics as $id => $count) {
+			$this->WidgetAnalytic->increment_impressions($id, $count);
+		}
+	}
+
+	private function insert_page($website_id, $url, $count) {
+		return $this->Page->add_page($url, $website_id, $count);
+	}
+
+    private function update_stats_url_counts($data) {
+        foreach ($data as $shown_website_id => $urls) {
+            foreach ($urls as $url => $count) {
+                if (!$this->Page->validate_url(array('url' => $url))) {
+                    continue;
+                }
+                $page = $this->Page->findByUrl($url);
+                $page_id = $this->Page->get_page_id_cache($url);
+
+                if (!$page && !empty($page_id)) {
+                    $page = array('Page' => array('id' => $page_id));
+                }
+
+                if (!$page) {
+                    $page_id = $this->insert_page($shown_website_id, $url, $count);
+                } else {
+                    $page_id = $page['Page']['id'];
+                    $this->Page->increment_impressions($page['Page']['id'], $count);
+                }
+
+                /* Add url -> page_id to memcached */
+                if ($page_id !== false) {
+                    $this->Page->set_page_id_cache($url, $page_id);
+                }
+            }
+        }
+    }
+
+	private function update_display_count_urls($widget_ids) {
+		if ($this->save_item_count > 50000) {
+			$this->save_item_count = 0;
+		}
+
+		foreach ($widget_ids as $widget_id => $urls) {
+			$widget = $this->Widget->findById($widget_id);
+			plat_assert(
+			    !empty($widget['Widget']['website_id']),
+		        array('widget_id' => $widget_id),
+		        false
+			);
+			$website_id = $widget['Widget']['website_id'];
+
+			foreach ($urls as $url => $count) {
+			    if (!$this->Page->validate_url(array('url' => $url))) {
+			        continue;
+			    }
+				$page = $this->Page->findByUrl($url);
+
+				if (!$page) {
+					//echo "Inserting page: ".$url.": ".$count."\n";
+					$page_id = $this->insert_page($website_id, $url, $count);
+				} else {
+					$page_id = $page['Page']['id'];
+					//echo "Incrementing impressions: ".$page_id.": ".$count."\n";
+					$this->Page->increment_impressions($page['Page']['id'], $count);
+				}
+
+				/* Add url -> page_id to memcached */
+				if ($page_id !== false) {
+					$this->Page->set_page_id_cache($url, $page_id);
+				}
+			}
+		}
+	}
+
+	public function clear_cache($website_id = NULL) {
+		if ($website_id) {
+			$widgets = $this->Widget->get_by_website_id($website_id);
+		} else {
+			$widgets = $this->Widget->get_active();
+		}
+
+		foreach ($widgets as $widget) {
+			// Clear contextual
+			for ($i = 1; $i <= DEFAULT_WIDGET_CONTEXTUAL_RANDOM_SEEDS; $i++) {
+				$this->WidgetAnalytic->clear_contextual_seed($widget['Widget']['id'], $i);
+			}
+
+			// Clear Basic
+			for ($i = 1; $i <= DEFAULT_WIDGET_BASIC_RANDOM_SEEDS; $i++) {
+				$this->WidgetAnalytic->clear_basic_seed($widget['Widget']['id'], $i);
+			}
+		}
+	}
+
+	/* Pull cache information and make it persist */
+	public function update_display_counts($timers = 1) {
+		$this->autoRender = false;
+        echo 'Somebody please remove me!! im not usefull anymore :(';
+ 	}
+
+ 	/* Pull cache information from kestrel and make it persist */
+ 	public function new_update_display_counts($instance = 1) {
+ 		$this->autoRender = false;
+ 		echo 'Somebody please remove me!! im not usefull anymore :(';
+ 	}
+
+ 	/**
+	 * Process the widget_stats_views queue
+	 *
+	 * @param  integer $server     The server numeric index
+	 * @param  integer $batch_size The size of the batch of elements to read
+	 * @param  integer $cycles     The number of cycles
+	 * @param  integer $sleep      The number of seconds to sleep between cycles
+	 *
+	 * @return void
+	 */
+	public function update_stats_impressions($instance = 1, $batch_size = 100000, $cycles = 1, $sleep = 10) {
+		$this->autoRender  = false;
+		echo 'Somebody please remove me!! im not usefull anymore :(';
+	}
+
+	/**
+	 * Same as update_stats_impressions but specifiying
+	 * the kestrel server where to red from
+	 *
+	 * @param  integer $server     The server numeric index
+	 * @param  integer $batch_size The size of the batch of elements to read
+	 * @param  integer $cycles     The number of cycles
+	 * @param  integer $sleep      The number of seconds to sleep between cycles
+	 *
+	 * @return void
+	 */
+	public function kestrel_update_stats_impressions($server = -1, $batch_size = 100000, $cycles = 1, $sleep = 10) {
+ 		if (!defined('KESTREL_READ') && $server >= 0) {
+ 			define('KESTREL_READ', $server);
+ 		}
+ 		$this->update_stats_impressions('k'.$server, $batch_size, $cycles, $sleep);
+ 	}
+
+ 	/**
+ 	 * Stops the run in watchdog of stats impressions
+ 	 *
+ 	 * @param  integer $instance     The instance to stop
+ 	 * @param  integer $delete_lock  If we are going to delete a lock
+ 	 * @param  integer $with_kestrel If the instance its a kestrel update
+ 	 *
+ 	 * @return void
+ 	 */
+ 	public function stop_update_stats_impressions($instance = 1, $delete_lock = 0, $with_kestrel = 0) {
+ 		$this->autoRender = false;
+
+ 		App::import('Component', 'Watchdog');
+ 		$watchdog = new WatchdogComponent();
+
+ 		$key = 'widget_engine_update_stats_impressions_'.($with_kestrel ? 'k' : '').$instance;
+ 		if ($delete_lock) {
+ 			$watchdog->stop($key);
+ 			echo 'Deleted lock for script /widget_engine/update_stats_impressions/'.$instance.'.'.PHP_EOL;
+ 		} else {
+ 			$watchdog->stop_process($key);
+ 			echo 'Stoping /widget_engine/update_stats_impressions/'.$instance.'... Will stop in next cycle.'.PHP_EOL;
+ 		}
+ 	}
+
+ 	/* Deletes the lock for a script */
+ 	public function stop_update_display_counts($instance = 1) {
+ 		App::import('Component', 'Watchdog');
+ 		$watchdog =& new WatchdogComponent();
+
+ 		$key = 'widget_engine_new_update_display_counts_' . $instance;
+ 		$watchdog->stop($key);
+ 	}
+
+ 	/* Pull cache information from kestrel and make it persist */
+ 	public function kestrel_update_display_counts($server = -1) {
+ 		$this->autoRender = false;
+ 		echo 'Somebody please remove me!! im not usefull anymore :(';
+ 	}
+
+	/* CSV Functions */
+	private function csv_log($csv_lines) {
+		if (0) {
+			foreach ($csv_lines as $line) {
+				$out = '';
+				foreach ($line as $element) {
+					$out .= $element.",";
+				}
+
+				$this->log($out, "widget_engine_tunings");
+			}
+		}
+	}
+
+	public function test() {
+		$website = $this->Website->findById(4);
+		$page = $this->Page->findById(52338974);
+
+		$rc = $this->get_peer_ctr($page, $website);
+		echo $rc;
+	}
+
+	/************************************************************
+	 * Only Unit Testing functions below
+	 ************************************************************/
+	public function test_accounts_get($website_id) {
+		plat_assert(Configure::read('unit_test'));
+
+		$website = $this->Website->findById($website_id);
+
+		return $this->accounts_get($website);
+	}
+
+	public function test_weight_rebalance($website_id) {
+		plat_assert(Configure::read('unit_test'));
+
+		$website = $this->Website->findById($website_id);
+
+		$accounts = $this->accounts_get($website);
+
+		return $this->widget_analytics_weight_rebalance($website, $accounts);
+	}
+
+}
+
+/* Helper functions */
+function w_cmp($a, $b) {
+	if ($a == $b) {
+		return 0;
+	}
+	return ($a < $b) ? -1 : 1;
+}
+
+function w_cmp_match_rate($a, $b) {
+	if ($a['match_rate'] == $b['match_rate']) {
+		return 0;
+	}
+	return ($a['match_rate'] < $b['match_rate']) ? -1 : 1;
+}
+
+function w_incoming_rate($a, $b) {
+	if ($a['incoming'] == $b['incoming']) {
+		return 0;
+	}
+	return ($a['incoming'] > $b['incoming']) ? -1 : 1;
+}
+
+?>

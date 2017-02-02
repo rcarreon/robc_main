@@ -1,0 +1,202 @@
+<?php
+
+namespace Test\Image\Drivers;
+
+use \CI\Image\Drivers\IMagick;
+use CI\IO\File;
+
+/**
+ * @group IMagick
+ * @group Drivers
+ * @group Image
+ */
+class ImagickTest extends \PHPUnit_Framework_TestCase
+{
+
+    protected $sImagePath = '../tests/resources/image.png';
+
+    protected $oImagick;
+
+    public function setUp()
+    {
+        $this->oImagick = new IMagick(LIBRARY_DIR . $this->sImagePath);
+    }
+
+    public function testConstruct()
+    {
+        $sExpected = 'CI\Image\Drivers\IMagick';
+        $sResult = $this->oImagick;
+
+        $this->assertInstanceOf($sExpected, $sResult);
+    }
+
+    /**
+     * @expectedException \ImagickException
+     */
+    public function testConstructException()
+    {
+        $this->sImagePath = '';
+        $this->setUp();
+    }
+
+    public function testreadFromFileName()
+    {
+        $bResult = $this->oImagick->readFromFileName(LIBRARY_DIR . $this->sImagePath);
+
+        $this->assertTrue($bResult);
+    }
+
+    /**
+     * @expectedException \ImagickException
+     */
+    public function testreadFromFileNameException()
+    {
+        $this->oImagick->readFromFileName('');
+    }
+
+    public function testreadFromBinaryString()
+    {
+        $sFileBinary = file_get_contents(LIBRARY_DIR . $this->sImagePath);
+        $bResult = $this->oImagick->readFromBinaryString($sFileBinary);
+
+        $this->assertTrue($bResult);
+    }
+
+    /**
+     * @expectedException \ImagickException
+     */
+    public function testreadFromBinaryStringException()
+    {
+        $bResult = $this->oImagick->readFromBinaryString('');
+
+        $this->assertTrue($bResult);
+    }
+
+    public function testResizeImageCorrectly()
+    {
+        $nFilter = \imagick::FILTER_LANCZOS;
+        $nWidth = 100;
+        $nHeight = 100;
+        $bResult = $this->oImagick->resizeImage($nWidth, $nHeight, true, $nFilter);
+
+        $this->assertTrue($bResult);
+    }
+
+    public function testResizeImageWithWidEqualtoNull()
+    {
+        $nFilter = \imagick::FILTER_LANCZOS;
+        $nWidth = null;
+        $nHeight = 100;
+        $bBestFit = true;
+        $bResult = $this->oImagick->resizeImage($nWidth, $nHeight, $bBestFit, $nFilter);
+
+        $this->assertTrue($bResult);
+    }
+
+    public function testResizeImageWithHeightEqualtoNull()
+    {
+        $nFilter = \imagick::FILTER_LANCZOS;
+        $nWidth = 100;
+        $nHeight = null;
+        $bBestFit = true;
+        $bResult = $this->oImagick->resizeImage($nWidth, $nHeight, $bBestFit, $nFilter);
+
+        $this->assertTrue($bResult);
+    }
+
+    /**
+     * @expectedException CI\Image\Drivers\Exception
+     * @expectedExceptionCode CI\Image\Drivers\Exception::INVALID_IMAGE_GEOMETRY
+     * @expectedExceptionMessage The width and height are invalid
+     */
+    public function testResizeImageWithWidthAndHeightEqualtoNull()
+    {
+        $nFilter = \imagick::FILTER_LANCZOS;
+        $nWidth = null;
+        $nHeight = null;
+        $bBestFit = true;
+        $bResult = $this->oImagick->resizeImage($nWidth, $nHeight, $bBestFit, $nFilter);
+
+        $this->assertTrue($bResult);
+    }
+
+    public function testCropimage()
+    {
+        $nWidth = 20;
+        $nHeight = 30;
+        $nPossX = 5;
+        $nPossY = 15;
+        $bResult = $this->oImagick->cropimage($nWidth, $nHeight, $nPossX, $nPossY);
+
+        $this->assertTrue($bResult);
+    }
+
+    /**
+     * @expectedException CI\Image\Drivers\Exception
+     * @expectedExpectionCode CI\Image\Drivers\Exception::INVALID_VALUES_TO_CROP
+     * @expectedExpecteionMessaget ome of the parameters to crop are not valid
+     */
+    public function testCropimageExceptionWithCero()
+    {
+        $nWidth = 0;
+        $nHeight = 30;
+        $nPossX = 0;
+        $nPossY = 15;
+        $bResult = $this->oImagick->cropimage($nWidth, $nHeight, $nPossX, $nPossY);
+    }
+
+
+    /**
+     * @expectedException CI\Image\Drivers\Exception
+     * @expectedExpectionCode CI\Image\Drivers\Exception::INVALID_VALUES_TO_CROP
+     * @expectedExpecteionMessaget ome of the parameters to crop are not valid
+     */
+    public function testCropimageExceptionWithNegative()
+    {
+        $nWidth = -202;
+        $nHeight = 30;
+        $nPossX = -1;
+        $nPossY = 15;
+        $bResult = $this->oImagick->cropimage($nWidth, $nHeight, $nPossX, $nPossY);
+    }
+
+    public function testCropThumbnailImage()
+    {
+        $nWidth = 10;
+        $nHeight = 40;
+        $bResult = $this->oImagick->cropThumbnailImage($nWidth, $nHeight);
+
+        $this->assertTrue($bResult);
+    }
+
+    /**
+     * @expectedException CI\Image\Drivers\Exception
+     * @expectedExpectionCode CI\Image\Drivers\Exception::INVALID_VALUES_TO_CROP
+     * @expectedExpecteionMessaget ome of the parameters to crop are not valid
+     */
+    public function testCropThumbnailImageExceptionWithCero()
+    {
+        $nWidth = 0;
+        $nHeight = 40;
+        $bResult = $this->oImagick->cropThumbnailImage($nWidth, $nHeight);
+    }
+
+    /**
+     * @expectedException CI\Image\Drivers\Exception
+     * @expectedExpectionCode CI\Image\Drivers\Exception::INVALID_VALUES_TO_CROP
+     * @expectedExpecteionMessaget ome of the parameters to crop are not valid
+     */
+    public function testCropThumbnailImageExceptionWithNegative()
+    {
+        $nWidth = 10;
+        $nHeight = -40;
+        $bResult = $this->oImagick->cropThumbnailImage($nWidth, $nHeight);
+    }
+
+    public function testGetImageString()
+    {
+        $sResult = $this->oImagick->getImageString();
+
+        $this->assertInternalType('string', $sResult);
+    }
+}

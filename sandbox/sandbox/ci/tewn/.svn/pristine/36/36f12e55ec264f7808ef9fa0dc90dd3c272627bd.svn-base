@@ -1,0 +1,53 @@
+<?php
+
+namespace CI\Component;
+use CI\Category;
+
+class Intersect
+{
+    /**
+     * Create an intersect array
+     *
+     * @param  string  $sCategories Category Ids separated by comma
+     * @param  integer $nSex        Demographic Sex id
+     * @param  integer $nContent    Content Rating id
+     *
+     * @return array The intersection
+     */
+    public function create($sCategories, $nSex, $nContent)
+    {
+        if(empty($sCategories)) {
+            $sCategories = Category::ALL;
+        }
+
+        $aIntersect = array(
+            'categories'      => $sCategories,
+            'demographic_sex' => $nSex,
+            'content_rating'  => $nContent,
+        );
+        return $aIntersect;
+    }
+
+    /**
+     * Obtain the intersection by page data
+     *
+     * @param  array   $aPage   Page data
+     * @param  integer $nDomain Domain id to translate categories
+     *
+     * @return array The intersection
+     */
+    public function getByPage($aPage, $nHubId = null)
+    {
+        $aCategories = $aPage['categories'];
+        if ($nHubId !== null) {
+            $oCategory = new \CI\Category();
+            array_walk($aCategories, function (&$nCategory) use($oCategory, $nHubId) {
+                $nCategory = $oCategory->translate($nCategory, $nHubId);
+            });
+        }
+
+        $sCategories = implode(',', array_unique($aCategories));
+        $aIntersect = $this->create($sCategories, $aPage['demographic_sex'], $aPage['content_rating']);
+        return $aIntersect;
+    }
+}

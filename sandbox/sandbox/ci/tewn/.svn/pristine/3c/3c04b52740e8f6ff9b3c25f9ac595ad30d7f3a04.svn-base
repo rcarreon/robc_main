@@ -1,0 +1,10 @@
+$.tablesorter.addParser({
+    id: "stringToNumber",
+    is: function(s) {
+        return false;
+    },
+    format: function(s) {
+        return s.replace('%','').replace(/,/g,'');
+    },
+    type: "numeric"
+});

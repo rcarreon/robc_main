@@ -1,0 +1,25 @@
+<?php
+defined('LIBRARY_DIR') or define('LIBRARY_DIR', '../library/'); // Where the app is located //
+defined('CI_PREFIX') or define('CI_PREFIX', 'CI');              // The CI namespace prefix //
+
+require_once 'PHPUnit/Autoload.php';
+require_once '../../autoload.php';
+
+spl_autoload_register(
+    function ($class) {
+    	load_namespace_classes($class);
+    }
+);
+
+function load_namespace_classes($class)
+{
+	if (strpos($class, CI_PREFIX) !== false) {
+		$class = str_replace(CI_PREFIX . '\\', '', $class); // Remove 'CI\' from the class name //
+		$class = explode('\\', $class);
+		$filePath = implode('/', $class).'.php';
+
+    	if (file_exists(LIBRARY_DIR. $filePath)) {
+        	include_once LIBRARY_DIR . $filePath;
+        }
+	}
+}

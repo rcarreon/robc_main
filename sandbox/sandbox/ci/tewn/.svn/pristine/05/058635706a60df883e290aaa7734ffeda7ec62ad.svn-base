@@ -1,0 +1,9 @@
+/* dashboard_refers.js */
+jQuery(document).ready(function() { 						   
+    $("#refers_table").tablesorter();   
+});
+
+function confirm_delete() {
+	var r = confirm("Are you sure you want to delete");
+	return r;
+}

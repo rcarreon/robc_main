@@ -1,0 +1,122 @@
+<?php
+
+namespace CI;
+use CI\Facade\Factory;
+
+abstract class Facade
+{
+
+    /**
+     * The resolved object instances.
+     *
+     * @var array
+     */
+    protected static $aResolvedInstance;
+
+    /**
+     * Get the root object behind the facade.
+     *
+     * @return mixed
+     */
+    public static function getFacadeRoot()
+    {
+        return static::resolveFacadeInstance(static::getFacadeAccessor());
+    }
+
+    /**
+     * Get the registered name of the component.
+     *
+     * @return string
+     */
+    protected static function getFacadeAccessor()
+    {
+        throw new Facade\Exception(Facade\Exception::ERROR_ACCESSOR);
+    }
+
+    /**
+     * Resolve the facade root instance from the container.
+     *
+     * @param  string $sName
+     * @return mixed
+     */
+    protected static function resolveFacadeInstance($sName)
+    {
+        if (!is_object($sName)) {
+            if (isset(static::$aResolvedInstance[$sName])) {
+                $sName = static::$aResolvedInstance[$sName];
+            } else {
+                $sName = static::$aResolvedInstance[$sName] = static::buildFacadeInstance($sName);
+            }
+        }
+        return $sName;
+    }
+
+    /**
+     * Builds the facade instance
+     *
+     * @param  string $sName
+     * @return mixed
+     */
+    protected static function buildFacadeInstance($sName)
+    {
+        $oInstance = Factory::build($sName);
+        if ($oInstance === null) {
+            throw new Facade\Exception(Facade\Exception::ERROR_FACTORY, $sName);
+        }
+        return $oInstance;
+    }
+
+    /**
+     * Clear a resolved facade instance.
+     *
+     * @param  string  $sName
+     * @return void
+     */
+    public static function clearResolvedInstance($sName)
+    {
+        unset(static::$aResolvedInstance[$sName]);
+    }
+
+    /**
+     * Clear all of the resolved instances.
+     *
+     * @return void
+     */
+    public static function clearResolvedInstances()
+    {
+        static::$aResolvedInstance = array();
+    }
+
+    /**
+     * Handle dynamic, static calls to the object.
+     *
+     * @param  string  $sMethod
+     * @param  array   $aArgs
+     * @return mixed
+     */
+    public static function __callStatic($sMethod, $aArgs)
+    {
+        $oInstance = static::resolveFacadeInstance(static::getFacadeAccessor());
+
+        switch (count($aArgs))
+        {
+            case 0:
+                return $oInstance->$sMethod();
+
+            case 1:
+                return $oInstance->$sMethod($aArgs[0]);
+
+            case 2:
+                return $oInstance->$sMethod($aArgs[0], $aArgs[1]);
+
+            case 3:
+                return $oInstance->$sMethod($aArgs[0], $aArgs[1], $aArgs[2]);
+
+            case 4:
+                return $oInstance->$sMethod($aArgs[0], $aArgs[1], $aArgs[2], $aArgs[3]);
+
+            default:
+                return call_user_func_array(array($oInstance, $sMethod), $aArgs);
+        }
+    }
+}

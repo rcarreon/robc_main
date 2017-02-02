@@ -1,0 +1,53 @@
+<?php
+
+$vw_configuration = array(
+    // Local environment for sandbox
+    'local' => array(
+        'widget' => array(
+            'host' => 'localhost',
+            'port' => 26542,
+        ),
+        'landing_page' => array(
+            'host' => 'localhost',
+            'port' => 26545,
+        ),
+    ),
+
+    // Development environment
+    'dev' => array(
+        'widget' => array(
+            'host' => 'app1v-vw.ci.dev.lax.gnmedia.net',
+            'port' => 26542,
+        ),
+        'landing_page' => array(
+            'host' => 'app1v-vw.ci.dev.lax.gnmedia.net',
+            'port' => 26545,
+        ),
+    ),
+
+    // Staging environment
+    'stg' => array(
+        'widget' => array(
+            'host' => 'vip-app-vw.ci.stg.lax.gnmedia.net',
+            'port' => 26542,
+        ),
+        'landing_page' => array(
+            'host' => 'vip-app-vw.ci.stg.lax.gnmedia.net',
+            'port' => 26545,
+        ),
+    ),
+
+    // Production environment
+    'prd' => array(
+        'widget' => array(
+            'host' => 'vip-app-vw.ci.prd.lax.gnmedia.net',
+            'port' => 26542,
+        ),
+        'landing_page' => array(
+            'host' => 'vip-app-vw.ci.prd.lax.gnmedia.net',
+            'port' => 26545,
+        ),
+    ),
+);
+
+return $vw_configuration[ENVIRONMENT];

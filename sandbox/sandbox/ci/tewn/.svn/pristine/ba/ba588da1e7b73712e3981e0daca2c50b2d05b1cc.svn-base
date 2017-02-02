@@ -1,0 +1,52 @@
+<?php
+/**
+ * ContentRating File
+ *
+ * PHP Version 5.3
+ *
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+
+namespace CI\Content;
+
+/**
+ * ContentRating Class
+ *
+ * PHP Version 5.3
+ *
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+class Rating
+{
+    const WEBSITE_CONTENT_G    = 0;
+    const WEBSITE_CONTENT_PG13 = 1;
+    const WEBSITE_CONTENT_R    = 2;
+    const WEBSITE_CONTENT_MENS = 3;
+
+    private $_oDataSource;
+
+    public function getContentDataSource()
+    {
+        if (empty($this->_oDataSource)) {
+            $this->_oDataSource = new Rating\DataSource\MyArray();
+        }
+
+        return $this->_oDataSource;
+    }
+
+    public function getAll()
+    {
+        $aReturn     = array();
+        $oDataSource = $this->getContentDataSource();
+
+        foreach ($oDataSource as $aContent) {
+             $aReturn[] = $aContent;
+        }
+
+        return $aReturn;
+    }
+}

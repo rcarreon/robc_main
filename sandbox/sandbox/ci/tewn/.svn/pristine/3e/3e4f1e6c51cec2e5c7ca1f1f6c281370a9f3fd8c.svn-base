@@ -1,0 +1,166 @@
+<?
+	function management_tab_selected($tab_selected, $tab_checked) {
+		if ($tab_selected == $tab_checked) {
+			$selected_class = "tab_selected";
+		} else {
+			$selected_class = "tab_unselected";
+		}
+		return $selected_class;
+	}
+
+    if (isset($user)) {
+        $full_admin = false;
+
+        if ($user['User']['domain_bitfield'] == -1) {
+            $full_admin = true;
+        }
+    }
+
+    $notes = '';
+
+    if ($is_curator_user || $full_admin) {
+        $selected_class = management_tab_selected($tab, "personal");
+        App::import('Helper', 'Info');
+        $info = new InfoHelper();
+        $total = $info->userNotes($user['User']['id']);
+        $notes = $total > 0 ? ' (' . $total . ')' : '';
+    }
+?>
+
+<div class="row">
+
+  <div id="tabs" class="column grid_12">
+     <table cellpadding=0 border=0>
+     <tr>
+       <?
+       if($is_curator_user && !$is_admin_user) {
+        ?>
+        <td>
+        <? $selected_class = management_tab_selected($tab, "home"); ?>
+           <div class="tab_small <?=$selected_class?>" id="admin_home"><a class="<?=$selected_class?>" href="/admin">Dashboard</a>
+           </div>
+        </td>
+
+        <td>
+        <? $selected_class = management_tab_selected($tab, "personal"); ?>
+           <div class="tab_small <?=$selected_class?>" id="personal"><a class="<?=$selected_class?>" href="/users/personal">Personal Board<?php echo $notes ?></a>
+           </div>
+        </td>
+
+        <td>
+        <? $selected_class = management_tab_selected($tab, "websites"); ?>
+           <div class="tab_small <?=$selected_class?>" id="websites"><a class="<?=$selected_class?>" href="/admin/websites/report">Websites</a>
+           </div>
+        </td>
+
+        <td>
+        <? $selected_class = management_tab_selected($tab, "page_search"); ?>
+           <div class="tab_small <?=$selected_class?>" id="page_search"><a class="<?=$selected_class?>" href="/management/page_search">Search</a>
+           </div>
+        </td>
+        <?
+       } else {
+		if ($full_admin) {
+       ?>
+       <td>
+		<? $selected_class = management_tab_selected($tab, "home"); ?>
+	       <div class="tab_small <?=$selected_class?>" id="admin_home"><a class="<?=$selected_class?>" href="/admin">Dashboard</a>
+	       </div>
+	  </td>
+       <td>
+		<? $selected_class = management_tab_selected($tab, "personal"); ?>
+	       <div class="tab_small <?=$selected_class?>" id="personal"><a class="<?=$selected_class?>" href="/users/personal">Personal Board<?php echo $notes ?></a>
+	       </div>
+	  </td>
+
+	   <? } ?>
+      <td>
+		<? $selected_class = management_tab_selected($tab, "websites"); ?>
+	       <div class="tab_small <?=$selected_class?>" id="websites"><a class="<?=$selected_class?>" href="/admin/websites/report">Websites</a>
+	       </div>
+	  </td>
+	<?
+		if ($full_admin) {
+	?>
+      <td>
+		<? $selected_class = management_tab_selected($tab, "widgets"); ?>
+	<div class="tab_small <?=$selected_class?>" id="widgets"><a class="<?=$selected_class?>" href="/widgets">Widgets</a>
+	       </div>
+	  </td>
+
+      <td>
+		<? $selected_class = management_tab_selected($tab, "report"); ?>
+	<div class="tab_small <?=$selected_class?>" id="report"><a class="<?=$selected_class?>" href="/management/report">Reports</a>
+	       </div>
+	</td>
+      <td>
+		<? $selected_class = management_tab_selected($tab, "page_search"); ?>
+	       <div class="tab_small <?=$selected_class?>" id="page_search"><a class="<?=$selected_class?>" href="/management/page_search">Search</a>
+	       </div>
+	  </td>
+      <td>
+		<? $selected_class = management_tab_selected($tab, "bd"); ?>
+	       <div class="tab_small <?=$selected_class?>" id="bd"><a class="<?=$selected_class?>" href="/management/bd">BD</a>
+	       </div>
+	  </td>
+
+
+<!--
+      <td>
+		<? $selected_class = management_tab_selected($tab, "credits"); ?>
+	       <div class="tab_small <?=$selected_class?>" id="credits"><a class="<?=$selected_class?>" href="/management/credits">Credits</a>
+	       </div>
+	  </td>
+      <td>
+		<? $selected_class = management_tab_selected($tab, "account"); ?>
+	       <div class="tab_small <?=$selected_class?>" tab_<? if ($tab != "account") { echo "un"; }?>selected" id="acctmgmt"><a class="<?=$selected_class?>" href="/management/account">Account Management</a>
+	       </div>
+	  </td>
+-->
+      <td>
+		<? $selected_class = management_tab_selected($tab, "ranker"); ?>
+	       <div class="tab_small <?=$selected_class?>" id="landing_page"><a class="<?=$selected_class?>" href="/ranker/view/5/5/3">Ranker</a>
+	       </div>
+	  </td>
+
+      <td>
+		<? $selected_class = management_tab_selected($tab, "landing_page"); ?>
+	       <div class="tab_small <?=$selected_class?>" id="landing_page"><a class="<?=$selected_class?>" href="/management/landing_page">A|B</a>
+	       </div>
+	  </td>
+
+
+
+      <td>
+		<? $selected_class = management_tab_selected($tab, "engine"); ?>
+	       <div class="tab_small <?=$selected_class?>" id="admin_home"><a class="<?=$selected_class?>" href="/management/engine">Engine</a>
+	       </div>
+	  </td>
+      <td>
+		<? $selected_class = management_tab_selected($tab, "user"); ?>
+	       <div class="tab_small <?=$selected_class?>" id="user"><a class="<?=$selected_class?>" href="/management/users">Users</a>
+	       </div>
+	  </td>
+
+<?
+		}
+    } //end if of if($is_curator)
+?>
+      <td>
+		<? $selected_class = management_tab_selected($tab, "dashboard"); ?>
+	       <div class="tab_small <?=$selected_class?>" id="dashboard"><a class="<?=$selected_class?>" href="/dashboard">User Dashboard</a>
+	       </div>
+	  </td>
+      <?php if ($user['User']['admin'] == 2) : ?>
+      <td>
+		<? $selected_class = management_tab_selected($tab, "settingstoolbar"); ?>
+	       <div class="tab_small <?=$selected_class?>" id="settingstoolbar"><a class="<?=$selected_class?>" href="/settings/index">Tunables</a>
+	       </div>
+	  </td>
+	  <?php endif; ?>
+     </tr>
+     </table>
+  </div> <!--  end column for tabs -->
+
+</div>  <!--  end row for tabs -->
+

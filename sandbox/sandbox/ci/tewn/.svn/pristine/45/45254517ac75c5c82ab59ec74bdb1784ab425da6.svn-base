@@ -1,0 +1,32 @@
+<div class="row main">
+<div id="content" class="column grid_12">
+
+  <h3 class="topContent">Help</h3>
+	
+		
+<div class="row" id="content_area">
+  <div class="column grid_12">
+	  
+	 <div style="margin-left:30px;">  
+	  
+	 <p style="font-size:24px;">During our Beta phase, please e-mail us directly to get help, ask questions, or report bugs</p>
+	 
+	 <div style="margin-left:30px;margin-top:18px;padding:12px;">
+	   <p>E-mail <a href="mailto:<?=EMAIL_TECH?>"><?=EMAIL_TECH?></a> if you have any questions about how <?=SITE_NAME?> works, questions about your admin account, if you have technical problems, questions about your credits, or need help in using the admin's dashboard.
+
+	   <p style="margin-top:18px;">As we get closer to exiting Beta phase, this page will be replaced by one of those fancy help and question pages and maybe even an Indian person to answer your questions live.
+	 </div>
+	
+	 <br><br>
+	 
+	 </div>
+	 
+  </div> 
+</div>
+	
+
+  <h3 class="bottomContent"></h3>
+
+</div> <!--  end of content column -->
+
+</div> <!--  end of content row -->

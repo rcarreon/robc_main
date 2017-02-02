@@ -1,0 +1,15 @@
+<?
+	if (!isset($canonical)) {
+        $canonical = "";
+    }
+
+	echo $this->element(DOMAIN."/header", array("title_for_layout" => $title_for_layout, "canonical" => $canonical));
+
+	echo $this->element(DOMAIN."/toolbar");
+
+	flush();
+
+	echo $content_for_layout;
+
+	echo $this->element("footer");
+?>

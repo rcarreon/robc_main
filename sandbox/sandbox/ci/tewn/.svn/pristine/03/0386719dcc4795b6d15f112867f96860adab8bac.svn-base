@@ -1,0 +1,491 @@
+<?php
+
+include_once (ROOT . DS . APP_DIR . DS . "global_defines.php");
+
+class UsersController extends AppController
+{
+    var $name = 'Users';
+    var $helpers = array('Html', 'Ajax', 'Javascript', 'Convert', 'Form');
+    var $uses = array('User', 'Note', 'Log', 'Account', 'Page', 'Website', 'MetricLog');
+    var $components = array('RequestHandler', 'Mail', 'Domain', 'Date', 'History');
+    var $cacheAction = false;
+
+    function beforeFilter() {
+        $this->set_types_user();
+
+        // Pages controller
+        App::import('Controller', 'Pages');
+        global $Pages;
+        $Pages = new PagesController;
+        $Pages->constructClasses();
+
+        $this->layout = DOMAIN.'/default';
+    }
+
+    function change_email() {
+        $this->autoRender = false;
+        Configure::write('debug', 0);
+
+        $this->Session->activate();
+        $this->Log->page_view();
+        $post = $this->params['form']; // get the email of a form
+
+        if (!isset($post['email'])) {
+            echo '{"error": "The email is not valid"}';
+            return;
+        }
+
+        // validate the email on the server side
+        if (preg_match("^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,3})$^", $post['email'])) {
+            $user = $this->Session->read('User');
+            $user = $this->User->findById($user['id']);
+            plat_assert($user);
+            $this->User->id = $user['User']['id'];
+            $this->User->saveField('email', $post['email']);
+            echo '{"email": "', $post['email'], '"}';
+        } else {
+            echo '{"error": "The email is not valid"}';
+        }
+    }
+
+    function change() {
+        $this->Session->activate();
+
+        $this->Log->page_view();
+
+        if (!empty($this->data)) {
+            if ($this->data['User']['new_password'] != $this->data['User']['confirm_password']) {
+                $this->set("password_mismatch", 1);
+            } else {
+                $this->set("password_mismatch", 0);
+            }
+
+            $user = $this->Session->read('User');
+            $user = $this->User->findById($user['id']);
+
+            plat_assert($user);
+
+            if ($user['User']['password'] == $this->data['User']['password']) {
+                $this->User->id = $user['User']['id'];
+                $this->User->saveField('password', $this->data['User']['new_password']);
+
+                $this->set("changed", 1);
+            } else {
+                $this->set("changed", -1);
+            }
+        }
+    }
+
+    function forgot() {
+        Configure::write('debug', 1);
+
+        $this->Log->page_view();
+        $this->layout = 'backend2';
+        $mailed = 0;
+        $error = 0;
+
+        if (!empty($this->data)) {
+            if(strstr($this->data['User']['email'], "@")){
+                $user = $this->User->findByEmail($this->data['User']['email']);
+            }else{
+                $user = $this->User->findByUsername($this->data['User']['email']);
+            }
+
+            // Invalidate the field to trigger the HTML
+            // Helper's error messages
+            if (!empty($user['User']['email'])) {
+
+                $message = "Forgotten password: ".$user['User']['password'];
+                $message .= "<br><br>Hope this helps<br><br>";
+                $message .= "- ".SITE_NAME." Staff";
+
+                $this->Mail->send_mail($user['User']['email'], EMAIL_ADMIN, SITE_NAME." lost password", $message);
+                $mailed = 1;
+            } else {
+                $error = 1;
+            }
+        }
+
+        $this->set('mailed', $mailed);
+        $this->set('error', $error);
+
+    }
+
+    function edit() {
+        $this->Log->page_view();
+
+        $user = $this->getUser();
+        $user_id = $user['id'];
+
+        if (!empty($this->data)) {
+            $this->User->id = $user_id;
+
+            $this->MetricLog->log(LOG_TYPE_USER_UPDATE);
+
+            if ($this->User->save($this->data)) {
+                $this->redirect('/users/home');
+            }
+        }
+
+        $this->set("user", $this->User->findById($user_id));
+
+    }
+
+    function create($inlined = 0) {
+        $this->Log->page_view();
+
+        if (!empty($this->data)) {
+            if (isset($this->data['User']['term']) && !$this->data['User']['term']) {
+                $this->User->invalidate('term');
+                return;
+            }
+
+            if ($this->User->save($this->data)) {
+                //$this->User->_clearCache();
+                $this->login($inlined);
+                $this->MetricLog->log(LOG_TYPE_USER_CREATE);
+            }
+
+        }
+
+    }
+
+    function login($inlined = 0)
+    {
+        $this->Session->activate();
+
+        // See if hthis was via an AJAX call
+        if ($this->RequestHandler->isAjax()) {
+            $ajax_call = 1;
+            $this->set('ajax_call', true);
+            $this->RequestHandler->renderAs($this, 'ajax');
+        } else {
+            $this->layout = 'backend2';
+            $ajax_call = 0;
+            $this->set('ajax_call', false);
+            $this->Log->page_view();
+        }
+
+        //Don't show the error message if no data has
+        //been submitted.
+        $this->set('error', false);
+
+        // If a user has submitted form data:
+        if (!empty($this->data)) {
+            // First, let's see if there are any
+            // users in the database
+            // with the username supplied by the
+            // user using the form:
+
+            $this->User->cacheQueries = false;
+            $someone = $this->User->findByUsername($this->data['User']['username']);
+
+            $account = $this->Account->findByUserId($someone['User']['id']);
+
+            // At this point, $someone is full of
+            // user data, or its empty.
+            // Let's compare the form-submitted
+            // password with the one in
+            // the database.
+
+            if(!empty($someone['User']['password']) && $someone['User']['password'] == $this->data['User']['password']) {
+                // check the last login, and also if the user already check the terms and conditions
+                if ($this->will_update_terms_and_condintions($someone, $this->Session->read('User'))) {
+                    $dispatcher = new Dispatcher();
+                    $dispatcher->dispatch(
+                        array('controller' => 'users', 'action' => 'update_your_password'),
+                        array(
+                            'data' => array(
+                                'User' => array(
+                                    'id' => $someone['User']['id'],
+                                    'password' => $someone['User']['password']
+                                )
+                            )
+                        )
+                    );
+                    exit;
+                }
+
+                $this->User->update_login_data($someone, $this->Session);
+
+                // Just return when login is part of a
+                // bigger function
+                if ($inlined) {
+                    return;
+                }
+
+                if (!$ajax_call) {
+                    $url = $this->User->get_redirect_url_before_login($this->User->id, $this->Session, $account);
+                    $this->redirect($url);
+                    exit();
+                }
+            } else {
+                // Else, they supplied incorrect data:
+                $this->set('error', true);
+            }
+        }
+    }
+
+    protected function will_update_terms_and_condintions($user, $login_user)
+    {
+        $return = false;
+        $login_user = new CI\ArrayManipulator($login_user);
+
+        if (false == $this->User->isAdmin($login_user->get('id', 0), $login_user->get('admin', 0))) {
+            if (empty($user['User']['last_login']) || empty($user['User']['terms'])) {
+                $return = true;
+            }
+        }
+
+        return $return;
+    }
+
+    public function update_your_password()
+    {
+        $this->layout    = 'backend2';
+        $error           = false;
+        $error_meessage  = '';
+        $user_id         = empty($this->data['User']['id']) ? 0 : $this->data['User']['id'] ;
+        $password        = empty($this->data['User']['password']) ? '' : trim($this->data['User']['password']) ;
+
+        $this->set('user_id', $user_id);
+        $this->set('password', $password);
+
+        if (empty($user_id) || empty($password)){
+            $error = true;
+            $error_meessage = 'Not enough info';
+        }
+
+        $this->set('error', $error);
+        $this->set('error_meessage', $error_meessage);
+
+    }
+
+    function logout() {
+        $this->Session->activate();
+
+        $this->Log->page_view();
+        $this->MetricLog->log(LOG_TYPE_USER_LOGOUT);
+
+        // Redirect users to this action if they click
+        // on a Logout button.
+        // All we need to do here is trash the session
+        // information:
+
+        $this->Session->delete('User');
+
+        setcookie("unique_id", "", time()-60*60*24*30, "/");
+        // And we should probably forward them
+        // somewhere, too...
+
+        $this->redirect('/');
+        exit();
+    }
+
+    function terms() {
+        $this->Log->page_view();
+
+        if ($this->data) {
+            $this->Session->activate();
+            $user = $this->Session->read('User');
+
+            $this->User->id = $user['id'];
+
+            if ($this->data['User']['terms']) {
+                $this->User->saveField("terms_accept", $this->Date->now());
+            }
+
+            $this->User->saveField("terms", $this->data['User']['terms']);
+            $this->redirect('/dashboard');
+            exit();
+        }
+    }
+
+    function personal($user_id = 0){
+        $this->layout = 'backend2';
+        global $Pages;
+
+        $this->Session->activate();
+
+        $this->Log->page_view();
+        $this->MetricLog->log(LOG_TYPE_PAGE_VIEW);
+
+        if (!$user_id) {
+            $user = $this->Session->read('User');
+            $user_id = $user['id'];
+        }
+
+        $User = $this->User->findById($user_id);
+
+        if (!$this->RequestAction("/management/validate_admin/".ADMIN_FULL)) {
+            $this->redirect("/login");
+        }
+
+        $yesterday = $this->Date->yesterday();
+
+        /* Get last moderated websites */
+        $websites = array();
+        $pages = $this->Page->latest_moderated($user_id, 1);
+        foreach ($pages as $page) {
+            $websites[] = $this->Website->findById($page['Page']['website_id']);
+        }
+
+        $count = count($websites);
+        for ($i = 0; $i < $count; $i++) {
+            $yesterday_stats = $this->RequestAction("/history_credits/stats_day/".$websites[$i]['Website']['account_id']."/".$yesterday);
+
+            $websites[$i]['Website']['yincoming'] = $yesterday_stats['incoming'];
+            $websites[$i]['Website']['youtgoing'] = $yesterday_stats['outgoing'];
+        }
+
+        /* Get last moderated pages */
+        $pages = $this->Page->latest_moderated($user_id);
+        $pages = $Pages->load_page_stats($pages);
+
+        /* Flagged websites */
+        $decoded = json_decode($User['User']['flagged_websites']);
+        $flagged_websites = (array) $decoded;
+
+        $flagged_websites = $this->Website->find('all', array('conditions' =>
+                                                              array('id' => $flagged_websites)));
+        $count = count($flagged_websites);
+        for ($i = 0; $i < $count; $i++) {
+            $yesterday_stats = $this->RequestAction("/history_credits/stats_day/".$flagged_websites[$i]['Website']['account_id']."/".$yesterday);
+
+            $flagged_websites[$i]['Website']['yincoming'] = $yesterday_stats['incoming'];
+            $flagged_websites[$i]['Website']['youtgoing'] = $yesterday_stats['outgoing'];
+        }
+
+        $notes = $this->Note->findAllByUserId($user_id);
+
+        /* Set outgoing variables */
+        $this->set('Flagged_Websites', $flagged_websites);
+        $this->set('Pages', $pages);
+        $this->set('Websites', $websites);
+        $this->set("user", $User);
+        $this->set("notes", $notes);
+    }
+
+    function add_note($user_id) {
+        $user = $this->User->findById($user_id);
+        $friends = $this->User->find('list', array(
+            'fields' => array('User.id', 'User.username'),
+            'confitions' => array('User.visible' => 1)
+        ));
+        if (isset($friends[$user_id])) unset($friends[$user_id]);
+        $this->set('id', $user['User']['id']);
+        $this->set('username', $user['User']['username']);
+        $this->set('friends', $friends);
+    }
+
+    function save_note($user_id) {
+        $this->autoRender = false;
+        $post = $this->params['form'];
+        $data['Note']['user_id'] = $post['friend'] == 0 ? $user_id : $post['friend'];
+        $data['Note']['text'] = $post['body'];
+        $data['Note']['from'] = $post['friend'] == 0 ? '' : $post['author'];
+        $data['Note']['color'] = $post['color'];
+        $data['Note']['xyz'] = '0x0x' . $post['zindex'];
+        $this->Note->save($data);
+
+        Configure::write('debug', 0);
+        echo $post['friend'] == 0 ? $this->Note->id : '';
+    }
+
+    function update_note($note_id) {
+        $this->autoRender = false;
+        $post = $this->params['form'];
+        $note = $this->Note->findById($note_id);
+        $note['Note']['xyz'] = $post['x'] . 'x' . $post['y'] . 'x' . $post['z'];
+        $this->Note->save($note);
+    }
+
+    function delete_note($note_id) {
+        $this->autoRender = false;
+        $this->Note->remove($note_id);
+    }
+
+    function show_note($user_id){
+            $user = $this->User->findById($user_id);
+            $notes = $user['User']['notes'];
+
+            if(!$notes){
+                $notes = '';
+            }
+
+            $this->set('id', $user['User']['id']);
+            $this->set('notes', $notes);
+    }
+
+    function edit_note($user_id, $notes = null){
+        $this->layout = 'ajax';
+        $this->autoRender = FALSE;
+
+        $user = $this->User->findById($user_id);
+
+        $user['User']['notes'] = $notes;
+        $rc = $this->User->save($user);
+
+        if($rc){
+            echo 'Note was saved successfully.';
+        }else{
+            echo 'There was an error saving the note please try again.';
+        }
+    }
+
+    function flag_website($website_id, $user_id){
+        $this->layout = 'ajax';
+        $this->autoRender = FALSE;
+
+        $user = $this->User->findById($user_id);
+
+        if($user['User']['flagged_websites'] != NULL && $user['User']['flagged_websites']!='null'){
+            $fw_json = $user['User']['flagged_websites'];
+            $flagged_websites = json_decode($fw_json);
+        }elseif($user['User']['flagged_websites'] == 'null'){
+            $flagged_websites = array();
+        }else{
+            $flagged_websites = array();
+        }
+
+        array_push($flagged_websites, $website_id);
+
+        $new_flagged_websites = json_encode(array_unique($flagged_websites));
+
+        $this->User->flag_website($new_flagged_websites, $user_id);
+
+        echo "1";
+        return $new_flagged_websites;
+    }
+
+    function unflag_website($website_id, $user_id){
+        $this->layout = 'ajax';
+        $this->autoRender = FALSE;
+
+        $user = $this->User->findById($user_id);
+
+        if($user['User']['flagged_websites']){
+            $fw_json = $user['User']['flagged_websites'];
+            $flagged_websites = json_decode($fw_json);
+            $remaining_websites = array();
+            foreach($flagged_websites as $key=>$value){
+                if($value != $website_id){
+                    array_push($remaining_websites,$flagged_websites[$key]);
+                }
+            }
+
+            $new_flagged_websites = json_encode(array_unique($remaining_websites));
+
+            $this->User->flag_website($new_flagged_websites, $user_id);
+
+            echo "1";
+            return $new_flagged_websites;
+        }else{
+            echo "0";
+            $new_flagged_websites = NULL;
+            return $new_flagged_websites;
+        }
+    }
+}
+
+?>

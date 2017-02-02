@@ -1,0 +1,88 @@
+<?php
+
+namespace Test\Stats;
+use CI\Stats;
+
+/**
+ * @group stats
+ */
+class StatsTest extends \PHPUnit_Framework_TestCase
+{
+    protected $oStats = null;
+
+    public function setUp()
+    {
+        $this->oStats = new StatsMock();
+    }
+
+    public function testGetData()
+    {
+        $nExpected = 100;
+        $this->oStats->setType(1)->setId(10);
+
+        $nResult = $this->oStats->getData();
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+    public function testErros()
+    {
+        $nExpected = 0;
+        $aExpected = array('Not id in conditions');
+
+        $nResult = $this->oStats->getData();
+        $aError = $this->oStats->getErrors();
+
+        $this->assertEquals($nExpected, $nResult, 'Result Assert');
+        $this->assertEquals($aExpected, $aError, 'Error Assert');
+    }
+}
+
+class StatsMock extends Stats
+{
+    protected $aDefaultConditions = array(
+        'type' => 0,
+    );
+
+    public function __construct()
+    {
+        $this->setConditions(array());
+        $this->setErrors(array());
+    }
+
+    public function getEmptyStats()
+    {
+        return 0;
+    }
+
+    public function setType($type)
+    {
+        $this->addCondition(array('type' => $type));
+        return $this;
+    }
+
+    public function setId($id)
+    {
+        $this->addCondition(array('id' => $id));
+        return $this;
+    }
+
+    protected function validateConditions()
+    {
+        $bValid = isset($this->aConditions['id']);
+        if (!$bValid) {
+            $this->addError('Not id in conditions');
+        }
+        return $bValid;
+    }
+
+    public function process()
+    {
+        $stats = 0;
+        if ($this->aConditions['type'] > 0) {
+            $stats = 100;
+        } else {
+            $stats = 10;
+        }
+        return $stats;
+    }
+}

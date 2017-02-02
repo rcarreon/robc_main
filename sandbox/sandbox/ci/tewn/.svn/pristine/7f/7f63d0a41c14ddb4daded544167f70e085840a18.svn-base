@@ -1,0 +1,217 @@
+<?php
+
+
+namespace CI\Test\Search;
+use CI\Search\Sphinx;
+
+/**
+ * Class MockMysqlResult mock class for testing
+ * @package CI\Test\Search
+ */
+class MockMysqlResult
+{
+    private $sRow = null;
+
+    /**
+     * Contstructor with value to be returned later by fetch_object();
+     * @param $row value to be returned later by fetch_object();
+     */
+    function __construct($row)
+    {
+        $this->sRow = $row;
+    }
+
+    /**
+     * Mock for mysqli->fetch_object()
+     * First call will return the value provided when the MockMysqlResult object was created.
+     * Subsequent calls return null.
+     * @return string (1st call); null (subsequent calls)
+     */
+    function fetch_object()
+    {
+        $sReturn = $this->sRow;
+        $this->sRow = null;
+        return $sReturn;
+    }
+}
+
+/**
+ * Class MockMysqli - mock class for mysqli testing of SphinxComponent
+ * @package CI\Test\Search
+ */
+class MockMysqli
+{
+    /**
+     * Mock function for mysqli query
+     * @param $query
+     * @return MockMysqlResult
+     */
+    function query($query)
+    {
+        return new MockMysqlResult($query);
+    }
+
+}
+
+
+/*
+ * @HACK Defines - because PHPunit is not happy reading global_defines.php
+ */
+define("WEBSITE_CONTENT_G", 0);
+define("WEBSITE_CONTENT_PG13", 1);
+define("WEBSITE_CONTENT_R", 2);
+define("WEBSITE_CONTENT_MENS", 3);
+
+/**
+ * Testing the functionality of Sphinx connector
+ *
+ * PHP Version 5.3
+ *
+ * @category CI
+ * @package  CI\Test\Search
+ * @author   Jenson Crawford jenson@crowdignite.com (with thanks to Julio Rodriguez for his PHPunit expertise!)
+ * @license  Copyright (C) 2011-2014 Evolve Media LLC.  All Rights Reserved.
+ * @link     http://crowdignite.com
+ */
+
+class SphinxTest extends \PHPUnit_Framework_TestCase
+{
+
+    protected $oSphinx = null;
+    protected $sSelect = 'SELECT *, domain_id & 13 as domain_match, category & 19 as category_match, WEIGHT() as weight FROM contextual WHERE domain_match > 0 AND category_match > 0';
+
+    /**
+     * Initialization before every test
+     * @return void.
+     */
+    public function setUp()
+    {
+        $this->oSphinx = new Sphinx('');
+        $this->oSphinx->setMysqlClient(new MockMysqli());
+    }
+
+    /**
+     * Test getter and setter for SphinxComponent mysqlclient
+     * @return void.
+     */
+    public function testGetSetMysqlClient()
+    {
+        $this->oSphinx->setMysqlClient(null);
+        $this->assertNull($this->oSphinx->getMysqlClient());
+        $oTest = new MockMysqli();
+        $this->oSphinx->setMysqlClient($oTest);
+        $this->assertEquals($oTest,$this->oSphinx->getMysqlClient());
+    }
+
+    /**
+     * Test addPage function
+     * @return void.
+     */
+    public function testAddPage()
+    {
+        $sResult = $this->oSphinx->addPage(1234, 'Title', 'description', 5, 6, 7, 8, 10)->fetch_object();
+        $this->assertEquals('REPLACE INTO contextual VALUES(1234, \'title\', \'description\', 6, 5, 7, 8, 0, 10, \'Title\', \'description\')',$sResult);
+    }
+
+    /**
+     * Test Stop Word Filter processing on addPage function
+     * @return void.
+     */
+    public function testAddPageStopWordFilter()
+    {
+        $sResult = $this->oSphinx->addPage(1234, 'My Title', 'this is a description', 5, 6, 7, 8, 10)->fetch_object();
+        $this->assertEquals('REPLACE INTO contextual VALUES(1234, \'title\', \'description\', 6, 5, 7, 8, 0, 10, \'My Title\', \'this is a description\')',$sResult);
+    }
+
+    /**
+     * Test removePage function
+     * @return void.
+     */
+    public function testRemovePage()
+    {
+        $sResult = $this->oSphinx->removePage(8765)->fetch_object();
+        $this->assertEquals('DELETE FROM contextual WHERE id = 8765', $sResult);
+    }
+
+    /**
+     * Test getStopWordFilter() function
+     * @return void.
+     */
+    public function testGetStopWordFilter()
+    {
+        $oStopWordFilter = $this->oSphinx->getStopWordFilter();
+        $this->assertEquals('CI\Filter\RemoveMysqlStopWord',get_class($oStopWordFilter));
+    }
+
+    /**
+     * Test query() function
+     * @return void.
+     */
+    public function testQuery()
+    {
+        $sExpectedStart = $this->sSelect;
+        $sResult = $this->oSphinx->query('text', 13, 17, 19, -1, WEBSITE_CONTENT_G, 11)[0];
+        $this->assertEquals($sExpectedStart . ' AND MATCH(\'text\') AND website_id <> 17 AND content_rating IN (0) LIMIT 11', $sResult);
+    }
+
+    /**
+     * Test query() function with multiple words - check for '|' between words in MATCH function
+     * @return void.
+     */
+    public function testQueryMultiWord()
+    {
+        $sExpectedStart = $this->sSelect;
+        $sExpectedEnd = 'website_id <> 17 AND content_rating IN (0) LIMIT 11';
+        $sResult = $this->oSphinx->query('crowd ignite evolve media', 13, 17, 19, -1, WEBSITE_CONTENT_G, 11)[0];
+        $this->assertEquals($sExpectedStart . ' AND MATCH(\'crowd|ignite|evolve|media\') AND ' . $sExpectedEnd, $sResult);
+    }
+
+    /**
+     * Test query() function with stop words - expect stop words will be removed and all words are lower case
+     * @return void.
+     */
+    public function testQueryStopWords()
+    {
+        $sExpectedStart = $this->sSelect;
+        $sExpectedEnd = 'website_id <> 17 AND content_rating IN (0) LIMIT 11';
+        $sResult = $this->oSphinx->query('Crowd Ignite is an Evolve Media Company for now', 13, 17, 19, -1, WEBSITE_CONTENT_G, 11)[0];
+        $this->assertEquals($sExpectedStart . ' AND MATCH(\'crowd|ignite|evolve|media|company\') AND ' . $sExpectedEnd, $sResult);
+    }
+
+    /**
+     * Test query() function with allowed websites specified
+     * @return void.
+     */
+    public function testQueryAllowWebsites()
+    {
+        $sExpectedStart = $this->sSelect . ' AND MATCH(\'text\')';
+        $sExpectedEnd = 'content_rating IN (0) LIMIT 11';
+        $aWebsites = array(1,2,3,5,8,13,21);
+        $sResult = $this->oSphinx->query('text', 13, 17, 19, -1, WEBSITE_CONTENT_G, 11, $aWebsites)[0];
+        $this->assertEquals($sExpectedStart . ' AND website_id IN (1,2,3,5,8,13,21) AND ' . $sExpectedEnd, $sResult);
+    }
+
+    /**
+     * Test query() function with content ratings - Expect
+     * - PG13 includes G, PG13
+     * - R includes G, PG13, R
+     * - Mens Entertainment only includes Mens Entertainment
+     *
+     * @return void.
+     */
+    public function testQueryRatings()
+    {
+        $sExpectedStart = $this->sSelect . ' AND MATCH(\'text\') AND website_id <> 17';
+        $sExpectedEnd = 'LIMIT 11';
+        $sResult = $this->oSphinx->query('text', 13, 17, 19, -1, WEBSITE_CONTENT_PG13, 11)[0];
+        $this->assertEquals($sExpectedStart . ' AND content_rating IN (1,0) ' . $sExpectedEnd, $sResult);
+
+        $sResult = $this->oSphinx->query('text', 13, 17, 19, -1, WEBSITE_CONTENT_R, 11)[0];
+        $this->assertEquals($sExpectedStart . ' AND content_rating IN (2,1,0) ' . $sExpectedEnd, $sResult);
+
+        $sResult = $this->oSphinx->query('text', 13, 17, 19, -1, WEBSITE_CONTENT_MENS, 11)[0];
+        $this->assertEquals($sExpectedStart . ' AND content_rating IN (3) ' . $sExpectedEnd, $sResult);
+    }
+
+
+}

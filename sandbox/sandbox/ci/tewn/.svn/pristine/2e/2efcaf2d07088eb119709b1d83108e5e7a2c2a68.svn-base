@@ -1,0 +1,57 @@
+<?php
+
+namespace Test\History;
+use CI\History\Render;
+use CI\History\Template;
+
+class RenderTest extends \PHPUnit_Framework_TestCase
+{
+    public function testGetMessageInHtml()
+    {
+        $sExpected = 'Added a page with id <a target="_blank" href="/pages/moderate/2094/657482318">657482318</a>';
+        $aData = array(
+            'website_id' => 2094,
+            'page_id'    => 657482318,
+        );
+        $oRender = new Render(new \CI\History\Template\TemplateHtmlTest());
+        $sResult = $oRender->getMessage(Template::TYPE_PAGE_ADD, $aData);
+
+        $this->assertEquals($sExpected, $sResult, 'We expected ' . $sExpected . ' and we got    ' . $sResult);
+    }
+
+    public function testGetMessageInText()
+    {
+        $sExpected = 'Added a page with id 657482318 into website 2094';
+        $aData = array(
+            'website_id' => 2094,
+            'page_id'    => 657482318,
+        );
+        $oRender = new Render(new \CI\History\Template\TemplateTextTest());
+        $sResult = $oRender->getMessage(Template::TYPE_PAGE_ADD, $aData);
+
+        $this->assertEquals($sExpected, $sResult, 'We expected ' . $sExpected . ' and we got    ' . $sResult);
+    }
+}
+
+namespace CI\History\Template;
+use CI\History\Template;
+
+class TemplateHtmlTest extends \CI\History\Template
+{
+    public function getTemplateMessages()
+    {
+        return array(
+            Template::TYPE_PAGE_ADD => 'Added a page with id <a target="_blank" href="/pages/moderate/%website_id%/%page_id%">%page_id%</a>',
+        );
+    }
+}
+
+class TemplateTextTest extends \CI\History\Template
+{
+    public function getTemplateMessages()
+    {
+        return array(
+            Template::TYPE_PAGE_ADD => 'Added a page with id %page_id% into website %website_id%',
+        );
+    }
+}

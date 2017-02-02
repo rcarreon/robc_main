@@ -1,0 +1,50 @@
+<?php
+
+namespace CI\Test\Filter;
+
+use CI\Filter\Container;
+use CI\Filter\String\Truncate;
+
+/**
+ * @group filter
+ */
+class FilterContainerTest extends \PHPUnit_Framework_TestCase
+{
+    private $oFilter;
+
+    public function setUp()
+    {
+        $this->oFilter = new Container();
+    }
+
+    /**
+     * Checks if is stored a filter added to the class container
+     */
+    public function testAddRule()
+    {
+        $oTruncate = $this->getMock('CI\Filter\String\Truncate');
+        $this->oFilter->addFilter($oTruncate);
+
+        $this->assertAttributeEquals(array($oTruncate), '_aFilters', $this->oFilter);
+    }
+
+    /**
+     * Tests if the process function is executed with all the filters
+     * that are attached.
+     */
+    public function testProccess()
+    {
+        $string = 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy';
+
+        $oTruncate = new Truncate();
+        $oTruncate->setLength(15);
+
+        $this->oFilter->addFilter($oTruncate);
+        $this->assertEquals(substr($string, 0, 15), $this->oFilter->filter($string));
+    }
+
+    public function tearDown()
+    {
+        unset($this->oFilter);
+    }
+}

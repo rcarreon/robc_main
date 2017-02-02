@@ -1,0 +1,422 @@
+<?php
+
+namespace CI\Category\DataSource;
+
+use CI\Hub;
+use CI\Category;
+
+class MyArray extends \CI\Category\DataSource
+{
+    protected $aAll = array(
+        'id'   => Category::ALL,
+        'name' => 'All',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_GAME_REVOLUTION,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_THEFASHIONSPOT,
+            Hub::DOMAIN_ID_TOTALLYHER,
+            Hub::DOMAIN_ID_NEWS,
+            Hub::DOMAIN_ID_ES,
+        ),
+        'alternatives' => array(),
+    );
+    protected $aOffbeat = array(
+        'id'   => Category::OFFBEAT,
+        'name' => 'Offbeat',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::MEDIA,
+            Category::TECHNOLOGY,
+            Category::CELEBRITIES,
+            Category::GAMING,
+        ),
+    );
+    protected $aSports = array(
+        'id'   => Category::SPORTS,
+        'name' => 'Sports',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+        ),
+        'alternatives' => array(
+            Category::MEDIA,
+            Category::CELEBRITIES,
+        ),
+    );
+    protected $aGaming = array(
+        'id'   => Category::GAMING,
+        'name' => 'Gaming',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_GAME_REVOLUTION,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+        ),
+        'alternatives' => array(
+            Category::CASUAL_GAMES,
+            Category::MEDIA,
+            Category::TECHNOLOGY,
+            Category::ANIME
+        ),
+    );
+    protected $aLifestyle = array(
+        'id'   => Category::LIFESTYLE,
+        'name' => 'Life Style',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_THEFASHIONSPOT,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::CELEBRITIES,
+            Category::MEDIA,
+            Category::PARENTING,
+            Category::HOME,
+            Category::TECHNOLOGY
+        ),
+    );
+    protected $aMedia = array(
+        'id'   => Category::MEDIA,
+        'name' => 'Media',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_THEFASHIONSPOT,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::CELEBRITIES,
+            Category::LIFESTYLE,
+            Category::HOME,
+            Category::TECHNOLOGY
+        ),
+    );
+    protected $aCelebrities = array(
+        'id'   => Category::CELEBRITIES,
+        'name' => 'Celebrities',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_THEFASHIONSPOT,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::MEDIA,
+            Category::LIFESTYLE,
+            Category::HOME,
+            Category::TECHNOLOGY
+        ),
+    );
+    protected $aTechnology = array(
+        'id'   => Category::TECHNOLOGY,
+        'name' => 'Technology',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::GAMING,
+            Category::CASUAL_GAMES,
+            Category::HOME,
+            Category::TECHNOLOGY
+        ),
+    );
+    protected $aMensEntertainment = array(
+        'id'   => Category::MENS_ENTERTAINMENT,
+        'name' => 'Mens Entertainment',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+        ),
+        'alternatives' => array(
+            Category::CELEBRITIES,
+            Category::MEDIA,
+            Category::OFFBEAT
+        ),
+    );
+    protected $aBeauty = array(
+        'id'   => Category::BEAUTY,
+        'name' => 'Beauty',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_THEFASHIONSPOT,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::CELEBRITIES,
+            Category::MEDIA,
+            Category::LIFESTYLE
+        ),
+    );
+    protected $aFood = array(
+        'id'   => Category::FOOD,
+        'name' => 'Food',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::PARENTING,
+            Category::HOME
+        ),
+    );
+    protected $aParenting = array(
+        'id'   => Category::PARENTING,
+        'name' => 'Parenting',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::HOME,
+            Category::DIY,
+            Category::DEALS
+        ),
+    );
+    protected $aDeals = array(
+        'id'   => Category::DEALS,
+        'name' => 'Deals',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::HOME,
+            Category::DIY,
+            Category::TRAVEL
+        ),
+    );
+    protected $aMusic = array(
+        'id'   => Category::MUSIC,
+        'name' => 'Music',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::URBAN,
+            Category::MEDIA,
+            Category::TECHNOLOGY
+        ),
+    );
+    protected $aTravel = array(
+        'id'   => Category::TRAVEL,
+        'name' => 'Travel',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::HOME,
+            Category::TECHNOLOGY
+        ),
+    );
+    protected $aCasualGames = array(
+        'id'   => Category::CASUAL_GAMES,
+        'name' => 'Casual Games',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_GAME_REVOLUTION,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::GAMING,
+            Category::TECHNOLOGY,
+            Category::MEDIA
+        ),
+    );
+    protected $aPets = array(
+        'id'   => Category::PETS,
+        'name' => 'Pets',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::OFFBEAT,
+            Category::PARENTING,
+            Category::MEDIA
+        ),
+    );
+    protected $aHome = array(
+        'id'   => Category::HOME,
+        'name' => 'Home',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::LIFESTYLE,
+            Category::TRAVEL,
+            Category::MEDIA
+        ),
+    );
+    protected $aHealth = array(
+        'id'   => Category::HEALTH,
+        'name' => 'Health',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::LIFESTYLE,
+            Category::CELEBRITIES,
+            Category::MEDIA
+        ),
+    );
+    protected $aDiy = array(
+        'id'   => Category::DIY,
+        'name' => 'Do It Yourself',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::HOME,
+            Category::LIFESTYLE,
+            Category::DEALS
+        ),
+    );
+    protected $aOutdoors = array(
+        'id'   => Category::OUTDOORS,
+        'name' => 'Outdoors',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+        ),
+        'alternatives' => array(
+            Category::TRAVEL,
+            Category::OFFBEAT
+        ),
+    );
+    protected $aAnime = array(
+        'id'   => Category::ANIME,
+        'name' => 'Anime',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+        ),
+        'alternatives' => array(
+            Category::MEDIA,
+            Category::OFFBEAT
+        ),
+    );
+    protected $aAutomotive = array(
+        'id'   => Category::AUTOMOTIVE,
+        'name' => 'Automotive',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+        ),
+        'alternatives' => array(
+            Category::TECHNOLOGY,
+            Category::LIFESTYLE
+        ),
+    );
+    protected $aUrban = array(
+        'id'   => Category::URBAN,
+        'name' => 'Urban',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_CRAVE_ONLINE,
+            Hub::DOMAIN_ID_MOMTASTIC,
+            Hub::DOMAIN_ID_TOTALLYHER,
+        ),
+        'alternatives' => array(
+            Category::CELEBRITIES,
+            Category::MEDIA,
+            Category::LIFESTYLE
+        ),
+    );
+    protected $aNews = array(
+        'id'   => Category::NEWS,
+        'name' => 'News',
+        'hubs' => array(
+            Hub::DOMAIN_ID_CROWD_IGNITE,
+            Hub::DOMAIN_ID_ES,
+            Hub::DOMAIN_ID_NEWS,
+        ),
+        'alternatives' => array(),
+    );
+
+    public function init()
+    {
+        $this->aCategories = array(
+            $this->aAll['id']               => $this->aAll,
+            $this->aOffbeat['id']           => $this->aOffbeat,
+            $this->aSports['id']            => $this->aSports,
+            $this->aGaming['id']            => $this->aGaming,
+            $this->aLifestyle['id']         => $this->aLifestyle,
+            $this->aMedia['id']             => $this->aMedia,
+            $this->aCelebrities['id']       => $this->aCelebrities,
+            $this->aTechnology['id']        => $this->aTechnology,
+            $this->aMensEntertainment['id'] => $this->aMensEntertainment,
+            $this->aBeauty['id']            => $this->aBeauty,
+            $this->aFood['id']              => $this->aFood,
+            $this->aParenting['id']         => $this->aParenting,
+            $this->aDeals['id']             => $this->aDeals,
+            $this->aMusic['id']             => $this->aMusic,
+            $this->aTravel['id']            => $this->aTravel,
+            $this->aCasualGames['id']       => $this->aCasualGames,
+            $this->aPets['id']              => $this->aPets,
+            $this->aHome['id']              => $this->aHome,
+            $this->aHealth['id']            => $this->aHealth,
+            $this->aDiy['id']               => $this->aDiy,
+            $this->aOutdoors['id']          => $this->aOutdoors,
+            $this->aAnime['id']             => $this->aAnime,
+            $this->aAutomotive['id']        => $this->aAutomotive,
+            $this->aUrban['id']             => $this->aUrban,
+            $this->aNews['id']              => $this->aNews,
+        );
+    }
+}

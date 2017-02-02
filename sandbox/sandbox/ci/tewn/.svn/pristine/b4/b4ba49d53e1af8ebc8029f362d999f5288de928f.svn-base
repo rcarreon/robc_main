@@ -1,0 +1,35 @@
+<?php
+
+namespace CI\Content\Provider;
+use CI\Content\Provider;
+
+class Bidtellect implements Provider
+{
+    public function provide(array $aOptions)
+    {
+        $oOptions = new \CI\ArrayManipulator($aOptions);
+        $oService = new \CI\Http\Service\Bidtellect(
+            array(
+                'test'   => $oOptions->get('test', false),
+                'width'  => $oOptions->get('width', 300),
+                'height' => $oOptions->get('height', 250),
+            )
+        );
+
+        $aData = $oService->query()->getData();
+        $aItem = array();
+
+        if (!empty($aData['Placements'][0]) && is_array($aData['Placements'][0])) {
+            $aData = new \CI\ArrayManipulator($aData['Placements'][0]);
+            $aItem = array(
+                'title'       => $aData->get('ShortText'),
+                'description' => $aData->get('LongText'),
+                'image'       => $aData->get('Image'),
+                'link'        => $aData->get('Click'),
+                'extra'       => $aData->get('Impression'),
+            );
+        }
+
+        return $aItem;
+    }
+}

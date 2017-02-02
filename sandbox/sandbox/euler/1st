@@ -1,0 +1,42 @@
+#!/bin/bash 
+#EXPR= `which expr`
+
+#for x in 
+#for (x=1; $x <= 1000;$x++)
+#do 
+#	if [`expr $x % 3 `< 3]
+#	then 
+#	   echo "$x" > mod3
+#	fi 
+#done 
+#for (y= 1; $y<=1000;$y++)
+#do
+#        if [`expr $y % 3 `< 5]  
+#        then 
+#           echo "$y" > mod5
+#        fi
+#done
+`rm -f mod`
+for x in {1..999};
+do 
+	YO=$(expr $x %  3)
+	if [[ $YO == 0 ]]
+	then 
+		echo "$x" >> mod3 
+	fi
+done
+`cat mod3 | awk '{sum += $1} END {print sum}'>> ./mod3` 
+for y in `seq 1 999`;
+do
+        YA=$(expr $y % 5)
+        if [[ $YA  == 0 ]]
+        then
+		
+                echo "$y" >> mod5
+        fi
+	
+done
+`cat mod5 | awk '{sum += $1} END {print sum}' >> ./mod5 ` 
+
+	
+

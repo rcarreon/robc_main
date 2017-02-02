@@ -1,0 +1,136 @@
+<?php
+
+namespace CI\VowpalWabbit\Data;
+
+use CI\Socket;
+use CI\ServiceLocator;
+use CI\VowpalWabbit\Data\Exception as DataException;
+require_once __DIR__ . '/../../logger/interface.php';
+
+class Access
+{
+    const MAX_ATTEMPTS_RECONNECT = 3;
+    const MAX_ATTEMPTS_GET       = 3;
+    const MAX_SLEEP              = 3;
+    const VW_MIN_VALUE_RETURN    = 0;
+    const VW_MAX_VALUE_RETURN    = 1;
+
+    private $_oSocket;
+    private $_sHost;
+    private $_nPort;
+    private $_nTry = 0;
+
+    protected $oLogger;
+
+    public function __construct($sHost = '', $nPort = '')
+    {
+        $this->setLogger(new \CI\logger\Simple());
+
+        if (false === empty($sHost) && false === empty($nPort)) {
+            $this->_sHost = $sHost;
+            $this->_nPort = $nPort;
+
+            $this->createSocket($sHost, $nPort);
+            $this->_oSocket->connect();
+
+        }
+
+    }
+
+    public function get(\CI\VowpalWabbit\Data\Set $oRequest)
+    {
+
+        try {
+            $this->_oSocket->write($oRequest->toString() . "\r\n");
+            $mResponse = $this->_oSocket->read();
+        } catch (\CI\Socket\Exception $oEx) {
+            $this->_nTry++;
+
+            if ($this->_nTry <= self::MAX_ATTEMPTS_GET) {
+                $this->reconnect(self::MAX_SLEEP);
+                $mResponse = $this->get($oRequest);
+            } else {
+                throw new \CI\Socket\Exception(\CI\Socket\Exception::ERR_MAX_ATTEMP_GET, self::MAX_ATTEMPTS_GET);
+            }
+        }
+
+        return $mResponse;
+    }
+
+    public function getCtp(\CI\VowpalWabbit\Data\Set $oRequest)
+    {
+        $sValue = trim($this->get($oRequest));
+
+        if (!is_numeric($sValue)) {
+            throw new \CI\VowpalWabbit\Data\Exception(DataException::IS_NOT_NUMERIC, $sValue);
+        }
+
+        $nReturn = (float) $sValue;
+
+        if ($nReturn < self::VW_MIN_VALUE_RETURN) {
+            $nReturn = self::VW_MIN_VALUE_RETURN;
+        } else if ($nReturn > self::VW_MAX_VALUE_RETURN) {
+            $nReturn = self::VW_MAX_VALUE_RETURN;
+        }
+
+        return $nReturn;
+    }
+
+    public function setLogger(\Logger_Interface $oLogger)
+    {
+        $this->oLogger = $oLogger;
+    }
+
+    public function getLogger()
+    {
+        return $this->oLogger;
+    }
+
+    protected function reconnect($nSleep)
+    {
+        $bReturn = false;
+        for ($nI = 0; $nI < self::MAX_ATTEMPTS_RECONNECT; $nI++) {
+            sleep($nSleep);
+            try {
+                $this->createSocket($this->_sHost, $this->_nPort, true);
+
+                if ($this->_oSocket->connect()) {
+                    $bReturn = true;
+                    break;
+                }
+            } catch(\CI\Socket\Exception $oEx) {
+                // Try again to connect
+            }
+        }
+
+        // Reach the max attempts to reconnect
+        if (false === $bReturn) {
+            throw new \CI\Socket\Exception(\CI\Socket\Exception::ERR_RECONNECT, self::MAX_ATTEMPTS_RECONNECT);
+        }
+
+        return $bReturn;
+    }
+
+    public function setSocket(Socket $oSocket)
+    {
+        $this->_oSocket = $oSocket;
+    }
+
+    public function getSocket()
+    {
+        return $this->_oSocket;
+    }
+
+    public function createSocket($sHost, $nPort, $bForce = false)
+    {
+        $sKey = 'socket-' . $sHost . '-' . $nPort;
+
+        if ($bForce || false === ServiceLocator::getInstance()->isRegistered($sKey)) {
+            $this->setSocket(new Socket($sHost, $nPort, Socket::TYPE_TCP));
+
+            ServiceLocator::getInstance()->register($sKey, $this->_oSocket);
+        } else {
+            $this->_oSocket = ServiceLocator::getInstance()->get($sKey);
+        }
+    }
+}

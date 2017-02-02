@@ -1,0 +1,27 @@
+<?
+
+class BitSettingsComponent extends Object {
+
+	protected $bits = 0;
+
+	protected function isFlagSet($flag) {
+		return (($this->bits & $flag) == $flag);
+	}
+
+	protected function setFlag($flag, $value) {
+		if($value){
+			$this->bits |= $flag;
+		} else {
+			$this->bits &= ~$flag;
+		}
+	}
+
+	public function getBits() {
+		return $this->bits;
+	}
+
+	public function setBits($bits) {
+		$this->bits = $bits;
+	}
+
+}

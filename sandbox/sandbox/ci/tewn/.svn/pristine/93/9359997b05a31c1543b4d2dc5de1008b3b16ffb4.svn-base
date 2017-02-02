@@ -1,0 +1,22 @@
+<?php
+
+namespace CI\Chart\Cache;
+use CI\Chart\Cache;
+
+class Widget extends Cache
+{
+    protected function getKeyAllStatsFromDate($sDate)
+    {
+        return "website_chart_widget::".$sDate;
+    }
+
+    protected function getKeyDomainStatsFromDate($sDate, $nDomainId)
+    {
+        return "website_chart_domain_widget::".$sDate.":".$nDomainId;
+    }
+
+    protected function getKeyStatsFromDate($sDate, $nId)
+    {
+        return "website_stats_widget::".$nId.":".$sDate;
+    }
+}

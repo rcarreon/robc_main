@@ -1,0 +1,14 @@
+<?php
+namespace CI\Facade;
+
+class Exception extends \CI\Exception
+{
+    const ERROR_ACCESSOR = 1;
+    const ERROR_FACTORY  = 2;
+
+    protected $aErrors = array(
+        self::ERROR_ACCESSOR => "Facade does not implement getFacadeAccessor method.",
+        self::ERROR_FACTORY  => "Factory could not build '%s'",
+    );
+
+}

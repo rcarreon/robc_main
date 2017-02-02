@@ -1,0 +1,267 @@
+$TTL 3600 ; 1 day
+@      IN      SOA     gnmedia.net. root@gnmedia.net. (
+		2013073001	; Serial
+		36262		; Refresh
+		300		; Retry
+		3600000		; Expire
+		3600 )		; Minimum
+
+	IN	NS	app1v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app2v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app3v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app4v-dns.tp.prd.lax.gnmedia.net.
+
+;1	IN	PTR	
+;2	IN	PTR	
+3	IN	PTR	int-vlan50.admin.core1.gnmedia.net.
+4	IN	PTR	ace1.core2.gnmedia.net.
+;5	IN	PTR	int-vlan50.ap.core1.gnmedia.net.
+6	IN	PTR	ace1.core2.gnmedia.net.
+7	IN	PTR	int-vlan50.gn1.core1.gnmedia.net.
+8	IN	PTR	ace1.core2.gnmedia.net.
+;9	IN	PTR	int-vlan50.sb.core1.gnmedia.net.
+10	IN	PTR	ace1.core2.gnmedia.net.
+11	IN	PTR	int-vlan50.gn1.core2.gnmedia.net.
+;12	IN	PTR	int-vlan50.legacy.core1.gnmedia.net.
+13	IN	PTR	int-vlan50.admin.core2.gnmedia.net.
+;14	IN	PTR	ap.ace1.core2.gnmedia.net.
+;15	IN	PTR	int-vlan50.sb.core2.gnmedia.net.
+;;16	IN	PTR	int-vlan50.doublehelix.core1.gnmedia.net.
+;17	IN	PTR	int-vlan50.ap.core2.gnmedia.net.
+;;18	IN	PTR	int-vlan50.doublehelix.core2.gnmedia.net.
+;19	IN	PTR	int-vlan50.legacy.core2.gnmedia.net.
+;20	IN	PTR
+;21	IN	PTR
+;22	IN	PTR
+;23	IN	PTR
+;24	IN	PTR
+;25	IN	PTR
+;26	IN	PTR
+;27	IN	PTR
+;28	IN	PTR
+;29	IN	PTR	New Dell Joomla STG VIP
+;30	IN	PTR	Stg Joomla
+;31	IN	PTR	New Dell Actiontrip PRD VIP
+;32	IN	PTR	New Dell Myanimelist PRD VIP
+;33	IN	PTR	New Dell Sherdog.com STG VIP
+;34	IN	PTR 	New Dell Backend (admin) Sherdog.com STG VIP
+;35	IN	PTR	New Dell stats-cms SBV PRD VIP
+;36     IN      PTR	
+;37	IN	PTR	joomla springboard
+;38	IN	PTR	joomla springboard lax1
+;39	IN	PTR	joomla springboard lax2
+;40	IN	PTR	staging.hfboards.com.
+;41	IN	PTR	vip.adops.gorillanation.com.
+;42	IN	PTR	vip.pubops.gorillanation.com.
+;43	IN	PTR	reports.gorillanation.com.
+;44	IN	PTR	transition.gorillanation.com.
+;45	IN	PTR	app-media-vip.sb.gnmedia.net.
+;46	IN	PTR	springboard lax1
+;47	IN	PTR	springboard lax2
+;48	IN	PTR	vip.actiontrip.com.
+;49	IN	PTR	vip.gamerevolution.com.
+;50	IN	PTR	triggertag.vip.gorillanation.com.
+;51	IN	PTR	springboard active/standby vip
+;52	IN	PTR	vip.hfboards.com.
+;53	IN	PTR	vip.thefashionspot.com.
+;54	IN	PTR	vip.qa.thefashionspot.com.
+;55	IN	PTR	vip.iconator.com.
+;56	IN	PTR	img.vip.iconator.com.
+;57	IN	PTR	vip.sherdog.net.
+;58	IN	PTR	vip.sherdog.com.
+;59	IN	PTR	vip.qa.sherdog.com.
+;60	IN	PTR	vip.search.atomiconline.com.
+;61	IN	PTR	vip.soaps.com.
+;62	IN	PTR	vip.video.gorillanation.com.
+;63	IN	PTR	vip.fs.craveonline.com.
+;64	IN	PTR	vip.ads.gorillanation.com.
+;65	IN	PTR	vip.images.craveonline.com.
+;66	IN	PTR	natpool-1-vlan50-1.admin.core.gnmedia.net.
+;67	IN	PTR	vip.speakeasy.craveonline.com.
+;68	IN	PTR	vip.concerts.craveonline.com.
+;69	IN	PTR	vip.adops21.stg.gorillanation.com.
+;70	IN	PTR	vip.myanimelist.net.
+;71	IN	PTR	joomla
+;72	IN	PTR	joomla-lax1
+;73	IN	PTR	joomla-lax2
+;74	IN	PTR	vip.analytics.gorillanation.com.
+;75	IN	PTR	triggertag.stg.gorillanation.com.
+;76	IN	PTR	assetmanager.si.evolvemediacorp.com.
+;77	IN	PTR	natpool-1-vlan50-1.legacy.core.gnmedia.net.
+;78	IN	PTR	vip.wuo.lax.sheknows.com.
+;79	IN	PTR	vip.assets.gorillanation.com.
+;80	IN	PTR	vip.wuo.stg.sheknows.com.
+;81	IN	PTR	vip.demo.gorillanation.com.
+;82	IN	PTR	vip.demo.evolvemedia.com.
+;83	IN	PTR	vip.demo.thefashionspot.atomiconline.com.
+;84	IN	PTR	vip.demo.teencrunch.atomiconline.com.
+;85	IN	PTR	vip.demo.sheknows.atomiconline.com.
+;86	IN	PTR	vip.demo.craveonline.atomiconline.com.
+;87	IN	PTR	vip.assets.evolvemediacorp.com.
+;88	IN	PTR	vip.assets.craveonline.com.
+;89	IN	PTR	vip.php-legacy.craveonline.com.
+;90	IN	PTR	vip.video-gn.gorillanation.com.
+;91	IN	PTR	vip.app-fe.dh.lax.gnmedia.net.
+;92	IN	PTR	vip.app-fe.dh.stg.gnmedia.net.
+;93	IN	PTR	vip.sqlrw.wuo.stg.sheknows.com.
+;94	IN	PTR	vip.sqlro.wuo.stg.sheknows.com.
+;95	IN	PTR	vip.app-fs.dh.lax.gnmedia.net.
+;96	IN	PTR	vip.app-fs.dh.stg.gnmedia.net.
+;97	IN	PTR	vip.sqlrw.cms-wuo.stg.gnmedia.net.
+;98	IN	PTR	vip.sqlro.cms-wuo.stg.gnmedia.net.
+;99	IN	PTR	vip.sqlrw.cms-wuo.lax.gnmedia.net.
+;100	IN	PTR	vip.sqlro.cms-wuo.lax.gnmedia.net.
+;101	IN	PTR	vip.sqlrw.wp-wuo.lax.gnmedia.net.
+;102	IN	PTR	vip.app.wp-wuo.stg.gnmedia.net.
+;103	IN	PTR	vip.wp-wuo.lax.gnmedia.net.
+;104	IN	PTR	vip.sqlrw.wuo.lax.gnmedia.net.
+;105	IN	PTR	vip.sqlro.wp-wuo.stg.gnmedia.net.
+;106	IN	PTR	vip.sqlro.wp-wuo.lax.gnmedia.net.
+;107	IN	PTR	vip.app.fab-wuo.stg.gnmedia.net.
+;108	IN	PTR	vip.app.fab-wuo.lax.gnmedia.net.
+;109	IN	PTR	vip.app-inv.lax.gnmedia.net.
+;110	IN	PTR	vip.sqlrw-inv.lax.gnmedia.net.
+;111	IN	PTR	vip.sqlro-inv.lax.gnmedia.net.
+;112	IN	PTR	vip.app-puppet.lax.gnmedia.net.
+;113	IN	PTR	vip.sql-puppet.lax.gnmedia.net.
+;114	IN	PTR	vip.app.connect-wuo.stg.gnmedia.net.
+;115	IN	PTR	vip.app.connect-wuo.lax.gnmedia.net.
+;116	IN	PTR     vip.app.sorry-tp.lax.gnmedia.net.
+;117	IN	PTR	vip.app.vb-wuo.lax.gnmedia.net.
+;118	IN	PTR	vip.app.media-wuo.lax.gnmedia.net.
+;119	IN	PTR	vip-app-fab-single.wuo.lax.gnmedia.net.
+;120	IN	PTR	vip.app.hfb.ao.lax.gnmedia.net.
+;121	IN	PTR
+;122	IN	PTR	vip.sqlro.rep-wuo.lax.gnmedia.net.
+;123	IN	PTR	vip.sqlrw.rep-wuo.lax.gnmedia.net.
+;124	IN	PTR     vip.sqlro.joomla.lax.gnmedia.net. 
+;125	IN	PTR     vip.sqlrw.joomla.lax.gnmedia.net.
+;126	IN	PTR     vip.sqlro.joomla.stg.gnmedia.net. 
+;127	IN	PTR     vip.sqlrw.joomla.stg.gnmedia.net.
+;128	IN	PTR     vip.sqlro.joomla.dev.gnmedia.net.
+;129	IN	PTR     vip.sqlrw.joomla.dev.gnmedia.net.
+;130	IN      PTR	vip.app-trend.lax.gnmedia.net.
+;131    IN      PTR	vip.sqlro.hfb.ao.lax.gnmedia.net.
+;132    IN      PTR	vip.sqlrw.hfb.ao.lax.gnmedia.net.
+;133    IN      PTR	New Dell Joomla Prd VIP
+;134    IN      PTR	New Dell Actiontrip Prd VIP
+;135    IN      PTR	New Dell pubops.evolvemediacorp.com
+;;136	IN	PTR	vip-pxy-upl.sbv.prd.lax.gnmedia.net.
+;137	IN	PTR
+;138	IN	PTR
+;139	IN	PTR
+;140	IN	PTR
+;141	IN	PTR	adops.stg
+;142	IN	PTR	pubops.stg
+;143	IN	PTR	vip-app-tt.ap.stg.lax.gnmedia.net.
+;144	IN	PTR	vipold-app-tt.ap.prd.lax.gnmedia.net.
+;145	IN	PTR
+;146	IN	PTR
+;147	IN	PTR
+;148	IN	PTR
+;149	IN	PTR
+;150	IN	PTR	vip.app-stats-cms.sb.stg.gnmedia.net.
+;151	IN	PTR	
+;152	IN	PTR	
+;153	IN	PTR	
+;154	IN	PTR	
+;155	IN	PTR
+;156	IN	PTR
+;157	IN	PTR
+;158	IN	PTR
+;159	IN	PTR
+;160	IN	PTR
+;161	IN	PTR
+;162	IN	PTR
+;163	IN	PTR
+;164	IN	PTR
+;165    IN      PTR
+;166    IN      PTR
+;167	IN	PTR
+;168    IN      PTR
+;169	IN	PTR
+;170	IN	PTR
+;171	IN	PTR
+;172	IN	PTR
+;173	IN	PTR
+;174	IN	PTR
+;175	IN	PTR
+;176	IN	PTR
+;177	IN	PTR
+;178	IN	PTR
+;179	IN	PTR
+;180	IN	PTR
+;181	IN	PTR
+;182	IN	PTR
+;183	IN	PTR
+;184	IN	PTR
+;185	IN	PTR
+;186	IN	PTR
+;187	IN	PTR
+;188	IN	PTR
+;189	IN	PTR
+;190	IN	PTR
+;191	IN	PTR
+;192	IN	PTR
+;193	IN	PTR
+;194	IN	PTR
+;195	IN	PTR
+;196	IN	PTR
+;197	IN	PTR
+;198	IN	PTR
+;199	IN	PTR
+;200	IN	PTR
+;201	IN	PTR
+;202	IN	PTR
+;203	IN	PTR
+;204	IN	PTR
+;205	IN	PTR
+;206	IN	PTR
+;207	IN	PTR
+;208	IN	PTR
+;209	IN	PTR
+;210	IN	PTR
+;211	IN	PTR
+;212	IN	PTR
+;213	IN	PTR
+;214	IN	PTR
+;215	IN	PTR
+;216	IN	PTR
+;217	IN	PTR
+;218	IN	PTR
+;219	IN	PTR
+;220	IN	PTR
+;221	IN	PTR
+;222	IN	PTR
+;223	IN	PTR
+;224	IN	PTR
+;225	IN	PTR
+;226	IN	PTR
+;227	IN	PTR
+;228	IN	PTR
+;229	IN	PTR
+;231	IN	PTR
+;232	IN	PTR
+;233	IN	PTR
+;234	IN	PTR
+;235	IN	PTR
+;236	IN	PTR
+;237	IN	PTR
+;238	IN	PTR
+;239	IN	PTR
+;240	IN	PTR
+;241	IN	PTR
+;242	IN	PTR
+;243	IN	PTR
+;244    IN      PTR
+;245    IN      PTR
+;246    IN      PTR
+;247    IN      PTR
+;248    IN      PTR
+;249    IN      PTR
+;250    IN      PTR
+;251    IN      PTR
+;252    IN      PTR
+;253    IN      PTR
+;254    IN      PTR
+;255    IN      PTR

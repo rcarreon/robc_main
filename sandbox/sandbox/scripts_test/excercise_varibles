@@ -1,0 +1,13 @@
+Q.1.How to Define variable x with value 10 and print it on screen.
+Q.2.How to Define variable xn with value Rani and print it on screen
+Q.3.How to print sum of two numbers, let's say 6 and 3?
+Q.4.How to define two variable x=20, y=5 and then to print division of x and y (i.e. x/y)
+Q.5.Modify above and store division of x and y to variable called z
+Q.6.Point out error if any in following script
+
+1  x=10  echo $x
+2  xn=Rani echo $xn
+3  expr 6 + 3
+4  x=20 y=5  echo expr x / y
+5  z=`expr x / y` echo $z
+

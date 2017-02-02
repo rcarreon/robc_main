@@ -1,0 +1,89 @@
+<?php 
+    $website = $component_data['card'];
+    $fields  = $component_data['options']['fields'];
+?>
+
+<?php if ($website === false) : ?>
+        <div class="alert alert-warning alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert">
+                <span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+            </button>
+            <strong>WARNING:</strong> Analytics not found
+        </div>
+<?php
+        return;
+    endif;
+?>
+
+<?php if ($component_data['options']['frame'] === true): ?>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title"><?php echo $component_data['options']['frame_title'] ?></h3>
+    </div>
+    <div class="panel-body">
+<?php endif ?>
+        <dl class="dl-horizontal" id="<?php echo $component_name ?>">
+            <?php if (in_array('link_moderate_id', $fields)): ?>
+            <dt>ID</dt>
+            <dd><a title="Moderate website" target="_blank" href="/websites/moderate/<?php echo $website['id'] ?>"><?php echo $website['id'] ?></a></dd>
+            <?php endif ?>
+
+            <?php if (in_array('id', $fields)): ?>
+            <dt>ID</dt>
+            <dd><?php echo $website['id'] ?></dd>
+            <?php endif ?>
+
+            <?php if (in_array('link_moderate_name', $fields)): ?>
+            <dt>Name</dt>
+            <dd><a title="Moderate website" target="_blank" href="/websites/moderate/<?php echo $website['id'] ?>"><?php echo $website['name'] ?></a></dd>
+            <?php endif ?>
+
+            <?php if (in_array('link_url_name', $fields)): ?>
+            <dt>Name</dt>
+            <dd><a title="Website URL" target="_blank" href="http://<?php echo $website['url'] ?>"><?php echo $website['name'] ?></a></dd>
+            <?php endif ?>
+
+            <?php if (in_array('name', $fields)): ?>
+            <dt>Name</dt>
+            <dd><?php echo $website['name'] ?></dd>
+            <?php endif ?>
+
+            <?php if (in_array('domain', $fields)): ?>
+            <dt>Primary Domain</dt>
+            <dd><?php echo $website['domain_primary_name'] ?></dd>
+            <?php endif ?>
+
+            <?php if (in_array('status', $fields)): ?>
+            <dt>Status</dt>
+            <dd><?php echo $website['status_name'] ?></dd>
+            <?php endif ?>
+
+            <?php if (in_array('category', $fields)): ?>
+            <dt>Category</dt>
+            <dd><?php echo $website['category_name'] ?></dd>
+            <?php endif ?>
+
+            <?php if (in_array('content_rating', $fields)): ?>
+            <dt>Content Rating</dt>
+            <dd><?php echo $website['content_rating_name'] ?></dd>
+            <?php endif ?>
+
+            <?php if (in_array('cross_domain', $fields)): ?>
+            <dt>Cross Domains</dt>
+            <dd><?php echo $website['domain_bitfield_names'] ?></dd>
+            <?php endif ?>
+
+            <?php if (in_array('allowed_categories', $fields)): ?>
+            <dt>Allowed Categories</dt>
+            <dd><?php echo $website['allowed_categories_bitfield_names'] ?></dd>
+            <?php endif ?>
+
+            <?php if (in_array('allowed_category_subcategories', $fields)): ?>
+            <dt>Allowed Category Subcategories</dt>
+            <dd><?php echo $website['allowed_category_subcategory_names'] ?></dd>
+            <?php endif ?>
+        </dl>
+<?php if ($component_data['options']['frame'] === true): ?>
+    </div>
+</div>
+<?php endif ?>

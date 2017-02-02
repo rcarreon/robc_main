@@ -1,0 +1,12 @@
+<?
+if (!isset($category)) {
+	$category = "undefined";
+}
+?>
+
+<!-- gn.grcrowdignite.com/home 300x250 -->
+<div id='div-gpt-ad-1368573000095-0'>
+<script type='text/javascript'>
+googletag.cmd.push(function() { googletag.display('div-gpt-ad-1368573000095-0'); });
+</script>
+</div>

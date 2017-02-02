@@ -1,0 +1,86 @@
+<?php
+
+namespace CI\Model;
+
+class Account
+{
+    const ACCOUNT_STATUS_RUNNING   = 0;
+    const ACCOUNT_STATUS_NEW       = 1;
+    const ACCOUNT_STATUS_PAUSED    = 2;
+    const ACCOUNT_STATUS_SUSPENDED = 3;
+    const ACCOUNT_STATUS_DENIED    = 4;
+    const ACCOUNT_STATUS_TRANSFER  = 5;
+    const ACCOUNT_STATUS_DELETED   = 6;
+    const ACCOUNT_STATUS_MAX       = 6;
+
+    protected $oDatabase;
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function getDatabaseObject()
+    {
+        if (empty($this->oDatabase)) {
+            $this->oDatabase = new \CI\Database\App();
+        }
+
+        return $this->oDatabase;
+    }
+
+    protected function find($aFields, $aConditions, $sOrderBy = '')
+    {
+        $aReturn = array();
+        $oDatabase = $this->getDatabaseObject();
+        $sFields = implode(',',$aFields);
+
+        $sWhere = 'WHERE ';
+
+        foreach ($aConditions as $aCondition) {
+            $sWhere .= key($aCondition) . current($aCondition) . ' ';
+        }
+
+        $sQuery = "SELECT %s
+                   FROM accounts
+                   %s
+                   %s";
+        $sQuery = sprintf(
+            $sQuery,
+            $sFields,
+            $sWhere,
+            $sOrderBy
+        );
+
+        if (!empty($aFields) && $sWhere !== 'WHERE ') {
+            $aReturn = $oDatabase->query($sQuery);
+        }
+
+        return $aReturn;
+    }
+
+    public function getRunningByDomainBit($nDomainBit)
+    {
+        return $this->find(
+            array('website_id', 'id', 'credits', 'buying', 'paid', 'featured'),
+            array(
+                array('status' => '= ' . self::ACCOUNT_STATUS_RUNNING . ' AND'),
+                array('transfer_account_id' => '= 0 AND'),
+                array('visible' => '= true AND '),
+                array('domain_bitfield' => ' & ' . $nDomainBit)
+            ),
+            'ORDER BY credits DESC'
+        );
+    }
+
+    public function getIncomingOutgoingByWebsites($mWebsitesIds)
+    {
+        if (is_array($mWebsitesIds)) {
+            $mWebsitesIds = implode(',', $mWebsitesIds);
+        }
+
+        return $this->find(
+            array('website_id', 'incoming', 'outgoing'),
+            array(
+                array('website_id' => " in({$mWebsitesIds})"),
+            )
+        );
+    }
+}

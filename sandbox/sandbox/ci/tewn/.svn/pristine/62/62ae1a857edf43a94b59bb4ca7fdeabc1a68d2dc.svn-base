@@ -1,0 +1,38 @@
+<body>
+
+<div id="header">
+	<div class="header_wrapper">
+	<a class="logo" href="http://www.thefashionspot.com/" style="width: 1024px; display: block; outline: medium none; text-decoration: none;"></a>
+	<?php if($WebsiteSettings->isShowBranding()): ?><div class="poweredby" style="display:none;"><span>powered by</span> <a href="http://get.crowdignite.com/" target="_blank">Crowd Ignite</a></div><?php endif; ?>
+		<?
+		if( isset($preview_style) ) {
+			if( $preview_style == 22 ||  $preview_style == 29) {
+				echo '<div class="ad_leaderboard">';
+				echo "<div id='div-gpt-ad-0'></div>";
+				/* // Using ad inside Iframe
+					echo '<iframe name="iframead"
+					class="iframead pb-ad"
+					resize="both"
+					allowtransparency="true"
+					scrolling="no"
+					frameborder="0"
+					style="margin: 0; border: none; overflow: hidden; display: block;"
+					width="728"
+					height="90"
+					data-src="/img/'.DOMAIN.'/ads/inside_iframe_728x90.html"
+					src="/img/'.DOMAIN.'/ads/inside_iframe_728x90.html"
+					id="728x90970x90970x66"></iframe>'; */
+			    echo '</div>';
+			}
+		}
+		?>
+		<ul class="menu">
+		        <li><a href="/"><span>Home</span></a></li>
+		        <li><a href="/popular/"><span>Popular</span></a></li>
+		        <li><a href="/newest/"><span>Newest</span></a></li>
+		        <?php if($WebsiteSettings->isShowBranding()): ?><li class="join"><a href="http://get.crowdignite.com/" target="_blank"><span>Join Crowd Ignite</span></a></li><?php endif; ?>
+		</ul>
+	</div>
+</div>
+
+

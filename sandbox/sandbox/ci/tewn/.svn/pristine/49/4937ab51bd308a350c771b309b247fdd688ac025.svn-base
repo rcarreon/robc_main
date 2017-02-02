@@ -1,0 +1,82 @@
+/* dashboard_widgets.js */
+function refreshWidgets() {
+    var websiteid = jQuery("#selectWebsite").val();
+    jQuery(".element_container").find(".widget_check").removeClass("active");
+    jQuery(".element_container").removeClass("active").addClass("inactive");
+    jQuery("#website-"+websiteid).removeClass("inactive").addClass("active");
+    jQuery("#website-"+websiteid).find(".widget_check").addClass("active");
+    jQuery("#website-"+websiteid+" .element:first-child").addClass("selected");
+    getGraphData();
+}
+
+var graph1;
+var graph2;
+var options; 
+var options2;     
+var updateLegendTimeout = null;
+var latestPosition = null;
+var updateLegendTimeout2 = null;
+var latestPosition2 = null;
+var colors = new Array();
+colors[0] = "rgb(255,0,0)";
+colors[1] = "rgb(0,255,0)";
+colors[2] = "rgb(0,0,255)";
+colors[3] = "rgb(255,255,0)";
+colors[4] = "rgb(255,0,255)";
+colors[5] = "rgb(0,255,255)";
+colors[6] = "rgb(255,128,0)";
+colors[7] = "rgb(255,0,128)";
+colors[8] = "rgb(0,255,128)";
+colors[9] = "rgb(0,128,255)";
+colors[10] = "rgb(128,0,128)";
+colors[11] = "rgb(255,128,128)";
+colors[12] = "rgb(128,128,128)";
+colors[13] = "rgb(0,0,0)";
+colors[14] = "rgb(23,76,228)";
+colors[15] = "rgb(255,23,128)";
+
+
+function getGraphData()
+{    
+    var widgetsSelected = new Array();
+    jQuery(".widget_check").each(function(){
+       if (jQuery(this).hasClass('active') == true)
+       {
+          widgetsSelected.push(jQuery(this).attr("id").split("-")[1]);
+       }
+    });
+    
+    if (widgetsSelected.length == 0 )
+    {
+    
+    }
+    else
+    {
+	    jQuery("#graph1").block({ message:jQuery("#waitingDiv1"), css: {width:'210px', height:'50px'}  });
+	    jQuery("#graph2").block({ message:jQuery("#waitingDiv2"), css: {width:'210px', height:'50px'}  });	
+
+	    var time = jQuery("#timeChoices").val();
+
+	    var now = new Date();
+	    now.setHours(0);
+	    now.setMinutes(0);
+	    
+	    var endTime = Math.ceil(now.getTime()/1000);
+
+	    // send all the information to the server here
+	    chartify('graph1', time, endTime, '/history_widgets/chart', "Click-Through Rate", "Rate", "lineLegend", 0, widgetsSelected.join(",") , "ctr", true, time_unit_day, function(){ jQuery("#graph1").unblock(); });
+
+	    //chartify('graph2', time, endTime, '/history_credits/chart', "Incoming/Outgoing", "I/O", "line", websitesSelected.join(","), 0, "incoming,outgoing", true, <?=TIME_UNIT_DAY?>, function(){ jQuery("#graph2").unblock(); });
+    
+    }
+
+    jQuery(".tooltip").qtip({
+      position: {
+        my:'bottom center',
+        at:'top center'
+      },
+      style: {
+        classes: 'ui-tooltip-plain'
+      }
+    });    
+}

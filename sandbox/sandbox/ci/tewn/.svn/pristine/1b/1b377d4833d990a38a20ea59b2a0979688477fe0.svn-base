@@ -1,0 +1,59 @@
+<?
+
+class RuleComponent extends Object {
+
+	function content_rating($displayer_rating, $page_rating) {
+		if ($page_rating > $displayer_rating) {
+			return 0;
+		}
+
+		return 1;
+	}
+
+	function category($displayer_category, $page_category) {
+		global $global_strict_categories;
+
+		if (in_array($displayer_category, $global_strict_categories)) {
+			if ($displayer_category != $page_category) {
+				return 0;
+			}
+		}
+
+		// Deals
+		if ($displayer_category == CATEGORY_DEALS) {
+			switch ($page_category) {
+			case CATEGORY_PARENTING:
+			case CATEGORY_FOOD:
+			case CATEGORY_TRAVEL:
+			case CATEGORY_DIY:
+			case CATEGORY_HOME:
+			case CATEGORY_DEALS:
+				break;
+			default:
+				return 0;
+			}
+		}
+
+		return 1;
+	}
+
+	/**
+	 * Validate if an entire intersect is valid for page
+	 * @param  array $intersect An intersect
+	 * @param  Page $page      Page that we are validating against
+	 * @return boolean            0 for invalid, 1 for valid
+	 */
+	function intersect($intersect, $page) {
+		if (!$this->category($intersect['category'], $page['Page']['category'])) {
+			return 0;
+		}
+
+		if (!$this->content_rating($intersect['content_rating'], $page['Page']['content_rating'])) {
+			return 0;
+		}
+
+		return 1;
+	}
+}
+
+?>

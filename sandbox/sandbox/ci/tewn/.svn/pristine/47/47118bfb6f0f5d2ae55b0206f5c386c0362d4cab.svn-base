@@ -1,0 +1,26 @@
+/* teenspot/grid.css (66%) */
+.grid_1{width:80px;}
+.grid_2{width:170px;}
+.grid_3{width:260px;}
+.grid_4{
+	width:300px;
+	background: #fff url("http://cdn.crowdignite.com/img/teenspot/bg-foot.gif") repeat-x bottom center;
+
+}
+.grid_5{width:440px;}
+.grid_6{width:530px;}
+.grid_7{width:620px;}
+.grid_8{width:652px;}
+.grid_9{width:800px;clear:right;}
+.grid_10{width:890px;}
+.grid_11{width:980px;}
+.grid_12{width:1070px;}
+.grid_13{width:320px;}
+.column{overflow:hidden;float:left;display:inline;margin:0 3px;}
+.row{overflow:hidden;margin:0 auto;
+    background: none repeat scroll 0 0 #D0ECFF;
+    overflow: hidden;
+    padding: 4px 3px 4px 4px;
+    width: 964px;
+    border-bottom: solid 4px #013783
+}

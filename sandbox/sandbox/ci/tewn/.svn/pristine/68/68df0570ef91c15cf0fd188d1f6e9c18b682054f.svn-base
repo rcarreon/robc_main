@@ -1,0 +1,185 @@
+<?
+/*
+ * An intersect is an intersection of different data
+ *
+ */
+class IntersectsComponent extends Object {
+	var $uses       = false;
+	var $components = array('History', 'Category');
+	var $Page       = NULL;
+
+	function get_all($domain_id = NULL, $collapsed = false) {
+		if (FULL_INTERSECT) {
+			$this->create_full_set(
+				CATEGORY_NUMBER,
+				DEMOGRAPHIC_SEX_NUMBER,
+				WEBSITE_CONTENT_NUMBER
+			);
+		} else {
+			if ($domain_id) {
+				$categories = $this->Category->domains($domain_id);
+				$intersects = $this->create_full_set($categories, 1, $collapsed ? 1 : WEBSITE_CONTENT_NUMBER);
+			} else {
+				$intersects = $this->create_full_set(CATEGORY_NUMBER, 1, $collapsed ? 1 : WEBSITE_CONTENT_NUMBER);
+			}
+		}
+
+		return $intersects;
+	}
+
+	function get_landing_page($domain_id = NULL) {
+		$intersects = $this->get_all($domain_id);
+
+		// Remove the 0,0,0,0 intersect
+		$count = count($intersects);
+		for ($i = 0; $i < $count; $i++) {
+			if ($intersects[$i]['category'] == 0 &&
+			    $intersects[$i]['demographic_sex'] == 0 &&
+			    $intersects[$i]['content_rating'] == 0) {
+				unset($intersects[$i]);
+				break;
+			}
+		}
+
+		return $intersects;
+	}
+
+	/*
+	 * This creates a fully populated intersect for each dimension
+	 */
+	function create_full_set($categories, $num_demographic_sex, $num_content_rating) {
+		$intersects = array();
+		$a = 0;
+
+		if (is_array($categories)) {
+			$num_category = count($categories);
+			$specified = 1;
+		} else {
+			$num_category = $categories;
+			$specified = 0;
+		}
+
+		plat_assert($num_category);
+		plat_assert($num_demographic_sex);
+		plat_assert($num_content_rating);
+
+		for ($i = 0; $i < $num_category; $i++) {
+			for ($j = 0; $j < $num_demographic_sex; $j++) {
+				for ($l = 0; $l < $num_content_rating; $l++) {
+					if ($specified) {
+						$intersects[$a]['category'] = $categories[$i];
+					} else {
+						$intersects[$a]['category'] = $i;
+					}
+					$intersects[$a]['demographic_sex'] = $j;
+					$intersects[$a]['content_rating'] = $l;
+					$a++;
+				}
+			}
+		}
+
+		return $intersects;
+	}
+
+	/*
+	 * Create an intersect
+	 */
+	function create($category, $demographic_sex, $content_rating) {
+		$intersect['category'] = $category;
+		$intersect['demographic_sex'] = $demographic_sex;
+		$intersect['content_rating'] = $content_rating;
+
+		return $intersect;
+	}
+
+	/*
+	 * Populate an intersect via an array
+	 */
+	function create_set($categories, $demographic_sexes, $content_ratings) {
+		$intersects = array();
+
+		if (empty($categories)) {
+			$categories = array(CATEGORY_ALL);
+		}
+		if (empty($demographic_sexes)) {
+			$demographic_sexes = array(DEMOGRAPHIC_SEX_BOTH);
+		}
+		if (empty($content_ratings)) {
+			$content_ratings = array(WEBSITE_CONTENT_G);
+		}
+
+		foreach ($categories as $category) {
+			foreach ($demographic_sexes as $demographic_sex) {
+				foreach ($content_ratings as $content_rating) {
+					$intersects[] = $this->create($category, $demographic_sex, $content_rating);
+				}
+			}
+		}
+
+		return $intersects;
+	}
+
+	function get_by_page($page) {
+		if (!isset($page['Page']['category']) ||
+			!isset($page['Page']['demographic_sex']) ||
+			!isset($page['Page']['content_rating'])) {
+			if ($this->Page == NULL) {
+				App::import('Model','Page');
+				$this->Page = new Page();
+			}
+			$page = $this->Page->findById($page['Page']['id']);
+		}
+		$intersect = $this->create($page['Page']['category'],
+								   $page['Page']['demographic_sex'],
+								   $page['Page']['content_rating']);
+
+		return $intersect;
+	}
+
+	function get_by_landing_page_analytic($lpa) {
+		$intersect = $this->create($lpa['LandingPageAnalytic']['category'],
+								   $lpa['LandingPageAnalytic']['demographic_sex'],
+								   $lpa['LandingPageAnalytic']['content_rating']);
+
+		return $intersect;
+	}
+
+	function matches($a, $b) {
+		if ($a['category'] == $b['category'] &&
+		    $a['demographic_sex'] == $b['demographic_sex'] &&
+		    $a['content_rating'] == $b['content_rating']) {
+			return 1;
+		}
+
+		return 0;
+	}
+
+	/*
+	 * Create intersect ID by shifting bits
+	 */
+	function get_id_by_intersect($intersect) {
+		if (!$intersect) {
+			return 0;
+		}
+
+		plat_assert(CATEGORY_NUMBER <= 16777216);
+		plat_assert(DEMOGRAPHIC_SEX_NUMBER <= 4);
+		plat_assert(WEBSITE_CONTENT_NUMBER <= 4);
+
+		$id = $intersect['category'] << 0;
+		$id |= $intersect['demographic_sex'] << 27;
+		$id |= $intersect['content_rating'] << 29;
+
+		return $id;
+	}
+
+	function get_intersect_by_id($id) {
+		$intersect['category'] = ($id >> 0) & 0xffffff;
+		$intersect['demographic_sex'] = ($id >> 27) & 0x3;
+		$intersect['content_rating'] = ($id >> 29) & 0x3;
+
+		return $intersect;
+	}
+
+}
+?>

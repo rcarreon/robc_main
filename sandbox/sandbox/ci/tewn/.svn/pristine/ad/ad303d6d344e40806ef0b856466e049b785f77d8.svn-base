@@ -1,0 +1,13 @@
+<?php
+
+namespace CI\logger;
+require_once __DIR__ . '/interface.php';
+
+class Simple implements \Logger_Interface
+{
+
+    public function log($message)
+    {
+        error_log($message);
+    }
+}

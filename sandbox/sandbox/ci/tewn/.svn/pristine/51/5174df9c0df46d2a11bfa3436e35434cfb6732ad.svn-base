@@ -1,0 +1,321 @@
+<?php
+class Widget extends AppModel {
+
+    var $name = 'Widget';
+    var $validate = array(
+        'website_id' => array('numeric'),
+        'widget_style_id' => array('numeric'),
+        'status' => array('numeric'),
+        'display' => array('numeric'),
+        'num_links' => array('numeric'),
+        'width' => array('numeric'),
+        'height' => array('numeric'),
+        'powered' => array('numeric')
+    );
+
+    public function get_max_links_by_website($website_id)
+    {
+        $num_links = 1; //Rule... minimum 1 link
+        $max_links = $this->find(
+            'first',
+            array(
+                'fields' => array('MAX(Widget.num_links) AS num_links'),
+                'conditions' => array(
+                    'website_id' => $website_id,
+                ),
+            )
+        );
+        if (!empty($max_links)) {
+            $num_links = intval($max_links[0]['num_links']);
+        }
+        return $num_links;
+    }
+
+    public function get_by_id($widget_id)
+    {
+        $key_gen = new CI\Memcached\KeyGen($widget_id, 'widget_get_by_id');
+        $cache_key = $key_gen->generate();
+        $widget = $this->memcached_get_json($cache_key);
+
+        if (empty($widget) && !is_array($widget)) {
+            $widget = $this->findById($widget_id);
+            if (!empty($widget)) {
+                $this->memcached_set_json($cache_key, $widget, 10 * 60 /*10 Minutes*/);
+            }
+        }
+
+        return $widget;
+    }
+
+    function get_by_domain_bit($domain_bit) {
+        $conditions = array("domain_bitfield & ".$domain_bit,
+                            "status" => WIDGET_STATUS_ACTIVE,
+                            "visible" => 1);
+
+        return $this->find("all", array("conditions" => $conditions));
+    }
+
+    function get_active() {
+        $conditions = array("status" => WIDGET_STATUS_ACTIVE,
+                            "visible" => 1);
+
+        return $this->find("all", array("conditions" => $conditions));
+    }
+
+    function get_social($website_id = NULL) {
+        $conditions = array("status" => WIDGET_STATUS_ACTIVE,
+                            "class" => WIDGET_CLASS_SOCIAL,
+                            "visible" => 1);
+
+        if ($website_id) {
+            $conditions['website_id'] = $website_id;
+        }
+
+        return $this->find("all", array("conditions" => $conditions));
+    }
+
+    function get_by_website_id($website_id) {
+        $widgets = $this->find("all", array("conditions" =>
+                            array("website_id" => $website_id,
+                              "status" => WIDGET_STATUS_ACTIVE,
+                              "visible" => true),
+                            "fields" => array("id",
+                                      "widget_style_id",
+                                      "num_links",
+                                      "width",
+                                      "height",
+                                      "name",
+                                      "powered")));
+
+//      plat_assert($widgets);
+
+        return $widgets;
+    }
+
+    function get_all_by_website_id($website_id)
+    {
+        $widgets = $this->find(
+            "all", array(
+                "conditions" => array(
+                    "website_id" => $website_id,
+                    "status <" => WIDGET_STATUS_DELETED,
+                    "visible" => true
+                ),
+                "fields" => array(
+                    "id",
+                    "widget_style_id",
+                    "num_links",
+                    "width",
+                    "height",
+                    "name",
+                    "powered"
+                )
+            )
+        );
+        return $widgets;
+    }
+
+    public function get_click_data_queue($widget_id, $incoming_type) {
+        return array(
+                     "type" => "widget",
+                     "widget_id" => $widget_id,
+                     "incoming_type" => $incoming_type,
+                    );
+    }
+
+    function incoming_click($widget_id, $link_type) {
+        $incoming_type = "incoming";
+        if ($link_type == LINK_TYPE_BASIC) {
+            $incoming_type = "incoming_basic";
+        } else if ($link_type == LINK_TYPE_CONTEXTUAL) {
+            $incoming_type = "incoming_contextual";
+        } else if ($link_type == LINK_TYPE_SIMILAR) {
+            $incoming_type = "incoming_similar";
+        } else if ($link_type == LINK_TYPE_TAG) {
+            $incoming_type = "incoming_tag";
+        }
+
+        $queue_data = $this->get_click_data_queue($widget_id, $incoming_type);
+        $this->send_to_kestrel($queue_data);
+    }
+
+    public function send_to_kestrel(array $data)
+    {
+        App::import('Component', 'QueueKestrel');
+        $queue = new QueueKestrelComponent("landing_page_and_widgets_clicks");
+        $queue->push(json_encode($data));
+    }
+
+    public function update_clicks(array $data)
+    {
+        if ( ! empty($data['widget'])) {
+
+            foreach ($data['widget'] as $widget_id => $incoming) {
+                $query = 'UPDATE widgets SET ';
+
+                foreach ($incoming as $incoming_type => $count) {
+                    $query .= "{$incoming_type} = {$incoming_type} + {$count}, ";
+                }
+
+                $query .= 'last_used = NOW() WHERE id = ' . $widget_id;
+                $this->query($query);
+            }
+        }
+    }
+
+    function incoming_raw_click($widget_id) {
+        $queue_data = $this->get_click_data_queue($widget_id, "incoming_raw");
+        $this->send_to_kestrel($queue_data);
+    }
+
+    function update_domain($website_id, $domain_bit) {
+        /* Update the incoming count */
+        $query = "UPDATE widgets SET domain_bitfield = ".$domain_bit." WHERE website_id = '".$website_id."'";
+        $this->query($query);
+    }
+
+    function point($id) {
+        $conditions = array("id" => $id);
+
+        $point = $this->find("first", array("conditions" => $conditions,
+                                            "order" => "created DESC"));
+
+        if (isset($point['Widget']['incoming']) && isset($point['Widget']['display'])) {
+            $stats['incoming'] = $point['Widget']['incoming'];
+            $stats['display'] = $point['Widget']['display'];
+        } else {
+            $stats['incoming'] = 0;
+            $stats['display'] = 0;
+        }
+
+        if (isset($point['Widget']['incoming_basic']) && isset($point['Widget']['display_basic'])) {
+            $stats['incoming_basic'] = $point['Widget']['incoming_basic'];
+            $stats['display_basic'] = $point['Widget']['display_basic'];
+        } else {
+            $stats['incoming_basic'] = 0;
+            $stats['display_basic'] = 0;
+        }
+
+        if (isset($point['Widget']['incoming_contextual']) && isset($point['Widget']['display_contextual'])) {
+            $stats['incoming_contextual'] = $point['Widget']['incoming_contextual'];
+            $stats['display_contextual'] = $point['Widget']['display_contextual'];
+        } else {
+            $stats['incoming_contextual'] = 0;
+            $stats['display_contextual'] = 0;
+        }
+
+        if (isset($point['Widget']['incoming_similar']) && isset($point['Widget']['display_similar'])) {
+            $stats['incoming_similar'] = $point['Widget']['incoming_similar'];
+            $stats['display_similar'] = $point['Widget']['display_similar'];
+        } else {
+            $stats['incoming_similar'] = 0;
+            $stats['display_similar'] = 0;
+        }
+
+        return $stats;
+    }
+
+    function increment_impressions($id, $count) {
+        plat_assert(is_numeric($count));
+
+        $query = "UPDATE widgets SET display = display + ".$count.", last_used = NOW() WHERE id = ".$id;
+        $rc = $this->query($query);
+
+        return $rc;
+    }
+
+    function increment_impression_type($id, $count, $type) {
+        plat_assert(is_numeric($count));
+
+        switch ($type) {
+            case LINK_TYPE_BASIC:
+            $query = "UPDATE widgets SET display_basic = display_basic + ".$count." WHERE id = ".$id;
+            break;
+            case LINK_TYPE_CONTEXTUAL:
+            $query = "UPDATE widgets SET display_contextual = display_contextual + ".$count." WHERE id = ".$id;
+            break;
+            case LINK_TYPE_SIMILAR:
+            $query = "UPDATE widgets SET display_similar = display_similar + ".$count." WHERE id = ".$id;
+            break;
+            case LINK_TYPE_TAG:
+            $query = "UPDATE widgets SET display_tag = display_tag + ".$count." WHERE id = ".$id;
+            break;
+            default:
+            plat_assert(0, array($id, $count, $type));
+        }
+
+        $rc = $this->query($query);
+
+        return $rc;
+    }
+
+    public function change_status($widget_id, $status) {
+        if (! is_numeric($widget_id)) {
+            $this->invalidate('id', 'Widget id should be numeric');
+            return false;
+        }
+
+        $this->id = $widget_id;
+
+        if (! $this->exists($widget_id)) {
+            $this->invalidate('id', 'Widget id does not exists');
+            return false;
+        }
+
+
+        return $this->save(
+            array('status' => $status)
+        );
+    }
+
+    public function delete($widget_id) {
+        return $this->change_status($widget_id, WIDGET_STATUS_DELETED);
+    }
+
+    public function get_list($limit, $offset)
+    {
+        if(! is_numeric($limit) || ! is_numeric($offset) || $limit < 1 || $offset < 0) {
+            return array();
+        }
+
+        $widgets = array();
+        $sql     = 'SELECT widgets.id AS widget_id, websites.id AS website_id, widgets.name AS widget_name,  widgets.incoming,
+                        websites.name AS website_name, widgets.display,widgets.width, widgets.height,
+                        widgets.created, widgets.last_used
+                    FROM widgets
+                    INNER JOIN websites ON widgets.website_id = websites.id
+                    WHERE websites.status = %d AND widgets.visible = 1 AND (widgets.status = %d OR widgets.status = %d)
+                    LIMIT %d OFFSET %d;';
+
+        $sql    = sprintf($sql, WEBSITE_STATUS_ACTIVE, WIDGET_STATUS_ACTIVE, WIDGET_STATUS_INACTIVE ,$limit, $offset);
+        $result = $this->query_read($sql, false);
+
+        if (! empty($result)) {
+            foreach ($result as $widget) {
+                $widget['widgets']['ctr'] = 0;
+                if ($widget['widgets']['display'] != 0){
+                    $widget['widgets']['ctr'] = round($widget['widgets']['incoming'] / $widget['widgets']['display'], 4);
+                    $widget['widgets']['ctr'] = $widget['widgets']['ctr'] * 100;
+                }
+
+
+                $widget['widgets']['display']   = number_format($widget['widgets']['display']);
+                $widget['widgets']['incoming']  = number_format($widget['widgets']['incoming']);
+                $widget['widgets']['highlight'] = "";
+
+                $years = \Carbon\Carbon::parse($widget['widgets']['last_used'])->diffInYears();
+
+                if ($widget['widgets']['last_used'] == '0000-00-00 00:00:00' ) {
+                    $widget['widgets']['highlight'] = 'danger';
+                } else if ($years > 0) {
+                    $widget['widgets']['highlight'] = 'warning';
+                }
+
+                $widgets[] = array_merge($widget['widgets'],$widget['websites']);
+            }
+        }
+
+        return $widgets;
+    }
+}
+?>

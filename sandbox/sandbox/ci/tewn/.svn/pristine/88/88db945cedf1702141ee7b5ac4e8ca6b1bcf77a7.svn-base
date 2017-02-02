@@ -1,0 +1,96 @@
+<?
+function percent($num) {
+	return number_format($num, 4)."%";
+}
+echo $this->element("dashboard2_toolbar", array("tab" => "refers"));
+?>
+
+<div class="row supercontainer" id="content_area">
+      
+        <div id="status_bar">
+            <div class="ddown_container">
+                &nbsp;
+            </div>                
+        </div>
+
+        <div class="table_container">
+
+
+	  <?
+	  if (count($refers)) {
+	  ?>
+	  	<div class="short_table">
+        <h4>Top Refers</h4>
+		<p>This is the list of active sites you've referred.  Get even more traffic by referring more!  
+		<br>
+		To refer someone else, send them through this link:</p>
+                <a href="http://<?=SITE_URL?>/account/<?=$account_id?>">http://<?=SITE_URL?>/account/<?=$account_id?></a>
+        </div>
+
+	        <table id="refers_table" class="tablesorter">
+                <thead>	         
+                        <tr>
+                        <th>Website</th>
+                        <th>Total Credits Received</th>
+                        <th>Credits Received Yesterday</th>	 
+						<th>Refer Date</th>
+                        </tr>
+                </thead>
+                <tbody>	 
+<?
+		$all_total_received = 0;
+		$all_yesterday_received = 0;
+
+		foreach($refers as $refer) {
+				if (empty($refer['Website']['name'])) {
+					$website_name = $refer['Website']['url'];
+				} else {
+					$website_name = $refer['Website']['name'];
+				}
+				$rate = $refer['Account']['refer_transfer_rate'];
+				$total_received = $refer['Account']['incoming'] * $rate;
+				$yesterday_received = $refer['Account']['yincoming'] * $rate;
+
+				$all_total_received += $total_received;
+				$all_yesterday_received += $yesterday_received;
+?>			
+                <tr>
+                <!-- Website -->
+	        <td align=center><?=$website_name?></td>
+		
+                <!-- Total Credits Received -->
+		<td align=center><?=number_format($total_received)?></td>
+
+                <!-- Yesterday Credits Received -->
+		<td align=center><?=number_format($yesterday_received)?></td>
+
+                <!-- Refer Date -->
+		<td align=center><?=date("m-d-Y", strtotime($refer['Account']['created']));?></td>
+
+<?
+         }
+?>
+                </tbody>
+		<tfoot>
+		  <tr>
+		    <td></td>
+		    <td align=center><?=number_format($all_total_received)?></td>
+		    <td align=center><?=number_format($all_yesterday_received)?></td>
+		    <td></td>
+		  </tr>
+		</tfoot>
+        </table>
+	       <? } else { ?>
+		<div class="short_table">
+        <h4>Refers</h4>
+		<p>
+	  You have not referred anyone yet.  You can be <b>earning <?=number_format($refer_bonus*100)?>% of the traffic</b> of the website you refer as long as your site is active.
+		<br/>For example, if a site you signed sends 20,000 visitors a month, you'd get 2,000 visitor bonus!
+                <br>
+		Have them signup through this link:</p>
+		<p><a href="http://<?=SITE_URL?>/account/<?=$account_id?>">http://<?=SITE_URL?>/account/<?=$account_id?></a></p>
+		</div>  
+	       <? } ?>
+		
+            </div>
+</div>        

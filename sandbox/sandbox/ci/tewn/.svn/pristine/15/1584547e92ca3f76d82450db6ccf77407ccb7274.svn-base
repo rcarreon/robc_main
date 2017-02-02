@@ -1,0 +1,202 @@
+<?php
+
+namespace Test;
+
+use CI\Socket;
+
+/**
+ * @group socket
+ * @group vowpalwabbit
+ */
+class SocketTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * Tests if throw a exception when passing a invalid hostnames.
+     *
+     * @dataProvider getInvalidHost
+     * @expectedException CI\Socket\Exception
+     *
+     * @return void
+     */
+    public function testShouldThrowExceptionWithEmptyHost($sHost, $nPort, $sType)
+    {
+        $oSocket = new Socket($sHost, $nPort, $sType);
+    }
+
+    /**
+     * Tests if throw a exception when passing a invalid port.
+     *
+     * @dataProvider getInvalidPort
+     * @expectedException CI\Socket\Exception
+     */
+    public function testShouldThrownExceptionWithInvalidPort($sHost, $nPort, $sType)
+    {
+        $oSocket = new Socket($sHost, $nPort, $sType);
+    }
+
+    /**
+     * Test if throw a exception when trying to connect our socket
+     * without hostname, port and type.
+     *
+     * @expectedException CI\Socket\Exception
+     */
+    public function testShouldThrowExceptionTryingToConnectWithoutConfigOptions()
+    {
+        // Temporary disable warning because we want to
+        // throw an exception when socket_create returns false
+        error_reporting(~E_WARNING);
+
+        $oMock = $this->getMockBuilder('CI\Socket')
+                      ->setMethods(null)
+                      ->disableOriginalConstructor()
+                      ->getMock();
+
+        $oMock->connect();
+    }
+
+    /**
+     * Tests should throw a exception when passing a invalid socket type
+     *
+     * @expectedException CI\Socket\Exception
+     */
+    public function testShouldThrowExceptionWithInvalidSocketType()
+    {
+        $oSocket = new Socket('localhost', 9999, 'InvalidType');
+    }
+
+    /**
+     * Tests if the instance of Socket has set all the properties
+     */
+    public function testCreateInstanceOfSocketClass()
+    {
+        $sHost = 'localhost';
+        $nPort = 9999;
+        $nType = Socket::TYPE_TCP;
+
+        $oSocket = new Socket($sHost, $nPort, $nType);
+
+        $this->assertAttributeEquals($sHost, '_sHost', $oSocket);
+        $this->assertAttributeEquals($nPort, '_nPort', $oSocket);
+        $this->assertAttributeEquals($nType, '_nType', $oSocket);
+        $this->assertFalse($oSocket->close(), 'The socket should not be connected');
+    }
+
+    /**
+     * Tests if the socket can connect to an end point
+     */
+    public function testConnect()
+    {
+        $oSocket = new Socket('dev.crowdignite.com', 80, Socket::TYPE_TCP);
+        $this->assertTrue($oSocket->connect());
+        $this->assertTrue($oSocket->close());
+    }
+
+    /**
+     * Tests if throw a exception when a host or port are not able
+     * to stablish a connection.
+     *
+     * @expectedException CI\Socket\Exception
+     */
+    public function testThrowExceptionWhenHostOrPortAreNotAble()
+    {
+        error_reporting(~E_WARNING);
+
+        $oSocket = new Socket('localhost', 999, Socket::TYPE_TCP);
+        $oSocket->connect();
+    }
+
+    /**
+     * Tests if we can send a request and get a response using our socket
+     */
+    public function testSendRequestAndGetResponse()
+    {
+        $sRequest = "HEAD / HTTP/1.1\r\n";
+        $sRequest .= "Host: dev.crowdignite.com\r\n";
+        $sRequest .= "Connection: Close\r\n\r\n";
+
+        $oSocket = new Socket('dev.crowdignite.com', 80, Socket::TYPE_TCP);
+        $oSocket->connect();
+        $nBytes = $oSocket->write($sRequest);
+        $sResponse = $oSocket->read();
+
+        $this->assertGreaterThan(0, $nBytes);
+        $this->assertGreaterThan(0, strlen($sResponse));
+
+        $oSocket->close();
+    }
+
+    /**
+     * Tests if throw a exception when passing invalid string request
+     *
+     * @dataProvider getInvalidRequest
+     */
+    public function testSendRequestWithInvalidRequest($sRequest)
+    {
+        $oSocket = new Socket('dev.crowdignite.com', 80, Socket::TYPE_TCP);
+        $oSocket->connect();
+        $nBytes = $oSocket->write($sRequest);
+
+        $this->assertEquals(0, $nBytes);
+    }
+
+    /**
+     * Tests if throw a exception when trying to send a request without
+     * a connection established to a server.
+     *
+     * @expectedException CI\Socket\Exception
+     */
+    public function testThrowExceptionWhenSendingRequestWithoutConnection()
+    {
+        error_reporting(~E_WARNING);
+
+        $oSocket = new Socket('localhost', 9999, Socket::TYPE_TCP);
+        $oSocket->write('Invalid request');
+    }
+
+    /**
+     * Tests if throw a exception when trying to read a response without
+     * a connection established to a server.
+     *
+     * @expectedException CI\Socket\Exception
+     */
+    public function testThrowExceptionWhenReadingResponseWithoutConnection()
+    {
+        error_reporting(~E_WARNING);
+
+        $oSocket = new Socket('localhost', 9999, Socket::TYPE_TCP);
+        $oSocket->read();
+    }
+
+    /**
+     * Data provider used on testSendRequestWithInvalidRequest
+     */
+    public function getInvalidRequest()
+    {
+        return array(
+            array(0),
+            array('')
+        );
+    }
+
+    /**
+     * Data provider used on testShouldThrowExceptionWithEmptyHost
+     */
+    public function getInvalidHost()
+    {
+        return array(
+            array("", 888, Socket::TYPE_TCP),
+            array(999, 888, Socket::TYPE_TCP),
+        );
+    }
+
+    /**
+     * Data provider used on testShouldThrownExceptionWithInvalidPort
+     */
+    public function getInvalidPort()
+    {
+        return array(
+            array("localhost", 0, Socket::TYPE_TCP),
+            array("localhost", "ABC", Socket::TYPE_TCP),
+        );
+    }
+}

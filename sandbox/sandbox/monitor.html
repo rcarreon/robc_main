@@ -1,0 +1,43 @@
+    <html>
+    <head>
+    <!-- This file lives at:
+         https://svn.gnmedia.net/deploytools/trunk/sites/cycler-monitorX.html
+        Just commit changes to subversion and the monitor will eventualy be updated -->
+     
+    <script type="text/javascript">
+    var urls    = new Array();
+    var nextpagesecs=20000
+    var url=0
+     
+    // Add new URLs here...
+    urls.push('http://www.sherdog.com')
+    urls.push('http://www.momtastic.com')
+    urls.push('http://www.myanimelist.net')
+    urls.push('http://ronagios.lax1.gnmedia.net/cgi-bin/status.cgi?hostgroup=all&style=summary')
+    urls.push('http://cacti.gnmedia.net/cacti/plugins/weathermap/weathermap-cacti-plugin.php')
+    urls.push('https://dfm.gnmedia.net/dfm/report/view/controllers-cpu-graph')
+    urls.push('https://dfm.gnmedia.net/dfm/report/view/big-graph/cpu-1d/1155?group=0')
+    urls.push('https://dfm.gnmedia.net/dfm/report/view/big-graph/cpu-1d/74?group=0')
+     
+     
+    function nextpage() {
+      if (!urls[url]) { window.location.reload(true); }
+       document.getElementById("showframe").src=urls[url]
+       document.title='Cycler: '+url+': '+urls[url]
+       url=url+1
+       var t=setTimeout("nextpage(url)",nextpagesecs);
+    }
+     
+    var d=new Date();
+    if (d.getDay() == 5) {
+      urls.push('http://aibarra.lax3.gnmedia.net/')
+    }
+    </script>
+    </head>
+    <body onload="javascript:nextpage(); return false;">
+    <iframe id="showframe" width="100%" height="99%">
+      <p>Your browser does not support iframes.</p>
+    </iframe>
+    </body>
+     
+    </html> 

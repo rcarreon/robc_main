@@ -1,0 +1,9 @@
+<?
+	foreach ($categories as $id => $category) {
+		$bit = 1 << $id;
+		$options = array("value" => $bit);
+		echo $form->checkbox('Website.allowed_categories_'.$id, $options);
+		echo ucwords($category)." ";
+		echo "<br/>";
+	}
+?>

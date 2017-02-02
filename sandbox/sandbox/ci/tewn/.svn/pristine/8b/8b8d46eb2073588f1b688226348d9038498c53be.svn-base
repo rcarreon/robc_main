@@ -1,0 +1,23 @@
+<?php 
+/* SVN FILE: $Id$ */
+/* AnalyticsController Test cases generated on: 2010-03-06 14:46:26 : 1267908386*/
+class AnalyticsControllerTest extends CakeTestCase {
+	var $Analytics = null;
+	var $fixtures = array('app.analytic', 'app.user', 'app.log');
+
+	function startTest() {
+		App::import('Controller', 'Analytics');
+		$this->Analytics = new AnalyticsController();
+		$this->Analytics->constructClasses();
+		$this->Analytics->autoRender = false;
+	}
+
+	function testAnalyticsControllerInstance() {
+		$this->assertTrue(is_a($this->Analytics, 'AnalyticsController'));
+	}
+
+	function endTest() {
+		unset($this->Analytics);
+	}
+}
+?>

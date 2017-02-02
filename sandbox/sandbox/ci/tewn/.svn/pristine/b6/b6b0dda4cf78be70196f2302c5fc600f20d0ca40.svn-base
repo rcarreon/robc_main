@@ -1,0 +1,65 @@
+<?php
+
+namespace Test\Stats;
+/**
+ * @group CI-92
+ */
+class HubTest extends \PHPUnit_Framework_TestCase
+{
+    public function testValidateConditionsWhenEverithingIsOk()
+    {
+        $bExpected = true;
+        $oHub      = new \Test\Stats\HubMock();
+        $oHub->setHubId(1);
+        $oHub->setgranularity('daily');
+        $oHub->setStartDate('2011-12-01 12:34:00');
+        $oHub->setEndDate('2012-12-01 12:34:00');
+        $bResult = $oHub->validateConditions();
+        $this->assertEquals($bExpected, $bResult);
+    }
+
+    public function testValidateConditionsWhenEverithingIsOkSettingSomeHubs()
+    {
+        $bExpected = true;
+        $oHub      = new \Test\Stats\HubMock();
+        $oHub->setHubsIds(array(1,12,10));
+        $oHub->setgranularity('daily');
+        $oHub->setStartDate('2011-12-01 12:34:00');
+        $oHub->setEndDate('2012-12-01 12:34:00');
+        $bResult = $oHub->validateConditions();
+        $this->assertEquals($bExpected, $bResult);
+    }
+
+    public function testValidateConditionsWhenGranularityInvalid()
+    {
+        $bExpected = false;
+        $oHub      = new \Test\Stats\HubMock();
+        $oHub->setHubsIds(array(1));
+        $oHub->setgranularity(1);
+        $oHub->setStartDate('2011-12-01 12:34:00');
+        $oHub->setEndDate('2012-12-01 12:34:00');
+        $bResult = $oHub->validateConditions();
+        $this->assertEquals($bExpected, $bResult);
+    }
+
+    public function testGetEmptyStats()
+    {
+        $aExpected = array();
+        $oHub      = new \Test\Stats\HubMock();
+        $aResult   = $oHub->getEmptyStats();
+        $this->assertEquals($aExpected, $aResult);
+    }
+}
+
+class HubMock extends \CI\Stats\Hub
+{
+    public function validateConditions()
+    {
+        return parent::validateConditions();
+    }
+
+    public function process()
+    {
+        return parent::process();
+    }
+}

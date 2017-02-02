@@ -1,0 +1,257 @@
+<?php
+
+namespace Test\VowpalWabbit\Parser\LandingPage\Paid;
+use CI\VowpalWabbit\Parser\LandingPage\Paid\Clicks;
+
+/**
+ * @group VowpalWabbit
+ * @group Correlator
+ * @group LandingPage
+ */
+
+class ClicksTest extends \PHPUnit_Framework_TestCase
+{
+
+    public function setUp()
+    {
+        $this->oClicks = new ClicksMock('20131030_05:00');
+    }
+
+    /**
+     * Testing the lecture of one line of the  Clicks log
+     *
+     * @return void
+     */
+    public function testRowsOfoneItemFromLog()
+    {
+        $oExpected['23-617203149'] = (object) array(
+            'unix_timestamp' => '1383134423',
+            'user_id' => '23',
+            'ip' => '192.168.12.48',
+            'paid_link_id' => '617203149',
+            'paid_link_campaign_id' => '2'
+        );
+        $nLimit = 1;
+        $oResult = $this->oClicks->readLog($nLimit);
+
+        $this->assertEquals($oExpected, $oResult, 'we are no getting the expected object ');
+    }
+
+    /**
+     * Testing the lecture of many lines of the  Clicks log
+     *
+     * @return void
+     */
+    public function testReadOneItemFromLog()
+    {
+        $nExpected = 1;
+        $oResult = $this->oClicks->readLog($nExpected);
+        $nResult = count($oResult);
+
+        $this->assertEquals($nExpected, $nResult, 'we didn\'t get the items was requested =' . $nExpected);
+    }
+
+    /**
+     * Testing the lecture of many lines of the  Widget Clicks log
+     *
+     * @return void
+     */
+    public function testReadManyItemsFromLog()
+    {
+        $nExpected = 4;
+        $oResult = $this->oClicks->readLog($nExpected);
+        $nResult = count($oResult);
+
+        $this->assertEquals($nExpected, $nResult, 'we didn\'t get the items was requested = ' . $nExpected);
+    }
+
+    /**
+     * Testing the Lecture
+     *
+     * @return void.
+     */
+    public function testReadOfTwoHourFile()
+    {
+        $nExpected = 6;
+        $oResult = $this->oClicks->readLog();
+        $nResult = count($oResult);
+
+        $this->assertEquals($nExpected, $nResult, 'we didn\'t get the items was requested = '. $nExpected);
+
+    }
+
+    /**
+     * Testing the exception
+     *
+     * @expectedException CI\File\Exception
+     *
+     * @return void.
+     */
+    public function testFileException()
+    {
+        $this->oClicks = new ClicksMock('20000816_12:00');
+        $this->oClicks->readLog();
+    }
+
+    /**
+     * Testing the Sanitation of our strings
+     *
+     * @return void
+     */
+    public function testSanitaze()
+    {
+        $sExpected = '0';
+        $sBad = '0    ';
+        $sReturn = $this->oClicks->sanitaze($sBad);
+
+        $this->assertEquals($sExpected, $sReturn, 'did not sanitaze correctly');
+    }
+
+    /**
+     * Testing the get the directories
+     *
+     * @return void.
+     */
+    public function testGetDirLogs()
+    {
+        $aExpected = array(
+          "app1v-ci.ci.prd.lax.gnmedia.net",
+          "app2v-ci.ci.prd.lax.gnmedia.net",
+          "app3v-ci.ci.prd.lax.gnmedia.net",
+          "app4v-ci.ci.prd.lax.gnmedia.net",
+          "app5v-ci.ci.prd.lax.gnmedia.net",
+          "app6v-ci.ci.prd.lax.gnmedia.net",
+          "app7v-ci.ci.prd.lax.gnmedia.net",
+          "app8v-ci.ci.prd.lax.gnmedia.net"
+        );
+        $aResult = $this->oClicks->getDirLogs();
+
+        $this->assertEquals($aExpected, $aResult);
+    }
+
+
+    /**
+     * Testing the get the directories
+     *
+     * @return void.
+     */
+    public function testGetAllLogs()
+    {
+        $aExpected = array(
+            '../library/../tests/resources/mnt/crowdignite/app1v-ci.ci.prd.lax.gnmedia.net/vwlogs/lppaidclick.log.20130816_12:00',
+            '../library/../tests/resources/mnt/crowdignite/app2v-ci.ci.prd.lax.gnmedia.net/vwlogs/lppaidclick.log.20130816_12:00',
+            '../library/../tests/resources/mnt/crowdignite/app3v-ci.ci.prd.lax.gnmedia.net/vwlogs/lppaidclick.log.20130816_12:00',
+            '../library/../tests/resources/mnt/crowdignite/app4v-ci.ci.prd.lax.gnmedia.net/vwlogs/lppaidclick.log.20130816_12:00',
+            '../library/../tests/resources/mnt/crowdignite/app5v-ci.ci.prd.lax.gnmedia.net/vwlogs/lppaidclick.log.20130816_12:00',
+            '../library/../tests/resources/mnt/crowdignite/app6v-ci.ci.prd.lax.gnmedia.net/vwlogs/lppaidclick.log.20130816_12:00',
+            '../library/../tests/resources/mnt/crowdignite/app7v-ci.ci.prd.lax.gnmedia.net/vwlogs/lppaidclick.log.20130816_12:00',
+            '../library/../tests/resources/mnt/crowdignite/app8v-ci.ci.prd.lax.gnmedia.net/vwlogs/lppaidclick.log.20130816_12:00'
+        );
+        $aResult = $this->oClicks->getAllLogs('20130816_12:00');
+
+        $this->assertEquals($aExpected, $aResult);
+    }
+    /**
+     * Testing the case of 30 minutes in time frame.
+     *
+     * @return void
+     */
+    public function testIsInTimeFrame30Minutes()
+    {
+        $bExpected = true;
+        $this->oClicks = new ClicksMock('20120816_16:30');
+        $nDate = strtotime('2012/08/16 17:00');
+        $TimeFrame = 30 * 60;
+        $bResult = $this->oClicks->isInTimeFrame($nDate, $TimeFrame);
+
+        $this->assertEquals($bExpected, $bResult);
+    }
+
+    /**
+     * Testing the case of 1 hour and 30 minutes in time frame.
+     *
+     * @return void
+     */
+    public function testIsInTimeFrame90Minutes()
+    {
+        $bExpected = true;
+        $this->oClicks = new ClicksMock('20120816_16:00');
+        $nDate = strtotime('2012/08/16 17:30');
+        $TimeFrame = 1.5 * 60 * 60;
+        $bResult = $this->oClicks->isInTimeFrame($nDate, $TimeFrame);
+
+        $this->assertEquals($bExpected, $bResult);
+    }
+
+    /**
+     * Testing the case of more of the time frime limit
+     *
+     * @return void
+     */
+    public function testIsNotInTimeFrame30Minutes()
+    {
+        $bExpected = false;
+        $this->oClicks = new ClicksMock('20120816_16:00');
+        $nDate = strtotime('2012/08/16 16:30:01');
+        $TimeFrame = 30 * 60;
+        $bResult = $this->oClicks->isInTimeFrame($nDate, $TimeFrame);
+
+        $this->assertEquals($bExpected, $bResult);
+    }
+
+    /**
+     * Testing the case of more of the time frime limit
+     *
+     * @return void
+     */
+    public function testIsLesstInTimeFrame()
+    {
+        $bExpected = false;
+        $this->oClicks = new ClicksMock('20120816_16:00');
+        $nDate = strtotime('2012/08/16 13:30:01');
+        $TimeFrame = 30 * 60;
+        $bResult = $this->oClicks->isInTimeFrame($nDate, $TimeFrame);
+
+        $this->assertEquals($bExpected, $bResult);
+    }
+
+    /**
+     * Testing the case of time stamp
+     *
+     * @return void
+     */
+    public function testTimeStam()
+    {
+        $bExpected = false;
+        $this->oClicks = new ClicksMock('20120816_12:00');
+        $nDate = 1376676001;
+        $TimeFrame = 30 * 60;
+        $bResult = $this->oClicks->isInTimeFrame($nDate, $TimeFrame);
+
+        $this->assertEquals($bExpected, $bResult);
+    }
+}
+
+/**
+ * Mockup of the class Click to rewrite some variables.
+ */
+class ClicksMock extends Clicks
+{
+    /**
+     * Rewrite the __construct to rewrite tha path to read the logs
+     *
+     * @param $sDate date to be proccess
+     *
+     * @return void.
+     */
+    public function __construct($sDate)
+    {
+        $this->sMountLogs = LIBRARY_DIR . '../tests/resources/mnt/crowdignite/';
+        parent::__construct($sDate);
+    }
+
+    public function moveDoneFiles($bVar = false)
+    {
+        //rewrite this function, to dont move any File
+    }
+}

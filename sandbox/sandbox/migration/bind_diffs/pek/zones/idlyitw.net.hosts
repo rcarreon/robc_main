@@ -1,0 +1,35 @@
+$TTL 86400
+idlyitw.net.	IN      SOA     idlyitw.net. root.idlyitw.net. (
+                        2014061900	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+idlyitw.net.	IN	NS		app3v-dns.tp.prd.lax.idlyitw.net.
+idlyitw.net.	IN	NS		app4v-dns.tp.prd.lax.idlyitw.net.
+idlyitw.net.	IN	NS		app1v-dns.tp.prd.lax.idlyitw.net.
+idlyitw.net.	IN	NS		app2v-dns.tp.prd.lax.idlyitw.net.
+idlyitw.net.	IN	MX	1	mail.idlyitw.net.
+;
+; local host
+;
+local           IN      A       127.0.0.1
+localhost       IN      A       127.0.0.1
+loghost         IN      A       127.0.0.1
+;
+;
+; hosts
+mail.idlyitw.net.	IN	A       72.172.76.78
+;
+; public DNS
+;
+ns3.idlyitw.net.	IN	A	67.15.66.42
+ns4.idlyitw.net.	IN	A	67.15.66.43
+ns5.idlyitw.net.	IN	A	64.34.172.209
+ns6.idlyitw.net.	IN	A	72.51.41.238
+app1v-dns.tp.prd.lax.idlyitw.net.        IN      A       10.11.20.68
+app2v-dns.tp.prd.lax.idlyitw.net.        IN      A       10.11.20.69
+app3v-dns.tp.prd.lax.idlyitw.net.        IN      A       10.11.20.53
+app4v-dns.tp.prd.lax.idlyitw.net.        IN      A       10.11.20.88

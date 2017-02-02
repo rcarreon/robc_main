@@ -1,0 +1,89 @@
+<?php
+
+namespace CI\Test\Filter\String;
+use CI\Filter\String\Truncate;
+
+/**
+ * @group filter
+ * @group filter_string
+ */
+class FilterStringTruncateTest extends \PHPUnit_Framework_TestCase
+{
+    private $oTruncate;
+
+    public function setUp()
+    {
+        $this->oTruncate = new Truncate();
+    }
+
+    /**
+     * Tests if a string is truncated given it's length
+     *
+     * @dataProvider getTruncate
+     */
+    public function testTruncate($nLength)
+    {
+        $sString = 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy';
+
+        $this->oTruncate->setLength($nLength);
+        $this->assertEquals(substr($sString, 0, $nLength), $this->oTruncate->filter($sString));
+    }
+
+    /**
+     * @expectedException \CI\String\Exception
+     * @expectedExceptionCode \CI\String\Exception::NOT_VALID
+     */
+    public function testInvalidFilterValue()
+    {
+        // The filter function only accept a string like parameter, should
+        // throw the exception.
+        $this->oTruncate->setLength(15)->filter(999999);
+    }
+
+    /**
+     * Tests if throw a \CI\String\Exception when the length is not set.
+     *
+     * @expectedException \CI\String\Exception
+     * @expectedExceptionCode \CI\String\Exception::INVALID_LENGTH
+     */
+    public function testLengthIsNotSet()
+    {
+        $this->oTruncate->filter('Lorem ipsum dolor sit amet, consectetuer adipiscing elit');
+    }
+
+    /**
+     * Tests if throw a \CI\String\Exception when the length is not greater than
+     * zero.
+     *
+     * @expectedException \CI\String\Exception
+     * @expectedExceptionCode \CI\String\Exception::INVALID_LENGTH
+     * @dataProvider getInvalidLength
+     */
+    public function testInvalidLength($nLength)
+    {
+        $this->oTruncate->setLength($nLength)->filter('Lorem ipsum dolor sit amet, consectetuer adipiscing elit');
+    }
+
+    public function getTruncate()
+    {
+        return array(
+            array(15),
+            array(1),
+            array(3000),
+        );
+    }
+
+    public function getInvalidLength()
+    {
+        return array(
+            array(0),
+            array(-1),
+            array("Lorem")
+        );
+    }
+
+    public function tearDown()
+    {
+        unset($this->oTruncate);
+    }
+}

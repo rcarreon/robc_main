@@ -1,0 +1,781 @@
+var ci = ci || {};
+
+ci.Reports = {
+    current_ajax : {},
+    tpl_ci_stats_system : {},
+    tpl_ci_stats_by_hub : {},
+    tpl_ci_stats_full_system : {},
+    tpl_ci_stats_full_system_year : {},
+    tpl_report_by_hub : {},
+    tpl_report_by_website : {},
+    current_type : '',
+    templates_list : {},
+    hash_instance : {},
+    init : function () {
+        ci.Reports.init_selectpickers();
+        ci.Reports.init_tooltips();
+        ci.Reports.init_helpers();
+        ci.Reports.init_butons();
+        ci.Reports.init_templates();
+        ci.Reports.init_side_bar();
+        ci.Reports.init_date_range();
+        ci.Reports.init_dowload_all_reports();
+        ci.Reports.load_report_list();
+    },
+    init_tooltips : function() {
+        $('.with-tooltip').tooltip({container:'body'});
+    },
+    init_selectpickers : function() {
+        $(".selectpicker").selectpicker();
+
+        $('.selectpicker[name=hubs_ids]').next().find("li a").on('click', function(e) {
+            var index     = $(this).parent().attr('rel');
+            var hub_value = $('.selectpicker[name=hubs_ids] option')[index].value;
+            var selected  = $('.selectpicker[name=hubs_ids]').val();
+
+            if (selected.length == 1 && hub_value == selected[0]) {
+                e.stopPropagation();
+            }
+        });
+
+        $('.selectpicker[name=website_list_component]').on('change', function(e) {
+            var selected = $(this).val();
+            var $buttons = $('#frm-report-by-website .load-website-report, #frm-report-by-website .save-report');
+
+            if (selected !== null) {
+                $buttons.removeAttr('disabled');
+            } else {
+                $buttons.attr('disabled', 'disabled');
+            }
+        });
+
+        $('.selectpicker[name=website_list_component]').next().find('.popover-title button').on('click', function(e){
+            var $selectpicker = $('.selectpicker[name=website_list_component]');
+
+            $selectpicker.selectpicker('deselectAll');
+            $selectpicker.trigger('change');
+        });
+
+        $('.selectpicker[name=hubs_details]').on('change', function(e){
+            var $selectpicker           = $('.selectpicker[name=hubs_details]');
+            var $options_dailybreakdown = $selectpicker.find('option[value=daily_breakdown]');
+
+            if ($.inArray('websites', $selectpicker.val()) != -1) {
+                $options_dailybreakdown.removeAttr('disabled');
+            } else {
+                $options_dailybreakdown.attr('disabled', 'disabled');
+                $options_dailybreakdown.removeAttr('selected');
+            }
+
+            $selectpicker.selectpicker('refresh');
+        });
+    },
+    delete_report : function(id, callback) {
+        var url = '/admin/reports/action/delete';
+        var params = {
+            id : id
+        };
+
+        $.ajax({
+            type  : 'GET',
+            url   : url,
+            data  : params,
+            cache : false
+        }).done(function(data){
+            if (data.status == "ok") {
+                ci.Reports.load_report_list();
+                if (ci.isFunction(callback)) {
+                    callback();
+                }
+            } else {
+                console.log(data);
+            }
+        });
+    },
+    load_report_list : function() {
+        var url = '/admin/reports/action/get_list';
+
+        $.ajax({
+            type  : 'GET',
+            url   : url,
+            cache : false
+        }).done(function(data){
+            if (data.status == "ok") {
+                var $modal_load_report = $('#modal-load-reports');
+                var $modal_save_report = $('#modal-save-reports');
+
+                $modal_load_report.find('.modal-body .select-container').html(ci.Reports.templates_list['report_list_select'](data.data.reports.load));
+                $modal_save_report.find('.modal-body .select-container').html(ci.Reports.templates_list['report_list_select'](data.data.reports.save));
+
+                ci.Reports.init_load_modal();
+                ci.Reports.init_save_modal();
+            } else {
+                console.log(data);
+            }
+        });
+    },
+    init_load_modal : function() {
+        var $selectpicker = $('#modal-load-reports .selectpicker[name="report-list"]');
+        var $btn_load     = $('.btn-load-report');
+
+        $selectpicker.selectpicker();
+        $selectpicker.on('change', function(){
+            if ($selectpicker.val() == -1) {
+                $btn_load.attr('disabled', 'disabled');
+            } else {
+                $btn_load.removeAttr('disabled');
+            }
+        });
+
+        $selectpicker.next().on('click', 'button.delete-report', function(e){
+            var id = $(this).data('id');
+
+            bootbox.confirm({
+                size     : 'small',
+                title    : '<i class="fa fa-exclamation-triangle"></i> Delete report',
+                message  : 'Are you sure to delete this report?',
+                callback : function(result) {
+                    if (result) {
+                        ci.Reports.delete_report(id);
+                    }
+                }
+            });
+            e.stopPropagation();
+        });
+    },
+    init_save_modal : function() {
+        var $selectpicker      = $('#modal-save-reports .selectpicker[name="report-list"]');
+        var $input_report_name = $('#modal-save-reports input[name="report_name"]');
+        var $input_report_id   = $('#modal-save-reports input[name="report_id"]');
+        var $btn_save          = $('.btn-save-report');
+
+        $selectpicker.selectpicker();
+        $input_report_name.on('keyup', function(){
+            if ($input_report_name.val().length > 0) {
+                $btn_save.removeAttr('disabled');
+            } else {
+                $btn_save.attr('disabled', 'disabled');
+            }
+        });
+
+        $selectpicker.next().on('click', 'button.delete-report', function(e){
+            var id = $(this).data('id');
+
+            bootbox.confirm({
+                size     : 'small',
+                title    : '<i class="fa fa-exclamation-triangle"></i> Delete report',
+                message  : 'Are you sure to delete this report?',
+                callback : function(result) {
+                    if (result) {
+                        ci.Reports.delete_report(id, function(){
+                            $('#modal-save-reports input[name="report_name"]').val('').removeAttr('readonly');
+                        });
+                    }
+                }
+            });
+            e.stopPropagation();
+        });
+
+        $selectpicker.on('change', function(){
+            if ($selectpicker.val() == -1) {
+                $btn_save.attr('disabled', 'disabled');
+                $input_report_name.removeAttr('readonly');
+                $input_report_name.val('');
+                $input_report_id.val('-1');
+                $input_report_name.focus();
+            } else {
+                $btn_save.removeAttr('disabled');
+                $input_report_name.attr('readonly', 'true');
+                $input_report_name.val($selectpicker.find('option[value=' + $selectpicker.val() + ']').text());
+                $input_report_id.val($selectpicker.val());
+            }
+        });
+    },
+    save_report : function() {
+        var params             = {};
+        var $btn_save          = $('.save-report');
+        var $modal_save_report = $('#modal-save-reports');
+
+        $btn_save.button('loading');
+
+        if (ci.Reports.current_type == 'report_by_hub') {
+            params = ci.Reports.get_params_by_hub();
+        } else if (ci.Reports.current_type == 'report_by_website'){
+            params = ci.Reports.get_params_by_website();
+        }
+
+        params['name'] = $modal_save_report.find('input[name=report_name]').val();
+        params['id']   = $modal_save_report.find('input[name=report_id]').val();
+
+        ci.Reports.current_ajax = $.ajax({
+            type  : 'POST',
+            url   : '/admin/reports/action/save',
+            data  : params,
+            cache : false
+        }).done(function(data){
+            if (data.status == "ok") {
+                ci.Reports.load_report_list();
+                $modal_save_report.modal('hide');
+            }
+            $btn_save.button('reset');
+        });
+    },
+    get_params_by_hub : function() {
+        var $form       = $('#frm-report-by-hub');
+        var hub_details = $form.find('.selectpicker[name=hubs_details]').val();
+        var params      = {
+            type       : 'report_by_hub',
+            start_date : $form.find('#reports-datepicker').data('daterangepicker').startDate.format('YYYY-MM-DD'),
+            end_date   : $form.find('#reports-datepicker').data('daterangepicker').endDate.format('YYYY-MM-DD'),
+            hubs_ids   : $form.find('.selectpicker[name=hubs_ids]').val().join(',')
+        };
+
+        if (hub_details !== null) {
+            hub_details.forEach(function(element, index, array) {
+                params[element] = 1;
+            });
+        }
+
+        return params;
+    },
+    get_params_by_website : function() {
+        var $form                     = $('#frm-report-by-website');
+        var website_details           = $form.find('.selectpicker[name=website-details]').val();
+        var params                    = {
+            type           : 'report_by_website',
+            start_date     : $form.find('#reports-datepicker').data('daterangepicker').startDate.format('YYYY-MM-DD'),
+            end_date       : $form.find('#reports-datepicker').data('daterangepicker').endDate.format('YYYY-MM-DD'),
+            websites_ids   : $form.find('.selectpicker[name=website_list_component]').val().join(',')
+        };
+
+        if (website_details !== null) {
+            website_details.forEach(function(element, index, array) {
+                params[element] = 1;
+            });
+        }
+
+        return params;
+    },
+    load_saved_report : function(id) {
+        var url = '/admin/reports/action/load';
+
+        $.ajax({
+            type  : 'GET',
+            data  : {id : id},
+            url   : url,
+            cache : false
+        }).done(function(response){
+            $('.btn-load-report').button('reset');
+
+            if (response.status == "ok") {
+                var type  = response.data.report.type;
+
+                if (type == 'report_by_website') {
+                    ci.Reports.hash_instance.setHash('#report_by_website', function(){
+                        var $form           = $('#frm-report-by-website');
+                        var $buttons        = $('#frm-report-by-website .load-website-report, #frm-report-by-website .save-report');
+                        var websites_ids    = [];
+                        var website_details = [];
+
+                        if (!ci.isUndefined(response.data.report.websites_ids)){
+                            websites_ids = response.data.report.websites_ids.split(',');
+                        }
+
+                        if (!ci.isUndefined(response.data.report.daily_breakdown)) {
+                            website_details.push('daily_breakdown');
+                        }
+
+                        $form.find('.selectpicker[name=website-details]').selectpicker('val', website_details);
+                        $form.find('.selectpicker[name=website_list_component]').selectpicker('val', websites_ids);
+
+                        $buttons.removeAttr('disabled');
+                    });
+                } else if (type == 'report_by_hub') {
+                    ci.Reports.hash_instance.setHash('#report_by_hub', function(){
+                        var $form       = $('#frm-report-by-hub');
+                        var hubs        = [];
+                        var hub_options = [];
+
+                        if (!ci.isUndefined(response.data.report.hubs_ids)){
+                            hubs = response.data.report.hubs_ids.split(',');
+                        }
+
+                        if (!ci.isUndefined(response.data.report.daily_breakdown)) {
+                            hub_options.push('daily_breakdown');
+                        }
+
+                        if (!ci.isUndefined(response.data.report.websites)) {
+                            hub_options.push('websites');
+                        }
+
+                        $form.find('.selectpicker[name=hubs_details]').selectpicker('val', hub_options);
+                        $form.find('.selectpicker[name=hubs_ids]').selectpicker('val', hubs);
+                    });
+                }
+
+                $('#modal-load-reports').modal('hide');
+            } else {
+                console.log(response);
+            }
+        });
+    },
+    reset_reports : function() {
+        ci.Reports.init_date_range();
+
+        // Hub
+        var $frm_hub = $('#frm-report-by-hub');
+        $frm_hub.find('.selectpicker[name=hubs_details]').selectpicker('deselectAll');
+        $frm_hub.find('.selectpicker[name=hubs_ids]').selectpicker('val', [0]);
+        $frm_hub.find('.export-hub-to-excel').attr('disabled', 'disabled');
+        $('#hub-report-content').empty();
+
+        // Websites
+        var $frm_website = $('#frm-report-by-website');
+        $frm_website.find('.selectpicker[name=website-details]').selectpicker('deselectAll');
+        $frm_website.find('.selectpicker[name=website_list_component]').selectpicker('deselectAll');
+        $frm_website.find('.load-website-report, .export-website-to-excel, .save-report').attr('disabled', 'disabled');
+        $('#website-report-content').empty();
+    },
+    init_helpers : function (){
+        Handlebars.registerHelper('numberFormat', function(number) {
+            //Seperates the components of the number
+            var n= number.toString().split(".");
+            //Comma-fies the first part
+            n[0] = n[0].replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+            //Combines the two sections
+            return n.join(".");
+        });
+    },
+    init_butons : function () {
+        ci.Reports.init_stats_butons_sidebar();
+        ci.Reports.init_button_export_to_excel();
+
+        // Reports by
+        ci.Reports.init_hub_button_sidebar();
+        ci.Reports.init_website_button_sidebar();
+
+        $('#load-stats-report').on('click', function(){
+           ci.Reports.load_report_ci_stats();
+        });
+
+        $('.load-hub-report').on('click', function(){
+            ci.Reports.load_report_by_hub();
+        });
+
+        $('.load-website-report').on('click', function(){
+            ci.Reports.load_report_by_website();
+        });
+
+        $('.export-website-to-excel').on('click', function(){
+            ci.Reports.download_report_by_website();
+        });
+
+        $('.export-hub-to-excel').on('click', function(){
+            ci.Reports.download_report_by_hub();
+        });
+
+        $('.btn-load-report').on('click', function(){
+            var id = $('.selectpicker[name=report-list]').val();
+            $(this).button('loading');
+            ci.Reports.load_saved_report(id);
+        });
+
+        $('.btn-clean-form').on('click', function(){
+            ci.Reports.reset_reports();
+        });
+
+        $('.btn-save-report').on('click', function(){
+            ci.Reports.save_report();
+        });
+    },
+    init_hub_button_sidebar : function() {
+        var $anchor_report = $('.report_by_hub');
+
+        $anchor_report.on("click", function(event) {
+            if (ci.isFunction(ci.Reports.current_ajax.abort)) {
+                ci.Reports.current_ajax.abort();
+                $('#load-stats-report').button('reset');
+            }
+
+            ci.Reports.current_type = $(this).attr('href').replace('#', '');
+            $(this).parent().parent().children("*").removeClass('active');
+            $(this).parent().addClass('active');
+
+            if (typeof event.originalEvent !== "undefined") {
+                ci.Reports.toggle_content_class();
+            }
+
+            ci.Reports.load_hub_header();
+        });
+    },
+    init_website_button_sidebar : function() {
+        var $anchor_report = $('.report_by_website');
+
+        $anchor_report.on("click", function(event) {
+            if (ci.isFunction(ci.Reports.current_ajax.abort)) {
+                ci.Reports.current_ajax.abort();
+                $('#load-stats-report').button('reset');
+            }
+
+            ci.Reports.current_type = $(this).attr('href').replace('#', '');
+            $(this).parent().parent().children("*").removeClass('active');
+            $(this).parent().addClass('active');
+
+            if (typeof event.originalEvent !== "undefined") {
+                ci.Reports.toggle_content_class();
+            }
+
+            ci.Reports.load_website_header();
+        });
+    },
+    load_hub_header : function() {
+        ci.Reports.reset_reports();
+        $('.right-content').addClass('hidden');
+        $('#hub-container').removeClass('hidden');
+    },
+    load_website_header : function() {
+        ci.Reports.reset_reports();
+        $('.right-content').addClass('hidden');
+        $('#website-container').removeClass('hidden');
+    },
+    init_stats_butons_sidebar : function (event) {
+        var $anchor_report = $('.ci_stats_report');
+
+        $anchor_report.on("click", function(event) {
+            if (ci.isFunction(ci.Reports.current_ajax.abort)) {
+                ci.Reports.current_ajax.abort();
+                $('#load-stats-report').button('reset');
+            }
+
+            ci.Reports.current_type = $(this).attr('href').replace('#', '');
+            $(this).parent().parent().children("*").removeClass('active');
+            $(this).parent().addClass('active');
+
+            if (typeof event.originalEvent !== "undefined") {
+                ci.Reports.toggle_content_class();
+            }
+
+            ci.Reports.load_report_header();
+        });
+    },
+    init_button_export_to_excel : function() {
+        $('#export-stats-to-excel').on("click", function(event) {
+            var url = '/admin/reports/action/generate_excel';
+            var params = {
+                type : ci.Reports.current_type,
+                start_date : $('#ci-stats-datepicker').data('daterangepicker').startDate.format('YYYY-MM-DD'),
+                end_date : $('#ci-stats-datepicker').data('daterangepicker').endDate.format('YYYY-MM-DD'),
+            };
+
+            var $export_excel_button = $('#export-stats-to-excel');
+            $export_excel_button.button('loading');
+            $.ajax({
+                type  : 'GET',
+                url   : url,
+                data  : params,
+                cache : false
+            }).done(function(data){
+                if (data.status == "ok") {
+                    file_name = data.data.file_name;
+                    window.location.href = '/admin/reports/action/download_excel?file_name=' + file_name;
+                }
+                $export_excel_button.button('reset');
+            });
+        });
+    },
+    init_dowload_all_reports : function(){
+        $('#export-excel-all').on("click", function () {
+            var $export_excel_button = $('#export-excel-all');
+            var $loading = $('#loading-all');
+            $loading.removeClass('hidden');
+
+            $.ajax({
+                type  : 'GET',
+                url   : '/admin/reports/action/generate_excel?type=all',
+                cache : false
+            }).done(function(data){
+                if (data.status == "ok") {
+                    file_name = data.data.file_name;
+                    $loading.addClass('hidden');
+                    window.location.href = '/admin/reports/action/download_excel?file_name=' + file_name;
+                } else {
+                    $loading.addClass('hidden');
+                }
+            });
+        });
+    },
+    load_report_header : function (){
+        $('.right-content').addClass('hidden');
+        $('#ci-stats-container').removeClass('hidden');
+        $('#export-stats-to-excel').addClass('disabled');
+        $('#stats-report-content').empty();
+        $('#stats-report-content').parent().removeClass('table-responsive');
+    },
+    load_report_ci_stats : function (event) {
+        var params = {
+            type       : ci.Reports.current_type,
+            start_date : $('#ci-stats-datepicker').data('daterangepicker').startDate.format('YYYY-MM-DD'),
+            end_date   : $('#ci-stats-datepicker').data('daterangepicker').endDate.format('YYYY-MM-DD'),
+        };
+
+        var $button_export_excel  = $('#export-stats-to-excel');
+        var $stats_report_content = $('#stats-report-content');
+        var $button_loading       = $('#load-stats-report');
+
+        $stats_report_content.empty();
+        $button_loading.button('loading');
+        ci.Reports.current_ajax = $.ajax({
+            type  : 'GET',
+            url   : '/admin/reports/action/ci_stats',
+            data  : params,
+            cache : false
+        }).done(function(data){
+            if (data.status == "ok") {
+                $stats_report_content.html(ci.Reports.templates_list[ci.Reports.current_type](data.data));
+                $('#stats-report-content').parent().addClass('table-responsive');
+                var $table_to_sort = $("#stats-report-content");
+
+                if ($table_to_sort.is('table')) {
+                    $table_to_sort.tablesorter();
+                }
+            }
+            $button_export_excel.removeClass('disabled');
+            $stats_report_content.parent().removeClass('hidden');
+            $button_loading.button('reset');
+        });
+    },
+    load_report_by_hub : function(event) {
+        var $hub_report_container = $('#hub-report-content');
+        var $btn_run_report       = $('.load-hub-report');
+        var $btn_export_excel     = $('#frm-report-by-hub .export-hub-to-excel');
+
+        $btn_run_report.button('loading');
+
+        ci.Reports.current_ajax = $.ajax({
+            type  : 'GET',
+            url   : '/admin/reports/action/',
+            data  : ci.Reports.get_params_by_hub(),
+            cache : false
+        }).done(function(data){
+            if (data.status == "ok") {
+                $hub_report_container.html(ci.Reports.templates_list[ci.Reports.current_type](data.data.hub));
+
+                if (!ci.isUndefined(data.data.website)) {
+                    $hub_report_container.append(ci.Reports.templates_list['report_by_website'](data.data.website));
+
+                    var $table_to_sort = $("#website-report-table");
+                    if ($table_to_sort.is('table')) {
+                        var headers = ci.Reports.get_tablesorter_headers_website_report(data.data);
+                        $table_to_sort.tablesorter({headers : headers});
+                        $('[data-toggle="popover"]').popover({trigger: 'hover', container : '#hub-container'});
+                    }
+                }
+
+                $btn_export_excel.removeAttr('disabled');
+            }
+            $btn_run_report.button('reset');
+        });
+    },
+    load_report_by_website : function(event) {
+        var $website_report_container = $('#website-report-content');
+        var $btn_run_report           = $('.load-website-report');
+        var $btn_export_excel         = $('#frm-report-by-website .export-website-to-excel');
+
+        $btn_run_report.button('loading');
+
+        ci.Reports.current_ajax = $.ajax({
+            type  : 'GET',
+            url   : '/admin/reports/action/',
+            data  : ci.Reports.get_params_by_website(),
+            cache : false
+        }).done(function(data){
+            if (data.status == "ok") {
+                $website_report_container.html(ci.Reports.templates_list['report_by_website'](data.data.website));
+
+                var $table_to_sort = $("#website-report-table");
+                if ($table_to_sort.is('table')) {
+                    var headers = ci.Reports.get_tablesorter_headers_website_report(data.data);
+                    $table_to_sort.tablesorter({headers : headers});
+                    $('[data-toggle="popover"]').popover({trigger: 'hover', container : '#website-container'});
+                }
+
+                $btn_export_excel.removeAttr('disabled');
+            }
+            $btn_run_report.button('reset');
+        });
+    },
+    get_tablesorter_headers_website_report : function(data) {
+        var headers = {
+            0  : {sorter : 'stringToNumber'},
+            4  : {sorter : 'stringToNumber'},
+            5  : {sorter : 'stringToNumber'},
+            6  : {sorter : 'stringToNumber'},
+            7  : {sorter : 'stringToNumber'},
+            8  : {sorter : 'stringToNumber'},
+            9  : {sorter : 'stringToNumber'},
+            10 : {sorter : 'stringToNumber'},
+            11 : {sorter : 'stringToNumber'},
+            12 : {sorter : 'stringToNumber'},
+            13 : {sorter : 'stringToNumber'}
+        };
+
+        if (data.daily_breakdown) {
+            headers = {
+                1  : {sorter : 'stringToNumber'},
+                5  : {sorter : 'stringToNumber'},
+                6  : {sorter : 'stringToNumber'},
+                7  : {sorter : 'stringToNumber'},
+                8  : {sorter : 'stringToNumber'},
+                9  : {sorter : 'stringToNumber'},
+                10 : {sorter : 'stringToNumber'},
+                11 : {sorter : 'stringToNumber'}
+            };
+        }
+        return headers;
+    },
+    download_report_by_hub : function(event) {
+        var $hub_report_container = $('#hub-report-content');
+        var $btn_run_report       = $('.export-hub-to-excel');
+
+        $btn_run_report.button('loading');
+
+        var params = ci.Reports.get_params_by_hub();
+
+        $.ajax({
+            url   : '/admin/reports/action/excel',
+            type  : 'GET',
+            data  : params,
+            cache : false
+        }).done(function(response){
+            if (response.status == 'ok') {
+                window.location.href = '/admin/reports/action/download_excel?file_name=' + response.data.excel_file_path;
+            } else {
+                console.log(response);
+            }
+            $btn_run_report.button('reset');
+        });
+    },
+    download_report_by_website : function(event) {
+        var $website_report_container = $('#website-report-content');
+        var $btn_run_report           = $('.export-website-to-excel');
+
+        $btn_run_report.button('loading');
+
+        var params = ci.Reports.get_params_by_website();
+
+        $.ajax({
+            url   : '/admin/reports/action/excel',
+            type  : 'GET',
+            data  : params,
+            cache : false
+        }).done(function(response){
+            if (response.status == 'ok') {
+                window.location.href = '/admin/reports/action/download_excel?file_name=' + response.data.excel_file_path;
+            } else {
+                console.log(response);
+            }
+            $btn_run_report.button('reset');
+        });
+    },
+    check_hash : function() {
+        var hash = window.location.hash;
+
+        ci.Reports.hash_instance = $(window).hashchange({
+            default_hash : hash
+        });
+    },
+    init_templates : function() {
+        ci.Reports.tpl_ci_stats_system           = Handlebars.compile($('#ci_stats_system').html());
+        ci.Reports.tpl_ci_stats_by_hub           = Handlebars.compile($('#ci_stats_by_hub').html());
+        ci.Reports.tpl_ci_stats_full_system      = Handlebars.compile($('#ci_stats_full_system').html());
+        ci.Reports.tpl_ci_stats_full_system_year = Handlebars.compile($('#ci_stats_full_system_year').html());
+        ci.Reports.tpl_report_by_hub             = Handlebars.compile($('#tpl-report-by-hub').html());
+        ci.Reports.tpl_report_by_website         = Handlebars.compile($('#tpl-report-by-website').html());
+        ci.Reports.tpl_report_list_select        = Handlebars.compile($('#tpl-report-list-select').html());
+
+        ci.Reports.templates_list = {
+            'stats_system'           : ci.Reports.tpl_ci_stats_system,
+            'stats_by_hub'           : ci.Reports.tpl_ci_stats_by_hub,
+            'stats_full_system'      : ci.Reports.tpl_ci_stats_full_system,
+            'stats_full_system_year' : ci.Reports.tpl_ci_stats_full_system_year,
+            'report_by_hub'          : ci.Reports.tpl_report_by_hub,
+            'report_by_website'      : ci.Reports.tpl_report_by_website,
+            'report_list_select'     : ci.Reports.tpl_report_list_select
+        };
+    },
+    init_date_range : function (){
+        var $date_range = $('.bs-daterange');
+        $date_range.daterangepicker({
+            format          : 'MM/DD/YYYY',
+            buttonClasses   : ['btn btn-default'],
+            applyClass      : 'btn-small btn-primary',
+            cancelClass     : 'btn-small',
+            separator       : ' to ',
+            maxDate         : moment(),
+            opens           : 'center',
+            ranges: {
+                'Yesterday'   : [moment().subtract(1, 'days'), moment().subtract(1, 'days')],
+                'Last 7 Days' : [moment().subtract(7, 'days'), moment().subtract(1, 'days')],
+                'Last 30 Days': [moment().subtract(30, 'days'), moment().subtract(1, 'days')],
+                'Last Month'  : [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        });
+
+        $('.bs-daterange-icon').click(function(){
+            $date_range.click();
+        });
+    },
+    toggle_content_class : function()
+    {
+        var window_width = $(window).width();
+        if (window_width > 768 && window_width <  992) {
+            $('.right-content').toggleClass('col-sm-offset-2');
+
+            $('#reports-default').toggleClass('col-sm-offset-1');
+
+            $('#ci-stats-container').toggleClass('col-sm-10');
+            $('#ci-stats-container').toggleClass('col-sm-12');
+        }
+
+    },
+    init_side_bar : function()
+    {
+        $('.btn-sidebar-toggle').click(function() {
+            var window_width = $(window).width();
+            ci.Reports.toggle_content_class();
+
+            if(window_width < 992)  {
+                if ($('#menu-collapse-container').hasClass('in')) {
+                    $('#btn-nav-toggle').click();
+                }
+            }
+
+            $('#nav-sidebar').toggleClass('sidebar-show');
+        });
+
+        $('#btn-nav-toggle').click(function(){
+            if($(window).width() < 992)  {
+                if ($('#nav-sidebar').hasClass('sidebar-show')) {
+                    $('.btn-sidebar-toggle').click();
+                }
+            }
+        });
+
+        $('.nav-sidebar').on("click", function() {
+            var $side_bar = $('#nav-sidebar');
+
+            if ($side_bar.hasClass('sidebar-show')) {
+                $side_bar.removeClass('sidebar-show');
+            }
+        });
+    },
+    change_hash : function(new_hash)
+    {
+        window.location.hash = '#' + new_hash;
+    }
+}
+
+$(document).ready(function(){
+    ci.Reports.init();
+    ci.Reports.check_hash();
+});

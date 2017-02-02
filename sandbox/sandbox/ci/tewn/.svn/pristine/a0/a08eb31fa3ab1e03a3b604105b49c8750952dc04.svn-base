@@ -1,0 +1,64 @@
+<?php
+
+App::import('Controller', 'Actions');
+
+class DevelopersActionsController extends ActionsController
+{
+    public $uses  = array('DebugbarCollector', 'DebugbarUsage');
+    public $view  = 'Theme';
+    public $theme = 'bootstrap';
+
+    protected $permissions = array(
+        'add_collector'    => User::DEVS,
+        'switch_collector' => User::DEVS,
+    );
+
+    public function add_collector()
+    {
+        $this->response->setMessage('add_collector');
+        $params = new \CI\ArrayManipulator($this->params['form']);
+        $collector_name = $params->get('name', '');
+        if (!empty($collector_name)) {
+            $this->DebugbarCollector->create();
+            $data = array('DebugbarCollector' => array('name' => $collector_name));
+            if ($this->DebugbarCollector->save($data)) {
+                $slugify = new CI\Filter\String\Slug();
+                $slugify->setLowerOutput(false);
+                $collector_key = $slugify->filter($data['DebugbarCollector']['name']);
+                $data['DebugbarCollector']['key'] = $collector_key;
+                $data['DebugbarCollector']['id'] = $this->DebugbarCollector->id;
+                $this->response->addData('collector', $data['DebugbarCollector']);
+            }
+        }
+        return $this->response->get();
+    }
+
+    public function switch_collector()
+    {
+        $this->Session->activate();
+        $user = $this->Session->read('User');
+
+        $this->response->setMessage('switch_collector');
+        $params = new \CI\ArrayManipulator($this->params['form']);
+        $data = array(
+            'DebugbarUsage' => array(
+                'debugbarid' => $params->get('id', 0),
+                'userid'     => $user['id'],
+            )
+        );
+        if ($params->get('state') === 'true') {
+            $this->DebugbarUsage->create();
+            if ($this->DebugbarUsage->save($data)) {
+                $this->response->addData('success', true);
+            }
+        } else {
+            $this->DebugbarUsage->remove($params->get('id', 0), $user['id']);
+            $this->response->addData('success', true);
+        }
+
+        $collectors_param = $this->DebugbarCollector->getActiveKeys($user['id']);
+        $collectors_param = empty($collectors_param) ? 1 : implode(',', $collectors_param);
+        $this->response->addData('collectors_param', $collectors_param);
+        return $this->response->get();
+    }
+}

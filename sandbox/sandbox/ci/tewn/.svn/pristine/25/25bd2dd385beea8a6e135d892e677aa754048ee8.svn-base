@@ -1,0 +1,26 @@
+<?php
+/**
+ * Rank File
+ *
+ * PHP Version 5.3
+ *
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+
+namespace CI\Http\Service;
+
+/**
+ * Rank Class
+ *
+ * PHP Version 5.3
+ *
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+abstract class Rank extends \CI\Http\Service
+{
+    abstract public function getRank($sUrl);
+}

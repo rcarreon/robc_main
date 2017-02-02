@@ -1,0 +1,241 @@
+<?php
+include_once (ROOT . DS . APP_DIR . DS . "global_defines.php");
+
+class FeedController extends AppController {
+    public $name = 'Feed';
+    public $uses = array('User', 'Account', 'Feed');
+
+    protected $_user = array();
+
+    function beforeFilter() {
+        $this->autoRender = false;
+        header('Content-type: application/json');
+
+        $response = array();
+        Configure::write('debug', 0);
+
+        // Get user
+        $this->Session->activate();
+        $this->_user = $this->Session->read('User');
+
+        if (empty($this->_user['id'])) {
+            $response['error']['msg'] = 'User not logged';
+            $response['status']       = 'error';
+            return json_encode($response);
+        }
+
+        $this->_user = $this->User->findById($this->_user['id']);
+
+        if (empty($this->_user)) {
+            $response['error']['msg'] = 'User not logged';
+            $response['status']       = 'error';
+            return json_encode($response);
+        }
+
+        // Check if accepted new terms and conditions
+        if (!$this->_user['User']['terms']) {
+            $response['error']['msg'] = 'User not logged';
+            $response['status']       = 'error';
+            return json_encode($response);
+        }
+    }
+
+    public function get($id)
+    {
+        if (!$this->is_admin()) {
+            $response['error']['msg'] = 'User not logged';
+            $response['status']       = 'error';
+            return json_encode($response);
+        }
+
+        $response = array('status' => 'ok');
+
+        if (!is_numeric($id)) {
+            $response['status']       = 'error';
+            $response['error']['msg'] = 'Invalid feed ID';
+            return json_encode($response);
+        }
+
+         $params   = array(
+            'fields' => array(
+                'id',
+                'website_id',
+                'category',
+                'name',
+                'expiration_days',
+                'url',
+                'whitelist',
+            ),
+            'conditions' => array(
+                'Feed.id'      => $id,
+            )
+        );
+
+        $feed = $this->Feed->find('first', $params);
+
+        if (empty($feed)) {
+            $response['status'] = 'error';
+            $response['error']['msg'] = 'Feed not found';
+        } else {
+            $response['feed'] = $feed['Feed'];
+        }
+
+        return json_encode($response);
+    }
+
+    public function lists()
+    {
+        if (!$this->is_admin()) {
+            $response['error']['msg'] = 'User not logged';
+            $response['status']       = 'error';
+            return json_encode($response);
+        }
+
+        App::import('Component', 'Dictionary');
+        $Dictionary = new DictionaryComponent();
+
+        $params = array(
+            'fields' => array(
+                'id',
+                'Website.id',
+                'Website.name',
+                'category',
+                'name',
+                'url',
+                'whitelist',
+            ),
+        );
+
+        $feeds = $this->Feed->find('all', $params);
+
+        $list = array();
+        foreach ($feeds as $feed) {
+            $list[] = array(
+                'id'         => $feed['Feed']['id'],
+                'website'    => $feed['Website']['name'],
+                'website_id' => $feed['Website']['id'],
+                'category'   => $Dictionary->get_name($Dictionary::TYPE_CATEGORY, $feed['Feed']['category']),
+                'name'       => $feed['Feed']['name'],
+                'url'        => $feed['Feed']['url'],
+                'whitelist'  => $feed['Feed']['whitelist'],
+            );
+        }
+
+        return json_encode($list);
+    }
+
+    public function publisher_list()
+    {
+        App::import('Component', 'Dictionary');
+        $Dictionary = new DictionaryComponent();
+
+        $params = array(
+            'fields' => array(
+                'id',
+                'Website.name',
+                'category',
+                'name',
+                'url',
+                'whitelist',
+            ),
+            'join' => array(
+                'table' => 'websites',
+                'alias' => 'Website',
+                'conditions' => array(
+                    'Website.id' => 'Feed.website_id',
+                )
+            ),
+            'conditions' => array(
+                'Website.user_id' => $this->_user['User']['id'],
+            ),
+        );
+
+        $feeds = $this->Feed->find('all', $params);
+
+        $list = array();
+        foreach ($feeds as $feed) {
+            $list[] = array(
+                'id'        => $feed['Feed']['id'],
+                'website'   => $feed['Website']['name'],
+                'category'  => $Dictionary->get_name($Dictionary::TYPE_CATEGORY, $feed['Feed']['category']),
+                'name'      => $feed['Feed']['name'],
+                'url'       => $feed['Feed']['url'],
+                'whitelist' => $feed['Feed']['whitelist'],
+            );
+        }
+
+        return json_encode($list);
+    }
+
+    public function delete($id)
+    {
+        if (!$this->is_admin()) {
+            $response['error']['msg'] = 'Not a valid user';
+            $response['status']       = 'error';
+            return json_encode($response);
+        }
+
+        $response = array('status' => 'ok');
+
+        if (!$this->Feed->delete($id)) {
+            $response['status'] = 'error';
+            $response['error']['msg'] = 'There was an error trying to delete the feed';
+        }
+
+        return json_encode($response);
+    }
+
+    public function add()
+    {
+        if (!$this->is_admin()) {
+            $response['error']['msg'] = 'Not a valid user';
+            $response['status']       = 'error';
+            return json_encode($response);
+        }
+
+        $response = array('status' => 'ok');
+
+        $this->data['Feed']['user_id']    = $this->_user['User']['id'];
+        $this->data['Feed']['created']    = time();
+        $this->data['Feed']['website_id'] = is_numeric($this->data['Feed']['website_id']) ? $this->data['Feed']['website_id'] : 0;
+
+        if (!$this->Feed->save($this->data)) {
+            $response['status'] = 'error';
+            foreach ($this->Feed->validationErrors as $field => $message) {
+                $response['error'][] = array(
+                    'name' => "data[Feed][$field]",
+                    'msg'  => $message
+                );
+            }
+        }
+
+        return json_encode($response);
+    }
+
+    public function update()
+    {
+        if (!$this->is_admin()) {
+            $response['error']['msg'] = 'Not a valid user';
+            $response['status']       = 'error';
+            return json_encode($response);
+        }
+
+        $array    = new \CI\ArrayManipulator($this->data['Feed']);
+        $response = array('status' => 'ok');
+        $id       = $array->get('id', 0);
+
+        $this->data['Feed']['whitelist'] = $array->get('whitelist', 0);
+
+        if (!$this->Feed->save($this->data)){
+            $response['status'] = 'error';
+            foreach ($this->Feed->validationErrors as $field => $message) {
+                $response['error'][] = array(
+                    'name' => "data[Feed][$field]",
+                    'msg'  => $message
+                );
+            }
+        }
+
+        return json_encode($response);
+    }
+}

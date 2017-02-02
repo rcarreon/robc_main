@@ -1,0 +1,15 @@
+$TTL 86400
+spidermanhype.com.     IN      SOA     spidermanhype.com. root.spidermanhype.com. (
+                           2014061200     ; serial
+                           28800          ; refresh
+                           14400          ; retry
+                           3600000        ; expire
+                           86400 )        ; minimum
+
+spidermanhype.com.         IN    NS       app1v-dns.tp.prd.lax.craveonline.com.
+spidermanhype.com.         IN    NS       app2v-dns.tp.prd.lax.craveonline.com.
+spidermanhype.com.         IN    NS       app3v-dns.tp.prd.lax.craveonline.com.
+spidermanhype.com.         IN    NS       app4v-dns.tp.prd.lax.craveonline.com.
+
+spidermanhype.com.         IN    A        72.172.76.151       
+www.spidermanhype.com.     IN    CNAME    spidermanhype.com.

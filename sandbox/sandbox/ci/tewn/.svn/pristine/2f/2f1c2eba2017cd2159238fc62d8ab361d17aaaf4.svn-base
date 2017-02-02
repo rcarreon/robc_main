@@ -1,0 +1,74 @@
+<?php
+
+namespace CI\Image\Drivers;
+
+class IMagick
+{
+    protected $oInstance;
+
+    public function __construct($mFiles = '')
+    {
+        $this->oInstance = new \Imagick($mFiles);
+    }
+
+    public function readFromFileName($sFileName)
+    {
+        return $this->oInstance->readImage($sFileName);
+    }
+
+    public function readFromBinaryString($sBinaryString)
+    {
+        return $this->oInstance->readImageBlob($sBinaryString);
+    }
+
+    public function resizeImage($nWidth, $nHeight, $bBestFit = true, $nFilter = imagick::FILTER_LANCZOS)
+    {
+        if (empty($nWidth) && empty($nHeight)) {
+            throw new Exception(Exception::INVALID_IMAGE_GEOMETRY);
+        }
+
+        if (empty($nWidth)) {
+            $nWidth = 0;
+        }
+
+        if (empty($nHeight)) {
+            $nHeight = 0;
+        }
+
+        return $this->oInstance->resizeImage($nWidth, $nHeight, $nFilter, $bBestFit);
+    }
+
+    public function cropImage($nWidth, $nHeight, $nPossX, $nPossY)
+    {
+        if ($nWidth < 1 || $nHeight < 1 || $nPossX < 0 || $nPossY  < 0) {
+            throw new Exception(
+                Exception::INVALID_VALUES_TO_CROP,
+                "nWidth = $nWidth, nHeight = $nHeight, nPossX = $nPossX, nPossX = $nPossX"
+            );
+        }
+
+        return $this->oInstance->cropimage($nWidth, $nHeight, $nPossX, $nPossY);
+    }
+
+    public function cropThumbnailImage($nWidth, $nHeight)
+    {
+        if ($nWidth < 1 || $nHeight < 1) {
+            throw new Exception(
+                Exception::INVALID_VALUES_TO_CROP,
+                "nWidth = $nWidth, nHeight = $nHeight"
+            );
+        }
+
+        return $this->oInstance->cropThumbnailImage($nWidth, $nHeight);
+    }
+
+    public function writeImage($sPath)
+    {
+        return $this->oInstance->writeImage($sPath);
+    }
+
+    public function getImageString()
+    {
+        return $this->oInstance->getImageBlob();
+    }
+}

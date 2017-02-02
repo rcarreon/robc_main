@@ -1,0 +1,57 @@
+.table tbody>tr>td.vert-align {
+    vertical-align: middle;
+}
+
+.legend table tbody>tr>td {
+    padding: 2px 0;
+}
+
+.legend table tbody>tr>td.legendLabel {
+    padding-left: 3px;
+}
+
+.main-container {
+    padding-top: 15px;
+}
+
+.btn-default {
+    color: #333 !important;
+}
+
+.content-column {
+    background: #fff;
+}
+
+.main-container a,
+.main-container a:active,
+.main-container a:visited {
+    color: #428bca;
+}
+
+.do-modal-info {
+    margin-right: 10px;
+}
+
+.glyphicon-quad-ll {
+    background: transparent url(/img/analysis/quad-ll.png) center center no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+.glyphicon-quad-lr {
+    background: transparent url(/img/analysis/quad-lr.png) center center no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+.glyphicon-quad-ur {
+    background: transparent url(/img/analysis/quad-ur.png) center center no-repeat;
+    width: 16px;
+    height: 16px;
+}
+
+.glyphicon-quad-ul {
+    background: transparent url(/img/analysis/quad-ul.png) center center no-repeat;
+    width: 16px;
+    height: 16px;
+}

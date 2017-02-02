@@ -1,0 +1,27 @@
+<?php
+/* Sitemaps Test cases generated on: 2011-12-05 19:12:55 : 1323135655*/
+class SitemapsControllerTestCase extends CakeTestCase {
+	var $fixtures = array('app.page', 'app.log');
+
+	function startTest() {
+		App::import('Controller', 'Sitemaps');
+		$this->Sitemaps = new SitemapsController();
+		$this->Sitemaps->constructClasses();
+		$this->Sitemaps->autoRender = false;
+	}
+
+	function endTest() {
+		unset($this->Sitemaps);
+		ClassRegistry::flush();
+	}
+
+	function testIndex() {
+
+	}
+
+	function testRobot() {
+
+	}
+
+}
+?>

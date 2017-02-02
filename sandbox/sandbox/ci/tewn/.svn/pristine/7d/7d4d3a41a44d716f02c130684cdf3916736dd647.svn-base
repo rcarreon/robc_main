@@ -1,0 +1,36 @@
+<?php
+use CI\Hub;
+
+App::import('Component', 'Ti');
+
+class ListHubsComponent extends TiComponent
+{
+    protected $hubs;
+
+    protected function init()
+    {
+        $hubs = new Hub(new \CI\Hub\DataSource\MyArray());
+
+        $this->hubs = $hubs->getAllActiveHubsName();
+        $this->view = 'ti/list_hubs';
+    }
+
+    protected function process()
+    {
+        $multiple    = '';
+        $is_multiple = $this->options->get('multiple', false);
+
+        if ($is_multiple) {
+            $multiple = ' multiple';
+        }
+
+        return array(
+            'list'    => $this->hubs,
+            'options' => array(
+                'name'       => $this->name,
+                'domain_ids' => $this->options->get('domain_ids', array()),
+                'multiple'   => $multiple,
+            )
+        );
+    }
+}

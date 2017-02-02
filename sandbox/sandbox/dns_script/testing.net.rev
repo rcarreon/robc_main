@@ -1,0 +1,21 @@
+$TTL 86400
+@	IN	SOA	hmo.gnmedia.net. noc.gorillanation.com (
+	2012010401	; serial
+	36000		; refresh
+	3600		; retry
+	3600000		; expire
+	36000 )		; default ttl
+
+@	IN	NS 	nochmo1.hmo.gnmedia.net.
+41	PTR	apache
+41	PTR	nagios
+45	PTR	nochmo1.hmo.gnmedia.net.
+49	PTR	nochmo2.hmo.gnmedia.net.
+101	PTR	rangel.hmo.gnmedia.net.
+109	PTR	orivera2.hmo.gnmedia.net.
+116	PTR	deepspace2.hmo.gnmedia.net.
+200	PTR	squid.n1.hmo.gnmedia.net.
+73	PTR	rcarreon
+;here  modify
+
+11	MX	rob

@@ -1,0 +1,13 @@
+<?php
+
+namespace CI\Database;
+
+class Engine extends \CI\Database
+{
+    function __construct()
+    {
+        $oConfig = new \CI\Config;
+        $aConfig = $oConfig->get('database_environment');
+        parent::__construct($aConfig['eng']);
+    }
+}

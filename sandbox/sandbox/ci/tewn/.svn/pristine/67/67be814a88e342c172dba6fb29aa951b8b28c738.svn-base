@@ -1,0 +1,125 @@
+<?php
+/**
+ * Controller to can
+ *
+ * PHP Version 5.4
+ *
+ * @category Engine
+ * @package  Engine
+ * @author   Julio Rodriguez <julio.rodriguez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+ini_set('memory_limit', '1024M');
+use \CI\VowpalWabbit\Parser\Builder;
+
+/**
+ * Controller to can
+ *
+ * PHP Version 5.4
+ *
+ * @category Engine
+ * @package  Engine
+ * @author   Julio Rodriguez <julio.rodriguez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+class VowpalWabbitController extends AppController
+{
+    public $uses = array();
+
+    const SUCCESS = '1';
+    const ERROR = '0';
+    /**
+     * We will be process the impressions and clicks of widgets
+     * to create a file with the necesary data to can train at
+     * Vowpal wabbit
+     *
+     * @param string $sDate date on the format Ymd h:00 example(20130816 12:00)
+     *
+     * @return void will be print 1 on success or 0 on error.
+     */
+    public function consolidate_widget_impressions_clicks($sDate = '')
+    {
+        $this->autoRender = false;
+        $sDate = $this->getTime($sDate);
+        $oConsolidate = Builder::getCorrelator($sDate, Builder::PARSER_TYPE_WIDGET);
+        $sRunResult = self::ERROR;
+
+        try{
+            $bRetun = $oConsolidate->process();
+
+            if ($bRetun) {
+                $sRunResult = self::SUCCESS;
+            }
+        } catch(CI\File\Exception $oFileException) {
+            $oDate = $this->getDateObject();
+            $sExtraInfo = PHP_EOL . 'Exception = [' . $oFileException->getMessage() . '] ';
+            $sExtraInfo .= PHP_EOL . 'argv = [' . print_r($this->passedArgs, true) . ']';
+            $oLogger = $oConsolidate->getLogger();
+            $oLogger->log($oDate->now() . ' '. __METHOD__ . ' The necesary logs didn\'t found. ' . $sExtraInfo);
+        }
+
+        exit($sRunResult);
+    }
+
+    public function correlator_landing_page_impressions_clicks_only_cpc_elements($sDate = '', $nType = Builder::PARSER_TYPE_LANDING_CPC)
+    {
+        return $this->correlator_landing_page($sDate, $nType);
+    }
+
+    protected function correlator_landing_page($sDate, $nType)
+    {
+        $this->autoRender = false;
+        $sDate = $this->getTime($sDate);
+        $oCorrelator = Builder::getCorrelator($sDate, $nType);
+        $sRunResult = self::ERROR;
+
+        try{
+            $bRetun = $oCorrelator->process();
+
+            if ($bRetun) {
+                $sRunResult = self::SUCCESS;
+            }
+        } catch(CI\File\Exception $oFileException) {
+            $oDate = $this->getDateObject();
+            $oLogger = $oCorrelator->getLogger();
+            $sExtraInfo = PHP_EOL . 'Exception = [' . $oFileException->getMessage() . '] ';
+            $sExtraInfo .= PHP_EOL . 'argv = [' . print_r($this->passedArgs, true) . ']';
+            $oLogger->log($oDate->now() . ' '. __METHOD__ . ' The necesary logs didn\'t found. ' . $sExtraInfo);
+        }
+
+        return $sRunResult;
+    }
+
+    public function correlator_landing_page_impressions_clicks($sDate = '', $nType = Builder::PARSER_TYPE_LANDING)
+    {
+         return $this->correlator_landing_page($sDate, $nType);
+    }
+
+    protected function getTime($sDate)
+    {
+        $sReturn = '';
+        $sFormat = 'Ymd.Hi';
+
+        if (empty($sDate)) {
+            $sDate = date($sFormat);
+            $oDate = $this->getDateObject();
+            $oDate->setFormat($sFormat);
+            $sReturn = $oDate->getMostRecentHalfHour($sDate);
+            $sReturn = $oDate->incrementOrDecrementHours($sReturn, -1);
+        } else {
+            $aReplace = array('_', '-');
+            $aToReplace = array('', '.');
+            $sReturn = str_replace($aReplace, $aToReplace, $sDate);
+        }
+
+        return $sReturn;
+    }
+
+    protected function getDateObject()
+    {
+        return new CI\Date();
+    }
+}

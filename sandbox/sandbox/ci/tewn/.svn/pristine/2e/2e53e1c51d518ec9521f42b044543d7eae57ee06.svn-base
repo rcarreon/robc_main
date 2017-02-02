@@ -1,0 +1,69 @@
+<!-- mgmt toolbar -->
+    <header>
+        <a class="logo" href="/">Crowd Ignite</a>
+        <button type="button" class="btn-navbar">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </button>
+
+        <br class="clearfloat"/>
+    </header>
+<!-- end mgmt toolbar -->
+
+    <div class="row supercontainer" id="update_your_password">
+        <form class="styled_form login_form" action="#" method="post" id="page_form">
+            <input type="hidden" name="data[User][id]" value="<?php echo $user_id ?>">
+            <input type="hidden" name="data[User][password]" value="<?php echo $password ?>">
+            <ul class="form">
+                <li class="title">
+                    <h2>CrowdIgnite</h2>
+                </li>
+                <li class="">
+                    <h3 class="margin">Update Your Password</h3>
+                    <p class="margin">For security reasons, please change your password.</p>
+                </li>
+                <li class="alt">
+                    <label>Create New Password</label>
+                    <div class="control">
+                        <input name="data[User][new_password]" type="password" id="new_password" value="">
+                    </div>
+                    <br class="clearfloat">
+                </li>
+
+                <li class="">
+                    <label>Re-type Password</label>
+                    <div class="control">
+                       <input name="data[User][retype_password]" type="password" id="retype_password" value="">
+                    </div>
+                    <br class="clearfloat">
+                </li>
+                <li id="error" class="hide">
+                <?
+                if ($error) {
+                ?>
+
+                    <div class="control">
+                        <span class="bold red margin"><?php echo $error_message ?> </span>
+                    </div>
+
+                <?
+                 }
+                ?>
+                </li>
+                <li class="alt">
+                    <p class="margin"><input type="checkbox" name="data[User][terms]" value="Terms"> I have read and understand the <a href="/terms" target="_blank">Terms and Conditions</a> and agree to be bound by all of the terms.</p>
+                    <br class="clearfloat">
+                </li>
+
+                <li>
+                    <div align="center">
+                        <a class="btn large disabled margin" id="submit" href="#">Submit</a>
+                        <a class="btn large margin" id="close" href="#">Close</a>
+                    </div>
+                </li>
+            </ul>
+        </form>
+        <script type="text/javascript" src="http://<?php echo CDN_URL;?>/js/jquery-1.8.2.min.js"></script>
+        <script>$new = $.noConflict(true);</script>
+    </div>

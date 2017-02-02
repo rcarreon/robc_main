@@ -1,0 +1,49 @@
+<?php
+
+/*
+ * This class is intended to manage the calls to the Alexa API.
+ */
+app::import("vendor","webservice");
+Class Alexa extends Webservice{
+
+	public function __construct(){
+
+	}
+
+	/*
+	 * This action gets the data from the Alexa API for a $domain passed as argument.
+	 * returns an array or throws an exception if failure.
+	 */
+	public function get_rank($domain = null){
+
+		if(is_null($domain)){
+			return false;
+		}
+
+		try{
+			$xml_result = $this->getResponse("http://data.alexa.com/data?cli=10&dat=s&url={$domain}");
+		}Catch(Exception $e){
+			throw new exception("The Alexa API is inaccesible at this moment (".$e->getMessage()."). Please wait a minute or try it again.");
+		}
+
+		/*
+		 * Enabling user error handling = true. 
+		 * Just avoiding getting E_WARNINGS if the XML is corrupted or something...
+		 */
+		libxml_use_internal_errors(true); 
+
+		$xml = simplexml_load_string($xml_result);
+
+		if(isset($xml->SD[1]->POPULARITY, $xml->SD[1]->REACH, $xml->SD[1]->RANK) === false){
+			throw new exception("The Alexa API is inaccesible at this moment. Please wait a minute or try it again.");
+		}
+
+		$result = array(
+			"popularity" => (string) $xml->SD[1]->POPULARITY->attributes()->TEXT,
+			"reach-rank" => (string) $xml->SD[1]->REACH->attributes()->RANK,
+			"rank-delta" => (string) $xml->SD[1]->RANK->attributes()->DELTA
+		);
+
+		return $result; // An object
+	}
+}

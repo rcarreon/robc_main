@@ -1,0 +1,97 @@
+<?php
+
+use \CI\Facade\DebugBar;
+
+App::import('Controller', 'Actions');
+
+class RefersActionsController extends ActionsController
+{
+    public $name   = 'Refers';
+    public $uses   = array('Account', 'Stats');
+    public $view   = 'Theme';
+    public $theme  = 'bootstrap';
+
+    protected $permissions = array(
+        'get'    => User::CURATOR,
+        'clear'  => User::CURATOR,
+    );
+
+    public function get()
+    {
+        $this->response->setMessage('Get referers');
+        $params = new \CI\ArrayManipulator($this->params['url']);
+
+        $accounts = $this->Account->find("all", array(
+            'joins' => array(
+                array(
+                    'table'      => 'websites',
+                    'alias'      => 'Website',
+                    'type'       => 'LEFT',
+                    'conditions' => array('Website.account_id = Account.id'),
+                ),
+                array(
+                    'table'      => 'websites',
+                    'alias'      => 'Referer',
+                    'type'       => 'LEFT',
+                    'conditions' => array('Referer.account_id = Account.refer_id'),
+                ),
+            ),
+            'conditions' => array(
+                'Account.refer_id >' => 0,
+                'Account.refer_transfer_rate >' => 0,
+            ),
+            'fields' => array(
+                'Account.id', 'Account.website_id', 'Account.status', 'Account.created',
+                'Website.id', 'Website.name', 'Website.url',
+                'Referer.id', 'Referer.name', 'Referer.url',
+            ),
+            'limit' => $params->get('limit', 20),
+            'offset' => $params->get('offset', 0),
+        ));
+
+        $website_ids = Set::classicExtract($accounts, '{n}.Account.website_id');
+        $stats = $this->Stats->get_stats_refers($website_ids);
+
+        App::import('Vendor', 'Carbon', array('file' => 'Carbon.php'));
+
+        $refers = array();
+        foreach($accounts as $account) {
+            $refer = array();
+            $id    = $account['Account']['id'];
+
+            $refer['id'] = $account['Account']['id'];
+            $refer['referer_id'] = $account['Referer']['id'];
+            $refer['referer_name'] = empty($account['Referer']['name']) ? $account['Referer']['url'] : $account['Referer']['name'];
+
+            $refer['website_id'] = $account['Website']['id'];
+            $refer['website_name'] = empty($account['Website']['name']) ? $account['Website']['url'] : $account['Website']['name'];
+
+            $refer['total_credits'] = number_format($stats['accounts'][$id]['credits']);
+            $refer['yesterday_credits'] = number_format($stats['accounts'][$id]['credits_yesterday']);
+
+            $refer['noactive'] = in_array($account['Account']['status'], array(ACCOUNT_STATUS_DENIED, ACCOUNT_STATUS_DELETED));
+            $refer['refer_date'] = \Carbon\Carbon::parse($account['Account']['created'])->format('m-d-Y');
+
+            $refers[] = $refer;
+        };
+
+        $this->response->addData('refers', $refers);
+
+        return $this->response->get();
+    }
+
+    public function delete()
+    {
+        $this->response->setMessage('Delete refer');
+        $params = new \CI\ArrayManipulator($this->params['url']);
+        $id = $params->get('id', 0);
+
+        if ((int) $id > 0) {
+            $this->Account->id = $id;
+            $this->Account->saveField("refer_id", 0);
+            $this->response->addData('account cleared');
+        }
+
+        return $this->response->get();
+    }
+}

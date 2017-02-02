@@ -1,0 +1,91 @@
+<?php
+/**
+ * Logger Analytic Interface
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger
+ * @package  Logger_Analytic
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+/**
+ * Logger Analytic Interface
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger
+ * @package  Logger_Analytic
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+interface Logger_Analytic_Interface
+{
+    /**
+     * Register a value into a logger element
+     *
+     * @param string $elementName Element name
+     * @param mixed  $value       The value to register
+     *
+     * @return void
+     */
+    public function registerElementValue($elementName, $value);
+
+    /**
+     * Register a logger element
+     *
+     * @param Logger_Analytic_Element_Interface $element Logger Element
+     *
+     * @return void
+     */
+    public function registerElement(Logger_Analytic_Element_Interface $element);
+
+    /**
+     * Gets a logger element
+     *
+     * @param string $elementName The element name
+     *
+     * @return Logger_Analytic_Element_Interface
+     */
+    public function getElement($elementName);
+
+    /**
+     * Removes an element
+     *
+     * @param string $elementName Elements name
+     *
+     * @return void
+     */
+    public function removeElement($elementName);
+
+    /**
+     * Gets the elements
+     *
+     * @return mixed
+     */
+    public function getElementsOrder();
+
+    /**
+     * Gets a log
+     *
+     * @return mixed
+     */
+    public function getLog();
+
+    /**
+     * Saves its log
+     *
+     * @return void
+     */
+    public function save();
+
+    /**
+     * Cleans this logger analytic
+     *
+     * @return void
+     */
+    public function clean();
+}

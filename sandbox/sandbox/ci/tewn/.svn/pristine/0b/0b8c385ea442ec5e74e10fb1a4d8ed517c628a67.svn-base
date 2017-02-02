@@ -1,0 +1,28 @@
+<script id="ci_stats_full_system" type="text/x-handlebars-template">
+    <thead>
+        <tr>
+            <th class="text-center">Date</th>
+            <th class="text-center">All Verticals Return Rate</th>
+            <th class="text-center">Crave Hub</th>
+            <th class="text-center">GameRev</th>
+            <th class="text-center">TotallyHer</th>
+            <th class="text-center">Momtastic</th>
+            <th class="text-center">TFS</th>
+            <th class="text-center">CTR</th>
+        </tr>
+    </thead>
+    <tbody>
+    {{#each ci_stats_full_system}}
+        <tr>
+            <td class="text-center">{{ date }}</td>
+            <td class="text-right">{{ return_rate }}%</td>
+            <td class="text-right">{{ craveonline.return_rate }}%</td>
+            <td class="text-right">{{ gamerevolution.return_rate }}%</td>
+            <td class="text-right">{{ totallyher.return_rate }}%</td>
+            <td class="text-right">{{ momtastic.return_rate }}%</td>
+            <td class="text-right">{{ thefashionspot.return_rate }}%</td>
+            <td class="text-right">{{ ctr }}%</td>
+        </tr>
+    {{/each}}
+    </tbody>
+</script>

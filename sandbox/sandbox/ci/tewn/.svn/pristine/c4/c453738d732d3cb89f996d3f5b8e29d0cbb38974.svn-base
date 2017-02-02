@@ -1,0 +1,166 @@
+;(function($){ // secure $ jQuery alias
+/**
+ * create a crayonbox around a textfield
+ * 
+ * @param	object	opt	options
+ */
+jQuery.fn.crayonbox = function(opt)
+{
+	var options = jQuery.extend(
+	{
+		// your crayon colors
+	    colors: ['#ffffcc','#ffff66','#ffcc66','#f2984c','#e1771e','#b47b10','#a9501b','#6f3c1b','#804000','#cc0000','#940f04','#660000','#c3d9ff','#99c9ff','#66b5ff','#3d81ee','#0066cc','#6c82b5','#32527a','#2d6e89','#006699','#215670','#003366','#000033','#caf99b','#80ff00','#00ff80','#78b749','#78b749','#2ba94f','#38b63c','#0d8f63','#2d8930','#1b703a','#11593c','#063e3f','#ffbbe8','#e895cc','#ff6fcf','#c94093','#9d1961','#800040','#800080','#72179d','#6728b2','#6131bd','#341473','#400058','#ffffff','#e6e6e6','#cccccc','#b3b3b3','#999999','#808080','#7f7f7f','#666666','#4c4c4c','#333333','#191919','#000000'],
+				
+		// define a default selected color
+	    selected: null, 
+		crayonTag: 'span',
+		clearButton: false,
+		onSelection: function(){}
+	}, opt);
+
+	return this.each(function()
+	{
+		var $this = $(this);
+
+		if ( '' !== $this.val() && null === options.selected )	{
+			options.selected = $this.val();	
+			
+			if(options.selected=='none' || options.selected=='transparent') { options.selected = '#FFFFFF'; }
+                        else {
+                           if( options.selected.charAt(0) != "#" ) options.selected = "#" + options.selected;
+                        }
+
+
+			$this.parent().css("background-color", options.selected );
+			var hex =  options.selected;								
+			if(getHexBrightness(hex) < 50) {
+				$this.parent().css("color", "#FFFFFF" );
+				$this.parent().children('input').css("color", "#FFFFFF" );					
+			} else {
+				$this.parent().css("color", "#000000" );
+				$this.parent().children('input').css("color", "#000000" );
+			}							
+		};
+	
+		// set $self to containing span.crayonbox
+		//var $self = $this.wrap('<span class="crayonbox"></span>').parent('.crayonbox');
+		var $self = $this.parent().parent().append('<div class="crayonbox"></div>').children('.crayonbox');
+		
+		$self.click(function(e)
+		{
+			var $clicked = $(e.target);
+			if ( $clicked.hasClass('crayon') )
+			{
+				$self.uncolor();
+				
+				$clicked.html('&diams;').addClass('coloring');
+				
+				$('input', $self.parent()).val( $clicked.attr('title') );
+
+				var hex =  $clicked.css("background-color");
+
+				if(getBrightness(hex) < 50){
+					$($self.parent().children('.colorbox') ).css("color", "#FFFFFF" );
+					$($self.parent().children('.colorbox').children('input') ).css("color", "#FFFFFF" );					
+				} else {
+					$($self.parent().children('.colorbox') ).css("color", "#000000" );
+					$($self.parent().children('.colorbox').children('input') ).css("color", "#000000" );
+				}
+				$($self.parent().children('.colorbox') ).css("background-color", $clicked.css("background-color") );
+                                $($self.parent().children('.colorbox') ).parent().children('.crayonbox').slideUp();
+
+
+			};			
+		 
+			options.onSelection.call($self);
+		});
+
+                $self.mouseenter(function(e)
+		{
+			var $hover = $(e.target);
+			if ( $hover.hasClass('crayon') )
+			{
+				$self.uncolor();
+
+				$hover.html('&diams;').addClass('coloring');
+
+				$('input', $self.parent()).val( $hover.attr('title') );
+
+				var hex =  $hover.css("background-color");
+
+				if(getBrightness(hex) < 50){
+					$($self.parent().children('.colorbox') ).css("color", "#FFFFFF" );
+					$($self.parent().children('.colorbox').children('input') ).css("color", "#FFFFFF" );
+				} else {
+					$($self.parent().children('.colorbox') ).css("color", "#000000" );
+					$($self.parent().children('.colorbox').children('input') ).css("color", "#000000" );
+				}
+				$($self.parent().children('.colorbox') ).css("background-color", $hover.css("background-color") );
+			};
+		});
+
+		function getBrightness(hex) {
+			hex = hex.replace(/[^0-9,]+/g, "");
+			var c_r = hex.split(",")[0];
+			var c_g = hex.split(",")[1];
+			var c_b = hex.split(",")[2];
+			return ((c_r * 299) + (c_g * 587) + (c_b * 114)) / 1000;
+		}
+		function getHexBrightness(hex) {
+			var hex = hex.replace('#','');		 
+			var c_r = hexDec(hex.substr(0, 2));
+			var c_g = hexDec(hex.substr(2, 2));
+			var c_b = hexDec(hex.substr(4, 2));
+		 
+			return ((c_r * 299) + (c_g * 587) + (c_b * 114)) / 1000;
+		}
+		function hexDec(hex_string){
+			hex_string = (hex_string+'').replace(/[^a-f0-9]/gi, '');
+			return parseInt(hex_string, 16);
+		}		
+
+		// build our crayons
+		var html = '';
+		for ( i=0; i<options.colors.length; i++ ){
+			$('<' + options.crayonTag + ' class="crayon" title="' + options.colors[i] + '">&nbsp;</' + options.crayonTag + '>')
+			.appendTo( $self )
+			.css( 'background-color', options.colors[i] );
+		};
+
+		// add clear button
+		if ( options.clearButton ) {
+			$('<' + options.crayonTag + ' class="boxlid">X</' + options.crayonTag + '>')
+			.appendTo( $self )
+			.click(function(){
+				$this.parents('.crayonbox').uncolor();
+			});
+		};
+		
+		// select default crayon
+		if ( null !== options.selected )
+		{
+			$self.find('[title=' + options.selected + ']').trigger('click');
+		};
+	});
+};
+
+/**
+ * Unselect the selected crayon
+ * 
+ * @param	boolean	clearTextfield	option to clear the textfield as well 
+ * @return	object	each item passed in 
+ */
+jQuery.fn.uncolor = function(clearTextfield)
+{
+	if (undefined === clearTextfield)
+	{
+		clearTextfield = true;
+	};
+	
+	return this.each(function()
+	{
+		$('.coloring', this).html('&nbsp;').removeClass('coloring');
+	});
+}
+/*******************************************************************************************/
+})( jQuery ); // confine scope

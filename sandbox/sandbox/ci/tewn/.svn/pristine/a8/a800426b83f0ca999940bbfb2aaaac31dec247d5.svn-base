@@ -1,0 +1,140 @@
+<?php
+/**
+ * Http Server global test
+ *
+ * PHP Version 5.4
+ *
+ * @category CI
+ * @package  CI\Test\Http
+ * @author   Julio Rodriguez <julio.rodriguez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+namespace Test\Http;
+use CI\Http\Server;
+
+/**
+ * Http Server global test
+ *
+ * PHP Version 5.4
+ *
+ * @category CI
+ * @package  CI\Test\Http
+ * @author   Julio Rodriguez <julio.rodriguez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ * @group    Http
+ * @group    Utils
+ * @group    Server
+ */
+
+class ServerTest extends \PHPUnit_Framework_TestCase
+{
+    /**
+     * @dataProvider getServerName
+     */
+    public function testGetElementExistent($sName, $sValue)
+    {
+        $sExpected = 'this-is-host-test';
+        $oServer = new ServerMock($sName, $sValue);
+        $sResult = $oServer->getElement('SERVER_NAME');
+
+        $this->assertEquals($sExpected, $sResult, 'We expected ' . $sExpected . ' and we got    ' . $sResult);
+    }
+
+    public function testGetElementNotExistent()
+    {
+        $sExpected = null;
+        $oServer = new ServerMock();
+        $sResult = $oServer->getElement('TRASH_THIS_KEY_DIDNT_EXIST');
+
+        $this->assertEquals($sExpected, $sResult, 'We expected ' . $sExpected . ' and we got ' . $sResult);
+    }
+
+    public function getServerName()
+    {
+        return array(array('SERVER_NAME', 'this-is-host-test'));
+    }
+
+    /**
+     * @dataProvider getRemoteAddr
+     */
+    public function testGetClientIpFromRemoteAddr($sName, $sValue)
+    {
+        $sExpected = '192.168.12.27';
+        $oServer = new ServerMock($sName, $sValue);
+        $sResult = $oServer->getClientIp(false);
+
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    /**
+     * @dataProvider getHttClientIp
+     */
+    public function testGetClientIpFromHtttpClientIp($sName, $sValue)
+    {
+        $sExpected = '34.56.224.12';
+        $oServer = new ServerMock($sName, $sValue);
+        $sResult = $oServer->getClientIp();
+
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    /**
+     * @dataProvider getHttpXForwardedFor
+     */
+    public function testGetClientIpFromHttpXForwardedFor($sName, $sValue)
+    {
+        $sExpected = '34.56.224.12';
+        $oServer = new ServerMock($sName, $sValue);
+        $sResult = $oServer->getClientIp();
+
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    /**
+     * @dataProvider getHttpXForwardedFor
+     */
+    public function testGetAllClientIps($sName, $sValue)
+    {
+        $sExpected = '34.56.224.12, 24.56.200.140, 111.45.60.100,90.56.234.3 ,20.45.200.111';
+        $oServer = new ServerMock($sName, $sValue);
+        $sResult = $oServer->getAllClientIps();
+
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function getRemoteAddr()
+    {
+        return array(array('REMOTE_ADDR', '192.168.12.27'));
+    }
+
+    public function getHttClientIp()
+    {
+        return array(array('HTTP_CLIENT_IP', '34.56.224.12'));
+    }
+
+    public function getHttpXForwardedFor()
+    {
+        return array(array(
+            'HTTP_X_FORWARDED_FOR',
+            '34.56.224.12, 24.56.200.140, 111.45.60.100,90.56.234.3 ,20.45.200.111'
+        ));
+    }
+}
+
+
+class ServerMock extends Server
+{
+
+    public function __construct($name = '', $sValue = '')
+    {
+        if (!empty($name) && !empty($sValue) ) {
+            $_SERVER[$name] = $sValue;
+        }
+
+        parent::__construct();
+    }
+
+}

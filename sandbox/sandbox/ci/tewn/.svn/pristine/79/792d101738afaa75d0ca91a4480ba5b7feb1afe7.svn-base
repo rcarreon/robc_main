@@ -1,0 +1,58 @@
+<?php
+
+namespace Test\Stats\Website\Metrics;
+use CI\Stats\Website\Metrics\Daily;
+
+class DailyTest extends \PHPUnit_Framework_TestCase
+{
+
+    public function testGetFromDateOnlyOneDate()
+    {
+        $aExpected = array(
+            'website_id' => 1, 'incoming' => 10, 'outgoing' => 45678, 'credits' => 666
+        );
+        $nWebsite      = 1;
+        $oDate         = \Carbon\Carbon::parse('01/11/2014');
+        $oStatsAccount = $this->getMockBuilder('\CI\Stats\Website\Metrics\Daily')
+                              ->setMethods(array('getDatabaseObject'))
+                              ->getMock();
+        $oDB           = $this->getMockBuilder('\CI\Database')
+                              ->disableOriginalConstructor()
+                              ->setMethods(array('query'))
+                              ->getMock();
+        $oDB->expects($this->any())
+            ->method('query')
+            ->will($this->returnValue(array('website_id' => 1, 'incoming' => 10, 'outgoing' => 45678, 'credits' => 666)));
+        $oStatsAccount->expects($this->any())
+                      ->method('getDatabaseObject')
+                      ->will($this->returnValue($oDB));
+        $aResult = $oStatsAccount->getFromDate($nWebsite, $oDate);
+
+        $this->assertEquals($aExpected, $aResult, 'dint get the correct info');
+    }
+
+    public function testGetFromDateWhenWebsiteDoesNotHaveDataOnlyOneDate()
+    {
+        $aExpected = array(
+            'website_id' => 56, 'incoming' => 0, 'outgoing' => 0, 'credits' => 0
+        );
+        $nWebsite      = 56;
+        $oDate         = \Carbon\Carbon::parse('01/11/2014 16:23:56');
+        $oStatsAccount = $this->getMockBuilder('\CI\Stats\Website\Metrics\Daily')
+                              ->setMethods(array('getDatabaseObject'))
+                              ->getMock();
+        $oDB           = $this->getMockBuilder('\CI\Database')
+                              ->disableOriginalConstructor()
+                              ->setMethods(array('query'))
+                              ->getMock();
+        $oDB->expects($this->any())
+            ->method('query')
+            ->will($this->returnValue(array()));
+        $oStatsAccount->expects($this->any())
+                      ->method('getDatabaseObject')
+                      ->will($this->returnValue($oDB));
+        $aResult = $oStatsAccount->getFromDate($nWebsite, $oDate);
+
+        $this->assertEquals($aExpected, $aResult, 'dint get the correct info');
+    }
+}

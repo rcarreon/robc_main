@@ -1,0 +1,116 @@
+(function($) {
+    var error_counter       = 0;
+    var tpl_subcategory_row = Handlebars.compile($('#subcategory-row').html());
+    var tpl_errors          = Handlebars.compile($('#error').html());
+    var $moderators_table   = $("#subcategories-list");
+    var current_sort        = [[2,0],[1,0]];
+
+    $(".selectpicker").selectpicker();
+
+    if ($moderators_table.is('table')) {
+        $moderators_table.tablesorter({
+            sortList: current_sort,
+            headers: {
+                4 : { sorter: false }
+            }
+        }).on('sortEnd', function(event){
+            current_sort = event.target.config.sortList;
+        });
+    }
+
+    $('#edit-subcategory').on('show.bs.modal', function(event) {
+        var $edit_button = $(event.relatedTarget);
+        var id           = $edit_button.data('id');
+        var name         = $edit_button.data('name');
+        var $modal       = $(this);
+        var $input_name  = $modal.find('.modal-body input[name="name"]');
+
+        $modal.find('.modal-body input[name="id"]').val(id);
+        $input_name.val(name);
+
+        $modal.find('form').submit(function(event){
+            event.preventDefault();
+
+            var $update_button = $('#btn-update-subcategory');
+            name               = $input_name.val();
+
+            $update_button.button('loading');
+
+            $.ajax({
+                url      : '/admin/action/update_subcategory',
+                type     : 'POST',
+                dataType : 'json',
+                cache    : false,
+                data     : {
+                    id   : id,
+                    name : name
+                }
+            }).done(function(response){
+                if (response.status == 'ok') {
+                    var $row = $('#subcategory-' + id);
+
+                    $modal.modal('hide');
+                    $edit_button.data('name', name);
+                    $row.addClass('success').find('.name').text(name);
+                    setTimeout(function(){
+                        $row.removeClass('success');
+                    }, 1000);
+
+                    $moderators_table.trigger('update');
+
+                    setTimeout(function(){
+                        $moderators_table.trigger('sorton', [current_sort]);
+                    }, 2);
+                } else {
+                    response.error_id = error_counter++;
+                    var $error_msg    = $('#edit-subcategory .modal-body').append(tpl_errors(response)).find('#danger-msg-' + response.error_id);
+
+                    setTimeout(function(){$error_msg.alert('close');}, 3000);
+                }
+
+                $update_button.button('reset');
+            });
+
+        });
+    })
+
+    $('#edit-subcategory').on('hide.bs.modal', function(event) {
+        $(this).find('form').off('submit');
+    });
+
+    $('form[name="add_subcategory"]').submit(function(event){
+        event.preventDefault();
+
+        var $this = $(this);
+
+        $.ajax({
+            url      : '/admin/action/add_subcategory',
+            data     : $this.serialize(),
+            type     : 'POST',
+            dataType : 'json',
+            cache    : false
+        }).done(function(response){
+            if (response.status == 'ok') {
+                $this.find('input').val('');
+                $this.find('select').val(0);
+
+                $(".selectpicker").selectpicker('refresh');
+                $('#subcategories-list tbody').prepend(tpl_subcategory_row(response.data));
+                $moderators_table.trigger('update');
+
+                setTimeout(function(){
+                    $moderators_table.trigger('sorton', [current_sort]);
+                }, 2);
+
+                setTimeout(function(){
+                    $('#subcategory-' + response.data['id']).removeClass('success');
+                }, 1000);
+            } else {
+                response.error_id = error_counter++;
+                var $error_msg    = $('form[name="add_subcategory"]').append(tpl_errors(response)).find('#danger-msg-' + response.error_id);
+
+                setTimeout(function(){$error_msg.alert('close');}, 3000);
+            }
+        });
+    });
+})(jQuery);

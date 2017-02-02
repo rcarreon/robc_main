@@ -1,0 +1,33 @@
+<?php
+
+namespace Test\Validator\Excel;
+
+/**
+ * @group Excel
+ */
+class FormatsTest extends \PHPUnit_Framework_TestCase
+{
+    public function testIsValidFormatCasePercentage00ExpectTrue()
+    {
+        $bExpected = true;
+        $oFormats = new \CI\Validator\Excel\Formats();
+        $bResult = $oFormats->isValid(\CI\Excel\Settings::FORMAT_PERCENTAGE_00);
+        $this->assertEquals($bExpected, $bResult);
+    }
+
+    public function testIsValidFormatWithNotValidOption()
+    {
+        $bExpected = false;
+        $oFormats = new \CI\Validator\Excel\Formats();
+        $bResult = $oFormats->isValid('this is not a valid option');
+        $this->assertEquals($bExpected, $bResult);
+    }
+
+    public function estIsValidFormatCasePercentage00ExpectTrue()
+    {
+        $bExpected = true;
+        $oFormats = new \CI\Validator\Excel\Formats();
+        $bResult = $oFormats->isValid(\CI\Excel\Settings::FORMAT_NUMBER_COMMA_SEPARATED1);
+        $this->assertEquals($bExpected, $bResult);
+    }
+}

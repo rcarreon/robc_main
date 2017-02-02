@@ -1,0 +1,113 @@
+<?php
+
+class StatsWidget extends AppModel
+{
+    public $useTable = 'stats_widgets_account';
+    public $useDbConfig = 'warehouse';
+
+    /**
+     * validate the widget information
+     *
+     * @param  array  $widget Widget information
+     *
+     * @return boolean True if the data is valid in the array
+     */
+    private function _is_valid(array $widget)
+    {
+        $fields = array(
+            'id'         => 'required|numeric',
+            'website_id' => 'required|numeric',
+        );
+
+        $validator = new CI\Validator\Options($fields);
+        return $validator->isValid($widget);
+    }
+
+    /**
+     * Validates the stats that would apply
+     *
+     * @param  array  $stats The stats array to apply
+     *
+     * @return array The result array
+     */
+    private function _init_stats(array $stats)
+    {
+        $fields = array(
+            'display', 'incoming', 'display_basic', 'display_contextual', 'display_similar',
+            'display_tag', 'incoming_basic', 'incoming_contextual', 'incoming_similar', 'incoming_tag',
+        );
+        return array_merge(array_fill_keys($fields, 0), $stats);
+    }
+
+    /**
+     * Increment the stats or create the registry of a stats in stats_widgets_account
+     *
+     * @param  string $created The date of this increment
+     * @param  array  $widget  The widget information with id, and website_id
+     * @param  array  $stats   The stats to increment
+     *
+     * @return boolean True if the increment was applied
+     */
+    public function increment_stats($created, $widget, array $stats) {
+        if (empty($widget)) {
+            return false;
+        }
+        $result = false;
+        if ($this->_is_valid($widget) && strtotime($created)) {
+            $stats = $this->_init_stats($stats);
+            $query = "INSERT INTO stats_widgets_account (created, widget_id, website_id, display, incoming,
+                    display_basic, display_contextual, display_similar, display_tag,
+                    incoming_basic, incoming_contextual, incoming_similar, incoming_tag)
+                VALUES (
+                    UNIX_TIMESTAMP('{$created}'), {$widget['id']}, {$widget['website_id']},
+                    {$stats['display']}, {$stats['incoming']}, {$stats['display_basic']},
+                    {$stats['display_contextual']}, {$stats['display_similar']}, {$stats['display_tag']},
+                    {$stats['incoming_basic']}, {$stats['incoming_contextual']}, {$stats['incoming_similar']},
+                    {$stats['incoming_tag']}
+                ) ON DUPLICATE KEY UPDATE
+                    display = display + {$stats['display']},
+                    incoming = incoming + {$stats['incoming']},
+                    display_basic = display_basic + {$stats['display_basic']},
+                    display_contextual = display_contextual + {$stats['display_contextual']},
+                    display_similar = display_similar + {$stats['display_similar']},
+                    display_tag = display_tag + {$stats['display_tag']},
+                    incoming_basic = incoming_basic + {$stats['incoming_basic']},
+                    incoming_contextual = incoming_contextual + {$stats['incoming_contextual']},
+                    incoming_similar = incoming_similar + {$stats['incoming_similar']},
+                    incoming_tag = incoming_tag + {$stats['incoming_tag']}";
+            $result = $this->query($query);
+        }
+        return $result;
+    }
+
+    private function _get_field_by_link_type($field, $link_type)
+    {
+        $field .= '_';
+        switch ($link_type) {
+            case LINK_TYPE_CONTEXTUAL:
+                $field .= 'contextual';
+                break;
+            case LINK_TYPE_SIMILAR:
+                $field .= 'similar';
+                break;
+            case LINK_TYPE_TAG:
+                $field .= 'tag';
+                break;
+            case LINK_TYPE_BASIC:
+            default:
+                $field .= 'basic';
+                break;
+        }
+        return $field;
+    }
+
+    public function get_display_by_type($link_type)
+    {
+        return $this->_get_field_by_link_type('display', $link_type);
+    }
+
+    public function get_incoming_by_type($link_type)
+    {
+        return $this->_get_field_by_link_type('incoming', $link_type);
+    }
+}

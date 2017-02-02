@@ -1,0 +1,51 @@
+<?php
+App::import('Component', 'CIAbstract');
+
+abstract class CIWebsiteStatusComponent extends CIAbstractComponent
+{
+    protected $aStatus = array();
+
+    protected function init()
+    {
+        $oWebsite = new \CI\Website();
+        $this->aStatus = $oWebsite->getAllStatus();
+    }
+
+    public function process()
+    {
+        $this->merge($this->options->get('merge'), array());
+        $this->remove($this->options->get('remove'), array());
+
+        return array(
+            'list' => $this->aStatus,
+            'options' => array(
+                'id'        => $this->options->get('id'),
+                'name'      => $this->options->get('name'),
+                'status_id' => $this->options->get('status_id')
+            )
+        );
+    }
+
+    protected function merge(array $aNew)
+    {
+        if(empty($aNew['id']) || empty($aNew['name'])) {
+            return;
+        }
+
+        $this->aStatus[$aNew['id']] = array(
+            'id'   => $aNew['id'],
+            'name' => $aNew['name']
+        );
+    }
+
+    protected function remove(array $aRemove)
+    {
+        if (empty($aRemove)) {
+            return;
+        }
+
+        foreach($aRemove as $nId) {
+            unset($this->aStatus[$nId]);
+        }
+    }
+}

@@ -1,0 +1,171 @@
+<?php
+/**
+ * Logger Analytic Abstract
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger
+ * @package  Logger_Analytic
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+/**
+ * Logger Analytic Abstract
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger
+ * @package  Logger_Analytic
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+abstract class Logger_Analytic_Abstract implements Logger_Analytic_Interface
+{
+    /**
+     * Logger component
+     * @var Logger_Interface
+     */
+    protected $logger = null;
+
+    /**
+     * Elements of this Logger Analytic
+     * @var array
+     */
+    protected $elements = array();
+
+    /**
+     * Constructs a logger analytic with a logger component
+     *
+     * @param Logger_Interface $logger The logger of this analytic
+     */
+    public function __construct(Logger_Interface $logger)
+    {
+        $this->logger = $logger;
+    }
+
+    /**
+     * Register a value into an element of this logger analytic
+     *
+     * @param string $key   Element name
+     * @param mixed  $value The value to register
+     *
+     * @throws Logger_Analytic_Exception_Element
+     * @return void
+     */
+    public function registerElementValue($key, $value)
+    {
+        if (isset($this->elements[$key])) {
+            $this->elements[$key]->registerValue($value);
+        } else {
+            throw new Logger_Analytic_Exception_Element(
+                $key, Logger_Analytic_Exception_Element::NON_EXIST
+            );
+        }
+    }
+
+    /**
+     * Register an element into this analytic logger
+     *
+     * @param Logger_Analytic_Element_Interface $element Element
+     *
+     * @throws Logger_Analytic_Exception_Element
+     * @return void
+     */
+    public function registerElement(Logger_Analytic_Element_Interface $element)
+    {
+        $key = $element->getName();
+        if (!isset($this->elements[$key])) {
+            $this->elements[$key] = $element;
+        } else {
+            throw new Logger_Analytic_Exception_Element(
+                $key, Logger_Analytic_Exception_Element::DUPLICATE
+            );
+        }
+    }
+
+    /**
+     * Gets an element
+     *
+     * @param string $key Name of the element
+     *
+     * @throws Logger_Analytic_Exception_Element
+     * @return Logger_Analytic_Element_Interface
+     */
+    public function getElement($key)
+    {
+        if (isset($this->elements[$key])) {
+            return $this->elements[$key];
+        }
+
+        throw new Logger_Analytic_Exception_Element(
+            $key, Logger_Analytic_Exception_Element::NON_EXIST
+        );
+    }
+
+    /**
+     * Removes an element
+     *
+     * @param string $key Name of the element
+     *
+     * @throws Logger_Analytic_Exception_Element
+     * @return Logger_Analytic_Element_Interface
+     */
+    public function removeElement($key)
+    {
+        if (isset($this->elements[$key])) {
+            unset($this->elements[$key]);
+        } else {
+            throw new Logger_Analytic_Exception_Element(
+                $key, Logger_Analytic_Exception_Element::NON_EXIST
+            );
+        }
+    }
+
+    /**
+     * Gets the names of the elements in order separated by comma
+     *
+     * @return string
+     */
+    public function getElementsOrder()
+    {
+        return implode(', ', array_keys($this->elements));
+    }
+
+    /**
+     * Gets the log of this logger analytic
+     * (builds all the output of its elements separated by comma)
+     *
+     * @return string
+     */
+    public function getLog()
+    {
+        $log = array();
+        foreach ($this->elements as $key => $value) {
+            $log[] = $value->build();
+        }
+        return implode(',', $log);
+    }
+
+    /**
+     * Saves its log with its logger
+     *
+     * @return void
+     */
+    public function save()
+    {
+        return $this->logger->log($this->getLog());
+    }
+
+    /**
+     * Removes all the elements
+     *
+     * @return void
+     */
+    public function clean()
+    {
+        $this->elements = array();
+    }
+}

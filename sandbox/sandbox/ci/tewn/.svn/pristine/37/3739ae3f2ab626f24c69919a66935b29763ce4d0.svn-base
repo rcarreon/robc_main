@@ -1,0 +1,334 @@
+<?php
+App::import('Controller', 'Actions');
+
+class AdminWebsitesActionsController extends ActionsController
+{
+    public $name  = 'Websites';
+    public $uses  = array('Website', 'MetricLog', 'Stats', 'Page');
+    public $view  = 'Theme';
+    public $theme = 'bootstrap';
+
+    protected $permissions = array(
+        'get_list'              => User::ADMIN,
+        'save_selected_columns' => User::ADMIN,
+        'load_selected_columns' => User::ADMIN,
+    );
+
+    public function get_list()
+    {
+        App::import('Controller', 'HistoryLandingPageAnalytics');
+        $HistoryLandingPageAnalytics = new HistoryLandingPageAnalyticsController();
+        App::import('Controller', 'HistoryWidgetAnalytics');
+        $HistoryWidgetAnalytics = new HistoryWidgetAnalyticsController();
+
+        $this->response->setMessage('Get list of websites');
+        $this->MetricLog->log(LOG_TYPE_PAGE_VIEW);
+
+        $params    = new \CI\ArrayManipulator($this->params['url']);
+        $domain_id = $params->get('domain_id', \CI\Hub::DOMAIN_ID_ALL);
+        $status    = $params->get('status', \CI\Website::WEBSITE_STATUS_ACTIVE);
+        $category  = $params->get('category', \CI\Category::ALL);
+
+        $stats          = array();
+        $websites       = $this->Website->get_websites_report($domain_id, $status, $category);
+        $websites_stats = $this->Stats->get_websites_stats_report(array_keys($websites));
+
+        $oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+        $domain_bit = $oHub->idToBit($domain_id);
+
+
+        $total_stats['incoming']           = 0;
+        $total_stats['outgoing']           = 0;
+        $total_stats['credits']            = 0;
+        $total_stats['page_active']        = 0;
+        $total_stats['page_pending']       = 0;
+        $total_stats['page_moderate']      = 0;
+        $total_stats['refreshness']        = 0;
+        $total_stats['widget_incoming']    = 0;
+        $total_stats['widget_traffic']     = 0;
+        $total_stats['article_traffic']    = 0;
+        $total_stats['article_impression'] = 0;
+        $total_stats['y_incoming']         = 0;
+        $total_stats['y_outgoing']         = 0;
+        $total_stats['y_lp_impression']    = 0;
+        $total_stats['y_lp_clicks']        = 0;
+        $total_stats['y_w_impression']     = 0;
+        $total_stats['y_w_clicks']         = 0;
+        $total_stats['r_lp_ctr']           = 0;
+        $total_stats['r_lp_imp']           = 0;
+        $total_stats['r_w_ctr']            = 0;
+        $total_stats['r_w_imp']            = 0;
+        $total_stats['traffic_delta']      = 0;
+
+
+        $landing_page_engine = new \CI\Engine\LandingPage();
+        $lp_priority         = $landing_page_engine->getAccountsByPriority($domain_bit);
+        $widget_engine       = new \CI\Engine\Widget();
+        $w_priority          = $widget_engine->getAccountsByPriority($domain_bit);
+
+        foreach($websites_stats as $website) {
+            $id  = $website['id'];
+            $website = $websites[$id] + $website;
+            $account_id = $website['account_id'];
+
+            $website['refreshness'] = $this->Page->get_freshness(\CI\Page::PAGE_STATUS_APPROVED, $id);
+            $website['lp_priority'] = isset($lp_priority[$account_id])? number_format($lp_priority[$account_id], 4) : '0.0000';
+            $website['w_priority']  = isset($w_priority[$account_id])? number_format($w_priority[$account_id], 4) : '0.0000';;
+
+            $total_stats['incoming']           += $website['incoming'];
+            $total_stats['outgoing']           += $website['outgoing'];
+            $total_stats['credits']            += $website['credits'];
+            $total_stats['page_active']        += $website['page_active'];
+            $total_stats['page_pending']       += $website['page_pending'];
+            $total_stats['page_moderate']      += $website['page_moderate'];
+            $total_stats['refreshness']        += $website['refreshness'];
+            $total_stats['widget_incoming']    += $website['widget_incoming'];
+            $total_stats['widget_traffic']     += $website['widget_traffic'];
+            $total_stats['article_traffic']    += $website['article_traffic'];
+            $total_stats['article_impression'] += $website['article_impression'];
+            $total_stats['y_incoming']         += $website['y_incoming'];
+            $total_stats['y_outgoing']         += $website['y_outgoing'];
+            $total_stats['y_lp_impression']    += $website['y_lp_impression'];
+            $total_stats['y_lp_clicks']        += $website['y_lp_clicks'];
+            $total_stats['y_w_impression']     += $website['y_w_impression'];
+            $total_stats['y_w_clicks']         += $website['y_w_clicks'];
+            $total_stats['refreshness']        += $website['refreshness'];
+
+            $stats[] = $website;
+        }
+
+        $total_websites             = count($stats);
+        $total_traffic              = $total_stats['widget_traffic'] + $total_stats['article_traffic'];
+        $total_incoming             = $total_stats['y_incoming'] + $total_stats['article_impression'];
+        $total_stats['rr']          = \CI\Formulas::getReturnRate($total_stats['outgoing'], $total_stats['incoming']);
+        $total_stats['y_rr']        = \CI\Formulas::getReturnRate($total_stats['y_outgoing'], $total_stats['y_incoming']);
+        $total_stats['y_gen_rr']    = \CI\Formulas::getGeneratedReturnRate($total_traffic, $total_incoming);
+        $total_stats['y_lp_ctr']    = \CI\Formulas::getCtr($total_stats['y_lp_impression'], $total_stats['y_lp_clicks']);
+        $total_stats['y_w_ctr']     = \CI\Formulas::getCtr($total_stats['y_w_impression'], $total_stats['y_w_clicks']);
+        $total_stats['websites']    = $total_websites;
+        $total_stats['refreshness'] = \CI\Formulas::getDivision($total_stats['refreshness'], $total_websites);
+
+        // Check which websites need attention
+        $needs_attention_count     = 0;
+        $needs_attention_notice    = 0;
+        $needs_attention_warning   = 0;
+        $needs_attention_immediate = 0;
+
+        foreach ($stats as $key => $website) {
+            $rolling_lp_stats     = $HistoryLandingPageAnalytics->stats_days_website_landing_pages($website['id'], MANAGEMENT_LANDING_PAGE_ROLLING_DAYS);
+            $rolling_widget_stats = $HistoryWidgetAnalytics->stats_days_website($website['id'], 0, MANAGEMENT_WIDGET_ROLLING_DAYS);
+
+            $website['r_lp_imp'] = $rolling_lp_stats['num_display'];
+            $website['r_w_imp']  = $rolling_widget_stats['num_display'];
+
+            $total_stats['r_lp_ctr'] += $rolling_lp_stats['num_ctr'];
+            $total_stats['r_lp_imp'] += $rolling_lp_stats['num_display'];
+
+            $total_stats['r_w_ctr'] += $rolling_widget_stats['num_ctr'];
+            $total_stats['r_w_imp'] += $rolling_widget_stats['num_display'];
+            $total_stats['traffic_delta'] += $website['traffic_delta'];
+            $attention       = $this->needs_attention($website, $total_stats);
+            $needs_attention = $attention['message'];
+
+            $class = "";
+
+            switch ($attention['level']) {
+            case ATTENTION_LEVEL_NOTICE:
+                $needs_attention_notice++;
+                break;
+            case ATTENTION_LEVEL_WARNING:
+                $needs_attention_warning++;
+                $class = 'warning';
+                break;
+            case ATTENTION_LEVEL_IMMEDIATE:
+                $needs_attention_immediate++;
+                $class = 'danger';
+                break;
+            }
+
+            $website['needs_attention']    = $needs_attention;
+            $website['is_needs_attention'] = $needs_attention != 0;
+            $website['attention_level']    = $attention['level'];
+            $website['attention_class']    = $class;
+
+            $website['attention_pending_pages']      = ($needs_attention & ATTENTION_PENDING_PAGES) ? 'attention' : '';
+            $website['attention_pending_moderation'] = ($needs_attention & ATTENTION_PENDING_MODERATION) ? 'attention' : '';
+            $website['attention_return_rate']        = ($needs_attention & ATTENTION_RETURN_RATE) ? 'attention' : '';
+            $website['attention_lp_performance']     = ($needs_attention & ATTENTION_LP_PERFORMANCE) ? 'attention' : '';
+            $website['attention_lp_impressions']     = ($needs_attention & ATTENTION_ENOUGH_LANDING_PAGE_IMPRESSIONS) ? 'attention' : '';
+            $website['attention_w_performance']      = ($needs_attention & ATTENTION_W_PERFORMANCE) ? 'attention' : '';
+            $website['attention_w_impressions']      = ($needs_attention & ATTENTION_ENOUGH_WIDGET_IMPRESSIONS) ? 'attention' : '';
+
+            if ($website['needs_attention']) {
+                $needs_attention_count++;
+            }
+
+            $stats[$key] = $website;
+        }
+
+
+
+        $total_stats['needs_attention_count']     = $needs_attention_count;
+        $total_stats['needs_attention_notice']    = $needs_attention_notice;
+        $total_stats['needs_attention_warning']   = $needs_attention_warning;
+        $total_stats['needs_attention_immediate'] = $needs_attention_immediate;
+
+        $this->response->addData('websites', $stats);
+        $this->response->addData('total', $total_stats);
+
+        return $this->response->get();
+    }
+
+    public function save_selected_columns() {
+        $user    = $this->Session->read('User');
+        $params  = new \CI\ArrayManipulator($this->params['form']);
+        $key_gen = new CI\Memcached\KeyGen(
+            array(
+                'user' => $user['id'],
+            ),
+            'websites_report_columns',
+            1
+        );
+
+        $config   = new \CI\Config();
+        $memcache = new \CI\Memcached($config->get('memcache'));
+        $memcache->set($key_gen->generate(), json_encode($params->get('columns')));
+
+        $this->response->addData('saved');
+
+        return $this->response->get();
+    }
+
+    public function load_selected_columns() {
+        $user    = $this->Session->read('User');
+        $key_gen = new CI\Memcached\KeyGen(
+            array(
+                'user' => $user['id'],
+            ),
+            'websites_report_columns',
+            1
+        );
+
+        $config   = new \CI\Config();
+        $memcache = new \CI\Memcached($config->get('memcache'));
+        $columns  = $memcache->get($key_gen->generate());
+
+        $this->response->addData('columns', json_decode($columns, true));
+
+        return $this->response->get();
+    }
+
+    private function needs_attention($website, $total_stats) {
+        $small_site    = 50;
+        $message       = 0;
+        $level         = 0;
+        $y_return_rate = $website['y_rr'];
+
+        // Check return rate
+        if ($website['y_incoming'] &&
+            $y_return_rate < $website['rate']) {
+            $message |= ATTENTION_RETURN_RATE;
+            $level = max($level, ATTENTION_LEVEL_WARNING);
+        }
+
+        // Check if not enough landing page impressions given the rolling landing page CTR
+        if ($y_return_rate < $website['rate']) {
+            // Total clicks we need for SLA
+            $clicks_needed = $website['rate'] * $website['y_incoming'];
+
+            // Widget return is responsible for the first click
+            $w_clicks_needed = $website['y_incoming'];
+
+            // LP is responsible for the extra clicks
+            $lp_clicks_needed = $clicks_needed - $w_clicks_needed;
+
+            // Approx clicks due to widgets
+            $w_clicks_recv = $website['y_w_impression'] * $website['y_w_ctr'];
+
+            // Approx clicks due to LP
+            $lp_clicks_recv = $website['y_lp_impression'] * $website['y_lp_ctr'];
+
+            // See if we need to decrement the number of LP clicks needed because W is making up for it
+            $w_clicks_surplus = $w_clicks_recv - $w_clicks_needed;
+            if ($w_clicks_surplus > 0) {
+                $lp_clicks_needed -= $w_clicks_surplus;
+            }
+
+            // See if we need to decrement the number of W clicks needed because LP is making up for it
+            $lp_clicks_surplus = $lp_clicks_recv - $lp_clicks_needed;
+            if ($lp_clicks_surplus > 0) {
+                $w_clicks_needed -= $lp_clicks_surplus;
+            }
+
+            // See if we have enough W impressions
+            if ($w_clicks_needed > $w_clicks_recv &&
+                ($message & ATTENTION_W_PERFORMANCE) == 0) {
+                    $message |= ATTENTION_ENOUGH_WIDGET_IMPRESSIONS;
+                    $level = max($level, ATTENTION_LEVEL_WARNING);
+            }
+
+            // See if we have enough LP impressions
+            if ($lp_clicks_needed > $lp_clicks_recv &&
+                ($message & ATTENTION_LP_PERFORMANCE) == 0) {
+                $message |= ATTENTION_ENOUGH_LANDING_PAGE_IMPRESSIONS;
+                $level = max($level, ATTENTION_LEVEL_WARNING);
+            }
+
+        }
+
+        // Update total stats
+        if ($total_stats['r_lp_imp'] && $total_stats['r_lp_ctr']) {
+            $total_stats['r_lp_click_rate'] = $total_stats['r_lp_ctr'] / $total_stats['r_lp_imp'];
+        }
+
+        if ($total_stats['r_w_imp'] && $total_stats['r_w_ctr']) {
+            $total_stats['r_w_click_rate'] = $total_stats['r_w_ctr'] / $total_stats['r_w_imp'];
+        }
+
+        // Check if LP CTR is low
+        if (($message & ATTENTION_ENOUGH_LANDING_PAGE_IMPRESSIONS) == 0 &&
+            $website['y_incoming'] &&
+            $website['y_lp_impression'] > 200 &&
+            $website['y_lp_ctr'] <
+            ($total_stats['r_lp_click_rate'] * .66)) {
+            $message |= ATTENTION_LP_PERFORMANCE;
+            $level = max($level, ATTENTION_LEVEL_NOTICE);
+        }
+
+        // Check if W CTR is low
+        if (($message & ATTENTION_ENOUGH_WIDGET_IMPRESSIONS) == 0 &&
+            $website['y_incoming'] &&
+            $website['y_w_impression'] > 1000 &&
+            $website['y_w_ctr'] <
+            ($total_stats['r_w_click_rate'] * .66)) {
+            $message |= ATTENTION_W_PERFORMANCE;
+            $level = max($level, ATTENTION_LEVEL_NOTICE);
+        }
+
+        // Downgrade any small site
+        if ($website['y_incoming'] < $small_site &&
+            $level == ATTENTION_LEVEL_WARNING) {
+            $level = ATTENTION_LEVEL_NOTICE;
+        }
+
+        // See if there are pages pending moderation
+        if ($website['page_moderate']) {
+            $message |= ATTENTION_PENDING_MODERATION;
+            if ($website['y_incoming'] < $small_site) {
+                $level = max($level, ATTENTION_LEVEL_WARNING);
+            } else {
+                $level = max($level, ATTENTION_LEVEL_IMMEDIATE);
+            }
+        }
+
+        if (!$website['page_active'] &&
+            $website['page_pending']) {
+            $message |= ATTENTION_PENDING_PAGES;
+            $level = max($level, ATTENTION_LEVEL_IMMEDIATE);
+        }
+
+        $out['message'] = $message;
+        $out['level'] = $level;
+        return $out;
+    }
+}

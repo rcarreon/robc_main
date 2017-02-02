@@ -1,0 +1,211 @@
+<?php
+/**
+ * Report\Website File
+ *
+ * PHP Version 5.3
+ *
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+
+namespace CI\Report;
+
+/**
+ * Report\Website Class
+ *
+ * PHP Version 5.3
+ *
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+class Website extends \CI\Report
+{
+    const PARAM_WEBSITES_LIST   = 'websites_list';
+    const PARAM_WEBSITES_IDS    = 'websites_ids';
+    const PARAM_GRANULARITY     = 'granularity';
+    const PARAM_DAILY_BREAKDOWN = 'daily_breakdown';
+
+    public function __construct(array $aParams = array())
+    {
+        $this->setParams($aParams);
+        $this->initDateRange();
+    }
+
+    public function getData()
+    {
+        $oWebsite = $this->getStatsObject();
+
+        $sWebsitesIds = implode(',', array_keys($this->getParam(self::PARAM_WEBSITES_LIST)));
+
+        $oWebsite->setWebsiteId($sWebsitesIds);
+        $oWebsite->setGranularity(self::DAILY);
+        $oWebsite->setStartDate((string) $this->getParam(self::PARAM_START_DATE));
+        $oWebsite->setEndDate((string) $this->getParam(self::PARAM_END_DATE));
+
+        $this->aData = $oWebsite->getData();
+
+        if ($this->hasParam(self::PARAM_DAILY_BREAKDOWN)) {
+            $this->processWithDailyBreakdown();
+        } else {
+            $this->process();
+        }
+
+        return $this->aData;
+    }
+
+    protected function getStatsObject()
+    {
+        return new \CI\Stats\Website();
+    }
+
+    protected function processWithDailyBreakdown()
+    {
+        $aEmptyStats    = array_fill_keys(array('impressions', 'clicks', 'incoming', 'outgoing', 'credits'), 0);
+        $aWebsiteStats  = array();
+        $aDailyWebsites = array();
+        $oWebsite       = new \CI\Website();
+        $oHub           = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+        $aWebsites      = $this->getParam(self::PARAM_WEBSITES_LIST);
+
+        foreach ($this->aData as $aStats) {
+            $oStats     = new \CI\ArrayManipulator($aStats);
+            $nWebsiteId = $oStats->get('website_id', 0);
+            $oDate      = new \Carbon\Carbon($oStats->get('date'));
+            $sDateIndex = $oDate->format('M d');
+
+            if (!isset($aWebsiteStats[$sDateIndex][$nWebsiteId])) {
+                $aWebsiteStats[$sDateIndex][$nWebsiteId] = $aEmptyStats;
+            }
+
+            $aWebsiteStats[$sDateIndex][$nWebsiteId]['impressions'] += (int) $oStats->get('widget_impressions', 0);
+            $aWebsiteStats[$sDateIndex][$nWebsiteId]['clicks']      += (int) $oStats->get('widget_traffic_from', 0);
+            $aWebsiteStats[$sDateIndex][$nWebsiteId]['incoming']    += (int) $oStats->get('traffic_from', 0);
+            $aWebsiteStats[$sDateIndex][$nWebsiteId]['outgoing']    += (int) $oStats->get('traffic_to', 0);
+            $aWebsiteStats[$sDateIndex][$nWebsiteId]['credits']     = (float) $oStats->get('credits', 0);
+        }
+
+        foreach ($aWebsiteStats as $sDate => $aStats) {
+            foreach ($aWebsites as $nId => $aWebsite) {
+                $aWebsiteData = array(
+                    'date'                => $sDate,
+                    'website_id'          => $nId,
+                    'website_name'        => $aWebsite['name'],
+                    'website_status'      => $aWebsite['status'],
+                    'website_status_name' => $oWebsite->getStatusName($aWebsite['status']),
+                    'hub_id'              => $aWebsite['domain_primary'],
+                    'hub_name'            => $oHub->fullName($aWebsite['domain_primary']),
+                );
+
+                if (empty($aStats[$nId])) {
+                    $aStats[$nId] = $aEmptyStats;
+                }
+
+                $aWebsiteData['account_incoming']    = $aStats[$nId]['incoming'];
+                $aWebsiteData['account_outgoing']    = $aStats[$nId]['outgoing'];
+                $aWebsiteData['account_credits']     = $aStats[$nId]['credits'];
+                $aWebsiteData['account_return_rate'] = \CI\Formulas::getReturnRate(
+                    $aWebsiteData['account_outgoing'],
+                    $aWebsiteData['account_incoming']
+                );
+
+                $aWebsiteData['widget_incoming'] = $aStats[$nId]['clicks'];
+                $aWebsiteData['widget_display']  = $aStats[$nId]['impressions'];
+                $aWebsiteData['widget_ctr']      = \CI\Formulas::getCtr(
+                    $aWebsiteData['widget_display'],
+                    $aWebsiteData['widget_incoming']
+                );
+
+                $aDailyWebsites[] = $aWebsiteData;
+            }
+        }
+
+        $this->aData = array(
+            'stats'           => $aDailyWebsites,
+            'daily_breakdown' => true
+        );
+    }
+
+    protected function process()
+    {
+        $oModelAccount = $this->getModelAccountObject();
+        $sWebsitesIds  = implode(',', array_keys($this->getParam(self::PARAM_WEBSITES_LIST)));
+        $aAccounts     = $oModelAccount->getIncomingOutgoingByWebsites($sWebsitesIds);
+        $oWebsite      = new \CI\Website();
+        $oHub          = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+        $aWebsites     = $this->getParam(self::PARAM_WEBSITES_LIST);
+
+        $aEmptyStats = array(
+            'widget_display'   => 0,
+            'widget_incoming'  => 0,
+            'account_outgoing' => 0,
+            'account_incoming' => 0,
+            'account_credits'  => 0,
+            'total_outgoing'   => 0,
+            'total_incoming'   => 0,
+        );
+
+        foreach ($this->aData as $aStats) {
+            $oStats     = new \CI\ArrayManipulator($aStats);
+            $nWebsiteId = $oStats->get('website_id', 0);
+
+            if (!isset($aWebsiteStats[$nWebsiteId])) {
+                $aWebsiteStats[$nWebsiteId] = $aEmptyStats;
+            }
+
+            $aWebsiteStats[$nWebsiteId]['widget_display']   += (int) $oStats->get('widget_impressions', 0);
+            $aWebsiteStats[$nWebsiteId]['widget_incoming']  += (int) $oStats->get('widget_traffic_from', 0);
+
+            $aWebsiteStats[$nWebsiteId]['account_incoming'] += (int) $oStats->get('traffic_from', 0);
+            $aWebsiteStats[$nWebsiteId]['account_outgoing'] += (int) $oStats->get('traffic_to', 0);
+            $aWebsiteStats[$nWebsiteId]['account_credits']  = (float) $oStats->get('credits', 0);
+
+            $aWebsiteStats[$nWebsiteId]['total_outgoing']   = 0;
+            $aWebsiteStats[$nWebsiteId]['total_incoming']   = 0;
+        }
+
+        foreach ($aAccounts as $aAccount) {
+            $nWebsiteId = $aAccount['website_id'];
+
+            if (!isset($aWebsiteStats[$nWebsiteId])) {
+                $aWebsiteStats[$nWebsiteId] = $aEmptyStats;
+            }
+
+            $aWebsiteStats[$nWebsiteId]['widget_ctr'] = \CI\Formulas::getCtr(
+                $aWebsiteStats[$nWebsiteId]['widget_display'],
+                $aWebsiteStats[$nWebsiteId]['widget_incoming']
+            );
+
+            $aWebsiteStats[$nWebsiteId]['total_outgoing']    = (int) $aAccount['outgoing'];
+            $aWebsiteStats[$nWebsiteId]['total_incoming']    = (int) $aAccount['incoming'];
+            $aWebsiteStats[$nWebsiteId]['total_return_rate'] = \CI\Formulas::getReturnRate(
+                $aAccount['outgoing'],
+                $aAccount['incoming']
+            );
+
+            $aWebsiteStats[$nWebsiteId]['account_return_rate'] = \CI\Formulas::getReturnRate(
+                $aWebsiteStats[$nWebsiteId]['account_outgoing'],
+                $aWebsiteStats[$nWebsiteId]['account_incoming']
+            );
+
+            $aWebsiteStats[$nWebsiteId]['website_id']          = $nWebsiteId;
+            $aWebsiteStats[$nWebsiteId]['website_name']        = $aWebsites[$nWebsiteId]['name'];
+            $aWebsiteStats[$nWebsiteId]['website_status']      = $aWebsites[$nWebsiteId]['status'];
+            $aWebsiteStats[$nWebsiteId]['website_status_name'] = $oWebsite->getStatusName($aWebsites[$nWebsiteId]['status']);
+            $aWebsiteStats[$nWebsiteId]['hub_id']              = $aWebsites[$nWebsiteId]['domain_primary'];
+            $aWebsiteStats[$nWebsiteId]['hub_name']            = $oHub->fullName($aWebsites[$nWebsiteId]['domain_primary']);
+
+        }
+
+        $this->aData = array(
+            'stats'           => $aWebsiteStats,
+            'daily_breakdown' => false
+        );
+    }
+
+    protected function getModelAccountObject()
+    {
+        return new \CI\Model\Account();
+    }
+}

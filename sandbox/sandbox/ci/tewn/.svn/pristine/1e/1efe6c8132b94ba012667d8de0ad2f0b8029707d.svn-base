@@ -1,0 +1,199 @@
+jQuery(function () {
+    function labelFormatter(label, series) {
+        return "<div style='font-size:8pt; font-weight:bold; text-align:center; padding:2px; color:#333;'>" + Math.round(series.percent) + "%</div>";
+    }
+
+    if (window.loadCharts) {
+        var websites = flot_charts.websites;
+        var pie_config = {
+            legend: {
+                labelFormatter: function (label, series) {
+                    if (!series.label_format) return label;
+                    var format = series.label_format;
+                    var featured = '';
+                    if (format.featured) featured = '<span class="label label-danger">F</span>';
+                    return '<a target="_blank" href="/websites/moderate/' + format.website_id + '">' + label + '</a> (' + format.data_value + ') <span class="label label-' + format.label_color + '">' + format.domain_name + '</span> ' + featured;
+                }
+            },
+            series: {
+                pie: {
+                    show: true,
+                    radius: 1,
+                    label: {
+                        show: true,
+                        radius: 3/4,
+                        formatter: labelFormatter,
+                        background: {
+                            opacity: 0,
+                            color: '#000'
+                        }
+                    }
+                }
+            }
+        };
+
+        $.plot('#chart', websites, pie_config);
+
+        var cross_data   = flot_charts.cross_data;
+        var average_data = flot_charts.average_data;
+        var average      = flot_charts.average;
+        var standard     = flot_charts.standard;
+        var ideal_rr     = {color: 'red', lineWidth: 2, xaxis: {from: flot_charts.ideal_rr, to: flot_charts.ideal_rr}};
+
+        var min_zone = parseInt(average - standard - (standard/2));
+        if (min_zone <= 0) min_zone = 1;
+
+        var dataset = [
+            { id: 'points', data: cross_data, lines: { show: false }, points: { show: true, symbol: "cross" }, color: "rgb(20, 150, 20)" },
+            { id: 'average', label: 'Avg: ' + average, data: average_data['average'], lines: { show: true }, color: "rgb(29, 17, 162)" },
+            { id: 'standard_down', label: 'SD: ' + standard, data: average_data['standard_down'], lines: { show: true, lineWidth: 0, fill: 0.3}, color: "rgb(129, 163, 175)", fillBetween: "standard_up" },
+            { id: 'max_zone', label: 'Max: ' + parseInt(average + standard + (standard/2)), data: average_data['max_zone'], lines: { show: true, lineWidth: 0, fill: false}, color: "rgb(129, 163, 175)" },
+            { id: 'min_zone', label: 'Min: ' + min_zone, data: average_data['min_zone'], lines: { show: true, lineWidth: 0, fill: 0.2}, color: "rgb(129, 163, 175)", fillBetween: "max_zone" },
+            { id: 'standard_up', label: 'IRR: ' + flot_charts.ideal_rr, data: average_data['standard_up'], lines: { show: true, lineWidth: 0, fill: false}, color: "red" },
+        ];
+
+        $.plot('#chart_alt', dataset, {
+            grid: {
+                hoverable: true,
+                markings: [ideal_rr]
+            },
+            yaxis: {
+                min: -10
+            }
+        });
+
+        $("<div id='chart_tooltip'></div>").css({
+            position: "absolute",
+            display: "none",
+            padding: "3px 8px",
+            color: '#fff',
+            opacity: 0.9,
+            'border-radius': "4px",
+            'font-size': '12px',
+            'line-height': '1.4',
+            'background-color': '#000',
+            'text-decoration': 'none',
+            'text-align': 'center',
+            'z-index': 999999
+        }).appendTo("body");
+
+        $("#chart_alt").bind("plothover", function (event, pos, item) {
+            if (item && item.series.id == 'points') {
+                var data = item.series.data[item.dataIndex],
+                    website = data[2];
+                    analytics = data[1],
+                    return_rate = data[0],
+                    label = website + "<br/> (RR: " + return_rate + "%, A: " + analytics + ")";
+
+                $("#chart_tooltip").html(label)
+                    .css({top: item.pageY-10, left: item.pageX - $("#chart_tooltip").width() - 25})
+                    .fadeIn(200);
+            } else {
+                $("#chart_tooltip").hide();
+            }
+        });
+    }
+
+    $('.select-tt').tooltip();
+    $('form button').on('click', function () {
+        var domain = $('#domain').val();
+        var category = $('#category').val();
+        var threshold = $('#threshold').val();
+        var content = $('#content_rating').val();
+        var rr_range = $('#rr_range').val();
+        var exclude = $('#penalized').is(':checked');
+        var crossdomain = $('#crossdomain').is(':checked');
+        window.location = '/analysis/lpcoverage/' + domain + '/' + threshold + '/' + category + '/' + content + '/' + rr_range + '/' + (exclude ? 1 : 0) + '/' + (crossdomain ? 1 : 0);
+        return false;
+    });
+
+    var tplViewAnalytics = Handlebars.compile($('#view-analytics-tpl').html());
+    $('.do-view-analytics').on('click', function () {
+        var button         = $(this);
+        var website        = button.data('website');
+        var website_id     = button.data('website-id');
+        var intersection   = button.data('intersection').split('_');
+        var domain         = parseInt(intersection[0]);
+        var category       = parseInt(intersection[1]);
+        var content_rating = parseInt(intersection[2]);
+        var exclude        = button.data('exclude');
+
+        $('#view-analytics-modal-title').html('<strong>' + website + '</strong> Analytic Details');
+        button.html('<img width="16" height="16" src="/img/wait.gif">');
+        button.prop('disabled', true);
+        var params = {
+            website_id: website_id,
+            domain_id: domain,
+            category: category,
+            content_rating: content_rating,
+            exclude_penalized: exclude
+        };
+        $.get('/analysis/action/get_coverage_analytics', params, function (data) {
+            $('#view-analytics-results').html(tplViewAnalytics(data));
+            $('#view-analytics-modal').modal();
+            $('.tool').tooltip();
+            button.html('View analytics');
+            button.prop('disabled', false);
+        }, 'json');
+    });
+
+    $('.do-category-distribution').on('click', function () {
+        var button     = $(this);
+        var domain     = button.data('domain');
+        var website    = button.data('website');
+        var website_id = button.data('website-id');
+        button.html('<img width="16" height="16" src="/img/wait.gif">');
+        button.prop('disabled', true);
+        var params = {
+            website_id: website_id,
+            domain_id: domain
+        }
+        $.get('/analysis/action/get_coverage_categories', params, function (data) {
+            $('#category-distribution-modal')
+                .data('points', data.points)
+                .data('strict', data.strict)
+                .data('average', data.average)
+                .data('avg', data.avg).modal();
+            button.html('Category distribution');
+            button.prop('disabled', false);
+        }, 'json');
+    });
+
+    $('#category-distribution-modal').on('shown.bs.modal', function (e) {
+        var points  = $('#category-distribution-modal').data('points');
+        var strict  = $('#category-distribution-modal').data('strict');
+        var average = $('#category-distribution-modal').data('average');
+        var avg     = $('#category-distribution-modal').data('avg');
+        var dataset = [
+            {id: 'strict', data: strict, bars: {show: true, align: 'center', label: {show: true}, barWidth: 0.6}, color: "rgb(162, 17, 29)" },
+            {id: 'points', data: points, bars: {show: true, align: 'center', label: {show: true}, barWidth: 0.6}, color: "rgb(20, 150, 20)" },
+            {id: 'average', label: 'Avg: ' + avg, data: average, lines: {show: true}, color: "rgb(29, 17, 162)" }
+        ];
+        var options = {
+            xaxis: {
+                mode: "categories",
+                tickLength: 0
+            },
+            grid: {
+                hoverable: true
+            }
+        };
+        $.plot('#chart_distribution', dataset, options);
+    });
+
+    $('#category-distribution-modal').on('hidden.bs.modal', function (e) {
+        $('#chart_distribution').html('');
+    });
+
+    $("#chart_distribution").bind("plothover", function (event, pos, item) {
+        if (item && (item.series.id == 'points' || item.series.id == 'strict')) {
+            var analytics = item.datapoint[1];
+
+            $("#chart_tooltip").html(analytics + ' Analytics')
+                .css({top: item.pageY-10, left: item.pageX+10})
+                .fadeIn(200);
+        } else {
+            $("#chart_tooltip").hide();
+        }
+    });
+});

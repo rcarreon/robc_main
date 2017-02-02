@@ -1,0 +1,14 @@
+<?
+class MiscComponent{
+	function stristr_array($haystack, $needle) {
+		if (!is_array($haystack)) {
+			return false;
+		}
+	
+		foreach ($haystack as $element) {
+			if (strstr($needle, $element)) {
+				return $element;
+			}
+		}
+	}
+}

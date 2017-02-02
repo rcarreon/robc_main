@@ -1,0 +1,39 @@
+<?php
+App::import('Component', 'CIAbstract');
+
+abstract class CIHubsComponent extends CIAbstractComponent {
+
+    protected $aHubs;
+
+    public function setAllActiveHubs() {
+        $oHubs       = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+        $this->aHubs = $oHubs->getAllActiveHubsName();
+    }
+
+    protected function process()
+    {
+        $this->setAllActiveHubs();
+
+        $this->add($this->options->get('add', array()));
+
+        return array(
+            'list'    => $this->aHubs,
+            'options' => array(
+                'name'    => $this->options->get('name'),
+                'id'      => $this->options->get('id'),
+                'hub_ids' => $this->options->get('hub_ids', array(\CI\Hub::DOMAIN_ID_CROWD_IGNITE)),
+                'title'   => $this->options->get('title', 'Hubs'),
+                'icon'    => $this->options->get('icon', 'fa fa-line-chart'),
+            )
+        );
+    }
+
+    protected function add(array $aHub)
+    {
+        if (empty($aHub)) {
+            return;
+        }
+
+        $this->aHubs = $aHub + $this->aHubs;
+    }
+}

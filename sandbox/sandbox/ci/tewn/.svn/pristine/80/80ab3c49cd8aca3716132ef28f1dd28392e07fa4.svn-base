@@ -1,0 +1,673 @@
+<?php
+class WidgetAnalytic extends AppModel {
+    private $_enableVowpalWabbit = true;
+
+    var $name = 'WidgetAnalytic';
+    var $validate = array(
+        'page_id' => array('numeric'),
+        'shown_website_id' => array('numeric')
+    );
+
+    /**
+     * Get the widget analytics for the pages running in widget.
+     *
+     * @param  number $website_id
+     * @param  number $widget_id
+     *
+     * @return array
+     */
+    public function get_pages_by_website($website_id, $widget_id)
+    {
+        $website_id = (int) $website_id;
+        $widget_id  = (int) $widget_id;
+
+        if ($website_id > 0 && $widget_id > 0) {
+            $query = "SELECT widget_analytics.id, pages.id, pages.status, pages.category, ci_ci_fn_select_page_name_subcategories(pages.id) as subcategory, pages.title, websites.name,  websites.id, widget_analytics.`type`,
+                                   CASE
+                                      WHEN widget_analytics.`type` = 0 THEN \"\"
+                                      WHEN (widget_analytics.`type` = 1 OR widget_analytics.`type` = 2) THEN
+                                        (SELECT CONCAT('{\"id\":\"', id,'\", \"title\":\"', REPLACE(IFNULL(title, ''), '\"', '\\\\\"'),'\",\"website_id\":\"', website_id,'\"}')
+                                         FROM pages WHERE id = widget_analytics.`key`)
+                                      WHEN (widget_analytics.`type` = 4 OR widget_analytics.`type` = 5) THEN
+                                        (SELECT CONCAT('{\"id\":\"', id,'\", \"name\":\"', REPLACE(IFNULL(name, ''), '\"', '\\\\\"'),'\"}')
+                                         FROM tags WHERE id = widget_analytics.`key`)
+                                      ELSE \"\"
+                                    END AS key_content,
+                                    num_ctr, num_display, ctp, widget_analytics.weight_modifier, widget_analytics.created, pages.url, pages.image, pages.image_server
+                            FROM widget_analytics
+                            JOIN pages ON widget_analytics.page_id = pages.id
+                            JOIN websites ON websites.id = pages.website_id
+                            LEFT JOIN widgets_ctp ON widget_analytics.id = widgets_ctp.widget_analytic_id
+                                AND widgets_ctp.website_id = {$website_id}
+                                AND widgets_ctp.partition_name = IFNULL(
+                                    (SELECT MAX(partition_name) FROM widgets_ctp WHERE website_id = {$website_id}), 0
+                                )
+                            WHERE widget_analytics.shown_website_id = {$website_id}
+                                    AND widget_analytics.visible = 1;";
+
+            $analytics = $this->query_read($query, false);
+        }
+
+        if (!empty($analytics)) {
+            App::import('Component', 'Dictionary');
+            $Dictionary = new DictionaryComponent();
+
+            foreach ($analytics as $index => $data) {
+                $analytics[$index]['widget_analytics']['ctr'] = 0;
+                if (!empty($data['widget_analytics']['num_display'])) {
+                    $analytics[$index]['widget_analytics']['ctr'] = round($data['widget_analytics']['num_ctr'] / $data['widget_analytics']['num_display'], 5) * 100;
+                }
+
+                if (isset($data['widgets_ctp']['ctp'])) {
+                    $ctp = json_decode($data['widgets_ctp']['ctp'], true);
+                    unset($analytics[$index]['widgets_ctp']);
+                    $analytics[$index]['widget_analytics']['ctp'] = isset($ctp[$widget_id]) ? $ctp[$widget_id] : 0;
+                } else {
+                    $analytics[$index]['widget_analytics']['ctp'] = 0;
+                }
+
+                $analytics[$index]['pages']['category'] = $Dictionary->get_name($Dictionary::TYPE_CATEGORY, $analytics[$index]['pages']['category']);
+
+                $analytics[$index]['widget_analytics']['key'] = '';
+                switch ($data['widget_analytics']['type']) {
+                    case LINK_TYPE_CONTEXTUAL:
+                    case LINK_TYPE_SIMILAR:
+                        $analytics[$index]['widget_analytics']['key']['Page'] = json_decode($data[0]['key_content'], true);
+                        break;
+                    case LINK_TYPE_TAG:
+                    case LINK_TYPE_SUBCATEGORY:
+                        $analytics[$index]['widget_analytics']['key']['Tag'] = json_decode($data[0]['key_content'], true);
+                        break;
+                }
+                $analytics[$index]['pages']['subcategory'] = isset($data[0]['subcategory']) ? $data[0]['subcategory'] : '';
+
+                unset($analytics[$index][0]);
+            }
+        } else {
+            $analytics = array();
+        }
+
+        return $analytics;
+    }
+
+    public function get_by_id($widget_analytic_id)
+    {
+        $key_gen = new CI\Memcached\KeyGen($widget_analytic_id, 'widget_analytic_get_by_id');
+        $cache_key = $key_gen->generate();
+        $widget_analytic = $this->memcached_get_json($cache_key);
+
+        if (empty($widget_analytic) && !is_array($widget_analytic)) {
+            $widget_analytic = $this->findById($widget_analytic_id);
+            if (!empty($widget_analytic)) {
+                $this->memcached_set_json($cache_key, $widget_analytic, 10 * 60 /*10 Minutes*/);
+            }
+        }
+
+        return $widget_analytic;
+    }
+    public function is_vowpal_wabbit_enabled() {
+        return $this->_enableVowpalWabbit;
+    }
+
+    /*
+     * Get the top pages by click through
+     */
+    function website_pages_top($website_id, $domain_bitfield, $join_with_pages = false) {
+        $joins = false;
+
+        if ($join_with_pages) {
+            $joins = array(
+                array(
+                    'table' => 'pages',
+                    'alias' => 'Page',
+                    'type' => 'inner',
+                    'conditions' => array(
+                        'Page.id = WidgetAnalytic.page_id',
+                    )
+                )
+            );
+        }
+
+        $ranks = $this->find('all', array(
+            'conditions' => array(
+                'WidgetAnalytic.shown_website_id' => $website_id,
+                'WidgetAnalytic.visible' => TRUE
+            ),
+            'joins' => $joins,
+            'fields' => array(
+                'Page.status',
+                'Page.category',
+                'Page.subcategory',
+                'Page.demographic_sex',
+                'Page.content_rating',
+                'Page.website_id',
+                'Page.id',
+                'Page.title',
+                'WidgetAnalytic.id',
+                'WidgetAnalytic.num_display',
+                'WidgetAnalytic.num_ctr',
+                'WidgetAnalytic.type',
+                'WidgetAnalytic.key',
+                'WidgetAnalytic.page_id',
+            ),
+        ));
+
+        return $ranks;
+    }
+
+    public function website_pages_top_trait($website)
+    {
+        if (empty($website)) {
+            plat_assert(false, $website, false);
+            return false;
+        }
+
+        $category_condition = '';
+        if ($website['Website']['allowed_categories_bitfield'] != 1 ) {
+            $category_condition = "({$website['Website']['allowed_categories_bitfield']} & 1 << Page.category) > 0 OR";
+        }
+        $valid_status = PAGE_STATUS_APPROVED;
+        $subcategory_type = TAG_TYPE_SUBCATEGORY;
+
+        $query = "SELECT Page.id, Page.title, Page.status, Page.category, ci_ci_fn_select_page_subcategories(WidgetAnalytic.page_id) AS subcategories, Page.demographic_sex,
+                   Page.content_rating, Page.website_id, WidgetAnalytic.id, WidgetAnalytic.num_display, WidgetAnalytic.num_ctr,
+                   WidgetAnalytic.`type`, WidgetAnalytic.`key`, WidgetAnalytic.page_id, Website.id, Website.domain_primary, Website.domain_bitfield,
+                   Website.user_id, Website.account_id, Website.status, Website.content_rating, Website.category, Website.demographic_sex,
+                   Website.subcategory, Website.strict_category, Website.allowed_categories_bitfield, Website.blacklist,
+                   Website.tier
+            FROM widget_analytics AS WidgetAnalytic
+            JOIN pages AS Page ON Page.id = WidgetAnalytic.page_id
+            JOIN websites AS Website ON Website.id = Page.website_id
+            WHERE WidgetAnalytic.shown_website_id = {$website['Website']['id']} AND WidgetAnalytic.visible = 1 AND Page.status = {$valid_status} AND
+                ({$category_condition}
+                 (IF(Page.category IN (SELECT tags.parent
+                                       FROM website_allowed_tags
+                                       JOIN tags ON tags.id = website_allowed_tags.tag_id AND tags.visible = 1
+                                       WHERE website_id = {$website['Website']['id']} AND website_allowed_tags.`type` = {$subcategory_type} AND website_allowed_tags.visible = 1), 1, 0)
+                 AND
+                 (IF(EXISTS (SELECT true
+                             FROM website_allowed_tags
+                             JOIN tags ON tags.id = website_allowed_tags.tag_id AND tags.visible = 1
+                             JOIN page_subcategories ON page_subcategories.tag_id = tags.id AND page_subcategories.visible = 1
+                             WHERE page_subcategories.page_id = Page.id AND website_id = {$website['Website']['id']} AND website_allowed_tags.`type` = {$subcategory_type} AND website_allowed_tags.visible = 1), 1, 0))
+                 OR
+                 ((IF(NOT EXISTS(SELECT true FROM page_subcategories WHERE page_id = Page.id AND visible = 1) AND
+                   Page.category NOT IN(SELECT parent FROM website_allowed_tags JOIN tags ON tags.id = tag_id
+                                        WHERE website_id = {$website['Website']['id']} AND website_allowed_tags.`type` = {$subcategory_type} AND website_allowed_tags.visible = 1 AND tags.visible = 1),1 ,0)))))";
+
+        $analytics = $this->query($query, false);
+
+        if (is_array($analytics)) {
+            array_walk($analytics, function (&$analytic) {
+                $analytic['Page']['subcategories'] = explode(',', $analytic[0]['subcategories']);
+            });
+        }
+
+        return $analytics;
+    }
+
+    public function save_pages($pages) {
+        return $this->saveAll($pages);
+    }
+
+    public function save_weight($page) {
+        if ($page['WidgetAnalytic']['id'] < 1) {
+            return;
+        }
+
+        $update_fields = 'weight_modifier = ' . $page['WidgetAnalytic']['weight_modifier'];
+
+        if (false === empty($update_fields)) {
+            $query = 'UPDATE widget_analytics SET ' . $update_fields . ' WHERE id = ' . $page['WidgetAnalytic']['id'];
+            $this->query($query);
+        }
+    }
+
+    function does_exist($shown_website_id, $page_id, $type = null, $key = null, $only_visibles = true) {
+        plat_assert($shown_website_id, array('field' => 'shown_website_id', 'value' => $shown_website_id));
+        plat_assert($page_id, array('field' => 'page_id', 'value' => $page_id));
+
+        $conditions = array(
+            "shown_website_id" => $shown_website_id,
+            "page_id" => $page_id
+        );
+
+        if ($only_visibles) {
+            $conditions['visible'] = true;
+        }
+
+        if (!is_null($type)) {
+            $conditions['type'] = $type;
+        }
+
+        if (!is_null($key)) {
+            $conditions['key'] = $key;
+        }
+
+        return $this->find("first", array(
+            'conditions' => $conditions,
+            'fields' => array('id')
+        ));
+    }
+
+    function _create_wa($shown_website, $domain_bitfield, $page_id, $type = LINK_TYPE_BASIC, $key = 0) {
+        $rc = array();
+        $shown_website_id = $shown_website['Website']['id'];
+
+        $wa = $this->does_exist($shown_website_id, $page_id, $type, $key, false/*Not only visibles*/);
+
+        if ($wa) {
+            $rc['WidgetAnalytic']['id'] = $wa['WidgetAnalytic']['id'];
+        } else {
+            // Make sure have a chance to run
+            $rc['WidgetAnalytic']['num_ctr'] = 1;
+            $rc['WidgetAnalytic']['num_display'] = 1;
+            $rc['WidgetAnalytic']['num_ctr_traffic'] = 1;
+        }
+
+        $rc['WidgetAnalytic']['domain_bitfield'] = $domain_bitfield;
+        $rc['WidgetAnalytic']['page_id'] = $page_id;
+        $rc['WidgetAnalytic']['shown_website_id'] = $shown_website_id;
+        $rc['WidgetAnalytic']['type'] = $type;
+        $rc['WidgetAnalytic']['key'] = $key;
+        $rc['WidgetAnalytic']['visible'] = true;
+        $rc['WidgetAnalytic']['weight_modifier'] = 1;
+
+        return $rc;
+    }
+
+    function increment_ctr($id, $count = 1) {
+        $query = "UPDATE widget_analytics SET num_ctr = num_ctr + ".$count." WHERE id = ".$id;
+
+        return $this->query($query);
+    }
+
+    function increment_impressions($id, $count) {
+        $query = "UPDATE widget_analytics SET num_display = num_display + ".$count." WHERE id = ".$id;
+
+        return $this->query($query);
+    }
+
+    function remove_page_from_widget($id) {
+        $query = "UPDATE widget_analytics SET visible = 0 WHERE id = ".$id;
+        return $this->query($query);
+    }
+
+    function remove_bulk_page_from_widget($website) {
+        if (empty($website)) {
+            plat_assert(false, $website, false);
+            return false;
+        }
+
+        $category_condition = '';
+        if ($website['Website']['allowed_categories_bitfield'] != 1 ) {
+            $category_condition = "OR ({$website['Website']['allowed_categories_bitfield']} & 1 << Page.category) = 0";
+        }
+        $valid_status = PAGE_STATUS_APPROVED;
+        $category_bitfield = $website['Website']['allowed_categories_bitfield'];
+        $website_id = $website['Website']['id'];
+
+        $query = "UPDATE widget_analytics
+        JOIN pages AS Page ON Page.id = widget_analytics.page_id
+        JOIN websites ON websites.id = Page.website_id
+        SET widget_analytics.visible = 0
+        WHERE shown_website_id = {$website_id} AND widget_analytics.visible = 1
+            AND(Page.status <> {$valid_status} {$category_condition} OR
+                ((IF(({$category_bitfield} & 1 << Page.category) > 0 AND
+                      Page.category NOT IN (SELECT tags.parent
+                                             FROM website_allowed_tags
+                                             JOIN tags ON tags.id = website_allowed_tags.tag_id AND tags.visible = 1
+                                             WHERE website_id = {$website_id} AND website_allowed_tags.`type` = 1 AND website_allowed_tags.visible = 1), 0, 1)) AND
+                (IF(({$category_bitfield} & 1 << Page.category) > 0 AND
+                     EXISTS (SELECT true
+                             FROM website_allowed_tags
+                             JOIN tags ON tags.id = website_allowed_tags.tag_id AND tags.visible = 1
+                             JOIN page_subcategories ON page_subcategories.tag_id = tags.id AND page_subcategories.visible = 1
+                             WHERE page_subcategories.page_id = Page.id AND website_id = {$website_id} AND website_allowed_tags.`type` = 1 AND website_allowed_tags.visible = 1), 0, 1)) AND
+                (IF(NOT EXISTS(SELECT true FROM page_subcategories WHERE page_id = Page.id AND visible = 1) OR
+                    EXISTS(SELECT true
+                           FROM tags
+                           JOIN page_subcategories ON page_subcategories.tag_id = tags.id AND page_subcategories.visible = 1
+                           WHERE tags.visible = 1 AND
+                                 tags.id NOT IN(SELECT tags.id
+                                                FROM website_allowed_tags
+                                                JOIN tags ON tags.id = tag_id
+                                                WHERE website_id = {$website_id} AND website_allowed_tags.`type` = 1 AND
+                                                      website_allowed_tags.visible = 1)), 1, 0))))";
+        return $this->query($query, false);
+    }
+
+    function zero_weight($website_id) {
+        $website_id = intval($website_id);
+
+        $query = "UPDATE widget_analytics SET weight_modifier = 0 WHERE shown_website_id = '".$website_id."' AND visible = 1";
+
+        return $this->query($query);
+    }
+
+    function ctr_count_increment($website_id, $page_id, $link_type = LINK_TYPE_BASIC) {
+        $website_id = intval($website_id);
+        $page_id = intval($page_id);
+
+        $query = "UPDATE widget_analytics SET num_ctr = num_ctr + 1 WHERE shown_website_id = '".$website_id."' AND page_id = '".$page_id."'";
+
+        return $this->query($query);
+    }
+
+    function ctr_traffic_count_increment($widget_analytic_id) {
+        if (empty($widget_analytic_id)) return;
+
+        $query = "UPDATE widget_analytics SET num_ctr_traffic = num_ctr_traffic + 1 WHERE id = '".$widget_analytic_id."'";
+
+        return $this->query($query);
+    }
+
+    function remove_from_widget($website_id, $page_id) {
+        $website_id = intval($website_id);
+        $page_id = intval($page_id);
+
+        $query = "UPDATE widget_analytics SET visible = 0 WHERE page_id = ".$page_id." AND shown_website_id = ".$website_id;
+
+        return $this->query($query);
+    }
+
+    function remove_with_website_and_domain($website_id, array $domains_to_update) {
+        $website_id = intval($website_id);
+        if (empty($domains_to_update)) {
+            return;
+        }
+
+        $page_status = PAGE_STATUS_PENDING;
+        $domains = implode(',', $domains_to_update);
+        $query = "CALL ci_ci_sp_update_invisible_widget_analytics({$website_id}, {$page_status},'{$domains}')";
+        return $this->query($query);
+    }
+
+    function find_all_for_website($website_id) {
+        $website_id = intval($website_id);
+
+        $query = "SELECT * FROM pages as Page LEFT JOIN widget_analytics as WidgetAnalytic ON WidgetAnalytic.page_id = Page.id WHERE Page.website_id = ".$website_id." AND Page.status = ".PAGE_STATUS_APPROVED." AND Page.visible = 1 And WidgetAnalytic.visible = 1";
+
+        return $this->query_read($query);
+    }
+
+    function is_active($page_id, $shown_website_id) {
+        $conditions = array(
+            "visible" => 1,
+            "page_id" => $page_id,
+            "shown_website_id" => $shown_website_id
+                            );
+
+        $point = $this->find("first", array("conditions" => $conditions, "order" => "created ASC"));
+
+        if ($point) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
+
+    public function update_key($page_id, $type, $key) {
+        if (!isset($key) || $key == NULL) {
+            $key = 0;
+        }
+
+        $query = "UPDATE widget_analytics SET widget_analytics.key = ".$key." WHERE page_id = ".$page_id." AND type = ".$type;
+
+        return $this->query($query);
+    }
+
+    function remove_subcategory($website_id, $tag_id) {
+        $this->remove_tag($website_id, $tag_id, TAG_TYPE_SUBCATEGORY);
+    }
+
+    function remove_tag($website_id, $tag_id, $type) {
+        $query = "UPDATE widget_analytics SET visible = 0 WHERE shown_website_id = ".$website_id." AND `key` = ".$tag_id." AND type = ".$type;
+
+        $this->query($query);
+    }
+
+    public function remove_tags($website_id, $tag_ids, $type) {
+        $this->updateAll(
+            array('visible' => NON_VISIBLE),
+            array(
+                'shown_website_id' => $website_id,
+                '`key`' => $tag_ids,
+                'type' => $type,
+            )
+        );
+    }
+
+    function created($page_id, $shown_website_id) {
+        $conditions = array(
+            "visible" => 1,
+            "page_id" => $page_id
+                            );
+
+        if ($shown_website_id) {
+            $conditions['shown_website_id'] = $shown_website_id;
+        }
+
+        $point = $this->find("first", array("conditions" => $conditions, "order" => "created ASC"));
+
+        return $point['WidgetAnalytic']['created'];
+    }
+
+    function duplicates($website_id) {
+        $conditions = array("shown_website_id" => $website_id,
+                    "visible" => true);
+
+        $analytics = $this->find("all", array("conditions" => $conditions,
+            "group" => "page_id having (count(page_id) > 1)",
+            "fields" => array("page_id", "count(page_id) as count"),
+            "order" => "count desc"));
+
+        return $analytics;
+    }
+
+    function get_similar_page_count() {
+        $conditions = array('type' => LINK_TYPE_SIMILAR,
+                            'visible' => 1
+            );
+
+        $params = array("conditions" => $conditions,
+                        'fields' => 'DISTINCT page_id'
+            );
+
+        $rc = $this->find("all", $params);
+
+        return count($rc);
+    }
+
+    function get_by_website($website_id, $domain_bit, $link_type = -1) {
+        $conditions = array(
+            "shown_website_id" => $website_id,
+            "visible" => 1
+        );
+
+        if ($link_type != -1) {
+            $conditions['type'] = $link_type;
+        }
+
+        $params = array(
+            'conditions' => $conditions,
+            'fields' => array(
+                'id',
+                'domain_bitfield',
+                'page_id',
+                'shown_website_id',
+                'num_ctr',
+                'num_display',
+                'num_ctr_traffic',
+                'weight_modifier',
+                'created',
+                'visible',
+                'type',
+                'key'
+            ),
+            'order' => 'weight_modifier DESC'
+        );
+
+        return $this->find("all", $params);
+    }
+
+    function page_by_website($website_id, $page_id) {
+        return $this->find("all", array("conditions" =>
+                         array("shown_website_id" => $website_id,
+                               "visible" => true,
+                               "page_id" => $page_id)));
+    }
+
+    function point($page_id, $shown_website_id = 0, $type = LINK_TYPE_ALL, $key = KEY_ALL) {
+        $points = $this->points($page_id, $shown_website_id, $type, $key);
+
+        $stats = $this->points_aggregate($points);
+
+        return $stats;
+    }
+
+    function points($page_id, $shown_website_id = 0, $type = LINK_TYPE_ALL, $key = KEY_ALL) {
+        $conditions = array(
+            "visible" => 1,
+            "page_id" => $page_id
+        );
+
+        if ($shown_website_id) {
+            $conditions['shown_website_id'] = $shown_website_id;
+        }
+
+        if ($type != LINK_TYPE_ALL) {
+            $conditions['type'] = $type;
+        }
+
+        if ($key != KEY_ALL) {
+            $conditions['key'] = $key;
+        }
+
+        $points = $this->find("all", array("conditions" => $conditions, "order" => "created DESC"));
+
+        return $points;
+    }
+
+    private function points_aggregate($points) {
+        $stats = array();
+        $stats['num_ctr'] = 0;
+        $stats['num_display'] = 0;
+        $stats['num_ctr_traffic'] = 0;
+
+        if ($points) {
+            foreach ($points as $point) {
+                $num_ctr = $point['WidgetAnalytic']['num_ctr'];
+                $num_display = $point['WidgetAnalytic']['num_display'];
+                $num_ctr_traffic = $point['WidgetAnalytic']['num_ctr_traffic'];
+
+                $stats['num_ctr'] += $num_ctr;
+                $stats['num_display'] += $num_display;
+                $stats['num_ctr_traffic'] += $num_ctr_traffic;
+            }
+        }
+
+        return $stats;
+    }
+
+    public function ctr($page_id, $website_id) {
+        $conditions = array(
+            "page_id" => $page_id,
+            "shown_website_id" => $website_id,
+            "visible" => 1
+            );
+
+        $analytic = $this->find("first", array("conditions" => $conditions,
+            "order" => "created DESC"
+            ));
+
+        if ($analytic['WidgetAnalytic']['num_display'] > 1) {
+            $ctr = $analytic['WidgetAnalytic']['num_ctr'] / $analytic['WidgetAnalytic']['num_display'];
+        } else {
+            $ctr = 0;
+        }
+
+        return $ctr;
+    }
+
+    function page_stats($page_id) {
+        $query = "SELECT SUM(num_ctr) AS ctr, SUM(num_display) AS impressions FROM widget_analytics as WidgetAnalytics WHERE page_id = ".$page_id." AND visible = 1";
+        return $this->query($query);
+    }
+
+    public function get_id_by_website_page($shown_website_id, $page_id) {
+        $key_gen = new CI\Memcached\KeyGen(
+            array(
+                $shown_website_id,
+                $page_id
+            ),
+            'widget_analytic_get_id_by_website_page'
+        );
+        $cache_key = $key_gen->generate();
+        $widget_analytic_id = $this->memcached_get_json($cache_key);
+
+        if (empty($widget_analytic_id) && !is_array($widget_analytic_id)) {
+            $conditions = array(
+                'page_id' => $page_id,
+                'shown_website_id' => $shown_website_id,
+                'type' => LINK_TYPE_BASIC
+            );
+            $widget_analytic_id = $this->field('id', $conditions);
+            if (!empty($widget_analytic_id)) {
+                $this->memcached_set_json($cache_key, $widget_analytic_id, 10 * 60 /*10 Minutes*/);
+            }
+        }
+
+        return $widget_analytic_id;
+    }
+
+    public function referrals($website_id) {
+        $query = "SELECT
+            WidgetAnalytics.shown_website_id + 0 AS website_id,
+            TRIM(Websites.name) AS referral,
+            GROUP_CONCAT(DISTINCT Pages.id SEPARATOR ',') AS page_id
+        FROM widget_analytics AS WidgetAnalytics
+        INNER JOIN pages AS Pages ON WidgetAnalytics.page_id = Pages.id
+        INNER JOIN websites AS Websites ON WidgetAnalytics.shown_website_id = Websites.id
+        WHERE Pages.website_id = %d
+          AND Pages.status = %d
+          AND Pages.visible = 1
+          AND Websites.status = %d
+        GROUP BY WidgetAnalytics.shown_website_id";
+
+        $query = sprintf($query, $website_id, PAGE_STATUS_APPROVED, WEBSITE_STATUS_ACTIVE);
+
+        return $this->query_read($query);
+    }
+
+    /* Memcached functions */
+    function get_seed($widget_id, $index) {
+        $key = $this->seed_key($widget_id, $index);
+
+        $seed = $this->memcached_get($key);
+
+        return $seed;
+    }
+
+    function set_basic_seed($widget_id, $index, $seed) {
+        $key = $this->seed_key($widget_id, $index);
+
+        $this->memcached_set($key, $seed, 60*5);
+    }
+
+    function clear_basic_seed($widget_id, $index) {
+        $key = $this->seed_key($widget_id, $index);
+
+        $this->memcached_delete($key);
+    }
+
+    /* Memcached Keys */
+    function seed_key($widget_id, $index) {
+        return "widget_seed::".$widget_id.":".$index;
+    }
+
+    function contextual_seed_key($widget_id, $index) {
+        return "contextual_seed::".$widget_id.":".$index;
+    }
+}
+?>

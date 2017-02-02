@@ -1,0 +1,61 @@
+<?
+if (isset($link_pretty)) {
+	$link_shown = $link_pretty;
+	$onmouse_down = "onmousedown=\"this.href='".$link."'\"";
+} else {
+	$link_shown = $link;
+	$onmouse_down = "";
+}
+
+if (!isset($item_size)) {
+    $item_size = "";
+}
+
+if (!isset($page_id)) {
+    $page_id = "";
+} else {
+    $page_id = 'data-page="'.$page_id.'"';
+}
+
+if (!isset($page_ranklevel)) {
+    $page_ranklevel = "";
+} else {
+    $page_ranklevel = 'data-ranklevel="'.$page_ranklevel.'"';
+}
+
+?>
+
+		<div class="<?=$grid?> <?php if ($is_third_party) { echo 'third_party'; } ?> <?=$alt?> item <?=$item_size?>" <?=$page_id?> <?=$page_ranklevel?>>
+                        <a class="linklayer" href="<?=$link_shown?>" rel="nofollow" target="_blank" <?=$onmouse_down?> onClick="<?=$page_tracker?>" data-publisher="<?php echo $link_pretty; ?>"></a>
+			<div class="image">
+                <?php if (isset($debug_page) && $debug_page) : ?>
+                <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 10; background-color: rgba(255,0,0,0.5); text-align: center; vertical-align: middle; line-height: 255px; font-size: 100px; font-weight: bold; color: #ffffff;"><?=$slot?></div>
+                <?php endif; ?>
+				<a href="<?=$link_shown?>" rel="nofollow" target="_blank" <?=$onmouse_down?> onClick="<?=$page_tracker?>" data-publisher="<?php echo $link_pretty; ?>">
+					<img src="<?=$image_html?>">
+				</a>
+			</div>
+			<div class="text"><p>
+				<a href="<?=$link_shown?>" rel="nofollow" target="_blank" <?=$onmouse_down?> onClick="<?=$page_tracker?>" data-publisher="<?php echo $link_pretty; ?>">
+                    <?php echo $wordsNumber->filter($title, $words_limit); ?>
+                </a>
+				<?
+				if ( (isset($style) && $style == "pinterest") || (isset($preview_style) && $preview_style == "20") ) {
+					if( isset($description) && $description != "" ) {
+				?>
+					<p class="description">
+						<a href="<?=$link_shown?>" rel="nofollow" target="_blank" <?=$onmouse_down?> onClick="<?=$page_tracker?>" data-publisher="<?php echo $link_pretty; ?>">
+					    	<?php echo $textHelper->truncate( $description,240,'...', false, false); ?>
+						</a>
+					</p>
+				<?
+					}
+				}
+				?>
+			</div>
+            <?php if ($is_third_party) { ?>
+                <div class="third_party_sponsored">
+                    <span>SPONSORED</span>
+                </div>
+            <?php } ?>
+		</div>

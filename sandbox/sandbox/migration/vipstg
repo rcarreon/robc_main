@@ -1,0 +1,9 @@
+vip-sqlrw-dh.si.stg.peak.gnmedia.net.            IN      A       10.64.75.15
+vip-sqlrw-ews.si.stg.peak.gnmedia.net.           IN      A       10.64.75.18
+vip-sqlro-ews.si.stg.peak.gnmedia.net.           IN      A       10.64.75.12
+vip-app-flow.si.stg.peak.gnmedia.net.            IN      A       10.64.75.10
+vip-app-55-dh.si.stg.peak.gnmedia.net.           IN      A       10.64.75.1
+vip-app-ews.si.stg.peak.gnmedia.net.             IN      A       97.64.84.107
+vip-app-dh.si.stg.peak.gnmedia.net.              IN      A       97.64.84.105
+vip-app-assets.si.stg.peak.gnmedia.net.          IN      A       97.64.84.102
+

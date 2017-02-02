@@ -1,0 +1,81 @@
+<?php
+namespace Test\IO;
+use CI\IO\File;
+use CI\IO\File\System;
+
+/**
+ * @group io
+ * @group io_file
+ */
+class FileTest extends \PHPUnit_Framework_TestCase
+{
+    protected $oFile;
+    protected $sPath;
+
+    public function setUp()
+    {
+        $this->sPath = LIBRARY_DIR . '../tests/resources/image.png';
+        $oFileSystem = new System();
+        $this->oFile = $oFileSystem->read($this->sPath);
+    }
+
+    public function testShoudGetTheSetPath()
+    {
+        $this->assertEquals($this->sPath, $this->oFile->getPath());
+    }
+
+    public function testShouldReturnImageMimeType()
+    {
+        $sExpectedMime = 'image/png';
+
+        $this->assertEquals($sExpectedMime, $this->oFile->getMimeType());
+    }
+
+    public function testGetNameShouldReturnTheName()
+    {
+        $sExpected = 'image';
+
+        $this->assertEquals($sExpected, $this->oFile->getName());
+    }
+
+    public function testGetBaseNameShouldReturnTheBaseName()
+    {
+        $sExpected = 'image.png';
+
+        $this->assertEquals($sExpected, $this->oFile->getBaseName());
+    }
+
+    public function testGetExtensionShouldReturnTheExtension()
+    {
+        $sExpected = 'png';
+
+        $this->assertEquals($sExpected, $this->oFile->getExtension());
+    }
+
+    public function testGetDirNameShouldReturnTheDirName()
+    {
+        $sExpected = '../library/../tests/resources';
+
+        $this->assertEquals($sExpected, $this->oFile->getDirName());
+    }
+
+    public function testSetPathShouldRemoveQuery()
+    {
+        $sExpected = 'http://www.test.com/image.png';
+        $sPath     = 'http://www.test.com/image.png?param=200';
+        $oFile     = new FileMock();
+
+        $oFile->setPath($sPath);
+        $this->assertEquals($sExpected, $oFile->getPath(), 'Fail to assert the path without query params');
+    }
+}
+
+class FileMock extends File
+{
+    public function __construct() {}
+
+    public function getPath()
+    {
+        return $this->sPath;
+    }
+}

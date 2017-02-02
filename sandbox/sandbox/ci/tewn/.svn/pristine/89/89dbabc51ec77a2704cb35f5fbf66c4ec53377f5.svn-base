@@ -1,0 +1,153 @@
+<?php
+/**
+ * Logger Storage File
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger
+ * @package  Logger_Storage
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+require_once LIBRARY_DIR . 'logger/storage/abstract.php';
+require_once LIBRARY_DIR . 'logger/storage/exception/file.php';
+/**
+ * Logger Storage File
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger
+ * @package  Logger_Storage
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+class Logger_Storage_File extends Logger_Storage_Abstract
+{
+    /**
+     * Path of the file
+     * @var string
+     */
+    private $_path = null;
+
+    /**
+     * File name
+     * @var string
+     */
+    private $_file = null;
+
+    /**
+     * File handler
+     * @var resource
+     */
+    private $_fileHandler = null;
+
+    /**
+     * Default configuration options
+     * @var array
+     */
+    protected $defaultConfig = array(
+        'filepath'    => '/tmp/tmp.log',
+        'create'      => false,
+        'permissions' => 755,
+        'mode'        => 'a'
+    );
+
+    /**
+     * Creates a logger file handler
+     *
+     * @return void
+     */
+    protected function init()
+    {
+        $this->_path = dirname($this->config['filepath']);
+        $this->_file = basename($this->config['filepath']);
+
+        $create      = $this->config['create'];
+        $permissions = $this->config['permissions'];
+
+        if ($this->isPathValid($create, $permissions)) {
+            $this->createHandler();
+        }
+    }
+
+    /**
+     * Close an open file resource
+     */
+    public function __destruct()
+    {
+        if (is_resource($this->_fileHandler)) {
+            fclose($this->_fileHandler);
+        }
+    }
+
+    /**
+     * Validates the path if exists and is writable
+     *
+     * @param boolean $create Created the path if doesn't exists
+     * @param integer $perms  Chmod for the created directory
+     *
+     * @return boolean
+     */
+    protected function isPathValid($create = false, $perms = 755)
+    {
+        if (!is_dir($this->_path)) {
+            if ($create) {
+                try {
+                    mkdir($this->_path);
+                } catch (Exception $e) {
+                    throw new Logger_Storage_Exception_File(
+                        $this->_path,
+                        Logger_Storage_Exception_File::NO_WRITE,
+                        $e
+                    );
+                }
+            } else {
+                throw new Logger_Storage_Exception_File(
+                    $this->_path, Logger_Storage_Exception_File::NON_EXIST
+                );
+            }
+        }
+
+        if (!is_writable($this->_path)) {
+            throw new Logger_Storage_Exception_File(
+                $this->_path, Logger_Storage_Exception_File::NO_WRITE
+            );
+        }
+
+        return true;
+    }
+
+    /**
+     * Creates the file handler
+     *
+     * @return void
+     */
+    protected function createHandler()
+    {
+        try {
+            $mode = $this->config['mode'];
+            $file = "{$this->_path}/{$this->_file}";
+            $this->_fileHandler = fopen($file, $mode);
+        } catch(Exception $e) {
+            throw new Logger_Storage_Exception_File(
+                "{$this->_path}/{$this->_file}",
+                Logger_Storage_Exception_File::NO_OPEN,
+                $e
+            );
+        }
+    }
+
+    /**
+     * Saves a log message into the file
+     *
+     * @param string $message The message to write in the file
+     *
+     * @return boolean
+     */
+    public function save($message)
+    {
+        return (boolean) fwrite($this->_fileHandler, $message.PHP_EOL);
+    }
+}

@@ -1,0 +1,21 @@
+<?php
+
+namespace CI\Facade;
+
+class Factory
+{
+    private static $_aClasses = array(
+        'config'             => 'CI\Config',
+        'std_output'         => 'CI\IO\StdOutput',
+        'server'             => 'CI\Http\Server',
+        'database'           => 'CI\Database\Engine',
+        'warehouse_database' => 'CI\Database\Warehouse',
+        'memcached'          => 'CI\Memcached\App',
+        'alexa'              => 'CI\Http\Service\Alexa',
+    );
+
+    static public function build($sName)
+    {
+        return isset(self::$_aClasses[$sName]) ? new self::$_aClasses[$sName]() : null;
+    }
+}

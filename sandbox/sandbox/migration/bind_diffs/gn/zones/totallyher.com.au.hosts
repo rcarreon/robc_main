@@ -1,0 +1,20 @@
+$TTL    86400 
+totallyher.com.au.  IN      SOA     totallyher.com.au. root.totallyher.com.au. (
+                                 2015020601     ; serial
+                                 28800          ; refresh
+                                 14400          ; retry
+                                 3600000        ; expire
+                                 86400 )        ; minimum
+
+totallyher.com.au.               IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+totallyher.com.au.               IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+totallyher.com.au.               IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+totallyher.com.au.               IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+totallyher.com.au.               IN    MX 10    cluster9.us.messagelabs.com.
+totallyher.com.au.               IN    MX 20    cluster9a.us.messagelabs.com.
+totallyher.com.au.               IN    TXT      "G0O0R34839"
+
+
+
+

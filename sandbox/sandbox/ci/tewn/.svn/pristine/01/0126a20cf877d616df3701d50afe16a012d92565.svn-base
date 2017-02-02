@@ -1,0 +1,293 @@
+<?php echo $this->element('crowdignite/backend2_toolbar', array("tab" => $tab, "user" => $user)); ?>
+
+<link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="/css/analysis/lpcoverage.css">
+
+<div class="row supercontainer">
+    <div class="side-column">
+        <span class="title icon icon-link">Analysis By</span>
+        <ul class="list">
+            <li><a href="/analysis/websites">Websites</a></li>
+            <li><a href="/analysis/hubs">Hubs</a></li>
+            <li><a href="/analysis/widgets">Widgets</a></li>
+            <li><a href="/analysis/lpwebsites">Website distribution</a></li>
+            <li class="active"><a href="/analysis/lpcoverage">Hubs distribution</a></li>
+            <li><a href="/analysis/tpcategory">Traffic categories</a></li>
+        </ul> <!-- list -->
+    </div> <!-- side-column -->
+    <div class="content-column">
+        <div class="options-bar">
+            <button class="pull-right btn btn-sm btn-info do-modal-info" data-toggle="modal" data-target="#information-modal"><strong>?</strong></button>
+            <form class="form-inline" role="form">
+                <div class="form-group">
+                    <label class="sr-only" for="domain">Domain</label>
+                    <select name="domain" id="domain" class="form-control select-tt" title="Select domain">
+                    <?php foreach ($domains as $id => $name): ?>
+                        <option value="<?php echo $id ?>" <?php if ($id == $domain): ?>selected="true"<?php endif ?>><?php echo $name ?></option>
+                    <?php endforeach ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="category">Categories</label>
+                    <select name="category" id="category" class="form-control select-tt" title="Select category">
+                        <option value="-1">----</option>
+                    <?php foreach ($categories as $id => $name): ?>
+                        <option value="<?php echo $id ?>" <?php if ($id == $category): ?>selected="true"<?php endif ?>><?php echo $name ?></option>
+                    <?php endforeach ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="content_rating">Content Rating</label>
+                    <select name="content_rating" id="content_rating" class="form-control select-tt" title="Select content rating">
+                        <option value="-1">----</option>
+                    <?php foreach ($content_ratings as $id => $name): ?>
+                        <option value="<?php echo $id ?>" <?php if ($id == $content_rating): ?>selected="true"<?php endif ?>><?php echo $name ?></option>
+                    <?php endforeach ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="rr_range">Return Rate Range</label>
+                    <select name="rr_range" id="rr_range" class="form-control select-tt" title="Select return rate time range">
+                        <option value="<?php echo $rr_times['yesterday'] ?>" <?php if ( $rr_times['yesterday'] == $rr_range): ?>selected="true"<?php endif ?>>Yesterday</option>
+                        <option value="<?php echo $rr_times['lastdays'] ?>" <?php if ( $rr_times['lastdays'] == $rr_range): ?>selected="true"<?php endif ?>>Last <?php echo MAX_ROLLING_STATS_DAYS ?> days</option>
+                        <option value="<?php echo $rr_times['monthdate'] ?>" <?php if ( $rr_times['monthdate'] == $rr_range): ?>selected="true"<?php endif ?>>Month to date</option>
+                        <option value="0" <?php if ( 0 == $rr_range): ?>selected="true"<?php endif ?>>Lifetime</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="sr-only" for="threshold">Threshold</label>
+                    <select name="threshold" id="threshold" class="form-control">
+                    <?php foreach (range(1, 10, 1) as $range): ?>
+                        <option value="<?php echo $range ?>" <?php if ($range == $threshold): ?>selected="true"<?php endif ?>><?php echo 'Top '.$range ?></option>
+                    <?php endforeach ?>
+                    </select>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="penalized" name="penalized" <?php if ($exclude_penalized): ?>checked="true"<?php endif ?>> Exclude penalized sites
+                    </label>
+                </div>
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" id="crossdomain" name="crossdomain" <?php if ($exclude_crossdomain): ?>checked="true"<?php endif ?>> Exclude cross domains
+                    </label>
+                </div>
+                <button type="button" class="btn btn-sm">Start analysis</button>
+            </form>
+        </div> <!-- options-bar -->
+        <div class="container-fluid main-container">
+        <?php if (isset($stats)): ?>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-body" style="padding-left: 0">
+                            <div id="chart" style="height: 260px"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div id="chart_alt" style="height: 260px"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <table class="table ">
+                        <thead>
+                            <tr>
+                                <th class="text-center">#</th>
+                                <th class="text-center">ID</th>
+                                <th class="text-center">Website</th>
+                                <th class="text-center">Domain</th>
+                                <th class="text-center">Analytics</th>
+                                <th class="text-center">Return Rate</th>
+                                <th class="text-center">Actions</th>
+                                <th class="text-center">Status</th>
+                            </tr>
+                        </thead>
+                        <tfoot>
+                            <tr>
+                                <td colspan="8" class="text-right"><span class="text-muted"><?php echo count($rates); ?> results found.</span></td>
+                            </tr>
+                        </tfoot>
+                        <tbody>
+                            <?php $count = 1; ?>
+                            <?php foreach ($rates as $website_id => $return_rate): ?>
+                                <?php $analytics = $stats[$website_id]; ?>
+                                <?php $website = $websites[$website_id]; ?>
+                                <?php $website_intersect = empty($intersect) ? '' : "?intersect={$intersect}_{$website_id}" ?>
+                                <tr <?php if ($website['domain_primary'] != $domain): ?>class="warning"<?php elseif (isset($top_stats[$website['id']])): ?>class="info"<?php endif ?>>
+                                    <td class="text-center"><?php echo $count++; ?></td>
+                                    <td class="text-right"><a target="_blank" href="/websites/moderate/<?php echo $website['id'] ?>"><?php echo $website['id'] ?></a></td>
+                                    <td><?php echo $website['name'] ?></td>
+                                    <td class="text-center"><span><?php echo $website['domain_name'] ?></span></td>
+                                    <td class="text-center"><span class="badge"><?php echo $analytics ?></span></td>
+                                    <td class="text-center"><span class="badge"><?php echo $website['return_rate'] ?>%</span></td>
+                                    <td class="text-center">
+                                        <button class="btn btn-default btn-xs do-view-analytics" data-website="<?php echo $website['name']; ?>" data-website-id="<?php echo $website['id']; ?>" data-exclude="<?php echo $exclude_penalized; ?>" data-intersection="<?php echo "{$domain}_{$category}_{$content_rating}"; ?>">Analytic details</button>
+                                        <a target="_blank" href="/analysis/lpwebsites/<?php echo $website['id'].$website_intersect ?>" class="btn btn-default btn-xs">View distribution</a>
+                                        <?php if ($category == -1): ?>
+                                        <button class="btn btn-default btn-xs do-category-distribution" data-website="<?php echo $website['name']; ?>" data-website-id="<?php echo $website['id'] ?>" data-domain="<?php echo $domain ?>">Category distribution</button>
+                                        <?php endif ?>
+                                    </td>
+                                    <td class="text-center">
+                                        <?php if (isset($website['status'])): ?>
+                                            <i class="glyphicon glyphicon-<?php echo $website['status'] ?>"></i>
+                                        <?php endif ?>
+                                    </td>
+                                </tr>
+                            <?php endforeach ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        <?php endif ?>
+        </div> <!-- container -->
+    </div> <!-- content-column -->
+</div>  <!-- row supercontainer -->
+
+<div class="modal fade" id="view-analytics-modal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="view-analytics-modal-title">Analytics Details</h4>
+      </div>
+      <div class="modal-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="border: 0">&nbsp;</th>
+                    <th colspan="3" class="text-center bg-warning">Analytic</th>
+                    <th colspan="3" class="text-center bg-info">Page</th>
+                    <th class="text-center">&nbsp;</th>
+                </tr>
+                <tr>
+                    <th style="border: 0">&nbsp;</th>
+                    <th class="text-center bg-warning">ID</th>
+                    <th class="text-center bg-warning">Hub</th>
+                    <th class="text-center bg-warning">Category</th>
+                    <th class="text-center bg-info">ID</th>
+                    <th class="text-center bg-info">Category</th>
+                    <th class="text-center bg-info">Content Rating</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="view-analytics-results"></tbody>
+        </table>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<div class="modal fade" id="category-distribution-modal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="category-distribution-modal-title">Category Distribution</h4>
+      </div>
+      <div class="modal-body">
+        <div id="chart_distribution" style="height: 260px"></div>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- Modal -->
+<div class="modal fade" id="information-modal" tabindex="-1" role="dialog" aria-labelledby="information-modal-title" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <h4 class="modal-title" id="information-modal-title">Help! I need somebody, Help! <i class="glyphicon glyphicon-music"></i></h4>
+      </div>
+      <div class="modal-body">
+        <dl>
+            <dt>Websites table</dt>
+            <dd>
+                <span class="label label-info">Blue row</span> means websites in the selected top analytics<br/>
+                <span class="label label-warning">Yellow row</span> means websites with different domain than the intersection<br/>
+                <i class="glyphicon glyphicon-quad-ll"></i>,
+                <i class="glyphicon glyphicon-quad-lr"></i>,
+                <i class="glyphicon glyphicon-quad-ul"></i> &amp;
+                <i class="glyphicon glyphicon-quad-ur"></i> indicates the quadrant position in the chart
+            </dd>
+            <br>
+            <dt>Crosses Chart</dt>
+            <dd>
+                <em>SD (Standard Deviation)</em> indicates how disperse are the analytics <br/>
+                <em>AVG (Average)</em> is the average of all analytics in the selected interesection <br/>
+                <em>Max &amp; Min</em> indicates the bundaries of the recommended number of analytics <br/>
+                <em>IRR</em> means Ideal Return Rate.
+            </dd>
+            <br>
+            <dt>Analytic Details</dt>
+            <dd>
+                <i class="glyphicon glyphicon-fire text-danger"></i> indicates that the analytic has a strict category but the page category is different
+            </dd>
+            <br>
+            <dt>Category Distribution</dt>
+            <dd>
+                <span class="label label-danger">Red bars</span> are strict categories <br/>
+                <span class="label label-success">Green bars</span> are not strict categories <br/>
+                <em>AVG (Average)</em> is the average of all analytics in the selected website
+            </dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/x-handlebars-template" id="view-analytics-tpl">
+    {{#each analytics}}
+    <tr>
+        <td class="text-center" style="border: 0">
+        {{#if is_wrong}}<span class="text-danger tool" title="Wrong category detected, PLEASE REPORT!"><i class="glyphicon glyphicon-fire"></i></span>{{/if}}
+        </td>
+        <td class="text-center bg-warning">{{id}}</td>
+        <td class="text-center bg-warning">{{domain}}</td>
+        <td class="text-center bg-warning">{{category}}</td>
+        <td class="text-center bg-info"><a target="_blank" href="/pages/moderate/{{website_id}}/{{page_id}}"><span title="{{page_title}}" class="tool">{{page_id}}</span></a></td>
+        <td class="text-center bg-info">{{page_category}}</td>
+        <td class="text-center bg-info">{{page_content_rating}}</td>
+        <td class="text-center">{{#if is_basic}}<a target="_blank" href="/analysis/lpwebsites/{{website_id}}?intersect={{domain_id}}_{{category_id}}_{{page_content_rating_id}}_{{website_id}}&highlight={{page_id}}" class="btn btn-default btn-xs">Check slot</a>{{/if}}</td>
+    </tr>
+    {{/each}}
+</script>
+
+<!-- jQuery -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<!-- Bootstrap -->
+<script src="http://netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+<!-- Handlebars -->
+<script src="/js/handlebars-v1.3.0.js"></script>
+<!-- Flot -->
+<script src="http://www.flotcharts.org/flot/jquery.flot.js"></script>
+<!-- Flot pie -->
+<script src="http://www.flotcharts.org/flot/jquery.flot.pie.js"></script>
+<!-- Flot categories -->
+<script src="http://www.flotcharts.org/flot/jquery.flot.categories.js"></script>
+<!-- Flot fillbetween -->
+<script src="http://www.flotcharts.org/flot/jquery.flot.fillbetween.js"></script>
+<!-- Flot symbols -->
+<script src="http://www.flotcharts.org/flot/jquery.flot.symbol.js"></script>
+
+<!-- Page Script -->
+<script>
+    $ = $.noConflict(true);
+    <?php if (isset($stats)): ?>
+    var loadCharts = true;
+    var flot_charts = {
+        'websites': <?php echo json_encode($chart_pie) ?>,
+        'cross_data': <?php echo json_encode($chart_lines) ?>,
+        'average_data': <?php echo json_encode($chart_lines_avg) ?>,
+        'average': <?php echo number_format($average, 2) ?>,
+        'standard': <?php echo number_format($standard, 2) ?>,
+        'ideal_rr': <?php echo intval($ideal_rr) ?>,
+    };
+    <?php endif; ?>
+</script>

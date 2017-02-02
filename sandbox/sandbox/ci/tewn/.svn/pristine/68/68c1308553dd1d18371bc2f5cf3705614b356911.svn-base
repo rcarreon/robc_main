@@ -1,0 +1,11 @@
+<?php
+    $html->css('bootstrap/external/select', 'stylesheet', null, false);
+    // $javascript->link('bootstrap/external/select', false);
+
+    $options = $component_data['options'];
+?>
+<select name="<?php echo $options['name'] ?>" id="<?php echo $options['id'];?>" class="selectpicker show-tick" data-width="100%">
+    <?php foreach($component_data['list'] as $demographic): ?>
+        <option <?php if($demographic['id'] == $options['demographic_id']) { echo 'selected="selected"';} ?> value="<?php echo $demographic['id']; ?>"><?php echo $demographic['name'];?></option>
+    <?php endforeach; ?>
+</select>

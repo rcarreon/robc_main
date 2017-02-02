@@ -1,0 +1,288 @@
+<?php
+
+namespace CI;
+
+class Date
+{
+    const TIME_UNIT_HOUR  =  1;
+    const TIME_UNIT_DAY   =  2;
+    const TIME_UNIT_WEEK  =  3;
+    const TIME_UNIT_MONTH =  4;
+
+    protected $sFormat;
+
+    public $oFormat = null;
+
+    public function __construct()
+    {
+        $this->oFormat = new Date\Format();
+        $this->sFormat = Date\Format::TIME_FORMAT;
+    }
+
+    public function setFormat($sFormat)
+    {
+        $this->sFormat = $sFormat;
+    }
+
+     /**
+     * Return the most recent half hour
+     *
+     * @param $sDate
+     */
+    public function getMostRecentHalfHour($sDate)
+    {
+        $sReturn = $sDate;
+        $nMinute =  $this->getMinutes($sReturn);
+        $aSearch = array('i', 'I', 's', 'S');
+        $sNewFormat = '';
+
+        if ($nMinute >= 30 ) {
+            $aReplace = array ('30', '30', '00', '00');
+            $sNewFormat = str_replace($aSearch, $aReplace, $this->sFormat);
+        } else {
+            $aReplace = array ('00', '00', '00', '00');
+            $sNewFormat = str_replace($aSearch, $aReplace, $this->sFormat);
+        }
+
+        return $this->oFormat->format($sReturn, $sNewFormat);
+    }
+
+    /**
+     * Getting the minutes of one date
+     *
+     * @param string $sDate
+     *
+     * @return integer minutes
+     */
+    public function getMinutes($sDate)
+    {
+        $oDateTime = new \DateTime($sDate);
+        $nReturn = (int) $oDateTime->format('i');
+
+        return $nReturn;
+    }
+
+    /**
+     * Increment or Decrement one date by hours
+     *
+     * @param string $sDate date will be modify
+     * @param integer $nHours hours to be add or Decrement
+     *
+     * @return string with the new date
+     */
+    public function incrementOrDecrementHours($sDate, $nHours)
+    {
+        $sHours = '';
+
+        if ($nHours > 0 ) {
+            $sHours = '+' . $nHours;
+        } else {
+            $sHours = $nHours;
+        }
+
+        $sReturn = $sDate . ", $sHours hour";
+
+        return $this->oFormat->format($sReturn, $this->sFormat);
+    }
+
+    /**
+     * Increment or Decrement one date by minutes
+     *
+     * @param string $sDate date will be modify
+     * @param integer $nMinutes hours to be add or Decrement
+     *
+     * @return string with the new date
+     */
+    public function incrementOrDecrementMinutes($sDate, $nMinutes)
+    {
+        $sMinutes = '';
+
+        if ($nMinutes > 0 ) {
+            $sMinutes = '+' . $nMinutes;
+        } else {
+            $sMinutes = $nMinutes;
+        }
+
+        $sReturn = $sDate . ", $sMinutes minutes";
+
+        return $this->oFormat->format($sReturn, $this->sFormat);
+    }
+
+    public function getAge($sDate)
+    {
+        $nNumDays = $this->getDays($sDate, $this->today(), true /*Allow Negatives*/);
+
+        if ($nNumDays > 0) {
+            $nNumDays--; // Subtract 1 since we don't want inclusive
+        }
+
+        return $nNumDays;
+    }
+
+    public function getHours($sDateStart, $sDateEnd)
+    {
+        $oDateStart = new \DateTime($sDateStart);
+        $oDateEnd   = new \DateTime($sDateEnd);
+        $oInterval  = $oDateStart->diff($oDateEnd);
+
+        return ($oInterval->h + 1); // Add 1 since this in inclusive
+    }
+
+    public function getHoursFromTimestamps($nTimestampStart, $nTimestampEnd)
+    {
+        $sDateStart = $this->oFormat->timestampToDate($nTimestampStart);
+        $sDateEnd   = $this->oFormat->timestampToDate($nTimestampEnd);
+
+        return $this->getHours($sDateStart, $sDateEnd);
+    }
+
+    /* Get number of days in between (inclusively) */
+    public function getDays($sDateStart, $sDateEnd, $bAllowNegative = false)
+    {
+        $oDateStart = new \DateTime($sDateStart);
+        $oDateEnd   = new \DateTime($sDateEnd);
+        $oInterval  = $oDateStart->diff($oDateEnd);
+
+        $nDays = 0;
+        if ($bAllowNegative && $oInterval->invert) {
+            $nDays = $oInterval->days * -1;
+        } else {
+            $nDays = $oInterval->days + 1; // Add 1 since this in inclusive
+        }
+
+        return $nDays;
+    }
+
+    /* Get number of days in between (inclusively) */
+    public function getDaysFromTimestamps($nTimestampStart, $nTimestampEnd, $bAllowNegative = false)
+    {
+        $sDateStart = $this->oFormat->timestampToDate($nTimestampStart);
+        $sDateEnd   = $this->oFormat->timestampToDate($nTimestampEnd);
+
+        return $this->getDays($sDateStart, $sDateEnd, $bAllowNegative);
+    }
+
+    public function getPointsFromTimestamps($datetime_start, $datetime_end, $time_unit)
+    {
+        $nNumPoints = 0;
+        switch ($time_unit) {
+            case self::TIME_UNIT_HOUR:
+                $nNumPoints = $this->getHoursFromTimestamps($datetime_start, $datetime_end);
+                break;
+            case self::TIME_UNIT_DAY:
+                $nNumPoints = $this->getDaysFromTimestamps($datetime_start, $datetime_end);
+                break;
+            case self::TIME_UNIT_WEEK:
+                throw new Date\Exception(Date\Exception::TIME_UNIT_NOT_ALLOWED, 'Week');
+                break;
+            case self::TIME_UNIT_MONTH:
+                throw new Date\Exception(Date\Exception::TIME_UNIT_NOT_ALLOWED, 'Month');
+                break;
+            default:
+                $nNumPoints = $this->getDaysFromTimestamps($datetime_start, $datetime_end);
+                break;
+        }
+
+        return $nNumPoints;
+    }
+
+    public function add($sDate, $nUnits, $nTimeUnit)
+    {
+        $sDate = '';
+        switch ($nTimeUnit) {
+            case self::TIME_UNIT_HOUR:
+                $sDate = $this->addHours($sDate, $nUnits);
+                break;
+            case self::TIME_UNIT_DAY:
+                $sDate = $this->addDays($sDate, $nUnits);
+                break;
+            case self::TIME_UNIT_WEEK:
+                throw new Date\Exception(Date\Exception::TIME_UNIT_NOT_ALLOWED, 'Week');
+                break;
+            case self::TIME_UNIT_MONTH:
+                throw new Date\Exception(Date\Exception::TIME_UNIT_NOT_ALLOWED, 'Month');
+                break;
+            default:
+                $sDate = $this->addDays($sDate, $nUnits);
+                break;
+        }
+        return $sDate;
+    }
+
+    public function addHours($sDate, $nNumHours)
+    {
+        $nTimestamp = strtotime($sDate);
+        return $this->oFormat->datetime("+".$nNumHours." hours", $nTimestamp);
+    }
+
+    public function addDays($sDate, $nNumDays)
+    {
+        $nTimestamp = strtotime($sDate);
+        return $this->oFormat->date("+".$nNumDays." days", $nTimestamp);
+    }
+
+    public function subtractDays($sDate, $nNumDays)
+    {
+        return $this->addDays($sDate, -1 * $nNumDays);
+    }
+
+    public function getDaysAgo($nNumDays)
+    {
+        return $this->subtractDays($this->today(), $nNumDays);
+    }
+
+    public function isToday($sDate)
+    {
+        $sDate = $this->oFormat->date($sDate);
+        return $sDate == $this->today();
+    }
+
+    public function isCurrentHour($sDate)
+    {
+        $bCurrentHour = false;
+        if ($this->isToday($sDate)) {
+            $bCurrentHour = date("G", strtotime($sDate)) == date("G");
+        }
+        return $bCurrentHour;
+    }
+
+    public function getMinutesBefore($nMinutes)
+    {
+        return $this->oFormat->datetime("-".$nMinutes." minutes");
+    }
+
+    public function getDayBefore($sDate)
+    {
+        return $this->subtractDays($sDate, 1);
+    }
+
+    public function yesterdayStart()
+    {
+        return $this->oFormat->dateStart($this->yesterday());
+    }
+
+    public function yesterdayEnd()
+    {
+        return $this->oFormat->dateEnd($this->yesterday());
+    }
+
+    public function yesterday()
+    {
+        return $this->oFormat->date('yesterday');
+    }
+
+    public function today()
+    {
+        return $this->oFormat->date('today');
+    }
+
+    public function now()
+    {
+        return $this->oFormat->datetime('now');
+    }
+
+    public function format($nTimestamp = 0)
+    {
+        return $this->oFormat->format($nTimestamp, $this->sFormat);
+    }
+}

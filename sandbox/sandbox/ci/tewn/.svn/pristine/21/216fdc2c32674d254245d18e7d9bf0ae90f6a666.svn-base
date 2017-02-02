@@ -1,0 +1,212 @@
+<?php
+/* SVN FILE: $Id$ */
+
+/**
+ * Application model for Cake.
+ *
+ * This file is application-wide model file. You can put all
+ * application-wide model-related methods here.
+ *
+ * PHP versions 4 and 5
+ *
+ * CakePHP(tm) :  Rapid Development Framework (http://www.cakephp.org)
+ * Copyright 2005-2010, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
+ *
+ * Licensed under The MIT License
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @filesource
+ * @copyright     Copyright 2005-2010, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
+ * @link          http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
+ * @package       cake
+ * @subpackage    cake.app
+ * @since         CakePHP(tm) v 0.2.9
+ * @version       $Revision$
+ * @modifiedby    $LastChangedBy$
+ * @lastmodified  $Date$
+ * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
+ */
+
+/**
+ * Application model for Cake.
+ *
+ * Add your application-wide methods in the class below, your models
+ * will inherit them.
+ *
+ * @package       cake
+ * @subpackage    cake.app
+ */
+class AppModel extends Model {
+	/*
+	 * Memcached Call Debug
+	 * 	0 : Off
+	 * 	1 : Commands & Keys
+	 * 	2 : Commands, Keys & Data
+	 */
+	var $memcached_debug = 0;
+	var $memcached_disable = 0;
+
+	// Use for read/write splitting
+	public function find($type, $options = array()) {
+		$masterConfig = $this->useDbConfig;
+		$slaveConfig = "{$this->useDbConfig}_slave";
+		$manager = ConnectionManager::getInstance();
+
+		if (isset($manager->config->{$slaveConfig})) {
+			foreach ($this->tableToModel as $table => $modelName) {
+				if (isset($this->{$modelName}) && $this->{$modelName}->useDbConfig === $this->useDbConfig) {
+					$this->{$modelName}->useDbConfig = $slaveConfig;
+				}
+			}
+
+			$this->useDbConfig = $slaveConfig;
+		}
+
+		$result = parent::find($type, $options);
+
+		if ($this->useDbConfig === $slaveConfig) {
+			foreach ($this->tableToModel as $table => $modelName) {
+				if (isset($this->{$modelName}) && $this->{$modelName}->useDbConfig === $slaveConfig) {
+					$this->{$modelName}->useDbConfig = $masterConfig;
+				}
+			}
+
+			$this->useDbConfig = $masterConfig;
+		}
+
+		return $result;
+	}
+
+	// Force the operation to the master
+	public function find_master($type, $options = array()) {
+		$result = parent::find($type, $options);
+
+		return $result;
+	}
+
+	/* Make read queries to the correct database source */
+	public function query_read($query, $cache_query = null) {
+		$masterConfig = $this->useDbConfig;
+		$slaveConfig = "{$this->useDbConfig}_slave";
+		$manager = ConnectionManager::getInstance();
+
+		if (isset($manager->config->{$slaveConfig})) {
+			foreach ($this->tableToModel as $table => $modelName) {
+				if (isset($this->{$modelName}) && $this->{$modelName}->useDbConfig === $this->useDbConfig) {
+					$this->{$modelName}->useDbConfig = $slaveConfig;
+				}
+			}
+
+			$this->useDbConfig = $slaveConfig;
+		}
+
+		$result = ($cache_query === null) ? parent::query($query) : parent::query($query, $cache_query);
+
+		if ($this->useDbConfig === $slaveConfig) {
+			foreach ($this->tableToModel as $table => $modelName) {
+				if (isset($this->{$modelName}) && $this->{$modelName}->useDbConfig === $slaveConfig) {
+					$this->{$modelName}->useDbConfig = $masterConfig;
+				}
+			}
+
+			$this->useDbConfig = $masterConfig;
+		}
+
+		return $result;
+	}
+
+	function change_data_source($new_source)  {
+		parent::setDataSource($new_source);
+		parent::__construct();
+	}
+
+	/* Memcached Functions */
+	public function memcached_get($key) {
+		if ($this->memcached_disable) {
+			return;
+		}
+
+		if (!isset($this->CakeMemcache)) {
+			App::import('Component', 'CakeMemcache');
+			$this->CakeMemcache =& new CakeMemcacheComponent(null);
+		}
+
+		$key = str_replace(" ", "_", $key);
+
+		$data = $this->CakeMemcache->get($key);
+
+		$this->memcached_debug("get", $key, $data);
+
+		return $data;
+	}
+
+	public function memcached_get_json($key) {
+		$json = $this->memcached_get($key);
+
+		if ($json) {
+			// Decode JSON
+			$decoded = json_decode($json, 1);
+
+			// Convert from stdClass
+			$out = (array) $decoded;
+
+			return $out;
+		} else {
+			return 0;
+		}
+	}
+
+	public function memcached_set($key, $data, $expire = false) {
+		if ($this->memcached_disable) {
+			return;
+		}
+
+		if (!isset($this->CakeMemcache)) {
+			App::import('Component', 'CakeMemcache');
+			$this->CakeMemcache =& new CakeMemcacheComponent(null);
+		}
+
+		$key = str_replace(" ", "_", $key);
+
+		$this->memcached_debug("set", $key, $data);
+
+		return $this->CakeMemcache->set($key, $data, $expire);
+	}
+
+	public function memcached_set_json($key, $data, $expire = false) {
+		$json = json_encode($data);
+
+		return $this->memcached_set($key, $json, $expire);
+	}
+
+	public function memcached_delete($key) {
+		if ($this->memcached_disable) {
+			return;
+		}
+
+		if (!isset($this->CakeMemcache)) {
+			App::import('Component', 'CakeMemcache');
+			$this->CakeMemcache =& new CakeMemcacheComponent(null);
+		}
+
+		$key = str_replace(" ", "_", $key);
+
+		$this->memcached_debug("delete", $key);
+
+		return $this->CakeMemcache->delete($key);
+	}
+
+	public function memcached_debug($call, $key, $data = 0) {
+		if ($this->memcached_debug > 0) {
+			echo $call.": ".$key;
+
+			if ($this->memcached_debug == 2 && $data) {
+				echo $data;
+			}
+			echo "<br>\n";
+		}
+
+	}
+
+}
+?>

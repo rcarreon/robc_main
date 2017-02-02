@@ -1,0 +1,8 @@
+<style>
+/* Hybrid layout for Crowdignite with the colors of Totally Her & new logo */
+#content { overflow:visible; }
+#interior_content { width:980px; padding:10px 20px 20px;}
+#header { width: 1044px; }
+#tabs { margin-left:20px; }
+#header div.logo { margin-left:20px;}
+</style>

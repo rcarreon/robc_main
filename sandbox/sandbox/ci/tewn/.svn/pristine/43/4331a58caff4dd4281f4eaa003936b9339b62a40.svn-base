@@ -1,0 +1,127 @@
+<link rel="stylesheet" type="text/css" href="/css/tablesort.css">
+<script type="text/javascript" src="/js/jquery.tablesorter.js"></script>
+<script>
+    jQuery(document).ready(function() {
+        jQuery.tablesorter.addParser({
+            id: "commaDigit",
+            is: function(s, table) {
+            var c = table.config;
+            return jQuery.tablesorter.isDigit(s.replace(/,/g, ""), c);
+            },
+            format: function(s) {
+                return jQuery.tablesorter.formatFloat(s.replace(/,/g, ""));
+            },
+            type: "numeric"
+        });
+
+        $("#pages_table").tablesorter({
+            // sort on the first column and third column, order asc
+            sortList: [[5,0],[9,1],[10,1],[11,1]]
+        });
+
+        $('.table-color-description .hide').live('click', function(){
+            $('#pages_table .modifier-0').toggle();
+            $('.table-color-description .hide').toggle();
+            event.preventDefault();
+        });
+    });
+</script>
+
+<div class="row main report">
+<div id="content" class="column grid_12">
+
+<?php echo $this->element("management_toolbar", array("tab" => "credits")); ?>
+
+<div class="row">
+    <div class="column grid_12">
+        <h3 class="topContent">Widget Active Pages</h3>
+        <div class="row" id="content_area">
+            <div class="column grid_12">
+                <div style="margin-left:10px;margin-top:18px;">
+                    <h2><?php echo $website['Website']['name']; ?></h2>
+                    <a href="http://<?php echo ENGINE_URL; ?>/widget_engine/rebalance/<?php echo $website['Website']['id']; ?>">Rebalance Widgets</a>
+                    <div class="table-color-description">
+                        <ul>
+                            <li>
+                                <span class="color penalized"></span>Penalized pages <a class="hide" href="#">(hide)</a><a class="hide" style="display:none" href="#">(show)</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <table id="pages_table" class="tablesorter">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Page</th>
+                                <th>Cat.</th>
+                                <th>Subcat.</th>
+                                <th>Website</th>
+                                <th>Type</th>
+                                <th>Match</th>
+                                <th>Clicks</th>
+                                <th>Display</th>
+                                <th>CTR</th>
+                                <th>CTP</th>
+                                <th>Mod.</th>
+                                <th>Created</th>
+                                <th>Image</th>
+                            </tr>
+                        </thead>
+                    <tbody>
+                    <?php
+                    $asset_image = new \CI\Asset\Image();
+
+                    foreach ($analytics as $page) : ?>
+                        <?php
+                            $image_html = $asset_image->getUrl(
+                                array(
+                                    'page_id' => $page['pages']['id'],
+                                    'type' => \CI\Asset\Image::URL_CROP_RELATIVE,
+                                    'image' => $page['pages']['image'],
+                                    'width' => 140,
+                                    'height' => 80,
+                                )
+                            );
+
+                            $modifier_class = '';
+                            if ($page['widget_analytics']['weight_modifier'] == 0) {
+                                $modifier_class = ' class="modifier-0"';
+                            }
+                        ?>
+                        <tr<?php echo $modifier_class; ?>>
+                            <!-- ID -->
+                            <td><?php echo $page['widget_analytics']['id']; ?></td>
+                            <!-- Page -->
+                            <td><a href="/pages/moderate/<?php echo $page['websites']['id']; ?>/<?php echo $page['pages']['id']; ?>"><?php echo $page['pages']['title']; ?></td>
+                            <!-- Category -->
+                            <td><?php echo $page['pages']['categories']; ?></td>
+                            <!-- Subcategory -->
+                            <td><?php echo $page['pages']['subcategory']; ?></td>
+                            <!-- Page Website -->
+                            <td><a href="/websites/moderate/<?php echo $page['websites']['id']; ?>"><?php echo $page['websites']['name']; ?></td>
+                            <!-- Type -->
+                            <td><?php echo $page['widget_analytics']['type']; ?></td>
+                            <!-- Key -->
+                            <td><?php echo $convert->link_key_html($page['widget_analytics']['type'], $page['widget_analytics']['key']); ?></td>
+                            <!-- Num Clicks -->
+                            <td><?php echo $page['widget_analytics']['num_ctr']; ?></td>
+                            <!-- Num Display -->
+                            <td><?php echo $page['widget_analytics']['num_display']; ?></td>
+                            <!-- CTR -->
+                            <td><?php echo $page['widget_analytics']['ctr']; ?>%</td>
+                            <!-- CTP -->
+                            <td><?php echo number_format($page['widget_analytics']['ctp'], 6); ?></td>
+                            <!-- Weight Modifier -->
+                            <td><?php echo number_format($page['widget_analytics']['weight_modifier'], 2); ?></td>
+                            <!-- Created -->
+                            <td><?php echo $page['widget_analytics']['created']; ?></td>
+                            <!-- Image -->
+                            <td><a href="<?php echo $page['pages']['url']; ?>"><img src="<?php echo $image_html; ?>"></a></td>
+                        </tr>
+                    <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+            <h3 class="bottomContent"></h3>
+        </div>
+    </div> <!--  end of content column -->
+</div> <!--  end of content row -->

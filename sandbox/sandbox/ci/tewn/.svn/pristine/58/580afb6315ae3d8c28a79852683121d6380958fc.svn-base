@@ -1,0 +1,9 @@
+<?php 
+/* SVN FILE: $Id$ */
+/* Analytic Fixture generated on: 2010-03-06 14:40:14 : 1267908014*/
+
+class NoteFixture extends CakeTestFixture {
+	var $name = 'Note';
+	var $import = 'Note';
+}
+?>

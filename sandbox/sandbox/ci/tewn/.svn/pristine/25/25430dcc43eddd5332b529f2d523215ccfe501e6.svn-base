@@ -1,0 +1,8 @@
+<script id="tpl-needs-attention" type="text/x-handlebars-template">
+    <div class="text-center">
+            <span class="label label-danger danger" data-toggle="popover" data-placement="left" data-content="Needs immediate attention">{{needs_attention_immediate}}</span>
+            <span class="label label-warning warning" data-toggle="popover" data-placement="top" data-content="Warnings">{{needs_attention_warning}}</span>
+            <span class="label notice" data-toggle="popover" data-placement="top" data-content="Notices">{{needs_attention_notice}}</span>
+            <span class="label default" data-toggle="popover" data-placement="left" data-content="Total attention notices">{{needs_attention_count}}</span>
+    </div>
+</script>

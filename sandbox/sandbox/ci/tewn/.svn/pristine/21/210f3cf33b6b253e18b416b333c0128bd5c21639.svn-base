@@ -1,0 +1,120 @@
+<?php
+App::import('Controller', 'Actions');
+
+class AdminChartsActionsController extends ActionsController
+{
+    public $name  = 'Charts';
+    public $uses  = array('Stats', 'MetricLog');
+    public $view  = 'Theme';
+    public $theme = 'bootstrap';
+    public $components = array('Date');
+
+    protected $permissions = array(
+        'history'   => User::ADMIN,
+    );
+
+    public function history()
+    {
+        $this->response->setMessage('Load history chart');
+
+        $oHub  = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+        $today = \Carbon\Carbon::today()->toDateString();
+
+        $params   = new \CI\ArrayManipulator($this->params['url']);
+        $params->setValidationType(\CI\ArrayManipulator::ARRAY_ISSET);
+
+        $start = $params->get('start', $today);
+        $start = \Carbon\Carbon::createFromFormat('Y-m-d', $start)->startOfDay()->toDateTimeString();
+
+        $end = $params->get('end', $today);
+        $end = \Carbon\Carbon::createFromFormat('Y-m-d', $end)->endOfDay()->toDateTimeString();
+
+        $website   = $params->get('website', '');
+        $hubs      = $params->get('hubs', '');
+        $time_unit = $params->get('time', 'daily');
+        $data      = array();
+
+        if (empty($data)) {
+            $data = array(
+                'is_all'     => $hubs === '' && empty($website),
+                'is_hubs'    => !empty($hubs) || $hubs == '0',
+                'is_website' => !empty($website) && empty($hubs),
+            );
+
+            $stats = array();
+            if ($data['is_all']) {
+                $stats = $this->Stats->getAll($start, $end, $time_unit);
+            } elseif ($data['is_hubs']) {
+                if ($hubs == \CI\Hub::DOMAIN_ID_ALL) {
+                    $hubs = $oHub->getAllActiveIds();
+                }
+                $stats = $this->Stats->getByHubs($hubs, $start, $end, $time_unit);
+            } else {
+                $stats = $this->Stats->getByWebsites($website, $start, $end, $time_unit);
+            }
+
+            $key_stats = array(
+                'tpm', 'widget_ctr', 'return_rate', 'generated_return_rate', 'total_return_rate', 'credits', 'traffic_from', 'traffic_to', 'widget_impressions',
+                'display_basic', 'display_contextual', 'display_similar', 'ctr_basic', 'ctr_contextual',
+                'ctr_similar');
+
+            $name = 'all';
+            if ($data['is_hubs']) {
+                $name = $oHub->name($stat['hub']);
+            } else if ($data['is_website']) {
+                $name = $website;
+            }
+
+            $oStats = new \CI\ArrayManipulator();
+
+            foreach ($stats as $stat) {
+
+
+                if (isset($stat['stats'])) {
+                    $stat = array_merge($stat[0], $stat['stats']);
+                } else {
+                    $stat = $stat[0];
+                }
+
+                if (empty($data[$name])) {
+                    $data[$name] = array_fill_keys($key_stats, array());
+                }
+
+                $oStats->setArray($stat);
+
+                $data[$name]['tpm'][]                   = (float) $oStats->get('tpm', 0);
+                $data[$name]['widget_ctr'][]            = (float) $oStats->get('ctr', 0);
+                $data[$name]['return_rate'][]           = (float) $oStats->get('rr', 0);
+                $data[$name]['total_return_rate'][]     = (float) $oStats->get('total_rr', 0);
+                $data[$name]['generated_return_rate'][] = (float) $oStats->get('gen_rr', 0);
+                $data[$name]['credits'][]               = (float) $oStats->get('credits', 0);
+                $data[$name]['traffic_from'][]          = (float) $oStats->get('traffic_from', 0);
+                $data[$name]['traffic_to'][]            = (float) $oStats->get('traffic_to', 0);
+                $data[$name]['widget_impressions'][]    = (float) $oStats->get('widget_impressions', 0);
+                $data[$name]['display_basic'][]         = (float) $oStats->get('imp_basic', 0);
+                $data[$name]['display_contextual'][]    = (float) $oStats->get('imp_contextual', 0);
+                $data[$name]['display_similar'][]       = (float) $oStats->get('imp_similar', 0);
+                $ctr_basic                              = $stat['imp_basic'] == 0 ? 0 : (float)($stat['widget_basic_traffic_from'] / $stat['imp_basic'] * 100);
+                $data[$name]['ctr_basic'][]             = round($ctr_basic, 2);
+                $ctr_contextual                         = $stat['imp_contextual'] == 0 ? 0 : (float)($stat['widget_contextual_traffic_from'] / $stat['imp_contextual'] * 100);
+                $data[$name]['ctr_contextual'][]        = round($ctr_contextual, 2);
+                $ctr_similar                            = $stat['imp_similar'] == 0 ? 0 : (float)($stat['widget_similar_traffic_from'] / $stat['imp_similar'] * 100);
+                $data[$name]['ctr_similar'][]           = round($ctr_similar, 2);
+            }
+        }
+
+        header("Pragma: no-cache");
+        header("Cache-Control: no-store, no-cache, max-age=0, must-revalidate");
+
+        if (empty($data[$name])) {
+            $nPoints = $this->Date->num_points($start, $end, TIME_UNIT_DAY);
+            $data[$name] = array_fill_keys($key_stats, array_fill(0, $nPoints, 0));
+        }
+
+        $this->response->addData('charts', $data);
+
+        return $this->response->get();
+    }
+
+
+}

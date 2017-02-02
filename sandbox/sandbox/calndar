@@ -1,0 +1,15 @@
+prv_month=$(date +%Y:%m:%d -d "1 month ago" |  cut -d : -f 2 )
+#lday_pvmnth=$(cal $prv_month $(date +%Y) )#| awk '!/^$/{print $NF}' | tail -1)
+lday_pvmnth=$(cal $prv_month $(date +%Y -d "1 month ago"))
+# | awk '!/^$/{print $NF}' | tail -1 )
+year=$(cal $prv_month $(date +%Y -d "1 year ago")| awk '!/^$/{ print $NF }' | awk 'NR == 1 { print }END{ print }'| head -1)
+if [[ $prv_month == "12" ]]
+then 
+	prv_year=$(cal $prv_month $(date +%Y -d "1 year ago") | awk '!/^$/{ print $NF }' | awk 'NR == 1 { print }END{ print }'| head -1)
+	#cal $prv_month $(date +%Y -d "1 year ago") | awk '!/^$/{ print $NF }' | awk 'NR == 1 { print }END{ print }'| tail -1 	     #echo "$lmonth_prvyear" | tr -d '\n'
+	echo "$year"	
+	echo "Previous month is $prv_month"
+	echo "The last day of $prv_month of $prv_year is $lday_pvmnth"
+	echo "$lday_pvmnth"
+fi
+

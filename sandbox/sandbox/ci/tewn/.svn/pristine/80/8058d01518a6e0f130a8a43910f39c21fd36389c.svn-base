@@ -1,0 +1,3 @@
+<?php
+    echo $form->select('Website.category', $categories, null);
+?>

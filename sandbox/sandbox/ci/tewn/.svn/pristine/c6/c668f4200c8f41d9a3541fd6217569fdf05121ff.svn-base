@@ -1,0 +1,63 @@
+<?php
+/**
+ * MaxMind File
+ *
+ * PHP Version 5.3
+ *
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+
+
+namespace CI\Geo\Adapter;
+
+require_once __DIR__ . '/../../../../GeoIp2/ProviderInterface.php';
+
+require_once __DIR__ . '/../../../../GeoIp2/Exception/GeoIp2Exception.php';
+require_once __DIR__ . '/../../../../GeoIp2/Exception/AddressNotFoundException.php';
+
+require_once __DIR__ . '/../../../../GeoIp2/Record/AbstractRecord.php';
+require_once __DIR__ . '/../../../../GeoIp2/Record/AbstractPlaceRecord.php';
+require_once __DIR__ . '/../../../../GeoIp2/Record/Continent.php';
+require_once __DIR__ . '/../../../../GeoIp2/Record/MaxMind.php';
+require_once __DIR__ . '/../../../../GeoIp2/Record/Country.php';
+require_once __DIR__ . '/../../../../GeoIp2/Record/RepresentedCountry.php';
+require_once __DIR__ . '/../../../../GeoIp2/Record/Traits.php';
+
+require_once __DIR__ . '/../../../../GeoIp2/Model/Country.php';
+
+require_once __DIR__ . '/../../../../GeoIp2/Db/Reader/Metadata.php';
+require_once __DIR__ . '/../../../../GeoIp2/Db/Reader/Decoder.php';
+require_once __DIR__ . '/../../../../GeoIp2/Db/Reader/Util.php';
+require_once __DIR__ . '/../../../../GeoIp2/Db/Reader.php';
+
+require_once __DIR__ . '/../../../../GeoIp2/Database/Reader.php';
+
+use \GeoIp2\Database\Reader;
+
+/**
+ * MaxMind Class
+ *
+ * PHP Version 5.3
+ *
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+class MaxMind extends \CI\Geo\Adapter
+{
+    protected $oReader;
+
+    public function __construct()
+    {
+        $this->oReader = new Reader(__DIR__ . '/../../../../GeoIp2/GeoIP2-Country.mmdb');
+    }
+
+    public function getCountry($sIp)
+    {
+        $oRecord = $this->oReader->country($sIp);
+
+        return $oRecord->country->isoCode;
+    }
+}

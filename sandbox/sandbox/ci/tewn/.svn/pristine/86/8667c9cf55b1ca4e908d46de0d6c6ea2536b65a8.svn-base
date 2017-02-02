@@ -1,0 +1,61 @@
+<?php
+namespace CI\Content\Provider;
+use CI\Content\Provider;
+use CI\Http\Facade\Server;
+
+class Gravity implements Provider
+{
+
+    const STORIES_LIMIT = 1;
+    const SPONSORED_RECOMENDATION_TYPE = 'sponsored';
+    const DISABLE_LOGGING = true;
+
+    public function provide(array $aOptions)
+    {
+        $aResponse = array();
+        $aItem     = array();
+        $oOptions  = new \CI\ArrayManipulator($aOptions);
+
+        $oService = $this->getService();
+        $oService->setArg('current_url', Server::getCurrentUrl());
+        $oService->setArg('limit', self::STORIES_LIMIT);
+        $oService->setArg('rec_type', self::SPONSORED_RECOMENDATION_TYPE);
+        $oService->setArg('ipOverride', $oOptions->get('test', false) ? '50.79.148.241' : Server::getClientIp());
+        $oService->addHeader('User-Agent', Server::getElement('HTTP_USER_AGENT'));
+
+        $oService->query();
+        $aResponse = $oService->getData();
+
+        if (!empty($aResponse['payload'][0]) && is_array($aResponse['payload'][0]) && !empty($aResponse['meta'])) {
+            $oData     = new \CI\ArrayManipulator($aResponse['payload'][0]);
+            $oCallback = new \CI\ArrayManipulator($aResponse['meta']);
+            $sExtra = $this->createExtra($oCallback->get('impressionViewedCallback'));
+
+            $aItem = array(
+                'title'       => $oData->get('title'),
+                'description' => $oData->get('summary'),
+                'image'       => $oData->get('image'),
+                'link'        => $oData->get('url'),
+                'extra'       => $sExtra
+            );
+        }
+
+        return $aItem;
+    }
+
+    public function getService()
+    {
+        return new \CI\Http\Service\Gravity();
+    }
+
+    protected function createExtra($sUrl)
+    {
+        $sTag = '';
+        if (! empty($sUrl)) {
+            $sTemplate = "<iframe src='%s' width='1' height='1' scrolling='no' frameborder='0'></iframe>";
+            $sTag      = sprintf($sTemplate, $sUrl);
+        }
+
+        return $sTag;
+    }
+}

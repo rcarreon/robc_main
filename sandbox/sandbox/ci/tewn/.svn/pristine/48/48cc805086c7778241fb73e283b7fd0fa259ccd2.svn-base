@@ -1,0 +1,244 @@
+<?php
+
+use CI\Facade\DebugBar;
+
+/* SVN FILE: $Id$ */
+/**
+ * Short description for file.
+ *
+ * This file is application-wide controller file. You can put all
+ * application-wide controller-related methods here.
+ *
+ * PHP versions 4 and 5
+ *
+ * CakePHP(tm) :  Rapid Development Framework (http://www.cakephp.org)
+ * Copyright 2005-2010, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
+ *
+ * Licensed under The MIT License
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @filesource
+ * @copyright     Copyright 2005-2010, Cake Software Foundation, Inc. (http://www.cakefoundation.org)
+ * @link          http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
+ * @package       cake
+ * @subpackage    cake.app
+ * @since         CakePHP(tm) v 0.2.9
+ * @version       $Revision$
+ * @modifiedby    $LastChangedBy$
+ * @lastmodified  $Date$
+ * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
+ */
+/**
+ * Short description for class.
+ *
+ * Add your application-wide methods in the class below, your controllers
+ * will inherit them.
+ *
+ * @package       cake
+ * @subpackage    cake.app
+ */
+class AppController extends Controller
+{
+    public    $helpers     = array('Asset.asset');
+    public    $components  = array('Session');
+    protected $permissions = array();
+
+    public function __construct()
+    {
+        parent::__construct();
+        parent::constructClasses();
+
+        $this->loadModel('Setting');
+        if ($this->Setting->get('DEVELOPERS_DEBUG_BAR') == 1) {
+            $this->Session->activate();
+
+            $param_debugbar = isset($_GET['debugbar']) ? $_GET['debugbar'] : null;
+            if (!is_null($param_debugbar)) {
+                $this->Session->write('debugbar_settings', $param_debugbar);
+            }
+            $debugbar_settings = $this->Session->read('debugbar_settings');
+            if (!empty($debugbar_settings)) {
+                DebugBar::build(new \DebugBar\StandardDebugBar());
+                if ($debugbar_settings !== '1') {
+                    $debugbar_settings = explode(',', $debugbar_settings);
+                    foreach ($debugbar_settings as $collector_key) {
+                        if (!empty($collector_key)) {
+                            $collector = new \DebugBar\DataCollector\MessagesCollector($collector_key);
+                            DebugBar::addCollector($collector);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public function beforeRender()
+    {
+        // This is to log database queries (not for now, left this comment to not forget this code)
+        // DebugBar::addCollector(new \DebugBar\DataCollector\MessagesCollector('DB_Queries'));
+        // $sources = ConnectionManager::sourceList();
+        // foreach ($sources as $source) {
+        //     $db = ConnectionManager::getDataSource($source);
+        //     if (method_exists($db, 'getLogs')) {
+        //         $logs = $db->getLogs();
+        //         foreach ($logs as $log) {
+        //             DebugBar::addToCollector('DB_Queries', $log, $source);
+        //         }
+        //     }
+        // }
+
+        $this->Session->activate();
+        if ($this->Setting->get('DEVELOPERS_DEBUG_BAR') == 1) {
+            $debugbar_settings = $this->Session->read('debugbar_settings');
+            if (!empty($debugbar_settings)) {
+                $this->set('DebugBarRenderer', DebugBar::getRenderer());
+            }
+        }
+    }
+
+    protected function check_permissions()
+    {
+        $action = isset($this->params['action']) ? $this->params['action'] : '';
+        if (isset($this->permissions[$action])) {
+            if (!$this->is_logged()) {
+                $this->redirect_login($this->Session);
+            } else {
+                $this->loadModel('User');
+                $this->Session->activate();
+                $user = $this->Session->read('User');
+                if (empty($user) || !isset($user['id'])) {
+                    $this->redirect_login($this->Session);
+                }
+                $admin = isset($user['admin']) ? $user['admin'] : null;
+                if (!$this->User->is_user_type($user['id'], $this->permissions[$action], $admin)) {
+                    $this->redirect("/dashboard");
+                    exit();
+                }
+            }
+        }
+    }
+
+    protected function redirect_login($session = null, $user = null)
+    {
+        $this->saveUrl($_SERVER['REQUEST_URI'], $session, $user);
+        $this->redirect("/login");
+        exit();
+    }
+
+    protected function is_developer()
+    {
+        $this->loadModel('User');
+
+        // Check if admin
+        $this->Session->activate();
+        $user = $this->Session->read('User');
+
+        return $this->User->isDeveloper($user['id']);
+    }
+
+    protected function is_admin()
+    {
+        $this->loadModel('User');
+
+        // Check if admin
+        $this->Session->activate();
+        $user = $this->Session->read('User');
+
+        return $this->User->isAdmin($user['id']);
+    }
+
+    protected function is_super_admin()
+    {
+        $this->loadModel('User');
+
+        // Check if admin
+        $this->Session->activate();
+        $user = $this->Session->read('User');
+
+        return $this->User->isSuperAdmin($user['id']);
+    }
+
+    protected function is_curator()
+    {
+        $this->loadModel('User');
+
+        // Check if admin
+        $this->Session->activate();
+        $user = $this->Session->read('User');
+
+        return $this->User->isCurator($user['id']);
+    }
+
+    protected function is_logged()
+    {
+        $this->Session->activate();
+        $user = $this->Session->read('User');
+
+        if(is_array($user) === false){//is an authenticated user?
+            //If there is no data for $user, it means there is no body logged
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function saveUrl($url, $session = null, $user = null)
+    {
+        if (empty($session)) {
+            $this->Session->activate();
+            $session = $this->Session;
+        }
+
+        if (empty($user)) {
+            $user = $session->read('User');
+        }
+
+        if (empty($user) && !empty($session) && !empty($url)){
+            $session->write(User::ATTEMPT_URL, $url);
+        }
+    }
+
+    protected function set_types_user($user = null)
+    {
+        if (empty($user)) {
+            $this->Session->activate();
+            $user = $this->Session->read('User');
+        }
+
+        $this->set('is_curator_user', $this->User->isCurator($user['id'], $user['admin']));
+        $this->set('is_admin_user', $this->User->isAdmin($user['id'], $user['admin']));
+        $this->set('is_super_admin_user', $this->User->isSuperAdmin($user['id'], $user['admin']));
+        $this->set('is_dev', $this->User->isDeveloper($user['id'], $user['admin']));
+    }
+
+    public function validate_admin($type, $domain_id = DOMAIN_ID_ALL) {
+        $is_admin = false;
+
+        $this->Session->activate();
+
+        $user          = $this->Session->read('User');
+        $is_curator    = $this->User->isCurator($user['id'], $user['admin']);
+        $is_admin_user = $this->User->isAdmin($user['id'], $user['admin']);
+
+        if ($type == ADMIN_FULL) {
+            $admin_domain_bits = $user['domain_bitfield'];
+
+            if (($is_admin_user || $is_curator) && $admin_domain_bits == -1) {
+                $is_admin = true;
+            }
+        } else if ($type == ADMIN_DOMAIN) {
+            if ($is_admin_user || $is_curator) {
+                $is_admin = true;
+            }
+        }
+
+        if (!$is_admin){
+            $this->saveUrl($_SERVER['REQUEST_URI'], $this->Session, $user);
+            $this->redirect("/login");
+            exit();
+        }
+
+        return $is_admin;
+    }
+}
+?>

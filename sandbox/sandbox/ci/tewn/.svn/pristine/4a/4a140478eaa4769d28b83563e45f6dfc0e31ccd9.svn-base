@@ -1,0 +1,44 @@
+#btn-update {
+    margin-top: 25px;
+}
+
+.with-3-buttons {
+    position: relative;
+}
+
+.with-3-buttons > .title {
+    padding-right: 90px;
+}
+
+.with-3-buttons > .btn-group {
+    position: absolute;
+    right: 10px;
+}
+
+span.warning,
+tr.warning {
+    background-color: #f6ea5f;
+}
+
+span.danger,
+tr.danger {
+    background-color: #eda170;
+}
+
+span.notice {
+    background-color: #CCC;
+}
+
+span.default {
+    background-color: #666;
+}
+
+tfoot tr {
+    background-color: #d1d1d1;
+    font-weight: bold;
+}
+
+.tablesorter .header:after,
+.tablesorter .header:before {
+    display:none !important;
+}

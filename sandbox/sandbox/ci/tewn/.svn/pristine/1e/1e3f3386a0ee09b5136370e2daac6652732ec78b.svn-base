@@ -1,0 +1,66 @@
+<?php
+    $this->layout = 'crowdignite/default';
+    $this->pageTitle= '404 - Page not found';
+?>
+<style>
+    #page_not_found {
+        margin:10px auto 30px;
+        width:700px;
+    }
+    #page_not_found h1 {
+        color:#df6330;
+        display:inline-block;
+        font-family:Arial,sans-serif;
+        font-size:180px;
+        font-weight: normal;
+        letter-spacing: -0.07em;
+        line-height: 1em;
+        margin:30px 0 0 0;
+        padding:0;
+    }
+    #page_not_found h4 {
+        color:#666;
+        display:inline-block;
+        font-family:Arial,sans-serif;
+        font-size:20px;
+        font-weight: normal;
+        letter-spacing: -0.03em;
+        line-height: 1.3em;
+        margin:0 0 0 17px;
+        width:400px;
+    }
+    #page_not_found a, #page_not_found a:hover { color:#df6330; text-decoration: underline; }
+    .firey_not_found {
+        background:url(/img/crowdignite/not_found.jpg) no-repeat;
+        float:left;
+        width:200px;
+        height: 273px;
+    }
+</style>
+<div class="row main">
+<div id="content" class="column grid_12">
+
+  <h3 class="topContent">Page not found</h3>
+
+
+<div class="row" id="content_area">
+  <div class="column grid_12">
+
+	 <div id="page_not_found">
+             <div class="firey_not_found">
+
+             </div>
+             <h1>uh oh!</h1>
+             <h4>It seems the page you were trying to find is not around anymore. Go back <a href="/">home</a>.</h4>
+             <br class="clearfloat"/>
+	 </div>
+      
+  </div>
+</div>
+
+
+  <h3 class="bottomContent"></h3>
+
+</div> <!--  end of content column -->
+
+</div> <!--  end of content row -->

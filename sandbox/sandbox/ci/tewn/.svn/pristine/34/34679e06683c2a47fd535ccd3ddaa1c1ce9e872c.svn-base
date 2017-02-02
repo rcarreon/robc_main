@@ -1,0 +1,1613 @@
+<?php
+
+include_once (ROOT . DS . APP_DIR . DS . "global_defines.php");
+include_once (ROOT . DS . APP_DIR . DS . "controllers/engine_controller.php");
+
+/*
+ * The normal operation flow is have the Engine do all the
+ * calculations on what relevant content is out there and set that
+ * information in a quickly consumable way for the landing pages
+ *
+ * The algorithm breaks a landing page up into X number of groups.
+ * Links are put into groups to reduce the number of writes that we
+ * have to do for accounting purposes.  However, we can't just put all
+ * the links in 1 giant group because there would be a bias for links
+ * towards the top to have a higher click through rate based on
+ * locality instead of merit.  Instead groups will be randomly ordered
+ * on the landing page so stastically where they fall on the page
+ * should be the same over the course of many page loads. And since
+ * click through is a relative measure, we should get more accurate
+ * numbers.
+ *
+ * So in otherwords, groups are designed to walk that line of not
+ * having to do a done of writes and maintaing accurate analytics
+  */
+
+/* History Landing Page Analytics */
+App::import('Controller', 'HistoryLandingPageAnalytics');
+global $HistoryLandingPageAnalytics;
+$HistoryLandingPageAnalytics = new HistoryLandingPageAnalyticsController;
+$HistoryLandingPageAnalytics->constructClasses();
+
+/* History Credits import */
+App::import('Controller', 'HistoryCredits');
+global $HistoryCredits;
+$HistoryCredits = new HistoryCreditsController;
+$HistoryCredits->constructClasses();
+
+/* Landing Page import */
+App::import('Controller', 'LandingPage');
+global $LandingPages;
+$LandingPages = new LandingPageController;
+$LandingPages->constructClasses();
+
+class LandingPageEngineController extends EngineController {
+
+	var $name = 'LandingPage';
+
+	var $uses = array('Account', 'Website', 'LandingPageAnalytic', 'Page', 'Log', 'LandingPageEngine', 'LandingPageRebalance', 'SocialPage', 'PageTag', 'Stats', 'Setting', 'PageSubcategory');
+	var $components = array('Trace', 'Intersects', 'Analytic', 'Timer', 'Date', 'Rule');
+	var $helpers = array('Html', 'Javascript', 'Ajax', 'Convert');
+
+	var $accounts_lp = NULL;
+	var $debug = 0;
+
+	var $arrBulkLpas = array();
+
+	public $delta_stats = false;
+
+	function beforeFilter() {
+		set_time_limit(10*60);
+
+		// Cake test suit resets error reporting
+		// for some reason.  Here's a workaround
+		if (Configure::read('debug')) {
+			error_reporting(E_ALL);
+		}
+	}
+
+	/*
+	 * Recalculates the landing_pages for all sites
+	 *
+	 * Does the following:
+	 *
+	 * 1.) Get all the active sites
+	 * 2.) Get the accounts we need to send traffic to
+	 * 3.) Update the weights in our landing_page analytics table
+	 *
+	 */
+	public function rebalance($full = 0, $domain_id = DOMAIN_ID_ALL) {
+		$this->autoRender = false;
+		$this->log("Rebalance start", "landing_page_engine");
+
+		if ($full) {
+			debug_message('Please run /landing_page_engine/rebalance_full script instead.');
+			return;
+		} else {
+			$this->Timer->start(TIMER_LANDING_PAGE_ENGINE_REBALANCE);
+			set_time_limit(TIME_LIMIT_LANDING_PAGE_REBALANCE);
+			ini_set('memory_limit', MEMORY_LIMIT_LANDING_PAGE_REBALANCE.'M');
+		}
+
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+		if ($domain_id == DOMAIN_ID_ALL) {
+			$domains = $oHub->getAllBits();
+		} else {
+			$domains = array($oHub->idToBit($domain_id));
+		}
+
+		// Order domains based on who hasn't gotten rebalanced lately
+		$domains = $this->order_domains($domains);
+
+		$script_count = 0;
+		$script_total = count($domains);
+		$this->Timer->progress_set(0);
+		$this->Timer->running_set();
+
+		foreach ($domains as $domain_bit) {
+			$time_start = microtime(true);
+			$domain_id = $oHub->bitToId($domain_bit);
+
+			// Get intersections
+			if ($full) {
+				$intersects = $this->Intersects->get_all($domain_id);
+			} else {
+				$intersects = $this->get_just_in_time_intersects($domain_bit);
+			}
+
+			$this->rebalance_intersect($domain_bit, $intersects);
+
+			$script_count++;
+			$this->Timer->progress_set($script_count, $script_total);
+			$this->Timer->running_set();
+		}
+
+		$this->log("Rebalance complete", "landing_page_engine");
+
+		$data = $this->Timer->set_memory_limit();
+		$this->Timer->stop_save($data);
+	}
+
+	public function rebalance_full($chunk, $domain_id = DOMAIN_ID_ALL) {
+		$this->autoRender = false;
+		$this->log("Rebalance full chunk {$chunk} start", "landing_page_engine");
+
+		// validate the chunks
+		$chunk = intval($chunk);
+		if ($chunk < 1 || $chunk > 4) {
+			debug_message('The correct values for a rebalance full chunk are from 1 to 4');
+			return;
+		}
+
+		// Set the parameters for this script run
+		$this->Timer->start(constant('TIMER_LANDING_PAGE_ENGINE_FULL_REBALANCE'.$chunk));
+		set_time_limit(TIME_LIMIT_LANDING_PAGE_FULL_REBALANCE);
+		ini_set('memory_limit', MEMORY_LIMIT_LANDING_PAGE_FULL_REBALANCE.'M');
+
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+
+		// Get the proper domains by chunks
+		if ($domain_id == DOMAIN_ID_ALL) {
+			switch($chunk) {
+				case 1:
+					$domain_ids = array(DOMAIN_ID_CROWD_IGNITE);
+					break;
+				case 2:
+					$domain_ids = array(DOMAIN_ID_CRAVE_ONLINE, DOMAIN_ID_MOMTASTIC);
+					break;
+				case 3:
+					$domain_ids = array(DOMAIN_ID_GAME_REVOLUTION, DOMAIN_ID_THEFASHIONSPOT);
+					break;
+				default:
+					$domain_ids = array(DOMAIN_ID_TOTALLYHER, DOMAIN_ID_NEWS, DOMAIN_ID_ES);
+			}
+			$domains = $oHub->idArrayToBitsArray($domain_ids);
+		} else {
+			$domains = array($oHub->idToBit($domain_id));
+		}
+
+		$script_count = 0;
+		$script_total = count($domains);
+		$this->Timer->progress_set(0);
+		$this->Timer->running_set();
+
+		foreach ($domains as $domain_bit) {
+			$domain_id = $oHub->bitToId($domain_bit);
+
+			// Get intersections
+			$intersects = $this->Intersects->get_all($domain_id, true /* collapsed */);
+
+			debug_memory('Processing domain '.$domain_id.' with '.count($intersects).' intersections');
+			$accounts = $this->accounts_get($domain_bit);
+			debug_memory('Processing '.count($accounts).' Accounts');
+			$this->landing_page_analytics_weight_rebalance($intersects, $accounts, $domain_bit);
+
+			$script_count++;
+			$this->Timer->progress_set($script_count, $script_total);
+			$this->Timer->running_set();
+		}
+
+		$this->log("Rebalance full chunk {$chunk} complete", "landing_page_engine");
+
+		$data = $this->Timer->set_memory_limit();
+		$this->Timer->stop_save($data);
+	}
+
+
+	function account_skip($account, $website) {
+		return 0;
+	}
+
+	private function rebalance_intersect($domain_bit, $intersects) {
+		// Get accounts we need to send traffic to
+		$accounts = $this->accounts_get($domain_bit);
+
+		// Rebalance the weight on landing_page analytics
+		$this->landing_page_analytics_weight_rebalance($intersects, $accounts, $domain_bit);
+	}
+
+	private function impressions_since_rebalance($intersect, $domain_bit) {
+		$count = $this->LandingPageRebalance->impressions($intersect, $domain_bit);
+
+		return $count;
+	}
+
+	public function rebalance_top_impressions() {
+		set_time_limit(TIME_LIMIT_LANDING_PAGE_FULL_REBALANCE);
+		ini_set('memory_limit', MEMORY_LIMIT_LANDING_PAGE_FULL_REBALANCE.'M');
+
+		$this->autoRender = false;
+		App::import('Helper', 'Convert');
+		$Convert = new ConvertHelper();
+
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+		$domains = $oHub->getAllBits();
+
+		foreach ($domains as $domain_bit) {
+			$domain_id = $oHub->bitToId($domain_bit);
+			$intersects = $this->Intersects->get_all($domain_id);
+
+			foreach ($intersects as $intersect) {
+				$number_impressions = $this->impressions_since_rebalance($intersect, $domain_bit);
+				$intersect_id = $this->Intersects->get_id_by_intersect($intersect);
+				$tmp_intersects[$intersect_id.":".$domain_id] = $number_impressions;
+			}
+		}
+
+		arsort($tmp_intersects);
+
+		$key = key($tmp_intersects);
+		$keys = explode(":", $key);
+		$intersect_id = $keys[0];
+		$domain_id = $keys[1];
+		$domain_bit = $oHub->idToBit($domain_id);
+		$impressions = $tmp_intersects[$key];
+		$intersect = $this->Intersects->get_intersect_by_id($intersect_id);
+		$intersects = array($intersect);
+
+		if (1) {
+			$category = $Convert->category($intersect['category']);
+			$content_rating = $Convert->content_rating($intersect['content_rating']);
+			$domain_name = $Convert->domain_name($domain_id);
+			echo "Rebalancing:[".$domain_name."][".$category."][".$content_rating."]: Impressions: ".$impressions."<br>\n";
+		}
+
+		$this->rebalance_intersect($domain_bit, $intersects);
+	}
+
+	private function get_just_in_time_intersects($domain_bit) {
+		$tmp_intersects = array();
+		$out_intersects = array();
+
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+		$domain_id = $oHub->bitToId($domain_bit);
+
+		$intersects = $this->Intersects->get_all($domain_id);
+
+		foreach ($intersects as $intersect) {
+			$number_impressions = $this->impressions_since_rebalance($intersect, $domain_bit);
+
+			// If any landing page is over the threshold, then rebalance the whole thing
+			if ($number_impressions >= $this->Setting->get('LANDING_PAGE_REBALANCE_IMPRESSION_THRESHOLD')) {
+				$intersect_id = $this->Intersects->get_id_by_intersect($intersect);
+				$tmp_intersects[$intersect_id] = $number_impressions;
+			}
+		}
+
+		arsort($tmp_intersects);
+
+		foreach ($tmp_intersects as $intersect_id => $number_impressions) {
+			$out_intersects[] = $this->Intersects->get_intersect_by_id($intersect_id);
+		}
+
+		return $out_intersects;
+	}
+
+	/********************************************
+	 * LandingPage Rebalance
+	 *******************************************/
+
+	/*
+	 * Order domains by who was last updated
+	 */
+	private function order_domains($domains) {
+		foreach ($domains as $domain_bit) {
+			$order[$domain_bit] = $this->LandingPageRebalance->top_impressions_domain($domain_bit);
+		}
+
+		arsort($order);
+
+		return array_keys($order);
+	}
+
+	/*
+	 * Update weights in landing_page analytics
+	 */
+	private function landing_page_analytics_weight_rebalance($intersects, $accounts, $domain_bit) {
+		$pages_to_add = array();
+
+		// Getting accounts pages
+		echo "Getting account pages...";
+		$account_pages = array();
+		foreach ($accounts as $account) {
+			$account_pages[$account['Account']['website_id']] = array();
+		}
+		$pages = $this->Page->get_active_by_website_id(array_keys($account_pages), $domain_bit);
+		foreach ($pages as $page) {
+			$account_pages[$page['Page']['website_id']][] = $page;
+		}
+		$pages = array();
+		////////////////////////////
+		debug_memory('Done');
+
+		$intersect_count = count($intersects);
+
+		$account_count = count($accounts);
+
+		if ($intersect_count == 0) {
+			return array("reused_pages" => array(), "new_pages" => array());
+		}
+
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+		$domain_id = $oHub->bitToId($domain_bit);
+
+		$oCache = new CI\Memcached\App();
+
+		foreach ($intersects as $intersect) {
+			$intersect_id = $this->Intersects->get_id_by_intersect($intersect);
+			$oWatchdog = new \CI\Memcached\Watchdog($oCache, __METHOD__."_{$domain_id}_{$intersect_id}");
+
+			if (!$oWatchdog->isAlive(120)) {
+				$oWatchdog->heartbeat();
+				debug_memory("Rebalancing Intersect: cat: ".$intersect['category']." content: ".$intersect['content_rating']);
+				$this->log("Weight rebalance Domain Bit: ".$domain_bit." Intersect: cat: ".$intersect['category']." content: ".$intersect['content_rating'], "landing_page_engine");
+
+				echo 'Getting pages...';
+				$pages = $this->get_base_pages($intersect, $accounts, $domain_bit);
+				debug_memory(''.count($pages).' Done');
+				$oWatchdog->heartbeat();
+
+				$page_count = count($pages);
+				$analytic_page_add_count = 0;
+
+				/*
+				 * Modify weight based on account rank and
+				 * add new pages if an account needs more pages
+				 */
+				echo 'Processing pages...';
+				for ($i = 0; $i < $account_count; $i++) {
+					$add_page = $this->Setting->get('LANDING_PAGE_NUMBER_GOOD_PERFORMERS');
+
+					// Penalize this site?
+					if ($this->penalize_site($accounts[$i], $i, $domain_id)) {
+						$add_page = 0;
+					}
+
+					$weight_modifier = $this->get_weight_modifier($accounts[$i], $i, $account_count, $domain_id);
+					$oWatchdog->heartbeat();
+
+					// Decrement if account ranks low
+					for ($j = 0; $j < $page_count; $j++) {
+						// Find all pages for this account
+						if ($pages[$j]['Page']['website_id'] == $accounts[$i]['Account']['website_id']) {
+							if ($this->debug) {
+								echo "[".$i."][".$j."] AID: ".$accounts[$i]['Account']['id'].
+									" LPID: ".$pages[$j]['LandingPageAnalytic']['id'].
+									" - ".$pages[$j]['LandingPageAnalytic']['weight'].
+									" * ".$weight_modifier." = ".
+									intval($pages[$j]['LandingPageAnalytic']['weight'] * $weight_modifier).PHP_EOL;
+							}
+
+							$pages[$j]['LandingPageAnalytic']['weight']    = intval($pages[$j]['LandingPageAnalytic']['weight'] * $weight_modifier);
+							$pages[$j]['LandingPageAnalytic']['weight_vw'] = intval($pages[$j]['LandingPageAnalytic']['weight_vw'] * $weight_modifier);
+							// If this is a good performer, we don't need
+							// a new page
+							if ($pages[$j]['LandingPageAnalytic']['type'] == LINK_TYPE_BASIC && (($j + 1) / $page_count) < $this->Setting->get('LANDING_PAGE_GOOD_PERFORMER')) {
+								$add_page--;
+							}
+						}
+						$oWatchdog->heartbeat();
+					}
+
+					// Add a page because:
+					// 1.) account doesn't have a page on
+					//     this website
+					// 2.) There's a low performing one
+					// 3.) It's the top account ($i == 0)
+					// 4.) It's a featured account
+					if ($add_page > 0 ||
+					    $i == 0 ||
+					    $accounts[$i]['Account']['featured']) {
+						if ($this->debug) {
+							echo "[".$i."] Accounts adding: ".$accounts[$i]['Account']['id'].
+								" Weight modifier: ".$weight_modifier." * ".$this->Setting->get('LANDING_PAGE_WEIGHT_NEW').
+								" = ".intval(($weight_modifier * $this->Setting->get('LANDING_PAGE_WEIGHT_NEW')))."";
+						}
+						debug_memory('    Adding pages for account '.$accounts[$i]['Account']['id'].' ['.intval($weight_modifier * $this->Setting->get('LANDING_PAGE_WEIGHT_NEW')).']');
+						$oWatchdog->heartbeat();
+						$lpas = $this->landing_page_analytic_page_add(
+							$accounts[$i],
+							$intersect,
+							intval($weight_modifier * $this->Setting->get('LANDING_PAGE_WEIGHT_NEW')),
+							$domain_bit,
+							0,
+							$account_pages[$accounts[$i]['Account']['website_id']]
+						);
+						$oWatchdog->heartbeat();
+						if ($lpas) {
+							foreach ($lpas as $lpa) {
+								array_push($pages_to_add, $lpa);
+								$analytic_page_add_count++;
+							}
+						}
+					}
+				}
+				debug_memory('Done');
+
+				// Set all the pages weight to 0 and we'll
+				// have to use the account updates to over
+				// write that.  This fills the hole where an
+				// account goes inactive or deleted and makes
+				// sure we still don't send them traffic
+				echo 'Updating weights...';
+				$oWatchdog->heartbeat();
+				$this->LandingPageAnalytic->zero_weight($intersect, $domain_bit);
+				$oWatchdog->heartbeat();
+
+				// Save the weights off
+				$pages_weight = array();
+				for ($j = 0; $j < $page_count; $j++) {
+					if ($pages[$j]['LandingPageAnalytic']['account_good'] &&
+						($pages[$j]['LandingPageAnalytic']['weight'] > 0 || $pages[$j]['LandingPageAnalytic']['weight_vw'] > 0)) {
+						$weight = $pages[$j]['LandingPageAnalytic']['weight'];
+						$pages_weight[$weight][] = array(
+	                                                     'id'        => $pages[$j]['LandingPageAnalytic']['id'],
+	                                                     'weight'    => $pages[$j]['LandingPageAnalytic']['weight'],
+	                                                     'weight_vw' => $pages[$j]['LandingPageAnalytic']['weight_vw']
+	                                                    );
+					}
+					$oWatchdog->heartbeat();
+				}
+				// update all weigths
+				$this->LandingPageAnalytic->update_pages_weight($pages_weight);
+				$oWatchdog->heartbeat();
+				debug_memory('Done');
+
+
+				// If we don't have enough for a page, we need to blindly add
+				// some more
+				echo 'Adding more needed pages...';
+				$total_links = $analytic_page_add_count + $page_count;
+				$k = 0;
+				if ($total_links < DEFAULT_LANDING_PAGE_GENERAL_MIN_LINKS) {
+					for ($i = $total_links; $i <= DEFAULT_LANDING_PAGE_GENERAL_MIN_LINKS; $i++) {
+						for ($j = 0; $j < $account_count; $j++) {
+							$oWatchdog->heartbeat();
+							debug_memory('    Adding pages for account '.$accounts[(($k+$j) % $account_count)]['Account']['id']);
+							$account = $accounts[(($k+$j) % $account_count)];
+							$lpas = $this->landing_page_analytic_page_add(
+								$account,
+								$intersect,
+								0,
+								$domain_bit,
+								$pages_to_add,
+								$account_pages[$account['Account']['website_id']]
+							);
+
+							if ($lpas) {
+								foreach ($lpas as $lpa) {
+									array_push($pages_to_add, $lpa);
+								}
+							}
+							$oWatchdog->heartbeat();
+						}
+					}
+				}
+				debug_memory('Done');
+
+				// Reset the count for impressions since rebalance
+				$this->LandingPageRebalance->reset($intersect, $domain_bit);
+				$oWatchdog->heartbeat();
+
+				echo 'Saving '.count($pages_to_add).' links...';
+				if (!empty($pages_to_add)) {
+					$this->LandingPageAnalytic->insert_bulk($pages_to_add);
+					$pages_to_add = array();
+				}
+				$oWatchdog->kill();
+			} else {
+				debug_memory('Intersect being rebalanced by another process');
+			}
+			debug_memory('Done');
+		} // foreach intersect
+
+		$this->LandingPageAnalytic->flush_bulk();
+
+		return array("reused_pages" => $pages, "new_pages" => $pages_to_add);
+	}
+
+	private function penalize_site($account, $rank, $domain_id) {
+		if ($account['Account']['featured'] != 0) {
+			return 0;
+		}
+
+		// Make sure we have enough sites to populate a landing page
+		if ($rank < $this->Setting->get('LANDING_PAGE_MINIMUM_ACCOUNTS')) {
+			return 0;
+		}
+
+		if ($this->Setting->tunable('LANDING_PAGE_PENALIZE_SMALL_SITE', $domain_id) &&
+			isset($account['incoming']) &&
+			$account['incoming'] < $this->Setting->tunable('LANDING_PAGE_PENALIZE_SMALL_SITE_THRESHOLD', $domain_id) &&
+			$account['Account']['credits'] < $this->Setting->tunable('LANDING_PAGE_PENALIZE_THRESHOLD', $domain_id)) {
+
+			return 1;
+		}
+
+		if ($this->Setting->tunable('LANDING_PAGE_PENALIZE', $domain_id) &&
+			$account['Account']['credits'] < $this->Setting->tunable('LANDING_PAGE_PENALIZE_THRESHOLD', $domain_id)) {
+
+			return 1;
+		}
+
+		return 0;
+	}
+
+	private function get_base_pages($intersect, $accounts, $domain_bit) {
+		$pages_count = array();
+		$pages_out = array();
+		$k = 0;
+
+		/**
+		 * Put all pages
+		 */
+		$pages = $this->pages_top($intersect, $domain_bit);
+
+		// Get the website ID for all the pages
+		$website_ids = array();
+		foreach ($accounts as $account) {
+			$website_ids[$account['Account']['website_id']] = 0;
+		}
+
+		// Get the accounts ids from those website pages
+		$website_account = $this->Website->find('list', array(
+			'conditions' => array('id' => array_keys($website_ids)),
+			'fields' => 'id, account_id'
+		));
+
+
+		// Check to make sure account is in good
+		// standing (ie passed into our function)
+		$pages_out = array();
+		$landing_page_instanc_max_pages = $this->Setting->get('LANDING_PAGE_INSTANCE_MAX_PAGES');
+		foreach ($pages as $page) {
+			// validate the website of the page (if its on the accounts)
+			if (empty($website_account[$page['Page']['website_id']])) {
+				continue;
+			}
+
+			// Guilty until proven innocent
+			$page['LandingPageAnalytic']['account_good'] = count($accounts) > 0 ? 1 : 0;
+
+			// Pull the account ID
+			$account_id = $website_account[$page['Page']['website_id']];
+
+			if ($page['LandingPageAnalytic']['type'] == LINK_TYPE_BASIC) {
+				if(isset($pages_count[$account_id])) {
+					$pages_count[$account_id]++;
+				} else {
+					$pages_count[$account_id] = 1;
+				}
+
+				// Make sure we don't put too many basic pages in for a particular account
+				if ($pages_count[$account_id] > $landing_page_instanc_max_pages) {
+					continue;
+				}
+			}
+			$pages_out[] = $page;
+		}
+
+        // Calculate the weight using ctr
+        $page_count = count($pages_out);
+        $pages_out = Set::sort($pages_out, '{n}.ctr', 'desc');
+        for ($i = 0; $i < $page_count; $i++) {
+            $pages_out[$i]['LandingPageAnalytic']['weight'] = $this->weight($pages_out[$i], $intersect, $i, $page_count);
+        }
+
+        // Calculate the weight using ctp
+        $pages_out = Set::sort($pages_out, '{n}.ctp', 'desc');
+        for ($i = 0; $i < $page_count; $i++) {
+            if (false == is_null($pages_out[$i]['ctp'])) {
+                $pages_out[$i]['LandingPageAnalytic']['weight_vw'] = $this->weight($pages_out[$i], $intersect, $i, $page_count);
+            }
+        }
+
+		return $pages_out;
+	}
+
+	public function get_bayesian_distribution($pages, $num_links, $type, $field_name, $weight_name) {
+        $Distribution = new \CI\Distribution\Bayesian(\CI\Distribution\Bayesian::TYPE_LANDING_PAGE_ANALYTIC);
+
+        if (count($pages) < $num_links) {
+            $num_links = count($pages);
+        }
+
+        if ($type == LINK_TYPE_BASIC && $num_links > 0) {
+            $tier_links = array();
+            for ($i = 0; $i < $num_links;) {
+                $pages        = $Distribution->simulate($pages, $field_name, $weight_name);
+                $pages_still  = array();
+                $active_links = array();
+
+                foreach ($pages as $page) {
+                    if ($page['LandingPageAnalytic'][$weight_name] > 0) {
+                        $active_links[] = $page;
+                    } else {
+                        $pages_still[] = $page;
+                    }
+                }
+
+                if (empty($active_links)) {
+                    break;
+                }
+
+                $pages = $pages_still;
+                $tier_links[] = $active_links;
+                $i += count($active_links);
+                unset($pages_still, $active_links); // for mental sanity of coto
+            }
+
+            $max_weight = 0;
+            $tier_pages = array();
+            for ($i = count($tier_links) - 1; $i >= 0; $i--) {
+                $tmp_weight = -1;
+                for ($j = 0, $tier_link_num = count($tier_links[$i]); $j < $tier_link_num; $j++) {
+                    $tier_links[$i][$j]['LandingPageAnalytic'][$weight_name] += $max_weight;
+                    $tier_pages[] = $tier_links[$i][$j];
+                    if ($tier_links[$i][$j]['LandingPageAnalytic'][$weight_name] > $tmp_weight) {
+                        $tmp_weight = $tier_links[$i][$j]['LandingPageAnalytic'][$weight_name];
+                    }
+                }
+                $max_weight = $tmp_weight;
+            }
+
+            $pages = array_merge($tier_pages, $pages);
+        } else {
+            $pages = $Distribution->simulate($pages, $field_name, $weight_name);
+        }
+
+        return $pages;
+    }
+
+	private function weight($page, $intersect, $rank, $count) {
+		$weight = ($this->Setting->get('LANDING_PAGE_WEIGHT_EXISTING') - intval($this->Setting->get('LANDING_PAGE_WEIGHT_EXISTING')*($rank/$count)));
+
+		if ($this->Setting->get('LANDING_PAGE_SOCIAL_BONUS')) {
+			if ($page['SocialPage']['trending'] > 0) {
+				echo "    [", $page['Page']['id'], "] Social bonus: ", $page['SocialPage']['trending'], PHP_EOL;
+				$weight += $this->Setting->get('LANDING_PAGE_SOCIAL_BONUS') * $page['SocialPage']['trending'];
+			}
+		}
+
+		if ($this->Setting->get('LANDING_PAGE_PENALIZE_CATEGORY')) {
+			if ($page['Page']['category'] != $intersect['category']) {
+				// Penalize it, but not so much that we lose data if we need to fallback
+				// to a category which has little inventory
+				$weight = intval($weight/10);
+			}
+		}
+
+		return $weight;
+	}
+
+	/*
+	 * Get the top links by using a rolling click through rate.  Or in
+	 * otherwords, how well has these pages performed over the past X days
+	 */
+	private function pages_top($intersect, $domain_bit) {
+		$analytics = $this->LandingPageAnalytic->intersect_pages_top($intersect, $domain_bit);
+
+		$delete_pages = array();
+		$out_analytics = array();
+		$count = count($analytics);
+		for ($i = 0; $i < $count; $i++) {
+			$page = array('Page' => $analytics[$i]['Page']);
+			if (!$this->business_rules_allowed($intersect, $page, $domain_bit, true)) {
+				$delete_pages[] = $analytics[$i]['LandingPageAnalytic']['id'];
+				continue;
+			}
+			$analytics[$i]['ctr'] = $this->calculate_ctr($analytics[$i]);
+			$analytics[$i]['ctp'] = $this->get_ctp($page);
+			$out_analytics[] = $analytics[$i];
+		}
+		$this->LandingPageAnalytic->remove_pages_from_intersect($delete_pages);
+
+		// Sort them by their rolling CTR
+		uasort($out_analytics, "lp_ctr_rate");
+
+		return $out_analytics;
+	}
+
+	private function get_ctp($page)
+	{
+        $ctp = null;
+        $logger_file = new Logger_Storage_File(
+            array(
+                'filepath' => \CI\VowpalWabbit\Parser\Common::LANDIN_PAGE_ERROR_LOG_PATH
+            )
+        );
+        $logger = new Logger($logger_file);
+
+        try{
+            $data_set              = new CI\VowpalWabbit\Data\Set();
+            $filter                = new CI\Filter\RemoveMysqlStopWord();
+            $config_vw             = Configure::read('vowpal_wabbit_landingpage_server');
+            $vowpal_wabbit_accesss = new CI\VowpalWabbit\Data\Access($config_vw['host'], $config_vw['port']);
+            $vowpal_wabbit_accesss->setLogger($logger);
+
+            $x_impression_to = 'page_id_'  . $page['Page']['id'] .
+               ' cat_'     . $page['Page']['category'] .
+               ' age_0'    .
+               ' gender_'  . $page['Page']['demographic_sex'] .
+               ' rating_'  . $page['Page']['content_rating'];
+
+            $v_title_to = 'v_title_to' . $filter->filter($page['Page']['title']);
+
+            $data_set->setLabel(1)
+                     ->addFeatures(array('x_impression_to' => $x_impression_to))
+                     ->addFeatures(array('v_title_to' => $v_title_to));
+
+            $ctp = $vowpal_wabbit_accesss->get($data_set);
+            $ctp = trim($ctp);
+            $ctp = is_numeric($ctp) ? (float) $ctp : 0;
+        } catch(\CI\Socket\Exception $oEx) {
+            $date = new \CI\Date();
+            $logger->log($date->now() . ' ' . $oEx->getMessage());
+        }
+
+		return $ctp;
+
+	}
+
+	function calculate_ctr($analytic) {
+		global $HistoryLandingPageAnalytics;
+		$intersect = $this->Intersects->get_by_landing_page_analytic($analytic);
+
+		// Make sure all pages get a chance to run a little bit before we switch over to rolling CTR
+		if ($this->Setting->get('LANDING_PAGE_USE_LIFETIME_CTR') || $analytic['LandingPageAnalytic']['num_display'] < $this->Setting->get('LANDING_PAGE_SIGNIFICANCE_IMPRESSION_THRESHOLD')) {
+			$ctr = $analytic['LandingPageAnalytic']['num_ctr'] / $analytic['LandingPageAnalytic']['num_display'];
+		} else {
+			$type = $analytic['LandingPageAnalytic']['type'];
+			$key = $analytic['LandingPageAnalytic']['key'];
+
+			// Use rolling CTR
+			$page = isset($analytic['Page']) ? $analytic['Page'] : $analytic['LandingPageAnalytic']['page_id'];
+			$landing_page_stats = $HistoryLandingPageAnalytics->stats_days($page, $intersect, $this->Setting->get('LANDING_PAGE_ROLLING_CTR_DAYS'), $type, $key);
+
+			if ($landing_page_stats['num_display'] > $this->Setting->get('LANDING_PAGE_SIGNIFICANCE_IMPRESSION_THRESHOLD')) {
+				$ctr = $landing_page_stats['num_ctr'] / $landing_page_stats['num_display'];
+			} else {
+				// This could result in "bouncing".  Needs to change to tracking last X number of impressions
+				$ctr = $analytic['LandingPageAnalytic']['num_ctr'] / $analytic['LandingPageAnalytic']['num_display'];
+			}
+		}
+
+		return $ctr;
+	}
+
+	protected function get_weight_modifier($account, $rank, $account_count, $domain_id) {
+		if ($this->penalize_site($account, $rank, $domain_id)) {
+			return 0;
+		}
+
+		// Decrementer weight depending on how
+		// this account ranks
+		if ($account_count) {
+			$numer = pow(($account_count - $rank), $this->Setting->get('LANDING_PAGE_ACCOUNT_FALLOFF_RATE'));
+			$denom = pow($account_count, $this->Setting->get('LANDING_PAGE_ACCOUNT_FALLOFF_RATE'));
+
+			$account_weight = 1 - ($numer/$denom);
+		} else {
+			$account_weight = 1;
+		}
+
+		// Click-Through to Service
+		// Level Agreement Ratio is a
+		// tunable for how much we
+		// care about meeting SLA
+		// requirements vs getting
+		// visitors into Raaze
+		$weight_modifier = (1 - ($account_weight * $this->Setting->get('LANDING_PAGE_SLA_TO_CTR_RATIO')));
+
+		// The top account gets a
+		// bonus and gets an "increment"
+		if ($rank == 0) {
+			$weight_modifier += $this->Setting->get('LANDING_PAGE_ACCOUNT_TOP_BONUS');
+		}
+
+		// Featured accounts get a bonus
+		if ($account['Account']['featured'] && $this->Setting->get('LANDING_PAGE_GIVE_FEATURED_BONUS')) {
+			$weight_modifier += $account['Account']['featured'];
+		}
+
+		return $weight_modifier;
+	}
+
+	/*
+	 * Find and add a page to this landing_page analytic
+	 */
+	private function landing_page_analytic_page_add($account, $intersect, $weight, $domain_bit, $page_array = 0, $pages = array()) {
+		$match_ranking = array();
+
+		// Find all elgible pages
+		if (empty($pages)) {
+			$pages = $this->Page->get_active_by_website_id($account['Account']['website_id'], $domain_bit);
+		}
+
+		if (empty($pages)) {
+			return;
+		}
+
+		$pages_ids = array();
+		foreach ($pages as $page) {
+			$pages_ids[] = $page['Page']['id'];
+		}
+
+		$collapsed_intersect = $intersect;
+		$collapsed_intersect['content_rating'] = WEBSITE_CONTENT_G;
+
+		$exist_pages = $this->LandingPageAnalytic->does_pages_exists(
+			$pages_ids, $collapsed_intersect, $domain_bit, LINK_TYPE_BASIC, null/*Key*/, true/*Only visibles*/
+		);
+
+		foreach ($pages as $page) {
+			if (DEBUG_MULTIDOMAIN) {
+				plat_assert($page['Page']['domain_bitfield'] & $domain_bit);
+			}
+
+			// See if we already added this one
+			if (isset($exist_pages[$page['Page']['id']])) {
+				continue;
+			}
+
+			// See if we have it in our page array
+			if ($page_array) {
+				$in_array = 0;
+				foreach($page_array as $element) {
+					if ($element['LandingPageAnalytic']['page_id'] == $page['Page']['id'] &&
+						$this->Intersects->matches($element['LandingPageAnalytic'], $intersect)) {
+						$in_array = 1;
+						break;
+					}
+				}
+				if ($in_array) {
+					continue;
+				}
+			}
+
+			// Figure out how good of a match this page to the intersect is
+			$match_rate = $this->page_to_intersect_match_rate($page, $intersect, true /* collapsed */);
+
+			if ($match_rate) {
+				$page['match_rate'] = $match_rate;
+				array_push($match_ranking, $page);
+			}
+		}
+
+		// See if could find a page
+		if (empty($match_ranking)) {
+			return;
+		}
+
+		// Sort and find the best match
+		uasort($match_ranking, "lp_cmp_match_rate");
+		$last = end($match_ranking);
+
+		// Create Structure
+		$lpas = $this->create_landing_page_analytics($collapsed_intersect, $last, $domain_bit, $weight);
+
+		return $lpas;
+	}
+
+	private function create_landing_page_analytics($intersect, $page, $domain_bit, $weight) {
+		$lpas = array();
+		$page_id = $page['Page']['id'];
+
+		// Create Basic
+		$lpas[] = $this->LandingPageAnalytic->_create_lpa($intersect, $page_id, $domain_bit, $weight, LINK_TYPE_BASIC, 0);
+
+		// Create Subcategories
+		$subcategories = $this->PageSubcategory->get_visible_by_page_id($page_id);
+		foreach ($subcategories as $subcategory) {
+			$lpas[] = $this->LandingPageAnalytic->_create_lpa($intersect, $page_id, $domain_bit, $weight, LINK_TYPE_SUBCATEGORY, $subcategory['id']);
+		}
+
+		// Create Tags
+		$page_tags = $this->PageTag->get_all_page_id($page_id);
+		foreach ($page_tags as $tag) {
+			$tag_id = $tag['PageTag']['tag_id'];
+			$lpas[] = $this->LandingPageAnalytic->_create_lpa($intersect, $page_id, $domain_bit, $weight, LINK_TYPE_TAG, $tag_id);
+		}
+
+		return $lpas;
+	}
+
+	public function business_rules_allowed($intersect, $page, $domain_bit = -1, $collapsed = false) {
+		if (isset($page['Page']['status']) && $page['Page']['status'] != PAGE_STATUS_APPROVED) {
+			return 0;
+		}
+
+		if (!($page['Page']['domain_bitfield'] & $domain_bit)) {
+			return 0;
+		}
+
+		$rate = $this->page_to_intersect_match_rate($page, $intersect, $collapsed);
+
+		if ($rate) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
+	/*
+	 * Figures out how good of a match based on category and
+	 * demographic a page is to a website
+	 *
+	 * To start off with this is a very basic algorithm
+	 * Just looks for matches in category & demographics
+	 */
+	private function page_to_intersect_match_rate($page, $intersect, $collapsed = false) {
+		$rate_category = 65;
+		$rate_sex = 35;
+		$rate = 0;
+
+		// Category
+		if ($page['Page']['category'] == $intersect['category']) {
+			$rate += $rate_category;
+		}
+
+		// Demographic sex
+		if ($page['Page']['demographic_sex'] == $intersect['demographic_sex']) {
+			$rate += $rate_sex;
+		} else if ($page['Page']['demographic_sex'] == DEMOGRAPHIC_SEX_BOTH) {
+			$rate += intval($rate_sex / 2);
+		} else if ($intersect['demographic_sex'] == DEMOGRAPHIC_SEX_BOTH) {
+			$rate += intval($rate_sex / 2);
+		}
+
+		if (!$collapsed) {
+			// Content Rating
+			if(!$this->Rule->content_rating($intersect['content_rating'], $page['Page']['content_rating'])) {
+				return 0;
+			}
+		}
+
+		// Category
+		if (!$this->Rule->category($intersect['category'], $page['Page']['category'])) {
+			return 0;
+		}
+
+		return $rate;
+	}
+
+	public function landing_pages_add($page_id, $type = LINK_TYPE_BASIC, $key = 0, $domain_id = 0) {
+		$page = $this->Page->findById($page_id);
+
+		$website_id = $page['Page']['website_id'];
+		$website = $this->Website->findById($website_id);
+
+		if ($domain_id) {
+			$domain_ids = array($domain_id);
+		} else {
+			$domain_id = $website['Website']['domain_primary'];
+			$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+			$domain_bit = $oHub->idToBit($domain_id);
+			$domain_ids = $oHub->bitsToIdArray($website['Website']['domain_bitfield']);
+		}
+
+		foreach ($domain_ids as $domain_id) {
+			if (!isset($this->accounts_lp[$domain_id])) {
+				$this->accounts_lp[$domain_id] = $this->accounts_get_by_primary_domain($domain_id);
+			}
+
+			$this->page_new($this->accounts_lp[$domain_id], $domain_id, $website, $page, $type, $key);
+		}
+	}
+
+	public function landing_pages_add_similar($page, $key = 0, $domain_id = 0) {
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+
+	    if ($domain_id) {
+	        $domain_ids = array($domain_id);
+	    } else {
+	        $domain_id = $page['Website']['domain_primary'];
+	        $domain_ids = $oHub->bitsToIdArray($page['Website']['domain_bitfield']);
+	    }
+
+        foreach ($domain_ids as $domain_id) {
+            if (!isset($this->accounts_lp[$domain_id])) {
+                $this->accounts_lp[$domain_id] = $this->accounts_get_by_primary_domain($domain_id);
+            }
+
+
+            $website['Website']['id'] = $page['Website']['id'];
+            $this->page_new($this->accounts_lp[$domain_id], $domain_id, $website, $page, LINK_TYPE_SIMILAR, $key, true);
+        }
+
+	    $this->LandingPageAnalytic->insert_bulk($this->arrBulkLpas);
+	    $this->arrBulkLpas = array();
+
+	}
+
+	/* Push a new page into the system */
+	public function page_new($accounts, $domain_id, $website, $page, $type = LINK_TYPE_BASIC, $key = 0, $bulk = false) {
+		$page_id = $page['Page']['id'];
+		$account_count = count($accounts);
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+		$domain_bit = $oHub->idToBit($domain_id);
+
+		/* Get the account index */
+		$count = 0;
+		foreach ($accounts as $account) {
+			if ($account['Account']['website_id'] == $website['Website']['id']) {
+				break;
+			}
+			$count++;
+		}
+
+		/* Check if account is even elgible to add a page in */
+		if ($count == $account_count) {
+			return 0;
+		}
+
+		plat_assert($count < $account_count, print_r(array($page, $website, $accounts), 1));
+
+		/* Get weight */
+		$weight_modifier = $this->get_weight_modifier($accounts[$count], $count, $account_count, $domain_id);
+		if (!$weight_modifier) {
+			// No point in adding links if weight is going to be 0
+			return;
+		}
+		$weight = intval($weight_modifier * $this->Setting->get('LANDING_PAGE_WEIGHT_NEW'));
+		$fields = array(
+						'weight'    => $weight,
+						'weight_vw' => $weight
+					    );
+
+		$conditions = array(
+                			'domain_bitfield & ' . $domain_bit,
+							'page_id' => $page_id,
+							'type'    => $type,
+							'key'     => $key
+            				);
+
+		// Update weight for existing records
+		$this->LandingPageAnalytic->updateAll($fields, $conditions);
+
+		/* Create LPA for each missing intersect */
+		$lpa = array();
+		$intersects = $this->Intersects->get_all($domain_id, true); // just collapsed intersections
+        $valid_intersect_ids = array();
+		foreach ($intersects as $intersect) {
+		    /* For basic links, only put it in category which it belongs */
+		    if ($type == LINK_TYPE_BASIC && $page['Page']['category'] != $intersect['category']) {
+		        continue;
+		    }
+		    if ($this->business_rules_allowed($intersect, $page, $domain_bit, true/*Collapsed*/) == 0) {
+		        continue;
+		    }
+		    $valid_intersect_ids[] = $this->Intersects->get_id_by_intersect($intersect);
+		}
+
+		$lpas = $this->LandingPageAnalytic->find(
+            "all",
+            array(
+                "conditions" => array(
+                    'domain_bitfield & ' . $domain_bit,
+                    'page_id' => $page_id,
+                    'type' => $type,
+                    'key' => $key
+                ),
+                "fields" => array(
+                    'LandingPageAnalytic.category',
+                    'LandingPageAnalytic.demographic_sex',
+                    'LandingPageAnalytic.content_rating',
+                )
+            )
+		);
+
+		$existent_intersect_ids = array();
+		foreach ($lpas as $lpa) {
+		    $intersect_id = $this->Intersects->get_id_by_intersect(
+                array(
+                    'category' => $lpa['LandingPageAnalytic']['category'],
+                    'demographic_sex' => $lpa['LandingPageAnalytic']['demographic_sex'],
+                    'content_rating' => $lpa['LandingPageAnalytic']['content_rating']
+                )
+		    );
+		    $existent_intersect_ids[] = $intersect_id;
+		}
+
+		$missing_intersects = array_diff($valid_intersect_ids, $existent_intersect_ids);
+		$missing_lpas = array();
+		foreach ($missing_intersects as $intersect) {
+			$intersect = $this->Intersects->get_intersect_by_id($intersect);
+			// if the intersection is collapsed add the page
+			if ($intersect['content_rating'] == WEBSITE_CONTENT_G) {
+			    $missing_lpas[] = $this->LandingPageAnalytic->build_new_lpa(
+	                $intersect,
+	                $page_id,
+	                $domain_bit,
+	                $weight,
+	                $type,
+	                $key
+	            );
+			}
+		}
+
+		/* Save it off */
+		if (!empty($missing_lpas)) {
+		    if ($bulk) {
+                $this->arrBulkLpas = array_merge($this->arrBulkLpas, $missing_lpas);
+		    } else {
+		        $rc = $this->LandingPageAnalytic->saveAll($missing_lpas);
+		    }
+
+		}
+	}
+
+	/* Engine abstract functions */
+	public function timer_start() {
+		$this->Timer->start(TIMER_LANDING_PAGE_UPDATE_DISPLAY_COUNTS);
+		set_time_limit(TIME_LIMIT_LANDING_PAGE_UPDATE_DISPLAY_COUNTS);
+		ini_set('memory_limit', MEMORY_LIMIT_LANDING_PAGE_UPDATE_DISPLAY_COUNTS.'M');
+	}
+
+	public function timer_stop() {
+		$data = $this->Timer->set_memory_limit();
+		$this->Timer->stop_save($data);
+	}
+
+	public function batch_data($batch, $json) {
+		$data = json_decode($json, true);
+
+		if (!$this->delta_stats) {
+
+			$intersect = $data['intersect'];
+			$intersect_id = $this->Intersects->get_id_by_intersect($intersect);
+
+			$domain_bit = $data['domain_bit'];
+
+			// Count the intersect
+			if (empty($batch['intersects'][$intersect_id][$domain_bit])) {
+				$batch['intersects'][$intersect_id][$domain_bit] = 0;
+			}
+			$batch['intersects'][$intersect_id][$domain_bit]++;
+
+			if (empty($batch['pages'])) {
+				$page_views = array();
+			} else {
+				$page_views = $batch['pages'];
+			}
+
+			if (empty($batch['analytics'])) {
+				$analytic_views = array();
+			} else {
+				$analytic_views = $batch['analytics'];
+			}
+
+			// General Pages
+			if (isset($data['general_pages'])) {
+				$pages = $data['general_pages'];
+				$updates = $this->update_batches($pages, $page_views, $analytic_views, $intersect_id, $domain_bit);
+				$page_views = $updates['page_views'];
+				$analytic_views = $updates['analytic_views'];
+			}
+
+			// Featured Pages
+			if (isset($data['featured_pages'])) {
+				$pages = $data['featured_pages'];
+				$updates = $this->update_batches($pages, $page_views, $analytic_views, $intersect_id, $domain_bit);
+				$page_views = $updates['page_views'];
+				$analytic_views = $updates['analytic_views'];
+			}
+
+			$batch['pages'] = $page_views;
+			$batch['analytics'] = $analytic_views;
+
+		} else {
+			// New way to storage stadistic data [AZ530]
+			$intersect_id = $data['int'];
+			$domain_bit = $data['dom'];
+			$created = date('Y-m-d 00:00:00', $data['date']);
+			foreach ($data['stats'] as $page) {
+				$type = isset($page['t']) ? $page['t'] : 0;
+				$key = isset($page['k']) ? $page['k'] : 0;
+				$id = md5(implode('_', array($page['i'], $page['w'], $domain_bit, $intersect_id, $type, $key, $created)));
+				if (isset($batch['stats_pages'][$id])) {
+					$batch['stats_pages'][$id]['impressions']++;
+				} else {
+					$batch['stats_pages'][$id] = array(
+						'page_id'     => $page['i'],
+						'website_id'  => $page['w'],
+						'domain_bit'  => $domain_bit,
+						'intersect'   => $intersect_id,
+						'type'        => $type,
+						'key'         => $key,
+						'created'     => $created,
+						'impressions' => 1
+					);
+				}
+			}
+
+			if(isset($data['info'])) {
+				// Count the intersect
+				if (empty($batch['intersects'][$intersect_id][$domain_bit])) {
+					$batch['intersects'][$intersect_id][$domain_bit] = 0;
+				}
+				$batch['intersects'][$intersect_id][$domain_bit]++;
+
+				if (empty($batch['pages'])) {
+					$page_views = array();
+				} else {
+					$page_views = $batch['pages'];
+				}
+
+				if (empty($batch['analytics'])) {
+					$analytic_views = array();
+				} else {
+					$analytic_views = $batch['analytics'];
+				}
+
+				// General Pages
+				if (isset($data['info']['general_pages'])) {
+					$pages = $data['info']['general_pages'];
+					$updates = $this->update_batches($pages, $page_views, $analytic_views, $intersect_id, $domain_bit);
+					$page_views = $updates['page_views'];
+					$analytic_views = $updates['analytic_views'];
+				}
+
+				// Featured Pages
+				if (isset($data['info']['featured_pages'])) {
+					$pages = $data['info']['featured_pages'];
+					$updates = $this->update_batches($pages, $page_views, $analytic_views, $intersect_id, $domain_bit);
+					$page_views = $updates['page_views'];
+					$analytic_views = $updates['analytic_views'];
+				}
+
+				$batch['pages'] = $page_views;
+				$batch['analytics'] = $analytic_views;
+			}
+		}
+
+		return $batch;
+	}
+
+	private function update_batches($pages, $page_views, $analytic_views, $intersect_id, $domain_bit) {
+		if (is_array($pages)) {
+			foreach ($pages as $page) {
+				// Use either analytic ID or intersect
+				if (isset($page['Page']['analytic_id'])) {
+					$analytic_id = $page['Page']['analytic_id'];
+					if (empty($analytic_views[$analytic_id])) {
+						$analytic_views[$analytic_id] = 0;
+					}
+
+					$analytic_views[$analytic_id]++;
+				} else {
+					$page_id = $page['Page']['id'];
+					if (empty($page_views[$intersect_id][$domain_bit])) {
+						$page_views[$intersect_id][$domain_bit] = array();
+					}
+					if (empty($page_views[$intersect_id][$domain_bit][$page_id])) {
+						$page_views[$intersect_id][$domain_bit][$page_id] = 0;
+					}
+
+					$page_views[$intersect_id][$domain_bit][$page_id]++;
+				}
+			}
+		}
+
+		$batch = array("analytic_views" => $analytic_views, "page_views" => $page_views);
+
+		return $batch;
+	}
+
+	public function save_item($type, $datas) {
+		foreach ($datas as $key => $value) {
+			switch ($type) {
+				case 'intersects':
+				$this->save_item_intersects($key, $value);
+				break;
+				case 'pages':
+				$this->save_item_pages($key, $value);
+				break;
+				case 'analytics':
+				$this->save_item_analytics($key, $value);
+				break;
+				case 'stats_pages': // [AZ530]
+				$this->save_item_stats_pages($key, $value);
+				break;
+				default:
+				plat_assert(0);
+			}
+		}
+	}
+
+	public function save_item_intersects($intersect_id, $datas) {
+		$intersect = $this->Intersects->get_intersect_by_id($intersect_id);
+
+		foreach ($datas as $domain_bit => $count) {
+			plat_assert($count);
+
+			$this->LandingPageRebalance->increment($intersect, $domain_bit, $count);
+		}
+	}
+
+	public function save_item_pages($intersect_id, $datas) {
+		$intersect = $this->Intersects->get_intersect_by_id($intersect_id);
+
+		foreach ($datas as $domain_bit => $pages) {
+			foreach ($pages as $page_id => $count) {
+				plat_assert($count);
+
+				$this->LandingPageAnalytic->display_count_update($intersect, $page_id, $domain_bit, $count);
+			}
+		}
+	}
+
+	public function save_item_analytics($analytic_id, $count) {
+		plat_assert($count);
+
+		$this->LandingPageAnalytic->display_count_update(0, 0, 0, $count, $analytic_id);
+	}
+
+	// [AZ530]
+	public function save_item_stats_pages($id, $page) {
+		$intersect = $this->Intersects->get_intersect_by_id($page['intersect']);
+		$this->Stats->increment_landing_page_stats(
+			$page['created'],
+			$page['page_id'],
+			$page['website_id'],
+			$page['domain_bit'],
+			$intersect,
+			$page['type'],
+			$page['key'],
+			0,
+			$page['impressions']
+		);
+	}
+
+	/* Pull cache information and make it persist */
+	public function update_display_counts($timers = 1) {
+		$this->autoRender = false;
+		echo 'Somebody please remove me!! im not usefull anymore :(';
+	}
+
+	public function new_update_display_counts($instance = 1, $timers = 1) {
+		$this->autoRender = false;
+		echo 'Somebody please remove me!! im not usefull anymore :(';
+	}
+
+	/**
+	 * Updates the impressions of pages in landing page
+	 *
+	 * @param  integer $instance The instance of this run
+	 * @param  integer $timers   1 to use timers
+	 *
+	 * @return integer Seconds to sleep when used by daemon script
+	 */
+	public function update_stats_impressions($instance = 1, $timers = 1) {
+		$this->autoRender  = false;
+		$this->delta_stats = true;
+		$key = 'landing_page_engine_update_stats_impressions_' . $instance;
+		App::import('Component', 'Watchdog');
+		$watchdog = new WatchdogComponent();
+		if ($watchdog->is_alive($key)) {
+			echo 'The script ', $key, ' is still alive.', PHP_EOL;
+			exit;
+		}
+		$this->process_queues("landing_page_stats_views", $timers, $key, 100000);
+		return 150;
+	}
+
+	/* Deletes the lock for a script */
+ 	public function stop_update_display_counts($instance = 1) {
+ 		$this->autoRender = false;
+ 		App::import('Component', 'Watchdog');
+ 		$watchdog = new WatchdogComponent();
+
+ 		$key = 'landing_page_engine_new_update_display_counts_' . $instance;
+ 		$watchdog->stop($key);
+ 	}
+
+ 	public function stop_update_stats_impressions($instance = 1) {
+ 		$this->autoRender = false;
+ 		App::import('Component', 'Watchdog');
+ 		$watchdog = new WatchdogComponent();
+
+ 		$key = 'landing_page_engine_update_stats_impressions_' . $instance;
+ 		$watchdog->stop($key);
+ 	}
+
+ 	public function kestrel_update_display_counts($server = -1) {
+ 		$this->autoRender = false;
+ 		echo 'Somebody please remove me!! im not usefull anymore :(';
+ 	}
+
+ 	public function kestrel_update_stats_impressions($server = -1, $batch_size = 100000, $batch_pop = 50) {
+ 		$this->autoRender = false;
+ 		$this->layout = "none";
+ 		$this->delta_stats = true;
+
+ 		if (!defined('KESTREL_READ') && $server >= 0) {
+ 			define('KESTREL_READ', $server);
+ 		}
+ 		$rc = $this->process_queues("landing_page_stats_views", 0, 'landing_page_engine_kestrel_update_stats_impressions_' . $server . '_' . $batch_size . '_' . $batch_pop, $batch_size, $batch_pop);
+
+ 		if ($rc) {
+ 			// only sleep for 20 seconds
+ 			return (10*2);
+ 		} else {
+ 			return 0;
+ 		}
+ 	}
+
+	public function add_top_page() {
+		$this->autoRender = false;
+
+		$this->Log->page_view();
+
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+		$domains = $oHub->getAllBits();
+
+		foreach ($domains as $domain_bit) {
+			$conditions = array("domain_bitfield & ".$domain_bit,
+				"top" => NULL,
+				"visible" => 1,
+				"rank <>" => 0,
+				"content_rating" => array(WEBSITE_CONTENT_G, WEBSITE_CONTENT_PG13));
+
+			$page = $this->Page->find("all", array("conditions" => $conditions,
+				"limit" => 1,
+				"order" => "rank DESC"));
+
+			if (empty($page)) {
+				continue;
+			}
+
+			$id = $page[0]['Page']['id'];
+
+			if (!$id) {
+				continue;
+			}
+
+			$this->Page->add_to_top_list($id);
+		}
+	}
+
+	public function refresh($domain_id = NULL) {
+		global $LandingPages;
+
+		$this->autoRender = false;
+
+		$timers = 0;
+		$watch = false;
+
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+
+		if ($domain_id != NULL) {
+			$domains = array($domain_id);
+		} else {
+			$domains = $oHub->getAllIds();
+
+			$this->Timer->start(TIMER_LANDING_PAGE_REFRESH);
+			set_time_limit(TIME_LIMIT_LANDING_PAGE_REFRESH);
+			ini_set('memory_limit', MEMORY_LIMIT_LANDING_PAGE_REFRESH.'M');
+			$timers = 1;
+
+			App::import('Component', 'Watchdog');
+			$watchdog = new WatchdogComponent();
+			$watch = true;
+
+			$key = 'landing_page_engine_refresh';
+			if ($watchdog->is_alive($key)) {
+				echo 'The script ', $key, ' is still alive.', PHP_EOL;
+				return;
+			}
+			$watchdog->heartbeat($key);
+		}
+
+		if ($timers) {
+			$script_total = count($domains);
+			$script_count = 0;
+			$this->Timer->progress_set(0);
+			$this->Timer->running_set();
+		}
+		foreach ($domains as $domain_id) {
+			debug_message("Domain: ".$oHub->name($domain_id));
+
+			$intersects = $this->Intersects->get_all($domain_id);
+
+			foreach ($intersects as $intersect) {
+				$intersect_id = $this->Intersects->get_id_by_intersect($intersect);
+
+				/* Delete the old version */
+				for ($i = 1; $i <= DEFAULT_LANDING_PAGE_RANDOM_SEEDS; $i++) {
+					$this->LandingPageAnalytic->cached_seed_clear($intersect_id, $domain_id, $i);
+					$seed = $LandingPages->get_seed($intersect_id, $domain_id, $i);
+					$domain_bit = $oHub->idToBit($domain_id);
+
+					echo 'Intersect: '.$intersect_id.', Seed: '.$seed.'...';
+					$this->LandingPageAnalytic->intersect_weight_all_pages($intersect, $domain_bit, $seed);
+					debug_memory('Done');
+					if (isset($watchdog)) {
+						$watchdog->heartbeat($key);
+					}
+				}
+			}
+
+			if ($timers) {
+				$script_count++;
+				$this->Timer->progress_set($script_count, $script_total);
+				$this->Timer->running_set();
+			}
+		}
+
+		if ($timers) {
+			$data = $this->Timer->set_memory_limit();
+			$this->Timer->stop_save($data);
+		}
+
+		if (isset($watchdog)) {
+			$watchdog->stop($key);
+		}
+	}
+
+	function test($domain_id, $category, $content_rating = WEBSITE_CONTENT_G) {
+		ini_set('memory_limit', MEMORY_LIMIT_LANDING_PAGE_REBALANCE.'M');
+		$this->autoRender = false;
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+		$bit = $oHub->idToBit($domain_id);
+		$intersect = $this->Intersects->create($category, 0, $content_rating);
+		$intersects = array($intersect);
+		$this->rebalance_intersect($bit, $intersects);
+	}
+
+	function test_landing_page_analytics() {
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+		$domains = $oHub->getAllBits();
+
+		foreach ($domains as $domain_bit) {
+			// Update analytic weights for style components
+			$this->Analytic->update_weights(ANALYTIC_LANDING_PAGE_LAYOUT, $domain_bit);
+		}
+	}
+
+	/************************************************************
+	 * Only Unit Testing functions below
+	 ************************************************************/
+	public function test_accounts_get($domain_bit) {
+		plat_assert(Configure::read('unit_test'));
+
+		return $this->accounts_get($domain_bit);
+	}
+
+	public function test_weight_rebalance($domain_bit) {
+		plat_assert(Configure::read('unit_test'));
+
+		$intersects = $this->Intersects->create_set(array(CATEGORY_ALL),
+							    array(DEMOGRAPHIC_SEX_MALE),
+							    array(WEBSITE_CONTENT_PG13));
+
+		$accounts = $this->accounts_get($domain_bit);
+
+		return $this->landing_page_analytics_weight_rebalance($intersects, $accounts, $domain_bit);
+	}
+
+}
+
+/* Helper functions */
+function lp_cmp($a, $b) {
+	if ($a == $b) {
+		return 0;
+	}
+	return ($a < $b) ? -1 : 1;
+}
+
+function lp_cmp_match_rate($a, $b) {
+	if ($a['match_rate'] == $b['match_rate']) {
+		return 0;
+	}
+	return ($a['match_rate'] < $b['match_rate']) ? -1 : 1;
+}
+
+function lp_ctr_rate($a, $b) {
+	if ($a['ctr'] == $b['ctr']) {
+		return 0;
+	}
+	return ($a['ctr'] > $b['ctr']) ? -1 : 1;
+}
+
+?>

@@ -1,0 +1,11 @@
+<?php
+namespace CI\Report;
+
+class Exception extends \CI\Exception
+{
+    const MISSING_PARAM = 1;
+
+    public $aErrors = array(
+        self::MISSING_PARAM => 'Missing param with the name "%s"',
+    );
+}

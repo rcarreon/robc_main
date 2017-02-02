@@ -1,0 +1,74 @@
+<?php
+
+class DevelopersReportsController extends AppController
+{
+    public $name       = 'DevelopersReports';
+    public $uses       = array('DevelopersReports', 'User', 'MetricLog');
+    public $components = array('CIWebsitesSelect', 'CIWidgetAnalyticsTable');
+    public $helpers    = array('Convert');
+
+    var $view       = 'Theme';
+    var $theme      = 'bootstrap';
+
+    public function beforeFilter()
+    {
+        $this->layout = 'bootstrap';
+
+        $this->Session->activate();
+        $user = $this->Session->read('User');
+        $user = $this->User->findById($user['id']);
+
+        $this->validate_admin(ADMIN_DOMAIN);
+        $this->set_types_user($user['User']);
+
+        $this->MetricLog->log(LOG_TYPE_PAGE_VIEW);
+        $this->set('user', $user);
+        $this->set('full_admin', $user['User']['domain_bitfield'] == -1);
+
+        $this->set('tab', 'developers');
+    }
+
+    public function wrong_widget_analytics()
+    {
+        $analytics = $this->DevelopersReports->get_wrong_widget_analytics();
+
+        if (!empty($analytics)) {
+            $oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+            foreach ($analytics as &$analytic) {
+                $domains = $oHub->bitsToIdArray($analytic['Website']['domain_bitfield']);
+                $analytic['Website']['domains'] = $domains;
+            }
+        }
+
+        $this->set('analytics', $analytics);
+    }
+
+    public function website_widget_analytics($visible = 1, $type = -1, $website_id = null)
+    {
+
+        $this->CIWebsitesSelect->setup(
+            'CIWebsitesSelect',
+            array(
+                'website_ids' => array($website_id),
+                'multiple'    => false,
+                'status'      => WEBSITE_STATUS_ACTIVE
+            )
+        );
+
+        if ($website_id !== null) {
+            $this->CIWidgetAnalyticsTable->setup(
+                'CIWidgetAnalyticsTable',
+                array(
+                    'website_id' => $website_id,
+                    'visible'    => $visible,
+                    'type'       => $type,
+                )
+            );
+        } else {
+            $this->set('CIWidgetAnalyticsTable', '');
+        }
+
+        $this->set('type', $type);
+        $this->set('visible', $visible);
+    }
+}

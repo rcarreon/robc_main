@@ -1,0 +1,91 @@
+<style>
+/* small_grid */ 
+.container_12 .grid_12 {
+    width: 1080px;
+}
+.container_12 .grid_5,
+.container_12 .grid_5 > .grid_5 {
+	width: auto;
+	margin:0;
+}
+.grid_12 .grid_5 img {
+	border-radius:0;	
+	-moz-border-radius:0;
+	-webkit-border-radius:0;
+}
+
+
+
+.container_12 .grid_12 {
+	width: 960px;
+}
+
+.grid_12 .grid_3 {
+	width: 320px;
+	float: right;
+	margin-bottom: 5px;
+}
+
+.container_12 .grid_5 {
+	margin-bottom: 5px;
+}
+
+.grid_5 .text {
+	padding-left: 0px;
+	padding-top: 0px;
+}
+
+#links_content {
+	margin-left: 0px;
+	background-color: #FFF;
+	-moz-border-radius: 6px 6px 0 0;
+	-webkit-border-radius: 6px 6px 0 0;
+	border-radius:6px 6px 0 0;
+	padding-bottom: 10px;
+	padding-top: 10px;
+        padding-left:15px!important;
+        width:945px;
+}
+/* item resize to fit Momtastic */
+.item{
+        margin:8px 8px!important;
+        height: 145px;
+        width: 205px;
+}
+.item .image {
+        height: 105px;
+        width: 205px;
+}
+.item .image img {
+        width:205px;
+}
+.item div.text p a {
+        max-height: 38px;
+        max-width: 200px;
+        width:200;
+}
+.item div.text p a:hover { color:black; }
+/* first_item */
+.grid_12 .grid_7>.grid_7 {
+        height: 316px;
+        width: 437px;
+}
+.grid_12 .grid_7>.grid_7 .image img {
+        width:437px;
+}
+.grid_12 .grid_7>.grid_7 .image,
+.grid_12 .grid_7>.grid_7 .image a  {
+        width: 437px;
+        height: 250px;
+}
+.grid_12 .grid_7>.grid_7 div.text {
+        width:437px;
+}
+.grid_12 .grid_7>.grid_7 div.text p a {
+        max-height: 50px;
+        max-width: 437px!important;
+        width:427px;
+}
+.bottom_content_spacer { margin-bottom:15px; width:960px!important; }
+
+</style>

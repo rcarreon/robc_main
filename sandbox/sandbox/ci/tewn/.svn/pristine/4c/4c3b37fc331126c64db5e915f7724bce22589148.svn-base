@@ -1,0 +1,151 @@
+<?
+    function tab_selected($status_a, $status_b) {
+        // Hack for casting issue
+        if ($status_a === "all" &&
+            $status_b === 0) {
+            return "tab_unselected";
+        }
+
+        if ($status_a == $status_b) {
+            $selected_class = "tab_selected";
+        } else {
+            $selected_class = "tab_unselected";
+        }
+        return $selected_class;
+    }
+    echo $this->element('crowdignite/backend2_toolbar', array("tab" => "ranker", "user" => $user));
+?>
+
+
+     <div class="row supercontainer" id="content_area">
+
+        <div class="hubs_column">
+            <ul class="hub_list">
+                <li class="title t_hubs">Hubs</li>
+                <?
+                    $all_domain_bits = $domain_component->getAllActiveBits();
+                    foreach ($all_domain_bits as $domain_bit) {
+                        $domain_name = $convert->domain_name_bit($domain_bit);
+                        $domain_id = $domain_component->bitToId($domain_bit);
+                        $selected_class = tab_selected($hub, $domain_id);
+                ?>
+                        <li class="<?=$selected_class?>">
+                            <a href="/ranker/view/<?=$category?>/<?=$num_links?>/<?=$domain_id?>"><?=$domain_name?></a>
+                        </li>
+                <?
+                    }
+                ?>
+            </ul><!-- hub_list -->
+        </div>
+
+        <div class="websites_column">
+
+            <div id="status_bar">
+
+                <div class="ddown_container ddown_container3">
+                    <span>Hubs</span>
+                    <dl class="dropdown dropdown3">
+                        <dt><a href="#"><span>Select Hub</span></a></dt>
+                        <dd>
+                            <ul>
+                                <?
+                                    $all_domain_bits = $domain_component->getAllActiveBits();
+                                    foreach ($all_domain_bits as $domain_bit) {
+                                        $domain_name = $convert->domain_name_bit($domain_bit);
+                                        $domain_id = $domain_component->bitToId($domain_bit);
+                                        $selected_class = tab_selected($hub, $domain_id);
+                                ?>
+                                        <li class="<?=$selected_class?>">
+                                            <a href="/ranker/view/<?=$category?>/<?=$num_links?>/<?=$domain_id?>"><?=$domain_name?></a>
+                                        </li>
+                                <?
+                                    }
+                                ?>
+                            </ul>
+                        </dd>
+                    </dl>
+                </div>
+
+                <div class="ddown_container">
+                    <!-- Category -->
+                    <span>Category</span>
+                    <dl class="dropdown dropdown2">
+                        <dt><a href="#"><span>Select</span></a></dt>
+                        <dd>
+                            <ul>
+                            <?
+                            $categories = $convert->category_select();
+                            foreach ($categories as $cat_id => $cat) {
+                                $selected_class = tab_selected($category, $cat_id);
+                            ?>
+                                    <li class="<?=$selected_class?>">
+                                        <a class="<?=$selected_class?>" href="/ranker/view/<?=$cat_id?>/<?=$num_links?>/<?=$hub?>"><?=$cat?></a>
+                                    </li>
+                            <?
+                                }
+                            ?>
+                            </ul>
+                        </dd>
+                    </dl>
+                </div>
+        </div><!-- Status bar  -->
+
+        <div class="table_container">
+
+        <table class="tablesorter" cellspacing=5 border=0>
+            <thead>
+            <tr>
+                <th>Rank</th>
+                <th>ID</th>
+                <th>Image</th>
+                <th>Title</th>
+                <th>Points</th>
+                <th>Trending</th>
+                <th>Created</th>
+                <th class='align_center'>Remove</th>
+            </tr>
+            </thead>
+            <tbody>
+            <?
+            $count = 0;
+            $image_asset = new \CI\Asset\Image();
+
+            foreach ($links as $link) {
+                $altrow = "NormRow";
+                $image_url = $image_asset->getUrl(
+                    array(
+                        'page_id' => $link['Page']['id'],
+                        'type' => \CI\Asset\Image::URL_CROP_FULL,
+                        'image' => $link['Page']['image'],
+                        'width' => 140,
+                        'height' => 80
+                    )
+                );
+
+                if($count % 2) $altrow = "AltRow";
+                $count++;
+                echo "<tr class='$altrow'><td>".$count."</td>";
+                echo "<td>";
+                echo $html->link($link['Page']['id'], "/pages/moderate/".$link['Page']['website_id']."/".$link['Page']['id']);
+                echo "</td><td>";
+                echo "<a href='/link/".$link['Page']['title_url']."/0' target='blank'>".$html->image($image_url)."</a>";
+                echo "</td><td>";
+                echo $html->link($link['Page']['title'], "/link/".$link['Page']['title_url']."/0", array("style" => "color:#000","target"=>"blank"));
+                echo "</td><td>";
+                echo $link['Page']['rank'];
+                echo "</td><td>";
+                echo ($link['Page']['rank'] >= $link['Page']['rank_prior']) ? 1 : 0;
+                echo "</td><td>";
+                echo $link['Page']['created'];
+                echo "</td><td class='align_center'>";
+                echo $ajax->link("Remove", "/pages/remove_rank/{$link['Page']['id']}", array('class'=>'info_icon icon_delete', 'style' => 'color:#000', 'update' => 'moderate'), "Are you sure you want to remove?");
+                echo "</td></tr>";
+            }
+            ?>
+            </tbody>
+        </table>
+
+        <div id="moderate"></div>
+        </div><!-- table container -->
+    </div>
+</div>

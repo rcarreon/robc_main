@@ -1,0 +1,125 @@
+#!/bin/bash
+# $Id: deploy_myanimelist 864 2011-10-06 02:41:52Z jcamou $
+set -e 
+set -u
+#set -x  #for debug infos
+
+#CONTACTS="jcamou@gorillanation.com"
+CONTACTS="atomicsiteshermosillo@gorillanation.com gyssler@gmail.com"
+SVN_PREFIX="https://svn.gnmedia.net"
+PROJECT="myanimelist.net"
+OBJ="trunk"
+DATE=`date +%Y%m%d`
+
+# Stored procedures updater user
+SP_USER="deploy"
+SP_PWD="dJb0gvAX"
+DB="myanimel_db"
+
+# Sanity checks
+if [ "$(id -u)" != "0" ]; then
+  echo  "You must use sudo to run this script."
+  exit 2
+fi
+
+if [ $# -lt 1 ] ; then
+  echo "Please enter the environment you want to deploy to (dev|stg|lax)."
+  echo "ex: $0 lax 912"
+  exit 1
+fi
+
+ENVIRONMENT="$1"
+
+case ${ENVIRONMENT} in 
+  dev)
+    DOCROOT_PREFIX="/app/shared/docroots/"
+    DOCROOT_SUFFIX="myanimelist.net"
+    SERVER="app1v-mal.ao.dev.lax.gnmedia.net"
+    DB_SERVER="sql1v-mal.ao.dev.lax.gnmedia.net"
+    CURL_OPT="Host: dev.myanimelist.net"
+  ;;
+
+  stg)
+    DOCROOT_PREFIX="/app/shared/docroots/"
+    DOCROOT_SUFFIX="myanimelist.net"
+    SERVER="app1v-mal.ao.stg.lax.gnmedia.net"
+    DB_SERVER="sql1v-mal.ao.stg.lax.gnmedia.net"
+    CURL_OPT="Host: stg.myanimelist.net"
+  ;;
+
+  lax)    
+    DOCROOT_PREFIX="/app/shared/docroots/"
+    DOCROOT_SUFFIX="myanimelist.net"
+    SERVER="app1v-mal.ao.prd.lax.gnmedia.net"
+    DB_SERVER="sql1v-mal.ao.prd.lax.gnmedia.net"
+    CURL_OPT="Host: myanimelist.net"
+  ;;
+
+  *)
+    echo "ERROR: Please enter a valid environment, (lax|stg)."
+    exit 1
+  ;;
+esac
+
+
+function do_remote {
+  su deploy -c "ssh -qt ${SERVER} $1"
+}
+
+URL=${SVN_PREFIX}/${PROJECT}/${OBJ}
+
+if [ $# -lt 2 ]; then
+  # No explicit revision, using HEAD then  
+  REVISION=`svn info ${URL}|grep "Last Changed Rev:"|sed s/Last\ Changed\ Rev:\ //g`
+else
+  REVISION="$2"
+fi
+
+CURRENT_VERSION=$(curl -sH "${CURL_OPT}" http://${SERVER}/version.txt)
+
+# Taking care of the stored procedure
+tmpdir=/tmp/deploy_mal.$$.$RANDOM
+svn co -q ${SVN_PREFIX}/${PROJECT}/${OBJ}/.htsql/ ${tmpdir}
+for sp in ${tmpdir}/*.sql
+do
+  echo -n "Working on ${sp}... "
+#  cat ${sp} | mysql -h ${DB_SERVER} -u ${SP_USER} -p${SP_PWD} ${DB}
+  echo "done."
+done
+
+rm -rf ${tmpdir}
+
+if (( "${CURRENT_VERSION}" < "${REVISION}" )); then
+  SVN_LOG=$(svn log -r ${CURRENT_VERSION}:${REVISION} ${URL})
+elif (( "${CURRENT_VERSION}" > "${REVISION}" )); then
+  SVN_LOG="Rollback from revision ${CURRENT_VERSION} to ${REVISION}"
+else 
+  echo "${PROJECT} is already at version ${REVISION}"
+  exit 1
+fi    
+
+TO_RUN="svn up -r ${REVISION} ${DOCROOT_PREFIX}/${DOCROOT_SUFFIX}/"
+echo ${TO_RUN}
+do_remote "${TO_RUN}" 
+
+TO_RUN="cp ${DOCROOT_PREFIX}/${DOCROOT_SUFFIX}/inc/${ENVIRONMENT}-constants.php ${DOCROOT_PREFIX}/${DOCROOT_SUFFIX}/inc/constants.php"
+echo $TO_RUN
+do_remote "${TO_RUN}" 
+
+# tricky but no other way around because of the > 
+echo ${REVISION} > /tmp/version.txt
+su deploy -c "scp /tmp/version.txt ${SERVER}:${DOCROOT_PREFIX}/${DOCROOT_SUFFIX}/version.txt"
+rm /tmp/version.txt
+
+MSG="${PROJECT}: ${ENVIRONMENT} deploy from r${CURRENT_VERSION} to r${REVISION} by ${SUDO_USER}"
+
+# log
+logger -t deployment $MSG
+
+## email
+for contact in ${CONTACTS};
+do 
+  echo -e "${MSG}\n\n${SVN_LOG}\n"  | mail ${contact} -s "[${PROJECT}] deployed r${REVISION} on ${ENVIRONMENT} from r${CURRENT_VERSION}"
+done
+
+

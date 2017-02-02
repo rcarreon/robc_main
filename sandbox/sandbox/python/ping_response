@@ -1,0 +1,83 @@
+#!/bin/python
+#modules
+import os
+import subprocess
+import paramiko
+import sys 
+import smtplib
+import webbrowser
+from email.mime.text import MIMEText
+
+user_res = raw_input("do you want to  provide a site o will you use file rt_sites? s/f \n")
+
+def emailing(msg):
+# Open a plain text file for reading.  For this example, assume that
+# the text file contains only ASCII characters.
+#with open(textfile) as fp:
+# Create a text/plain message
+#        msg = MIMEText(fp.read())
+#        me = "roberto.carreon@evolvemediallc.com"
+#        to = "roberto.carreon@evolvemediallc.com"
+#        msg['Subject'] = 'The contents of %s' % textfile
+#        msg['From'] = me
+#        msg['To'] = you
+#        return
+
+# Send the message via our own SMTP server.
+#        s = smtplib.SMTP('localhost')
+#        s.send_message(msg)
+#        s.quit()
+#    sender = 'roberto.carreon@evolvemediallc.com'
+    sender = 'rcarreon@rcarreon'
+    receivers = ['roberto.carreon@evolvemediallc.com']
+#    msg = """From: Roberto Carreon  <rcarreon@rcarreon>
+#    To: To Roberto Carreon <roberto.carreon@evolvemediallc.com>
+#    Subject: SMTP e-mail test DownTime
+#    
+#    This is a test e-mail message.
+#    """
+    try:
+       smtpObj = smtplib.SMTP('localhost')
+       smtpObj.sendmail(sender, receivers, msg)         
+       print "Successfully sent email"
+       smtpObj.quit()
+    except SMTPException:
+       print "Error: unable to send email"
+
+
+def pinger():
+    if user_res.upper() == 'S':
+            hostname = raw_input("Please provide a site..\n")
+            response = os.system("ping -c 2 -W 1 " + hostname  + " &> /dev/null")
+        #response = subprocess.call(['ping', '-c', '1', '-W', '1', hostname],stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w'))
+
+            if response == 0:
+                print hostname, 'is up!'
+            else:
+            ### HERE i m adding the subject  to the mail and will pass the variable msg to function emailing, along with the subject and the function is called below carriing the msg var.
+                subject =  'Host %s is Down check on it ! ' % hostname
+                msg = 'Subject: %s \n\n Host %s is DOWN look it up!!!' % (subject,hostname)
+                emailing(msg) 
+
+    elif user_res.upper() == 'F':
+            rt_file = open("rt_sites", "r")
+            for  hostname  in rt_file:
+                response = os.system("ping -c 2 -W 1 " + hostname  + " &> /dev/null")
+            #response = subprocess.call(['ping', '-c', '1', '-W', '1', hostname],stdout=open('/dev/null', 'w'), stderr=open('/dev/null', 'w'))
+     #and then check the response...
+                if response == 0:
+                    print hostname, 'is up!'
+                    print response
+                else:
+                    ### HERE i m adding the subject  to the mail and will pass the variable msg to function emailing, along with the subject and the function is called below carriing the msg var.
+                    subject =  'Host %s is Down check on it ! ' % hostname
+                    msg = 'Subject: %s \n\n Host %s is DOWN look it up!!!' % (subject,hostname)
+                    emailing(msg) 
+                    print hostname, 'is down'
+                    emailing()
+    else:
+        print 'Not a valid response exiting'
+        quit()
+        
+
+pinger()

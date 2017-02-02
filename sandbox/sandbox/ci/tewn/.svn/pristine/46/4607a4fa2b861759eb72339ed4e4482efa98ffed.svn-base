@@ -1,0 +1,1346 @@
+<?php
+include_once (ROOT . DS . APP_DIR . DS . "global_defines.php");
+
+  /*
+   * Wordpress premalink structures:
+   *
+   * Default: http://jakem.net/?p=123
+   * Day/Name: http://jakem.net/2010/03/25/sample-post/
+   * Month/Name: http://jakem.net/2010/03/sample-post/
+   * Numeric: http://jakem.net/archives/123
+   */
+class WebsitesController extends AppController {
+
+	const SEARCH_BY_NAME = 'name';
+	const SEARCH_BY_ID = 'id';
+	const SEARCH_BY_USER_NAME = 'userName';
+
+	var $name = 'Websites';
+	var $uses = array('Website', 'Page', 'Account', 'Widget', 'User', 'WidgetAnalytic', 'LandingPageAnalytic', 'CompeteStore', 'WidgetRebalance', 'MetricLog', 'Tag', 'WebsiteAllowedTag', 'Setting');
+	var $helpers = array("Html", "Ajax", "Form", "Convert", "Javascript");
+	var $components = array("RequestHandler", "Mail", "Date", 'Compete', 'Category', 'Alexa', 'BitSettings', 'WebsiteSettings');
+	var $pageTitle = SITE_NAME;
+
+	var $common_url_regexs = array(
+		'#(https?://?[^/]+/(\?p=[0-9]+))#', // WP Default
+		'#(https?://?[^/]+/(index.php\?p=[0-9]+))#', // WP Default variation
+		'#(https?://?[^/]+(/[0-9]+/[0-9]+/[0-9]+/[a-z0-9\-_.]+))#i', // WP Year/Month/Day/Name
+		'#(https?://?[^/]+(/[0-9]+/[0-9]+/[a-z0-9\-_.]+/))#i', // WP Year/Month/Name
+		'#(https?://?[^/]+(/[a-z0-9\-_]+/[0-9]+))#i', // WP Numeric
+		'#(https?://?[^/]+(/[a-z0-9\-_]+/[0-9]+/[0-9]+/[a-z0-9\-_.]+))#i', // Category Month/Name
+		'#(https?://?[^/]+(/[a-z0-9\-_]+/[0-9]+/[0-9]+/[0-9]+/[a-z0-9\-_.]+))#i', // Category Day/Name
+		'%(https?://?[a-z0-9-.]+(.+)/(#more-[0-9]+))?%i', // Wordpress more
+		'#(https?://?[^/]+(.+))#' // Catch all
+		);
+
+	private $is_curator;
+	private $is_admin;
+
+	function beforeFilter() {
+		$this->Session->activate();
+		$user = $this->Session->read('User');
+		$this->set_types_user($user);
+		$this->is_admin = $this->User->isAdmin($user['id'], $user['admin']);
+		$this->is_curator = $this->User->isCurator($user['id'], $user['admin']);
+		$this->layout = DOMAIN.'/default';
+	}
+
+	function moderate($website_id = 0) {
+		global $all_domains;
+
+		$this->MetricLog->log(LOG_TYPE_PAGE_VIEW, $website_id);
+
+		$this->check_permission();
+
+		$count = 0;
+
+		if (!$website_id) {
+			$websites = $this->Website->find_new();
+		} else {
+			$websites = $this->Website->find("all",
+				array("conditions" => array(
+					"id" => $website_id
+				))
+			);
+		}
+
+		$all_websites = $this->Website->find("all", array( 'fields'=>array('Website.id', 'Website.name') ));
+
+		foreach ($all_websites as $website => $name ) {
+			if( trim($name['Website']['name']) != "" ) {
+				$websites_select[$name['Website']['id']] = $name['Website']['name'];
+			}
+		}
+		asort($websites_select);
+
+		/* Try figuring out what regex to use */
+		foreach($websites as $website) {
+			/*
+			$pages = $this->Page->findAllByWebsiteId($website['Website']['id']);
+			$page_count = $this->Page->find("count", array("conditions" => array(
+										   "website_id" => $website['Website']['id'])));
+			if ($page_count && (!$website['Website']['url_regex'] || $website['Website']['url_regex'] == DEFAULT_URL_REGEX)) {
+				foreach ($pages as $page) {
+					if ($page) {
+						foreach ($this->common_url_regexs as $regex) {
+							preg_match($regex, $page['Page']['url'], $matches);
+							if (isset($matches[1])) {
+								// have a match!
+								break 2;
+							}
+						}
+					} else {
+						$regex = DEFAULT_URL_REGEX;
+					}
+				}
+
+				$websites[$count]['Website']['url_regex'] = $regex;
+
+			}
+			*/
+			$page_count = 0;
+			$websites[$count]['Website']['page_count'] = $page_count;
+			$account = $this->Account->findById($websites[$count]['Website']['account_id']);
+			$user = $this->User->findById($account['Account']['user_id']);
+			$websites[$count]['User'] = $user['User'];
+			$websites[$count]['Account'] = $account['Account'];
+			$refer_account = $this->Account->findById($account['Account']['refer_id']);
+			$refer = $this->Website->findById($refer_account['Account']['website_id']);
+			$user = $this->User->findById($website['Website']['user_id']);
+			$refer_user = $this->User->findById($refer['Website']['user_id']);
+
+			$widgets = $this->Widget->findAllByWebsiteId($website['Website']['id']);
+
+			$transfer_account = $this->Account->findById($account['Account']['transfer_account_id']);
+			$transfer_website = $this->Website->findById($transfer_account['Account']['website_id']);
+
+			$subcategories = $this->Tag->get_by_category($websites[$count]['Website']['category']);
+			$websites[$count]['Website']['subcategories'] = $subcategories;
+
+			$websites[$count]['Account']['transfer_website'] = $transfer_website;
+			$websites[$count]['Website']['refer_website'] = $refer['Website']['url'];
+			$websites[$count]['Website']['refer_id'] = $account['Account']['refer_id'];
+			$websites[$count]['Website']['refer_transfer_rate'] = $account['Account']['refer_transfer_rate'];
+			$websites[$count]['Website']['account_rate'] = $account['Account']['rate'];
+			$websites[$count]['Website']['refer_email'] = $refer_user['User']['email'];
+			$websites[$count]['Website']['email'] = $user['User']['email'];
+			$websites[$count]['Website']['widgets'] = $widgets;
+			if ($websites[$count]['Website']['status'] == WEBSITE_STATUS_NEW) {
+				$websites[$count]['Website']['url_regex'] = '#(https?://?[^/]+(.+))#';
+				$websites[$count]['Website']['allowed_categories_bitfield'] = 1 << $websites[$count]['Website']['category'];
+			}
+
+			$websites[$count]['Website']['allowed_subcategories'] = $this->WebsiteAllowedTag->find(
+				'list',
+				array(
+					'fields' => array('tag_id', 'tag_id'),
+					'conditions' => array(
+						'website_id' => $website['Website']['id'],
+						'type'       => TAG_TYPE_SUBCATEGORY,
+						'visible'    => VISIBLE
+					),
+				)
+			);
+
+			$url = $website['Website']['url'];
+			if ($this->is_valid_url($url)) {
+				$uv = $this->CompeteStore->get($url);
+				if ($uv === false) {
+					$uv = $this->Compete->get_uv($url);
+					if (empty($uv)) {
+						$uv = 0;
+					}
+					$this->CompeteStore->set($url, $uv);
+				}
+
+				$websites[$count]['Website']['uv'] = $uv;
+			} else {
+				$websites[$count]['Website']['uv'] = -1;
+			}
+
+			$count++;
+		}
+
+		$all_subcategories = $this->Tag->all_subcategory_list(true);
+
+		$impressions_since_rebalance = $this->WidgetRebalance->impressions($website['Website']['id']);
+		$time_since_rebalance = $this->Account->last_rebalance($website['Website']['id']);
+
+		$this->Session->activate();
+		$user = $this->Session->read('User');
+		$user = $this->User->findById($user['id']);
+
+		$this->set('user', $user);
+		$this->set("domains", $all_domains);
+		$this->set("websites", $websites);
+		$this->set("websites_select", $websites_select);
+		$this->set("common_regexs", $this->common_url_regexs);
+
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+		$this->set("domain_component", $oHub);
+
+		$this->set("category_component", $this->Category);
+		$this->set("impressions_since_rebalance", $impressions_since_rebalance);
+		$this->set("time_since_rebalance", $time_since_rebalance);
+		$this->set("all_subcategories", $all_subcategories);
+		$this->set("WebsiteSettings", $this->WebsiteSettings);
+	}
+
+	function approve() {
+		set_time_limit(60*2);
+		$this->check_permission();
+
+		if (isset($this->data['Website']['send_mail'])) {
+			$send_mail = $this->data['Website']['send_mail'];
+		} else {
+			$send_mail = 0;
+		}
+
+		$website_id = $this->data['Website']['id'];
+		$website = $this->Website->findById($website_id);
+		$account_id = $website['Website']['account_id'];
+		$current_status = $website['Website']['status'];
+
+		$this->MetricLog->log(LOG_TYPE_WEBSITE_APPROVE, $website_id);
+
+		$this->data['Website']['url'] = trim($this->data['Website']['url']);
+
+		// before saving, checking if there are errors in the data to be saved...
+		$fields = array(
+			"name" => "Make sure a <strong>Website Name</strong> is defined.",
+			"url" => "Make sure a <strong>URL</strong> is defined.",
+			"domain_primary" => "Make sure a <strong>Primary domain</strong> is selected.",
+			"demographic_sex" => "Make sure select an item for the <strong>Sex</strong> select option.",
+			"category" => "Make sure select an item for the <strong>Category</strong> select option.",
+			"content_rating" => "Make sure select an item for the <strong>Content Rating</strong> select option.",
+		);
+		// by default, there are no notices...
+		$errors = false;
+		$fields_to_check = array();
+		// for each field to check
+		foreach ($fields as $input_name => $msg) {
+			// check for errors
+			switch ($input_name) {
+				case 'domain_primary':
+				case 'demographic_sex':
+				case 'category':
+				case 'content_rating':
+					if ($this->data["Website"][$input_name] == "") {
+						$fields_to_check[] = $msg;
+					}
+					break;
+				default:
+					if (empty($this->data["Website"][$input_name])) {
+						$fields_to_check[] = $msg;
+					}
+			}
+		}
+		// Showing errors if something wrong happened:
+		if (count($fields_to_check) > 0) {
+			$this->layout = "none";
+			$this->autoRender = false;
+
+			echo "<div style='color:red;border-left:1px solid red;padding-left:5px;'>";
+			echo "<strong>Before continue saving, check the points below: </strong><br />";
+			foreach($fields_to_check as $msg){
+				echo " - " . $msg . "<br />";
+			}
+			echo "</div>";
+
+			// if an error happened, script shoult not continue running...
+			return;
+		}
+
+
+		if ($website['Website']['status'] == WEBSITE_STATUS_NEW) {
+			$this->data["Website"]['tier'] = \CI\Component\Tier::WEBSITE_TIER_NOT_AVAILABLE;
+			try {
+				$this->data["Website"]['tier'] = \CI\Component\Facade\Tier::getFromUrl($this->data['Website']['url'], new \CI\Http\Service\Alexa);
+			} catch(Exception $ex) {
+				error_log(__METHOD__ . $ex->getMessage());
+			}
+			/* if the status of the website is new, it means that the moderator
+			   needs to save a user with the website */
+			$errors = array();
+			$this->data['Website']['status'] = WEBSITE_STATUS_ACTIVE;
+			// change the status of the account
+			$account_status = ACCOUNT_STATUS_RUNNING;
+
+			/* Set user info */
+			if ($website['Website']['user_id'] == 0) {
+				if (empty($this->data['User']['username'])) {
+					$errors[] = 'The username could not be empty';
+				}
+				if (empty($this->data['User']['password'])) {
+					$errors[] = 'The password could not be empty';
+				}
+				if (empty($this->data['User']['email'])) {
+					$errors[] = 'The email of the user could not be empty';
+				}
+
+				if (empty($errors)) {
+					// Save off user info
+					$this->data['User']['premium'] = 0;
+					$this->data['User']['lastlogin'] = date('Y-m-d H:i:s');
+					$this->data['User']['visible'] = true;
+
+					// Set terms accept
+					$this->data['User']['terms'] = '1';
+					$this->data['User']['terms_accept'] = date('Y-m-d G:i:s');
+
+					$rc = $this->User->save($this->data);
+					if (!$rc) {
+						$errors[] = 'The user could not be saved';
+						foreach ($this->User->validationErrors as $field => $msg) {
+							$errors[] = $msg;
+						}
+					} else {
+						$user_id = $this->User->getLastInsertId();
+						$this->data['Website']['user_id'] = $user_id;
+						$website['Website']['user_id'] = $user_id;
+					// add the user to the account
+						$this->Account->id = $account_id;
+						$this->Account->saveField('user_id', $user_id);
+					}
+				}
+
+				if (!empty($errors)) {
+					$this->layout = "none";
+					$this->autoRender = false;
+
+					echo "<div style='color:red;border-left:1px solid red;padding-left:5px;'>";
+					echo "<strong>Before continue saving, check the points below: </strong><br />";
+					foreach ($errors as $error) {
+						echo " - " . $error . "<br />";
+					}
+					echo "</div>";
+					return;
+				}
+			}
+		}
+
+		if ($website['Website']['status'] == WEBSITE_STATUS_SUSPENDED ||
+			$website['Website']['status'] == WEBSITE_STATUS_DENIED) {
+			$this->change_website_status($website_id, WEBSITE_STATUS_ACTIVE);
+		}
+
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+		$this->data['Website']['domain_bitfield'] = $oHub->getBitsDomainArray($this->data['Website']);
+		$domain_primary_bit = $oHub->idToBit($this->data['Website']['domain_primary']);
+
+		// The primary domain bit must be set, otherwise stuff blows up in the engine
+		$this->data['Website']['domain_bitfield'] |= $domain_primary_bit;
+
+		$this->data['Website']['allowed_categories_bitfield'] = $this->get_bits_category_array($this->data);
+
+		if (!empty($this->data['Website']['blacklist'])) {
+			$this->data['Website']['blacklist'] = implode(',',$this->data['Website']['blacklist']);
+		}
+
+		if (!empty($this->data['Website']['whitelist'])) {
+			$this->data['Website']['whitelist'] = implode(',',$this->data['Website']['whitelist']);
+		}
+
+		$all_subcategories = $this->Tag->get_subcategories_active();
+
+		$allowed_subcategories = $this->get_bits_subcategory_array($this->data, $all_subcategories);
+		$this->allowed_subcategories_set($website_id, $allowed_subcategories);
+
+		//Setting up bits
+		$WebsiteSettings = $this->WebsiteSettings;
+
+		if ($this->data['Website']['show_branding']) {
+			$WebsiteSettings->setShowBranding(true);
+			unset($this->data['Website']['show_branding']);
+		}
+
+		//Converting to bits
+		$this->data['Website']['settings'] = $WebsiteSettings->getBits();
+
+		$rc = $this->Website->save($this->data);
+		if (!$rc) {
+			$this->layout = "none";
+			$this->autoRender = false;
+
+			echo "<div style='color:red;border-left:1px solid red;padding-left:5px;'>";
+			echo "<strong>Before continue saving, check the points below: </strong><br />";
+			echo " - The website could not be saved<br />";
+			foreach ($this->Website->validationErrors as $field => $msg) {
+				echo " - " . $msg . "<br />";
+			}
+			echo "</div>";
+			return;
+		}
+
+		// Update the account info
+		$account_refer_transfer_rate = $this->data['Account']['refer_transfer_rate'];
+		$account_rate = $this->data['Account']['rate'];
+		$account_refer_id = $this->data['Account']['refer_id'];
+
+		$this->Account->id = $account_id;
+		if (isset($this->data['Account']['paid'])) {
+			$this->Account->saveField("paid", $this->data['Account']['paid']);
+		}
+		if (isset($this->data['Account']['buying'])) {
+			$this->Account->saveField("buying", $this->data['Account']['buying']);
+		}
+
+		if (isset($this->data['Account']['transfer_account_id']) and $this->data['Account']['transfer_account_id']) {
+			// save the transfer account id
+			$this->Account->saveField("transfer_account_id", $this->data['Account']['transfer_account_id']);
+			$this->Website->id = $website_id;
+			$this->Website->saveField("status", WEBSITE_STATUS_TRANSFER);
+			$account_status = ACCOUNT_STATUS_TRANSFER;
+		}
+
+		if(isset($this->data['Account']['remove_transfer'])){
+			// remove the transfer account id
+			$this->Account->saveField("transfer_account_id", 0);
+			$this->Website->id = $website_id;
+			$this->Website->saveField("status", WEBSITE_STATUS_ACTIVE);
+			$account_status = ACCOUNT_STATUS_RUNNING;
+		}
+
+		// update the status of the account if it needs to change
+		if (isset($account_status)) {
+			$this->Account->saveField("status", $account_status);
+		}
+		$this->Account->saveField("featured", $this->data['Account']['featured']);
+		$this->Account->saveField("refer_transfer_rate", $account_refer_transfer_rate);
+		$this->Account->saveField("rate", $account_rate);
+		$this->Account->saveField("refer_id", $account_refer_id);
+
+		// Adjust the domain bits on all the analytic/account/page info
+		$this->domain_bits_set($account_id, $website_id, $this->data['Website']['domain_bitfield'], $domain_primary_bit);
+
+		// Send mail
+		if ($send_mail && $current_status == WEBSITE_STATUS_NEW) {
+			$user = $this->User->findById($website['Website']['user_id']);
+			$mail = $user['User']['email'];
+			$username = $user['User']['username'];
+			$this->Mail->website_approved($mail, $username, $website['Website']['name'], DEFAULT_RETURN_RATE);
+
+			App::import('Helper', 'Convert');
+			$Convert = new ConvertHelper();
+
+			$website_mail_data = array(
+				'site'            => $this->data['Website']['url'],
+				'landing_page'    => $Convert->domain_name($this->data['Website']['domain_primary']),
+				'category'        => $Convert->category($this->data['Website']['category']),
+				'demographic_sex' => $Convert->demographic_sex($this->data['Website']['demographic_sex']),
+				'content_rating'  => $Convert->content_rating($this->data['Website']['content_rating']),
+				'tier'            => \CI\Component\Facade\Tier::getValidTier($this->data['Website']['tier']),
+			);
+			$this->Mail->new_site_approved($website_mail_data);
+		}
+
+		// Make sure we invalidate the regex in case we
+		// changed it
+		$this->Website->invalidate_url_regex($website_id);
+
+		if ($rc) {
+			$this->Session->activate();
+			$this->Session->setFlash(__('Approved', true));
+			$this->redirect("/pages/flashed");
+		} else {
+			plat_assert(0);
+		}
+	}
+
+	function moderate_get_allowed_categories() {
+		App::import('Helper', 'Convert');
+		$Convert = new ConvertHelper();
+		$primary_domain = $_POST['domain'];
+
+		$categories = $this->Category->domain($primary_domain);
+		$out = array();
+		foreach ($categories as $category) {
+			$out[$category] = $Convert->category($category);
+		}
+		$this->set('categories', $out);
+	}
+
+	function moderate_get_website_categories() {
+		App::import('Helper', 'Convert');
+		App::import('Component','Domain');
+		$Convert = new ConvertHelper();
+			// $this->autoRender = false;
+		$primary_domain = $_POST['domain'];
+
+		$CategoryComponent = new CategoryComponent();
+		$DomainComponent = new DomainComponent();
+		$categories = $Convert->category_multi_select($DomainComponent, $CategoryComponent);
+
+		$out = array();
+		foreach ($categories[$primary_domain] as $category) {
+			$out[$category] = $Convert->category($category);
+		}
+		$this->set('categories', $out);
+	}
+
+	function moderate_get_allowed_categorytree() {
+		App::import('Helper', 'Convert');
+		$Convert = new ConvertHelper();
+
+		App::import('Helper', 'Form');
+		$form = new FormHelper();
+
+		$primary_domain = $_POST['domain'];
+
+		$category_component = $this->Category;
+		$categories = $Convert->category_domain_select($primary_domain, $category_component);
+		$all_subcategories = $this->Tag->get_subcategories_active();
+
+		$this->set('primary_domain', $primary_domain);
+		$this->set('categories', $categories);
+		$this->set('all_subcategories', $all_subcategories);
+	}
+
+	function deny() {
+		$this->check_permission();
+
+		// Get Website info
+		$website_id = $this->data['Website']['id'];
+		$website = $this->Website->findById($website_id);
+		$current_status = $website['Website']['status'];
+
+		if (isset($this->data['Website']['send_mail'])) {
+			$send_mail = $this->data['Website']['send_mail'];
+		} else {
+			$send_mail = 0;
+		}
+
+		$this->MetricLog->log(LOG_TYPE_WEBSITE_DENY, $website_id);
+
+		$this->data['Website']['status'] = WEBSITE_STATUS_DENIED;
+
+		$rc = $this->Website->save($this->data);
+
+		$account_id = $this->Website->field("account_id", array("id" => $website_id));
+		$this->Account->id = $account_id;
+		$this->Account->saveField("status", ACCOUNT_STATUS_DENIED);
+
+		// Send mail
+		if ($send_mail && WEBSITE_STATUS_NEW == $current_status) {
+			if ($website['Website']['user_id']) {
+				$user = $this->User->findById($website['Website']['user_id']);
+				$to = $user['User']['email'];
+			} else {
+				// trying to fetch the email contact from the notes. (We don't have user account for the website yet).
+				preg_match('/Contact Email: (.*)?,/',$website['Website']['notes'],$matches);
+				$to = $matches[1];
+			}
+
+			if (!isset($to)) {
+				plat_assert(false, array(
+					'msg' => '$email to notify to website owner was not found.',
+					'website' => $website
+				));
+			}
+
+			$reject_email = array();
+			$reject_email['to'] = $to;
+			$reject_email['from'] = "noreply@crowdignite.com";
+			$reject_email['subject'] = "Your site does not qualify for ".SITE_NAME;
+
+			/* fetching email from a view */
+			$view = new View($this, false);
+			$view->layout = "none";
+			$reject_email['body'] = $view->render('rejected');
+			$this->Mail->send_mail($reject_email['to'], $reject_email['from'], $reject_email['subject'], $reject_email['body']);
+		}
+
+		if ($rc) {
+			$this->Session->activate();
+			$this->Session->setFlash(__('Denied', true));
+			$this->redirect("/pages/flashed");
+		} else {
+			plat_assert(0);
+		}
+	}
+
+	function suspend() {
+		$this->check_permission();
+
+		$website_id = $this->data['Website']['id'];
+		$rc = $this->change_website_status($website_id, WEBSITE_STATUS_SUSPENDED);
+
+		$this->MetricLog->log(LOG_TYPE_WEBSITE_SUSPEND, $website_id);
+
+		if ($rc) {
+			$this->Session->activate();
+			$this->Session->setFlash(__('Suspended', true));
+			$this->redirect("/pages/flashed");
+		} else {
+			plat_assert(0);
+		}
+	}
+
+	function down() {
+		$this->check_permission();
+
+		plat_assert($this->data);
+		plat_assert($this->data['Website']['id']);
+
+		// Website
+		$website_id = $this->data['Website']['id'];
+		$website = $this->Website->findById($website_id);
+		$this->change_website_status($website_id, WEBSITE_STATUS_DOWN);
+
+		$this->MetricLog->log(LOG_TYPE_WEBSITE_DOWN, $website_id);
+
+		// Pages
+		$pages = $this->Page->get_active_by_website_id($website_id, $website['Website']['domain_bitfield']);
+		foreach ($pages as $page) {
+			$this->requestAction("/pages/pause/".$page['Page']['id']);
+		}
+
+		// Return
+		$this->Session->activate();
+		$this->Session->setFlash(__('Suspended', true));
+		$this->redirect("/pages/flashed");
+	}
+
+	function delete() {
+		$this->check_permission();
+
+		plat_assert($this->data);
+		plat_assert($this->data['Website']['id']);
+
+		// Website
+		$website_id = $this->data['Website']['id'];
+		$website = $this->Website->findById($website_id);
+		plat_assert($website);
+		$this->Website->delete($website_id, false);
+
+		$this->MetricLog->log(LOG_TYPE_WEBSITE_DELETE, $website_id);
+
+		// Account
+		$account_id = $website['Website']['account_id'];
+		$this->Account->delete($account_id, false);
+
+		// Pages
+		$pages = $this->Page->findAllByWebsiteId($website_id);
+		foreach ($pages as $page) {
+			// Delete from widget analytics
+			$analytics = $this->WidgetAnalytic->findAllByPageId($page['Page']['id']);
+			foreach ($analytics as $analytic) {
+				$this->WidgetAnalytic->delete($analytic['WidgetAnalytic']['id'], false);
+			}
+
+			// Delete from landing page analytics
+			$analytics = $this->LandingPageAnalytic->findAllByPageId($page['Page']['id']);
+			foreach ($analytics as $analytic) {
+				$this->LandingPageAnalytic->delete($analytic['LandingPageAnalytic']['id'], false);
+			}
+
+			$this->Page->delete($page['Page']['id'], false);
+		}
+
+		// Delete Widgets
+		$widgets = $this->Widget->findAllByWebsiteId($website_id);
+		foreach ($widgets as $widget) {
+			$this->Widget->delete($widget['Widget']['id'], false);
+		}
+
+		// Return
+		$this->Session->activate();
+		$this->Session->setFlash(__('Deleted', true));
+		$this->redirect("/pages/flashed");
+	}
+
+	function deleteajax($websiteid = "") {
+
+		Configure::write("debug", 0);
+		if ($this->RequestHandler->isAjax()) {
+			$this->RequestHandler->renderAs($this, 'ajax');
+		}
+
+		if (!$websiteid) {
+			$websiteid = $_POST['websiteid'];
+		}
+
+		// Website
+		$website_id = $websiteid;
+		$website = $this->Website->findById($website_id);
+		plat_assert($website);
+		$this->Website->delete($website_id, false);
+
+		$this->MetricLog->log(LOG_TYPE_WEBSITE_DELETE, $website_id);
+
+		// Account
+		// $account_id = $website_id;
+		// $this->Account->delete($account_id, false);
+
+		// Pages
+		$pages = $this->Page->findAllByWebsiteId($website_id);
+		foreach ($pages as $page) {
+			// Delete from widget analytics
+			$analytics = $this->WidgetAnalytic->findAllByPageId($page['Page']['id']);
+			foreach ($analytics as $analytic) {
+				$this->WidgetAnalytic->delete($analytic['WidgetAnalytic']['id'], false);
+			}
+
+			// Delete from landing page analytics
+			$analytics = $this->LandingPageAnalytic->findAllByPageId($page['Page']['id']);
+			foreach ($analytics as $analytic) {
+				$this->LandingPageAnalytic->delete($analytic['LandingPageAnalytic']['id'], false);
+			}
+
+			$this->Page->delete($page['Page']['id'], false);
+		}
+
+		// Delete Widgets
+		$widgets = $this->Widget->findAllByWebsiteId($website_id);
+		foreach ($widgets as $widget) {
+			$this->Widget->delete($widget['Widget']['id'], false);
+		}
+
+		// Return
+		$this->Session->activate();
+		$this->Session->setFlash(__('Deleted', true));
+		$this->redirect("/pages/flashed");
+
+		$this->layout = "none";
+	}
+
+	function rename($websiteid = "", $newname = "") {
+		Configure::write("debug", 0);
+		if ($this->RequestHandler->isAjax()) {
+			$this->RequestHandler->renderAs($this, 'ajax');
+		}
+
+		if (!$websiteid || $newname=="") {
+			$websiteid = $_POST['websiteid'];
+			$newname = $_POST['newname'];
+		}
+
+		$newname = preg_replace('/[^A-Za-z0-9-.()\' ]/', '', $newname);
+		$newname = substr($newname, 0, 25); //truncate new name to 25 chars
+
+		// Website rename
+		$website = $this->Website->findById($websiteid);
+		plat_assert($website);
+		$this->Website->id = $websiteid;
+		$this->Website->saveField('name', $newname, false);
+
+		$this->MetricLog->log(LOG_TYPE_WEBSITE_RENAME, $websiteid);
+
+		// Return
+		$this->Session->activate();
+		$this->layout = "none";
+		$this->redirect("/pages/flashed");
+	}
+
+	function resume() {
+		$this->check_permission();
+
+		plat_assert($this->data);
+		plat_assert($this->data['Website']['id']);
+
+		// Website
+		$website_id = $this->data['Website']['id'];
+		$this->change_website_status($website_id, WEBSITE_STATUS_ACTIVE);
+
+		$this->MetricLog->log(LOG_TYPE_WEBSITE_RESUME, $website_id);
+
+		// Pages
+		$pages = $this->Page->get_paused_by_website_id($website_id);
+		foreach ($pages as $page) {
+			$this->requestAction("/pages/resume/".$page['Page']['id']);
+		}
+
+		// Return
+		$this->Session->activate();
+		$this->Session->setFlash(__('Suspended', true));
+		$this->redirect("/pages/flashed");
+	}
+
+	function add($website = "") {
+		Configure::write("debug", 0);
+		if ($this->RequestHandler->isAjax()) {
+			$this->RequestHandler->renderAs($this, 'ajax');
+		}
+
+		$this->Session->activate();
+		$user = $this->Session->read('User');
+		$user_id = $user['id'];
+
+		if (!$website) {
+			$website = $_POST['website'];
+		}
+
+		$website_id = $this->requestAction("/accounts/add/".$user_id."/".addslashes($website));
+
+		$this->MetricLog->log(LOG_TYPE_WEBSITE_ADD, $website_id);
+
+		echo $website_id;
+
+		$this->layout = "none";
+	}
+
+	function change_website_status($website_id, $website_status) {
+			// Website
+			$this->Website->id = $website_id;
+
+			// Account
+			$account_id = $this->Website->field("account_id", array("id" => $website_id));
+			$this->Account->id = $account_id;
+
+			if ($website_status == WEBSITE_STATUS_ACTIVE) {
+				$transfer_account_id = $this->Account->field('transfer_account_id');
+				if ($transfer_account_id) {
+					$website_status = WEBSITE_STATUS_TRANSFER;
+				}
+			}
+
+			$rc = $this->Website->saveField("status", $website_status);
+			if (!$rc) {
+				return $rc;
+			}
+			$website = $this->Website->findById($website_id);
+
+			$account_status = $this->website_account_status_convert($website_status);
+
+			// Account
+			$rc = $this->Account->saveField("status", $account_status);
+			if (!$rc) {
+				// Should roll back website status
+				// Make this into a CakePHP transaction
+			}
+
+			return $rc;
+	}
+
+	function website_account_status_convert($website_status) {
+			switch($website_status) {
+			case WEBSITE_STATUS_ACTIVE:
+				$account_status = ACCOUNT_STATUS_RUNNING;
+				break;
+			case WEBSITE_STATUS_NEW:
+				$account_status = ACCOUNT_STATUS_NEW;
+				break;
+			case WEBSITE_STATUS_DENIED:
+				$account_status = ACCOUNT_STATUS_DENIED;
+				break;
+			case WEBSITE_STATUS_SUSPENDED:
+				$account_status = ACCOUNT_STATUS_SUSPENDED;
+				break;
+			case WEBSITE_STATUS_PAUSED:
+				$account_status = ACCOUNT_STATUS_PAUSED;
+				break;
+			case WEBSITE_STATUS_INACTIVE:
+				$account_status = ACCOUNT_STATUS_PAUSED;
+				break;
+			case WEBSITE_STATUS_DOWN:
+				$account_status = ACCOUNT_STATUS_PAUSED;
+				break;
+			case WEBSITE_STATUS_TRANSFER:
+				$account_status = ACCOUNT_STATUS_TRANSFER;
+				break;
+			default:
+				plat_assert(0);
+			}
+
+			return $account_status;
+	}
+
+	function active_manage() {
+		$this->autoRender = false;
+
+		/* Mark inactive sites as inactive */
+		$inactive_sites = $this->inactive_sites();
+		foreach($inactive_sites as $site) {
+			echo "Site {$site['Website']['name']} ({$site['Website']['id']}) going INACTIVE\n";
+			$this->change_website_status($site['Website']['id'], WEBSITE_STATUS_INACTIVE);
+			$this->MetricLog->log(LOG_TYPE_WEBSITE_INACTIVE, $site['Website']['id']);
+		}
+		echo "--------------------------------------\n";
+		/* Mark active sites as active */
+		$active_sites = $this->active_sites();
+		foreach($active_sites as $site) {
+			echo "Site {$site['Website']['name']} ({$site['Website']['id']}) going ACTIVE\n";
+			$this->change_website_status($site['Website']['id'], WEBSITE_STATUS_ACTIVE);
+			$this->MetricLog->log(LOG_TYPE_WEBSITE_ACTIVE, $site['Website']['id']);
+		}
+		echo "Done\n";
+	}
+
+	function never_implemented_widget($domain_id = DOMAIN_ID_ALL) {
+		$conditions = array("status" => WEBSITE_STATUS_INACTIVE);
+
+		if ($domain_id != DOMAIN_ID_ALL) {
+			$conditions['domain_primary'] = $domain_id;
+		}
+
+		$websites = $this->Website->find("all", array("conditions" => $conditions));
+
+		return $websites;
+	}
+
+	// Find sites that are inactive
+	function inactive_sites() {
+		$inactive_websites = array();
+
+		$this->Website->bindModel(array('hasOne' => array('Account')));
+		$websites = $this->Website->find('all', array(
+			'fields' => array(
+				'Website.id', 'Website.account_id', 'Website.name', 'Website.created',
+				'Account.credits', 'Account.featured'
+			),
+			'conditions' => array(
+				'Website.status'  => array(WEBSITE_STATUS_ACTIVE, WEBSITE_STATUS_TRANSFER),
+				'Website.visible' => true,
+			),
+		));
+
+		$transfer_accounts = $this->Account->find('list', array(
+			'fields' => 'transfer_account_id, id',
+			'conditions' => array(
+				'status' => ACCOUNT_STATUS_TRANSFER,
+				'visible' => true,
+			),
+		));
+
+		$this->loadModel('StatsAccount');
+
+		$stats_account = new CI\Stats\Account();
+		$end_date   = $this->Date->yesterday();
+		$start_date = $this->Date->date_subtract($end_date, 2); // only 2 because yesterday would be 1
+
+		$stats_account
+			->setModel($this->StatsAccount)
+			->setDateRange($start_date, $end_date)
+			->setTypeAverage();
+
+		foreach ($websites as $website) {
+			// if its new don't put it inactive
+			if ($this->Date->get_age($website['Website']['created']) < 4) {
+				continue;
+			}
+
+			// if its featured don't put it inactive
+			if($website['Account']['featured']) {
+				continue;
+			}
+
+			// Check if has less than 100 credits
+			// no one is transferring credits to this site
+			// and doesn't generate incoming... put it as inactive
+			if ($website['Account']['credits'] < 1000) {
+				if (!isset($transfer_accounts[$website['Website']['account_id']])) {
+					$average = $stats_account->setAccountId($website['Website']['account_id'])->getData();
+					if (5 >= $average['incoming']) {
+						$inactive_websites[] = $website;
+					}
+				}
+			}
+		}
+		return $inactive_websites;
+	}
+
+	// Find sites that are active
+	function active_sites() {
+		$active_websites = array();
+
+		$this->Website->bindModel(array('hasOne' => array('Account')));
+		$websites = $this->Website->find('all', array(
+			'fields' => array(
+				'Website.id', 'Website.account_id', 'Website.name', 'Website.created',
+				'Account.credits', 'Account.featured'
+			),
+			'conditions' => array(
+				'Website.status'  => WEBSITE_STATUS_INACTIVE,
+				'Website.visible' => true,
+			),
+		));
+
+		$transfer_accounts = $this->Account->find('list', array(
+			'fields' => 'transfer_account_id, id',
+			'conditions' => array(
+				'status' => ACCOUNT_STATUS_TRANSFER,
+				'visible' => true,
+			),
+		));
+
+		$this->loadModel('StatsAccount');
+
+		$stats_account = new CI\Stats\Account();
+		$end_date   = $this->Date->yesterday();
+		$start_date = $this->Date->date_subtract($end_date, 2); // only 2 because yesterday would be 1
+
+		$stats_account
+			->setModel($this->StatsAccount)
+			->setDateRange($start_date, $end_date)
+			->setTypeAverage();
+
+		foreach($websites as $website) {
+			// if the site is new
+			if ($this->Date->get_age($website['Website']['created']) < 4) {
+				$active_websites[] = $website;
+				continue;
+			}
+
+			// if the site is featured
+			if ($website['Account']['featured']) {
+				$active_websites[] = $website;
+				continue;
+			}
+
+			// if someone its transferring credits to this site
+			if (isset($transfer_accounts[$website['Website']['account_id']])) {
+				$active_websites[] = $website;
+				continue;
+			}
+
+			// Checking the incoming average
+			$average = $stats_account->setAccountId($website['Website']['account_id'])->getData();
+			if (5 < $average['incoming']) {
+				$active_websites[] = $website;
+				continue;
+			}
+
+			// checking the credits
+			if ($website['Account']['credits'] > 1000) {
+				// Ask if the site has active pages to send them traffic
+				// and decrease their credits (avoiding false positives)
+				$pages = $this->Page->find('count', array(
+					'conditions' => array(
+						'website_id' => $website['Website']['id'],
+						'status'     => PAGE_STATUS_APPROVED,
+						'visible'    => true,
+					),
+				));
+				if ($pages > 0) {
+					$active_websites[] = $website;
+					continue;
+				}
+			}
+		}
+		return $active_websites;
+	}
+
+	private function allowed_subcategories_set($website_id, $subcategories) {
+		/* Get current subcategories */
+		$current_allowed = $this->WebsiteAllowedTag->find(
+			'list',
+			array(
+				'fields' => array('id', 'tag_id', 'visible'),
+				'conditions' => array(
+					'type'       => TAG_TYPE_SUBCATEGORY,
+					'website_id' => $website_id,
+				),
+			)
+		);
+
+		/* Add new subcategories */
+		if ($subcategories == NULL) {
+			$subcategories = array();
+		}
+
+		$add_tags = array();
+		$exist_tags = array();
+		$update_tags = array();
+		foreach ($subcategories as $subcategory) {
+			if (isset($current_allowed[VISIBLE]) && in_array($subcategory, $current_allowed[VISIBLE])) {
+				$exist_tags[] = $subcategory;
+			} elseif (isset($current_allowed[NON_VISIBLE]) && in_array($subcategory, $current_allowed[NON_VISIBLE])) {
+				$update_tags[] = $subcategory;
+			} else {
+				$add_tags[] = array(
+					'tag_id'     => $subcategory,
+					'website_id' => $website_id,
+					'type'       => TAG_TYPE_SUBCATEGORY,
+					'visible'    => VISIBLE,
+				);
+			}
+		}
+
+		$remove_tags = array();
+		if (isset($current_allowed[VISIBLE])) {
+			foreach ($current_allowed[VISIBLE] as $id => $tag) {
+				if (!in_array($tag, $exist_tags)) {
+					$remove_tags[] = $tag;
+				}
+			}
+		}
+
+		if (!empty($add_tags)) {
+			$this->WebsiteAllowedTag->saveAll($add_tags);
+		}
+		if (!empty($update_tags)) {
+			$this->WebsiteAllowedTag->updateAll(
+				array('visible' => VISIBLE),
+				array(
+					'website_id' => $website_id,
+					'tag_id' => $update_tags
+				)
+			);
+		}
+		if (!empty($remove_tags)) {
+			$this->WebsiteAllowedTag->updateAll(
+				array('visible' => NON_VISIBLE),
+				array(
+					'website_id' => $website_id,
+					'tag_id' => $remove_tags
+				)
+			);
+			$this->WidgetAnalytic->remove_tags($website_id, $remove_tags, TAG_TYPE_SUBCATEGORY);
+		}
+	}
+
+	function subcategories_by_category($category = NULL) {
+		Configure::write('debug', 0);
+		$this->autoRender = false;
+
+		if (!$category) {
+			$category = $_POST['category'];
+		}
+
+		$all_subcategories = $this->Tag->get_subcategories_active();
+		$out = array();
+
+		foreach($all_subcategories as $subcategory){
+			if($subcategory['Tag']['parent'] == $category ) {
+				$out[$subcategory['Tag']['name']] = $subcategory['Tag']['id'];
+			}
+		}
+		echo json_encode($out);
+	}
+
+	private function domain_bits_set($account_id, $website_id, $domain_bitfield, $domain_primary) {
+		// Set Account
+		$this->Account->id = $account_id;
+		$this->Account->saveField("domain_bitfield", $domain_bitfield);
+
+		// Set Pages
+		$this->Page->update_domain($website_id, $domain_bitfield);
+
+		// Set Analytics
+		$this->requestAction("/widget_analytics/domain_bits_set/".$website_id."/".$domain_bitfield);
+		$this->requestAction("/landing_page_analytics/domain_bits_set/".$website_id."/".$domain_bitfield);
+
+		// Set Widgets
+		$this->Widget->update_domain($website_id, $domain_primary);
+		$this->requestAction("/widget_engine/rebalance/".$website_id);
+	}
+
+	private function get_bits_category_array($website) {
+		$out_bits = 0;
+
+		for ($i = 0; $i < CATEGORY_NUMBER; $i++) {
+
+			if (isset($website['Website']['allowed_categories_'.$i])) {
+				$out_bits |= $website['Website']['allowed_categories_'.$i];
+			}
+		}
+
+		// add the website category to the allowed categories
+		$website_category = $website['Website']['category'];
+		if (!isset($website['Website']['allowed_categories_'.$website_category])
+		  || $website['Website']['allowed_categories_'.$website_category] == 0) {
+			$out_bits |=  1 << $website_category;
+		}
+
+		return $out_bits;
+	}
+
+	private function get_bits_subcategory_array($website, $all_subcategories ) {
+		$out_bits = array();
+		foreach($all_subcategories as $subcategory){
+			$i = $subcategory['Tag']['id'];
+			if (isset($website['Website']['allowed_subcategories_'.$i])) {
+				if ($website['Website']['allowed_subcategories_'.$i] != 0) {
+					$out_bits[] = $i;
+				}
+			}
+		}
+		return $out_bits;
+	}
+
+	private function check_permission() {
+		if (!$this->is_admin) {
+			if ($this->is_curator) {
+				$this->redirect("/management/home");
+			} else {
+				$this->saveUrl($_SERVER['REQUEST_URI']);
+				$this->redirect("/login");
+			}
+			exit();
+		}
+	}
+
+	function search() {
+		if (!empty($this->params['form']['webPageQuery'])) {
+
+			$this->MetricLog->log(LOG_TYPE_WEBSITE_SEARCH);
+
+			App::import('Sanitize');
+			$term = Sanitize::escape($this->params['form']['webPageQuery']);
+			$searchBy = self::SEARCH_BY_NAME;
+
+			if (isset($this->params['form']['searchBy'])) {
+				$searchBy = Sanitize::escape($this->params['form']['searchBy']);
+			}
+
+			$res = array();
+
+			if (self::SEARCH_BY_ID === $searchBy ) {
+				$res = $this->Website->findById((int) $term);
+
+				if (false !== $res) {
+					$res = array($res);
+				}
+			} else if (self::SEARCH_BY_USER_NAME === $searchBy ) {
+				$user = $this->User->findByUsername($term);
+
+				if ($user !== false ) {
+					$res = $this->Website->findAll('user_id=' . $user['User']['id']);
+				}
+			} else {
+				$res = $this->Website->findAll("name LIKE '%".$term."%' OR url LIKE '%".$term."%'");
+			}
+
+			$this->set("websites", $res);
+			$this->set("term", $term);
+			$this->layout = 'ajax';
+		}
+	}
+
+	function is_valid_url($url) {
+		return preg_match('|^[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(/.*)?$|i', $url);
+	}
+
+	function show_note($website_id){
+		$this->MetricLog->log(LOG_TYPE_PAGE_VIEW, $website_id);
+
+		$website = $this->Website->findById($website_id);
+		$notes = $website['Website']['notes'];
+
+		if(!$notes){
+			$notes = '';
+		}
+
+		$this->set('id', $website['Website']['id']);
+		$this->set('notes', $notes);
+	}
+
+	function edit_note($website_id, $notes = null){
+		$this->MetricLog->log(LOG_TYPE_PAGE_VIEW, $website_id);
+
+		$this->layout = 'ajax';
+		$this->autoRender = FALSE;
+
+		$website = $this->Website->findById($website_id);
+
+		$website['Website']['notes'] = $notes;
+		$rc = $this->Website->save($website);
+
+		if($rc){
+			echo 'Note was saved successfully.';
+		}else{
+			echo 'There was an error saving the note please try again.';
+		}
+	}
+
+	/*
+	 * This action receives a domain or list of domains by $_POST and
+	 * returns in a json the alexa ranking for each domain.
+	 */
+	public function alexaajax(){
+		$this->autoRender = false;
+		Configure::write('debug', 0);
+
+		//getting the domain from $_POST
+		$domain = $_POST['domain']; //$this->data;
+
+		if (strlen($domain) > 0) {
+			//if we received just an string, is just 1 domain.
+			try {
+				$output = $this->Alexa->popularity($domain);
+			} Catch(Exception $e) {
+				echo json_encode(array("error" => $e->getMessage()));
+				exit(0);
+			}
+		}
+
+		//converting to json, and printing to screen
+		echo json_encode($output);
+	}
+
+	public function welcome_email($website_id){
+		$website_id = (int) $website_id;
+
+		$this->MetricLog->log(LOG_TYPE_EMAIL_WELCOME, $website_id);
+
+		//1. getting website info.
+		$website = $this->Website->findById($website_id);
+
+		//if Website with $website_id is not found.
+		if(is_array($website) === false){
+			//redirecting to moderation page.
+			$this->redirect("/websites/moderate");
+		}
+
+		//2. getting user account info.
+		$user = $this->User->findById($website['Website']['user_id']);
+
+		//3. sending email.
+		$mail = $user['User']['email'];
+		$username = $user['User']['username'];
+
+		$this->Mail->website_approved($mail, $username, $website['Website']['name'], DEFAULT_RETURN_RATE);
+
+		//...
+		$this->Session->activate();
+		$this->Session->setFlash(__('The Welcome email has just been re sent', true));
+		$this->redirect("/websites/moderate/". $website_id);
+
+		exit();
+	}
+
+	/**
+	 * Returns all the accounts that fits with the term passed as GET ($_GET['term']). If not term passed
+	 * it'll just show by default first 5 records.
+	 *
+	 * @return String json data with the accounts that matched
+	 */
+	public function getaccounts(){
+		//Receiving
+		$term = isset($_GET['term'])?$_GET['term']:null;
+
+		//look for that values on database table Accounts
+		$data = $this->Website->match($term);
+
+		echo json_encode($data);
+		//return as a Json
+
+		exit();
+	}
+
+	public function rejected() {
+		$this->layout = "none";
+	}
+
+	public function select() {
+		Configure::write('debug', 0);
+		$this->autoRender = false;
+		$websites = array();
+		$term = isset($_GET['name']) ? $_GET['name'] : '';
+		if (!empty($term)) {
+			App::import('Sanitize');
+			$term = Sanitize::escape($term);
+			$condition = "name LIKE '%{$term}%'";
+			$result = $this->Website->find('list', array('conditions' => $condition));
+			foreach ($result as $id => $name) {
+				$websites[] = array(
+					'value' => $id,
+					'text'  => $name,
+				);
+			}
+		}
+		header('Content-Type: application/json');
+		return json_encode($websites);
+	}
+}
+?>

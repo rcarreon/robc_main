@@ -1,0 +1,10 @@
+<select class="form-control multiselect" id="<?php echo $component_name ?>" name="<?php echo $component_name ?>">
+<?php $website_id = $component_data['options']['website_id']; ?>
+<?php foreach ($component_data['list'] as $domain => $websites_options): ?>
+    <optgroup label="<?php echo $domain ?>">
+    <?php foreach ($websites_options as $id => $name): ?>
+        <option value="<?php echo $id; ?>" <?php echo $id == $website_id ? 'selected="selected"' : '' ?>><?php echo $name; ?></option>
+    <?php endforeach ?>
+    </optgroup>
+<?php endforeach ?>
+</select>

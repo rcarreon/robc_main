@@ -1,0 +1,90 @@
+<?php
+namespace Test\IO\File;
+use CI\IO\File;
+use CI\IO\File\System;
+
+/**
+ * @group io
+ * @group io_file
+ */
+class SystemTest extends \PHPUnit_Framework_TestCase
+{
+    protected $oFileSystem;
+    protected $sPath;
+
+    public function setUp()
+    {
+        $this->sPath       = LIBRARY_DIR . '../tests/resources/image.png';
+        $this->oFileSystem = new System();
+    }
+
+    public function testExistsShouldValidateThatTheFileExists()
+    {
+        $this->assertTrue($this->oFileSystem->exists($this->sPath));
+    }
+
+    public function testWriteShouldSaveTheFile()
+    {
+        $oFile = $this->oFileSystem->read($this->sPath);
+
+        $this->assertNotEmpty($this->oFileSystem->write($oFile, $this->sPath, true));
+    }
+
+    /**
+     * @expectedException \CI\IO\File\Exception
+     * @expectedExceptionCode \CI\IO\File\Exception::FILE_ALREADY_EXISTS
+     */
+    public function testWriteShouldThrowException()
+    {
+        $oFile = $this->oFileSystem->read($this->sPath);
+
+        $this->oFileSystem->write($oFile, $this->sPath);
+    }
+
+    /**
+     * @expectedException \CI\IO\File\Exception
+     * @expectedExceptionCode \CI\IO\File\Exception::ORIGIN_NOT_SET
+     */
+    public function testReadRemoteShouldThrowException()
+    {
+        $oFile = $this->oFileSystem->readRemote('');
+    }
+
+    /**
+     * @expectedException \CI\IO\File\Exception
+     * @expectedExceptionCode \CI\IO\File\Exception::UNABLE_TO_OPEN_URL
+     */
+    public function testReadRemoteFailReadShouldThrowException()
+    {
+        $oFile = $this->oFileSystem->readRemote('/path/not/found');
+    }
+
+
+    public function testGetBaseNameNesteDirSuccessTwoDirs()
+    {
+        $sExpected  = 'other/test/this_file.1293_.file.ext';
+        $sPath  = '/home/some/dir/other/test/this_file.1293_.file.ext';
+
+        $sResult = $this->oFileSystem->getBaseNameNestedDir($sPath, 2);
+
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+
+    public function testGetBaseNameNesteDirNotEnoughDir()
+    {
+        $sExpected  = '/home/some/dir/other/test/this_file.1293_.file.ext';
+        $sPath  = '/home/some/dir/other/test/this_file.1293_.file.ext';
+
+        $sResult = $this->oFileSystem->getBaseNameNestedDir($sPath, 10);
+
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testReadRemoteShouldReturnFile()
+    {
+        $oFile = $this->oFileSystem->readRemote('file://' . __DIR__ . '/../../../' . $this->sPath);
+
+        $this->assertInstanceOf('\CI\IO\File', $oFile, 'The object should be a \CI\IO\File');
+    }
+}

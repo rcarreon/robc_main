@@ -1,0 +1,54 @@
+<?php
+/**
+ * Logger Analytic LandingPage Paid
+ *
+ * PHP Version 5.4
+ *
+ * @category Logger
+ * @package  Logger_Analytic
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+/**
+ * Logger Analytic LandingPage Paid
+ *
+ * PHP Version 5.4
+ *
+ * @category Logger
+ * @package  Logger_Analytic
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+class Logger_Analytic_LandingPage_Paid extends Logger_Analytic_Abstract
+{
+    /**
+     * Creates and register the elements for a logger analytic
+     * landing page
+     *
+     * @param Logger_Interface $logger The logger
+     */
+    public function __construct(Logger_Interface $logger)
+    {
+        parent::__construct($logger);
+        $format = array(
+            'item'      => '%s',
+            'separator' => ',',
+        );
+
+        $this->registerElement(new Logger_Analytic_Element_TimeStamp('unix_time_stamp', $format));
+        $this->registerElement(new Logger_Analytic_Element_UserId('user_id', $format));
+        $this->registerElement(new Logger_Analytic_Element_Basic('refering_page_id', $format));
+        $this->registerElement(new Logger_Analytic_Element_Ip('ip_address', $format));
+        $this->registerElement(new Logger_Analytic_Element_Array('landing_page_layout_id'));
+        $this->registerElement(new Logger_Analytic_Element_Array('paid_link_ids'));
+        $this->registerElement(new Logger_Analytic_Element_Array('paid_link_campaign_ids'));
+        $this->registerElement(new Logger_Analytic_Element_Basic('utm_source_page'));
+        $this->registerElement(new Logger_Analytic_Element_Basic('utm_medium_page'));
+        $this->registerElement(new Logger_Analytic_Element_Basic('utm_campain_page'));
+        $this->registerElement(new Logger_Analytic_Element_Basic('domain_bitfield'));
+        $this->registerElement(new Logger_Analytic_Element_Basic('style_id'));
+        $this->registerElement(new Logger_Analytic_Element_Array('paid_link_titles'));
+        $this->registerElement(new Logger_Analytic_Element_Array('to_pub_id'));
+    }
+}

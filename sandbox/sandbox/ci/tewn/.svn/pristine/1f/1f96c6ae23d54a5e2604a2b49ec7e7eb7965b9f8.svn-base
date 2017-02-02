@@ -1,0 +1,39 @@
+<?php
+
+namespace CI\Stats\Account;
+
+abstract class Adapter extends \CI\Model\Cake
+{
+    abstract public function getStats($nAccountId, $sStartDate, $sEndDate);
+
+    public function getEmptyStats()
+    {
+        return array(
+            'incoming' => 0,
+            'outgoing' => 0,
+            'credits'  => 0,
+        );
+    }
+
+    public function getAverage($nAccountId, $sStartDate, $nDays)
+    {
+        if ($nDays <= 0) {
+            return array('incoming' => 0, 'outgoing' => 0);
+        }
+
+        $sStartTime = strtotime($sStartDate);
+        $aStats     = $this->getEmptyStats();
+
+        for ($i = 0; $i < $nDays; $i++) {
+            $sDate = date('Y-m-d', strtotime("+".$i." days", $sStartTime));
+            $aStatsDay = $this->getStats($nAccountId, $sDate.' 00:00:00', $sDate.' 23:59:59');
+            $aStats['incoming'] += $aStatsDay['incoming'];
+            $aStats['outgoing'] += $aStatsDay['outgoing'];
+        }
+
+        return array(
+            'incoming' => $aStats['incoming'] / $nDays,
+            'outgoing' => $aStats['outgoing'] / $nDays,
+        );
+    }
+}

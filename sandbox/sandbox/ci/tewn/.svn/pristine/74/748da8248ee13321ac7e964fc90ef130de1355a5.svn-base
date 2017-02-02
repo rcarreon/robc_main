@@ -1,0 +1,159 @@
+<?php
+
+namespace CI\Stats;
+use CI\Stats;
+use CI\Validator\Options;
+
+class Page extends Stats
+{
+    const BY_PAGE    = 1;
+    const BY_WEBSITE = 2;
+
+    protected $oValidator = null;
+
+    public function __construct()
+    {
+        $this->oValidator = new Options();
+        $this->oValidator->setOptions(
+            array(
+                'id'          => 'required|numeric',
+                'type'        => 'required|numeric',
+                'start_range' => 'required|string',
+                'end_range'   => 'required|string',
+                'model'       => 'required',
+            )
+        );
+        $this->reset();
+    }
+
+    /**
+     * Get a representation of empty stats
+     * @return array Empty stats
+     */
+    public function getEmptyStats()
+    {
+        return array('impressions' => 0);
+    }
+
+    /**
+     * Validates the conditions to start processing
+     * @return boolean True if the conditions validates, False if not
+     */
+    protected function validateConditions()
+    {
+        $bValid = $this->oValidator->isValid($this->aConditions);
+        $this->setErrors(array_values($this->oValidator->getMessages()));
+
+        return $bValid;
+    }
+
+    /**
+     * Process the conditions to obtain data
+     * @return mixed Stats data
+     */
+    protected function process()
+    {
+        $sStart     = $this->aConditions['start_range'];
+        $sEnd       = $this->aConditions['end_range'];
+        $nId        = $this->aConditions['id'];
+        $nStartDate = strtotime($sStart);
+        $oWidget    = new Page\Delta($this->aConditions['model']);
+
+        $mResult = null;
+        if ($this->aConditions['type'] === self::BY_PAGE) {
+            $mResult = $oWidget->getStats($nId, $sStart, $sEnd);
+        } else {
+            $mResult = $oWidget->getStatsByWebsite($nId, $sStart, $sEnd);
+        }
+
+        return $mResult;
+    }
+
+    /**
+     * Find by widget id
+     *
+     * @param integer $nId The widget id
+     *
+     * @return CI\Stats\Page
+     */
+    public function setPageId($nId)
+    {
+        $this->addCondition(
+            array(
+                'id' => $nId,
+                'type' => self::BY_PAGE,
+            )
+        );
+        return $this;
+    }
+
+    /**
+     * Find by website id
+     *
+     * @param integer $nId The website id
+     *
+     * @return CI\Stats\Page
+     */
+    public function setWebsiteId($nId)
+    {
+        $this->addCondition(
+            array(
+                'id' => $nId,
+                'type' => self::BY_WEBSITE,
+            )
+        );
+        return $this;
+    }
+
+    /**
+     * Sets the model to get data
+     *
+     * @param object $oModel The delta model
+     *
+     * @return CI\Stats\Page
+     */
+    public function setModel($oModel)
+    {
+        $this->addCondition(array('model' => $oModel));
+        return $this;
+    }
+
+    /**
+     * Sets a range of dates to get stats
+     *
+     * @param string $sStart Start date
+     * @param string $sEnd   End date
+     *
+     * @return CI\Stats\Page
+     */
+    public function setDateRange($sStart, $sEnd)
+    {
+        $this->addCondition(
+            array(
+                'start_range' => $sStart,
+                'end_range'   => $sEnd,
+            )
+        );
+        return $this;
+    }
+
+    /**
+     * Sets a date to get stats by a time unit
+     *
+     * @param string  $sDate     The date to get stats
+     * @param integer $nTimeUnit The unit time to use for this point
+     *
+     * @return CI\Stats\Page
+     */
+    public function setDate($sDate)
+    {
+        $oDateFormat = new \CI\Date\Format();
+        $this->addCondition(
+            array(
+                'start_range' => $oDateFormat->dateStart($sDate),
+                'end_range'   => $oDateFormat->dateEnd($sDate),
+            )
+        );
+        return $this;
+    }
+}

@@ -1,0 +1,32 @@
+<?php
+
+class DebugbarCollector extends AppModel
+{
+    public $name     = 'DebugbarCollector';
+    public $useTable = 'debugbar_collector';
+
+    public function getActiveKeys($user_id)
+    {
+        $user_id = (int) $user_id;
+        $data = $this->query_read(
+            "SELECT name
+             FROM debugbar_collector
+                INNER JOIN debugbar_usage ON id = debugbarid AND userid = {$user_id}"
+        );
+
+        if (empty($data)) {
+            $data = array();
+        } else {
+            $data = Set::classicExtract($data, '{n}.debugbar_collector.name');
+        }
+
+        $slugify = new CI\Filter\String\Slug();
+        $slugify->setLowerOutput(false);
+
+        array_walk($data, function (&$item) use ($slugify) {
+            $item = $slugify->filter($item);
+        });
+
+        return $data;
+    }
+}

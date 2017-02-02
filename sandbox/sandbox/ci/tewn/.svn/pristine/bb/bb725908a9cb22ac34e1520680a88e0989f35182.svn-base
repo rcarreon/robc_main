@@ -1,0 +1,84 @@
+<?php
+
+namespace CI\Validator;
+
+class NotEmpty extends Rule
+{
+    const INVALID  = 'notEmptyInvalid';
+    const IS_EMPTY = 'isEmpty';
+
+    /**
+     * @var array
+     */
+    protected $aMessageTemplates = array(
+        self::IS_EMPTY => "Value is required and can't be empty",
+        self::INVALID  => "Invalid type given",
+    );
+
+    /**
+     * Returns true if and only if $mValue meets the validation requirements
+     *
+     * If $mValue fails validation, then this method returns false and getMessages()
+     * will return an array of messages that explain why the validation failed.
+     *
+     * @param mixed $mValue The value to validate
+     *
+     * @return boolean
+     */
+    public function isValid($mValue)
+    {
+        // doesn't work with objects? is_object? (http://php.net/manual/en/function.is-object.php)
+        if ($mValue !== null && !is_string($mValue) && !is_int($mValue)
+            && !is_float($mValue) && !is_bool($mValue) && !is_array($mValue)
+        ) {
+            $this->error(self::INVALID);
+            return false;
+        }
+
+        $this->setValue($mValue);
+
+        // space ('  ')
+        if (is_string($mValue) && (preg_match('/^\s+$/s', $mValue))) {
+            $this->error(self::IS_EMPTY);
+            return false;
+        }
+
+        // NULL (null)
+        if (null === $mValue) {
+            $this->error(self::IS_EMPTY);
+            return false;
+        }
+
+        // empty array (array())
+        if (is_array($mValue) && (array() == $mValue)) {
+            $this->error(self::IS_EMPTY);
+            return false;
+        }
+
+        // string ('')
+        if (is_string($mValue) && ('' == $mValue)) {
+            $this->error(self::IS_EMPTY);
+            return false;
+        }
+
+        // float (0.0)
+        if (is_float($mValue) && (0.0 == $mValue)) {
+            $this->error(self::IS_EMPTY);
+            return false;
+        }
+
+        // integer (0)
+        if (is_int($mValue) && (0 == $mValue)) {
+            $this->error(self::IS_EMPTY);
+            return false;
+        }
+
+        // boolean (false)
+        if (is_bool($mValue) && (false == $mValue)) {
+            $this->error(self::IS_EMPTY);
+            return false;
+        }
+
+        return true;
+    }
+}

@@ -1,0 +1,15 @@
+<style>
+.container_12 .grid_12 {
+	background:#fff;
+    width: 953px;
+}
+#links_content {
+    border-radius:0!important;
+    -moz-border-radius:0!important;
+    -webkit-border-radius:0!important;
+    margin-left: 5px;
+    margin-top: 0px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+</style>

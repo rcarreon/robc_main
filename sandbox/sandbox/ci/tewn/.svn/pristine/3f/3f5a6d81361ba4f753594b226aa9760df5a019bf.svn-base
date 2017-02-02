@@ -1,0 +1,121 @@
+<?php
+
+/**
+ * Testing Interface Component
+ *
+ * Component that renders itself into a view variable,
+ * to be used inside a view.
+ *
+ * @extends Object Cakephp component
+ */
+
+abstract class CIAbstractComponent extends Object
+{
+    /**
+     * Controller that called the component
+     * @var AppController
+     */
+    protected $controller = null;
+
+    /**
+     * Name of the view to render
+     * @var string
+     */
+    protected $view = __CLASS__;
+
+    /**
+     * Options of the componet to render itself
+     * @var CI\ArrayManipulator
+     */
+    protected $options = null;
+
+    /**
+     * View helpers for partial views
+     * @var array
+     */
+    public $helpers = array();
+
+    /**
+     * Override of the initialize method of a cakephp component.
+     * Initialize specific properties of this component only once.
+     * @param  AppController $controller Controller that called this component
+     * @return void
+     */
+    public function initialize(&$controller)
+    {
+        // register the controller that call us
+        $this->controller = $controller;
+        // register helpers with the controller
+        $helpers = is_array($this->helpers) ? $this->helpers : array();
+        $helpers = array_merge($this->controller->helpers, $helpers);
+
+        $this->controller->helpers = $helpers;
+        // initialize inner properties only once
+        $this->initView();
+        $this->init();
+    }
+
+    /**
+     * Process options and render the view for this component,
+     * setting up a view variable inside the controller that call this component
+     * @return void
+     */
+    public function render(array $options = array(), $name = __CLASS__)
+    {
+        $this->options = new CI\ArrayManipulator($options);
+        // get a valid view of the controller that call us
+        $view = $this->getViewInstance();
+
+        // setting the parameters to send to the view
+        $params = array(
+            'component_name' => $name,
+            'component_data' => $this->process()
+        );
+
+        // rendering the view with the options processed
+        return $view->element($this->view, $params, true /* Load helpers */);
+    }
+
+    protected function getViewInstance() {
+        $sViewClass = 'View';
+
+        if ($this->controller->view == 'Theme') {
+            App::import('View', 'Theme');
+            $sViewClass = 'Theme' . $sViewClass;
+        }
+
+        return new $sViewClass($this->controller, true);
+    }
+
+    /**
+     * Setups a component variable view inside the controller
+     * that called the component with custom options
+     * @param  string $name    The name of the variable to be rendered
+     * @param  array  $options Options to build the component render variable
+     * @return void
+     */
+    public function setup($name = __CLASS__, array $options = array())
+    {
+        $this->controller->set($name, $this->render($options, $name));
+    }
+
+    /**
+     * Initialize inner properties of this component
+     * only once
+     * @return void
+     */
+    protected function init() {}
+
+    /**
+     * Abstract method to process the options that were
+     * setting up to build the component view variable
+     * @return array The results of processing options (component data)
+     */
+    abstract protected function process();
+
+    /**
+     * Abstract method to set the view that we are going to render
+     * @return void
+     */
+    abstract protected function initView();
+}

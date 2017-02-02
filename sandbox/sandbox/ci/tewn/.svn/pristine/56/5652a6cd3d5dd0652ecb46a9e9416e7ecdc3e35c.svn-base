@@ -1,0 +1,66 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en" >
+	<head>
+	<?
+	echo $this->element("chartbeat_start");
+	?>
+	<title><? echo $title_for_layout ?></title>
+	<meta name="description" content="">
+	<meta name="keywords" content="">
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />	
+<?
+	if ($canonical) {
+		echo '<link rel="canonical" href="'.$canonical.'"/>';
+	}
+?>
+
+	<link href="/img/favicon.gif" rel="shortcut icon" />
+	<link rel="shortcut icon" href="/img/favicon.png" type="image/x-icon" />
+	<link rel="apple-touch-icon" href="/img/favicon.png" type="image/png" />
+	 
+<?
+	// CSS
+        $html->css(DOMAIN.'/style', null, null, false);
+        $html->css('grid', null, null, false);
+
+	// Javascript
+	$javascript->link('jquery', false);
+	$javascript->link('ie.js', false);
+	$javascript->link('jquery.corner.js', false);
+	$javascript->link('jquery.form', false);
+	$javascript->link('jquery.jeditable.mini.js', false);
+
+	echo $asset->scripts_for_layout();
+
+?>
+
+<!-- Backup if hit ordering issue w/ Asset scripts
+	
+<script type="text/javascript" src="/js/jquery.min.js"></script>
+<script type="text/javascript" src="/js/ie.js"></script>
+<script type="text/javascript" src="/js/jquery.corner.js"></script>
+<script type="text/javascript" src="/js/jquery.form.js"></script>
+<script type="text/javascript" src="/js/jquery.jeditable.mini.js"></script>
+-->
+
+		
+<script>
+        function init_function() {
+		if (is_IE) {
+			jQuery("#top").corner("round bottom 28px");
+			jQuery("#widget_button").corner("12px");
+			jQuery("#content").corner("28px");
+			jQuery("#bottomContent").corner("round bottom 28px");
+			jQuery(".rightnav").corner("28px");
+			jQuery("#tab_top").corner("round top 16px");
+			jQuery("#tab_newest").corner("round top 16px");
+			jQuery("#tab_random").corner("round top 16px");
+		}
+		
+	}
+</script>    
+
+<?
+	echo $this->element(DOMAIN."/ad_header");
+?>
+

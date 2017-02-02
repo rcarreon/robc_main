@@ -1,0 +1,146 @@
+<?php
+
+namespace Test;
+
+class BitwiseTest extends \PHPUnit_Framework_TestCase
+{
+    public function testBit()
+    {
+        $nNumber   = 17;
+        $nExpected = 131072;
+
+        $oBitwise = new \CI\Bitwise();
+        $nResult = $oBitwise->bit($nNumber);
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+    public function testArrayToBit()
+    {
+        $aNumbers  = array(1, 17);
+        $nExpected = 131074;
+
+        $oBitwise = new \CI\Bitwise();
+        $nResult = $oBitwise->bit($aNumbers);
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+    public function testNullValue()
+    {
+        $mNumber   = null;
+        $nExpected = 0;
+
+        $oBitwise = new \CI\Bitwise();
+        $nResult = $oBitwise->bit($mNumber);
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+    public function testStringValue()
+    {
+        $mNumber   = 'string';
+        $nExpected = 0;
+
+        $oBitwise = new \CI\Bitwise();
+        $nResult = $oBitwise->bit($mNumber);
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+    public function testContainsSingle()
+    {
+        $nNumber   = 17;
+        $nBits     = 131074;
+        $nExpected = true;
+
+        $oBitwise = new \CI\Bitwise();
+        $nResult = $oBitwise->contains($nNumber, $nBits);
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+    public function testNotContainsSingle()
+    {
+        $nNumber   = 3;
+        $nBits     = 131074;
+        $nExpected = false;
+
+        $oBitwise = new \CI\Bitwise();
+        $nResult = $oBitwise->contains($nNumber, $nBits);
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+    public function testContains()
+    {
+        $aNumbers  = array(1, 17);
+        $nBits     = 131074;
+        $nExpected = true;
+
+        $oBitwise = new \CI\Bitwise();
+        $nResult = $oBitwise->contains($aNumbers, $nBits);
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+    public function testNotContains()
+    {
+        $aNumbers  = array(3, 17);
+        $nBits     = 131074;
+        $nExpected = false;
+
+        $oBitwise = new \CI\Bitwise();
+        $nResult = $oBitwise->contains($aNumbers, $nBits);
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+    public function testContainsStrings()
+    {
+        $aNumbers  = array(1, 'string');
+        $nBits     = 131074;
+        $nExpected = false;
+
+        $oBitwise = new \CI\Bitwise();
+        $nResult = $oBitwise->contains($aNumbers, $nBits);
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+    public function testContainsNull()
+    {
+        $aNumbers  = array(null, 17);
+        $nBits     = 131074;
+        $nExpected = false;
+
+        $oBitwise = new \CI\Bitwise();
+        $nResult = $oBitwise->contains($aNumbers, $nBits);
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+    public function testContainsFloats()
+    {
+        $aNumbers  = array(1.3, 17.5);
+        $nBits     = 131074;
+        $nExpected = true;
+
+        $oBitwise = new \CI\Bitwise();
+        $nResult = $oBitwise->contains($aNumbers, $nBits);
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+    public function testContainsSingleStrings()
+    {
+        $sValue    = 'string';
+        $nBits     = 131074;
+        $nExpected = false;
+
+        $oBitwise = new \CI\Bitwise();
+        $nResult = $oBitwise->contains($sValue, $nBits);
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+    public function testContainsSingleNull()
+    {
+        $mValue    = null;
+        $nBits     = 131074;
+        $nExpected = false;
+
+        $oBitwise = new \CI\Bitwise();
+        $nResult = $oBitwise->contains($mValue, $nBits);
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+}

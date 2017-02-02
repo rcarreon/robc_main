@@ -1,0 +1,178 @@
+<?php 
+
+class RuleComponentTestController extends Controller{
+	var $components = array('Rule');
+}
+
+class RuleComponentTest extends CakeTestCase{
+	var $Controller;
+	
+	function start(){
+		$this->Controller = new RuleComponentTestController();
+		$this->Controller->constructClasses();
+		$this->Controller->Component->initialize($this->Controller);
+		$this->Controller->beforeFilter();
+		$this->Controller->Component->startup($this->Controller);
+	}
+	
+	function testContentRating(){
+		/* G rating */
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_G, WEBSITE_CONTENT_G);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_G, WEBSITE_CONTENT_PG13);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_G, WEBSITE_CONTENT_R);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_G, WEBSITE_CONTENT_MENS);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+
+		/* PG-13 rating */
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_PG13, WEBSITE_CONTENT_G);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_PG13, WEBSITE_CONTENT_PG13);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_PG13, WEBSITE_CONTENT_R);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_PG13, WEBSITE_CONTENT_MENS);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		/* R rating */
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_R, WEBSITE_CONTENT_G);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_R, WEBSITE_CONTENT_PG13);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_R, WEBSITE_CONTENT_R);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_R, WEBSITE_CONTENT_MENS);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		/* Mens rating */
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_MENS, WEBSITE_CONTENT_G);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_MENS, WEBSITE_CONTENT_PG13);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_MENS, WEBSITE_CONTENT_R);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->content_rating(WEBSITE_CONTENT_MENS, WEBSITE_CONTENT_MENS);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+	}
+	
+	function testCategory(){
+		/* Parenting */
+		$rc = $this->Controller->Rule->category(CATEGORY_PARENTING, CATEGORY_PARENTING);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->category(CATEGORY_PARENTING, CATEGORY_TRAVEL);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->category(CATEGORY_PARENTING, CATEGORY_CELEBRITIES);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		/* Travel */
+		$rc = $this->Controller->Rule->category(CATEGORY_TRAVEL, CATEGORY_TRAVEL);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->category(CATEGORY_TRAVEL, CATEGORY_CELEBRITIES);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->category(CATEGORY_TRAVEL, CATEGORY_FOOD);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		/* Food */
+		$rc = $this->Controller->Rule->category(CATEGORY_FOOD, CATEGORY_FOOD);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->category(CATEGORY_FOOD, CATEGORY_CELEBRITIES);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->category(CATEGORY_FOOD, CATEGORY_PARENTING);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		/* Outdoor */
+		$rc = $this->Controller->Rule->category(CATEGORY_OUTDOORS, CATEGORY_OUTDOORS);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->category(CATEGORY_OUTDOORS, CATEGORY_CELEBRITIES);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->category(CATEGORY_OUTDOORS, CATEGORY_PARENTING);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		/* Deals */
+		$rc = $this->Controller->Rule->category(CATEGORY_DEALS, CATEGORY_DEALS);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->category(CATEGORY_DEALS, CATEGORY_CELEBRITIES);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->category(CATEGORY_DEALS, CATEGORY_PARENTING);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->category(CATEGORY_DEALS, CATEGORY_HOME);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		/* Non-special case */
+		$rc = $this->Controller->Rule->category(CATEGORY_GAMING, CATEGORY_CELEBRITIES);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->category(CATEGORY_MEDIA, CATEGORY_MEDIA);
+		$expected = 1;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->category(CATEGORY_MEDIA, CATEGORY_PARENTING);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+		$rc = $this->Controller->Rule->category(CATEGORY_MEDIA, CATEGORY_DIY);
+		$expected = 0;
+		$this->assertEqual($rc, $expected);
+
+	}
+}

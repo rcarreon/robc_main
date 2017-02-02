@@ -1,0 +1,199 @@
+<?php
+
+// Get the real hostname of the server
+// This is used by the engine servers
+if (empty($_SERVER['SERVER_NAME'])) {
+    define('ENGINE_SERVER', true);
+    $_SERVER['SERVER_NAME'] = php_uname("n");
+} else {
+    define('ENGINE_SERVER', false);
+}
+
+// Getting environment
+$server_name = strtolower($_SERVER['SERVER_NAME']);
+
+// Verify server name
+switch ($server_name) {
+    case preg_match('/(^local.*)/', $server_name) > 0:
+    case 'ulisesacosta':
+    case 'franciscogonzalez':
+    case 'jorgecortes':
+    case 'marcopatino':
+    case 'jorgerodriguez':
+    case 'julios-macbook-pro.local':
+    case 'lapida':
+        $environment_prefix = 'local.';
+        define('ENVIRONMENT', 'local');
+        define("DEBUG", 1);
+        define("CDN_URL_MAX", 0);
+        break;
+    case preg_match('/(.*sbx.*|uid1v-.*)/', $server_name) > 0:
+        $ldapname = substr($server_name, 0, strpos($server_name, '.'));
+        $environment_prefix = $ldapname . '.sbx.';
+        define('ENVIRONMENT', 'local');
+        define("DEBUG", 1);
+        define("CDN_URL_MAX", 0);
+        break;
+    case preg_match('/(^dev.*|^eng\d+v.*dev.*|^app\d+v.*dev.*)/', $server_name) > 0:
+        $environment_prefix = 'dev.';
+        define('ENVIRONMENT', 'dev');
+        define("DEBUG", 1);
+        define("CDN_URL_MAX", 0);
+        break;
+    case preg_match('/(^stg.*|^eng\d+v.*stg.*|^app\d+v.*stg.*)/', $server_name) > 0:
+        $environment_prefix = 'stg.';
+        define('ENVIRONMENT', 'stg');
+        define("DEBUG", 0);
+        define("CDN_URL_MAX", 4);
+        break;
+    case preg_match('/(^eng\d+v.*prd.*|^app\d+v.*prd.*|^eng\d+v.*-ci*|^app\d+v.*eval.mlp1*)/', $server_name) > 0:
+    case 'crowdignite.com':
+    case 'crowdignite.gamerevolution.com':
+    case 'crowdignite.craveonline.com':
+    case 'crowdignite.momtastic.com':
+    case 'crowdignite.thefashionspot.com':
+    case 'crowdignite.totallyher.com':
+    case 'origin.crowdignite.com':
+    case 'cdn.crowdignite.com':
+    case 'cdn1.crowdignite.com':
+    case 'cdn2.crowdignite.com':
+    case 'cdn3.crowdignite.com':
+    case 'cdn4.crowdignite.com':
+    case 'management.crowdignite.com':
+    case 'crowdignite.gnmedia.net':
+    case 'engine.crowdignite.com':
+    case 'news.crowdignite.craveonline.com':
+    case 'es.crowdignite.craveonline.com':
+    case 'peak.crowdignite.com':
+    case 'peak.crowdignite.totallyher.com':
+    case 'peak.crowdignite.craveonline.com':
+    case 'peak.news.crowdignite.craveonline.com':
+    case 'peak.crowdignite.gamerevolution.com':
+    case 'peak.crowdignite.momtastic.com':
+    case 'peak.crowdignite.thefashionspot.com':
+    case 'peak.management.crowdignite.com':
+        $environment_prefix = "";
+        define('ENVIRONMENT', 'prd');
+        define("DEBUG", 0);
+        define("CDN_URL_MAX", 4);
+        break;
+    default:
+        echo $server_name;
+        define("DEBUG", 0);
+        plat_assert(0, $server_name);
+}
+
+// Default values for connect to database
+if (strpos($server_name, 'management') !== false) {
+    define('MGMT_SERVER', 1);
+} else if (!ENGINE_SERVER) {
+    define('APP_SERVER', 1);
+}
+if (!defined('MGMT_SERVER')) {
+    define('MGMT_SERVER', 0);
+}
+if (!defined('APP_SERVER')) {
+    define('APP_SERVER', 0);
+}
+
+// Default values for URLs
+$widget_port = ENVIRONMENT == "local" ? ":81" : "";
+define("ENGINE_URL",     DATACENTER . $server_name);
+define("WIDGET_URL",     DATACENTER . $environment_prefix . "widget.crowdignite.com" . $widget_port);
+define("MANAGEMENT_URL", DATACENTER . $environment_prefix . "management.crowdignite.com");
+define("CDN_URL",        $environment_prefix . "cdn.crowdignite.com");
+define("RSS_URL",        "feeds.feedburner.com/raaze");
+
+// getCDNURL function, does round robin on available names
+// use CDN_URL_MAX=0 to limit to cdn1
+define("CDN_URL_PRE_NUM",  $environment_prefix . "cdn");
+define("CDN_URL_POST_NUM",  ".crowdignite.com");
+
+// Setup the landing pages
+if (strpos($server_name, 'crowd-ignite.totallyher.com') !== false) {
+    $domain = DATACENTER . 'crowd-ignite.totallyher.com';
+} else if(strpos($server_name, 'news.crowdignite.craveonline.com') !== false) {
+    $domain = DATACENTER . 'news.crowdignite.craveonline.com';
+} else if(strpos($server_name, 'es.crowdignite.craveonline.com') !== false) {
+    $domain = DATACENTER . 'es.crowdignite.craveonline.com';
+} else {
+    preg_match('/^.*\.(.+\.com)$/', $server_name, $matches);
+    $domain = isset($matches[1]) ? $matches[1] : $server_name;
+}
+
+define("ENVIRONMENT_PREFIX", DATACENTER . $environment_prefix);
+
+switch ($domain) {
+    case 'gamerevolution.com':
+        define("SITE_NAME",          DOMAIN_NAME_GAME_REVOLUTION);
+        define("TAG_LINE",           "Xbox 360, Wii, PS3, PS2 Game Cheats & Reviews");
+        define("DEFAULT_PAGE_TITLE", SITE_NAME. " - ". TAG_LINE);
+        define("DOMAIN",             "gamerevolution");
+        define("DOMAIN_ID",          DOMAIN_ID_GAME_REVOLUTION);
+        define("SITE_URL",           "www.gamerevolution.com");
+        define("LANDING_PAGE",       DATACENTER . $environment_prefix . "crowdignite.gamerevolution.com");
+        break;
+    case 'craveonline.com':
+        define("SITE_NAME",          DOMAIN_NAME_CRAVE_ONLINE);
+        define("TAG_LINE",           "Your online source for Videos, Movie News & Trailers, Video Games, Sports and More");
+        define("DEFAULT_PAGE_TITLE", TAG_LINE." - ".SITE_NAME);
+        define("DOMAIN",             "craveonline");
+        define("DOMAIN_ID",          DOMAIN_ID_CRAVE_ONLINE);
+        define("SITE_URL",           "www.craveonline.com");
+        define("LANDING_PAGE",       DATACENTER . $environment_prefix . "crowdignite.craveonline.com");
+        break;
+    case 'momtastic.com':
+        define("SITE_NAME",          DOMAIN_NAME_MOMTASTIC);
+        define("TAG_LINE",           "Moms, Food, Health, Beauty, Home, Living, Entertainment");
+        define("DEFAULT_PAGE_TITLE", TAG_LINE." | ".SITE_NAME);
+        define("DOMAIN",             "momtastic");
+        define("DOMAIN_ID",          DOMAIN_ID_MOMTASTIC);
+        define("SITE_URL",           "www.momtastic.com");
+        define("LANDING_PAGE",       DATACENTER . $environment_prefix . "crowdignite.momtastic.com");
+        break;
+    case 'thefashionspot.com':
+        define("SITE_NAME",          DOMAIN_NAME_THEFASHIONSPOT);
+        define("TAG_LINE",           "Celebrity Fashion, Designers, Models, &amp; Interviews");
+        define("DEFAULT_PAGE_TITLE", TAG_LINE." | ".SITE_NAME);
+        define("DOMAIN",             "thefashionspot");
+        define("DOMAIN_ID",          DOMAIN_ID_THEFASHIONSPOT);
+        define("SITE_URL",           "www.thefashionspot.com");
+        define("LANDING_PAGE",       DATACENTER . $environment_prefix . "crowdignite.thefashionspot.com");
+        break;
+    case 'totallyher.com':
+        define("SITE_NAME",          DOMAIN_NAME_TOTALLYHER);
+        define("TAG_LINE",           "");
+        define("DEFAULT_PAGE_TITLE", SITE_NAME);
+        define("DOMAIN",             "totallyhers");
+        define("DOMAIN_ID",          DOMAIN_ID_TOTALLYHER);
+        define("SITE_URL",           "totallyher.com");
+        define("LANDING_PAGE",       DATACENTER . $environment_prefix . "crowdignite.totallyher.com");
+        break;
+    case 'news.crowdignite.craveonline.com':
+        define("SITE_NAME",          DOMAIN_NAME_NEWS);
+        define("TAG_LINE",           "");
+        define("DEFAULT_PAGE_TITLE", SITE_NAME);
+        define("DOMAIN",             "news");
+        define("DOMAIN_ID",          DOMAIN_ID_NEWS);
+        define("SITE_URL",           "news.crowdignite.craveonline.com");
+        define("LANDING_PAGE",       DATACENTER . $environment_prefix . "news.crowdignite.craveonline.com");
+        break;
+    case 'es.crowdignite.craveonline.com':
+        define("SITE_NAME",          DOMAIN_NAME_ES);
+        define("TAG_LINE",           "");
+        define("DEFAULT_PAGE_TITLE", SITE_NAME);
+        define("DOMAIN",             "es");
+        define("DOMAIN_ID",          DOMAIN_ID_ES);
+        define("SITE_URL",           "es.crowdignite.craveonline.com");
+        define("LANDING_PAGE",       DATACENTER . $environment_prefix . "es.crowdignite.craveonline.com");
+        break;
+    default:
+        define("SITE_NAME",          DOMAIN_NAME_CROWD_IGNITE);
+        define("TAG_LINE",           "Igniting New Audiences!");
+        define("DEFAULT_PAGE_TITLE", SITE_NAME." - ".TAG_LINE);
+        define("DOMAIN",             "crowdignite");
+        define("DOMAIN_ID",          DOMAIN_ID_CROWD_IGNITE);
+        define("SITE_URL",           "crowdignite.com");
+        define("LANDING_PAGE",       DATACENTER . $environment_prefix . "crowdignite.com");
+        break;
+}

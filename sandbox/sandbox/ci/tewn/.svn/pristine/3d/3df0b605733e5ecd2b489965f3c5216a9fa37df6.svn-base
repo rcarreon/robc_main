@@ -1,0 +1,590 @@
+<!-- <link rel="stylesheet" type="text/css" href="/css/jquery-ui-1.8.custom.css" /> -->
+<link href="/js/jqtransformplugin/jqtransform.css" rel="stylesheet" type="text/css" />
+<link href="/js/jquery.crayonbox.css" rel="stylesheet" type="text/css" />
+<link href="/css/widget_creation_redesign.css" rel="stylesheet" type="text/css" />
+<link href='http://fonts.googleapis.com/css?family=Arvo:700&v2' rel='stylesheet' type='text/css'>
+<script type="text/javascript" src="/js/jqtransformplugin/jquery.jqtransform.js"></script>
+<script type="text/javascript" src="/js/jquery.crayonbox.js"></script>
+<script>
+
+jQuery(document).ready(function() {
+    jQuery("form.jqtransform").jqTransform();
+
+    if(	jQuery('input#logo').val() == '' ) { // no logo? then it's a new widget
+        jQuery('#text_color').val("#000000");
+        jQuery('#background_color').val("#E6E6E6");
+        jQuery('#element_border_color').val('#666666');
+        jQuery('#element_background_color').val('#FFFFFF');
+        jQuery('#font_size').val('12');
+        jQuery("#font_size_select div.jqTransformSelectWrapper span").text('12');
+        jQuery('input#logo').val('http://crowdignite.com/img/crowdignite/logo_small.jpg'); //Default logo
+    } else { 
+        //check the colors from the existing widget
+        var bgcolor = validateHexColor( jQuery('#background_color').val(), '#E6E6E6' );
+        jQuery('#background_color').val( bgcolor );
+
+        var text_color = validateHexColor( jQuery('#text_color').val(), '#000000' );
+        jQuery('#text_color').val( text_color );
+
+        var text_color = validateHexColor( jQuery('#element_border_color').val(), '#666666' );
+        jQuery('#element_border_color').val( text_color );
+
+        var text_color = validateHexColor( jQuery('#element_background_color').val(), '#FFFFFF' );
+        jQuery('#element_background_color').val( text_color );
+    }
+
+    jQuery('#step2').hide();
+    jQuery('#step3').hide();
+
+    // select a website
+    jQuery("#website_select div.jqTransformSelectWrapper ul li a").click(function(){
+            var option_value= jQuery("#website_select div.jqTransformSelectWrapper span").text()
+            jQuery("#website_select select option").each( function(){
+                if( jQuery(this).text() == option_value ) {
+                    window.location.replace("/dashboard/design/"+jQuery(this).val());
+                }
+            });
+            return false;
+    });
+
+    jQuery('#add_logo').click(function(){ //add logo button
+        jQuery('#logo_msg').html('');
+        if(validateUrl('input#logo')){
+            var img = new Image();
+            jQuery(img).load(function () { // load logo to check img dimensions
+                //jQuery(this).css('display', 'none'); // .hide() doesn't work in Safari when the element isn't on the DOM already
+                jQuery(this).hide();
+
+                if(img.width > 900 || img.height > 150) {
+                    jQuery('#logo_msg').html('Image should be less that 900x150px!');
+                } else {
+                    jQuery('#lp_preview #logo img').remove();
+                    jQuery('#lp_preview #logo').append(this);
+                    jQuery(this).fadeIn();
+                }
+            }).error(function () {
+                jQuery('#logo_msg').html('Unable to read URL or image!');
+            }).attr('src', jQuery('input#logo').val()  ); //
+        } else {
+            jQuery('#logo_msg').html('Invalid URL!');
+        }
+    });
+
+    jQuery('#add_link').click(function(){ //add logo link
+        var $oLink = $("#logo_link");
+
+        if (validateUrl($oLink)) {
+            var $oAnchor    = $("<a>",{href:$oLink.val(), target:"_blank"});
+            var $oImgLogo   = $("#logo img");
+            var $oDivParent = $oImgLogo.parent();
+
+            $oAnchor.append($oImgLogo);
+
+            $oDivParent.empty();
+            $oDivParent.append($oAnchor);
+        }
+
+    });
+
+    jQuery('#add_background').click(function(){ //add background button
+        jQuery('#back_msg').html('');
+        if(validateUrl('input#background_image')){            
+            jQuery('#lp_preview').css('background-repeat','repeat').css('background-image','url('+jQuery('input#background_image').val()+')' );
+        } else {
+            jQuery('#back_msg').html('Invalid URL!');
+        }
+    });
+
+    function validateUrl(urlInput) {
+        val = jQuery(urlInput).val();
+        if (val.length == 0) { return false; }
+
+        // if user has not entered http:// https:// or ftp:// assume they mean http://
+        if(!/^(https?|ftp):\/\//i.test(val)) {
+            val = 'http://'+val;
+            jQuery(urlInput).val(val);
+        }        
+        return /^(https?|ftp):\/\/(((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&amp;'\(\)\*\+,;=]|:)*@)?(((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5]))|((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.?)(:\d*)?)(\/((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&amp;'\(\)\*\+,;=]|:|@)+(\/(([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&amp;'\(\)\*\+,;=]|:|@)*)*)?)?(\?((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&amp;'\(\)\*\+,;=]|:|@)|[\uE000-\uF8FF]|\/|\?)*)?(\#((([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(%[\da-f]{2})|[!\$&amp;'\(\)\*\+,;=]|:|@)|\/|\?)*)?$/i.test(val);
+    }
+
+    jQuery("#font_size_select div.jqTransformSelectWrapper ul li a").click(function(){
+            var value= jQuery("#font_size_select div.jqTransformSelectWrapper span").text()
+            jQuery("#font_size").val(value);
+            lp_preview();
+            return false;
+    });
+
+    /*submit button */
+    jQuery("#landing_page_style").click(function(){
+        jQuery("#landing_page_form").submit();
+    });
+    
+    jQuery("#cancel").click(function(){
+       location.href = "/dashboard/";
+    });
+
+
+    /* Color boxes */
+	jQuery('input.colorboxed').each( function(index, boxId) {
+    	jQuery(boxId).crayonbox({
+			colors: new Array( // this is the color palette
+'#ffffcc','#ffff66','#ffcc66','#f2984c','#e1771e','#b47b10','#a9501b','#6f3c1b','#804000','#cc0000','#940f04','#660000','#c3d9ff','#99c9ff','#66b5ff','#3d81ee','#0066cc','#6c82b5','#32527a','#2d6e89','#006699','#215670','#003366','#000033','#caf99b','#80ff00','#00ff80','#78b749','#78b749','#2ba94f','#38b63c','#0d8f63','#2d8930','#1b703a','#11593c','#063e3f','#ffbbe8','#e895cc','#ff6fcf','#c94093','#9d1961','#800040','#800080','#72179d','#6728b2','#6131bd','#341473','#400058','#ffffff','#e6e6e6','#cccccc','#b3b3b3','#999999','#808080','#7f7f7f','#666666','#4c4c4c','#333333','#191919','#000000'
+			),
+			onSelection: function(){
+                                switch( jQuery(boxId).attr('id') ) {
+                                    case 'border_color':jQuery('#border_color_clear').show(); break;
+                                    case 'image_border_color':jQuery('#image_border_color_clear').show(); break;
+                                    case 'background_color':jQuery('#background_color_clear').show(); break;
+                                }
+				lp_preview();
+			}
+		});
+  	});
+
+	jQuery('div.colorbox').click(function() {
+		jQuery(this).parent().children('.crayonbox').slideToggle();
+	} );
+
+        jQuery('input.colorboxed').blur( function(){
+             var id = jQuery(this).attr('id');
+             var defaultcolor = '#FFFFFF';
+             switch(id) {
+                case 'text_color':          defaultcolor='#000000'; break;
+                case 'border_color':        defaultcolor='none'; break;
+                case 'image_border_color':  defaultcolor='#999999'; break;
+                case 'background_color':
+                default:break;
+             }
+             var color = jQuery(this).val();
+             var newcolor = validateHexColor(color, defaultcolor);
+             jQuery(this).val(newcolor);
+
+             if(getHexBrightness(newcolor) > 50 || newcolor == 'transparent' || newcolor == 'none' ){
+                    jQuery(this).css("color", "#000000" );
+                    jQuery(this).parent().css("color", "#000000" );
+                    if( newcolor == 'transparent' || newcolor == 'none' ) newcolor = "#FFFFFF";
+             } else {
+                    jQuery(this).css("color", "#FFFFFF" );
+                    jQuery(this).parent().css("color", "#FFFFFF" );
+             }
+
+             jQuery(this).parent().css('background-color',newcolor);
+             changeWidget();
+        });
+
+
+	jQuery('#border_color_clear').click(function(){
+		jQuery('#border_color').val('none');
+		jQuery('#border_color').parent().css('background',"#FFFFFF");
+                jQuery('#border_color').parent().parent().children('.crayonbox').slideUp();
+                jQuery(this).hide();
+		changeWidget();
+		return false;
+	});
+	jQuery('#image_border_color_clear').click(function(){
+		jQuery('#image_border_color').val('none');
+		jQuery('#image_border_color').parent().css('background',"#FFFFFF");
+                jQuery('#image_border_color').parent().parent().children('.crayonbox').slideUp();
+                jQuery(this).hide();
+		changeWidget();
+		return false;
+	});
+	jQuery('#background_color_clear').click(function(){
+		jQuery('#background_color').val('transparent');
+		jQuery('#background_color').parent().css('background',"#FFFFFF");
+                jQuery('#background_color').parent().parent().children('.crayonbox').slideUp();
+                jQuery(this).hide();
+		changeWidget();
+		return false;
+	});
+
+        function validateHexColor( hexcolor, defaultc ){
+            if( hexcolor.length == 6 || hexcolor.length == 3 ) {
+                if( hexcolor.indexOf("#") == -1 ) hexcolor = '#'+hexcolor;
+            }
+            if ( /^#[a-f0-9]{6}$/i.test(hexcolor) || hexcolor == 'transparent' || hexcolor == 'none' ) {
+                return hexcolor;
+            } else {
+                return defaultc;
+            }
+        }
+        function getHexBrightness(hex) {
+                var hex = hex.replace('#','');
+                var c_r = hexDec(hex.substr(0, 2));
+                var c_g = hexDec(hex.substr(2, 2));
+                var c_b = hexDec(hex.substr(4, 2));
+
+                return ((c_r * 299) + (c_g * 587) + (c_b * 114)) / 1000;
+        }
+        function hexDec(hex_string){
+                hex_string = (hex_string+'').replace(/[^a-f0-9]/gi, '');
+                return parseInt(hex_string, 16);
+        }
+
+        function lp_preview() {		
+		var background_color = jQuery('#background_color').val();
+                var font_color = jQuery('#text_color').val();
+                var font_size = jQuery('#font_size').val() + "px";                
+
+		var item_border_color = jQuery('#element_border_color').val();
+		var item_background_color = jQuery('#element_background_color').val();
+
+                jQuery('#lp_preview').css("background", background_color);
+                jQuery('#lp_preview .item').css("background", item_background_color).css("border-color", item_border_color).css("color", font_color);
+                jQuery('#lp_preview .item h2').css("font-size", font_size);
+        }
+
+
+/* Steps Nav */
+	jQuery('.tab').click(function() {
+		var selectStep = jQuery(this).attr('id').charAt(3);
+		gotoStep(selectStep);
+		return false;
+	} );
+
+	function gotoStep( step ){
+		if( parseInt(step)-1 == 2) {
+			if( jQuery("#LandingPageStyleWebsiteId").val() == "0"   ){
+				alert ( "Please select your Website in step 1" );
+				return false;
+			}
+		}
+		if( step <=3 ) {
+			jQuery('.step').hide();
+			jQuery('#step'+step).show();
+			jQuery('.tab').removeClass('selected');
+			jQuery('.tab').children('.nextarrow').fadeOut('slow');
+			jQuery('#step_tabs').children('#tab'+step).addClass('selected');
+		}
+                if( step > 3 ) {
+                    var leave = true;
+                    if( jQuery('#widget_code').css('display') == "none" ) {
+                        leave = confirm("Don't forget to Save your changes.\nDo you want to continue? ");
+                    }
+                    if(leave) window.location.replace("http://crowdignite.com/dashboard/widgets");
+                }
+	}
+
+	jQuery('.tab').children('.icon').mouseover(function() {
+		jQuery(this).parent().parent().children('.selected').children('.nextarrow').stop(true, true).fadeIn('slow');
+	})
+
+});
+
+</script>
+<style>
+    #step1 .control { width:300px; text-align:left;}
+    #step1 .name{ padding-top:0px;}
+    input#logo { margin: 0;}
+    .control > span {
+        display: inline-block;
+        float: left;
+        font-size: 12px;
+        margin: 8px 15px;
+    }
+    #step2 textarea { width:500px!important; height:100px; }
+</style>
+
+<div class="row">
+<div id="content" class="column grid_12">
+<h3 class="topContent">Crowd Ignite Landing Page Creation</h3>
+<div id="content_area">
+<div class="grid_12">
+     <?
+        $session->activate();
+        if ($session->check('Message.flash')) {
+                        $session->flash();
+        }
+    ?>
+    <div id="step_tabs" class="grid_12">
+        <div id="tab1" class="tab selected"><span class="icon"></span><a href="#">Main Page Options</a><div class="nextarrow"></div></div>
+        <div id="tab2" class="tab"><span class="icon"></span><a href="#">Item Options</a><div class="nextarrow"></div></div>
+        <div id="tab3" class="tab"><span class="icon"></span><a href="#">Save Changes</a><div class="nextarrow"></div></div>
+    </div>
+    <div class="clear"></div>
+
+    <div id="wrapper" class="grid_12">
+    <form id="landing_page_form" class="jqtransform" action="<?php echo $html->url('/dashboard/design'); ?>" method="post">
+       <?
+		 if (isset($this->data['LandingPageStyle']['id'])) {
+			 echo $form->hidden("LandingPageStyle.id");
+		}
+	?>
+	 
+        <div id="step_container" >
+
+                <div id="step1" class="step">
+                    <div id="white_arrow"></div>
+                        <div class="step_row grid_12" >
+                        <div class="name">Website</div>
+                        <div class="control">
+                            <div id="website_select">
+		 <?
+                                     // Figure out the default website
+                                     if (isset($this->data['LandingPageStyle']['website_id'])) {
+                                             $website_id_default = $this->data['LandingPageStyle']['website_id'];
+
+                                             // Print out all the websites
+                                             foreach($websites as $website) {
+                                                     if ($website['Website']['id'] == $website_id_default) {
+                                                             echo $convert->get_website_name($website);
+                                                             break;
+                                                     }
+                                             }
+                                            echo $form->hidden("LandingPageStyle.website_id");
+
+                                     } else {
+                                             $website_id_default = $websites[0]['Website']['id'];
+
+                                             $dropdown = array();
+                                             if(count($websites)>1) {
+                                                $dropdown += array('0'=>'Please select your Website');
+                                             }
+                                             foreach($websites as $website) {
+                                                     $dropdown += array($website['Website']['id'] => $convert->get_website_name($website));
+                                             }
+
+                                             echo $form->select("LandingPageStyle.website_id", $dropdown, null, array("showParents" => false), false);
+                                     }
+
+		 ?>
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+
+                    <div class="step_row alt grid_12" >
+                        <div class="name">Logo URL</div>
+                        <div class="control fleft">
+                             <span class="prelabel">URL</span>
+                             <div class="wider_input">
+                             <?
+                                echo $form->text('LandingPageStyle.logo', array("id" => "logo"));
+                             ?>
+                             </div>
+                        </div>
+                        <div class="control fleft">
+                            <input id="add_logo" type="button" value="Add Logo" /><span class="red fright" id="logo_msg"></span>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+
+                    <div class="step_row grid_12" >
+                        <div class="name">Logo Link</div>
+                        <div class="control fleft">
+                             <span class="prelabel">Link</span>
+                             <div class="wider_input">
+                             <?
+                                echo $form->text('LandingPageStyle.logo_link', array("id" => "logo_link"));
+                             ?>
+                             </div>
+                        </div>
+                        <div class="control fleft">
+                            <input id="add_link" type="button" value="Add Link" /><span class="red fright" id="link_msg"></span>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+
+                    <div class="step_row alt grid_12" >
+                        <div class="name">Background</div>
+                        <div class="columnr">
+                            <div class="control">
+                                    <div class="colorbox">
+                                        <span>Background color</span>
+                                        <?php
+                                            echo $form->text('LandingPageStyle.background_color', array("id" => "background_color",'size' => "8", 'class' => 'colorboxed jqtranformdone'));
+                                        ?>
+                                        <div class="clear"></div>
+                                    </div>
+                            </div>
+                        </div>
+
+                        <div class="clear"></div>
+                    </div>
+
+                    <div class="step_row grid_12" >
+                        <div class="name">&nbsp;</div>
+
+                        <div class="control fleft">
+                             <span class="prelabel">URL</span>
+                             <div class="wider_input">
+                                <?
+                                 echo $form->text('LandingPageStyle.background_image', array("id" => "background_image"));
+                                ?>
+                             </div>
+                        </div>
+
+                        <div class="control fleft">
+                            <input id="add_background" type="button" value="Add Background" /><span class="red fright" id="back_msg"></span>
+                        </div>
+
+                        <div class="clear"></div>
+                    </div>
+
+                </div><!-- step 1 -->
+
+                <div id="step2" class="step">
+                    <div id="white_arrow"></div>
+
+                    <div class="step_row grid_12" >
+                        <div class="name">FONT</div>
+                        <div class="columnr">
+                            <div class="control fleft">
+                                    <div class="colorbox">
+                                        <span>Text color</span>
+                                        <?php
+                             echo $form->text('LandingPageStyle.text_color', array("id" => "text_color",'size' => "8", 'class' => 'colorboxed jqtranformdone'));
+                                        ?>
+                                        <div class="clear"></div>
+                                    </div>
+
+                            </div>
+                        </div>
+                        <div class="columnr">                            
+                            <div class="control fleft ">
+                            <span>Font Size</span>
+                            <div id="font_size_select">
+                            <div class="spacemaker"></div>
+                     <?
+                             //echo $form->text('LandingPageStyle.font_size', array("id" => "font_size"));
+
+                            $font_sizes = array('8' => '8', '9' => '9', '10' => '10', '11' => '11', '12' => '12', '13' => '13', '14' => '14','15' => '15','16' => '16','17' => '17','18' => '18');
+                            echo $form->select("LandingPageStyle.font_size", $font_sizes, null, array("escape" => false, "id"=>"font_size"), false);
+
+                     ?>     
+                            </div>
+                            <span>px</span>
+                            </div>                            
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+
+                    <div class="step_row alt grid_12" >
+                        <div class="name">Item Colors</div>
+                        <div class="columnr">
+                            <div class="control fleft">
+                                    <div class="colorbox">
+                                        <span>Border color</span>
+                                        <?php
+                                        echo $form->text('LandingPageStyle.element_border_color', array("id" => "element_border_color", 'size' => "8", 'class' => 'colorboxed jqtranformdone'));
+                                        ?>
+                                        <div class="clear"></div>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="columnr">
+                            <div class="control">
+                                    <div class="colorbox">
+                                        <span>Background color</span>
+                                        <?php
+                                        echo $form->text('LandingPageStyle.element_background_color', array("id" => "element_background_color",'size' => "8", 'class' => 'colorboxed jqtranformdone'));
+                                        ?>
+                                        <div class="clear"></div>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+
+
+                    <div class="step_row grid_12" >
+                        <div class="name">Custom CSS</div>
+                        <div class="control">
+		 <?
+		         echo $form->textarea('LandingPageStyle.customcss', array("id" => "customcss", 'class' => 'customcss'));
+		 ?>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+
+                <div id="step3" class="step">
+                    <div id="white_arrow"></div>
+
+                    <div class="step_row grid_12" >
+                        <div class="name">Save Changes</div>
+                        <div class="control">
+                            <span>Check the preview of your page below. If you like the look, click on Save to make the changes effective.</span>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+
+                    <div class="step_row alt grid_12" >
+                        <div class="name">&nbsp;</div>
+                        <div class="control">
+                            <p style="margin-top:18px;"><div class="awesome purple big" id="landing_page_style">Save</div> <div class="awesome purple big" id="cancel">Cancel</div>
+                        </div>
+                        <div class="clear"></div>
+                    </div>
+                </div>
+
+
+        </div>
+	 </form>
+                <div id="lp_preview">
+                    <div id="lp_wrap">
+                        <div id="logo" >
+                            <?php
+                                $imgUrl = "http://crowdignite.com/img/crowdignite/logo_small.jpg";
+
+                                if (false == empty($this->data['LandingPageStyle']['logo'])) {
+                                    $imgUrl = $this->data['LandingPageStyle']['logo'];
+                                }
+
+                                if (false == empty($this->data['LandingPageStyle']['logo_link'])) {
+
+                            ?>
+                                    <a target="_blank" href="<?php echo $this->data['LandingPageStyle']['logo_link']; ?>">
+                                        <img src="<?php echo $imgUrl ?>"/>
+                                    </a>
+                            <?php
+                                } else {
+                            ?>
+                                    <img src="<?php echo $imgUrl ?>"/>
+                            <?php
+                                }
+                            ?>
+                        </div>
+                        <div class="item" >
+                            <img src="/img/widget_creation/adsample.jpg"/>
+                            <h2>This is a sample</h2>
+                        </div>
+                        <div class="item" >
+                            <img src="/img/widget_creation/adsample.jpg"/>
+                            <h2>This is a sample</h2>
+                        </div>
+                        <div class="item" >
+                            <img src="/img/widget_creation/adsample.jpg"/>
+                            <h2>This is a sample</h2>
+                        </div>
+                        <div class="item" >
+                            <img src="/img/widget_creation/adsample.jpg"/>
+                            <h2>This is a sample</h2>
+                        </div>
+                    </div>
+                </div><!-- widget_preview -->
+
+                <div class="clear"></div>
+                </div>
+
+
+    </div><!--wrapper-->
+
+</div> <!-- end grid_12 -->
+</div>  <!-- end content area -->
+</div> <!-- end content column -->
+</div> <!-- end content row -->
+<?php /*
+	if (isset($this->data['LandingPageStyle']['id'])) {
+            echo $form->hidden("LandingPageStyle.id", array("id" => $this->data['LandingPageStyle']['id']));
+	} */
+
+    if ( isset($website['Website']['landing_page_style_id']) ) {
+        echo $form->hidden("LandingPageStyle.id", array("id" => "LandingPageStyleId", "value" => $website['Website']['landing_page_style_id'] ));
+        //echo '<input type="hidden" name="website_account_id" id="website_account_id" value="'. $website['Website']['account_id'] .'">';
+    }
+
+?>
+
+</body></html>
+

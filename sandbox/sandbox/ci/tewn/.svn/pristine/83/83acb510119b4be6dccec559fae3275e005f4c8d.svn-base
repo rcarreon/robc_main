@@ -1,0 +1,181 @@
+<?php
+
+namespace CI\Stats;
+use CI\Validator\Options;
+use CI\Stats;
+
+class Widget extends Stats
+{
+    const WIDGET_FIELD   = 0;
+    const WEBSITE_FIELD  = 1;
+
+    protected $aDefaultConditions = array(
+        'by_field' => self::WIDGET_FIELD,
+    );
+
+    /**
+     * Prepare all the conditions
+     */
+    public function __construct()
+    {
+        $this->cleanConditions();
+    }
+
+    /**
+     * Get a representation of empty stats
+     * @return array Empty stats
+     */
+    public function getEmptyStats()
+    {
+        $aFields = array(
+            'display', 'incoming',
+            'display_basic', 'display_contextual', 'display_similar', 'display_tag',
+            'incoming_basic', 'incoming_contextual', 'incoming_similar', 'incoming_tag',
+        );
+        return array_fill_keys($aFields, 0);
+    }
+
+    /**
+     * Validates the conditions to start processing
+     * @return boolean True if the conditions validates, False if not
+     */
+    protected function validateConditions()
+    {
+        $oValidator = new Options();
+        $oValidator->setOptions(
+            array(
+                'id'             => 'required|numeric',
+                'by_field'       => 'required|numeric',
+                'start_range'    => 'required|string',
+                'end_range'      => 'required|string',
+                'model'          => 'required',
+            )
+        );
+
+        $bValid = $oValidator->isValid($this->aConditions);
+        $this->setErrors(array_values($oValidator->getMessages()));
+
+        return $bValid;
+    }
+
+    /**
+     * Process the conditions to obtain data
+     * @return mixed Stats data
+     */
+    protected function process()
+    {
+        $sStart     = $this->aConditions['start_range'];
+        $sEnd       = $this->aConditions['end_range'];
+        $nId        = $this->aConditions['id'];
+        $nStartDate = strtotime($sStart);
+        $oWidget    = new Widget\Delta($this->aConditions['model']);
+
+        $mResult = null;
+        if ($this->aConditions['by_field'] === self::WIDGET_FIELD) {
+            $mResult = $oWidget->getStats($nId, $sStart, $sEnd);
+        } else {
+            $mResult = $oWidget->getStatsByWebsite($nId, $sStart, $sEnd);
+        }
+
+        return $mResult;
+    }
+
+    /**
+     * Find by widget id
+     *
+     * @param integer $nId The widget id
+     *
+     * @return CI\Stats\Widget
+     */
+    public function setWidgetId($nId)
+    {
+        $this->addCondition(
+            array(
+                'id' => $nId,
+                'by_field' => self::WIDGET_FIELD,
+            )
+        );
+        return $this;
+    }
+
+    /**
+     * Find by website id
+     *
+     * @param integer $nId The website id
+     *
+     * @return CI\Stats\Widget
+     */
+    public function setWebsiteId($nId)
+    {
+        $this->addCondition(
+            array(
+                'id' => $nId,
+                'by_field' => self::WEBSITE_FIELD,
+            )
+        );
+        return $this;
+    }
+
+    /**
+     * Sets the model to get data
+     *
+     * @param object $oModel The delta model
+     *
+     * @return CI\Stats\Widget
+     */
+    public function setModel($oModel)
+    {
+        $this->addCondition(array('model' => $oModel));
+        return $this;
+    }
+
+    /**
+     * Sets a range of dates to get stats
+     *
+     * @param string $sStart Start date
+     * @param string $sEnd   End date
+     *
+     * @return CI\Stats\Widget
+     */
+    public function setDateRange($sStart, $sEnd)
+    {
+        $this->addCondition(
+            array(
+                'start_range' => $sStart,
+                'end_range'   => $sEnd,
+            )
+        );
+        return $this;
+    }
+
+    /**
+     * Sets a date to get stats by a time unit
+     *
+     * @param string  $sDate     The date to get stats
+     * @param integer $nTimeUnit The unit time to use for this point
+     *
+     * @return CI\Stats\Widget
+     */
+    public function setDate($sDate, $nTimeUnit = Stats::UNIT_DAY)
+    {
+        $sStartFormatDate = $nTimeUnit == Stats::UNIT_DAY ? 'Y-m-d 00:' : 'Y-m-d H:';
+        $sEndFormatDate   = $nTimeUnit == Stats::UNIT_DAY ? 'Y-m-d 23:' : 'Y-m-d H:';
+        $this->addCondition(
+            array(
+                'start_range' => date($sStartFormatDate.'00:00', strtotime($sDate)),
+                'end_range'   => date($sEndFormatDate.'59:59', strtotime($sDate)),
+            )
+        );
+        return $this;
+    }
+
+    /**
+     * Clears the conditions
+     * @return CI\Stats\Widget
+     */
+    public function cleanConditions()
+    {
+        $this->setConditions(array());
+        return $this;
+    }
+}

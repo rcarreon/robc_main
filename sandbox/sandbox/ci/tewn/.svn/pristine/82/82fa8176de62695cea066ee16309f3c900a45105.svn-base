@@ -1,0 +1,16 @@
+<?php
+    $header = '';
+    if (isset($component_data['options']['header'])) {
+        $header = ' data-header="' . $component_data['options']['header'] . '"';
+    }
+?>
+<select class="multiselect selectpicker show-tick" id="<?php echo $component_name ?>" name="<?php echo $component_name ?>"<?php echo $component_data['options']['multiple'] ?> data-live-search="true" data-width="100%"<?php echo $header; ?>>
+<?php $website_ids = $component_data['options']['website_ids']; ?>
+<?php foreach ($component_data['list'] as $domain => $websites_options): ?>
+    <optgroup label="<?php echo $domain ?>">
+    <?php foreach ($websites_options as $id => $name): ?>
+        <option value="<?php echo $id; ?>" <?php echo in_array($id, $website_ids) ? 'selected="selected"' : '' ?>><?php echo $name; ?></option>
+    <?php endforeach ?>
+    </optgroup>
+<?php endforeach ?>
+</select>

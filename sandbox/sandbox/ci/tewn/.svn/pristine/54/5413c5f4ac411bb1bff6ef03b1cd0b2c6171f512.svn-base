@@ -1,0 +1,8 @@
+<?php
+namespace CI\IO;
+
+abstract class Formatter
+{
+    private $_aColors = array();
+    abstract public function getColoredString($sMessage, $sForegroundColor = null, $sBackgroundColor = null);
+}

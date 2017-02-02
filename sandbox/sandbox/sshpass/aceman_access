@@ -1,0 +1,12 @@
+#!/bin/bash
+#ssh $1
+S1="xcat.gnmedia.net" 
+if [ $1 = $S1 ] ; then 
+	echo -e "These are your options for aceman"
+	ssh $1 'sudo aceman -c list'
+		echo "Please select an option\n" 
+		
+else 
+	echo "wrong server"
+	exit 1;
+fi 

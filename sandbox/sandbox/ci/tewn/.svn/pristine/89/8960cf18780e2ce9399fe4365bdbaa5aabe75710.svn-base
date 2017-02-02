@@ -1,0 +1,784 @@
+<?php
+
+class AnalysisController extends AppController
+{
+    /**
+     * Models used by the controller
+     * @var array
+     */
+    public $uses = array('User', 'Website', 'WidgetAnalytic', 'LandingPageAnalytic', 'Account', 'Page', 'Setting');
+
+    /**
+     * Components used by the controller
+     * @var array
+     */
+    public $components = array('RequestHandler', 'Intersects', 'Date', 'Category', 'Dictionary', 'Statistic');
+
+    public $helpers = array('Convert');
+
+    /**
+     * Buffer of landing pages to not use repeated database requests
+     * @var array
+     */
+    public $lp_links_cache = array();
+
+    /**
+     * Before Filter used by cakephp to initialize the controller
+     * validating the user and set properties depending if this
+     * request is Ajax or a normal request
+     *
+     * @return void
+     */
+    public function beforeFilter()
+    {
+        // Get user
+        $this->Session->activate();
+        $user = $this->Session->read('User');
+        $user = $this->User->findById($user['id']);
+        $this->set_types_user($user['User']);
+        $is_admin = $this->User->isAdmin($user['User']['id'], $user['User']['admin']);
+
+        $admin_domain_bits = isset($user['User']['domain_bitfield']) ?
+            $user['User']['domain_bitfield'] : false;
+
+        if ($is_admin && $admin_domain_bits == -1) {
+            $this->set('user', $user);
+            $this->set('tab', 'analysis');
+        } else {
+            $this->saveUrl($_SERVER['REQUEST_URI'], $this->Session, $user);
+            $this->redirect("/login");
+            exit();
+        }
+
+        $this->layout = 'backend2';
+
+        if ($this->RequestHandler->isAjax()) {
+            $this->layout = '';
+            set_time_limit(20 * MINUTE);
+            ini_set('memory_limit', '256M');
+            Configure::write('debug', 0); // clean ajax results (no debug info)
+        }
+    }
+
+    /**
+     * Easy way to send an Ajax Response from a cakephp controller
+     * not a fancy one but ir works...
+     * TODO: Change this behaviour if you find a better way
+     *
+     * @param  mixed $data The mixed data to send as a response
+     * @return void
+     */
+    protected function sendAjaxResponse($data)
+    {
+        echo json_encode($data);
+        exit;
+    }
+
+    /**
+     * Websites action for web request
+     *
+     * @param  string $websites Website ID's separated by comma
+     *
+     * @return void
+     */
+    public function websites($websites = null)
+    {
+        if ($this->RequestHandler->isAjax()) {
+            $items = array();
+            $websites = isset($_POST['websites']) ? $_POST['websites'] : null;
+            if (!empty($websites)) {
+                if (!is_array($websites)) {
+                    $websites = explode(',', $websites);
+                }
+                // find the websites to analyse
+                $websites = $this->Website->find('all', array(
+                    'conditions' => array(
+                        'id' => $websites,
+                    ),
+                ));
+                $items = $this->_websites_analysis($websites);
+            }
+            $this->sendAjaxResponse($items);
+        }
+
+        $website_list = $this->Website->find('list', array(
+            'conditions' => array('visible' => true),
+            'fields'     => array('id', 'name')
+        ));
+
+        if (!empty($websites)) {
+            $this->set('websites', $websites);
+        }
+
+        $this->set('website_list', $website_list);
+    }
+
+    /**
+     * Websites action for web request
+     *
+     * @param  string $websites Website ID's separated by comma
+     *
+     * @return void
+     */
+    public function lpwebsites($website_id = null)
+    {
+        set_time_limit(HOUR);
+
+        $oHub    = new CI\Hub(new CI\Hub\DataSource\MyArray());
+        $domains = new CI\ArrayManipulator($oHub->getAllActiveHubsName());
+
+        $websites = $this->Website->query_read(
+            "SELECT Website.id, Website.name, Website.domain_primary FROM websites Website
+             WHERE id IN (SELECT website_id FROM pages WHERE status = 0) AND status = 0"
+        );
+
+        $website_list = array();
+        foreach ($websites as $website) {
+            $website = $website['Website'];
+            $domain  = $domains->get($website['domain_primary'], "Unknown ({$website['domain_primary']})");
+            $website_list[$domain][$website['id']] = $website['name'];
+        }
+
+        if (!empty($website_id)) {
+            $website = $this->Website->findById($website_id);
+            $account = $this->Account->findById($website['Website']['account_id']);
+
+            App::import('Helper', 'Convert');
+            $Convert = new ConvertHelper();
+
+            $pages = $this->Page->find(
+                'all',
+                array(
+                    'conditions' => array(
+                        'visible'    => 1,
+                        'status'     => PAGE_STATUS_APPROVED,
+                        'website_id' => $website_id,
+                    ),
+                )
+            );
+
+            $website['Website']['active_pages'] = count($pages);
+
+            $categories = array();
+            $contents = array();
+
+            foreach ($pages as $page) {
+                $page = $page['Page'];
+                if (isset($categories[$page['category']])) {
+                    $categories[$page['category']]++;
+                } else {
+                    $categories[$page['category']] = 1;
+                }
+                if (isset($contents[$page['content_rating']])) {
+                    $contents[$page['content_rating']]++;
+                } else {
+                    $contents[$page['content_rating']] = 1;
+                }
+            }
+
+            $active = array('categories' => array(), 'content_ratings' => array());
+            foreach ($categories as $category => $total) {
+                $name = $Convert->category($category);
+                $name = empty($name) ? 'Not set' : $name;
+                $active['categories'][] = array(
+                    'label' => $name." ({$total})",
+                    'data' => $total,
+                );
+            }
+            foreach ($contents as $content_rating => $total) {
+                $name = $Convert->content_rating($content_rating);
+                $name = empty($name) ? 'Not set' : $name;
+                $active['content_ratings'][] = array(
+                    'label' => $name." ({$total})",
+                    'data' => $total,
+                );
+            }
+
+            $cross_domains = $oHub->bitsToIdArray($website['Website']['domain_bitfield']);
+            $valid_lps     = $this->getValidLandingPages($website_id);
+
+            if (!empty($this->params['url']['intersect'])) {
+                $this->set('intersect', $this->params['url']['intersect']);
+            }
+
+            if (!empty($this->params['url']['highlight'])) {
+                $this->set('highlight_page', $this->params['url']['highlight']);
+            }
+
+            if ($account['Account']['credits'] > 0) {
+                $account['Account']['credits'] = number_format($account['Account']['credits'] / 10, 2);
+            }
+            $account['Account']['incoming'] = number_format($account['Account']['incoming'], 2);
+            $account['Account']['outgoing'] = number_format($account['Account']['outgoing'], 2);
+            $account['Account']['return_rate'] = empty($account['Account']['incoming']) ?
+                'N/A (No traffic from)' :
+                number_format($account['Account']['outgoing']/$account['Account']['incoming'] * 100, 2).'%';
+
+            $this->set('active', $active);
+
+            $this->set('website', $website['Website']);
+            $this->set('account', $account['Account']);
+
+            $this->set('valid_landing_pages', $valid_lps);
+            $this->set('website_domains', $cross_domains);
+
+            $this->set('domains', $domains);
+        }
+
+        $this->set('website_id', $website_id);
+        $this->set('website_list', $website_list);
+    }
+
+    public function lpcoverage($domain_id = -1, $threshold = 10, $category = -1, $content_rating = -1, $return_rate_range = 0, $exclude_penalized = 1, $cross_domains = 0)
+    {
+        $Date            = new CI\Date();
+        $domains         = $this->Dictionary->get_dictionary(DictionaryComponent::TYPE_DOMAIN);
+        $categories      = $this->Dictionary->get_dictionary(DictionaryComponent::TYPE_CATEGORY);
+        $content_ratings = $this->Dictionary->get_dictionary(DictionaryComponent::TYPE_CONTENT);
+
+        if ($domain_id > -1) {
+
+            $analytics = $this->LandingPageAnalytic->get_analytics_coverage($domain_id, $category, $content_rating, 0, $exclude_penalized, $cross_domains);
+            $ideal_return_rate = $this->Setting->tunable('IDEAL_RETURN_RATE', $domain_id);
+
+            $stats = array();
+            foreach ($analytics as $analytic) {
+                $website_id = $analytic['Page']['website_id'];
+                if (isset($stats[$website_id])) {
+                    $stats[$website_id]++;
+                } else {
+                    $stats[$website_id] = 1;
+                }
+            }
+
+            $average       = empty($stats) ? 0 : array_sum($stats) / count($stats);
+            $standard      = $this->Statistic->standard_deviation_population($stats);
+            $standard_up   = $average + $standard;
+            $standard_down = $average - $standard;
+            $max_zone      = $average + $standard + ($standard / 2);
+            $min_zone      = $average - $standard - ($standard / 2);
+
+            if ($min_zone < 0) $min_zone = 0;
+            if ($standard_down < 0) $standard_down = 0;
+
+            $fields = array(
+                'Website.id', 'Website.name', 'Website.domain_primary',
+                'Account.id', 'Account.featured', 'Account.incoming', 'Account.outgoing'
+            );
+            $websites_list = $this->Website->get_websites_accounts(array_keys($stats), $fields);
+
+            App::import('Helper', 'Convert');
+            $Convert = new ConvertHelper();
+
+            $rates = array();
+            $websites = array();
+            $rate_stats = array();
+            if (!empty($websites_list)) {
+                if ($return_rate_range > 0) {
+                    $datetime_start = $Date->format($return_rate_range);
+                    $datetime_end   = $Date->yesterdayEnd();
+
+                    $this->loadModel('StatsAccount');
+                    $account_id_list = Set::classicExtract($websites_list, '{n}.Account.id');
+                    $accountStats = new CI\Stats\Account();
+                    $rate_stats = $accountStats
+                        ->setModel($this->StatsAccount)
+                        ->setDateRange($datetime_start, $datetime_end)
+                        ->setAccountsIds($account_id_list)
+                        ->setGroupByAccount()
+                        ->getData();
+                }
+
+                foreach ($websites_list as $website) {
+                    $account = $website['Account'];
+                    $website = $website['Website'];
+                    $websites[$website['id']] = $website;
+                    $websites[$website['id']]['domain'] = $Convert->domain_short_name_bit(1 << $website['domain_primary']);
+                    $websites[$website['id']]['featured'] = $account['featured'];
+                    $websites[$website['id']]['domain_name'] = $domains[$website['domain_primary']];
+                    if ($return_rate_range > 0) {
+                        $account_stat = $rate_stats[$account['id']];
+                        $return_rate = $account_stat['incoming'] == 0 ? 0 : intval($account_stat['outgoing'] / $account_stat['incoming'] * 100);
+                    } else {
+                        $return_rate = $account['incoming'] == 0 ? 0 : intval($account['outgoing'] / $account['incoming'] * 100);
+                    }
+                    $websites[$website['id']]['return_rate'] = $return_rate;
+                    $rates[$website['id']] = $return_rate;
+                }
+            }
+
+
+            $chart_lines = array();
+            foreach ($stats as $website_id => $data) {
+                $return_rate = $websites[$website_id]['return_rate'];
+                $standard_down = $average - $standard;
+                $chart_lines[] = array($return_rate, $data, $websites[$website_id]['name']);
+                // getting the cuadratic status for analytics axis (y axis) against analytics average,
+                // 'l' means low (bottom part of the quadrant) and 'u' means up (top part of the quadrant)
+                $analytic_cuadrant = $data < $average ? 'l' : 'u';
+                // getting the cuadratic status for return rate axis (x axis) against ideal return rate,
+                // 'l' means the left part and 'r' means the right part
+                $return_rate_cuadrant = $return_rate < $ideal_return_rate ? 'l' : 'r';
+                $websites[$website_id]['status'] = "quad-{$analytic_cuadrant}{$return_rate_cuadrant}";
+            }
+
+            arsort($rates);
+            arsort($stats);
+
+            // Get only the firs and end part, just to draw the line
+            $chart_lines_avg                  = array();
+            $end_rate                         = end($rates);
+            $first_rate                       = reset($rates);
+            $chart_lines_avg['average']       = array(array($first_rate, $average), array($end_rate, $average));
+            $chart_lines_avg['standard_up']   = array(array($first_rate, $standard_up), array($end_rate, $standard_up));
+            $chart_lines_avg['standard_down'] = array(array($first_rate, $standard_down), array($end_rate, $standard_down));
+            $chart_lines_avg['max_zone']      = array(array($first_rate, $max_zone), array($end_rate, $max_zone));
+            $chart_lines_avg['min_zone']      = array(array($first_rate, $min_zone), array($end_rate, $min_zone));
+
+            $others         = array();
+            $other_websites = 0;
+            $chart_pie      = array();
+            foreach ($stats as $website_id => $data) {
+                if (count($chart_pie) < $threshold) {
+                    $website     = $websites[$website_id];
+                    $label_color = $website['domain_primary'] == $domain_id ? 'success' : 'warning';
+                    $chart_pie[] = array(
+                        'label'       => $website['name'],
+                        'data'        => $data,
+                        'label_format' => array(
+                            'website_id'  => $website_id,
+                            'data_value'  => $data,
+                            'label_color' => $label_color,
+                            'domain_name' => $website['domain'],
+                            'featured'    => floatval($website['featured']) > 0,
+                        ),
+                    );
+                } else {
+                    if (empty($others)) {
+                        $others = array(
+                            'label' => 'Other %d Websites (%d)',
+                            'data' => $data,
+                        );
+                    } else {
+                        $others['data'] += $data;
+                    }
+                    $other_websites++;
+                }
+            }
+
+            if (!empty($others)) {
+                $others['label'] = sprintf($others['label'], $other_websites, $others['data']);
+                $chart_pie[] = $others;
+            }
+
+            $this->set('chart_pie', $chart_pie);
+            $this->set('chart_lines', $chart_lines);
+            $this->set('chart_lines_avg', $chart_lines_avg);
+            $this->set('average', $average);
+            $this->set('standard', $standard);
+            $this->set('ideal_rr', $ideal_return_rate);
+
+            $this->set('stats', $stats);
+            $this->set('rates', $rates);
+            $this->set('websites', $websites);
+            $this->set('top_stats', array_slice($stats, 0, $threshold, true));
+        }
+
+        $intersect = "{$domain_id}_{$category}_" . ($content_rating == -1 ? 0 : $content_rating);
+        if ($category == -1) {
+            $intersect = '';
+        }
+
+        $times = array();
+        $times['yesterday'] = strtotime($Date->yesterdayStart());
+        $times['lastdays']  = strtotime($Date->oFormat->datetime($Date->getDaysAgo(MAX_ROLLING_STATS_DAYS)));
+        $times['monthdate'] = strtotime($Date->oFormat->datetime(date('Y-m-01')));
+
+        $this->set('rr_times', $times);
+
+        $this->set('domain', $domain_id);
+        $this->set('category', $category);
+        $this->set('content_rating', $content_rating);
+        $this->set('threshold', $threshold);
+        $this->set('exclude_penalized', $exclude_penalized);
+        $this->set('exclude_crossdomain', $cross_domains);
+        $this->set('intersect', $intersect);
+        $this->set('rr_range', $return_rate_range);
+
+        $this->set('domains', $domains);
+        $this->set('categories', $categories);
+        $this->set('content_ratings', $content_ratings);
+    }
+
+    public function tpcategory() {
+        $categories = $this->Dictionary->get_dictionary(DictionaryComponent::TYPE_CATEGORY);
+        $this->set('categories', $categories);
+    }
+
+    protected function getValidLandingPages($website_id)
+    {
+        $landing_pages = array();
+        $Hub           = new CI\Hub(new CI\Hub\DataSource\MyArray);
+        $lps           = $this->Website->query_read(
+            "CALL ci_ci_sp_select_active_pages_per_website_intersection({$website_id})"
+        );
+
+        foreach ($lps as $lp) {
+            $lp       = $lp['web_pages'];
+            $domain   = $Hub->bitToId($lp['domain_bitfield']);
+            $category = $lp['category'];
+            $content  = $lp['content_rating'];
+            if ($category != CATEGORY_ALL) {
+                $landing_pages[$domain][$category][$content] = true;
+            }
+        }
+
+        return $landing_pages;
+    }
+
+    /**
+     * Hubs action for web request
+     *
+     * @param  integer $hub    Hub ID
+     * @param  integer $status Website status ID
+     *
+     * @return void
+     */
+    public function hubs($hub = null, $status = WEBSITE_STATUS_ACTIVE)
+    {
+        if ($this->RequestHandler->isAjax()) {
+            $items = array();
+            $hub = isset($_POST['hub']) ? $_POST['hub'] : null;
+            $status = isset($_POST['status']) ? $_POST['status'] : null;
+            if (is_numeric($hub) && is_numeric($status)) {
+                // find the websites to analyse
+                $websites = $this->Website->find('all', array(
+                    'conditions' => array(
+                        'domain_primary' => $hub,
+                        'status'         => $status,
+                    ),
+                ));
+                $items = $this->_websites_analysis($websites);
+            }
+            $this->sendAjaxResponse($items);
+        }
+
+        if (is_numeric($hub) && is_numeric($status)) {
+            $this->set('hub', $hub);
+            $this->set('status', $status);
+        }
+
+        $this->set('hubs_list', $this->Dictionary->get_dictionary(DictionaryComponent::TYPE_DOMAIN));
+        $this->set('status_list', $this->Dictionary->get_dictionary(DictionaryComponent::TYPE_WEBSITE_STATUS));
+    }
+
+    /**
+     * Widgets action for web request
+     *
+     * @param  string $widgets List of widgets id's separated by comma
+     *
+     * @return void
+     */
+    public function widgets($widgets = null)
+    {
+        if ($this->RequestHandler->isAjax()) {
+            $items = array();
+            $widgets = isset($_POST['widgets']) ? $_POST['widgets'] : null;
+            if (!empty($widgets)) {
+                // find the widgets to analyse
+                $this->loadModel('Widget');
+                $widgets = $this->Widget->find('all', array(
+                    'fields' => array('Widget.*', 'Website.*'),
+                    'conditions' => array(
+                        'Widget.id' => explode(',', $widgets),
+                    ),
+                    'joins' => array(
+                        array(
+                            'table'      => 'websites',
+                            'alias'      => 'Website',
+                            'type'       => 'INNER',
+                            'conditions' => array('Website.id = Widget.website_id'),
+                        )
+                    ),
+                ));
+                $items = $this->_widgets_analysis($widgets);
+            }
+            $this->sendAjaxResponse($items);
+        }
+
+        if (!empty($widgets)) {
+            $this->set('widgets', $widgets);
+        }
+    }
+
+    /**
+     * Gets specific data for websites analysis
+     *
+     * @param  array  $websites Websites cakephp model objects
+     *
+     * @return array
+     */
+    private function _websites_analysis(array $websites)
+    {
+        $items = array();
+        foreach ($websites as $website) {
+            $wid             = $website['Website']['id'];
+            $name            = $website['Website']['name'];
+            $whitelist       = $website['Website']['whitelist'];
+            $blacklist       = $website['Website']['blacklist'];
+            $domain          = $website['Website']['domain_primary'];
+            $wcategory       = $website['Website']['category'];
+            $wcontent_rating = $website['Website']['content_rating'];
+
+            $pages = $this->WidgetAnalytic->query_read('
+                SELECT
+                    Page.id, Page.website_id, Page.category,
+                    Page.content_rating, WidgetAnalytic.type,
+                    WidgetAnalytic.id
+                FROM
+                    widget_analytics WidgetAnalytic INNER JOIN
+                    pages Page ON Page.id = WidgetAnalytic.page_id
+                WHERE
+                    WidgetAnalytic.visible = 1
+                    AND WidgetAnalytic.shown_website_id = '.$wid,
+            false);
+
+            $pcount = 0;
+            $types = array();
+            $website_pages = array();
+            $intersects = array();
+            foreach ($pages as $page) {
+                $id       = $page['Page']['id'];
+                $category = $page['Page']['category'];
+                $website  = $page['Page']['website_id'];
+                $content  = !is_null($wcontent_rating) ? $wcontent_rating : $page['Page']['content_rating'];
+                $wa_id    = $page['WidgetAnalytic']['id'];
+                $type     = $this->Dictionary->get_name(
+                    DictionaryComponent::TYPE_LINK, $page['WidgetAnalytic']['type']
+                );
+
+                // translate category for domain_id?
+                $category = $this->Category->translate($category, $domain);
+
+                if (isset($types[$type])) {
+                    $types[$type]++;
+                } else {
+                    $types[$type] = 1;
+                }
+
+                if (isset($website_pages[$website][$id])) {
+                    continue;
+                }
+
+                $intersects[$category][$content]['links'][] = $id;
+
+                $intersect_id = $this->Intersects->get_id_by_intersect(array(
+                    'category' => $category,
+                    'demographic_sex' => 0,
+                    'content_rating' => $content,
+                ));
+
+                if (!isset($intersects[$category][$content]['cached'])) {
+
+                    $intersects[$category][$content]['names'] = array(
+                        'category' => $this->Dictionary->get_name(DictionaryComponent::TYPE_CATEGORY, $category),
+                        'content' => $this->Dictionary->get_name(DictionaryComponent::TYPE_CONTENT, $content),
+                    );
+                    $intersects[$category][$content]['pages'] = $this->_get_lp_pages(
+                        $category, $content, 1 << $domain, $whitelist
+                    );
+
+                    $rand_seed = $this->LandingPageAnalytic->cached_seed_get($intersect_id, $domain, 1);
+                    if ($rand_seed === false) {
+                        $intersects[$category][$content]['cached'] = null;
+                    } else {
+                        $cached_pages = $this->LandingPageAnalytic->cached_pages_get(
+                            $intersect_id, $domain, $rand_seed
+                        );
+                        if ($cached_pages === false) {
+                            $intersects[$category][$content]['cached'] = -1;
+                        } else {
+                            // storing the keys from memcache
+                            $num_chunks_key = $this->LandingPageAnalytic
+                                ->lp_pages_num_chunks_key($intersect_id, $domain, $rand_seed);
+                            $num_chunks = $this->LandingPageAnalytic->memcached_get($num_chunks_key);
+
+                            $intersects[$category][$content]['memcache_keys'][] = $num_chunks_key;
+                            for ($number = 0; $number < $num_chunks; $number++) {
+                                $intersects[$category][$content]['memcache_keys'][] = $this->LandingPageAnalytic
+                                    ->lp_pages_chunk_num_key($intersect_id, $domain, $rand_seed, $number);
+                            }
+
+                            $cached_count = array();
+                            foreach ($cached_pages as $page) {
+                                $id = $page['LandingPageAnalytic']['page_id'];
+                                if (!isset($cached_count[$id])) {
+                                    $cached_count[$id] = true;
+                                }
+                            }
+                            $intersects[$category][$content]['cached'] = count($cached_count);
+                            unset($cached_pages);
+                            unset($cached_count);
+                        }
+                    }
+                }
+
+                $website_pages[$website][$id] = true;
+                $pcount++;
+            }
+
+            $pages_by_type = array();
+            foreach ($types as $type => $count) {
+                $pages_by_type[] = array(
+                    'type'  => $type,
+                    'count' => $count
+                );
+            }
+            unset($types);
+
+            $pages_by_website = array();
+            foreach ($website_pages as $website_id => $pages_id) {
+                $pages_by_website[] = array(
+                    'website_id' => $website_id,
+                    'pages_id' => array_keys($pages_id),
+                );
+            }
+            unset($website_pages);
+
+            $intersects_array = array();
+            foreach ($intersects as $category => $contents) {
+                foreach ($contents as $content_id => $data) {
+                    $intersects_array[] = array(
+                        'category' => $category,
+                        'content' => $content_id,
+                        'names' => $data['names'],
+                        'links' => $data['links'],
+                        'cached' => $data['cached'],
+                        'pages' => $data['pages'],
+                        'memcache' => isset($data['memcache_keys']) ? $data['memcache_keys'] : array()
+                    );
+                }
+            }
+            unset($intersects);
+
+            $items[] = array(
+                'website' => array(
+                    'id'        => $wid,
+                    'name'      => $name,
+                    'domain'    => $this->Dictionary->get_name(DictionaryComponent::TYPE_DOMAIN, $domain),
+                    'category'  => $this->Dictionary->get_name(DictionaryComponent::TYPE_CATEGORY, $wcategory),
+                    'whitelist' => implode(', ', explode(',', $whitelist)),
+                    'blacklist' => implode(', ', explode(',', $blacklist)),
+                ),
+                'pages' => array(
+                    'count'         => count($pages),
+                    'types'         => $pages_by_type,
+                    'unique_count'  => $pcount,
+                    'website_pages' => $pages_by_website,
+                ),
+                'intersects' => $intersects_array,
+            );
+        }
+
+        return $items;
+    }
+
+    /**
+     * Gets specific data for widgets information
+     *
+     * @param  array $widgets Widget cakephp model objects
+     *
+     * @return array
+     */
+    private function _widgets_analysis($widgets)
+    {
+        App::import('Controller', 'HistoryWidgets');
+        $History = new HistoryWidgetsController();
+        $History->constructClasses();
+
+        $items = array();
+        $yesterday = $this->Date->yesterday();
+        foreach ($widgets as $widget) {
+            $stats = $History->stats_day($widget['Widget']['id'], $yesterday);
+            $widget['Website']['domain'] = $this->Dictionary->get_name(
+                DictionaryComponent::TYPE_DOMAIN, $widget['Website']['domain_primary']
+            );
+            $widget['Website']['category_name'] = $this->Dictionary->get_name(
+                DictionaryComponent::TYPE_CATEGORY, $widget['Website']['category']
+            );
+            $widget['Website']['content_name'] = $this->Dictionary->get_name(
+                DictionaryComponent::TYPE_CONTENT, $widget['Website']['content_rating']
+            );
+            $widget['Widget']['status_name'] = $this->Dictionary->get_name(
+                DictionaryComponent::TYPE_WIDGET_STATUS, $widget['Widget']['status']
+            );
+            $items[] = array(
+                'widget' => $widget['Widget'],
+                'website' => $widget['Website'],
+                'stats' => $stats,
+            );
+        }
+        return $items;
+    }
+
+    /**
+     * Gets the number of unique pages in a landing page filtered by
+     * category, content rating, domain and a posible whitelist
+     *
+     * @param  integer $category       The category ID
+     * @param  integer $content_rating The content rating ID
+     * @param  integer $domain_bit     The domain ID
+     * @param  string  $whitelist      List of websites ID's separated by comma
+     *
+     * @return integer
+     */
+    private function _get_lp_pages($category, $content_rating, $domain_bit, $whitelist)
+    {
+        $id = md5("{$category}_{$content_rating}_{$domain_bit}");
+        $pages = array();
+        if (isset($this->lp_links_cache[$id])) {
+            $pages = $this->lp_links_cache[$id];
+        } else {
+            $field_name = $this->LandingPageAnalytic->get_weight_field_name();
+            $query = "SELECT Page.id, Page.website_id, Page.content_rating
+                FROM landing_page_analytics LandingPageAnalytic
+                    INNER JOIN pages Page ON (LandingPageAnalytic.page_id = Page.id)
+                    INNER JOIN websites Website ON (Page.website_id = Website.id)
+                WHERE LandingPageAnalytic.domain_bitfield & {$domain_bit}
+                    AND LandingPageAnalytic.category = {$category}
+                    AND LandingPageAnalytic.demographic_sex = 0
+                    AND LandingPageAnalytic.content_rating = 0
+                    AND LandingPageAnalytic." . $field_name . " >= 0
+                    AND LandingPageAnalytic.visible = 1
+                    AND Page.status = 0
+                    AND Website.status = 0";
+            $pages_temp = $this->LandingPageAnalytic->query_read($query, false);
+            foreach ($pages_temp as $page) {
+                if($page['Page']['content_rating'] <= $content_rating) {
+                    $pages[] = $page;
+                }
+            }
+            $this->lp_links_cache[$id] = $pages;
+            unset($pages_temp);
+        }
+
+        $pages_filtered = array();
+        $whitelist = empty($whitelist) ? false : explode(',', $whitelist);
+
+        foreach ($pages as $page) {
+            if ($whitelist) {
+                if (!in_array($page['Page']['website_id'], $whitelist)) {
+                    continue;
+                }
+            }
+
+            if (isset($pages_filtered[$page['Page']['id']])) {
+                continue;
+            }
+
+            $pages_filtered[$page['Page']['id']] = $page;
+        }
+
+        return count($pages_filtered);
+    }
+}

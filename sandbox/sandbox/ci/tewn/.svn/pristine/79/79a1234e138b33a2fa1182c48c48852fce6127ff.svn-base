@@ -1,0 +1,75 @@
+<?php
+    $oDate = new \CI\Date();
+    if (false === empty($pages)) {
+        echo $paginator->counter(array('format' => 'Page: %page% of %pages%... Total pages: %count%<br/>'));
+        echo '<table class="tablesorter" id="page_search"><thead>';
+        echo '<th class="image">Image</th>';
+        echo '<th class="page">Page</th>';
+        echo '<th>Website</th>';
+        echo '<th>Hub</th>';
+        echo '<th>Category</th>';
+        echo '<th>Subcategory</th>';
+        echo '<th>Page Age</th>';
+        echo '<th>Page Rating</th>';
+        echo '<th>Website Rating</th>';
+        echo '</thead><tbody>';
+        $c = 0;
+        $image_assets = new \CI\Asset\Image();
+
+        foreach ($pages as $page) {
+            if (empty($page['Page']['image'])) {
+                $image_url = '/img/crowdignite/page_image_not_found.jpg';
+            } else {
+                $image_url = $image_assets->getUrl(
+                    array(
+                        'page_id' => $page['Page']['id'],
+                        'type' => \CI\Asset\Image::URL_RELATIVE,
+                        'image' => $page['Page']['image']
+                    )
+                );
+            }
+
+            $display = $page['Page']['title'];
+            $subcategory_name = '';
+
+            if (false == empty($all_subcategories[$page['Page']['subcategory']])) {
+                $subcategory_name = $all_subcategories[$page['Page']['subcategory']];
+            }
+
+            $alt = "NormRow";
+            if($c%2) $alt = "AltRow";
+            echo '<tr class="'.$alt.'">';
+            echo '<td class="image">'.
+                '<a href="'."/pages/moderate/".$page['Page']['website_id']."/".$page['Page']['id'].'"><img width="100" src="' . $image_url . '"/></a>'.
+                '</td>';
+            echo '<td class="page_title"><span>'.$html->link($display, "/pages/moderate/".$page['Page']['website_id']."/".$page['Page']['id'], array('class' => 'title', 'title' => $page['Page']['title_url'])).'</span>';
+            echo '<span class="url"><a target="_blank" href="'.$page['Page']['url'].'">'.$page['Page']['url'].'</a></span>';
+            echo '<span class="description">'.$page['Page']['description'].'</span>';
+            echo '</td>';
+            echo '<td class="general">' .
+                    "<a class='' title='Edit Website' href='/management/website/".$page['Page']['website_id']." '>" .
+                        $page['websites']['name'] . '</a><br/>Status: <b>' . $convert->website_status($page['websites']['status']) .'</b></td>';
+            echo '<td class="general">'. $convert->domain_name($page['websites']['domain_primary']). '</td>';
+            echo '<td class="general">'. $convert->category($page['websites']['category']). '</td>';
+            echo '<td class="general">'. $subcategory_name . '</td>';
+            echo '<td class="general"><b>'. $oDate->getAge($page['Page']['created']). '</b> days</td>';
+            echo '<td class="general">'. $convert->content_rating($page['Page']['content_rating']). '</td>';
+            echo '<td class="general">'. $convert->content_rating($page['websites']['content_rating']). '</td>';
+            echo '</tr>';
+            $c++;
+        }
+        echo '</tbody>';
+        echo '</table>';
+        ?>
+<div class="pagination">
+<?php
+        echo $paginator->first('« First', null, null, array('class' => 'disabled'));
+        echo $paginator->prev('‹ Previous', null, null, array('class' => 'disabled'));
+        echo '<div class="numbers">';
+        echo $paginator->numbers(array('separator' => ''));
+        echo '</div>';
+        echo $paginator->next('Next ›', null, null, array('class' => 'disabled'));
+        echo $paginator->last('Last »', null, null, array('class' => 'disabled'));
+    }
+?>
+</div>

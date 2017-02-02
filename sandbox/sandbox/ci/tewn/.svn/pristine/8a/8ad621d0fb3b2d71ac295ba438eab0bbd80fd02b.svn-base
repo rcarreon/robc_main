@@ -1,0 +1,68 @@
+<?php
+/**
+ * Logger Analytic Element UserId
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger_Analytic
+ * @package  Logger_Analytic_Element
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+/**
+ * Logger Analytic Element UserId
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger_Analytic
+ * @package  Logger_Analytic_Element
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+class Logger_Analytic_Element_UserId extends Logger_Analytic_Element_Abstract
+{
+    const LENGTH_MD5 = 32;
+    /**
+     * Register a new user id
+     *
+     * @param string $value Hash user id
+     *
+     * @return void
+     */
+    public function registerValue($value)
+    {
+        $this->value = is_null($value) ? $this->_getUserId() : $value;
+    }
+
+    /**
+     * Gets a random unique generated user id
+     *
+     * @return string UserId hash
+     */
+    private function _getUserId()
+    {
+        $user_id = null;
+
+        if (!empty($_GET['user_id'])) {
+            $user_id = $_GET['user_id'];
+        } else if (!empty($_COOKIE['ci_uid'])) {
+            $user_id = $_COOKIE['ci_uid'];
+        }
+
+        if (!ctype_alnum($user_id) || self::LENGTH_MD5 != strlen($user_id)) {
+            $user_id = md5(session_id().'_'.CITools::getIp());
+        }
+
+        setcookie(
+            'ci_uid',
+            $user_id,
+            time() + (CITools::MINUTE * 10),
+            '/', '.' . LANDING_PAGE
+        );
+
+        return $user_id;
+    }
+}

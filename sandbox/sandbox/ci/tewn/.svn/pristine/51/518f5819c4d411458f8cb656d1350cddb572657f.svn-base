@@ -1,0 +1,25 @@
+/* backend2 - widgets.js */
+jQuery(document).ready(function() { 						 
+    jQuery.tablesorter.addParser({
+	id: "commaDigit",
+	is: function(s, table) {
+	    var c = table.config;
+	    return jQuery.tablesorter.isDigit(s.replace(/,/g, ""), c);
+		},
+	format: function(s) {
+	    return jQuery.tablesorter.formatFloat(s.replace(/,/g, ""));
+	},
+	type: "numeric"
+    });
+
+    $("#widgets_table").tablesorter({
+		widgets: ['zebra'],
+   		widgetZebra: {css: ["NormRow","AltRow"]} // css classes to apply to rows    	
+    });
+
+});
+
+function confirm_delete() {
+    var r = confirm("Are you sure you want to delete");
+    return r;
+}

@@ -1,0 +1,159 @@
+<? 
+	function tab_selected($status_a, $status_b) {
+		// Hack for casting issue
+		if ($status_a === "all" &&
+		    $status_b === 0) {
+			return "tab_unselected";
+		}
+
+		if ($status_a == $status_b) {
+			$selected_class = "tab_selected";
+		} else {
+			$selected_class = "tab_unselected";
+		}
+		return $selected_class;
+	}
+
+	echo $this->element('crowdignite/backend2_toolbar', array("tab" => "landing_page", "user" => $user));
+?>
+
+
+<div class="row supercontainer" id="content_area">
+
+	<div class="hubs_column"> <!-- left col -->
+		<ul class="hub_list">
+			<li class="title t_info">Landing Page</li>
+			<li class="tab_selected"><a href="/management/landing_page">LP Layouts</a></li>
+			<li><a href="/management/landing_page_engine">LP Algorithms</a></li>
+		</ul>		
+	</div>
+
+	<div class="websites_column"> <!-- right col -->
+
+    	<div id="status_bar">
+			<div class="ddown_container ddown_container3">
+				<span>Landing Page</span>
+				<dl class="dropdown dropdown_chart">
+				    <dt><a href="#"><span>Layouts</span></a></dt>
+				    <dd>
+				        <ul style="display: none;">
+				        	<li class="tab_selected"><a class="all_websites" href="#">Layouts</a></li>
+				        	<li class=""><a class="individual_websites" href="#">Algorithms</a></li>
+						</ul>
+				    </dd>
+				</dl>
+			</div>
+			
+			<div class="ddown_container">
+				<?php
+				$analytics_status_name = "All";
+				switch($analytic_status) {
+					case 1: $analytics_status_name = "Running";break;
+					case 0: $analytics_status_name = "Paused"; break;					
+				}
+				?>
+				<span>Display</span>
+				<dl class="dropdown dropdown_chart">
+				    <dt><a href="#"><span><?=$analytics_status_name?></span></a></dt>
+				    <dd>
+				        <ul style="display: none;">
+				        	<? $selected_class = tab_selected($analytic_status, -1); ?>
+				        	<li class="<?=$selected_class?>"><a class="all_websites" href="/management/landing_page/0/-1">All</a></li>
+				        	<? $selected_class = tab_selected($analytic_status, 1); ?>
+				        	<li class="<?=$selected_class?>"><a class="individual_websites" href="/management/landing_page/0/1">Running</a></li>
+				        	<? $selected_class = tab_selected($analytic_status, 0); ?>
+				        	<li class="<?=$selected_class?>"><a class="individual_hubs" href="/management/landing_page/0/0">Paused</a></li>
+						</ul>
+				    </dd>
+				</dl>
+			</div>			
+
+			<div class="ddown_container">
+				<a class="button" href="/analytics/landing_page">Add New Landing Page</a>
+			</div>
+		</div>
+		<div class="table_container">
+
+
+	<? //echo $this->element("analytics_toolbar", array("tab" => ANALYTIC_LANDING_PAGE_ENGINE)); ?>
+
+	  	<table id="pages_table" class="tablesorter">
+		    <thead>
+				<tr>
+					<th>ID</th>
+					<th>Name</th>
+					<th>Hub</th>
+				    <th>Unique ID</th>
+					<th>CTR</th>
+					<th>Number Clicks</th>
+				    <th>Number Display</th>
+					<th>Weight</th>
+					<th>Notes</th>
+					<th class="align_center">Edit</th>
+					<th class="align_center">Status</th>
+					<th class="align_center">Change Status</th>
+				</tr>
+		    </thead>
+	    <tbody>
+	<?
+		foreach ($analytics as $analytic) {
+	?>
+	        <tr>
+
+	        <!-- ID -->
+	        <td><?=$analytic['Analytic']['id']?></td>
+
+		<!-- Name -->
+	        <td><?=$analytic['Analytic']['name']?></td>
+
+		<!-- Hub -->
+		<td><?=$convert->domain_name_bit($analytic['Analytic']['domain_bitfield'])?></td>
+
+	        <!-- Unique ID -->
+	        <td><?=$analytic['Analytic']['unique_id']?></td>
+
+	        <!-- CTR -->
+		<td><?=(round($analytic['Analytic']['num_ctr']/$analytic['Analytic']['num_display'], 4)*100)?>%</td>
+
+	        <!-- Number Clicks -->
+		<td><?=number_format($analytic['Analytic']['num_ctr'])?></td>
+
+	        <!-- Number Display -->
+		<td><?=number_format($analytic['Analytic']['num_display'])?></td>
+
+	        <!-- Weight -->
+	        <td><?=$analytic['Analytic']['weight']?></td>
+
+	        <!-- Notes -->
+	        <td><?=$analytic['Analytic']['notes']?></td>
+
+	        <!-- Edit -->
+	        <td class="align_center"><a title="Edit" class="info_icon icon_edit" href="/analytics/landing_page/<?=$analytic['Analytic']['id']?>">Edit</a></td>
+
+		<?
+		if ($analytic['Analytic']['visible']) {
+		?>
+	        <!-- Active Status -->
+	        <td class="align_center"><span class="green">Active</span></td>
+
+	        <!-- Change Status -->
+	        <td class="align_center"><a title="Pause" class="info_icon icon_pause" href="/analytics/landing_page_pause/<?=$analytic['Analytic']['id']?>">Pause</a></td>
+
+		<? } else { ?>
+	        <!-- Paused Status -->
+		<td class="align_center"><span class="red">Paused</span></td>
+
+	        <!-- Change Status -->
+		<td class="align_center"><a title="Resume" class="info_icon icon_play" href="/analytics/landing_page_resume/<?=$analytic['Analytic']['id']?>">Resume</a></td>
+		<? } ?>
+	        </tr>
+
+	<?
+	        }
+	?>
+	        </tbody>
+		</table>
+
+	</div>
+</div>
+</div>

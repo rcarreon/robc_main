@@ -1,0 +1,40 @@
+<?php
+namespace CI;
+
+class Demographic
+{
+    const DEMOGRAPHIC_SEX_FEMALE = 0;
+    const DEMOGRAPHIC_SEX_MALE   = 1;
+    const DEMOGRAPHIC_SEX_BOTH   = 2;
+    const DEMOGRAPHIC_SEX_NUMBER = 3;
+
+    private $_oDataSource;
+
+    protected function getDemographicDataSource()
+    {
+        if (empty($this->_oDataSource)) {
+            $this->_oDataSource = new Demographic\DataSource\MyArray();
+        }
+
+        return $this->_oDataSource;
+    }
+
+    public function getName($nId)
+    {
+        $oDataSource  = $this->getDemographicDataSource();
+        $aDemographic = $oDataSource->getById($nId);
+        return $aDemographic !== null ? $aDemographic['name'] : '';
+    }
+
+    public function getAll()
+    {
+        $aReturn     = array();
+        $oDataSource = $this->getDemographicDataSource();
+
+        foreach ($oDataSource as $aDemographic) {
+             $aReturn[] = $aDemographic;
+        }
+
+        return $aReturn;
+    }
+}

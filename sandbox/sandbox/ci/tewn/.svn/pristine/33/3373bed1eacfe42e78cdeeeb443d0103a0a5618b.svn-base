@@ -1,0 +1,448 @@
+<?php
+
+class Stats extends AppModel {
+
+	const HOURLY  = 'hourly';
+	const DAILY   = 'daily';
+	const MONTHLY = 'monthly';
+	const WEEKLY  = 'weekly';
+
+	const ALL_DOMAINS  = -1;
+	const ALL_WEBSITES = -1;
+	const ALL_PAGES    = -1;
+	const ALL_TYPES    = -1;
+	const ALL_KEYS     = -1;
+
+	const ALL_CATEGORIES = -1;
+	const ALL_GENDERS    = -1;
+	const ALL_CONTENTS   = -1;
+
+	// This model does not use an specific table
+	public $name        = 'Stats';
+	public $useTable    = false;
+	public $useDbConfig = 'warehouse';
+
+	public function getAll($start, $end, $granularity = self::DAILY)
+	{
+		return $this->getBySP('', '', $start, $end, $granularity);
+	}
+
+	public function getByHubs($hubs, $start, $end, $granularity = self::DAILY)
+	{
+		if (is_array($hubs)) {
+			$hubs = implode(',', $hubs);
+		}
+		return $this->getBySP($hubs, '', $start, $end, $granularity);
+	}
+
+	public function getByWebsites($websites, $start, $end, $granularity = self::DAILY)
+	{
+		if (is_array($websites)) {
+			$websites = implode(',', $websites);
+		}
+		return $this->getBySP('', $websites, $start, $end, $granularity);
+	}
+
+	protected function getBySP($hubs, $websites, $start, $end, $granularity = self::DAILY)
+	{
+		$query = "CALL dw_ci_sp_select_dashboard_stats('%s', '%s', '%s', '%s', '%s')";
+		return $this->query_read(sprintf($query, $hubs, $websites, $granularity, $start, $end));
+	}
+
+	public function get_hub_return_rate($start, $end)
+	{
+		$query = "CALL dw_ci_sp_select_hub_return_rate('%s', '%s')";
+		return $this->query_read(sprintf($query, $start, $end));
+	}
+
+	public function increment_widget_stats($created, $page_id, $website_id, $domain_bit, $shown_website_id, $type, $key, $clicks, $impressions, $traffic) {
+		$query = "INSERT INTO stats_widget (created, page_id, website_id, domain_bit, shown_website_id, `type`, `key`, clicks, impressions, traffic)
+			VALUES (UNIX_TIMESTAMP('%s'), %d, %d, %d, %d, %d, %d, %d, %d, %d) ON DUPLICATE KEY UPDATE clicks = clicks + %d, impressions = impressions + %d, traffic = traffic + %d";
+		return $this->query(sprintf(
+			$query,
+			$created,
+			$page_id,
+			$website_id,
+			$domain_bit,
+			$shown_website_id,
+			$type,
+			$key,
+			$clicks,
+			$impressions,
+			$traffic,
+			$clicks,
+			$impressions,
+			$traffic
+		));
+	}
+
+	public function increment_landing_page_stats($created, $page_id, $website_id, $domain_bit, $intersection, $type, $key, $clicks, $impressions) {
+		$query = "INSERT INTO stats_landing_page (created, page_id, website_id, domain_bit, category, sex, content, `type`, `key`, clicks, impressions)
+			VALUES (UNIX_TIMESTAMP('%s'), %d, %d, %d, %d, %d, %d, %d, %d, %d, %d) ON DUPLICATE KEY UPDATE clicks = clicks + %d, impressions = impressions + %d";
+		return $this->query(sprintf(
+			$query,
+			$created,
+			$page_id,
+			$website_id,
+			$domain_bit,
+			$intersection['category'],
+			$intersection['demographic_sex'],
+			$intersection['content_rating'],
+			$type,
+			$key,
+			$clicks,
+			$impressions,
+			$clicks,
+			$impressions
+		));
+	}
+
+	public function get_website_widget_stats($website_id, $date_start, $date_end, $shown_website_id = null) {
+		$stats = array();
+		$shown_website_key = empty($shown_website_id) ? '' : $shown_website_id;
+		$shown_website_condition = empty($shown_website_id) ? '' : "AND shown_website_id = {$shown_website_id}";
+
+		$cache_key = 'get_websites_widget_stats::'.md5("{$website_id}:{$date_start}:{$date_end}:{$shown_website_key}");
+		$stats = $this->memcached_get_json($cache_key);
+
+		if (empty($stats)) {
+			$stats = array('clicks' => 0, 'impressions' => 0, 'traffic' => 0);
+			$date_start = strtotime($date_start);
+			$date_end = strtotime($date_end);
+			$query = "SELECT IFNULL(SUM(clicks), 0) AS clicks, IFNULL(SUM(impressions), 0) AS impressions, IFNULL(SUM(traffic), 0) AS traffic
+				FROM stats_widget
+				WHERE created >= {$date_start} AND created <= {$date_end}
+					AND website_id = {$website_id} {$shown_website_condition}";
+			$datas = $this->query_read($query, false);
+			if (is_array($datas)) {
+				$datas = array_shift($datas);
+				$stats = array(
+					'clicks' => (int) $datas[0]['clicks'],
+					'impressions' => (int) $datas[0]['impressions'],
+					'traffic' => (int) $datas[0]['traffic'],
+				);
+			}
+			$this->memcached_set_json($cache_key, $stats, 12 * HOUR);
+		}
+		return $stats;
+	}
+
+	/**
+	 * Get the available websites statistics for a range of days
+	 * used only on the history_widget_analytics_controller precache
+	 *
+	 * @param  string  $websites_ids
+	 * @param  string  $date_start
+	 * @param  string  $date_end
+	 * @param  integer $shown_website_id
+	 *
+	 * @return array
+	 */
+	public function get_websites_widget_stats($websites_ids, $date_start, $date_end, $shown_website_id = null)
+	{
+		$stats = array();
+		$shown_website_key = empty($shown_website_id) ? '' : $shown_website_id;
+		$shown_website_condition = empty($shown_website_id) ? '' : "AND shown_website_id = {$shown_website_id}";
+
+		$query = "SELECT website_id + 0 AS website_id, SUM(clicks) AS clicks, SUM(impressions) AS impressions, SUM(traffic) AS traffic
+				  FROM stats_widget
+				  WHERE created >= {$date_start}
+				        AND created <= {$date_end}
+				        AND website_id in ({$websites_ids}) {$shown_website_condition}
+		          GROUP BY website_id";
+
+		$datas = $this->query_read($query, false);
+
+		if (is_array($datas)) {
+			foreach ($datas as $data) {
+				$data = $data[0];
+				$stats[$data['website_id']] = array(
+					'clicks' => intval($data['clicks']),
+					'impressions' => intval($data['impressions']),
+					'traffic' => intval($data['traffic'])
+				);
+			}
+		}
+
+		return $stats;
+	}
+
+	public function get_page_widget_stats($page_id, $date_start, $date_end, $shown_website_id = null, $type = LINK_TYPE_ALL, $key = KEY_ALL) {
+		$shown_website_key = empty($shown_website_id) ? '' : $shown_website_id;
+		$shown_website_condition = empty($shown_website_id) ? '' : "AND shown_website_id = {$shown_website_id}";
+
+		$cache_key = 'get_pages_widget_stats::'.md5("{$page_id}:{$date_start}:{$date_end}:{$shown_website_key}:{$type}:{$key}");
+		$type_condition = $type == LINK_TYPE_ALL ? '' : "AND `type` = {$type}";
+		$key_condition = $key == KEY_ALL ? '' : "AND `key` = {$key}";
+
+		$stats = $this->memcached_get_json($cache_key);
+
+		if (empty($stats)) {
+			$stats = array('clicks' => 0, 'impressions' => 0, 'traffic' => 0);
+			$date_start = strtotime($date_start);
+			$date_end = strtotime($date_end);
+			$query = "SELECT IFNULL(SUM(clicks), 0) AS clicks, IFNULL(SUM(impressions), 0) AS impressions, IFNULL(SUM(traffic), 0) AS traffic
+				FROM stats_widget
+				WHERE created >= {$date_start} AND created <= {$date_end}
+					AND page_id = {$page_id} {$shown_website_condition} {$type_condition} {$key_condition}";
+			$datas = $this->query_read($query, false);
+			if (is_array($datas)) {
+				$datas = array_shift($datas);
+				$stats = array(
+					'clicks' => (int) $datas[0]['clicks'],
+					'impressions' => (int) $datas[0]['impressions'],
+					'traffic' => (int) $datas[0]['traffic']
+				);
+			}
+			$this->memcached_set_json($cache_key, $stats, 12 * HOUR);
+		}
+		return $stats;
+	}
+
+	public function get_widget_stats_referrals(array $referral_ids, array $page_ids, $date_start, $date_end) {
+		// Note: Quick fix to get rid of empty referrals or pages //
+		if (empty($referral_ids) || empty($page_ids)) {
+			return array();
+		}
+
+		$stats = array();
+		$referral_ids = implode(',', array_keys($referral_ids));
+		$page_ids = implode(',', $page_ids);
+
+		$cache_key = 'get_widget_stats_referrals::'.md5("{$date_start}:{$date_end}:{$referral_ids}:{$page_ids}");
+		$stats = $this->memcached_get_json($cache_key);
+
+		if (empty($stats)) {
+			$stats = array();
+			$date_start = strtotime($date_start);
+			$date_end = strtotime($date_end);
+			$query = "SELECT shown_website_id + 0 AS website_id, DATE(FROM_UNIXTIME(created)) AS created,
+					SUM(clicks) AS num_ctr, SUM(impressions) AS num_display, SUM(traffic) AS num_ctr_traffic
+				FROM stats_widget
+				WHERE created BETWEEN {$date_start} AND {$date_end}
+					AND shown_website_id IN ({$referral_ids}) AND page_id IN ({$page_ids})
+				GROUP BY shown_website_id, created";
+			$stats = $this->query_read($query, false);
+			$this->memcached_set_json($cache_key, $stats, 12 * HOUR);
+		}
+		return $stats;
+	}
+
+	public function get_website_landing_page_stats($website_id, $date_start, $date_end, $intersect = null) {
+		$intersect_key = empty($intersect) ? '' : implode('_', array(
+			$intersect['category'], $intersect['demographic_sex'], $intersect['content_rating']
+		));
+		$intersect_condition = empty($intersect) ? '' :
+			"AND category = {$intersect['category']}
+			AND sex = {$intersect['demographic_sex']}
+			AND content = {$intersect['content_rating']}";
+		$cache_key = 'get_websites_landing_page_stats::'.md5("{$website_id}:{$date_start}:{$date_end}:{$intersect_key}");
+		$stats = $this->memcached_get_json($cache_key);
+
+		if (empty($stats)) {
+			$stats = array('clicks' => 0, 'impressions' => 0);
+			$date_start = strtotime($date_start);
+			$date_end = strtotime($date_end);
+			$query = "SELECT IFNULL(SUM(clicks), 0) AS clicks, IFNULL(SUM(impressions), 0) AS impressions
+				FROM stats_landing_page
+				WHERE created >= {$date_start} AND created <= {$date_end}
+					AND website_id = {$website_id} {$intersect_condition}";
+			$datas = $this->query_read($query, false);
+			if (is_array($datas)) {
+				$datas = array_shift($datas);
+				$stats = array(
+					'clicks' => (int) $datas[0]['clicks'],
+					'impressions' => (int) $datas[0]['impressions'],
+				);
+			}
+			$this->memcached_set_json($cache_key, $stats, 12 * HOUR);
+		}
+		return $stats;
+	}
+
+	public function get_page_landing_page_stats($page_id, $date_start, $date_end, $intersect = null, $type = LINK_TYPE_ALL, $key = KEY_ALL) {
+		$intersect_key = empty($intersect) ? '' : implode('_', array(
+			$intersect['category'], $intersect['demographic_sex'], $intersect['content_rating']
+		));
+		$intersect_condition = empty($intersect) ? '' :
+			"AND category = {$intersect['category']}
+			AND sex = {$intersect['demographic_sex']}
+			AND content = {$intersect['content_rating']}";
+		$cache_key = 'get_pages_landing_page_stats::'.md5("{$page_id}:{$date_start}:{$date_end}:{$intersect_key}:{$type}:{$key}");
+		$type_condition = $type == LINK_TYPE_ALL ? '' : "AND `type` = {$type}";
+		$key_condition = $key == KEY_ALL ? '' : "AND `key` = {$key}";
+
+		$stats = $this->memcached_get_json($cache_key);
+
+		if (empty($stats)) {
+			$stats = array('clicks' => 0, 'impressions' => 0);
+			$date_start = strtotime($date_start);
+			$date_end = strtotime($date_end);
+			$query = "SELECT IFNULL(SUM(clicks), 0) AS clicks, IFNULL(SUM(impressions), 0) AS impressions
+				FROM stats_landing_page
+				WHERE created >= {$date_start} AND created <= {$date_end}
+					AND page_id = {$page_id} {$intersect_condition} {$type_condition} {$key_condition}";
+			$datas = $this->query_read($query, false);
+			if (is_array($datas)) {
+				$datas = array_shift($datas);
+				$stats = array(
+					'clicks' => (int) $datas[0]['clicks'],
+					'impressions' => (int) $datas[0]['impressions'],
+				);
+			}
+			$this->memcached_set_json($cache_key, $stats, 12 * HOUR);
+		}
+		return $stats;
+	}
+
+	/**
+	 * Get the delta stats for the widget from a shown_website_id
+	 *
+	 * @param  integer $shown_website_id
+	 * @param  string  $date_start
+	 * @param  string  $date_end
+	 * @return array
+	 */
+	public function get_shown_website_widget_stats($shown_website_id, $date_start, $date_end)
+	{
+		$stats = array();
+
+		$cache_key = 'get_shown_website_widget_stats::'.md5("{$shown_website_id}:{$date_start}:{$date_end}");
+		$stats = $this->memcached_get_json($cache_key);
+
+		if (empty($stats)) {
+			$stats = array('clicks' => 0, 'impressions' => 0, 'traffic' => 0);
+			$date_start = strtotime($date_start);
+			$date_end = strtotime($date_end);
+
+			$query = "SELECT IFNULL(SUM(clicks), 0) AS clicks, IFNULL(SUM(impressions), 0) AS impressions, IFNULL(SUM(traffic), 0) AS traffic
+				FROM stats_widget
+				WHERE created >= {$date_start} AND created <= {$date_end}
+					AND shown_website_id = {$shown_website_id}";
+			$datas = $this->query_read($query, false);
+
+			if (is_array($datas)) {
+				$datas = array_shift($datas);
+				$stats = array(
+					'clicks'      => (int) $datas[0]['clicks'],
+					'impressions' => (int) $datas[0]['impressions'],
+					'traffic'     => (int) $datas[0]['traffic'],
+				);
+			}
+			$this->memcached_set_json($cache_key, $stats, 12 * HOUR);
+		}
+		return $stats;
+	}
+
+    public function get_stats_refers(array $websites_ids)
+    {
+        $keyGen = new \CI\Memcached\KeyGen($websites_ids, 'stats::get_stats_refers');
+        $key = $keyGen->generate();
+        $cache_component = new \CI\Memcached\App();
+        $stats = $cache_component->get($key);
+        if (empty($stats)) {
+            App::import('Vendor', 'Carbon', array('file' => 'Carbon.php'));
+            $websites_ids = implode(',', $websites_ids);
+            $date = \Carbon\Carbon::yesterday()->startOfDay()->timestamp;
+            $stats = $this->query_read(
+                "SELECT Account.id, Account.website_id, Account.incoming, Account.refer_transfer_rate,
+                     Metrics.account_incoming
+                 FROM accounts Account
+                     LEFT JOIN website_metrics_daily Metrics
+                     ON Account.website_id = Metrics.website_id AND Metrics._date = {$date}
+                 WHERE Account.website_id IN ({$websites_ids})"
+            );
+
+            $accounts = array();
+            $credits = 0;
+            $credits_yesterday = 0;
+            foreach ($stats as $stat) {
+                $rate = $stat['Account']['refer_transfer_rate'];
+                $account = array(
+                    'credits'           => $stat['Account']['incoming'] * $rate,
+                    'credits_yesterday' => $stat['Metrics']['account_incoming'] * $rate,
+                );
+                $credits           += $account['credits'];
+                $credits_yesterday += $account['credits_yesterday'];
+                $accounts[$stat['Account']['id']] = $account;
+            }
+
+            $stats = array(
+                'accounts' => $accounts,
+                'credits' => $credits,
+                'credits_yesterday' => $credits_yesterday,
+            );
+            $cache_component->set($key, $stats, 1 * HOUR);
+        }
+        return $stats;
+    }
+
+	/** Cache methods **/
+	public function get_cache_website_referral_stats($website_id, $date_start, $date_end) {
+		$key = $this->key_cache_website_referral_stats($website_id, $date_start, $date_end);
+		return $this->memcached_get($key);
+	}
+
+	public function set_cache_website_referral_stats($website_id, $date_start, $date_end, $data) {
+		$key = $this->key_cache_website_referral_stats($website_id, $date_start, $date_end);
+		$date = date("Y-m-d G:i:s", strtotime("23:59:59")); // just for today
+		return $this->memcached_set($key, $data, $date);
+	}
+
+	private function key_cache_website_referral_stats($website_id, $date_start, $date_end) {
+		$date_start = str_replace(array(' ', ':'), array('_', '_'), $date_start);
+		$date_end = str_replace(array(' ', ':'), array('_', '_'), $date_end);
+		return "widget_analytic_website_referrals_stats::".$website_id.":".$date_start.":".$date_end;
+	}
+
+    public function get_top_credits($day, $hub, $order)
+    {
+        $query = "CALL dw_ci_sp_select_hub_credits_delta('%s', %d, '%s')";
+
+        return $this->query_read(sprintf($query, $day, $hub, $order), false);
+    }
+
+    public function get_websites_stats_report(array $ids)
+    {
+        if (empty($ids)) {
+            return array();
+        }
+
+        $websites = array();
+        $query    = 'CALL dw_ci_sp_select_management_website_stats("%s");';
+        $query    = sprintf($query, implode(',', $ids));
+        $result   = $this->query_read($query, false);
+
+        if (! empty($result)) {
+            foreach ($result as $website) {
+                $id       = (int) $website['website_lp']['website_id'];
+                $y_lp_ctr = \CI\Formulas::getCtr($website[0]['landing_page_impressions'], $website[0]['landing_page_clicks']);
+                $y_w_ctr  = \CI\Formulas::getCtr($website[0]['widget_impressions'], $website[0]['widget_clicks']);
+                $traffic  = $website[0]['widget_traffic'] + $website[0]['article_traffic'];
+                $incoming = $website[0]['traffic_from'] + $website[0]['article_impression'];
+                $websites[$id] = array(
+                    'id'                 => $id,
+                    'y_gen_rr'           => \CI\Formulas::getGeneratedReturnRate($traffic, $incoming),
+                    'widget_incoming'    => (int) $website[0]['widget_incoming'],
+                    'widget_traffic'     => (int) $website[0]['widget_traffic'],
+                    'article_traffic'    => (int) $website[0]['article_traffic'],
+                    'article_impression' => (int) $website[0]['article_impression'],
+                    'y_rr'               => \CI\Formulas::getReturnRate($website[0]['traffic_to'], $website[0]['traffic_from']),
+                    'y_incoming'         => (int) $website[0]['traffic_from'],
+                    'y_outgoing'         => (int) $website[0]['traffic_to'],
+                    'y_lp_ctr'           => $y_lp_ctr,
+                    'y_lp_impression'    => (int) $website[0]['landing_page_impressions'],
+                    'y_lp_clicks'        => (int) $website[0]['landing_page_clicks'],
+                    'y_w_ctr'            => $y_w_ctr,
+                    'y_w_impression'     => (int) $website[0]['widget_impressions'],
+                    'y_w_clicks'         => (int) $website[0]['widget_clicks'],
+                    'traffic_delta'      => \CI\Formulas::getTrafficDelta($website[0]['widget_traffic'], $website[0]['traffic_to'], $website[0]['traffic_from']),
+                    'aprox_lp_traffic'   => round($website[0]['landing_page_impressions'] * $y_lp_ctr, 2),
+                    'aprox_w_traffic'    => round($website[0]['widget_impressions'] * $y_w_ctr, 2)
+                );
+            }
+        }
+
+        return $websites;
+    }
+}

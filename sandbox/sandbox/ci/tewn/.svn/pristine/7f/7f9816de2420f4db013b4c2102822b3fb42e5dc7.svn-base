@@ -1,0 +1,121 @@
+<?php
+
+use Carbon\Carbon;
+
+class StatsArticle extends AppModel
+{
+    const TYPE_IMPRESSIONS = 'impressions';
+    const TYPE_CLICKS = 'clicks';
+
+    public $name        = 'StatsArticle';
+    public $useTable    = 'stats_article';
+    public $useDbConfig = 'warehouse';
+
+    /**
+     * validate the article information
+     *
+     * @param  array  $article Array with domain, id, website and initial credits information
+     *
+     * @return boolean True if the data is valid in the array
+     */
+    private function _is_valid(array $article)
+    {
+        $fields = array(
+            'id'             => 'required|numeric',
+            'website_id'     => 'required|numeric',
+            'domain_primary' => 'required|numeric',
+            'category'       => 'required|numeric',
+        );
+
+        $validator = new CI\Validator\Options($fields);
+        return $validator->isValid($article);
+    }
+
+    /**
+     * Validates the stats that would apply
+     *
+     * @param  array  $stats The stats array to apply
+     *
+     * @return array The result array
+     */
+    private function _init_stats(array $stats)
+    {
+        return array_merge(
+            array(
+                'impressions' => 0,
+                'clicks'      => 0,
+                'traffic'     => 0
+            ),
+            $stats
+        );
+    }
+
+    /**
+     * Increment the stats or create the registry of a stats in stats_article
+     *
+     * @param  string $created The date and time of this increment
+     * @param  array  $article The article information with id, domain_id and category
+     * @param  array  $stats   The stats to increment, could be impressions or/and clicks
+     *
+     * @return boolean True if the increment was applied
+     */
+    public function increment_stats($created, $article, array $stats) {
+        $result = false;
+        if (!empty($article)) {
+            try {
+                $date = \Carbon\Carbon::createFromFormat('Y-m-d H:i:s', $created);
+                if ($this->_is_valid($article)) {
+                    $stats = $this->_init_stats($stats);
+                    $created = $date->timestamp;
+                    $created_date = $date->startOfDay()->timestamp;
+                    $query = "INSERT INTO stats_article (created, date_created, domain_id, category, website_id, article_id, impressions, clicks, traffic)
+                        VALUES (%d, %d, %d, %d, %d, %d, %d, %d, %d)
+                        ON DUPLICATE KEY UPDATE impressions = impressions + %d, clicks = clicks + %d, traffic = traffic + %d";
+                    $result = $this->query(
+                        sprintf(
+                            $query, $created, $created_date, $article['domain_primary'],
+                            $article['category'], $article['website_id'], $article['id'],
+                            $stats['impressions'], $stats['clicks'], $stats['traffic'],
+                            $stats['impressions'], $stats['clicks'], $stats['traffic']
+                        )
+                    );
+                }
+            } catch(Exception $e) { // Carbon could throw an exception if date its not valid
+                $result = false;
+                error_log($e->getMessage());
+            }
+        }
+        return $result;
+    }
+
+    public function get_by_website_id($website_id, array $id_array_article = array())
+    {
+        $return = false;
+
+        if (false !== filter_var($website_id, FILTER_VALIDATE_INT) && $website_id > 0) {
+
+            $articles_in = '';
+
+            if (!empty($id_array_article)) {
+
+                $str_articles_id = implode(',', $id_array_article);
+                $articles_in = "AND article_id IN ($str_articles_id)";
+            }
+
+            $query = "SELECT SUM(impressions) as impressions, SUM(clicks) as clicks, article_id
+                FROM {$this->useTable}
+                WHERE website_id = {$website_id} {$articles_in}
+                GROUP BY article_id";
+            $result = $this->query_read($query, false);
+
+            if (!empty($result)) {
+
+                foreach ($result as $key => $value) {
+                    $return[$value['stats_article']['article_id']] = $value[0];
+                }
+            }
+        }
+
+        return $return;
+    }
+}

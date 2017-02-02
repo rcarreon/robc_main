@@ -1,0 +1,79 @@
+<?php
+
+namespace CI\CPC;
+
+class Stats
+{
+
+    const WAREHOUSE_DATABASE = 'warehouse';
+    const AUDIT_DATABASE     = 'audit';
+
+    private $_aDatabase = array();
+
+    public function courtesy(\CI\ArrayManipulator $oParams)
+    {
+        $oCampaign   = new \CI\ArrayManipulator($oParams->get('campaign', array()));
+        $nWebsiteId  = $oParams->get('website_id', 0);
+        $aPages      = $oParams->get('pages', array());
+        $nCampaignId = $oCampaign->get('id', 0);
+        $sCreated    = $oCampaign->get('created');
+
+        if ($nWebsiteId <= 0 || empty($aPages) || $nCampaignId <= 0 || empty($sCreated)) {
+            return;
+        }
+
+        $aValues  = array();
+        $nCreated = strtotime($sCreated);
+
+        // Check if list of page_id is in our cpc stats
+        $sSqlTemplate = 'SELECT DISTINCT page_id FROM stats_cpc_landing_page_device WHERE campaign_id = %d
+                         AND page_id IN(%s)';
+
+        $sSql        = sprintf($sSqlTemplate, $nCampaignId, implode(',', $aPages));
+        $oDB         = $this->getDBManagment(self::WAREHOUSE_DATABASE);
+        $aPagesStats = array();
+
+        foreach ($oDB->query($sSql) as $aPage) {
+            $aPagesStats[] = $aPage['page_id'];
+        }
+
+        $aPages = array_diff($aPages, $aPagesStats);
+
+        // Save courtesy impression and click
+        if (! empty($aPages) ) {
+            foreach ($aPages as $nPageId) {
+                $aValues[] = "($nCampaignId, $nWebsiteId, $nPageId, $nCreated" . '%1$s)';
+            }
+
+            $sValue       = implode(',', $aValues);
+            $sSqlTemplate = 'INSERT INTO stats_cpc_landing_page_devic
+                                (campaign_id, website_id, page_id, created, clicks, impressions)
+                             VALUES ' . $sValue;
+            $sSql         = sprintf($sSqlTemplate, ', 1, 1');
+            $oDB->execute($sSql);
+
+            // Create sql template for audit tables
+            $oDB           = $this->getDBManagment(self::AUDIT_DATABASE);
+            $sSqlTemplate  = 'INSERT INTO %2$s (campaign_id, website_id, page_id, created)
+                              VALUES ' . $sValue;
+            $sSql          = sprintf($sSqlTemplate, '', 'landing_page_cpc_click');
+            $oDB->execute($sSql);
+
+            $sSql = sprintf($sSqlTemplate, '', 'landing_page_cpc_impression');
+            $oDB->execute($sSql);
+        }
+    }
+
+    protected function getDBManagment($sType)
+    {
+        if (empty($this->_aDatabase[$sType])) {
+            $oConfig   = new \CI\Config();
+            $aDBConfig = $oConfig->get('database_environment')['mgmt'][$sType];
+            $this->_aDatabase[$sType] = new \CI\Database($aDBConfig);
+        }
+
+        return $this->_aDatabase[$sType];
+    }
+
+
+}

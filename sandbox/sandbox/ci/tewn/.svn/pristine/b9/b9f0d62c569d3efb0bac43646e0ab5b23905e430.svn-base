@@ -1,0 +1,16 @@
+<?php
+
+namespace CI\String;
+
+class Exception extends \CI\Exception
+{
+    const NOT_VALID            = 0;
+    const INVALID_LENGTH       = 1;
+    const INVALID_WORDS_NUMBER = 2;
+
+    protected $aErrors = array(
+        self::NOT_VALID            => '%s is not a string',
+        self::INVALID_LENGTH       => 'Invalid length, should be greater than zero',
+        self::INVALID_WORDS_NUMBER => 'Invalid words number, should be greater than zero',
+    );
+}

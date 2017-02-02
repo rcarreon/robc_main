@@ -1,0 +1,346 @@
+<?php
+
+use \CI\Memcached\Facade\Memcached as MemcachedObject;
+use \CI\Memcached\KeyGen;
+
+App::import('Controller', 'Actions');
+App::import('Model', 'User');
+
+class CpcActionsController extends ActionsController
+{
+    const  NOT_AVAILABLE = 'N/A';
+
+    public $uses = array('CPCCampaign');
+
+    protected $permissions = array(
+        'get_providers' => User::ADMIN,
+    );
+
+    public function get_providers()
+    {
+        $params = new CI\ArrayManipulator($this->params['url']);
+        $search = $params->get('search');
+        $limit  = $params->get('limit', 0);
+        $page   = $params->get('page', 0);
+
+        $factory = new \CI\Content\Provider\Factory;
+        $providers = $factory->getList();
+        if (!empty($search)) {
+            $input = preg_quote($search, '~');
+            $providers = preg_grep('~' . $input . '~', $providers);
+        }
+        $total = count($providers);
+        $pages = array_chunk($providers, $limit, true);
+        $pages_chunk = isset($pages[$page - 1]) ? $pages[$page - 1] : array();
+
+        $items = array();
+        foreach ($pages_chunk as $id => $name) {
+            $items[] = array('id' => $id, 'name' => $name);
+        }
+
+        echo json_encode(
+            array(
+                'status' => 'ok',
+                'data'   => array(
+                    'providers'  => $items,
+                    'navigation' => array(
+                        'previous' => $page > 1,
+                        'next'     => $page < count($pages),
+                    ),
+                ),
+            )
+        );
+    }
+
+    public function get_third_party_campaigns()
+    {
+        $response   = array('status' => 'ok');
+        $params     = new \CI\ArrayManipulator($this->params['form']);
+        $website_id = intval($params->get('website_id', 0));
+        $start_date = $params->get('start_date');
+        $status     = $params->get('status', CPC_CAMPAIGN_STATUS_ALL);
+
+        $date       = new \CI\Date();
+        $factory    = new \CI\Content\Provider\Factory;
+        $providers  = $factory->getList();
+        $start_date = $date->format($start_date);
+
+        $status_query = "AND campaign.status = {$status}";
+
+        if ($status == CPC_CAMPAIGN_STATUS_ALL) {
+            $status_query = "ORDER BY campaign.status ASC";
+        }
+
+        if ($status == CPC_CAMPAIGN_STATUS_INACTIVE) {
+            $status = implode(',', array(CPC_CAMPAIGN_STATUS_INACTIVE, CPC_CAMPAIGN_STATUS_EXPIRED));
+            $status_query = "AND campaign.status IN ({$status})";
+        }
+
+        $campaigns = $this->CPCCampaign->query_read(
+            "SELECT campaign.id, campaign.title, campaign.status, campaign.start_date, campaign.end_date,
+                 campaign.click_budget, campaign.third_party
+             FROM cpc_campaign AS campaign
+             WHERE
+                 campaign.website_id = {$website_id}
+                 AND campaign.third_party <> ''
+                 AND campaign.end_date >= '{$start_date}' {$status_query}",
+            false
+        );
+
+        $response['data'] = array('campaigns' => array());
+        foreach ($campaigns as $campaign) {
+            $provider = $campaign['campaign']['third_party'];
+            $provider = isset($providers[$provider]) ? $providers[$provider] : $provider;
+            $campaign['campaign']['third_party_name'] = $provider;
+            $response['data']['campaigns'][] = $campaign['campaign'];
+        }
+
+        echo json_encode($response);
+    }
+
+    public function get_campaign_data_by_id()
+    {
+        $answer = array('status' => 'error', 'data' => 'empty');
+
+        if (isset($this->params['form']['campaign_id'])) {
+            $campaign_id = intval($this->params['form']['campaign_id']);
+            $campaign_pages = $this->CPCCampaign->query_read(
+                "SELECT campaign.id, campaign.title, campaign.status, campaign.start_date, campaign.end_date,
+                    campaign.daily_budget, campaign.click_budget, campaign.third_party,
+                    pages.id, pages.title, pages.url, pages.category, pages.content_rating
+                FROM cpc_campaign as campaign
+                    LEFT JOIN cpc_campaign_pages as campaign_pages ON campaign_pages.campaign_id = campaign.id
+                    LEFT JOIN pages ON campaign_pages.page_id = pages.id
+                WHERE
+                    campaign.id = {$campaign_id}",
+                    false
+            );
+
+            if(!empty($campaign_pages)) {
+                $factory = new \CI\Content\Provider\Factory();
+                $answer['status'] = 'ok';
+                $answer['data'] = $campaign_pages;
+                $answer['third_party_names'] = $factory->getList();
+            }
+        }
+
+        echo json_encode($answer);
+    }
+
+    public function add_campaign()
+    {
+        $aResponse = array('status' => 'error', 'msg' => '');
+
+        if (!empty($this->params['form'])) {
+            $aPageIds = explode(',', $this->params['form']['page_ids']);
+            unset($this->params['form']['page_ids']);
+
+            $campaign = $this->params['form'];
+            $campaign['created'] = date("Y-m-d G:i:s");
+
+            if (!empty($campaign['third_party'])) {
+                unset($this->CPCCampaign->validate['daily_budget']);
+                $campaign['daily_budget'] = 0;
+            }
+            if ($this->CPCCampaign->save($campaign)) {
+                if (empty($campaign['third_party'])) {
+                    $nCampaignId = $this->CPCCampaign->id;
+                    $aPages = array();
+                    foreach ($aPageIds as $nPageId) {
+                        $aPages[] = array(
+                            'campaign_id' => $nCampaignId,
+                            'page_id'     => $nPageId,
+                            'created'     => date("Y-m-d G:i:s"),
+                        );
+                    }
+
+                    $this->loadModel('CPCCampaignPages');
+                    if (!empty($aPages) && $this->CPCCampaignPages->saveAll($aPages)) {
+                        try {
+                            $new_pages = array();
+                            foreach ($aPages as $aPage) {
+                                $new_pages[] = $aPage['page_id'];
+                            }
+
+                            $oCPCObserver = new \CI\CPC\Observer();
+                            $oCPCObserver->trigger(
+                                \CI\CPC\Observer::CPC_CAMPAIGN_EVENT_ADD,
+                                array(
+                                    'website_id' => $campaign['website_id'],
+                                    'pages'      => $new_pages
+                                )
+                            );
+                        } catch(Exception $ex) {
+                            error_log(__CLASS__ . '/' . __METHOD__ . ' - ' . $ex->getMessage());
+                        }
+
+                        $aResponse['status'] = 'ok';
+                        $aResponse['msg'] = 'Campaign saved';
+                    } else{
+                        $aResponse['error'][] = array(
+                            'msg'  => 'Failed to saved the pages for the campaign'
+                        );
+                    }
+                } else {
+                    $aResponse['status'] = 'ok';
+                    $aResponse['msg'] = 'Third Party Campaign saved';
+                }
+            } else {
+                $aResponse['status'] = 'error';
+                foreach ($this->CPCCampaign->validationErrors as $sField => $sMessage) {
+                    $aResponse['error'][] = array(
+                        'name' => $sField,
+                        'msg'  => $sMessage
+                    );
+                }
+            }
+        } else {
+            $aResponse['error'][] = array(
+                'msg'  => 'Empty form',
+            );
+        }
+
+        echo json_encode($aResponse);
+    }
+
+    public function get_all_campagins_data_by($filter_by = CPC_FILTER_VIEW_BY_CAMPAIGNS, $website_id = 0, $status =  CPC_CAMPAIGN_STATUS_ALL, $start_date = null, $page = 1, $limit = 10)
+    {
+        $answer     = array('status' => 'error', 'data' => 'empty');
+        $params     = new \CI\ArrayManipulator($this->params['form']);
+        $filter_by  = $params->get('filter_by', $filter_by);
+        $website_id = $params->get('website_id', $website_id);
+        $status     = $params->get('status', $status);
+        $start_date = $params->get('start_date', $start_date);
+        $page       = $params->get('page', $page);
+
+        if ($filter_by != CPC_FILTER_VIEW_BY_CAMPAIGNS && $website_id != 0 ){
+            App::import('Controller', 'Cpc');
+            $cpcController = new CpcController;
+            $cpcController->constructClasses();
+            $campagin_data  = array_values(
+                $cpcController->get_campaigns_data(
+                    intval($website_id),
+                    $start_date,
+                    $status
+                )
+            );
+
+            $campaign_ids = Set::classicExtract($campagin_data, '{n}.id');
+            $campaign_ids = implode(',', $campaign_ids);
+            $this->loadModel('CpcLandingPageCountry');
+
+            $KeyGen = new KeyGen(array($website_id, $status, $start_date), __METHOD__);
+            $stats_key = $KeyGen->generate();
+
+            $stats = MemcachedObject::get($stats_key);
+
+            if (empty($stats) || $page == 1) {
+                $stats = $this->CpcLandingPageCountry->report_by_campaign_id($campaign_ids);
+                MemcachedObject::set($stats_key, json_encode($stats), 10 * MINUTES);
+            } else {
+                $stats = json_decode($stats, true);
+            }
+
+            $total_elemets = count($stats);
+
+            $answer['status'] = 'ok';
+            $answer['data']   = array();
+            $geo_country      = new \CI\Geo\Country();
+            $totals           = array(
+                'country'       => 'Total',
+                'widget_imps'   => self::NOT_AVAILABLE,
+                'widget_clicks' => self::NOT_AVAILABLE,
+                'widget_ctr'    => self::NOT_AVAILABLE,
+                'lp_imps'       => 0,
+                'lp_clicks'     => 0,
+                'lp_ctr'        => 0,
+                'avg_cpc'       => 0,
+                'spent'         => 0,
+            );
+
+            foreach ($stats as $stats_data) {
+                $row = isset($stats_data[0]) ? $stats_data[0] : array();
+
+                if ($row['impressions'] == 0 ) {
+                    $row['ctr'] = 0;
+                } else {
+                    $row['ctr'] = ($row['clicks'] / $row['impressions']) * 100;
+                }
+
+                try {
+                    $country_name = $geo_country->getName($stats_data['stats_cpc_landing_page_country']['country']);
+                } catch (\CI\Geo\Country\Exception $geo_country_exception){
+                    $country_name = self::NOT_AVAILABLE;
+                }
+
+                $lp_ctr  = round($row['ctr'], 2);
+                $avg_cpc = round($row['cpc_avg'], 2);
+                $spent   = round($row['spent'], 2);
+
+                $answer['data']['report'][] = array(
+                    'country'       => $country_name,
+                    'widget_imps'   => self::NOT_AVAILABLE,
+                    'widget_clicks' => self::NOT_AVAILABLE,
+                    'widget_ctr'    => self::NOT_AVAILABLE,
+                    'lp_imps'       => $row['impressions'],
+                    'lp_clicks'     => $row['clicks'],
+                    'lp_ctr'        => $lp_ctr,
+                    'avg_cpc'       => $avg_cpc,
+                    'spent'         => $spent,
+                );
+
+                $totals['lp_imps']   += $row['impressions'];
+                $totals['lp_clicks'] += $row['clicks'];
+                $totals['lp_ctr']    += $lp_ctr;
+                $totals['avg_cpc']   += $avg_cpc;
+                $totals['spent']     += $spent;
+            }
+
+            $stats_chunk = array_chunk($answer['data']['report'], $limit);
+            $answer['data']['report'] = $stats_chunk[$page - 1];
+
+            $total_lp_ctr = 0;
+
+            if (!empty($totals['lp_imps'])) {
+                $total_lp_ctr = round(($totals['lp_clicks'] / $totals['lp_imps']) * 100, 2);
+            }
+
+            $answer['data']['footer'] = array(
+                    'title'         => 'Total',
+                    'widget_imps'   => self::NOT_AVAILABLE,
+                    'widget_clicks' => self::NOT_AVAILABLE,
+                    'widget_ctr'    => self::NOT_AVAILABLE,
+                    'lp_imps'       => $totals['lp_imps'],
+                    'lp_clicks'     => $totals['lp_clicks'],
+                    'lp_ctr'        => $total_lp_ctr,
+                    'avg_cpc'       => $totals['avg_cpc'],
+                    'spent'         => $totals['spent'],
+            );
+
+            $last_page  = (int)($total_elemets / $limit) + ($total_elemets % $limit > 0 ? 1 : 0);
+
+            $answer['data']['pagination'] = array(
+                'hasPrevious' => $page > 1,
+                'hasNext'     => $page < $last_page,
+                'previous'    => $page - 1,
+                'next'        => $page + 1,
+                'last'        => $last_page,
+                'current'     => $page,
+                'numbers'     => array(),
+            );
+
+            $numbers = $this->pagination($total_elemets, $limit, $page, 8);
+
+            if (count($numbers) > 1) {
+                foreach ($numbers as $number) {
+                    $answer['data']['pagination']['numbers'][] = array(
+                        'page'     => $number,
+                        'selected' => $number == $page,
+                    );
+                }
+            }
+        }
+
+        return json_encode($answer);
+    }
+}

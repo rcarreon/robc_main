@@ -1,0 +1,140 @@
+// ###################################### FACEBOOK ASYNC CALL, TWITTER WIDGET JS #####################
+var isFBUser;
+
+if (window.console == undefined) {
+    window.console = {
+        log: function(msg) {}
+    };
+}
+
+window.fbAsyncInit = function() {
+    FB.init({appId:'396217757149003', status:true, cookie:true, xfbml:true});
+    FB.getLoginStatus(function(response) {
+        if (response.status != 'unknown') {
+            isFBUser = true;
+        } else {
+            isFBUser = false;
+        }
+    });
+};
+
+function ci_load_js(d, id, url) {
+    var js; if (d.getElementById(id)) { return; }
+    js = d.createElement('script'); js.id = id; js.async = true;
+    js.src = url; d.getElementsByTagName('head')[0].appendChild(js);
+}
+
+(function(d){ // Load the SDK Asynchronously
+    ci_load_js(d, 'facebook-jssdk', "//connect.facebook.net/en_US/all.js");
+    ci_load_js(d, 'twitter-jssdk', "//platform.twitter.com/widgets.js?ver=1.1");
+}(document));
+
+// ###################################### MAIN FUNCTION #############################################
+
+if (window.addEventListener) {
+    window.addEventListener('load', function() {
+        socStatus.init();
+    });
+} else {
+    window.attachEvent('onload', function() {
+        socStatus.init();
+    });
+}
+
+var socStatus = {
+    sitesChecked: 0, // Counter
+    totalSites: 6, // Should match number of sites we're checking
+    totalMemberOf: 0, // User is member of this many sites
+    pushOncePerSession: true, // Whether to push data to GA once per user's session
+    siteImages: new Array(), // Used to create image objects
+    socData: [
+        { "name":"Google", "imgurl":"https://accounts.google.com/CheckCookie?continue=https://www.google.com/intl/en/images/logos/accounts_logo.png" },
+        { "name":"Google+", "imgurl":"https://plus.google.com/up/?continue=https://www.google.com/intl/en/images/logos/accounts_logo.png&type=st&gpsrc=ogpy0" },
+        { "name":"LinkedIn", "imgurl":"http://www.linkedin.com/nhome/nus-redirect?url=http%3A%2F%2Fwww.linkedin.com%2Fscds%2Fcommon%2Fu%2Fimages%2Flogos%2Flogo_linkedin_flat_white_98x25.png" },
+        { "name":"Reddit", "imgurl":"https://ssl.reddit.com/login?dest=https%3A%2F%2Fssl.reddit.com%2Ffavicon.ico" },
+        { "name":"Twitter", "imgurl":"https://twitter.com/login?redirect_after_login=%2Fimages%2Fspinner.gif" }
+    ],
+
+
+    socResult: function(site, loggedin) {
+        socStatus.setCookie('social' + site, loggedin);
+        if (loggedin) { // User is logged in to this service
+            console.log('Logged in to ' + site);
+            _gaq.push(['_trackEvent', 'SocialNetworks', site]);
+            socStatus.totalMemberOf++;
+        } else {
+            console.log('Not logged in to ' + site);
+        }
+        if (++socStatus.sitesChecked == socStatus.totalSites) { // We're done
+            _gaq.push(['_trackEvent', 'OnTotalSocialNetworks', socStatus.totalMemberOf]);
+            console.log('Finished checking social networks. Member is on ' + socStatus.totalMemberOf + ' out of ' + socStatus.totalSites + ' networks.');
+            socStatus.setCookie('socialSessionPushed', true);
+        }
+    },
+
+
+    setCookie: function(c_name, c_value) {
+        document.cookie = c_name + "=" + escape(c_value);
+    },
+
+
+    getCookie: function(c_name) {
+        var c_value = document.cookie;
+        var c_start = c_value.indexOf(" " + c_name + "=");
+        if (c_start == -1) {
+            c_start = c_value.indexOf(c_name + "=");
+        }
+        if (c_start == -1) {
+            c_value = null;
+        } else {
+            c_start = c_value.indexOf("=", c_start) + 1;
+            var c_end = c_value.indexOf(";", c_start);
+            if (c_end == -1) { c_end = c_value.length; }
+            c_value = unescape(c_value.substring(c_start,c_end));
+        }
+        if (c_value == 'false') { c_value = false; }
+        if (c_value == 'true') { c_value = true; }
+        return c_value;
+    },
+
+
+    init: function() {
+        if (socStatus.getCookie('socialSessionPushed') == true && socStatus.pushOncePerSession) {
+            console.log('Already pushed data for this session...');
+            return false;
+        }
+
+        for (i in socStatus.socData) {
+            var cValue = socStatus.getCookie('social' + socStatus.socData[i].name);
+            console.log(socStatus.socData[i].name + ' cookie: ' + cValue);
+            if (cValue != null) { // Using cookie value
+                console.log('using cookie value for ' + socStatus.socData[i].name);
+                socStatus.socResult(socStatus.socData[i].name, cValue);
+            } else {
+                socStatus.siteImages[i] = new Image();
+                socStatus.siteImages[i].onload = (function(index) { return function() { socStatus.socResult(socStatus.socData[index].name, true); }; })(i);
+                socStatus.siteImages[i].onerror = (function(index) { return function() { socStatus.socResult(socStatus.socData[index].name, false); }; })(i);
+                socStatus.siteImages[i].src = socStatus.socData[i].imgurl;
+            }
+        }
+
+        var cValue = socStatus.getCookie('socialFacebook'); // Facebook
+        console.log('Facebook cookie: ' + cValue);
+        if (cValue != null) {
+            console.log('using cookie value for Facebook');
+            socStatus.socResult('Facebook', cValue);
+        } else { // If we're not using cookie value, keep looking for 'FB.getLoginStatus' output
+            socStatus.checkFB();
+        }
+    },
+
+    checkFB: function() {
+        console.log('checking fb');
+        if (isFBUser != null) {
+            socStatus.socResult('Facebook', isFBUser);
+        } else {
+            console.log('setting timeout....');
+            setTimeout('socStatus.checkFB()', 1000);
+        }
+    }
+};

@@ -1,0 +1,139 @@
+<?php
+
+class WidgetAnalyticsController extends AppController {
+
+	var $name = 'WidgetAnalytics';
+	var $uses = array('WidgetAnalytic', 'WidgetAnalyticVowpalWabbit', 'Page', 'Website', 'Widget');
+	var $components = array('Timer');
+
+	function beforeFilter() {
+		App::import('Controller', 'WidgetEngine');
+		global $WidgetEngine;
+		$WidgetEngine = new WidgetEngineController;
+		$WidgetEngine->constructClasses();
+	}
+
+	function domain_bits_set($website_id, $domain_bitfield) {
+		// Update pages domain for this website's widgets
+		$this->domain_bits_website_pages_remove($website_id, $domain_bitfield);
+
+		// Remove pages of website_id that from other website's widgets
+		$this->domain_bits_widget_pages_remove($website_id, $domain_bitfield);
+
+	}
+
+	function domain_bits_website_pages_remove($website_id, $domain_bitfield) {
+		$pages = $this->WidgetAnalytic->query_read(
+			"SELECT WidgetAnalytic.page_id
+			 FROM widget_analytics WidgetAnalytic
+			     INNER JOIN pages Page ON Page.id = WidgetAnalytic.page_id
+			     INNER JOIN websites Website ON Page.website_id = Website.id
+			     INNER JOIN websites Shown ON WidgetAnalytic.shown_website_id = Shown.id
+			 WHERE WidgetAnalytic.shown_website_id = {$website_id}
+			     AND WidgetAnalytic.visible = 1
+			     AND (Website.domain_bitfield & (1 << Shown.domain_primary)) = 0"
+		);
+
+		foreach ($pages as $page) {
+			$this->WidgetAnalytic->remove_from_widget($website_id, $page['WidgetAnalytic']['page_id']);
+		}
+	}
+
+	function domain_bits_widget_pages_remove($website_id, $domain_bitfield) {
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+
+		$domains = $oHub->getAllIds();
+		$domain_bitfield_ids = $oHub->bitsToIdArray($domain_bitfield);
+		$domains_to_update = array();
+
+		foreach ($domains as $domain) {
+			if (!in_array($domain, $domain_bitfield_ids)) {
+				$domains_to_update[] = $domain;
+			}
+		}
+
+		$this->WidgetAnalytic->remove_with_website_and_domain($website_id, $domains_to_update);
+	}
+
+	function find_all_for_website($website_id) {
+		$analytics = $this->WidgetAnalytic->find_all_for_website($website_id);
+
+		return $analytics;
+	}
+
+	function update_business_rules() {
+		set_time_limit(10*60);
+
+		$websites = $this->Website->find("all", array("conditions" => array("visible" => 1)));
+
+		foreach ($websites as $website) {
+			$this->update_business_rules_website($website);
+		}
+	}
+
+	function update_business_rules_website($website) {
+		$analytics = $this->WidgetAnalytic->find("all", array("conditions" => array(
+									      "shown_website_id" => $website['Website']['id'],
+									      "visible" => 1)));
+
+		foreach ($analytics as $analytic) {
+			$page = $this->Page->findById($analytic['WidgetAnalytic']['page_id']);
+
+			$this->update_business_rules_page($website, $page, $analytic);
+		}
+	}
+
+	function update_business_rules_page($website, $page, $analytic = null) {
+		global $WidgetEngine;
+
+        $this->Timer->start(30*60);
+
+		$good = $WidgetEngine->business_rules_allowed($website, $page, 1);
+
+		if (!$good) {
+			// remove from widget analytics
+			if (!$analytic) {
+				$analytic = $this->WidgetAnalytic->find("one", array("conditions" => array(
+											     "shown_website_id" => $website['Website']['id'],
+											     "page_id" => $page['Page']['id'])));
+			}
+
+			echo "Removing: ".$page['Page']['title_url']." from ".$website['Website']['name']." ID: ".$analytic['WidgetAnalytic']['id']."<br>\n";
+
+			$this->WidgetAnalytic->remove_page_from_widget($analytic['WidgetAnalytic']['id']);
+		}
+	}
+
+	/* Return the stats of a page after a specific date */
+	function page_stats($page_id) {
+		$stats = $this->WidgetAnalytic->page_stats($page_id);
+
+		$ctr = $impressions = 0;
+		$impressions = $stats[0][0]['impressions'];
+		$ctr = $stats[0][0]['ctr'];
+
+		return array('impressions' => $impressions, 'ctr' => $ctr);
+	}
+
+	function fix_duplicates() {
+		set_time_limit(60*60);
+		$this->layout = "none";
+
+		$websites = $this->Website->active();
+
+		foreach ($websites as $website) {
+			$analytics = $this->WidgetAnalytic->duplicates($website['Website']['id']);
+
+			foreach ($analytics as $analytic) {
+				$duplicates = $this->WidgetAnalytic->page_by_website($website['Website']['id'], $analytic['WidgetAnalytic']['page_id']);
+				$count = count($duplicates);
+				for ($i = 1; $i < $count; $i++) {
+					$this->WidgetAnalytic->remove_page_from_widget($duplicates[$i]['WidgetAnalytic']['id']);
+				}
+			}
+		}
+	}
+
+
+}
+?>

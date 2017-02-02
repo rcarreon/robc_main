@@ -1,0 +1,114 @@
+<?php
+
+namespace CI\Engine;
+
+use \CI\Config\System\Setting;
+
+class Widget extends \CI\Engine
+{
+    /**
+     * @codeCoverageIgnore
+     */
+    protected function getFormulasObject()
+    {
+        if (empty($this->oFormulas)) {
+            $this->oFormulas = new \CI\Formulas\Widget();
+        }
+
+        return $this->oFormulas;
+    }
+
+    public function isPenalizeAccount($aAccount, $nRank, $nDomainId)
+    {
+        $bReturn = null;
+
+        if ($aAccount['featured'] != 0) {
+            $bReturn = false;
+        }
+
+        $oSetting = $this->getSettingObject();
+
+        if (is_null($bReturn) && $nRank < $oSetting->get('WIDGET_MINIMUM_ACCOUNTS')) {
+            $bReturn = false;
+        }
+
+        if (is_null($bReturn) && $oSetting->getByHub(Setting::WIDGET_PENALIZE_SMALL_SITE, $nDomainId) &&
+            isset($aAccount['incoming']) &&
+            $aAccount['incoming'] < $oSetting->getByHub(Setting::WIDGET_PENALIZE_SMALL_SITE_THRESHOLD, $nDomainId) &&
+            $aAccount['credits'] < $oSetting->getByHub(Setting::WIDGET_PENALIZE_THRESHOLD, $nDomainId)) {
+            $bReturn = true;
+        }
+
+        if (is_null($bReturn) && $oSetting->getByHub(Setting::WIDGET_PENALIZE, $nDomainId) &&
+            $aAccount['credits'] < $oSetting->getByHub(Setting::WIDGET_PENALIZE_THRESHOLD, $nDomainId)) {
+            $bReturn = true;
+        }
+
+        if (is_null($bReturn)) {
+            $bReturn = false;
+        }
+
+        return $bReturn;
+    }
+
+    public function getWeightModifier($aAccount, $nRank, $nAccountCount, $nDomainId, $bPaid = false)
+    {
+        $nReturn = 0;
+
+        if (!$this->isPenalizeAccount($aAccount, $nRank, $nDomainId)) {
+            $oFormulas = $this->getFormulasObject();
+            $nReturn = $oFormulas->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        }
+
+        return $nReturn;
+    }
+
+    public function isBlacklisted($aWebsite, $nWebsiteIdToCheck)
+    {
+        $bReturn = false;
+
+        if (!empty($aWebsite['blacklist'])) {
+            $aWebsites = explode(",", $aWebsite['blacklist']);
+
+            if (in_array($nWebsiteIdToCheck, $aWebsites)) {
+                $bReturn = true;
+            }
+        }
+
+        return $bReturn;
+    }
+
+    public function isWhitelisted($aWebsite, $nWebsiteIdCheck)
+    {
+        $bReturn = true;
+
+        if (!empty($aWebsite['whitelist'])) {
+            $aWhiteList = explode(",", $aWebsite['whitelist']);
+
+            $bReturn = in_array($nWebsiteIdCheck, $aWhiteList);
+        }
+
+        return $bReturn;
+    }
+
+    public function skipAccount($aAccount, $aWebsite)
+    {
+        $bReturn = false;
+        // Skip the account for this website
+        if ($aWebsite && $aWebsite['account_id'] == $aAccount['id']) {
+            $bReturn = true;
+        }
+
+        // Check to see if account is blacklisted by site
+        if ($bReturn == false && $this->isBlacklisted($aWebsite, $aAccount['website_id'])) {
+            $bReturn = true;
+        }
+
+        // Check to see if account is not whitelisted by site
+        if ($bReturn == false && !$this->isWhitelisted($aWebsite, $aAccount['website_id'])) {
+           $bReturn = true;
+        }
+
+        return $bReturn;
+    }
+}

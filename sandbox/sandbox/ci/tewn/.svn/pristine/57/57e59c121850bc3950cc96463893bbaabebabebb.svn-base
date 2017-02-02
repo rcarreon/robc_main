@@ -1,0 +1,373 @@
+<?php
+/**
+ * Test the different functions of Date class
+ * PHP Version 5.3
+ *
+ * @category Test
+ * @package  Test_Test
+ * @author   Julio Rodriguez <julio.rodriguez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+namespace Test\Date;
+use CI\Date;
+/**
+ * Test the different functions of Date class
+ * PHP Version 5.3
+ *
+ * @category Test
+ * @package  Test_Test
+ * @author   Julio Rodriguez <julio.rodriguez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ * @group    Utils
+ * @group    Date
+ * @group    VowpalWabbit
+ */
+
+/**
+ * @group date
+ */
+class DateTest extends \PHPUnit_Framework_TestCase
+{
+    protected $oDate;
+
+    /**
+     * Setup method
+     *
+     * return void.
+     */
+    public function setUp()
+    {
+        $this->oDate = new Date();
+        $this->oDate->setFormat('Y-m-d H:i:s');
+    }
+
+    public function testGetAge()
+    {
+        $date_start = date('Y-m-d', strtotime('yesterday'));
+        $results = $this->oDate->getAge($date_start);
+        $this->assertTrue(!empty($results));
+
+        $expected = 1;
+
+        $this->assertEquals($results, $expected);
+    }
+
+    public function testGetNumDaysTime()
+    {
+        $time_start = strtotime('2011-09-26');
+        $time_end = strtotime('2011-11-29');
+
+        $results = $this->oDate->getDaysFromTimestamps($time_start, $time_end);
+        $this->assertTrue(!empty($results));
+
+        $expected = 65;
+
+        $this->assertEquals($results, $expected);
+    }
+
+    public function testGetNumDays()
+    {
+        $time_start = '2011-09-26';
+        $time_end = '2011-09-28';
+        $results = $this->oDate->getDays($time_start, $time_end);
+        $this->assertTrue(!empty($results));
+
+        $expected = 3;
+
+        $this->assertEquals($results, $expected);
+    }
+
+    public function testDateAdd()
+    {
+        $base_date = '2011-09-28';
+        $num_days = 5;
+        $results = $this->oDate->addDays($base_date, $num_days);
+        $this->assertTrue(!empty($results));
+
+        $expected = '2011-10-03';
+        $this->assertEquals($results, $expected);
+    }
+
+    public function testIsToday()
+    {
+        $date = date('Y-m-d');
+        $results = $this->oDate->isToday($date);
+
+        $this->assertTrue(!empty($results));
+
+        $expected = 1;
+        $this->assertEquals($results, $expected);
+    }
+
+    public function testGetTimeMinutesBefore()
+    {
+        $minutes = 120;
+        $results = $this->oDate->getMinutesBefore($minutes);
+        $this->assertTrue(!empty($results));
+
+        $expected = date('Y-m-d H:i:s', strtotime('2 hours ago'));
+        $this->assertEquals($expected, $results);
+    }
+
+    public function testGetDayBefore()
+    {
+        $date = '2001-09-12';
+        $results = $this->oDate->getDayBefore($date);
+        $this->assertTrue(!empty($results));
+
+        $expected = "2001-09-11";
+        $this->assertEquals($results, $expected);
+    }
+
+    public function testGetYesterday()
+    {
+        $results = $this->oDate->yesterday();
+        $this->assertTrue(!empty($results));
+
+        $expected = date('Y-m-d', strtotime('yesterday'));
+        $this->assertEquals($results, $expected);
+    }
+
+    public function testGetDayStart()
+    {
+        $date = '2001-09-12';
+        $results = $this->oDate->oFormat->dateStart($date);
+        $this->assertTrue(!empty($results));
+
+        $expected = $date.' 00:00:00';
+        $this->assertEquals($results, $expected);
+    }
+
+    public function testGetDayEnd()
+    {
+        $date = '2001-09-12';
+        $results = $this->oDate->oFormat->dateEnd($date);
+        $this->assertTrue(!empty($results));
+
+        $expected = $date.' 23:59:59';
+        $this->assertEquals($results, $expected);
+    }
+
+    public function testNow()
+    {
+        $results = $this->oDate->now();
+        $this->assertTrue(!empty($results));
+
+        $expected = date(\CI\Date\Format::TIME_FORMAT);
+        $this->assertEquals($results, $expected);
+    }
+
+
+    /**
+     *
+     *
+     * @return void.
+     */
+    public function testSpecial1()
+    {
+        $sExpected = '2013-11-12 23:00:00';
+        $sResult = $this->oDate->getMostRecentHalfHour('2013-11-12 23:05:01');
+
+        $this->assertEquals($sExpected, $sResult , 'We are expecting ' . $sExpected);
+    }
+
+    /**
+     *
+     *
+     * @return void.
+     */
+    public function testSpecial2()
+    {
+        $sExpected = '2013-11-12 23:30:00';
+        $sResult = $this->oDate->getMostRecentHalfHour('2013-11-12 23:35:01');
+
+        $this->assertEquals($sExpected, $sResult , 'We are expecting ' . $sExpected);
+
+    }
+
+    /**
+     *
+     *
+     * @return void.
+     */
+    public function testSpecial3()
+    {
+        $sExpected = '2013-11-13 00:00:00';
+        $sResult = $this->oDate->getMostRecentHalfHour('2013-11-13 00:05:01');
+
+        $this->assertEquals($sExpected, $sResult , 'We are expecting ' . $sExpected);
+    }
+
+    /**
+     * Test if is the exact Half Hour
+     *
+     * @return void.
+     */
+    public function testIsTheExactHalHourWithTheExactTime()
+    {
+        $sExpected = '2012-04-21 17:30:00';
+        $sResult = $this->oDate->getMostRecentHalfHour('2012-04-21 17:30:00');
+
+        $this->assertEquals($sExpected, $sResult , 'We are expecting ' . $sExpected);
+    }
+
+    /**
+     * Test if is the exact Half Hour
+     *
+     * @return void.
+     */
+    public function testIsTheExactHalHourWithTheExactTime2()
+    {
+        $sExpected = '2012-04-21 01:00:00';
+        $sResult = $this->oDate->getMostRecentHalfHour('2012-04-21 1:00:00');
+
+        $this->assertEquals($sExpected, $sResult , 'We are expecting ' . $sExpected);
+    }
+
+    /**
+     * Test if is the exact Half Hour
+     *
+     * @return void.
+     */
+    public function testIsTheExactHalHourWithNotTheExactTime()
+    {
+        $sExpected = '2014-02-21 09:00:00';
+        $sResult = $this->oDate->getMostRecentHalfHour('2014-02-21 9:15:00');
+
+        $this->assertEquals($sExpected, $sResult , 'We are expecting ' . $sExpected);
+    }
+
+    /**
+     * Test if is the exact Half Hour
+     *
+     * @return void.
+     */
+    public function testIsTheExactHalHourWithNotTheExactTime2()
+    {
+        $sExpected = '2010-10-21 20:30:00';
+        $sResult = $this->oDate->getMostRecentHalfHour('2010-10-21 20:59:00');
+
+        $this->assertEquals($sExpected, $sResult , 'We are expecting ' . $sExpected);
+    }
+
+    /**
+     * Test the increment hours
+     *
+     * @return void.
+     */
+    public function testIncrementHour()
+    {
+        $sExpected = '2015-11-21 02:30:00';
+        $sResult = $this->oDate->incrementOrDecrementHours('2015-11-21 0:30:00', +2);
+
+        $this->assertEquals($sExpected, $sResult , 'We are expecting ' . $sExpected);
+    }
+
+    /**
+     * Test the decrement hours
+     *
+     * @return void.
+     */
+    public function testDecrementHour()
+    {
+        $sExpected = '2015-11-21 10:30:00';
+        $sResult = $this->oDate->incrementOrDecrementHours('2015-11-21 12:30:00', -2);
+
+        $this->assertEquals($sExpected, $sResult , 'We are expecting ' . $sExpected);
+    }
+
+
+    /**
+     * Test the increment Minutes
+     *
+     * @return void.
+     */
+    public function testIncrementMinutes()
+    {
+        $sExpected = '2015-11-21 02:30:00';
+        $sResult = $this->oDate->incrementOrDecrementMinutes('2015-11-21 2:10:00', +20);
+
+        $this->assertEquals($sExpected, $sResult , 'We are expecting ' . $sExpected);
+    }
+
+    /**
+     * Test the decrement Minutes
+     *
+     * @return void.
+     */
+    public function testDecrementMinutes()
+    {
+        $sExpected = '2015-11-21 10:30:00';
+        $sResult = $this->oDate->incrementOrDecrementMinutes('2015-11-21 10:50:00', -20);
+
+        $this->assertEquals($sExpected, $sResult , 'We are expecting ' . $sExpected);
+    }
+
+    /**
+     * Test the decrement -1
+     *
+     * @return void.
+     */
+    public function testDecrementMinutes1()
+    {
+        $sExpected = '2013-11-12 23:00:00';
+        $sResult = $this->oDate->incrementOrDecrementHours('2013-11-13 00:00:00', -1);
+
+        $this->assertEquals($sExpected, $sResult , 'We are expecting ' . $sExpected);
+    }
+
+    /**
+     * Test the decrement -1
+     *
+     * @return void.
+     */
+    public function testDecrementMinutes2()
+    {
+        $sExpected = '2013-11-12 23:30:00';
+        $sResult = $this->oDate->incrementOrDecrementHours('2013-11-13 00:30:00', -1);
+
+        $this->assertEquals($sExpected, $sResult , 'We are expecting ' . $sExpected);
+    }
+
+    /**
+     * Test the decrement -1
+     *
+     * @return void.
+     */
+    public function testDecrementMinutes3()
+    {
+        $sExpected = '2013-11-13 00:00:00';
+        $sResult = $this->oDate->incrementOrDecrementHours('2013-11-13 01:00:00', -1);
+
+        $this->assertEquals($sExpected, $sResult , 'We are expecting ' . $sExpected);
+    }
+
+    /**
+     * Test the decrement -1
+     *
+     * @return void.
+     */
+    public function testDecrementMinutes4()
+    {
+        $sExpected = '2013-11-13 00:30:00';
+        $sResult = $this->oDate->incrementOrDecrementHours('2013-11-13 01:30:00', -1);
+
+        $this->assertEquals($sExpected, $sResult , 'We are expecting ' . $sExpected);
+    }
+
+    /**
+     * Testing the get of the minutes
+     *
+     * @return void.
+     */
+    public function testGetTheMinutes()
+    {
+        $nExpected = 44;
+        $nResult = $this->oDate->getMinutes('2015-11-21 6:44:00');
+
+        $this->assertEquals($nExpected, $nResult);
+    }
+}

@@ -1,0 +1,39 @@
+</head>
+<body>
+              <script type ="text/javascript">
+
+          if(document.body){
+              if(document.all){
+                  document.body.onload = init_function;
+              } else {
+                  document.body.setAttribute("onload","init_function()");
+              }
+          }
+        </script>
+<div id="header">
+    <div class="header_wrapper">
+        <div class="logo">
+            <a href="http://news.crowdignite.craveonline.com/">
+                <img src="http://<?=CDN_URL?>/img/<?=DOMAIN?>/logo_small.jpg" id="logo">
+            </a>
+            <div class="beta">
+                <span>Beta</span>
+            </div>
+        </div>
+        <div id="topnav">
+        
+        </div>
+        <?
+        if( isset($preview_style) ) {
+            if( $preview_style == 22 ||  $preview_style == 29) {
+                echo '<div class="ad_leaderboard">';
+                echo "<div id='div-gpt-ad-0'></div>";
+                echo '</div>';
+            }
+        }
+        ?>
+<?
+        echo $this->element("tabs");
+?>
+    </div>
+</div>

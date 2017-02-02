@@ -1,0 +1,72 @@
+$TTL 86400
+springboardvideo.com.		IN      SOA     springboardvideo.com. root.springboardvideo.com. (
+                        2014071100	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+springboardvideo.com.     IN      NS              app3v-dns.tp.prd.lax.gorillanation.com.
+springboardvideo.com.     IN      NS              app4v-dns.tp.prd.lax.gorillanation.com.
+springboardvideo.com.     IN      NS              app1v-dns.tp.prd.lax.gorillanation.com.
+springboardvideo.com.     IN      NS              app2v-dns.tp.prd.lax.gorillanation.com.
+;
+; local host
+;
+local           IN      A       127.0.0.1
+localhost       IN      A       127.0.0.1
+loghost         IN      A       127.0.0.1
+;
+;
+; mail servers
+springboardvideo.com.		IN	MX	20	cluster9a.us.messagelabs.com.
+springboardvideo.com.		IN	MX	10	cluster9.us.messagelabs.com.
+; hosts
+;@			IN	A	72.172.76.22
+
+springboardvideo.com.          IN  A   72.172.76.177
+;www                         IN  CNAME   www.evolvemediacorp.com.edgesuite.net.
+www.springboardvideo.com.       IN A 72.172.76.177
+
+
+
+*.springboardvideo.com.	    IN  CNAME   springboardvideo.com.
+analytics.springboardvideo.com.		IN	A	72.172.76.117
+analytics.dev.springboardvideo.com.	IN	A	72.172.76.74
+analytics.stg.springboardvideo.com.	IN	A	72.172.76.81
+
+; new FE infrastructure -jsj
+origin.campaigns		IN	A	72.172.76.121
+campaigns               IN  CNAME   origin.campaigns
+cdn.campaigns			IN	CNAME	cdn.campaigns.springboardvideo.com.edgesuite.net.
+staging.campaigns		 IN  A   72.172.76.122
+
+origin.assets			IN	A	72.172.76.110
+cdn.assets				IN	CNAME	cdn.assets.springboardvideo.com.edgesuite.net.
+assets					IN	CNAME	cdn.assets
+staging.assets			IN  CNAME   staging.assets.springboardvideo.com.edgesuite.net.
+demo.assets                      IN  CNAME   demo.assets.springboardvideo.com.edgesuite.net.
+origin.staging.assets	IN	A	72.172.76.111
+streaming.springboardvideo.com.          IN      CNAME       springboardvideo-f.akamaihd.net.
+cdn.springboardvideo.com.                IN      CNAME       cdn.springboardvideo.edgesuite.net.
+origin.springboardvideo.com.             IN      CNAME       origin.springboard.gorillanation.com.
+dev.analytics.springboardvideo.com.      IN      CNAME       app1v-stats-cms.sbv.dev.lax.gnmedia.net.
+rmdemo.springboardvideo.com.             IN      CNAME       campaigns.springboardvideo.com.
+staging.rmdemo.springboardvideo.com.     IN      CNAME       staging.campaigns.springboardvideo.com.
+dev.cpv.springboardvideo.com.            IN      CNAME       app1v-media.sbv.dev.lax.gnmedia.net.
+stg.cpv.springboardvideo.com.            IN      CNAME       stg.springboardplatform.com.
+cpv.springboardvideo.com.                IN      CNAME       cdn.springboardvideo.edgesuite.net.
+dev.cpv.media.springboardvideo.com.      IN      CNAME       app1v-media.sbv.dev.lax.gnmedia.net.
+;stg.cpv.media.springboardvideo.com.      IN      A       72.172.76.174
+stg.cpv.media.springboardvideo.com.      IN      CNAME       stg.springboardplatform.com.
+cpv.media.springboardvideo.com.          IN      CNAME       cdn.springboardvideo.edgesuite.net.
+
+;UID 
+aarwine.cpv.springboardvideo.com.   IN  CNAME   uid1v-aarwine.sbv.dev.lax.gnmedia.net.
+dstankovic.cpv.springboardvideo.com.    IN  CNAME uid1v-dstankovic.sbv.dev.lax.gnmedia.net.
+mjovanovic.cpv.springboardvideo.com.    IN  CNAME uid1v-mjovanovic.sbv.dev.lax.gnmedia.net.
+mtodorovic.cpv.springboardvideo.com.    IN  CNAME uid1v-mtodorovic.sbv.dev.lax.gnmedia.net.
+npetkoski.cpv.springboardvideo.com. IN  CNAME uid1v-npetkoski.sbv.dev.lax.gnmedia.net.
+pmilosevic.cpv.springboardvideo.com.    IN  CNAME uid1v-pmilosevic.sbv.dev.lax.gnmedia.net.
+

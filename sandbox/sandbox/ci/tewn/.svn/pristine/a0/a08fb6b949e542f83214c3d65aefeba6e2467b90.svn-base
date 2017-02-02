@@ -1,0 +1,70 @@
+<?php
+
+namespace CI\Test\Filter\Url;
+use CI\Filter\Url\Utm;
+
+/**
+ * @group filter
+ * @group filter_url
+ */
+class FilterUrlUtmTest extends \PHPUnit_Framework_TestCase
+{
+    protected $oFilter;
+    protected $sReferrer;
+
+    public function setUp()
+    {
+        $this->oFilter = new Utm();
+        $this->sReferrer = 'http://www.test.com/test,other-pictures?utm=test&nggpage=43,44&utm_medium=test&icid=1234';
+    }
+
+    public function testOnlyUtmParamsShouldBeRemoved()
+    {
+        $params = array(
+            'nggpage=43',
+            'utm=x',
+            'utm_source=y',
+            'keep=test',
+            'utm_campaign=z',
+            'utm_medium=a',
+            'utm_term=h',
+            'keep2=other',
+            'utm_content=123',
+            'icid=987',
+        );
+        $this->sReferrer = 'http://www.test.com/testother-pictures?' . implode('&', $params);
+        $sExpectedUrl = 'http://www.test.com/testother-pictures?nggpage=43&keep=test&keep2=other';
+
+        $sResult = $this->oFilter->filter($this->sReferrer);
+
+        $this->assertEquals(
+            $sExpectedUrl,
+            $sResult
+        );
+    }
+
+    public function testComasShouldBePreserve()
+    {
+        $sExpectedUrl = 'http://www.test.com/test,other-pictures?nggpage=43,44';
+
+        $sResult = $this->oFilter->filter($this->sReferrer);
+
+        $this->assertEquals(
+            $sExpectedUrl,
+            $sResult
+        );
+    }
+
+    public function testThrowAnExceptionWhenTheValueToFilterIsNotAString()
+    {
+        $this->setExpectedException('\CI\String\Exception');
+        $aNotString = array();
+
+        $this->oFilter->filter($aNotString);
+    }
+
+    public function tearDown()
+    {
+        unset($this->oFilter, $this->sReferrer);
+    }
+}

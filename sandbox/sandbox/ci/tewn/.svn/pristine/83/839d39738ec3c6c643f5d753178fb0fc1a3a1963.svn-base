@@ -1,0 +1,220 @@
+<?php
+/**
+ * A thin kestrel client that wraps Memcached (using libmemcached extension)
+ */
+class CakeKestrelComponent
+{
+    const HOST = 0;
+    const PORT = 1;
+
+    protected $_memcached = null;
+    protected $_connected = false;
+    protected $read_from = -1;
+    protected $read_next = -1;
+    protected $servers = array();
+
+    function startup(&$controller) {
+
+    }
+
+    /**
+     * Sets the connection
+     */
+    public function __construct()
+    {
+        if (defined('DISABLE_KESTREL')) {
+            return false;
+        }
+
+        $oConfig       = new \CI\Config();
+        $this->servers = $oConfig->get('kestrel');
+
+        $this->_memcached = array();
+
+        // several servers - use addServer
+        foreach ($this->servers as $server) {
+            $this->_memcached[] = null;
+        }
+
+        if (defined('KESTREL_READ')) {
+            $this->read_from = KESTREL_READ;
+        } else {
+            $this->read_from = -1;
+        }
+
+        return $this->_connected;
+    }
+
+    public function connect($idx) {
+    	if ($this->_memcached[$idx] == null) {
+            $host = $this->servers[$idx][self::HOST];
+            $port = $this->servers[$idx][self::PORT];
+
+            $this->_memcached[$idx] = new Memcache();
+
+    		if ($this->_memcached[$idx]->addServer($host, $port)) {
+    			$this->_connected = true;
+    		} else {
+    			$this->_connected = false;
+    		}
+    	} else {
+    		$this->_connected = true;
+    	}
+    }
+
+    public function getReadServer() {
+    	if ($this->read_from < 0) {
+    		if ($this->read_next < 0) {
+    			$m = array_rand($this->servers);
+    			$this->read_next = $m;
+    		} else {
+    			$this->read_next++;
+    			if ($this->read_next >= count($this->servers)) {
+    				$this->read_next = 0;
+    			}
+    			$m = $this->read_next;
+    		}
+    	} else {
+    		$m = $this->read_from;
+    	}
+    	return $m;
+    }
+
+
+    /**
+     * Sets data on the queue, json_encoding the value to avoid problematic
+     * serialization.
+     *
+     * @param string $queue The queue name
+     * @param mixed  $data  The data to store
+     *
+     * @return bool
+     */
+	public function set($queue, $data) {
+		$m = array_rand($this->_memcached);
+
+		$this->connect($m);
+
+		if (!$this->_connected) return false;
+
+		// Local json serialization, as kestrel doesn't
+		// send serialization flags
+		$rc = $this->_memcached[$m]->set($queue, json_encode($data));
+		if (!$rc) {
+			$this->check_results($queue, 'Set', $m);
+		}
+		return $rc;
+    }
+
+    /**
+     * Reliably read an item off of the queue.  Meant to be run in a loop, and
+     * call closeReliableRead() when done to make sure the final job is not left
+     * on the queue.
+     *
+     * @param mixed $queue   The queue name to read from
+     * @param int   $timeout The timeout to wait for a job to appear
+     *
+     * @return array|false
+     * @see close()
+     */
+    public function get($queue, $timeout = 200)
+    {
+        $m = $this->getReadServer();
+
+        $this->connect($m);
+
+        if (!$this->_connected) return false;
+
+        $queue = $queue . '/close/open/t=' . $timeout;
+        $result = @$this->_memcached[$m]->get($queue);
+
+        if (!$result) {
+            return false;
+        }
+        // Local json serialization, as kestrel doesn't send serialization flags
+        return json_decode($result, true);
+    }
+
+    /**
+     * Closes any existing open read
+     *
+     * @param string $queue The queue name
+     *
+     * @return false
+     */
+    public function close($queue)
+    {
+        $queue = $queue . '/close';
+
+        $m = $this->getReadServer();
+
+        $this->connect($m);
+
+        if (!$this->_connected) return false;
+
+        return $this->_memcached[$m]->get($queue);
+    }
+
+    /**
+     * Aborts an existing reliable read
+     *
+     * @param string $queue The queue name
+     *
+     * @return false
+     */
+    public function abort($queue)
+    {
+        $queue = $queue . '/abort';
+
+        $m = $this->getReadServer();
+
+        $this->connect($m);
+
+        if (!$this->_connected) return false;
+
+        return $this->_memcached[$m]->get($queue);
+    }
+
+    public function size($queue)
+    {
+        $return = array();
+        $size_key = 'queue_' . $queue . '_items';
+        foreach($this->servers as $m => $server) {
+            $this->connect($m);
+            $server = split('\.', $server[0]);
+            $server = $server[0];
+            $stats  = $this->_memcached[$m]->getStats('sizes');
+
+            $return[$server] = isset($stats[$size_key]) ? (int) $stats[$size_key] : 0;
+        }
+
+        return $return;
+    }
+
+    public function check_results($queue, $operation, $m) {
+        $message = null;
+
+    	//if called from command line, these values doesn't exists.
+    	if(isset($_SERVER['argc']) === FALSE){//if not called from CLI
+    		$message .= "URL: ".$_SERVER['REQUEST_URI']."\n";
+    		if (isset($_SERVER['HTTP_REFERER'])) {
+    			$message .= "Refer: ".$_SERVER['HTTP_REFERER']."\n";
+    		}
+    	}
+
+    	$message .= "PID: ".getmypid()."\n";
+    	$message .= "Command: ".$operation."\n";
+    	$message .= "Queue: ".$queue."\n";
+    	$message .= "Message: \n";
+    	$message .= "Date: ".date("r")."\n";
+    	$message .= "Client Server: ".php_uname()."\n";
+    	$message .= "Kestrel Server: ".$this->servers[$m]."\n";
+
+    	if (Configure::read("unit_test")) {
+			echo $message;
+		} else {
+			//CakeLog::write("cake_kestrel", $message);
+            //plat_assert(false, $message, false);
+		}
+    }
+}

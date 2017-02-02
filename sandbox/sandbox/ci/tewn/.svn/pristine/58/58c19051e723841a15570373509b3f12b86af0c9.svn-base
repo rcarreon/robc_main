@@ -1,0 +1,12 @@
+<?php
+class TraceComponent extends Object {
+
+	function msg($text) {
+		if (Configure::read("trace_logging")) {
+			$backtrace = debug_backtrace();
+			echo $backtrace[1]['function']."(): ".$text."\n";
+		}
+	}
+
+}
+?>

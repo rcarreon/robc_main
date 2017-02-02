@@ -1,0 +1,108 @@
+$(document).ready(function(){
+    var $date = $('.bs-daterange');
+    $(".selectpicker").selectpicker();
+    var $imagePreview = $('#pane-add-image').ciImagePreview();
+
+    $date.daterangepicker({
+        format       : 'MM/DD/YYYY HH:mm:ss',
+        buttonClasses: ['btn btn-default'],
+        applyClass   : 'btn-small',
+        cancelClass  : 'btn-small',
+        separator    : ' to ',
+        startDate    : moment(),
+        endDate      : moment().add(30, 'days'),
+        minDate      : moment(),
+        opens        : 'center',
+        timePicker       : true,
+        timePickerIncrement : 1,
+        timePicker12Hour : false
+    });
+
+    $('.bs-daterange-icon').click(function(){
+        $date.click();
+    });
+
+    jQuery.validator.setDefaults({
+        highlight: function (element, errorClass, validClass) {
+            if (element.type === "radio") {
+                this.findByName(element.name).addClass(errorClass).removeClass(validClass);
+            } else {
+                $(element).closest('.form-group').removeClass('has-success has-feedback').addClass('has-error has-feedback');
+                $(element).closest('.form-group').find('span.glyphicon').remove();
+                $(element).closest('.form-group').append(' <span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>');
+            }
+        },
+        unhighlight: function (element, errorClass, validClass) {
+            if (element.type === "radio") {
+                this.findByName(element.name).removeClass(errorClass).addClass(validClass);
+            } else {
+                $(element).closest('.form-group').removeClass('has-error has-feedback').addClass('has-success has-feedback');
+                $(element).closest('.form-group').find('span.glyphicon').remove();
+                $(element).closest('.form-group').append('<span class="glyphicon glyphicon-ok form-control-feedback" aria-hidden="true"></span>');
+            }
+        },
+        submitHandler: function() {
+            $("#btn-add-page").button('loading');
+            var cropData    = $imagePreview.data('_ciImagePreview').getCropper().cropper('getData');
+            var $datePicker = $('.bs-daterange').data('daterangepicker');
+            $.ajax({
+                url      : '/custom_landing_page/action/add?' + $('#form-add-custom-page').serialize(),
+                type     : 'GET',
+                dataType : 'json',
+                data     : {
+                    x1 : cropData.x,
+                    x2 : cropData.x + cropData.width,
+                    y1 : cropData.y,
+                    y2 : cropData.y + cropData.height,
+                    start_at : $datePicker.startDate.format('YYYY-MM-DD HH:mm:ss'),
+                    end_at   : $datePicker.endDate.format('YYYY-MM-DD HH:mm:ss')
+                }
+            }).done(function(data){
+                if(data.hasOwnProperty("status") && data.status == 'ok') {
+                    window.location = '/management/website/' + $('#input-website-id').val();
+                }
+            });
+        }
+    });
+
+    $('#form-add-custom-page').validate({
+        ignore : '#txt-get-image, .selectpicker + div.dropdown-menu input',
+        rules : {
+            headline: {
+                required : true
+            },
+            byline: {
+                required : true
+            },
+            body_text: {
+                required : true
+            },
+            readmore_link: {
+                required : true,
+                url : true
+            },
+            image : {
+                required : true
+            }
+        },
+        messages : {
+            headline : {
+                required  : 'Please enter a head line'
+            },
+            byline : {
+                required : 'Please enter a byline'
+            },
+            body_text : {
+                required : 'Please enter a abstract'
+            },
+            readmore_link : {
+                required : 'Please enter a URL',
+                url      : 'Invalid URL'
+            },
+            image : {
+                required : 'Image is required'
+            }
+        }
+    });
+});
+

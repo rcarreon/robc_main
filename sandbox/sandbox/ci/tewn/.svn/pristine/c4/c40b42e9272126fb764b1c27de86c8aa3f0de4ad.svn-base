@@ -1,0 +1,25 @@
+<?php
+    $kestrel_config = array(
+        'local' => array(
+            array('kes1v-ci.ci.dev.lax.gnmedia.net', 22133)
+        ),
+        'dev' => array(
+            array('kes1v-ci.ci.dev.lax.gnmedia.net', 22133)
+        ),
+        'stg' => array(
+            array('kes1v-ci.ci.stg.lax.gnmedia.net', 22133),
+            array('kes2v-ci.ci.stg.lax.gnmedia.net', 22133)
+        ),
+        'prd' => array(
+            array('kes1v-ci.ci.prd.lax.gnmedia.net', 22133),
+            array('kes2v-ci.ci.prd.lax.gnmedia.net', 22133),
+            array('kes3v-ci.ci.prd.lax.gnmedia.net', 22133),
+            array('kes4v-ci.ci.prd.lax.gnmedia.net', 22133),
+            array('kes5v-ci.ci.prd.lax.gnmedia.net', 22133),
+            array('kes6v-ci.ci.prd.lax.gnmedia.net', 22133),
+            array('kes7v-ci.ci.prd.lax.gnmedia.net', 22133),
+            array('kes8v-ci.ci.prd.lax.gnmedia.net', 22133)
+        )
+    );
+
+return $kestrel_config[ENVIRONMENT];

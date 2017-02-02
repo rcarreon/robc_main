@@ -1,0 +1,98 @@
+<script id="tpl-report-by-website" type="text/x-handlebars-template">
+    <div class="table-responsive">
+        <table id="website-report-table" class="table table-striped table-bordered tablesorter">
+            {{#if daily_breakdown}}
+                <thead>
+                    <tr>
+                        <th class="text-center">Date</th>
+
+                        <th class="text-center">ID</th>
+                        <th class="text-center">Website</th>
+                        <th class="text-center">Hub</th>
+                        <th class="text-center">Status</th>
+
+                        <th class="text-center">Traffic<br>To</th>
+                        <th class="text-center">Traffic<br>From</th>
+                        <th class="text-center">RR</th>
+
+                        <th class="text-center">Widget<br>Clicks</th>
+                        <th class="text-center">Widget<br>Display</th>
+                        <th class="text-center">Widget<br>CTR</th>
+
+                        <th class="text-center">Credits</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {{#each stats}}
+                    <tr>
+                        <td class="text-center">{{date}}</td>
+
+                        <td class="text-rigth">{{website_id}}</td>
+                        <td>{{website_name}}</td>
+                        <td>{{hub_name}}</td>
+                        <td>{{website_status_name}}</td>
+
+                        <td class="text-right">{{formatNumber account_outgoing}}</td>
+                        <td class="text-right">{{formatNumber account_incoming}}</td>
+                        <td class="text-right">{{formatNumber account_return_rate "2" "percentage"}}%</td>
+
+
+                        <td class="text-right">{{formatNumber widget_incoming}}</td>
+                        <td class="text-right">{{formatNumber widget_display}}</td>
+                        <td class="text-right">{{formatNumber widget_ctr "2" "percentage"}}%</td>
+
+                        <td class="text-right">{{formatNumber account_credits}}</td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            {{else}}
+                <thead>
+                    <tr>
+                        <th class="text-center">ID</th>
+                        <th class="text-center">Website</th>
+                        <th class="text-center">Hub</th>
+                        <th class="text-center">Status</th>
+
+                        <th class="text-center" data-toggle="popover" data-placement="top" data-content="Traffic To">T<br>To</th>
+                        <th class="text-center" data-toggle="popover" data-placement="top" data-content="Traffic From">T<br>From</th>
+                        <th class="text-center" data-toggle="popover" data-placement="top" data-content="Return Rate">RR</th>
+
+                        <th class="text-center" data-toggle="popover" data-placement="top" data-content="Widget Clicks">W<br>Clicks</th>
+                        <th class="text-center" data-toggle="popover" data-placement="top" data-content="Widget Display">W<br>Display</th>
+                        <th class="text-center" data-toggle="popover" data-placement="top" data-content="Widget CTR">W<br>CTR</th>
+
+                        <th class="text-center">Credits</th>
+
+                        <th class="text-center" data-toggle="popover" data-placement="top" data-content="Total Traffic From">Total<br>TF</th>
+                        <th class="text-center" data-toggle="popover" data-placement="top" data-content="Total Traffic To">Total<br>TT</th>
+                        <th class="text-center">Total<br>RT</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {{#each stats}}
+                    <tr>
+                        <td class="text-right">{{website_id}}</td>
+                        <td class="text-nowrap">{{website_name}}</td>
+                        <td class="text-nowrap">{{hub_name}}</td>
+                        <td>{{website_status_name}}</td>
+
+                        <td class="text-right">{{formatNumber account_outgoing}}</td>
+                        <td class="text-right">{{formatNumber account_incoming}}</td>
+                        <td class="text-right">{{formatNumber account_return_rate "2" "percentage"}}%</td>
+
+                        <td class="text-right">{{formatNumber widget_incoming}}</td>
+                        <td class="text-right">{{formatNumber widget_display}}</td>
+                        <td class="text-right">{{formatNumber widget_ctr "2" "percentage"}}%</td>
+
+                        <td class="text-right">{{formatNumber account_credits}}</td>
+
+                        <td class="text-right">{{formatNumber total_incoming}}</td>
+                        <td class="text-right">{{formatNumber total_outgoing}}</td>
+                        <td class="text-right">{{formatNumber total_return_rate "2" "percentage"}}%</td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            {{/if}}
+        </table>
+    </div>
+</script>

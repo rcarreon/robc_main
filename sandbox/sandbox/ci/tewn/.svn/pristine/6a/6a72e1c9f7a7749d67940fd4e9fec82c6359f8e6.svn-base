@@ -1,0 +1,22 @@
+<?php
+
+include_once (ROOT . DS . APP_DIR . DS . "global_defines.php");
+
+class LandingPageRebalanceFixture extends CakeTestFixture {
+	var $name = 'LandingPageRebalance';
+	// var $import = 'LandingPageRebalance';
+	var $fields = array(
+		'id' => array('type' => 'integer','null' => null,'default' => null,'length' => '10','key' => 'primary'),
+		'domain_bitfield' => array('type' => 'integer','null' => null,'default' => '0','length' => '20'),
+		'category' => array('type' => 'integer','null' => null,'default' => '0','length' => '20','key' => 'index'),
+		'demographic_sex' => array('type' => 'integer','null' => null,'default' => '0','length' => '5'),
+		'content_rating' => array('type' => 'integer','null' => null,'default' => '0','length' => '5','key' => 'index'),
+		'num_display' => array('type' => 'integer','null' => null,'default' => '0','length' => '20'),
+		'modified' => array('type' => 'datetime','null' => '1','default' => null,'length' => null),
+		'created' => array('type' => 'datetime','null' => '1','default' => null,'length' => null),
+		'visible' => array('type' => 'integer','null' => null,'default' => '1','length' => '11','key' => 'index')
+	);
+
+	var $records = array();
+}
+?>

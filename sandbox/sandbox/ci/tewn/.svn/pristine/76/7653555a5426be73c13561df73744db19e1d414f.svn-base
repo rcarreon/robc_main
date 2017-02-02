@@ -1,0 +1,58 @@
+<?php
+
+namespace CI\Validator\LandingPage;
+
+class Intersect extends \CI\Validator\Rule
+{
+    const EMPTY_CATEGORY        = 0;
+    const EMPTY_CONTENT_RATING  = 1;
+    const EMPTY_DEMOGRAPHIC_SEX = 2;
+
+    const ERROR_EMPTY_CATEGORY        = 'emptyCategory';
+    const ERROR_EMPTY_CONTENT_RATING  = 'emptyContentRating';
+    const ERROR_EMPTY_DEMOGRAPHIC_SEX = 'emptyDemographicSex';
+
+    protected $aMessageTemplates = array(
+        self::ERROR_EMPTY_CATEGORY        => 'The intersect don\'t have category',
+        self::ERROR_EMPTY_CONTENT_RATING  => 'The intersect don\'t have comtent rating',
+        self::ERROR_EMPTY_DEMOGRAPHIC_SEX => 'The intersect don\'t have demographic sex',
+    );
+
+    public function isValid($aIntersect)
+    {
+        $bReturn        = true;
+        $sDefaultErrror = "Intesect invalid";
+        $oCategory      = new \CI\Category();
+        $oDemographic   = new \CI\Demographic();
+        $oContentRating = new \CI\ContentRating();
+
+        $aCategories = explode(',', $aIntersect['categories']);
+        foreach ($aCategories as $nCategory) {
+            if ($oCategory->getName($nCategory) == '') {
+                $this->error(
+                    self::ERROR_EMPTY_CATEGORY,
+                    $this->aMessageTemplates[self::ERROR_EMPTY_CATEGORY]
+                );
+                $bReturn = false;
+            }
+        }
+
+        if ($oDemographic->getName($aIntersect['demographic_sex']) == '') {
+            $this->error(
+                self::ERROR_EMPTY_DEMOGRAPHIC_SEX,
+                $this->aMessageTemplates[self::ERROR_EMPTY_DEMOGRAPHIC_SEX]
+            );
+            $bReturn = false;
+        }
+
+        if ($oContentRating->getName($aIntersect['content_rating']) == '') {
+            $this->error(
+                self::ERROR_EMPTY_CONTENT_RATING,
+                $this->aMessageTemplates[self::ERROR_EMPTY_CONTENT_RATING]
+            );
+            $bReturn = false;
+        }
+
+        return $bReturn;
+    }
+}

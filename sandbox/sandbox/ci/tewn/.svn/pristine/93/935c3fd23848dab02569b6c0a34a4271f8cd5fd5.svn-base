@@ -1,0 +1,529 @@
+<?php
+
+namespace Test\Excel;
+
+/**
+ * @group Excel
+ */
+class SettingsTest extends \PHPUnit_Framework_TestCase
+{
+    public function testDefaultDocumentTitle()
+    {
+        $sExpected = 'Title';
+        $oSettings = new \CI\Excel\Settings();
+        $sResult = $oSettings->getDocumentTitle();
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testSetDocumentTitle()
+    {
+        $sExpected = 'Title Custom';
+        $oSettings = new \CI\Excel\Settings(
+            array(
+                'Document' => array(
+                    'title' => 'Title Custom'
+                )
+            )
+        );
+        $sResult = $oSettings->getDocumentTitle();
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetDefaultDocumentFontSize()
+    {
+        $nExpected = 12;
+        $oSettings = new \CI\Excel\Settings();
+        $nResult = $oSettings->getDocumentFontSize();
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+    public function testGetCustomDocumentFontSize()
+    {
+        $nExpected = 20;
+        $oSettings = new \CI\Excel\Settings(
+            array(
+                'Document' => array(
+                    'font_size' => 20
+                )
+            )
+        );
+        $nResult = $oSettings->getDocumentFontSize();
+        $this->assertEquals($nExpected, $nResult);
+    }
+
+    public function testGetDefaultDocumentFontStyle()
+    {
+        $sExpected = 'Arial';
+        $oSettings = new \CI\Excel\Settings();
+        $sResult = $oSettings->getDocumentFontStyle();
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetCustomDocumentFontStyle()
+    {
+        $sExpected = 'Times Roman';
+        $oSettings = new \CI\Excel\Settings(
+            array(
+                'Document' => array(
+                    'font_style' => 'Times Roman'
+                )
+            )
+        );
+        $sResult = $oSettings->getDocumentFontStyle();
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetDefaultCreator()
+    {
+        $sExpected = 'Crowdignite';
+        $oSettings = new \CI\Excel\Settings();
+        $sResult = $oSettings->getDocumentCreator();
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetCustomCreator()
+    {
+        $sExpected = 'Juan Roman';
+        $oSettings = new \CI\Excel\Settings(
+            array(
+                'Document' => array(
+                    'creator' => 'Juan Roman'
+                )
+            )
+        );
+        $sResult = $oSettings->getDocumentCreator();
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetDefaultSheetName()
+    {
+        $sExpected = 'Sheet1';
+        $oSetting = new \CI\Excel\Settings();
+        $sResult = $oSetting->getSheetName();
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetCustomSheetName()
+    {
+        $sExpected = 'Report by title';
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'report_title' => array(
+                        'title' => 'Report by title'
+                    )
+                )
+            )
+        );
+        $sResult = $oSetting->getSheetName('report_title');
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetDefaultOfThirdSheetName()
+    {
+        $sExpected = 'Sheet3';
+        $oSetting = new \CI\Excel\Settings();
+        $sResult = $oSetting->getSheetName(3);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetCustomOfThirdSheetName()
+    {
+        $sExpected = 'Graphs';
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'report_by_tutle' => array(
+                        'title' => 'Report by title'
+                    ),
+                    'list_all_categories' => array(
+                        'title' => 'List of all Articles'
+                    ),
+                    'graphs' => array(
+                        'title' => 'Graphs'
+                    )
+                )
+            )
+        );
+        $sResult = $oSetting->getSheetName('graphs');
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+
+
+    public function testGetTitleCustomColumn1()
+    {
+        $sExpected = 'Names';
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'report_1' => array(
+                        'Columns' => array(
+                            'names' => array('title' => 'Names'),
+                            'return_rate' => array('title' => 'Return rate'),
+                            'money' => array('title' => 'money')
+                        )
+                    )
+                )
+            )
+        );
+        $sResult = $oSetting->getColumTitleByName('report_1', 'names');
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetFormatCustomColumn3()
+    {
+        $sExpected = \CI\Excel\Settings::FORMAT_PERCENTAGE_00;
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'report' => array(
+                        'Columns' => array(
+                            'names' => array(
+                                'title' => 'Names',
+                                'format' => \CI\Excel\Settings::FORMAT_NUMBER_COMMA_SEPARATED1
+
+                            ),
+                            'return_rate' => array('title' => 'Return rate'),
+                            'money' => array(
+                                'title' => 'money',
+                                'format' => \CI\Excel\Settings::FORMAT_PERCENTAGE_00
+                            )
+                        )
+                    )
+                )
+            )
+        );
+        $sResult = $oSetting->getColumFormatByName('report', 'money');
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetAlignment()
+    {
+        $sExpected = \CI\Excel\Settings::FORMAT_PERCENTAGE_00;
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'report' => array(
+                        'Columns' => array(
+                            'names' => array(
+                                'title' => 'Names',
+                                'format' => \CI\Excel\Settings::FORMAT_NUMBER_COMMA_SEPARATED1,
+                                'alignment' => array(
+                                    'vertical' =>  \CI\Excel\Settings::VERTICAL_CENTER,
+                                    'horizontal' => \CI\Excel\Settings::HORIZONTAL_RIGHT
+                                )
+
+                            ),
+                            'return_rate' => array('title' => 'Return rate'),
+                            'money' => array(
+                                'title' => 'money',
+                                'format' => \CI\Excel\Settings::FORMAT_PERCENTAGE_00
+                            )
+                        )
+                    )
+                )
+            )
+        );
+        $sResult = $oSetting->getColumFormatByName('report', 'money');
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetColumNameByTitle1()
+    {
+        $sExpected = 'money';
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'by_hub' => array(
+                        'Columns' => array(
+                            'names' => array(
+                                'title' => 'Names',
+                                'format' => \CI\Excel\Settings::FORMAT_NUMBER_COMMA_SEPARATED1
+
+                            ),
+                            'return_rate' => array(
+                                'title' => 'Return rate'
+                            ),
+                            'incoming' => array(
+                                'title' => 'money',
+                                'format' => \CI\Excel\Settings::FORMAT_PERCENTAGE_00
+                            )
+                        )
+                    )
+                )
+            )
+        );
+
+        $sResult = $oSetting->getColumTitleByName('by_hub', 'incoming');
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetColumNameByTitle2()
+    {
+        $sExpected = 'Return rate';
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'Sheet1' => array(
+                        'Columns' => array(
+                            'names' => array(
+                                'title' => 'Names',
+                                'format' => \CI\Excel\Settings::FORMAT_NUMBER_COMMA_SEPARATED1
+
+                            ),
+                            'return_rate' => array(
+                                'title' => 'Return rate'
+                            ),
+                            'incoming' => array(
+                                'title' => 'money',
+                                'format' => \CI\Excel\Settings::FORMAT_PERCENTAGE_00
+                            )
+                        )
+                    )
+                )
+            )
+        );
+
+        $sResult = $oSetting->getColumTitleByName('Sheet1', 'return_rate');
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetColumNameByTitleWhenTheColumDoesNotExist()
+    {
+        $sExpected = 'credits';
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'Sheet1' => array(
+                        'Columns' => array(
+                            'names' => array(
+                                'title' => 'Names',
+                                'format' => \CI\Excel\Settings::FORMAT_NUMBER_COMMA_SEPARATED1
+                            ),
+                            'return_rate' => array(
+                                'title' => 'Return rate'
+                            ),
+                            'incoming' => array(
+                                'title' => 'money',
+                                'format' => \CI\Excel\Settings::FORMAT_PERCENTAGE_00
+                            )
+                        )
+                    )
+                )
+            )
+        );
+
+        $sResult = $oSetting->getColumTitleByName('Sheet1', 'credits');
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    /**
+     * @expectedException \CI\Excel\Exception
+     * @expectedExceptionCode \CI\Excel\Exception::INVALID_FORMAT
+     */
+    public function testGetFormatCustomColumnException()
+    {
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'Sheet1' => array(
+                        'Columns' => array(
+                            'names' => array(
+                                'title' => 'Names',
+                                'format' => \CI\Excel\Settings::FORMAT_NUMBER_COMMA_SEPARATED1
+
+                            ),
+                            'return_rate' => array(
+                                'title' => 'Return rate',
+                                'format' => 'this format does not exist'
+                            ),
+                            'dinero' => array(
+                                'title' => 'money',
+                                'format' => \CI\Excel\Settings::FORMAT_PERCENTAGE_00
+                            )
+                        )
+                    )
+                )
+            )
+        );
+        $sResult = $oSetting->getColumnFormat('Sheet1', 'field_666');
+    }
+
+    public function testColumnAllowed()
+    {
+        $bExpected = true;
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'Sheet1' => array(
+                        'Columns' => array(
+                            'column_1' => array(),
+                            'column_2' => array(),
+                            'column_3' => array(),
+                            'column_4' => array()
+                        )
+                    )
+                )
+            )
+        );
+
+        $bRestul = $oSetting->columnAllowed('Sheet1', 'column_2');
+        $this->assertEquals($bExpected, $bRestul);
+    }
+
+    public function testColumnDontAllowed()
+    {
+        $bExpected = false;
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'Sheet1' => array(
+                        'Columns' => array(
+                            'column_1' => array(),
+                            'column_2' => array(),
+                            'column_3' => array(),
+                            'column_4' => array()
+                        )
+                    )
+                )
+            )
+        );
+
+        $bRestul = $oSetting->columnAllowed('Sheet1', 'column_666');
+        $this->assertEquals($bExpected, $bRestul);
+    }
+
+    public function testColumnAllowed2()
+    {
+        $bExpected = true;
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'Sheet1' => array(
+                        'Columns' => array(
+                            'column_1' => array(),
+                            'column_2' => array(),
+                            'column_3' => array(),
+                            'column_4' => array()
+                        )
+                    )
+                )
+            )
+        );
+
+        $bRestul = $oSetting->columnAllowed('report_1', 'return_rate');
+        $this->assertEquals($bExpected, $bRestul);
+    }
+
+    public function testColumnAllowedWithEmptyAllowedArray()
+    {
+        $bExpected = true;
+        $oSetting = new \CI\Excel\Settings();
+
+        $bRestul = $oSetting->columnAllowed('dont_have_sheet', 'column_666');
+        $this->assertEquals($bExpected, $bRestul);
+    }
+
+    public function testOrderByOrder()
+    {
+        $aExpected = array(
+            'item_1',
+            'item_2',
+            'item_3',
+            'item_4',
+            'item_5'
+        );
+
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'Sheet1' => array(
+                        'Columns' => array(
+                            'item_1' => array(),
+                            'item_2' => array(),
+                            'item_3' => array(),
+                            'item_4' => array(),
+                            'item_5' => array()
+                        )
+                    )
+                )
+            )
+        );
+
+        $aResult = $oSetting->getOrderedColums('Sheet1');
+        $this->assertEquals($aExpected, $aResult);
+    }
+
+    public function testOrderByOrderWhenEmptyArrayGiven()
+    {
+        $aExpected = array();
+
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'Sheet1' => array(
+                        'Columns' => array()
+                    )
+                )
+            )
+        );
+
+        $aResult = $oSetting->getOrderedColums('Sheet1');
+        $this->assertEquals($aExpected, $aResult);
+    }
+
+    public function testOrderByOrder2()
+    {
+        $aExpected = array(
+            'name',
+            'hub_id',
+            'credits',
+            'return_rate',
+            'incoming'
+        );
+
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'Sheet1' => array(
+                        'Columns' => array(
+                            'name' => array(),
+                            'hub_id' => array(),
+                            'credits' => array(),
+                            'return_rate' => array(),
+                            'incoming' => array()
+                        )
+                    )
+                )
+            )
+        );
+
+        $aResult = $oSetting->getOrderedColums('Sheet1');
+        $this->assertEquals($aExpected, $aResult);
+    }
+
+    public function testOrderByOrderEmptySheet()
+    {
+        $aExpected = array();
+
+        $oSetting = new \CI\Excel\Settings(
+            array(
+                'Sheets' => array(
+                    'Sheet2' => array(
+                        'Columns' => array(
+                            'name' => array(),
+                            'hub_id' => array(),
+                            'credits' => array(),
+                            'return_rate' => array(),
+                            'incoming' => array()
+                        )
+                    )
+                )
+            )
+        );
+
+        $aResult = $oSetting->getOrderedColums('Sheet1');
+        $this->assertEquals($aExpected, $aResult);
+    }
+}

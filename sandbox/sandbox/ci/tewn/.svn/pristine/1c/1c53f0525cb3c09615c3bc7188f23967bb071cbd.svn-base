@@ -1,0 +1,368 @@
+<?php echo $html->css('settings'); ?>
+
+<div class="row main">
+	<div id="content" class="column grid_12">
+		<div class="column grid_12">
+
+			<?php echo $this->element("management_toolbar", array("tab" => "settingstoolbar","user" => $user));?>
+
+			<h3 class="topContent">Tunables</h3>
+
+			<div class="row" id="content_area">
+				<div id="settings">
+					<h2>Per Hub Tunables</h2>
+
+					<p>
+						<ul>
+						<?php foreach($hubs as $id => $hub) {?>
+							<li><a href="/settings/hub/<?php echo $id?>"><?php echo $hub; ?></a></li>
+						<?php } ?>
+						</ul>
+					</p>
+
+					<br />
+
+					<form method="post" action="/settings/index">
+
+						<?php
+							$session->activate();
+							if ($session->check('Message.flash')) {
+								$session->flash();
+							}
+						?>
+
+						<h3>Common Engine Tunables</h3>
+
+						<p>Cutoff point in how we order the accounts in importance<br />
+						<br />
+						The point when we don't care about your current number of credits and only<br />
+						care about how you performed yesterday.<br />
+						<br />
+						Database form</p>
+
+						<label for="ACCOUNT_CREDITS_CUTOFF_input">ACCOUNT_CREDITS_CUTOFF</label>: <input type="text" value="<?php echo isset($settings['Setting']['ACCOUNT_CREDITS_CUTOFF']) ? $settings['Setting']['ACCOUNT_CREDITS_CUTOFF'] : 1000 ; ?>" name="Setting[ACCOUNT_CREDITS_CUTOFF]" id="ACCOUNT_CREDITS_CUTOFF_input" /><br />
+
+						<p>Cutoff point to rescue a website from going to inactive<br />
+						<br />
+						The point where we can rescue a website from going to inactive<br />
+						if its accounts credits are above this value and it has pages<br />
+						<br />
+						Database form</p>
+						<label for="WEBSITE_CREDITS_CUTOFF_input">WEBSITE_CREDITS_CUTOFF</label>: <input type="text" value="<?php echo isset($settings['Setting']['WEBSITE_CREDITS_CUTOFF']) ? $settings['Setting']['WEBSITE_CREDITS_CUTOFF'] : 1000 ; ?>" name="Setting[WEBSITE_CREDITS_CUTOFF]" id="WEBSITE_CREDITS_CUTOFF_input" /><br />
+
+						<p>Percentage of image to migrate</p>
+						<label for="IMAGE_MIGRATION_PERCENTAGE_input">IMAGE_MIGRATION_PERCENTAGE</label>: <input type="text" value="<?php echo isset($settings['Setting']['IMAGE_MIGRATION_PERCENTAGE']) ? $settings['Setting']['IMAGE_MIGRATION_PERCENTAGE'] : 100 ; ?>" name="Setting[IMAGE_MIGRATION_PERCENTAGE]" id="IMAGE_MIGRATION_PERCENTAGE_input" /><br />
+
+						<h3>Widget Engine Tunables</h3>
+
+						<p>Our base score</p>
+						<label for="WIDGET_WEIGHT_EXISTING_input">WIDGET_WEIGHT_EXISTING</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_WEIGHT_EXISTING']) ? $settings['Setting']['WIDGET_WEIGHT_EXISTING'] : 1000 ; ?>" name="Setting[WIDGET_WEIGHT_EXISTING]" id="WIDGET_WEIGHT_EXISTING_input" /><br />
+
+						<p>Bonus to new pages to ensure they get a chance to<br />
+						show their stuff for a little while at least</p>
+						<label for="WIDGET_WEIGHT_NEW_input">WIDGET_WEIGHT_NEW</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_WEIGHT_NEW']) ? $settings['Setting']['WIDGET_WEIGHT_NEW'] : 800 ; ?>" name="Setting[WIDGET_WEIGHT_NEW]" id="WIDGET_WEIGHT_NEW_input" /><br />
+
+						<p>Bonus for being the top account<br />
+						<br />
+						This should only be more than 1 if we have an<br />
+						account which we can't keep up the SLA up with (usually 1.5 is<br />
+						about right in that case)<br >
+						</p>
+						<label for="WIDGET_ACCOUNT_TOP_BONUS_input">WIDGET_ACCOUNT_TOP_BONUS</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_ACCOUNT_TOP_BONUS']) ? $settings['Setting']['WIDGET_ACCOUNT_TOP_BONUS'] : 0 ; ?>" name="Setting[WIDGET_ACCOUNT_TOP_BONUS]" id="WIDGET_ACCOUNT_TOP_BONUS_input" /><br />
+
+						<p>Service Level Agreement to Click-Through Ratio is a<br />
+						tunable for how much we care about meeting SLA<br />
+						requirements vs getting visitors into Crowd Ignite<br />
+						<br />
+						The higher it is, the more we bias towards SLA, the<br />
+						lower, the more we bias towards high click through<br />
+						<br />
+						Value should be between 0-1</p>
+						<label for="WIDGET_SLA_TO_CTR_RATIO_input">WIDGET_SLA_TO_CTR_RATIO</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_SLA_TO_CTR_RATIO']) ? $settings['Setting']['WIDGET_SLA_TO_CTR_RATIO'] : 0.3 ; ?>" name="Setting[WIDGET_SLA_TO_CTR_RATIO]" id="WIDGET_SLA_TO_CTR_RATIO_input" /><br />
+
+						<p>How fast account rank falls off as far as giving a bonus<br />
+						<br />
+						Value of 1 is a linear fall off.<br />
+						Everythign above 1 is exponential</p>
+						<label for="WIDGET_ACCOUNT_FALLOFF_RATE_input">WIDGET_ACCOUNT_FALLOFF_RATE</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_ACCOUNT_FALLOFF_RATE']) ? $settings['Setting']['WIDGET_ACCOUNT_FALLOFF_RATE'] : 1 ; ?>" name="Setting[WIDGET_ACCOUNT_FALLOFF_RATE]" id="WIDGET_ACCOUNT_FALLOFF_RATE_input" /><br />
+
+						<p>Give a bonus to paid traffic<br />
+						<br />
+						Value should be between 0-1</p>
+						<label for="WIDGET_BUYER_BONUS_input">WIDGET_BUYER_BONUS</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_BUYER_BONUS']) ? $settings['Setting']['WIDGET_BUYER_BONUS'] : 0.3 ; ?>" name="Setting[WIDGET_BUYER_BONUS]" id="WIDGET_BUYER_BONUS_input" /><br />
+
+						<p>Give an extra bonus to sites which are paid to show<br />
+						links of sites which are buying<br />
+						<br />
+						Value should be between 0-1</p>
+						<label for="WIDGET_PAID_MATCH_BONUS_input">WIDGET_PAID_MATCH_BONUS</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_PAID_MATCH_BONUS']) ? $settings['Setting']['WIDGET_PAID_MATCH_BONUS'] : 0.8 ; ?>" name="Setting[WIDGET_PAID_MATCH_BONUS]" id="WIDGET_PAID_MATCH_BONUS_input" /><br />
+
+						<p>Good performers are in the top x%.  With 1% being the best<br /></p>
+						<label for="WIDGET_GOOD_PERFORMER_input">WIDGET_GOOD_PERFORMER</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_GOOD_PERFORMER']) ? $settings['Setting']['WIDGET_GOOD_PERFORMER'] : 0.50 ; ?>" name="Setting[WIDGET_GOOD_PERFORMER]" id="WIDGET_GOOD_PERFORMER_input" /><br />
+
+						<p>Number of good performing pages each account should have<br /></p>
+						<label for="WIDGET_NUMBER_GOOD_PERFORMERS_input">WIDGET_NUMBER_GOOD_PERFORMERS</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_NUMBER_GOOD_PERFORMERS']) ? $settings['Setting']['WIDGET_NUMBER_GOOD_PERFORMERS'] : 7 ; ?>" name="Setting[WIDGET_NUMBER_GOOD_PERFORMERS]" id="WIDGET_NUMBER_GOOD_PERFORMERS_input" /><br />
+
+						<p>How many days to look at to come up w/ a click through rate<br />
+						<br />
+						Ideally this would be the past 8,000 displays (statistical significance)</p>
+						<label for="WIDGET_ROLLING_CTR_DAYS_input">WIDGET_ROLLING_CTR_DAYS</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_ROLLING_CTR_DAYS']) ? $settings['Setting']['WIDGET_ROLLING_CTR_DAYS'] : 3 ; ?>" name="Setting[WIDGET_ROLLING_CTR_DAYS]" id="WIDGET_ROLLING_CTR_DAYS_input" /><br />
+
+						<p>Do we look at rolling CTR or lifetime<br />
+						<br />
+						Normally 0, only enable this when our rolling CTR stats are broken</p>
+						<label for="WIDGET_USE_LIFETIME_CTR_input">WIDGET_USE_LIFETIME_CTR</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_USE_LIFETIME_CTR']) ? $settings['Setting']['WIDGET_USE_LIFETIME_CTR'] : 0 ; ?>" name="Setting[WIDGET_USE_LIFETIME_CTR]" id="WIDGET_USE_LIFETIME_CTR_input" /><br />
+
+						<p>What is the maximum number of pages elgible for a widget instance<br />
+						<br />
+						This is to ensure that certain sites don't get more traffic just because they have more pages shown on widgets</p>
+						<label for="WIDGET_INSTANCE_MAX_PAGES_input">WIDGET_INSTANCE_MAX_PAGES</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_INSTANCE_MAX_PAGES']) ? $settings['Setting']['WIDGET_INSTANCE_MAX_PAGES'] : 20 ; ?>" name="Setting[WIDGET_INSTANCE_MAX_PAGES]" id="WIDGET_INSTANCE_MAX_PAGES_input" /><br />
+
+						<p>How many impressions a widget needs before rebalancing<br /></p>
+						<label for="WIDGET_REBALANCE_IMPRESSION_THRESHOLD_input">WIDGET_REBALANCE_IMPRESSION_THRESHOLD</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_REBALANCE_IMPRESSION_THRESHOLD']) ? $settings['Setting']['WIDGET_REBALANCE_IMPRESSION_THRESHOLD'] : 2000 ; ?>" name="Setting[WIDGET_REBALANCE_IMPRESSION_THRESHOLD]" id="WIDGET_REBALANCE_IMPRESSION_THRESHOLD_input" /><br />
+
+						<p>Boolean if the featured account bonus is given</p>
+						<label for="WIDGET_GIVE_FEATURED_BONUS_input">WIDGET_GIVE_FEATURED_BONUS</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_GIVE_FEATURED_BONUS']) ? $settings['Setting']['WIDGET_GIVE_FEATURED_BONUS'] : 0 ; ?>" name="Setting[WIDGET_GIVE_FEATURED_BONUS]" id="WIDGET_GIVE_FEATURED_BONUS_input" /><br />
+
+						<p>How many impressions a page needs to reach statstical significance</p>
+						<label for="WIDGET_SIGNIFICANCE_IMPRESSION_THRESHOLD_input">WIDGET_SIGNIFICANCE_IMPRESSION_THRESHOLD</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_SIGNIFICANCE_IMPRESSION_THRESHOLD']) ? $settings['Setting']['WIDGET_SIGNIFICANCE_IMPRESSION_THRESHOLD'] : 1000 ; ?>" name="Setting[WIDGET_SIGNIFICANCE_IMPRESSION_THRESHOLD]" id="WIDGET_SIGNIFICANCE_IMPRESSION_THRESHOLD_input" /><br />
+
+						<p>Minimum number of sites to populate a widget</p>
+						<label for="WIDGET_MINIMUM_ACCOUNTS_input">WIDGET_MINIMUM_ACCOUNTS</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_MINIMUM_ACCOUNTS']) ? $settings['Setting']['WIDGET_MINIMUM_ACCOUNTS'] : 5 ; ?>" name="Setting[WIDGET_MINIMUM_ACCOUNTS]" id="WIDGET_MINIMUM_ACCOUNTS_input" /><br />
+
+						<p>A bonus for trending pages</p>
+						<label for="WIDGET_SOCIAL_BONUS_input">WIDGET_SOCIAL_BONUS</label>: <input type="text" value="<?php echo isset($settings['Setting']['WIDGET_SOCIAL_BONUS']) ? $settings['Setting']['WIDGET_SOCIAL_BONUS'] : 0.1 ; ?>" name="Setting[WIDGET_SOCIAL_BONUS]" id="WIDGET_SOCIAL_BONUS_input" /><br />
+
+
+						<h3>Landing Page Engine Tunables</h3>
+
+						<p>Our base score</p>
+						<label for="LANDING_PAGE_WEIGHT_EXISTING_input">LANDING_PAGE_WEIGHT_EXISTING</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_WEIGHT_EXISTING']) ? $settings['Setting']['LANDING_PAGE_WEIGHT_EXISTING'] : 1000 ; ?>" name="Setting[LANDING_PAGE_WEIGHT_EXISTING]" id="LANDING_PAGE_WEIGHT_EXISTING_input" /><br />
+
+						<p>Bonus to new pages to ensure they get a chance to <br />
+						show their stuff for a little while at least <br /></p>
+						<label for="LANDING_PAGE_WEIGHT_NEW_input">LANDING_PAGE_WEIGHT_NEW</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_WEIGHT_NEW']) ? $settings['Setting']['LANDING_PAGE_WEIGHT_NEW'] : 800 ; ?>" name="Setting[LANDING_PAGE_WEIGHT_NEW]" id="LANDING_PAGE_WEIGHT_NEW_input" /><br />
+
+						<p>Bonus for being the top account <br />
+						<br />
+						This should only be more than 1 if we have an <br />
+						account which we can't keep up the SLA up with (usually 1.5 is <br />
+						about right in that case) <br /></p>
+						<label for="LANDING_PAGE_ACCOUNT_TOP_BONUS_input">LANDING_PAGE_ACCOUNT_TOP_BONUS</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_ACCOUNT_TOP_BONUS']) ? $settings['Setting']['LANDING_PAGE_ACCOUNT_TOP_BONUS'] : 1.5 ; ?>" name="Setting[LANDING_PAGE_ACCOUNT_TOP_BONUS]" id="LANDING_PAGE_ACCOUNT_TOP_BONUS_input" /><br />
+
+						<p>Service Level Agreement to Click-Through Ratio is a<br />
+						tunable for how much we care about meeting SLA <br />
+						requirements vs getting visitors into Crowd Ignite <br />
+						<br />
+						The higher it is, the more we bias towards SLA, the <br />
+						lower, the more we bias towards high click through <br />
+						<br />
+						Value should be between 0-1<br /></p>
+						<label for="LANDING_PAGE_SLA_TO_CTR_RATIO_input">LANDING_PAGE_SLA_TO_CTR_RATIO</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_SLA_TO_CTR_RATIO']) ? $settings['Setting']['LANDING_PAGE_SLA_TO_CTR_RATIO'] : 0.5 ; ?>" name="Setting[LANDING_PAGE_SLA_TO_CTR_RATIO]" id="LANDING_PAGE_SLA_TO_CTR_RATIO_input" /><br />
+
+						<p>How fast account rank falls off as far as giving a bonus <br />
+						<br />
+						Value of 1 is a linear fall off. <br />
+						Everythign above 1 is exponential</p>
+						<label for="LANDING_PAGE_ACCOUNT_FALLOFF_RATE_input">LANDING_PAGE_ACCOUNT_FALLOFF_RATE</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_ACCOUNT_FALLOFF_RATE']) ? $settings['Setting']['LANDING_PAGE_ACCOUNT_FALLOFF_RATE'] : 1 ; ?>" name="Setting[LANDING_PAGE_ACCOUNT_FALLOFF_RATE]" id="LANDING_PAGE_ACCOUNT_FALLOFF_RATE_input" /><br />
+
+						<p>Good performers are in the top x%.  With 0% being the top</p>
+						<label for="LANDING_PAGE_GOOD_PERFORMER_input">LANDING_PAGE_GOOD_PERFORMER</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_GOOD_PERFORMER']) ? $settings['Setting']['LANDING_PAGE_GOOD_PERFORMER'] : 0.50 ; ?>" name="Setting[LANDING_PAGE_GOOD_PERFORMER]" id="LANDING_PAGE_GOOD_PERFORMER_input" /><br />
+
+						<p>Number of good performing pages each account should have</p>
+						<label for="LANDING_PAGE_NUMBER_GOOD_PERFORMERS_input">LANDING_PAGE_NUMBER_GOOD_PERFORMERS</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_NUMBER_GOOD_PERFORMERS']) ? $settings['Setting']['LANDING_PAGE_NUMBER_GOOD_PERFORMERS'] : 7 ; ?>" name="Setting[LANDING_PAGE_NUMBER_GOOD_PERFORMERS]" id="LANDING_PAGE_NUMBER_GOOD_PERFORMERS_input" /><br />
+
+
+						<p>How many days to look at to come up w/ a click through rate <br />
+						<br />
+						Ideally this would be the past 8,000 displays (statistical significance)</p>
+						<label for="LANDING_PAGE_ROLLING_CTR_DAYS_input">LANDING_PAGE_ROLLING_CTR_DAYS</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_ROLLING_CTR_DAYS']) ? $settings['Setting']['LANDING_PAGE_ROLLING_CTR_DAYS'] : 7 ; ?>" name="Setting[LANDING_PAGE_ROLLING_CTR_DAYS]" id="LANDING_PAGE_ROLLING_CTR_DAYS_input" /><br />
+
+						<p>Do we look at rolling CTR or lifetime <br />
+						<br />
+						Normally 0, only enable this when our rolling CTR stats are broken</p>
+						<label for="LANDING_PAGE_USE_LIFETIME_CTR_input">LANDING_PAGE_USE_LIFETIME_CTR</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_USE_LIFETIME_CTR']) ? $settings['Setting']['LANDING_PAGE_USE_LIFETIME_CTR'] : 0 ; ?>" name="Setting[LANDING_PAGE_USE_LIFETIME_CTR]" id="LANDING_PAGE_USE_LIFETIME_CTR_input" /><br />
+
+						<p>What is the maximum number of pages elgible for a landing page instance<br />
+						<br />
+						This is to ensure that certain sites don't get more traffic just because they have more pages shown on a landing page</p>
+						<label for="LANDING_PAGE_INSTANCE_MAX_PAGES_input">LANDING_PAGE_INSTANCE_MAX_PAGES</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_INSTANCE_MAX_PAGES']) ? $settings['Setting']['LANDING_PAGE_INSTANCE_MAX_PAGES'] : PHP_INT_MAX ; ?>" name="Setting[LANDING_PAGE_INSTANCE_MAX_PAGES]" id="LANDING_PAGE_INSTANCE_MAX_PAGES_input" /><br />
+
+						<p>Boolean if the featured account bonus is given</p>
+						<label for="LANDING_PAGE_GIVE_FEATURED_BONUS_input">LANDING_PAGE_GIVE_FEATURED_BONUS</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_GIVE_FEATURED_BONUS']) ? $settings['Setting']['LANDING_PAGE_GIVE_FEATURED_BONUS'] : 1 ; ?>" name="Setting[LANDING_PAGE_GIVE_FEATURED_BONUS]" id="LANDING_PAGE_GIVE_FEATURED_BONUS_input" /><br />
+
+						<p>How many impressions a landing page needs before rebalancing</p>
+						<label for="LANDING_PAGE_REBALANCE_IMPRESSION_THRESHOLD_input">LANDING_PAGE_REBALANCE_IMPRESSION_THRESHOLD</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_REBALANCE_IMPRESSION_THRESHOLD']) ? $settings['Setting']['LANDING_PAGE_REBALANCE_IMPRESSION_THRESHOLD'] : 1000 ; ?>" name="Setting[LANDING_PAGE_REBALANCE_IMPRESSION_THRESHOLD]" id="LANDING_PAGE_REBALANCE_IMPRESSION_THRESHOLD_input" /><br />
+
+						<p>How many impressions a page needs to reach statstical significance</p>
+						<label for="LANDING_PAGE_SIGNIFICANCE_IMPRESSION_THRESHOLD_input">LANDING_PAGE_SIGNIFICANCE_IMPRESSION_THRESHOLD</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_SIGNIFICANCE_IMPRESSION_THRESHOLD']) ? $settings['Setting']['LANDING_PAGE_SIGNIFICANCE_IMPRESSION_THRESHOLD'] : 100 ; ?>" name="Setting[LANDING_PAGE_SIGNIFICANCE_IMPRESSION_THRESHOLD]" id="LANDING_PAGE_SIGNIFICANCE_IMPRESSION_THRESHOLD_input" /><br />
+
+						<p>Minimum number of sites to populate a landing page<br /></p>
+						<label for="LANDING_PAGE_MINIMUM_ACCOUNTS_input">LANDING_PAGE_MINIMUM_ACCOUNTS</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_MINIMUM_ACCOUNTS']) ? $settings['Setting']['LANDING_PAGE_MINIMUM_ACCOUNTS'] : 20 ; ?>" name="Setting[LANDING_PAGE_MINIMUM_ACCOUNTS]" id="LANDING_PAGE_MINIMUM_ACCOUNTS_input" /><br />
+
+						<p>Penalize a page if does not match the category</p>
+						<label for="LANDING_PAGE_PENALIZE_CATEGORY_input">LANDING_PAGE_PENALIZE_CATEGORY</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_PENALIZE_CATEGORY']) ? $settings['Setting']['LANDING_PAGE_PENALIZE_CATEGORY'] : 1 ; ?>" name="Setting[LANDING_PAGE_PENALIZE_CATEGORY]" id="LANDING_PAGE_PENALIZE_CATEGORY_input" /><br />
+
+						<p>Show links on the landing page in weight order w/o any random component</p>
+						<label for="LANDING_PAGE_STRAIGHT_WEIGHT_input">LANDING_PAGE_STRAIGHT_WEIGHT</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_STRAIGHT_WEIGHT']) ? $settings['Setting']['LANDING_PAGE_STRAIGHT_WEIGHT'] : 0 ; ?>" name="Setting[LANDING_PAGE_STRAIGHT_WEIGHT]" id="LANDING_PAGE_STRAIGHT_WEIGHT_input" /><br />
+
+						<p>A bonus for trending pages</p>
+						<label for="LANDING_PAGE_SOCIAL_BONUS_input">LANDING_PAGE_SOCIAL_BONUS</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_SOCIAL_BONUS']) ? $settings['Setting']['LANDING_PAGE_SOCIAL_BONUS'] : 0.1 ; ?>" name="Setting[LANDING_PAGE_SOCIAL_BONUS]" id="LANDING_PAGE_SOCIAL_BONUS_input" /><br />
+
+
+						<h3>Landing Page Algorithms</h3>
+
+						<p>The standard</p>
+						<label for="LANDING_PAGE_ALGORITHM_STOCK_input">LANDING_PAGE_ALGORITHM_STOCK</label>: <input type="text" value="<?php echo isset($settings['Setting']['LANDING_PAGE_ALGORITHM_STOCK']) ? $settings['Setting']['LANDING_PAGE_ALGORITHM_STOCK'] : 1 ; ?>" name="Setting[LANDING_PAGE_ALGORITHM_STOCK]" id="LANDING_PAGE_ALGORITHM_STOCK_input" /><br />
+
+
+						<h3>Rank Engine Tunables</h3>
+
+						<p>Add this to the traffic compontent to balance out the time "watering"</p>
+						<label for="RANK_TRAFFIC_CONSTANT_input">RANK_TRAFFIC_CONSTANT</label>: <input type="text" value="<?php echo isset($settings['Setting']['RANK_TRAFFIC_CONSTANT']) ? $settings['Setting']['RANK_TRAFFIC_CONSTANT'] : 1 ; ?>" name="Setting[RANK_TRAFFIC_CONSTANT]" id="RANK_TRAFFIC_CONSTANT_input" /><br />
+
+						<p>How many seconds until a standard deviation of traffic is given to all sites</p>
+						<label for="RANK_RELEVANT_PERIOD_input">RANK_RELEVANT_PERIOD</label>: <input type="text" value="<?php echo isset($settings['Setting']['RANK_RELEVANT_PERIOD']) ? $settings['Setting']['RANK_RELEVANT_PERIOD'] : 86400 ; ?>" name="Setting[RANK_RELEVANT_PERIOD]" id="RANK_RELEVANT_PERIOD_input" /><br />
+
+						<p>Number of days to pull page data</p>
+						<label for="RANK_TRAFFIC_PERIOD_input">RANK_TRAFFIC_PERIOD</label>: <input type="text" value="<?php echo isset($settings['Setting']['RANK_TRAFFIC_PERIOD']) ? $settings['Setting']['RANK_TRAFFIC_PERIOD'] : 1 ; ?>" name="Setting[RANK_TRAFFIC_PERIOD]" id="RANK_TRAFFIC_PERIOD_input" /><br />
+
+						<p>Number of days to pull page data<br />
+						<br />
+						RANK_TRAFFIC_HISTORY = [your input] * RANK_TRAFFIC_PERIOD</p>
+						<label for="RANK_TRAFFIC_HISTORY_input">RANK_TRAFFIC_HISTORY</label>: <input type="text" value="<?php echo isset($settings['Setting']['RANK_TRAFFIC_HISTORY']) ? $settings['Setting']['RANK_TRAFFIC_HISTORY'] : 3; ?>" name="Setting[RANK_TRAFFIC_HISTORY]" id="RANK_TRAFFIC_HISTORY_input" /><br />
+
+						<p>Minimum number of impressions before we rank a page</p>
+						<label for="RANK_MINIMUM_IMPRESSIONS_input">RANK_MINIMUM_IMPRESSIONS</label>: <input type="text" value="<?php echo isset($settings['Setting']['RANK_MINIMUM_IMPRESSIONS']) ? $settings['Setting']['RANK_MINIMUM_IMPRESSIONS'] : 10 ; ?>" name="Setting[RANK_MINIMUM_IMPRESSIONS]" id="RANK_MINIMUM_IMPRESSIONS_input" /><br />
+
+
+						<h3>Contextual Matching Engine Tunables</h3>
+
+						<?php if (isset($error)) {?><span id="fixit"></span><?php } ?>
+						<p>Service Level Agreement weight is a tunable for how much <br />
+						weight to give SLA to the average contextual score <br />
+						<br />
+						The higher it is, the more we bias towards SLA. <br />
+						lower, the more we bias towards the other scores <br />
+						<br />
+						Value should be between 0-1 <br /></p>
+						<label for="CONTEXTUAL_SLA_WEIGHT_input">CONTEXTUAL_SLA_WEIGHT</label>: <input type="text" value="<?php echo isset($settings['Setting']['CONTEXTUAL_SLA_WEIGHT']) ? $settings['Setting']['CONTEXTUAL_SLA_WEIGHT'] : 0.2 ; ?>" name="Setting[CONTEXTUAL_SLA_WEIGHT]" id="CONTEXTUAL_SLA_WEIGHT_input" <?php if(isset($error)) { ?>class="error"<?php } ?> /><br />
+
+						<p>CTR weight is the rank on the click through rate for a link on a site <br />
+						<br />
+						The higher it is, the more we bias towards CTR. The <br />
+						lower, the more we bias towards the other scores <br />
+						<br />
+						Value should be between 0-1 <br /></p>
+						<label for="CONTEXTUAL_CTR_WEIGHT_input">CONTEXTUAL_CTR_WEIGHT</label>: <input type="text" value="<?php echo isset($settings['Setting']['CONTEXTUAL_CTR_WEIGHT']) ? $settings['Setting']['CONTEXTUAL_CTR_WEIGHT'] : 0.5 ; ?>" name="Setting[CONTEXTUAL_CTR_WEIGHT]" id="CONTEXTUAL_CTR_WEIGHT_input" <?php if(isset($error)) { ?>class="error"<?php } ?> /><br />
+
+						<p>Match weight is how much weight to give to a good contextual match vs other<br />
+						aspects<br />
+						<br />
+						The higher it is, the more we bias towards matching. The<br />
+						lower, the more we bias towards the other scores<br />
+						<br />
+						Value should be between 0-1<br /></p>
+						<label for="CONTEXTUAL_MATCH_WEIGHT_input">CONTEXTUAL_MATCH_WEIGHT</label>: <input type="text" value="<?php echo isset($settings['Setting']['CONTEXTUAL_MATCH_WEIGHT']) ? $settings['Setting']['CONTEXTUAL_MATCH_WEIGHT'] : 0.3 ; ?>" name="Setting[CONTEXTUAL_MATCH_WEIGHT]" id="CONTEXTUAL_MATCH_WEIGHT_input" <?php if(isset($error)) { ?>class="error"<?php } ?> /><br />
+
+						<p>Minimum score we consider a match <br />
+						<br />
+						The higher it is, the more accurate the match must be<br />
+						<br />
+						Value should be between 0-1<br /></p>
+						<label for="CONTEXTUAL_MATCH_MINIMUM_SCORE_input">CONTEXTUAL_MATCH_MINIMUM_SCORE</label>: <input type="text" value="<?php echo isset($settings['Setting']['CONTEXTUAL_MATCH_MINIMUM_SCORE']) ? $settings['Setting']['CONTEXTUAL_MATCH_MINIMUM_SCORE'] : 0.30 ; ?>" name="Setting[CONTEXTUAL_MATCH_MINIMUM_SCORE]" id="CONTEXTUAL_MATCH_MINIMUM_SCORE_input" /><br />
+
+						<p>Minimum score we consider showing in a widget <br />
+						<br />
+						The higher it is, the more strict we are <br />
+						<br />
+						Value should be between 0-1 <br /></p>
+						<label for="CONTEXTUAL_MINIMUM_SCORE_input">CONTEXTUAL_MINIMUM_SCORE</label>: <input type="text" value="<?php echo isset($settings['Setting']['CONTEXTUAL_MINIMUM_SCORE']) ? $settings['Setting']['CONTEXTUAL_MINIMUM_SCORE'] : 0.50 ; ?>" name="Setting[CONTEXTUAL_MINIMUM_SCORE]" id="CONTEXTUAL_MINIMUM_SCORE_input" /><br />
+
+
+						<h3>Social Engine Tunables</h3>
+
+						<p>Number of days to pull page data</p>
+						<label for="SOCIAL_TRAFFIC_PERIOD_input">SOCIAL_TRAFFIC_PERIOD</label>: <input type="text" value="<?php echo isset($settings['Setting']['SOCIAL_TRAFFIC_PERIOD']) ? $settings['Setting']['SOCIAL_TRAFFIC_PERIOD'] : 1 ; ?>" name="Setting[SOCIAL_TRAFFIC_PERIOD]" id="SOCIAL_TRAFFIC_PERIOD_input" /><br />
+
+						<p>Number of days to pull page data<br />
+						<br />
+						SOCIAL_TRAFFIC_HISTORY = [your input] * SOCIAL_TRAFFIC_PERIOD</p>
+						<label for="SOCIAL_TRAFFIC_HISTORY_input">SOCIAL_TRAFFIC_HISTORY</label>:  <input type="text" value="<?php echo isset($settings['Setting']['SOCIAL_TRAFFIC_HISTORY']) ? $settings['Setting']['SOCIAL_TRAFFIC_HISTORY'] : 3 ; ?>" name="Setting[SOCIAL_TRAFFIC_HISTORY]" id="SOCIAL_TRAFFIC_HISTORY_input" /><br />
+
+						<p>Minimum number of impressions before we rank a page</p>
+						<label for="SOCIAL_MINIMUM_IMPRESSIONS_input">SOCIAL_MINIMUM_IMPRESSIONS</label>: <input type="text" value="<?php echo isset($settings['Setting']['SOCIAL_MINIMUM_IMPRESSIONS']) ? $settings['Setting']['SOCIAL_MINIMUM_IMPRESSIONS'] : 10 ; ?>" name="Setting[SOCIAL_MINIMUM_IMPRESSIONS]" id="SOCIAL_MINIMUM_IMPRESSIONS_input" /><br />
+
+						<p>Weight bonus to give to trending pages</p>
+						<label for="SOCIAL_TRENDING_BONUS_input">SOCIAL_TRENDING_BONUS</label>: <input type="text" value="<?php echo isset($settings['Setting']['SOCIAL_TRENDING_BONUS']) ? $settings['Setting']['SOCIAL_TRENDING_BONUS'] : 1 ; ?>" name="Setting[SOCIAL_TRENDING_BONUS]" id="SOCIAL_TRENDING_BONUS_input" /><br />
+
+						<h3>HEALTH FORMULA</h3>
+						<p>L Index</p>
+						<label for="HEALTH_FORMULA_L_INDEX_input">HEALTH_FORMULA_L_INDEX</label>: <input type="text" value="<?php echo isset( $settings['Setting']['HEALTH_FORMULA_L_INDEX'] ) ? $settings['Setting']['HEALTH_FORMULA_L_INDEX'] : 0.5; ?>" name="Setting[HEALTH_FORMULA_L_INDEX]" id="HEALTH_FORMULA_L_INDEX_input"  /><br />
+
+            <p>TIER 1</p>
+						<label for="HEALTH_FORMULA_TIER_1_input">HEALTH_FORMULA_TIER_1</label>: <input type="text" value="<?php echo isset( $settings['Setting']['HEALTH_FORMULA_TIER_1'] ) ? $settings['Setting']['HEALTH_FORMULA_TIER_1'] : 8; ?>" name="Setting[HEALTH_FORMULA_TIER_1]" id="HEALTH_FORMULA_TIER_1_input"  /><br />
+
+            <p>TIER 2</p>
+						<label for="HEALTH_FORMULA_TIER_2_input">HEALTH_FORMULA_TIER_2</label>: <input type="text" value="<?php echo isset( $settings['Setting']['HEALTH_FORMULA_TIER_2'] ) ? $settings['Setting']['HEALTH_FORMULA_TIER_2'] : 4; ?>" name="Setting[HEALTH_FORMULA_TIER_2]" id="HEALTH_FORMULA_TIER_2_input"  /><br />
+
+            <p>TIER 3</p>
+						<label for="HEALTH_FORMULA_TIER_2_input">HEALTH_FORMULA_TIER_3</label>: <input type="text" value="<?php echo isset( $settings['Setting']['HEALTH_FORMULA_TIER_3'] ) ? $settings['Setting']['HEALTH_FORMULA_TIER_3'] : 1; ?>" name="Setting[HEALTH_FORMULA_TIER_3]" id="HEALTH_FORMULA_TIER_2_input"  /><br />
+
+            <p>This is a tunable to make the credit count make things worse and worse as the credit count gets higher. </br>CREDIT "A" VARIABLE</p>
+						<label for="HEALTH_FORMULA_A_CREDIT_VARIABLE_input">HEALTH_FORMULA_A_CREDIT_VARIABLE</label>: <input type="text" value="<?php echo isset( $settings['Setting']['HEALTH_FORMULA_A_CREDIT_VARIABLE'] ) ? $settings['Setting']['HEALTH_FORMULA_A_CREDIT_VARIABLE'] : 2; ?>" name="Setting[HEALTH_FORMULA_A_CREDIT_VARIABLE]" id="HEALTH_FORMULA_A_CREDIT_VARIABLE_input"  /><br />
+
+						<h3>BAYESIAN</h3>
+						<label for="WIDGET_VW_PRIORS_input">WIDGET_VW_PRIORS</label>: <input type="text" value="<?php echo isset( $settings['Setting']['WIDGET_VW_PRIORS'] ) ? $settings['Setting']['WIDGET_VW_PRIORS'] : 1000; ?>" name="Setting[WIDGET_VW_PRIORS]" id="WIDGET_VW_PRIORS_input"  /><br />
+						<p>This tunable gives a boost on widgets depending on the category.</br></br>
+						<label for="WIDGET_CATEGORY_BOOST_input">WIDGET_CATEGORY_BOOST</label>: <input type="text" value="<?php echo isset( $settings['Setting']['WIDGET_CATEGORY_BOOST'] ) ? $settings['Setting']['WIDGET_CATEGORY_BOOST'] : 0; ?>" name="Setting[WIDGET_CATEGORY_BOOST]" id="WIDGET_CATEGORY_BOOST_input"  /><br />
+
+                        <h3>RSS FEED INGESTION</h3>
+                        <p>This is a tunable of the time in minutes that indicates how often all the publishers rss feeds will be checked.</br></br>
+                        <label for="RSS_FEED_INGESTION_TIME_input">RSS_FEED_INGESTION_TIME</label>: <input type="text" value="<?php echo isset( $settings['Setting']['RSS_FEED_INGESTION_TIME'] ) ? $settings['Setting']['RSS_FEED_INGESTION_TIME'] : 25; ?>" name="Setting[RSS_FEED_INGESTION_TIME]" id="RSS_FEED_INGESTION_TIME_input"  /> min.<br />
+                        <p>Limit of words to be used in the title of the pages (LandingPage).</br></br>
+                        <label for="RSS_FEED_TITLE_LIMIT_WORDS_input">RSS_FEED_TITLE_LIMIT_WORDS</label>: <input type="text" value="<?php echo isset( $settings['Setting']['RSS_FEED_TITLE_LIMIT_WORDS'] ) ? $settings['Setting']['RSS_FEED_TITLE_LIMIT_WORDS'] : 15; ?>" name="Setting[RSS_FEED_TITLE_LIMIT_WORDS]" id="RSS_FEED_TITLE_LIMIT_WORDS_input"  /><br />
+                        <p>Limit of words to be used in the title of the pages (Widget).</br></br>
+                        <label for="RSS_FEED_TITLE_LIMIT_WORDS_input_WIDGET">RSS_FEED_TITLE_LIMIT_WORDS_WIDGET</label>: <input type="text" value="<?php echo isset( $settings['Setting']['RSS_FEED_TITLE_LIMIT_WORDS_WIDGET'] ) ? $settings['Setting']['RSS_FEED_TITLE_LIMIT_WORDS_WIDGET'] : 10; ?>" name="Setting[RSS_FEED_TITLE_LIMIT_WORDS_WIDGET]" id="RSS_FEED_TITLE_LIMIT_WORDS_WIDGET_input"  /><br />
+
+						<h3>DEVELOPERS SETTINGS</h3>
+						<p>Allow the usage of debug bar only for developer users</p>
+						<label for="DEVELOPERS_DEBUG_BAR_input">DEVELOPERS_DEBUG_BAR</label>: <input type="text" value="<?php echo isset( $settings['Setting']['DEVELOPERS_DEBUG_BAR'] ) ? $settings['Setting']['DEVELOPERS_DEBUG_BAR'] : 0; ?>" name="Setting[DEVELOPERS_DEBUG_BAR]" id="DEVELOPERS_DEBUG_BAR_input"  /><br />
+
+                        <h3>DRIVE TRAFFIC</h3>
+                        <p>Send traffic to widgets or landing pages. Just need to add the prefix url where you want to duplicate the traffic.
+                            <br/>
+                            <br/>
+                            For example in <strong>widgets</strong> <em>http://peak.stg.%s</em> will create a url <em>http://peak.stg.widget.com</em> and in <strong>landing pages</strong> <em>http://jrodriguez.sbx.%s</em> will create a url <em>http://jrodriguez.sbx.crowdignite.craveonline.com</em>
+                            <br/>
+                            <div id="traffic_to_container"></div>
+                            <br/>
+                            <input id="traffic_button" type="button" value="Add another" />
+                            <input id="data-traffic" type="hidden" value="<?php echo $settings['Setting']['DRIVE_TRAFFIC'] ?>" />
+                        </p>
+                        <input type="submit" value="Save" />
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript">
+    var drive_traffic = '<?php echo $settings["Setting"]["DRIVE_TRAFFIC"] ?>';
+</script>
+<script type="text/x-handlebars-template" id="drive-traffic-tpl">
+    {{#each data}}
+    <div class="drive_traffic">
+        <label>Prefix URL</label><input type="text" name="Setting[DRIVE_TRAFFIC][{{position "+"}}][url]" value="{{url}}" />
+        <label>Percentage</label><input type="text" name="Setting[DRIVE_TRAFFIC][{{position}}][percentage]"  value="{{percentage}}" />
+        <label>In</label>
+        <select name="Setting[DRIVE_TRAFFIC][{{position}}][type]">
+            <option value="widget" {{#equals type 'widget'}} selected {{/equals}}>Widget</option>
+            <option value="landing_page" {{#equals type 'landing_page'}} selected {{/equals}}>Landing Page</option>
+        </select>
+        <input class="traffic_delete_button" type="button" value="Delete" />
+    </div>
+    {{/each}}
+</script>
+<script type="text/javascript" src="/js/handlebars-v1.3.0.js"></script>
+<script type="text/javascript" src="/js/backend2/settings_index.js"></script>

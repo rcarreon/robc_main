@@ -1,0 +1,53 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:dc="http://purl.org/dc/elements/1.1/">
+	<channel>
+	<title><?=DEFAULT_PAGE_TITLE?></title>
+	<link>http://<?=SITE_URL?></link>
+	<description>Finding the best blogs around.</description>
+        <language>en-us</language>
+	<pubDate><?php echo date("D, j M Y H:i:s", gmmktime()) . ' GMT';?></pubDate>
+	<docs>http://blogs.law.harvard.edu/tech/rss</docs>
+        <generator>CakePHP</generator>
+	<managingEditor><?=EMAIL_ADMIN?> (<?=SITE_NAME?> Admin)</managingEditor>
+	<webMaster><?=EMAIL_ADMIN?> (<?=SITE_NAME?>)</webMaster>
+<?
+$image_assets = new \CI\Asset\Image();
+$count = count($pages);
+for ($i = 0; $i < $count; $i++) {
+	$image_src = $image_assets->getUrl(
+        array(
+			'page_id'    => $pages[$i]['Page']['id'],
+			'type'       => \CI\Asset\Image::URL_CROP_FULL,
+			'image'      => $pages[$i]['Page']['image'],
+			'width'      => 150,
+			'height'     => 150,
+			'extra_dirs' => array(
+                DOMAIN_ID,
+            ),
+            'extra_parameters' => array(
+                't' => strtotime($pages[$i]['Page']['moderator_modified']),
+            )
+        )
+    );
+
+	$pages[$i]['Page']['description'] = $html->link(
+		$image_src, $pages[$i]['Page']['title_url'], array(), false, false
+	)."<br><br>";
+	$pages[$i]['Page']['description'] .= "<br><br>";
+}
+
+echo $rss->items($pages, 'transformRss');
+
+function transformRSS($data) {
+
+	return array(
+		'title' => $data['Page']['title'],
+		'link'  => $data['Page']['title_url'],
+//		'guid'  => array('action' => 'view', $data['Page']['id']),
+		'description' => $data['Page']['description'],
+		'author' => $data['Page']['user_id'],
+		'pubDate' => $data['Page']['created']
+		);
+}
+?>
+	</channel>
+</rss>

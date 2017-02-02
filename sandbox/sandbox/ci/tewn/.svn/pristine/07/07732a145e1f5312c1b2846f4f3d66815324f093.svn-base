@@ -1,0 +1,148 @@
+<?php
+/**
+ * Website File
+ *
+ * PHP Version 5.3
+ *
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+
+namespace CI\Stats;
+
+/**
+ * Website Class
+ *
+ * PHP Version 5.3
+ *
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+class Website extends \CI\Stats
+{
+    /**
+     * Gets a representation of an empty stats
+     * @return array Empty Stats
+     */
+    public function getEmptyStats()
+    {
+        return array();
+    }
+
+    /**
+     * Validate the condition filters
+     * @return boolean True if the conditions are correct, False if not
+     */
+    protected function validateConditions()
+    {
+        $oValidator = new \CI\Validator\Options();
+        $oValidator->setOptions(
+            array(
+                'website_id'  => 'required',
+                'granularity' => 'required|string',
+                'start_date'  => 'required|string',
+                'end_date'    => 'required|string',
+            )
+        );
+
+        $bValid = $oValidator->isValid($this->aConditions);
+        $this->setErrors(array_values($oValidator->getMessages()));
+
+        return $bValid;
+    }
+
+    /**
+     * Process the condition filters to get statistical data
+     * @return array The statistical data
+     */
+    protected function process()
+    {
+        $oWarehouse = new \CI\Database\Warehouse();
+        $sQuery = "CALL dw_ci_sp_select_dashboard_stats('%s', '%s', '%s', '%s', '%s')";
+
+        $aData = $oWarehouse->query(
+            sprintf(
+                $sQuery,
+                '',
+                $this->aConditions['website_id'],
+                $this->aConditions['granularity'],
+                $this->aConditions['start_date'],
+                $this->aConditions['end_date']
+            )
+        );
+
+        return $aData;
+    }
+
+    /**
+     * Sets the website id.
+     *
+     * @param mixed $nWwebsiteId the website id
+     *
+     * @return self
+     */
+    public function setWebsiteId($nWwebsiteId)
+    {
+        $this->aConditions['website_id'] = $nWwebsiteId;
+
+        return $this;
+    }
+
+    /**
+     * Sets the websites ids
+     *
+     * @param array $aWebsitesIds the Websites Ids
+     *
+     * @return  self
+     */
+    public function setWebsitesIds(array $aWebsitesIds)
+    {
+        $this->aConditions['website_id'] = implode(', ', $aWebsitesIds);
+
+        return $this;
+    }
+
+    /**
+     * Sets the value of granularity.
+     *
+     * @param number $granularity the granularity
+     *
+     * @return self
+     */
+    public function setGranularity($nGranularity)
+    {
+        $this->aConditions['granularity'] = $nGranularity;
+
+        return $this;
+    }
+
+    /**
+     * Sets the value of start_date.
+     *
+     * @param string $sStartDate the start date
+     *
+     * @return self
+     */
+    public function setStartDate($sStartDate)
+    {
+        $this->aConditions['start_date'] = $sStartDate;
+
+        return $this;
+    }
+
+    /**
+     * Sets the value of end_date.
+     *
+     * @param string $sEndDate the end date
+     *
+     * @return self
+     */
+    public function setEndDate($sEndDate)
+    {
+        $this->aConditions['end_date'] = $sEndDate;
+
+        return $this;
+    }
+}

@@ -1,0 +1,532 @@
+<?
+
+/*
+ * Per Hub Tunables
+ *
+ * Slowly move all the tunables to being a call
+ */
+
+define("WIDGET_PENALIZE", 1);
+define("WIDGET_PENALIZE_THRESHOLD", 2);
+define("WIDGET_PENALIZE_SMALL_SITE", 3);
+define("WIDGET_PENALIZE_SMALL_SITE_THRESHOLD", 4);
+define("LANDING_PAGE_PENALIZE", 5);
+define("LANDING_PAGE_PENALIZE_THRESHOLD", 6);
+define("LANDING_PAGE_PENALIZE_SMALL_SITE", 7);
+define("LANDING_PAGE_PENALIZE_SMALL_SITE_THRESHOLD", 8);
+
+function tunable($tunable, $domain_id) {
+	switch ($tunable) {
+	case WIDGET_PENALIZE:
+		return tunable_widget_penalize($domain_id);
+		break;
+	case WIDGET_PENALIZE_THRESHOLD:
+		return tunable_widget_penalize_threshold($domain_id);
+		break;
+	case WIDGET_PENALIZE_SMALL_SITE:
+		return tunable_widget_penalize_small_site($domain_id);
+		break;
+	case WIDGET_PENALIZE_SMALL_SITE_THRESHOLD:
+		return tunable_widget_penalize_small_site_threshold($domain_id);
+		break;
+	case LANDING_PAGE_PENALIZE:
+		return tunable_landing_page_penalize($domain_id);
+		break;
+	case LANDING_PAGE_PENALIZE_THRESHOLD:
+		return tunable_landing_page_penalize_threshold($domain_id);
+		break;
+	case LANDING_PAGE_PENALIZE_SMALL_SITE:
+		return tunable_landing_page_penalize_small_site($domain_id);
+		break;
+	case LANDING_PAGE_PENALIZE_SMALL_SITE_THRESHOLD:
+		return tunable_landing_page_penalize_small_site_threshold($domain_id);
+		break;
+	default:
+		plat_assert(0);
+	}
+}
+
+/***********************************************************
+ * Common Engine Tunables
+ */
+
+/*
+ * Cutoff point in how we order the accounts in importance
+ *
+ * The point when we don't care about your current number of credits and only
+ * care about how you performed yesterday.
+ *
+ * Database form
+ */
+define("ACCOUNT_CREDITS_CUTOFF", 1000);
+
+/*
+ * Cutoff point to rescue a website from going to inactive
+ *
+ * The point where we can rescue a website from going to inactive
+ * if its accounts credits are above this value and it has pages
+ *
+ * Database form
+ */
+define("WEBSITE_CREDITS_CUTOFF", 1000);
+
+
+/***********************************************************
+ * Widget Engine Tunables
+ */
+
+/*
+ * Our base score
+ *
+ */
+define ("WIDGET_WEIGHT_EXISTING", 1000);
+
+/*
+ * Bonus to new pages to ensure they get a chance to
+ * show their stuff for a little while at least
+ */
+define ("WIDGET_WEIGHT_NEW", 800);
+
+/*
+ * Bonus for being the top account
+ *
+ * This should only be more than 1 if we have an
+ * account which we can't keep up the SLA up with (usually 1.5 is
+ * about right in that case)
+ *
+ */
+define ("WIDGET_ACCOUNT_TOP_BONUS", 0);
+
+/*
+ * Service Level Agreement to Click-Through Ratio is a
+ * tunable for how much we care about meeting SLA
+ * requirements vs getting visitors into Crowd Ignite
+ *
+ * The higher it is, the more we bias towards SLA, the
+ * lower, the more we bias towards high click through
+ *
+ * Value should be between 0-1
+ */
+define ("WIDGET_SLA_TO_CTR_RATIO", 0.3);
+
+/*
+ * How fast account rank falls off as far as giving a bonus
+ *
+ * Value of 1 is a linear fall off.
+ * Everythign above 1 is exponential
+ */
+define ("WIDGET_ACCOUNT_FALLOFF_RATE", 1);
+
+/*
+ * Do we penalize low credit accounts
+ *
+ * Only need to do this if we have a few accounts we
+ * can't keep up with
+ */
+function tunable_widget_penalize($domain_id) {
+	switch ($domain_id) {
+	default:
+		return 0;
+	}
+}
+
+/*
+ * At what point do we penalize
+ *
+ * Number of credits that if under we penalize
+ *
+ * database form
+ */
+function tunable_widget_penalize_threshold($domain_id) {
+	switch ($domain_id) {
+	default:
+		return 200;
+	}
+}
+
+/*
+ * Do we penalize small sites
+ *
+ * Do this if we have small sites that are getting way too much traffic
+ *
+ */
+function tunable_widget_penalize_small_site($domain_id) {
+	switch ($domain_id) {
+	default:
+		return 1;
+	}
+}
+
+/*
+ * At what point do we penalize small sites
+ *
+ * Amount of incoming traffic
+ */
+function tunable_widget_penalize_small_site_threshold($domain_id) {
+	switch ($domain_id) {
+	default:
+		return 20;
+	}
+}
+
+/*
+ * Give a bonus to paid traffic
+ *
+ * Value should be between 0-1
+ */
+define ("WIDGET_BUYER_BONUS", 0.3);
+
+/*
+ * Give an extra bonus to sites which are paid to show
+ * links of sites which are buying
+ *
+ * Value should be between 0-1
+ */
+define ("WIDGET_PAID_MATCH_BONUS", 0.8);
+
+/*
+ * Good performers are in the top x%.  With 1% being the best
+ */
+define('WIDGET_GOOD_PERFORMER', 0.50);
+
+/*
+ * Number of good performing pages each account should have
+ */
+define('WIDGET_NUMBER_GOOD_PERFORMERS', 7);
+
+/*
+ * How many days to look at to come up w/ a click through rate
+ *
+ * Ideally this would be the past 8,000 displays (statistical significance)
+ */
+define('WIDGET_ROLLING_CTR_DAYS', 3);
+
+/*
+ * Do we look at rolling CTR or lifetime
+ *
+ * Normally 0, only enable this when our rolling CTR stats are broken
+ */
+define('WIDGET_USE_LIFETIME_CTR', 0);
+
+/*
+ * What is the maximum number of pages elgible for a widget instance
+ *
+ * This is to ensure that certain sites don't get more traffic just because they have more pages shown on widgets
+ */
+define('WIDGET_INSTANCE_MAX_PAGES', 20);
+
+/*
+ * How many impressions a widget needs before rebalancing
+ *
+ */
+define('WIDGET_REBALANCE_IMPRESSION_THRESHOLD', 2000);
+
+/*
+ * Boolean if the featured account bonus is given
+ *
+ */
+define('WIDGET_GIVE_FEATURED_BONUS', 0);
+
+/*
+ * How many impressions a page needs to reach statstical significance
+ */
+define('WIDGET_SIGNIFICANCE_IMPRESSION_THRESHOLD', 1000);
+
+/*
+ * Minimum number of sites to populate a widget
+ */
+define('WIDGET_MINIMUM_ACCOUNTS', 5);
+
+/*
+ * A bonus for trending pages
+ */
+define('WIDGET_SOCIAL_BONUS', 0.1);
+
+/*
+ ***********************************************************
+ * Landing Page Engine Tunables
+ */
+/*
+ * Our base score
+ *
+ */
+define ("LANDING_PAGE_WEIGHT_EXISTING", 1000);
+
+/*
+ * Bonus to new pages to ensure they get a chance to
+ * show their stuff for a little while at least
+ */
+define ("LANDING_PAGE_WEIGHT_NEW", 800);
+
+/*
+ * Bonus for being the top account
+ *
+ * This should only be more than 1 if we have an
+ * account which we can't keep up the SLA up with (usually 1.5 is
+ * about right in that case)
+ *
+ */
+define ("LANDING_PAGE_ACCOUNT_TOP_BONUS", 1.5);
+
+/*
+ * Service Level Agreement to Click-Through Ratio is a
+ * tunable for how much we care about meeting SLA
+ * requirements vs getting visitors into Crowd Ignite
+ *
+ * The higher it is, the more we bias towards SLA, the
+ * lower, the more we bias towards high click through
+ *
+ * Value should be between 0-1
+ */
+define ("LANDING_PAGE_SLA_TO_CTR_RATIO", 0.5);
+
+/*
+ * How fast account rank falls off as far as giving a bonus
+ *
+ * Value of 1 is a linear fall off.
+ * Everythign above 1 is exponential
+ */
+define ("LANDING_PAGE_ACCOUNT_FALLOFF_RATE", 1);
+
+/*
+ * Do we penalize low credit accounts
+ *
+ * Only need to do this if we have a few accounts we
+ * can't keep up with
+ */
+function tunable_landing_page_penalize($domain_id) {
+	switch ($domain_id) {
+	case DOMAIN_ID_THECELEBRITYCAFE:
+		return 1;
+	default:
+		return 1;
+	}
+}
+
+/*
+ * At what point do we penalize
+ *
+ * Number of credits that if under we penalize
+ *
+ * database form
+ */
+function tunable_landing_page_penalize_threshold($domain_id) {
+	switch ($domain_id) {
+	default:
+		return 200;
+	}
+}
+
+/*
+ * Do we penalize small sites
+ *
+ * Use this if have small sites getting way too much traffic
+ */
+function tunable_landing_page_penalize_small_site($domain_id) {
+	switch ($domain_id) {
+	default:
+		return 1;
+	}
+}
+
+/*
+ * At what point do we penalize small sites
+ *
+ * Amount of incoming traffic
+ *
+ */
+function tunable_landing_page_penalize_small_site_threshold($domain_id) {
+	switch ($domain_id) {
+	default:
+		return 200;
+	}
+}
+
+/*
+ * Good performers are in the top x%.  With 0% being the top
+ */
+define('LANDING_PAGE_GOOD_PERFORMER', 0.50);
+
+/*
+ * Number of good performing pages each account should have
+ */
+define('LANDING_PAGE_NUMBER_GOOD_PERFORMERS', 7);
+
+/*
+ * How many days to look at to come up w/ a click through rate
+ *
+ * Ideally this would be the past 8,000 displays (statistical significance)
+ */
+define('LANDING_PAGE_ROLLING_CTR_DAYS', 7);
+
+/*
+ * Do we look at rolling CTR or lifetime
+ *
+ * Normally 0, only enable this when our rolling CTR stats are broken
+ */
+define('LANDING_PAGE_USE_LIFETIME_CTR', 0);
+
+/*
+ * What is the maximum number of pages elgible for a landing page instance
+ *
+ * This is to ensure that certain sites don't get more traffic just because they have more pages shown on a landing page
+ */
+define('LANDING_PAGE_INSTANCE_MAX_PAGES', PHP_INT_MAX);
+
+/*
+ * Boolean if the featured account bonus is given
+ *
+ */
+define('LANDING_PAGE_GIVE_FEATURED_BONUS', 1);
+
+/*
+ * How many impressions a landing page needs before rebalancing
+ *
+ */
+define('LANDING_PAGE_REBALANCE_IMPRESSION_THRESHOLD', 1000);
+
+/*
+ * How many impressions a page needs to reach statstical significance
+ */
+define('LANDING_PAGE_SIGNIFICANCE_IMPRESSION_THRESHOLD', 100);
+
+/*
+ * Minimum number of sites to populate a landing page
+ */
+define('LANDING_PAGE_MINIMUM_ACCOUNTS', 20);
+
+/*
+ * Penalize a page if does not match the category
+ */
+define('LANDING_PAGE_PENALIZE_CATEGORY', 1);
+
+/*
+ * Show links on the landing page in weight order w/o any random component
+ */
+define('LANDING_PAGE_STRAIGHT_WEIGHT', 0);
+
+/*
+ * A bonus for trending pages
+ */
+define('LANDING_PAGE_SOCIAL_BONUS', 0.1);
+
+/*
+ ***************************************
+ * Landing Page Algorithms
+ */
+/*
+ * The standard
+ */
+define('LANDING_PAGE_ALGORITHM_STOCK', 1);
+
+/*
+ ***********************************************************
+ * Rank Engine Tunables
+ */
+/*
+ * Add this to the traffic compontent to balance out the time "watering"
+ */
+define('RANK_TRAFFIC_CONSTANT', 1);
+
+/*
+ * How many seconds until a standard deviation of traffic is given to all sites
+ */
+define('RANK_RELEVANT_PERIOD', 86400);
+
+/*
+ * Number of days to pull page data
+ */
+define('RANK_TRAFFIC_PERIOD', 1);
+
+/*
+ * Number of days to pull page data
+ */
+define('RANK_TRAFFIC_HISTORY', (RANK_TRAFFIC_PERIOD*3));
+
+
+/*
+ * Minimum number of impressions before we rank a page
+ */
+define ('RANK_MINIMUM_IMPRESSIONS', 10);
+
+/*
+ ***********************************************************
+ * Contextual Matching Engine Tunables
+ */
+/*
+ * Service Level Agreement weight is a tunable for how much
+ * weight to give SLA to the average contextual score
+ *
+ * The higher it is, the more we bias towards SLA.
+ * lower, the more we bias towards the other scores
+ *
+ * Value should be between 0-1
+ */
+define ("CONTEXTUAL_SLA_WEIGHT", 0.2);
+
+/*
+ * CTR weight is the rank on the click through rate for a link on a site
+ *
+ * The higher it is, the more we bias towards CTR. The
+ * lower, the more we bias towards the other scores
+ *
+ * Value should be between 0-1
+ */
+define ("CONTEXTUAL_CTR_WEIGHT", 0.5);
+
+/*
+ * Match weight is how much weight to give to a good contextual match vs other
+ * aspects
+ *
+ * The higher it is, the more we bias towards matching. The
+ * lower, the more we bias towards the other scores
+ *
+ * Value should be between 0-1
+ */
+define ("CONTEXTUAL_MATCH_WEIGHT", 0.3);
+
+plat_assert((CONTEXTUAL_SLA_WEIGHT + CONTEXTUAL_CTR_WEIGHT + CONTEXTUAL_MATCH_WEIGHT) == 1);
+
+/*
+ * Minimum score we consider a match
+ *
+ * The higher it is, the more accurate the match must be
+ *
+ * Value should be between 0-1
+ */
+define ("CONTEXTUAL_MATCH_MINIMUM_SCORE", 0.30);
+
+/*
+ * Minimum score we consider showing in a widget
+ *
+ * The higher it is, the more strict we are
+ *
+ * Value should be between 0-1
+ */
+define ("CONTEXTUAL_MINIMUM_SCORE", 0.50);
+
+/*
+ ***********************************************************
+ * Social Engine Tunables
+ */
+/*
+ * Number of days to pull page data
+ */
+define('SOCIAL_TRAFFIC_PERIOD', 1);
+
+/*
+ * Number of days to pull page data
+ */
+define('SOCIAL_TRAFFIC_HISTORY', (SOCIAL_TRAFFIC_PERIOD*3));
+
+/*
+ * Minimum number of impressions before we rank a page
+ */
+define ('SOCIAL_MINIMUM_IMPRESSIONS', 10);
+
+/*
+ * Weight bonus to give to trending pages
+ */
+define ('SOCIAL_TRENDING_BONUS', 1);
+
+?>

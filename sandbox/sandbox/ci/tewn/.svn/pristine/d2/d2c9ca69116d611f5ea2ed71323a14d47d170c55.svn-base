@@ -1,0 +1,780 @@
+<?php
+
+$database_config = array(
+    /**
+     * The local database configuration (Modify for your local env)
+     * @var array The database configuration
+     */
+    'local' => array(
+        "test" => array(
+            'driver' => 'cidb',
+            'encoding' => 'utf8',
+            'persistent' => false,
+            'host' => 'sql1v-56-ci.ci.dev.lax.gnmedia.net',
+            'login' => 'app_ci_test_w',
+            'password' => '2Y9PEm8i',
+            'database' => 'tewn_test',
+        ),
+        "app" => array(
+            'write' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'sql1v-56-ci.ci.dev.lax.gnmedia.net',
+                'login' => 'app_ci_ci_w',
+                'password' => '2QpeeeNU',
+                'database' => 'tewn',
+            ),
+            'read' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'sql1v-56-ci.ci.dev.lax.gnmedia.net',
+                'login' => 'app_ci_ci_w',
+                'password' => '2QpeeeNU',
+                'database' => 'tewn',
+            ),
+            'audit' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-audit.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_ci_audit_w',
+                    'password' => 'GTnJ5kOo',
+                    'database' => 'audit',
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-audit.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_ci_audit_r',
+                    'password' => 'k9hY3zjq',
+                    'database' => 'audit',
+                )
+            ),
+            'warehouse' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-dw.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_ci_dw_w',
+                    'password' => 'EvYWXki0',
+                    'database' => 'warehouse',
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-dw.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_ci_dw_r',
+                    'password' => 'bVdceE1f',
+                    'database' => 'warehouse',
+                )
+            )
+        ),
+        "mgmt" => array(
+            'write' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'sql1v-56-ci.ci.dev.lax.gnmedia.net',
+                'login' => 'app_mgmt_ci_w',
+                'password' => 'YL4YCtjT',
+                'database' => 'tewn',
+            ),
+            'read' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'sql1v-56-ci.ci.dev.lax.gnmedia.net',
+                'login' => 'app_mgmt_ci_w',
+                'password' => 'YL4YCtjT',
+                'database' => 'tewn',
+            ),
+            'audit' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-audit.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_mgmt_audit_w',
+                    'password' => 'PQG9Yf05',
+                    'database' => 'audit'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-audit.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_mgmt_audit_r',
+                    'password' => '1pmizzXm',
+                    'database' => 'audit'
+                )
+            ),
+            'warehouse' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-dw.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_mgmt_ci_dw_w',
+                    'password' => '1cGJliG0',
+                    'database' => 'warehouse'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-dw.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_mgmt_ci_dw_r',
+                    'password' => '1Yp4OfMt',
+                    'database' => 'warehouse'
+                )
+            )
+        ),
+        "eng" => array(
+            'write' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'sql1v-56-ci.ci.dev.lax.gnmedia.net',
+                'login' => 'eng_ci_ci_w',
+                'password' => 'Od26mMud',
+                'database' => 'tewn',
+            ),
+            'read' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'sql1v-56-ci.ci.dev.lax.gnmedia.net',
+                'login' => 'eng_ci_ci_r',
+                'password' => 's2fTCspr',
+                'database' => 'tewn',
+            ),
+            'audit' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-audit.ci.dev.lax.gnmedia.net',
+                    'login' => 'eng_ci_audit_w',
+                    'password' => 'tjW7wRw4',
+                    'database' => 'audit'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-audit.ci.dev.lax.gnmedia.net',
+                    'login' => 'eng_ci_audit_r',
+                    'password' => 'MtrzCf0C',
+                    'database' => 'audit'
+                )
+            ),
+            'warehouse' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-dw.ci.dev.lax.gnmedia.net',
+                    'login' => 'eng_ci_dw_w',
+                    'password' => 'MMIYPblX',
+                    'database' => 'warehouse'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-dw.ci.dev.lax.gnmedia.net',
+                    'login' => 'eng_ci_dw_r',
+                    'password' => 'vZi6FjBI',
+                    'database' => 'warehouse'
+                )
+            )
+        )
+    ),
+
+    /**
+     * The development environment database configuration
+     * @var array The database configuration
+     */
+    'dev' => array(
+        "test" => array(
+            'driver' => 'cidb',
+            'encoding' => 'utf8',
+            'persistent' => false,
+            'host' => 'sql1v-56-ci.ci.dev.lax.gnmedia.net',
+            'login' => 'app_ci_test_w',
+            'password' => '2Y9PEm8i',
+            'database' => 'tewn_test'
+        ),
+        "app" => array(
+            'write' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'sql1v-56-ci.ci.dev.lax.gnmedia.net',
+                'login' => 'app_ci_ci_w',
+                'password' => '2QpeeeNU',
+                'database' => 'tewn',
+            ),
+            'read' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'sql1v-56-ci.ci.dev.lax.gnmedia.net',
+                'login' => 'app_ci_ci_w',
+                'password' => '2QpeeeNU',
+                'database' => 'tewn',
+            ),
+            'audit' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-audit.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_ci_audit_w',
+                    'password' => 'GTnJ5kOo',
+                    'database' => 'audit'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-audit.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_ci_audit_r',
+                    'password' => 'k9hY3zjq',
+                    'database' => 'audit'
+                )
+            ),
+            'warehouse' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-dw.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_ci_dw_w',
+                    'password' => 'EvYWXki0',
+                    'database' => 'warehouse'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-dw.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_ci_dw_r',
+                    'password' => 'bVdceE1f',
+                    'database' => 'warehouse'
+                )
+            )
+        ),
+        "mgmt" => array(
+            'write' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'sql1v-56-ci.ci.dev.lax.gnmedia.net',
+                'login' => 'app_mgmt_ci_w',
+                'password' => 'YL4YCtjT',
+                'database' => 'tewn',
+            ),
+            'read' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'sql1v-56-ci.ci.dev.lax.gnmedia.net',
+                'login' => 'app_mgmt_ci_w',
+                'password' => 'YL4YCtjT',
+                'database' => 'tewn',
+            ),
+            'audit' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-audit.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_mgmt_audit_w',
+                    'password' => 'PQG9Yf05',
+                    'database' => 'audit'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-audit.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_mgmt_audit_r',
+                    'password' => '1pmizzXm',
+                    'database' => 'audit'
+                )
+            ),
+            'warehouse' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-dw.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_mgmt_ci_dw_w',
+                    'password' => '1cGJliG0',
+                    'database' => 'warehouse'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-dw.ci.dev.lax.gnmedia.net',
+                    'login' => 'app_mgmt_ci_dw_r',
+                    'password' => '1Yp4OfMt',
+                    'database' => 'warehouse'
+                )
+            )
+        ),
+        "eng" => array(
+            'write' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'sql1v-56-ci.ci.dev.lax.gnmedia.net',
+                'login' => 'eng_ci_ci_w',
+                'password' => 'Od26mMud',
+                'database' => 'tewn',
+            ),
+            'read' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'sql1v-56-ci.ci.dev.lax.gnmedia.net',
+                'login' => 'eng_ci_ci_w',
+                'password' => 'Od26mMud',
+                'database' => 'tewn',
+            ),
+            'audit' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-audit.ci.dev.lax.gnmedia.net',
+                    'login' => 'eng_ci_audit_w',
+                    'password' => 'tjW7wRw4',
+                    'database' => 'audit'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-audit.ci.dev.lax.gnmedia.net',
+                    'login' => 'eng_ci_audit_r',
+                    'password' => 'MtrzCf0C',
+                    'database' => 'audit'
+                )
+            ),
+            'warehouse' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-dw.ci.dev.lax.gnmedia.net',
+                    'login' => 'eng_ci_dw_w',
+                    'password' => 'MMIYPblX',
+                    'database' => 'warehouse'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'sql1v-56-dw.ci.dev.lax.gnmedia.net',
+                    'login' => 'eng_ci_dw_r',
+                    'password' => 'vZi6FjBI',
+                    'database' => 'warehouse'
+                )
+            )
+        )
+    ),
+
+    /**
+     * The stage environment database configurations
+     * @var array The write, read, test and audit database configurations
+     */
+    'stg' => array(
+        "test" => array(
+            'driver' => 'cidb',
+            'encoding' => 'utf8',
+            'persistent' => false,
+            'host' => 'sql1v-56-ci.ci.dev.lax.gnmedia.net',
+            'login' => 'app_ci_test_w',
+            'password' => '2Y9PEm8i',
+            'database' => 'tewn_test'
+        ),
+        "app" => array(
+            'write' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'vip-sqlrw-ci.ci.stg.lax.gnmedia.net',
+                'login' => 'app_ci_ci_w',
+                'password' => 'iLvcXM1k',
+                'database' => 'tewn'
+            ),
+            'read' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'vip-sqlro-ci.ci.stg.lax.gnmedia.net',
+                'login' => 'app_ci_ci_r',
+                'password' => 'Y5SLyJGp',
+                'database' => 'tewn'
+            ),
+            'audit' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlrw-audit.ci.stg.lax.gnmedia.net',
+                    'login' => 'app_ci_audit_w',
+                    'password' => 'vSXIaxo7',
+                    'database' => 'audit'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlro-audit.ci.stg.lax.gnmedia.net',
+                    'login' => 'app_ci_audit_r',
+                    'password' => 'LToMnC5x',
+                    'database' => 'audit'
+                )
+            ),
+            'warehouse' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlrw-dw.ci.stg.lax.gnmedia.net',
+                    'login' => 'app_ci_dw_w',
+                    'password' => 'hDSoz9Dr',
+                    'database' => 'warehouse'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlro-dw.ci.stg.lax.gnmedia.net',
+                    'login' => 'app_ci_dw_r',
+                    'password' => 'WB1ncSO8',
+                    'database' => 'warehouse'
+                )
+            )
+        ),
+        "mgmt" => array(
+            'write' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'vip-sqlrw-ci.ci.stg.lax.gnmedia.net',
+                'login' => 'app_mgmt_ci_w',
+                'password' => 'pVOIGJj5',
+                'database' => 'tewn'
+            ),
+            'read' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'vip-sqlro-ci.ci.stg.lax.gnmedia.net',
+                'login' => 'app_mgmt_ci_r',
+                'password' => '4SdOxjyG',
+                'database' => 'tewn'
+            ),
+            'audit' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlrw-audit.ci.stg.lax.gnmedia.net',
+                    'login' => 'app_mgmt_audit_w',
+                    'password' => 'J0gpl1V8',
+                    'database' => 'audit'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlro-audit.ci.stg.lax.gnmedia.net',
+                    'login' => 'app_mgmt_audit_r',
+                    'password' => 'nlknORaO',
+                    'database' => 'audit'
+                )
+            ),
+            'warehouse' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlrw-dw.ci.stg.lax.gnmedia.net',
+                    'login' => 'app_mgmt_ci_dw_w',
+                    'password' => 'JjOK0mZz',
+                    'database' => 'warehouse'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlro-dw.ci.stg.lax.gnmedia.net',
+                    'login' => 'app_mgmt_ci_dw_r',
+                    'password' => 'TatVtsNB',
+                    'database' => 'warehouse'
+                )
+            )
+        ),
+        "eng" => array(
+            'write' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'vip-sqlrw-ci.ci.stg.lax.gnmedia.net',
+                'login' => 'eng_ci_ci_w',
+                'password' => 'iHRbXpNv',
+                'database' => 'tewn'
+            ),
+            'read' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'vip-sqlro-ci.ci.stg.lax.gnmedia.net',
+                'login' => 'eng_ci_ci_r',
+                'password' => 'rb09T22S',
+                'database' => 'tewn'
+            ),
+            'audit' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlrw-audit.ci.stg.lax.gnmedia.net',
+                    'login' => 'eng_ci_audit_w',
+                    'password' => 'fLxYvNg8',
+                    'database' => 'audit'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlro-audit.ci.stg.lax.gnmedia.net',
+                    'login' => 'eng_ci_audit_r',
+                    'password' => 'mdsWg6f2',
+                    'database' => 'audit'
+                )
+            ),
+            'warehouse' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlrw-dw.ci.stg.lax.gnmedia.net',
+                    'login' => 'eng_ci_dw_w',
+                    'password' => 'BTF9nr55',
+                    'database' => 'warehouse'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlro-dw.ci.stg.lax.gnmedia.net',
+                    'login' => 'eng_ci_dw_r',
+                    'password' => '5X9HLN5r',
+                    'database' => 'warehouse'
+                )
+            )
+        )
+    ),
+
+    /**
+     * The production environment database configurations
+     * @var array The write, read and audit database configurations
+     */
+    'prd' => array(
+        "app" => array(
+            'write' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'vip-sqlrw-ci.ci.prd.lax.gnmedia.net',
+                'login' => 'app_ci_ci_w',
+                'password' => 'bVmZDJb3',
+                'database' => 'tewn'
+            ),
+            'read' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'vip-sqlro-ci.ci.prd.lax.gnmedia.net',
+                'login' => 'app_ci_ci_r',
+                'password' => 'HLVN5Cri',
+                'database' => 'tewn'
+            ),
+            'audit' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlrw-audit.ci.prd.lax.gnmedia.net',
+                    'login' => 'app_ci_audit_w',
+                    'password' => 'vrOA097m',
+                    'database' => 'audit'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlro-audit.ci.prd.lax.gnmedia.net',
+                    'login' => 'app_ci_audit_r',
+                    'password' => '6ZavPkW6',
+                    'database' => 'audit'
+                )
+            ),
+            'warehouse' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlrw-dw.ci.prd.lax.gnmedia.net',
+                    'login' => 'app_ci_dw_w',
+                    'password' => 'mMHV8a6E',
+                    'database' => 'warehouse'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlro-dw.ci.prd.lax.gnmedia.net',
+                    'login' => 'app_ci_dw_r',
+                    'password' => '1uXqD9sT',
+                    'database' => 'warehouse'
+                )
+            )
+        ),
+        "mgmt" => array(
+            'write' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'vip-sqlrw-ci.ci.prd.lax.gnmedia.net',
+                'login' => 'app_mgmt_ci_w',
+                'password' => '2cCaf4YN',
+                'database' => 'tewn'
+            ),
+            'read' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'vip-sqlro-ci.ci.prd.lax.gnmedia.net',
+                'login' => 'app_mgmt_ci_r',
+                'password' => 'qLtlWBAp',
+                'database' => 'tewn'
+            ),
+            'audit' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlrw-audit.ci.prd.lax.gnmedia.net',
+                    'login' => 'app_mgmt_audit_w',
+                    'password' => 'r4smBCQ7',
+                    'database' => 'audit'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlro-audit.ci.prd.lax.gnmedia.net',
+                    'login' => 'app_mgmt_audit_r',
+                    'password' => '0xphpoFe',
+                    'database' => 'audit'
+                )
+            ),
+            'warehouse' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlrw-dw.ci.prd.lax.gnmedia.net',
+                    'login' => 'app_mgmt_ci_dw_w',
+                    'password' => 'm1KqL4J9',
+                    'database' => 'warehouse'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlro-dw.ci.prd.lax.gnmedia.net',
+                    'login' => 'app_mgmt_ci_dw_r',
+                    'password' => 'imZ2jxe3',
+                    'database' => 'warehouse'
+                )
+            )
+        ),
+        "eng" => array(
+            'write' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'vip-sqlrw-ci.ci.prd.lax.gnmedia.net',
+                'login' => 'eng_ci_ci_w',
+                'password' => 'fq4fcSn0',
+                'database' => 'tewn'
+            ),
+            'read' => array(
+                'driver' => 'cidb',
+                'encoding' => 'utf8',
+                'persistent' => false,
+                'host' => 'vip-sqlro-ci.ci.prd.lax.gnmedia.net',
+                'login' => 'eng_ci_ci_r',
+                'password' => 'GTcY8vaL',
+                'database' => 'tewn'
+            ),
+            'audit' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlrw-audit.ci.prd.lax.gnmedia.net',
+                    'login' => 'eng_ci_audit_w',
+                    'password' => '8kF8yOQx',
+                    'database' => 'audit'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlro-audit.ci.prd.lax.gnmedia.net',
+                    'login' => 'eng_ci_audit_r',
+                    'password' => 'p8zVq1eI',
+                    'database' => 'audit'
+                )
+            ),
+            'warehouse' => array(
+                'write' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlrw-dw.ci.prd.lax.gnmedia.net',
+                    'login' => 'eng_ci_dw_w',
+                    'password' => 'KbiYFRFn',
+                    'database' => 'warehouse'
+                ),
+                'read' => array(
+                    'driver' => 'cidb',
+                    'encoding' => 'utf8',
+                    'persistent' => false,
+                    'host' => 'vip-sqlro-dw.ci.prd.lax.gnmedia.net',
+                    'login' => 'eng_ci_dw_r',
+                    'password' => 'qJ3fD7th',
+                    'database' => 'warehouse'
+                )
+            )
+        )
+    ),
+);
+
+return $database_config[ENVIRONMENT];

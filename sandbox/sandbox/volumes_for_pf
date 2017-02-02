@@ -1,0 +1,16 @@
+PRD
+nac1a_sql1v_vb_pf_ao_prd_lax_data       sql1_prd
+nac1a_sql1v_vb_pf_ao_prd_lax_binlog
+nac1a_ao_lax_prd_sql_log/sql1v-vb-pf.ao.prd.lax.gnmedia.net -- qtree
+nac1a_sql2v_vb_pf_ao_prd_lax_data 	sql2_prd
+nac1a_sql2v_vb_pf_ao_prd_lax_binlog
+nac1a_ao_lax_prd_sql_log/sql2v-vb-pf.ao.prd.lax.gnmedia.net -- qtree 
+STG
+
+nac1a_sql1v_vb_pf_ao_stg_lax_data	sql1_stg
+nac1a_sql1v_vb_pf_ao_stg_lax_binlog 
+nac1a_ao_lax_stg_sql_log/sql1v-vb-pf.ao.stg.lax.gnmedia.net
+nac1a_sql2v_vb_pf_ao_stg_lax_data	sql2_stg
+nac1a_sql2v_vb_pf_ao_stg_lax_binlog
+nac1a_ao_lax_stg_sql_log/sql2v-vb-pf.ao.stg.lax.gnmedia.net
+

@@ -1,0 +1,36 @@
+<script id="ci_stats_system" type="text/x-handlebars-template">
+    <thead>
+        <tr>
+            <th class="text-center">Date</th>
+            <th class="text-center">CTR </th>
+            <th class="text-center text-nowrap">Return Rate</th>
+            <th class="text-center text-nowrap">Widget Impressions</th>
+            <th class="text-center">TPM</th>
+            <th class="text-center text-nowrap">Gen RR</th>
+            <th class="text-center text-nowrap">Imp. Basic</th>
+            <th class="text-center text-nowrap">Imp Similar</th>
+            <th class="text-center text-nowrap">Imp Contextual</th>
+            <th class="text-center text-nowrap">CTR Basic</th>
+            <th class="text-center text-nowrap">CTR Similar</th>
+            <th class="text-center text-nowrap">CTR Contextual</th>
+        </tr>
+    </thead>
+    <tbody>
+    {{#each ci_stats_system}}
+        <tr>
+            <td class="text-right text-nowrap">{{ date }}</td>
+            <td class="text-right">{{ ctr }}%</td>
+            <td class="text-right">{{ return_rate }}%</td>
+            <td class="text-right">{{ numberFormat widget_impressions }}</td>
+            <td class="text-right">{{ tpm }}</td>
+            <td class="text-right">{{ gen_rr }}%</td>
+            <td class="text-right">{{ numberFormat imp_basic }}</td>
+            <td class="text-right">{{ numberFormat imp_similar }}</td>
+            <td class="text-right">{{ numberFormat imp_contextual }}</td>
+            <td class="text-right">{{ ctr_basic }}%</td>
+            <td class="text-right">{{ ctr_similar }}%</td>
+            <td class="text-right">{{ ctr_contextual }}%</td>
+        </tr>
+    {{/each}}
+    </tbody>
+</script>

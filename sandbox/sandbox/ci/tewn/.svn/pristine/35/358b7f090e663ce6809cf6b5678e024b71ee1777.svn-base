@@ -1,0 +1,202 @@
+/* dashboard - websites.js */
+jQuery(document).ready(function() { 						   
+
+jQuery.blockUI.defaults.overlayCSS = {};
+jQuery.blockUI.defaults.css = {}; 
+
+///////////
+//  Create a new website
+///////////
+jQuery("#add_website_button").click(function(){
+jQuery.blockUI({ message:jQuery("#addWebsiteDiv"), css: { background:'white', top: '180px', left: '38%', width:'300px', height:'180px', padding:'20px', border:'1px solid #666'}, overlayCSS:  { backgroundColor: '#000', opacity:0.6, cursor:'wait' } });
+return false;
+});
+
+jQuery("#save_website").click(function(){
+
+ jQuery.post("/websites/add", {website: jQuery("#new_website").val()}, function(data){
+         if( data != "" ) {
+             var div = jQuery("<div/>").addClass("element");
+
+             var title = jQuery("<div/>").addClass("title").html(
+                '<span id="websitename-'+ data +'" class="websitename">'+
+                jQuery("#new_website").val()+
+                '</span><span class="rate">0%</span><br class="clearfloat">'
+             );
+             var info =  jQuery("<div/>").addClass("info").html('<p>CTR: <b>0.0%</b>&nbsp;&nbsp;&nbsp;Incoming Clicks: <b>0</b>&nbsp;&nbsp;&nbsp;Widgets: <b>0</b></p>');
+             var btns =  jQuery("<div/>").addClass("buttons").html(
+                 '<a href="" id="website-'+ data +'" class="button chart website_check"><span class="icon"></span><span class="label">Chart</span></a>'+
+                 '<a href="" class="button rename"><span class="icon"></span><span class="label">Rename</span></a>'
+             );
+
+             info.append(btns);
+             div.append(title);
+             div.append(info);
+
+             jQuery(".element_container").append(div);
+             jQuery("#new_website").val("");
+             jQuery.unblockUI();
+         } else {
+            jQuery("#addWebsiteDiv p.message").html("Enter a valid URL").css("color","red");         
+         }
+});
+
+});
+
+jQuery("#cancel_website").click(function(){
+jQuery.unblockUI();
+});
+
+	 	 
+ /////////
+ // update the graphs
+ /////////
+
+ jQuery("#timeChoices").change(function(){
+    getGraphData();
+ });
+
+   jQuery(".website_check").click(function(){
+       jQuery(this).toggleClass('active');
+       getGraphData();
+       return false;
+   });         
+   
+   $('.element .title').live('click', function() {
+       if(jQuery(this).parent().hasClass('selected')) {
+            jQuery(this).parent().removeClass('selected');
+            jQuery(this).parent().children('.info').slideUp();
+       } else {
+            jQuery(this).parent().addClass('selected');
+            jQuery(this).parent().children('.info').slideDown();
+       }
+       return false;
+   });
+
+   //////////
+   //  Delete a website code
+   /////////
+
+   jQuery("a.delete").click(function(){
+	    var ID = jQuery(this).parent().children('.website_check').attr('id').split("-")[1].toString();
+	    jQuery("#deleteID").val(ID);
+            jQuery.blockUI({ message:jQuery("#deleteDiv"), css: { background:'white', top: '180px', left: '38%', width:'300px', height:'180px', padding:'20px', border:'1px solid #666'}, overlayCSS:  { backgroundColor: '#000', opacity:0.6, cursor:'wait' } });
+            return false;
+	 });
+   jQuery("#yesDelete").click(function(){
+       var websiteid = jQuery("#deleteID").val().trim();
+       var website_div = jQuery('#websitename-'+websiteid).parent().parent();
+       jQuery.post("/websites/deleteajax", { websiteid: websiteid }, function(data){
+            website_div.remove();
+       });
+       jQuery("#deleteID").val("");
+       jQuery.unblockUI(); 
+   });
+
+   jQuery("#noDelete").click(function(){
+       jQuery("#deleteID").val("");
+       jQuery.unblockUI();
+   });
+
+   //////////
+   // Rename Website
+   //////////
+   
+    jQuery("a.rename").click(function(){
+        var ID = jQuery(this).parent().children('.website_check').attr('id').split("-")[1].toString();
+        jQuery("#renameID").val(ID);
+        jQuery.blockUI({ message:jQuery("#renameWebsiteDiv"), css: { background:'white', top: '180px', left: '38%', width:'300px', height:'180px', padding:'20px', border:'1px solid #666'}, overlayCSS:  { backgroundColor: '#000', opacity:0.6, cursor:'wait' } });
+    });
+    jQuery("#yesRename").click(function(){
+       var websiteid = jQuery("#renameID").val().trim();
+       var website_div = jQuery('#websitename-'+websiteid).parent().parent();
+       var newname = jQuery("#new_website_name").val().trim();
+       if( newname.length > 0 ) {
+            jQuery.post("/websites/rename", { websiteid: websiteid, newname:newname }, function(data){
+                jQuery('#websitename-'+websiteid).parent().parent().find('.websitename a').text(newname);
+            });
+       }
+       jQuery("#renameID").val("");
+       jQuery.unblockUI();
+   });
+   jQuery("#noRename").click(function(){
+       jQuery("#renameID").val("");
+       jQuery.unblockUI();
+   });
+
+    getGraphData(); 
+        
+});
+
+var graph1;
+var graph2;
+var options; 
+var options2;     
+var updateLegendTimeout = null;
+var latestPosition = null;
+var updateLegendTimeout2 = null;
+var latestPosition2 = null;
+var colors = new Array();
+colors[0] = "rgb(255,0,0)";
+colors[1] = "rgb(0,255,0)";
+colors[2] = "rgb(0,0,255)";
+colors[3] = "rgb(255,255,0)";
+colors[4] = "rgb(255,0,255)";
+colors[5] = "rgb(0,255,255)";
+colors[6] = "rgb(255,128,0)";
+colors[7] = "rgb(255,0,128)";
+colors[8] = "rgb(0,255,128)";
+colors[9] = "rgb(0,128,255)";
+colors[10] = "rgb(128,0,128)";
+colors[11] = "rgb(255,128,128)";
+colors[12] = "rgb(128,128,128)";
+colors[13] = "rgb(0,0,0)";
+colors[14] = "rgb(23,76,228)";
+colors[15] = "rgb(255,23,128)";
+
+
+function getGraphData()
+{    
+    var websitesSelected = new Array();
+
+    jQuery(".website_check").each(function(){
+       if (jQuery(this).hasClass('active') == true)
+       {
+          websitesSelected.push(jQuery(this).attr("id").split("-")[1]);
+       }
+    });
+    
+    if (websitesSelected.length == 0)
+    {
+    
+    }
+    else
+    {
+	    jQuery("#graph1").block({ message:jQuery("#waitingDiv1"), css: {width:'210px', height:'50px'}  });
+	    jQuery("#graph2").block({ message:jQuery("#waitingDiv2"), css: {width:'210px', height:'50px'}  });	
+
+	    var time = jQuery("#timeChoices").val();
+
+	    var now = new Date();
+	    now.setHours(0);
+	    now.setMinutes(0);
+	    
+	    var endTime = Math.ceil(now.getTime()/1000);
+
+	    // send all the information to the server here
+	    // chartify('graph1', time, endTime, '/history_widgets/chart', "Click-Through Rate", "Rate", "line", websitesSelected.join(","), widgetsSelected.join(","), "ctr", true, <?=TIME_UNIT_DAY?>, function(){ jQuery("#graph1").unblock(); });
+
+	    chartify('graph2', time, endTime, '/history_credits/chart', "Traffic From/To", "I/O", "lineLegend", websitesSelected.join(","), 0, "incoming,outgoing", true, time_unit_day, function(){ jQuery("#graph2").unblock(); });
+    	    	
+    }
+
+  jQuery(".tooltip").qtip({
+    position: {
+      my:'bottom center',
+      at:'top center'
+    },
+    style: {
+      classes: 'ui-tooltip-plain'
+    }
+  });    
+}

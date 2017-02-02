@@ -1,0 +1,77 @@
+<?php
+namespace Test;
+
+use \CI\Config;
+
+class ConfigTest extends \PHPUnit_Framework_TestCase
+{
+    private $_oConfig;
+
+    public function setUp()
+    {
+        $this->_oConfig = new Config();
+        $this->_oConfig->setPath(__DIR__ . '/Config/');
+    }
+
+    /**
+     * @covers \CI\Config::load
+     */
+    public function testLoad()
+    {
+        $sConfigFile = 'MemcachedTest';
+
+        $aConfigExpected = $this->getExpectedConfig();
+
+        $this->_oConfig->load($sConfigFile);
+
+        $this->assertSame($aConfigExpected, $this->_oConfig->get($sConfigFile));
+    }
+
+    /**
+     * @expectedException \CI\Config\Exception
+     * @expectedExceptionCode \CI\Config\Exception::MISSING_FILE
+     */
+    public function testThowConfigExceptionWhenFileDoesntExists()
+    {
+        $this->_oConfig->load("FileNotExists");
+    }
+
+    /**
+     * @covers \CI\Config::get
+     */
+    public function testGet()
+    {
+        $sConfigFile = 'MemcachedTest';
+
+        $aConfigExpected = $this->getExpectedConfig();
+
+        $this->assertSame($aConfigExpected, $this->_oConfig->get($sConfigFile));
+    }
+
+    private function getExpectedConfig()
+    {
+        $aConfig = array(
+            'local' => array(
+                array('localhost.test', 11211),
+            ),
+
+            'dev' => array(
+                array('mem1v-ci.ci.dev.lax.gnmedia.net.test', 11211),
+            ),
+
+            'stg' => array(
+                array('mem1v-ci.ci.stg.lax.gnmedia.net.test', 11211),
+                array('mem2v-ci.ci.stg.lax.gnmedia.net.test', 11211),
+                array('mem3v-ci.ci.stg.lax.gnmedia.net.test', 11211),
+            ),
+        );
+
+        return $aConfig;
+    }
+
+
+    public function tearDown()
+    {
+        $this->_oConfig = null;
+    }
+}

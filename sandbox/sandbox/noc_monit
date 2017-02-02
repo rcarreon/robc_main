@@ -1,0 +1,33 @@
+#!/bin/perl -w 
+use strict;
+no warnings; 
+## http testing ##
+## telnetl ##
+## curl ##
+## conns ##
+## sql queries ##
+## strings ## 
+## wget ##
+
+my $site = <STDIN>;
+chomp $site;
+my $telnet_test= print `echo exit | telnet $site 80`;
+
+my $cucur=`curl -ILs $site | grep Served | cut -d : -f 2 `;
+#$cucur =~ split(':', $cucur, m/Served/);
+my $cocur2=`curl -ILs $site | grep Served | cut -d . -f 1 | cut -d : -f 2 | cut -d - -f 2`;
+chomp $cucur;
+#my @cucur = split (':',$cucur);
+my $weege= print `wget --timeout=3 --tries=1 --spider --no-check-certificate $site > /dev/null 2>&1` ;
+my $wout = `echo $?`;
+chomp $wout;
+if ($wout == 0){
+	print "site is  up and running right now\n";
+	print "$cucur\n";
+	my $vip = `ssh xcat.gnmedia.net 'sudo aceman sfarm | egrep -i $cocur2 | grep -i app| grep -i prd'`;
+	my $conns = `ssh xcat.gnmedia.net 'sudo aceman sfarm $vip' `;
+	print "conns $conns";
+}
+#(my $new = $original) =~ s/foo/bar/;
+#or 
+#my $new = $old =~ s/foo/bar/r;

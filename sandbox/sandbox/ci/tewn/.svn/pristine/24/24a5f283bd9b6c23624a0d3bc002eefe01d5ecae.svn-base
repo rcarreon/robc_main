@@ -1,0 +1,58 @@
+<?php
+/**
+ * Logger Analytic Element Array
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger_Analytic
+ * @package  Logger_Analytic_Element
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+/**
+ * Logger Analytic Element Array
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger_Analytic
+ * @package  Logger_Analytic_Element
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+class Logger_Analytic_Element_Array extends Logger_Analytic_Element_Abstract
+{
+    /**
+     * Adds the value to the array container
+     *
+     * @param mixed $value The value to add to this array
+     *
+     * @return void
+     */
+    public function registerValue($value)
+    {
+        if (is_null($value) && is_null($this->value)) {
+            $this->value = array();
+        } elseif (!is_null($value)) {
+            if (!is_array($value)) {
+                $value = array($value);
+            }
+            foreach ($value as $item) {
+                $this->value[] = sprintf($this->format['item'], $item);
+            }
+        }
+    }
+
+    /**
+     * Builds the valur of the array container separated
+     * with the separator formatter
+     *
+     * @return string Array values
+     */
+    public function build()
+    {
+        return implode($this->format['separator'], $this->value);
+    }
+}

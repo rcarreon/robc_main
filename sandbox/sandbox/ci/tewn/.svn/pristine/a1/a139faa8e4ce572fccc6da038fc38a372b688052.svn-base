@@ -1,0 +1,123 @@
+<script id="tpl-websites-table" type="text/x-handlebars-template">
+    <div class="col-md-12">
+        <div class="">
+            <table class="table table-striped table-bordered tablesorter">
+                <thead>
+                    <tr>
+                        <th class="text-center">Id</th>
+                        <th class="text-center">Website</th>
+                        <th class="text-center hidden needs_attention">!</th>
+                        <th class="text-center hidden age" data-toggle="popover" data-placement="top" data-content="Overall average time in the system">Age</th>
+                        <th class="text-center page_active" data-toggle="popover" data-placement="top" data-content="Active pages in the system which CI is trying to send traffic to">A</th>
+                        <th class="text-center hidden page_pending" data-toggle="popover" data-placement="top" data-content="Pages pending moderation">P</th>
+                        <th class="text-center" data-toggle="popover" data-placement="top" data-content="Pages that the publisher has requested be put into the system">M</th>
+                        <th class="text-center" data-toggle="popover" data-placement="top" data-content="Featured Bonus">FB</th>
+                        <th class="text-center" data-toggle="popover" data-placement="top" data-content="Traffic Delta - Getting more traffic than their site is generating">TD</th>
+                        <th class="text-center hidden credits" data-toggle="popover" data-placement="top" data-content="Credits or balance of how many visitors we owe a publisher">C</th>
+                        <th class="text-center hidden return_rate" data-toggle="popover" data-placement="top" data-content="Website Return Rate">RR</th>
+                        <th class="text-center hidden y_to" data-toggle="popover" data-placement="top" data-content="Yesterday Out - Number of visitors sent to the publisher yesterday">Y To</th>
+                        <th class="text-center hidden y_from" data-toggle="popover" data-placement="top" data-content="Yesterday In - Number of visitors received from the publisher yesterday">Y From</th>
+                        <th class="text-center hidden y_return_rate" data-toggle="popover" data-placement="top" data-content="Yesterday Return Rate">Y RR</th>
+                        <th class="text-center hidden y_lp_ctr" data-toggle="popover" data-placement="top" data-content="Yesterday Landing Page Click Through Rate">Y LP CTR</th>
+                        <th class="text-center hidden y_lp_impressions" data-toggle="popover" data-placement="top" data-content="Yesterday Landing Page Impressions">Y LP Imp</th>
+                        <th class="text-center hidden y_widget_ctr" data-toggle="popover" data-placement="top" data-content="Yesterday Widget Click Through Rate">Y W CTR</th>
+                        <th class="text-center hidden y_widget_impressions" data-toggle="popover" data-placement="top" data-content="Yesterday Widget Page Impressions">Y W Imp</th>
+                        <th class="text-center hidden y_gen_return_rate" data-toggle="popover" data-placement="top" data-content="Yesterday Return Rate Generated">Y GRR</th>
+                        <th class="text-center hidden tier" data-toggle="popover" data-placement="top" data-content="A tier to classify publishers">T</th>
+                        <th class="text-center hidden widget_priority" data-toggle="popover" data-placement="top" data-content="Widget Priority">WP</th>
+                        <th class="text-center hidden lp_priority" data-toggle="popover" data-placement="left" data-content="Landing Page Priority">LP</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {{#each websites}}
+                <tr id="website-{{id}}" class="{{attention_class}}" data-id="{{id}}" data-name="{{name}}" data-website='{{json this}}'>
+                    <td class="text-center">
+                        <a target="_blank" href="/management/website/{{id}}">{{id}}</a>
+                    </td>
+                    <td class="with-3-buttons">
+                        <span class="title">
+                            <a target="_blank" href="http://{{url}}">{{name}}</a>
+                            <span class="btn-group pull-right">
+                                <button type="button" class="btn btn-default btn-xs btn-charts" data-toggle="modal" data-target="#modal-charts" >
+                                    <span class="fa fa-line-chart" data-toggle="popover" data-placement="top" data-content="Website charts"></span>
+                                </button>
+                                <button type="button" class="btn btn-default btn-xs btn-add-page">
+                                    <span class="fa fa-file-o" data-toggle="popover" data-placement="top" data-content="Add page"></span>
+                                </button>
+                                <button type="button" class="btn btn-default btn-xs" data-toggle="modal" data-target="#modal-full-stats">
+                                    <span class="btn-xs fa fa-list-alt" data-toggle="popover" data-placement="top" data-content="Full stats"></span>
+                                </button>
+                            </span>
+                        </span>
+                    </td>
+                    <td class="text-right hidden  needs_attention">{{attention_level}}</td>
+                    <td class="text-right hidden age">{{formatNumber refreshness "0"}}</td>
+                    <td class="text-right">
+                        <a target="_blank" href="/management/pages/{{id}}">{{formatNumber page_active "0"}}</a>
+                    </td>
+                    <td class="text-right hidden page_pending {{attention_pending_pages}}">{{formatNumber page_pending "0"}}</td>
+                    <td class="text-right {{attention_pending_moderation}}">
+                        <a target="_blank" href="/pages/moderate/{{id}}">{{formatNumber page_moderate "0"}}</a>
+                    </td>
+                    <td class="text-right">{{featured}}</td>
+                    <td class="text-right">{{formatNumber traffic_delta "0"}}</td>
+                    <td class="text-right hidden credits">
+                        <a target="_blank" href="/accounts/credit/{{id}}">{{formatNumber credits "0"}}</a>
+                    </td>
+                    <td class="text-right hidden return_rate">
+                        <a href="#" data-toggle="modal" data-target="#modal-charts" data-chart="return_rate">{{formatNumber rr "2" "percentage"}}%</a>
+                    </td>
+                    <td class="text-right hidden y_to">
+                        <a href="#" data-toggle="modal" data-target="#modal-charts" data-chart="traffic">{{formatNumber y_outgoing}}</a>
+                    </td>
+                    <td class="text-right hidden y_from">
+                        <a href="#" data-toggle="modal" data-target="#modal-charts" data-chart="traffic">{{formatNumber y_incoming}}</a>
+                    </td>
+                    <td class="text-right hidden y_return_rate {{attention_return_rate}}">{{formatNumber y_rr "2" "percentage"}}%</td>
+                    <td class="text-right hidden y_lp_ctr {{attention_lp_performance}}">{{formatNumber y_lp_ctr "2" "percentage"}}%</td>
+                    <td class="text-right hidden y_lp_impressions {{attention_lp_impressions}}">
+                        <a target="_blank" href="/management/landing_page_analytics/0/{{domain_primary}}">{{formatNumber y_lp_impression}}</a>
+                    </td>
+                    <td class="text-right hidden y_widget_ctr {{attention_w_performance}}">{{formatNumber y_w_ctr "2" "percentage"}}%</td>
+                    <td class="text-right hidden y_widget_impressions {{attention_w_impressions}}">
+                        <a target="_blank" href="/management/widget_analytics_website/{{id}}">{{formatNumber y_w_impression }}</a>
+                    </td>
+                    <td class="text-right hidden y_gen_return_rate">{{formatNumber y_gen_rr "2" "percentage"}}%</td>
+                    <td class="text-right hidden tier">{{tier}}</td>
+                    <td class="text-right hidden widget_priority">{{w_priority}}</td>
+                    <td class="text-right hidden lp_priority">{{lp_priority}}</td>
+                </tr>
+                {{/each}}
+                </tbody>
+                {{#if websites}}
+                <tfoot>
+                    <tr class="default">
+                        <td class="text-center">{{formatNumber total.websites "0"}}</td>
+                        <td class="text-right"></td>
+                        <td class="text-right hidden needs_attention"></td>
+                        <td class="text-right hidden age">{{formatNumber total.refreshness "0"}}</td>
+                        <td class="text-right page_active">{{formatNumber total.page_active "0"}}</td>
+                        <td class="text-right hidden page_pending">{{formatNumber total.page_pending "0"}}</td>
+                        <td class="text-right">{{formatNumber total.page_moderate "0"}}</td>
+                        <td class="text-right"></td>
+                        <td class="text-right">{{formatNumber total.traffic_delta "0"}}</td>
+                        <td class="text-right hidden credits">{{formatNumber total.credits "0"}}</td>
+                        <td class="text-right hidden return_rate">{{formatNumber total.rr "2" "percentage"}}%</td>
+                        <td class="text-right hidden y_to">{{formatNumber total.y_outgoing}}</td>
+                        <td class="text-right hidden y_from">{{formatNumber total.y_incoming}}</td>
+                        <td class="text-right hidden y_return_rate">{{formatNumber total.y_rr "2" "percentage"}}%</td>
+                        <td class="text-right hidden y_lp_ctr">{{formatNumber total.y_lp_ctr "2" "percentage"}}%</td>
+                        <td class="text-right hidden y_lp_impressions">{{formatNumber total.y_lp_impression}}</td>
+                        <td class="text-right hidden y_widget_ctr">{{formatNumber total.y_w_ctr "2" "percentage"}}%</td>
+                        <td class="text-right hidden y_widget_impressions">{{formatNumber total.y_w_impression}}</td>
+                        <td class="text-right hidden y_gen_return_rate">{{formatNumber total.y_gen_rr "2" "percentage"}}%</td>
+                        <td class="text-right hidden tier"></td>
+                        <td class="text-right hidden widget_priority"></td>
+                        <td class="text-right hidden lp_priority"></td>
+                    </tr>
+                </tfoot>
+                {{/if}}
+            </table>
+        </div>
+    </div>
+</script>

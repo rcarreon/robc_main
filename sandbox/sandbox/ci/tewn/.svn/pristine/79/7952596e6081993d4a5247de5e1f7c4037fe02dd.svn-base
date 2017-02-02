@@ -1,0 +1,81 @@
+<?php
+class Log extends AppModel {
+
+	var $name = 'Log';
+	var $useDbConfig = 'audit_server';
+
+	function get_ip() {
+		// check ip from share internet
+		if (!empty($_SERVER['HTTP_CLIENT_IP']))	{
+			$ip = $_SERVER['HTTP_CLIENT_IP'];
+		} elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+			// Check if from proxy
+			$ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+		} elseif (isset($_SERVER['REMOTE_ADDR'])) {
+			$ip = $_SERVER['REMOTE_ADDR'];
+		} else {
+			$ip = "127.0.0.1";
+		}
+
+		return $ip;
+	}
+
+	function page_view() {
+/*
+		if (!isset($_COOKIE["unique_id"])) {
+			$unique_id = uniqid(rand());
+			setcookie("unique_id", $unique_id, time()+60*60*24*30, "/");
+		} else {
+			$unique_id = $_COOKIE["unique_id"];
+		}
+*/
+
+		$ip = $this->get_ip();
+
+		if (isset($_SERVER['REQUEST_URI'])) {
+			$url = addslashes($_SERVER['REQUEST_URI']);
+		} else {
+			$url = addslashes($_SERVER['argv'][1]);
+		}
+
+		if (isset($_SERVER['HTTP_REFERER'])) {
+			$refer = addslashes($_SERVER['HTTP_REFERER']);
+		} else {
+			$refer = "-";
+        }
+
+        if (preg_match('/^\/link\//', $url) == 1) {
+            $query = "INSERT INTO logs (url, domain_bitfield, ip, refer, created) VALUES ('%s', %d, '%s', '%s', NOW())";
+            $query = sprintf($query, $url, DOMAIN_BIT, $ip, $refer);
+            $this->query($query);
+        }
+    }
+
+	function get_pages_second($limit) {
+		$query = "SELECT NOW() as now, created, url, refer, ip FROM logs ORDER BY id DESC LIMIT ".$limit;
+
+		return $this->query_read($query);
+	}
+
+	function get_last_logs($limit, $domain_bit = 0) {
+		//$query = "SELECT url, ip FROM logs WHERE url LIKE '/link/%' ORDER BY id DESC LIMIT ".$limit;
+
+		if ($domain_bit) {
+			// We set the ID field here because before this ID, we didn't track domain_bitfield correct and this is a big performance increase
+			$query_domain_bit = "AND domain_bitfield = ".$domain_bit;
+		} else {
+			$query_domain_bit = "";
+		}
+
+		$query = "
+            SELECT SUBSTR(SUBSTRING_INDEX(url, '/', 3), 7) as url, ip
+            FROM logs
+            WHERE url NOT LIKE '/link/%/0?%'
+                $query_domain_bit
+            ORDER BY id DESC
+            LIMIT $limit";
+
+		return $this->query_read($query, false);
+	}
+}
+?>

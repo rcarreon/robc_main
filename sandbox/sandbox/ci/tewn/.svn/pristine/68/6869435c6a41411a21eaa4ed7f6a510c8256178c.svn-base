@@ -1,0 +1,35 @@
+<?
+App::import('Model', 'User');
+
+class MetricLogsController extends AppController
+{
+    public $uses = array();
+
+    protected $permissions = array(
+        'index' => User::ADMIN,
+    );
+
+    public function beforeFilter()
+    {
+        $this->check_permissions();
+        $this->layout = 'backend2';
+
+        $user = $this->Session->read('User');
+        $this->set_types_user($user);
+        $this->set('user', array('User' => $user));
+    }
+
+    public function index()
+    {
+        App::import('Model', 'MetricLog'); // is not an instance, just an import (include)
+        $filters = array(
+            MetricLog::FILTER_ALL  => 'All',
+            MetricLog::FILTER_BD   => 'BD',
+            MetricLog::FILTER_TECH => 'Tech',
+        );
+        $this->set('tab', 'history');
+        $this->set('filters', $filters);
+    }
+}
+
+?>

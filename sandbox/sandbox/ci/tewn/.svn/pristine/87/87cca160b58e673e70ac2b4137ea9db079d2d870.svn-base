@@ -1,0 +1,40 @@
+<?php
+
+namespace CI\Validator\Excel;
+
+class Options extends \CI\Validator\Rule
+{
+    const INVALID = 'invalid';
+
+    protected $Options = array();
+
+    protected $aMessageTemplates = array(
+        self::INVALID  => "Invalid Option: [%value%]",
+    );
+
+    public function __construct()
+    {
+        $this->Options = array(
+            \CI\Excel\Settings::OPTION_CREATOR    => true,
+            \CI\Excel\Settings::OPTION_TITLE      => true,
+            \CI\Excel\Settings::OPTION_FONT_STYLE => true,
+            \CI\Excel\Settings::OPTION_FONT_SIZE  => true,
+            \CI\Excel\Settings::OPTION_FORMAT     => true,
+            \CI\Excel\Settings::OPTION_COLUMNS    => true,
+            \CI\Excel\Settings::OPTION_ALIGNMENT  => true,
+        );
+    }
+
+    public function isValid($mValue)
+    {
+        $bReturn = true;
+        $this->setValue($mValue);
+
+        if (!isset($this->Options[$mValue])) {
+            $bReturn = false;
+            $this->error(self::INVALID);
+        }
+
+        return $bReturn;
+    }
+}

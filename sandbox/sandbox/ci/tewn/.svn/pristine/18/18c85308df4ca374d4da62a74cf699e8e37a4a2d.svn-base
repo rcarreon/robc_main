@@ -1,0 +1,70 @@
+<?php
+/**
+ * Testing the Hub class to get the clean the
+ * params from the array allowed by the hub reporty
+ * PHP Version 5.3
+ *
+ * @category Test
+ * @package  Test\Report\Setting\Hub
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+namespace Test\Report\Setting;
+use CI\Report\Setting\Hub;
+
+/**
+ * Testing the Hub class to get the clean the
+ * params from the array allowed by the hub reporty
+ *
+ * @category Test
+ * @package  Test\Report\Setting\Factory
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ * @group    report
+ */
+class HubTest extends \PHPUnit_Framework_TestCase
+{
+    protected $oSettingHub;
+
+    public function setUp()
+    {
+        $this->oSettingHub = new Hub();
+        $aTestValues = array(
+            'invalid_param'   => 'value',
+            'other_invalid'   => 'value',
+            'type'            => 'value',
+            'daily_breakdown' => 'value',
+            'date_end'        => 'value',
+            'date_start'      => 'value',
+            'websites'        => 'value',
+            'hubs_ids'        => 'value',
+        );
+        $this->oSettingHub->populate($aTestValues);
+    }
+
+    public function testReportSettingHubShouldReturnTheArrayOfValidElements()
+    {
+        $aExpected = array(
+            'type'            => 'value',
+            'hubs_ids'        => 'value',
+            'daily_breakdown' => 'value',
+            'websites'        => 'value',
+        );
+
+        $aResult = $this->oSettingHub->getElements();
+
+        $this->assertEquals($aExpected, $aResult);
+    }
+
+    public function testReportSettingHubShouldReturnAValidJsonString()
+    {
+        $sExpected = '{"type":"value","daily_breakdown":"value","websites":"value","hubs_ids":"value"}';
+
+        $sResult = $this->oSettingHub->toString();
+
+        $this->assertEquals($sExpected, $sResult);
+    }
+}

@@ -1,0 +1,13 @@
+<?php
+
+namespace CI\Report\Setting;
+
+class Hub extends \CI\Report\Setting
+{
+    protected $aValidFields = array(
+        'type',
+        'hubs_ids',
+        'daily_breakdown',
+        'websites',
+    );
+}

@@ -1,0 +1,215 @@
+var ci = ci || {};
+
+ci.Landing = function($){
+
+    var _pageNumber = 1;
+    var _sentRequest = true;
+    var _config = {};
+
+    (function constructor(){
+        _config = $.parseJSON($("#body").attr('data-layout'));
+    })();
+
+    return{
+        addMorePages : function(){
+            if (_sentRequest && $(document).height() - $(window).scrollTop() <= $(window).height() * 2.5) {
+                _sentRequest = false;
+
+                var $body = $("#body");
+                var url = "";
+                $body.after("<div class='loading'></div>");
+                _pageNumber++;
+
+                if (_config.is_home_page) {
+                    url = "/top/page:" + _pageNumber;
+                } else {
+                    url = location.protocol + '//' + location.host + '/v/' + _config.widget_id + '/' + _config.page_id + '/' + _config.seed + '/' + _pageNumber;
+                    url += '?refer=' + _config.refer + '&infinite=1';
+                }
+
+                $.ajax({
+                    url : url,
+                    success: function(data) {
+                        var debugbar_script = '';
+                        var matches = data.match(/<code id="debugbar_data">([^<]*)<\/code>/);
+                        if (matches) debugbar_script = matches[1];
+
+                        if (debugbar_script !== '') {
+                            debugbar_script = new Function(debugbar_script);
+                            debugbar_script();
+                        }
+
+                        var $cards = $(data).find(".page_link");
+                        _sentRequest = true;
+
+                        $cards.click(ci.Landing.onPageClicked);
+                        $(".loading").remove();
+                        $body.append($cards).masonry('appended', $cards, true);
+
+                        if ($cards.length < _config.limit) {
+                            $(window).unbind('scroll');
+                        }
+                    }
+                });
+            }
+        },
+        onPageClicked : function(){
+            var $anchor     = $(this);
+            var urlOutbound = $anchor.attr("href");
+
+            // Pretty link functionality
+            if (_config.is_home_page == false) {
+                var prettyLink = urlOutbound;
+                urlOutbound    = $anchor.attr("data-link");
+
+                $anchor.attr("href", urlOutbound);
+                $anchor.mouseleave(function(){
+                    $(this).attr("href", prettyLink).unbind("mouseleave");
+                });
+            }
+
+            // Record outbound link
+            try {
+                var myTracker =_gat._getTracker("UA-20708699-1");
+                myTracker._trackEvent('Outbound Links', urlOutbound);
+            }catch(err){}
+        },
+        getConfigValue : function(name) {
+            var confing = null;
+
+            if (typeof name == "string" && _config.hasOwnProperty(name)) {
+                confing = _config[name];
+            }
+
+            return confing;
+        }
+    }
+
+}(jQuery);
+
+ci.include = {
+    js : function(sUrl, fCallback, oAttr) {
+        var oScript = document.createElement("script");
+        oScript.setAttribute("language", "javascript");
+        oScript.setAttribute("type", "text/javascript");
+        oScript.setAttribute("src", sUrl);
+        oScript.setAttribute("async", true);
+
+        if (typeof oAttr == "object") {
+            for( sAtrr in oAttr ) {
+                oScript.setAttribute(sAtrr, oAttr[sAtrr]);
+            }
+        }
+
+        if (typeof fCallback == 'function') {
+            if (oScript.addEventListener) {
+                oScript.addEventListener('load', fCallback);
+            } else {
+                oScript.attachEvent('onload', fCallback);
+            }
+        }
+
+        document.body.appendChild(oScript);
+    }
+};
+
+$(document).ready(function() {
+    var $body  = $('#body');
+    var $pages = $body.find('.page_link');
+
+    $(window).scroll(ci.Landing.addMorePages);
+    $pages.click(ci.Landing.onPageClicked);
+
+
+    $body.masonry({
+        itemSelector: ".card",
+        columnWidth : 200,
+        gutter : 10,
+        isFitWidth : true
+    });
+
+    $body.masonry('on', 'layoutComplete', function(){
+        var bodyOffset = $body.offset();
+        var $ad        = $(".ad_leaderboard");
+        var $logo      = $("#logo");
+        var $login     = $("#login");
+        var topLogo    = ($logo.parent().height() - $logo.height()) / 2;
+
+        $logo.css('left', bodyOffset.left);
+        $logo.css('top', topLogo);
+
+        if ($ad.length > 0 ) {
+            $ad.css('right', bodyOffset.left);
+        }
+
+        if ($login.length > 0 ) {
+            var topLogin = ($login.parent().height() - $login.height()) / 2;
+            $login.css('right', bodyOffset.left);
+            $login.css('top', topLogin);
+        }
+
+    });
+
+
+    var limit = ci.Landing.getConfigValue("limit");
+
+    if ($(document).height() <= $(window).height() && limit == $pages.length){
+        ci.Landing.addMorePages();
+    }
+
+    $body.find(".card img").each(function(){
+        var $img = $(this);
+        var src = $img.attr("data-src");
+        $img.attr("src", src);
+    });
+
+    $body.masonry();
+});
+
+$(window).load(function(){
+    // Include chartbeat
+    window._sf_async_config={};
+    window._sf_async_config.uid = 8555;
+    window._sf_async_config.domain = "crowdignite.com";
+    window._sf_endpt=(new Date()).getTime();
+    ci.include.js('//static.chartbeat.com/js/chartbeat.js');
+
+    // Include comscore
+    var sComscore = (document.location.protocol == "https:" ? "https://sb" : "http://b") + ".scorecardresearch.com/beacon.js";
+
+    ci.include.js(sComscore, function(){
+        COMSCORE.beacon({
+                        c1:2,
+                        c2:6036161,
+                        c3:"",
+                        c4:"",
+                        c5:"",
+                        c6:"",
+                        c15:""
+        });
+    });
+
+    // Include fraudlogix
+    var tci = "flx367";
+    var flcachebuster = Math.round((new Date()).getTime() / 1000);
+    var sFraud = (document.location.protocol=='https:') ? 'https://'+tci+'.lporirxe.com':'http://'+tci+'.lporirxe.com'+"/"+"flp"+"/"+"ncvp.js?"+flcachebuster;
+    window._flbtn = "";
+
+    ci.include.js(sFraud, function(){
+            FLPXobj.procinit(['367','631']);
+            var myto = setInterval(function(){
+                clearInterval(myto);
+                var status = FLPXobj.pxstatus;
+            }, 500);
+    }, {'charset' : 'ISO-8859-1'});
+
+    // Include clickheat
+    ci.include.js("http://cdn.assets.evolvemediacorp.com/ao_clickheat/clickheat.js", function(){
+        window.clickHeatSite = ci.clickheat.site;
+        window.clickHeatGroup = ci.clickheat.group;
+        window.clickHeatServer = ci.clickheat.server;
+
+        initClickHeat();
+    });
+
+});

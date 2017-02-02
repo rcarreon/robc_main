@@ -1,0 +1,557 @@
+<?php
+
+App::import('Controller', 'Actions');
+
+class AdminReportsActionsController extends ActionsController
+{
+    const REPORT_BY_HUB            = 'report_by_hub';
+    const REPORT_BY_WEBSITE        = 'report_by_website';
+    const CI_TYPE_SYSTEM           = 'stats_system';
+    const CI_TYPE_BY_HUB           = 'stats_by_hub';
+    const CI_TYPE_FULL_SYSTEM      = 'stats_full_system';
+    const CI_TYPE_FULL_SYSTEM_YEAR = 'stats_full_system_year';
+    const CI_TYPE_ALL              = 'all';
+    const START_DATE               = '2013-01-01 00:00:00';
+
+    public $uses = array('Stats', 'Website');
+
+    protected $type;
+
+    protected $all_ci_reports = array(
+        self::CI_TYPE_SYSTEM,
+        self::CI_TYPE_BY_HUB,
+        self::CI_TYPE_FULL_SYSTEM,
+        self::CI_TYPE_FULL_SYSTEM_YEAR,
+        self::CI_TYPE_ALL
+    );
+
+    protected $permissions = array(
+        'ci_stats'       => User::ADMIN,
+        'generate_excel' => User::ADMIN,
+        'index'          => User::ADMIN,
+        'delete'         => User::ADMIN,
+        'get_list'       => User::ADMIN,
+        'get_user_list'  => User::ADMIN,
+        'save'           => User::ADMIN,
+        'load'           => User::ADMIN,
+        'migrate'        => User::ADMIN,
+    );
+
+    public function beforeFilter()
+    {
+        parent::beforeFilter();
+        App::import('Vendor', 'Carbon', array('file' => 'Carbon.php'));
+    }
+
+    public function index()
+    {
+        $params = new \CI\ArrayManipulator($this->params['url']);
+        $type   = $params->get('type', self::CI_TYPE_SYSTEM);
+
+        switch ($type) {
+            case self::REPORT_BY_HUB:
+                $this->response->setMessage('reports by hub');
+                $this->report_by_hub($params->getArray());
+                break;
+            case self::REPORT_BY_WEBSITE:
+                $this->response->setMessage('reports by websites');
+                $this->report_by_website($params->getArray());
+                break;
+        }
+
+        return $this->response->get();
+    }
+
+    protected function report_by_hub(array $params)
+    {
+        if (isset($params['websites'])) {
+            $hubs     = isset($params['hubs_ids']) ? $params['hubs_ids'] : null;
+            $websites = $this->Website->get_running_by_hub($hubs);
+
+            $params[\CI\Report\Website::PARAM_WEBSITES_LIST] = $websites;
+
+            $this->report_by_website($params);
+        }
+
+        $hub_report = new \CI\Report\Hub($params);
+        $hub_stats = $hub_report->getData();
+
+        $this->response->addData('hub', $hub_stats);
+    }
+
+    protected function report_by_website(array $params)
+    {
+        if (!isset($params[\CI\Report\Website::PARAM_WEBSITES_LIST]) && isset($params[\CI\Report\Website::PARAM_WEBSITES_IDS])) {
+
+            $websites_ids = explode(',', $params[\CI\Report\Website::PARAM_WEBSITES_IDS]);
+            $websites     = $this->Website->get_visible_by_ids($websites_ids);
+
+            $params[\CI\Report\Website::PARAM_WEBSITES_LIST] = $websites;
+        }
+
+        $website_report = new \CI\Report\Website($params);
+        $website_stats  = $website_report->getData();
+
+        $this->response->addData('website', $website_stats);
+    }
+
+    public function delete()
+    {
+        $this->response->setMessage('reports delete');
+        $this->Session->activate();
+        $this->loadModel('ReportSetting');
+
+        $user   = $this->Session->read('User');
+        $params = new \CI\ArrayManipulator($this->params['url']);
+        $id     = $params->get('id', false);
+
+        if ($id !== false) {
+            if (!$this->ReportSetting->delete_by_id_user($id, $user['id'])) {
+                $this->response->addErrors($this->ReportSetting->validationErrors);
+            } else {
+                $this->response->addData('id', $id);
+            }
+        } else {
+            $this->response->addError('Id', 'Missing report id');
+        }
+
+        return $this->response->get();
+    }
+
+    public function get_list()
+    {
+        $this->Session->activate();
+        $this->loadModel('ReportSetting');
+
+        $user        = $this->Session->read('User');
+        $report_list = $this->ReportSetting->get_list_with_user($user['id']);
+
+        if ($report_list !== false) {
+            $this->response->addData('reports', $report_list);
+        }
+
+        return $this->response->get();
+    }
+
+    public function get_user_list()
+    {
+        $this->Session->activate();
+        $this->loadModel('ReportSetting');
+
+        $user        = $this->Session->read('User');
+        $report_list = $this->ReportSetting->get_list_by_user($user['id']);
+
+        if ($report_list !== false) {
+            $this->response->addData('reports', $report_list);
+        }
+
+        return $this->response->get();
+    }
+
+    public function save()
+    {
+        $this->loadModel('ReportSetting');
+        $this->Session->activate();
+
+        $user            = $this->Session->read('User');
+        $params          = new \CI\ArrayManipulator($this->params['form']);
+        $report_factory  = new \CI\Report\Setting\Factory();
+        $report_settings = $report_factory->createReportSetting($params->get('type'));
+
+        $report_settings->populate($params->getArray());
+
+        if ($params->get('id', false) !== false) {
+            $this->ReportSetting->id = $params->get('id');
+        }
+
+        $report = array(
+            'user_id' => (int) $user['id'],
+            'name'    => $params->get('name'),
+            'value'   => $report_settings->toString(),
+            'created' => \Carbon\Carbon::now()->toDateTimeString(),
+        );
+
+        if (!$this->ReportSetting->save($report)) {
+            $this->response->addErrors($this->ReportSetting->validationErrors);
+        } else {
+            $this->response->addData('id', $this->ReportSetting->id);
+        }
+
+        return $this->response->get();
+    }
+
+    public function load()
+    {
+        $response = array();
+        $this->loadModel('ReportSetting');
+
+        $params = new \CI\ArrayManipulator($this->params['url']);
+        $id     = $params->get('id', false);
+        $report = $this->ReportSetting->findById($id);
+
+        $report = json_decode($report['ReportSetting']['value'], true);
+
+        $this->response->addData('report', $report);
+
+        return $this->response->get();
+    }
+
+    public function migrate()
+    {
+        $this->loadModel('ReportSetting');
+        $reports = $this->ReportSetting->find('all');
+
+        foreach ($reports as $index => $report) {
+            $values = json_decode($report['ReportSetting']['value'], true);
+
+            if (isset($values['ReportByWebsites']['website_chosen'])) {
+                $values['websites_ids'] = implode(',', $values['ReportByWebsites']['website_chosen']);
+                unset($values['ReportByWebsites']);
+            }
+
+            if (isset($values['domains'])) {
+                $values['hubs_ids'] = $values['domains'];
+                unset($values['domains']);
+            }
+
+            if (isset($values['filter_type'])) {
+                if ($values['filter_type'] == 'byHub') {
+                    $values['type'] = 'report_by_hub';
+                } else if ($values['filter_type'] == 'byWebsite') {
+                    $values['type'] = 'report_by_website';
+                }
+                unset($values['filter_type']);
+            }
+
+            if (isset($values['checked_selector'])) {
+                unset($values['checked_selector']);
+            }
+
+            $reports[$index]['ReportSetting']['value'] = json_encode($values);
+        }
+
+        if ($this->ReportSetting->saveAll($reports)) {
+            $this->response->addData('report', 'updated');
+        } else {
+            $this->response->addErrors($this->ReportSetting->validationErrors);
+        }
+
+        return $this->response->get();
+    }
+
+    public function ci_stats()
+    {
+        $this->response->setMessage('reports ci_stats');
+        $params     = new \CI\ArrayManipulator($this->params['url']);
+        $type       = $params->get('type', self::CI_TYPE_SYSTEM);
+        $start_date = $params->get('start_date');
+        $end_date   = $params->get('end_date');
+
+        if($this->is_valid_ci_stats_report($type)) {
+
+            try {
+                $start_date = \Carbon\Carbon::parse($start_date);
+                $end_date   = \Carbon\Carbon::parse($end_date);
+            } catch (\Exception $exception) {
+                $start_date = \Carbon\Carbon::parse(self::START_DATE);
+                $end_date = \Carbon\Carbon::now();
+            }
+
+            if ($start_date->gte($end_date)) {
+                $start_date = \Carbon\Carbon::parse(self::START_DATE);
+                $end_date = \Carbon\Carbon::now();
+            }
+
+            $start_date = $start_date->startOfDay();
+            $end_date   = $end_date->endOfDay();
+
+            switch ($type) {
+                case self::CI_TYPE_BY_HUB:
+                    $this->get_ci_stats_by_hub($start_date, $end_date);
+                    break;
+                case self::CI_TYPE_SYSTEM:
+                    $this->get_ci_stats_system($start_date, $end_date);
+                    break;
+                case self::CI_TYPE_FULL_SYSTEM:
+                    $this->get_ci_stats_full_system($start_date, $end_date);
+                    break;
+                case self::CI_TYPE_FULL_SYSTEM_YEAR:
+                    $this->get_ci_stats_full_system_year($start_date, $end_date);
+                    break;
+            }
+        }
+
+        return $this->response->get();
+    }
+
+    protected function get_ci_stats_full_system($start_date, $end_date)
+    {
+        $this->response->setMessage('get_ci_stats_full_system');
+        $data_report = $this->Stats->get_hub_return_rate($start_date, $end_date);
+
+        if (!empty($data_report)) {
+            $process_data = new \CI\Stats\CIStats\ProcessData();
+            $answer       = $process_data->fullSystem($data_report);
+            $this->response->addData('ci_stats_full_system', $answer);
+        } else {
+            if (false !== $data_report) {
+                $this->response->addData('msg', 'Data not found');
+            }
+        }
+    }
+
+    protected function get_ci_stats_full_system_year($start_date, $end_date)
+    {
+        $this->response->setMessage('get_ci_stats_full_system_year');
+        $data_report = $this->Stats->get_hub_return_rate($start_date, $end_date);
+
+        if (!empty($data_report)) {
+            $process_data = new \CI\Stats\CIStats\ProcessData();
+            $answer       = $process_data->fullSystemYear($data_report);
+            $this->response->addData('ci_stats_full_system_year', $answer);
+        } else {
+            if (false !== $data_report) {
+                $this->response->addData('msg', 'Data not found');
+            }
+        }
+    }
+
+    protected function get_ci_stats_by_hub($start_date, $end_date)
+    {
+        $this->response->setMessage('get_ci_stats_by_hub');
+        $hub         = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+        $all_hubs    = $hub->getAllActiveIds();
+        $data_report = $this->Stats->getByHubs($all_hubs, $start_date, $end_date);
+
+        if (!empty($data_report)) {
+            $process_data = new \CI\Stats\CIStats\ProcessData();
+            $answer       = $process_data->byHub($data_report);
+            $this->response->addData('ci_stats_by_hub', $answer);
+        } else {
+           if (false !== $data_report) {
+                $this->response->addData('msg', 'Data not found');
+            }
+        }
+    }
+
+    protected function get_ci_stats_system($start_date, $end_date)
+    {
+        $this->response->setMessage('get_ci_stats_system');
+        $data_report = $this->Stats->getAll($start_date, $end_date);
+
+        if (!empty($data_report)) {
+            $process_data = new \CI\Stats\CIStats\ProcessData();
+            $answer       = $process_data->system($data_report);
+            $this->response->addData('ci_stats_system', $answer);
+
+        } else {
+            if (false !== $data_report) {
+                $this->response->addData('msg', 'Data not found');
+            }
+        }
+    }
+
+    protected function is_valid_ci_stats_report($type)
+    {
+        return in_array($type, $this->all_ci_reports);
+    }
+
+    public function excel()
+    {
+        set_time_limit(MINUTES * 10);
+
+        $report_data = array();
+        $params      = new \CI\ArrayManipulator($this->params['url']);
+        $type        = $params->get('type', self::CI_TYPE_SYSTEM);
+
+        switch ($type) {
+            case self::REPORT_BY_HUB:
+                $report_data = $this->get_excel_by_hub($params->getArray());
+                break;
+            case self::REPORT_BY_WEBSITE:
+                $report_data = $this->get_excel_by_website($params->getArray());
+                break;
+        }
+
+        $oConfig   = new \CI\Config();
+        $aExcelCfg = $oConfig->get('reports/excel');
+        $oExcel    = new \CI\Excel(
+            new \CI\Excel\Settings(
+                array(
+                    \CI\Excel\Settings::SHEETS => $aExcelCfg,
+                )
+            ),
+            $report_data
+        );
+
+        try{
+            $this->response->addData('excel_file_path', $oExcel->generateExcel(\Carbon\Carbon::now()->toDateTimeString()));
+        } catch(Exception $ex) {
+            $this->response->addError('exception', $ex->getMessage());
+        }
+
+        return $this->response->get();
+    }
+
+    public function download_excel()
+    {
+        $params = new \CI\ArrayManipulator($this->params['url']);
+        $file_name = $params->get('file_name');
+
+        $oExcel = new \CI\Excel(new \CI\Excel\Settings());
+        $oExcel->dowloadAlreadyCreatedFile($file_name);
+    }
+
+    protected function get_excel_by_hub($params)
+    {
+        $response = array();
+
+        if (isset($params['websites'])) {
+            $hubs     = isset($params['hubs_ids']) ? $params['hubs_ids'] : null;
+            $websites = $this->Website->get_running_by_hub($hubs);
+
+            $params[\CI\Report\Website::PARAM_WEBSITES_LIST] = $websites;
+
+            $response = array_merge($response, $this->get_excel_by_website($params));
+        }
+
+        $hub_report = new \CI\Report\Hub($params);
+        $hub_stats = array('hub' => $hub_report->getData());
+        $response = array_merge($response, $hub_stats);
+
+        return $response;
+    }
+
+    protected function get_excel_by_website($params)
+    {
+        $report_name = 'website';
+
+        if (!isset($params[\CI\Report\Website::PARAM_WEBSITES_LIST]) && isset($params[\CI\Report\Website::PARAM_WEBSITES_IDS])) {
+            $websites_ids = explode(',', $params[\CI\Report\Website::PARAM_WEBSITES_IDS]);
+            $websites     = $this->Website->get_visible_by_ids($websites_ids);
+
+            $params[\CI\Report\Website::PARAM_WEBSITES_LIST] = $websites;
+        }
+
+        $website_report = new \CI\Report\Website($params);
+        $website_stats  = $website_report->getData();
+
+        if ($website_stats['daily_breakdown'] === true) {
+            $report_name = 'website_daily_breakdown';
+        }
+
+        return array($report_name => $website_stats['stats']);
+    }
+
+    public function generate_excel()
+    {
+        set_time_limit(MINUTES * 10);
+        $this->response->setMessage('generate_excel');
+
+        $params     = new \CI\ArrayManipulator($this->params['url']);
+        $type       = $params->get('type', self::CI_TYPE_SYSTEM);
+        $start_date = $params->get('start_date');
+        $end_date   = $params->get('end_date');
+
+        if($this->is_valid_ci_stats_report($type)) {
+            try {
+                $start_date = \Carbon\Carbon::parse($start_date);
+                $end_date   = \Carbon\Carbon::parse($end_date);
+            } catch (\Exception $exception) {
+                $start_date = \Carbon\Carbon::parse(self::START_DATE);
+                $end_date = \Carbon\Carbon::now();
+            }
+
+            if ($start_date->gte($end_date)) {
+                $start_date = \Carbon\Carbon::parse(self::START_DATE);
+                $end_date = \Carbon\Carbon::now();
+            }
+
+            $start_date = $start_date->startOfDay();
+            $end_date   = $end_date->endOfDay();
+
+            $active_sheet = 0;
+
+            $report_ci_stats_excel = new \CI\Report\CIStats\Excel();
+            $excel = $report_ci_stats_excel->getPHPExcel();
+
+            $excel->setActiveSheetIndex($active_sheet);
+            $sheet = $excel->getActiveSheet();
+
+            switch ($type) {
+                case self::CI_TYPE_BY_HUB:
+                    $sheet = $this->get_ci_stats_by_hub_sheet($start_date, $end_date, $sheet);
+                    break;
+                case self::CI_TYPE_SYSTEM:
+                    $sheet = $this->get_ci_stats_system_sheet($start_date, $end_date, $sheet);
+                    break;
+                case self::CI_TYPE_FULL_SYSTEM:
+                    $sheet = $this->get_ci_stats_full_system_sheet($start_date, $end_date, $sheet);
+                    break;
+                case self::CI_TYPE_FULL_SYSTEM_YEAR:
+                    $sheet = $this->get_ci_stats_full_system_year_sheet($start_date, $end_date, $sheet);
+                    break;
+                case self::CI_TYPE_ALL:
+                    $sheet = $this->get_ci_stats_by_hub_sheet($start_date, $end_date, $sheet);
+
+                    $active_sheet++;
+                    $sheet = $excel->createSheet($active_sheet);
+                    $excel->setActiveSheetIndex($active_sheet);
+                    $sheet = $excel->getActiveSheet();
+                    $sheet = $this->get_ci_stats_system_sheet($start_date, $end_date, $sheet);
+
+                    $active_sheet++;
+                    $sheet = $excel->createSheet($active_sheet);
+                    $excel->setActiveSheetIndex($active_sheet);
+                    $sheet = $excel->getActiveSheet();
+                    $sheet = $this->get_ci_stats_full_system_sheet($start_date, $end_date, $sheet);
+
+                    $active_sheet++;
+                    $sheet = $excel->createSheet($active_sheet);
+                    $excel->setActiveSheetIndex($active_sheet);
+                    $sheet = $excel->getActiveSheet();
+                    $sheet = $this->get_ci_stats_full_system_year_sheet($start_date, $end_date, $sheet);
+
+                    break;
+            }
+
+            $report_ci_stats_excel->deleteAllReports();
+            $today = \Carbon\Carbon::now()->format('Y-m-d');
+            $file_name = "{$today}_ci_stats_{$type}.xls";
+            $report_ci_stats_excel->write($file_name);
+            $this->response->addData('file_name', $file_name);
+        }
+        return $this->response->get();
+    }
+
+    protected function get_ci_stats_full_system_sheet($start_date, $end_date, $sheet)
+    {
+        $data_report = $this->Stats->get_hub_return_rate($start_date, $end_date);
+        $report_ci_stats_excel = new \CI\Report\CIStats\Excel();
+        return $report_ci_stats_excel->fullSystemSheet($data_report, $sheet);
+    }
+
+    protected function get_ci_stats_full_system_year_sheet($start_date, $end_date, $sheet)
+    {
+        $data_report = $this->Stats->get_hub_return_rate($start_date, $end_date);
+        $report_ci_stats_excel = new \CI\Report\CIStats\Excel();
+        return $report_ci_stats_excel->fullSystemYearSheet($data_report, $sheet);
+
+    }
+
+    protected function get_ci_stats_by_hub_sheet($start_date, $end_date, $sheet)
+    {
+        $hub         = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+        $all_hubs    = $hub->getAllActiveIds();
+        $data_report = $this->Stats->getByHubs($all_hubs, $start_date, $end_date);
+        $report_ci_stats_excel = new \CI\Report\CIStats\Excel();
+        return $report_ci_stats_excel->byHubSheet($data_report, $sheet);
+    }
+
+    protected function get_ci_stats_system_sheet($start_date, $end_date, $sheet)
+    {
+        $data_report = $this->Stats->getAll($start_date, $end_date);
+        $report_ci_stats_excel = new \CI\Report\CIStats\Excel();
+        return $report_ci_stats_excel->systemSheet($data_report, $sheet);
+    }
+}

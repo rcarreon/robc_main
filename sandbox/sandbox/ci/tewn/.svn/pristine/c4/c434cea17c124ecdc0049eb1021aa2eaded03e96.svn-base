@@ -1,0 +1,352 @@
+<script>
+// making filter by website works
+jQuery(document).ready(function() {
+	//var filters = new Filters("<?php echo isset($data["filter_type"])?$data["filter_type"]:''; ?>");
+});
+</script>
+
+<?
+	echo $this->element('crowdignite/backend2_toolbar', array("tab" => "report", "user" => $user));
+?>
+
+<div class="row supercontainer" id="content_area">
+
+    	<div id="status_bar">
+			<form id='report_form' method="post" action="/management/report">
+
+			<div class="ddown_container">
+				<span>Report by</span>
+				<dl class="dropdown dropdown_report">
+				    <dt><a href="#"><span>Hub</span></a></dt>
+				    <dd>
+				        <ul style="display: none;">
+				        	<li><a class="report_by_hub" href="#">Hub</a></li>
+				        	<li><a class="report_by_website" href="#">Website</a></li>
+						</ul>
+				    </dd>
+				</dl>
+			</div>
+
+			<div id="domain_checkboxes" class="ddown_container">
+				<!-- Columns -->
+				<span>Hubs</span>
+				<dl class="dropdown dropdown_hubs">
+				    <dt><a href="#"><span>Select</span></a></dt>
+				    <dd>
+				        <ul style="display: none;">
+							<?
+							$domains = $convert->domain_select();
+							foreach($domains as $bit => $domain) {
+								if (isset($data['domains']) and in_array($bit, $data['domains'])) {
+									// checkbox must be selected
+									echo '<li><input name="checked_selector" type="checkbox" value="'.$bit.'" checked="yes" /><label>'.ucfirst($domain)."</label></li>";
+								} else {
+									echo '<li><input name="checked_selector" type="checkbox" value="'.$bit.'" /><label> '.ucfirst($domain)."</label></li>";
+								}
+							}
+							?>
+						</ul>
+				    </dd>
+				</dl>
+			</div>
+
+			<div class="ddown_container down_bywebsite">
+				<select id="website_chosen" name="ReportByWebsites[website_chosen][]" data-placeholder="Choose a website..." class="chzn-select" multiple tabindex="4">
+					<option value=""></option>
+					<?php foreach ($websites_for_chosen as $id => $name) {
+						if (isset($data["ReportByWebsites"]) && in_array($id, $data["ReportByWebsites"]["website_chosen"])) {
+							echo '<option value="'.$id.'" selected>'.$name.'</option>';
+						} else {
+							echo '<option value="'.$id.'">'.$name.'</option>';
+						}
+					} ?>
+				</select>
+			</div>
+
+			<div class="ddown_container">
+				<span>Details</span>
+				<dl class="dropdown dropdown_details">
+				    <dt><a href="#"><span>Select</span></a></dt>
+				    <dd>
+				        <ul style="display: none;">
+							<li id="website_details">
+								<input name="websites" type='checkbox' value='1' <?php echo isset($data['websites'])?'checked="yes"':''; ?>>
+								<label>Website Details</label>
+							</li>
+							<li id="input_daily_breakdown">
+								<input type="checkbox" name="daily_breakdown"  <?php if(isset($data['daily_breakdown']) and $data['daily_breakdown']) { ?>checked="checked"<?php } ?> />
+								<label>Daily Breakdown</label>
+							</li>
+						</ul>
+				    </dd>
+				</dl>
+			</div>
+
+			<div class="ddown_container">
+				<span>Start Date</span>
+				<input name="date_start" id="date_start" size="10" type="text" value="<?php echo isset($data['date_start'])?$data['date_start']:''; ?>"/>
+			</div>
+
+			<div class="ddown_container">
+				<span>End Date</span>
+				<input name="date_end" id="date_end" size="10" type="text" value="<?php echo isset($data['date_end'])?$data['date_end']:''; ?>"/>
+			</div>
+
+			<div class="ddown_container">
+				<input class="button" type="submit" onclick="run_report()" value="Run report" />
+			</div>
+
+			<div class="ddown_container">
+				<input class="button" type="submit" name="btn_export" onclick="run_report_csv()" value="Export to CSV">
+			</div>
+
+			<div class="ddown_container">
+				<input class="button" type="submit" onclick="open_save_report(); return false;" value="Save report" />
+			</div>
+
+			<div class="ddown_container">
+				<span>Saved reports</span>
+				<dl class="dropdown dropdown_report_names">
+					<dt><a href="#"><span class="selected">---</span></a></dt>
+					<dd>
+						<ul style="display: none;">
+							<?php foreach ($report_list_names as $id => $name) : ?>
+							<li>
+								<img class="left delete-report" src="/img/crowdignite/icon_delete.png" onclick="delete_report(<?php echo $id; ?>); return false;" />
+								<a data-id="<?php echo $id; ?>" href="#"><?php echo ucfirst($name); ?></a>
+							</li>
+							<?php endforeach; ?>
+							<li>
+								<a data-id="-1" href="#">Clear Selection</a>
+							</li>
+						</ul>
+					</dd>
+				</dl>
+			</div>
+
+			<input type="hidden" id="domains" name="domains">
+			<input type="hidden" id="report_name" name="report_name">
+			<input type="hidden" id="report_id" name="report_id" value='-1'>
+			<input type="hidden" id="export_csv" name="export_csv">
+			<select name="filter_type" id="filter_type_input" style="display:none;">
+				<option value="byHub">by Hub</option>
+				<option value="byWebsite">by Website</option>
+			</select>
+			</form>
+		</div> <!-- Status bar -->
+
+		<div class="table_container">
+
+<?
+	if (isset($widget_clicks)) {
+?>
+	<div class="short_table">
+		<table>
+			<tr class="divider">
+				<td class="title">Hubs</td>
+				<td>
+					<?php foreach ($domain_ids as $domain_id) { ?>
+						<?php echo $convert->domain_name($domain_id) ?> /
+					<?php } ?>
+				</td>
+			</tr>
+			<tr class="odd">
+				<td class="title">Date Start</td>
+				<td align=right><?=$date_start?></td>
+			</tr>
+			<tr>
+				<td class="title">Date End:</td>
+				<td align=right><?=$date_end?></td>
+			</tr>
+			<tr class="odd">
+				<td class="title">Widget Clicks</td>
+				<td align=right><?=number_format($widget_clicks)?></td>
+			</tr>
+			<tr>
+				<td class="title">Widget Impressions</td>
+				<td align=right><?=number_format($widget_impressions)?></td>
+			</tr>
+			<tr class="odd">
+				<td class="title">Widget CTR</td>
+				<td align=right><?=round($widget_ctr, 2)?>%</td>
+			</tr>
+			<tr>
+				<td class="title">Return Rate</td>
+				<td align=right><?=round($return_rate, 2)?>%</td>
+			</tr>
+			<tr class="odd">
+				<td class="title">TPM</td>
+				<td align=right><?=round($tpm, 2)?></td>
+			</tr>
+		</table>
+	</div>
+<?
+	}
+
+if (isset($data["daily_breakdown"]) and $data["daily_breakdown"]) {
+	?>
+	        <table id="website_table" class="tablesorter">
+                <thead>
+                        <tr>
+                        <th>Date</th>
+                        <th>ID</th>
+                        <th>Website</th>
+                        <th>Hub</th>
+                        <th>Status</th>
+                        <th>Traffic to</th>
+                        <th>Traffic from</th>
+                        <th>Ret. Rate</th>
+                        <th>Widget Clicks</th>
+                        <th>Widget Display</th>
+                        <th>Widget CTR</th>
+                        <th>Credits</th>
+
+                        </tr>
+                </thead>
+                <tbody>
+		  <?
+		foreach ($websites as $date => $daily_stat) {
+				foreach($daily_stat as $website) {
+					if (empty($website['Website']['name'])) {
+						$website_name = $website['Website']['url'];
+					} else {
+						$website_name = $website['Website']['name'];
+					}
+					$incoming = $website['Account']['incoming'];
+					$outgoing = $website['Account']['outgoing'];
+
+					$wincoming=  $website['Widget']['incoming'];
+					$wdisplay = $website['Widget']['display'];
+
+			?>
+		<tr>
+		  <td><?=$date?></td>
+		  <td><?=$website['Website']['id']?></td>
+		  <td><?=$website_name?></td>
+		  <td><?=$convert->domain_name($website['Website']['domain_primary'])?></td>
+		  <td><?=$convert->website_status($website['Website']['status'])?></td>
+		  <td><?=$outgoing?></td>
+		  <td><?=$incoming?></td>
+		  <td><? echo $incoming ? round((($outgoing/$incoming)*100), 2) : 0?></td>
+		  <td><?=$wincoming?></td>
+		  <td><?=$wdisplay?></td>
+		  <td><? echo $wdisplay ? round((($wincoming/$wdisplay)*100), 3) : 0?></td>
+		  <td><? echo $website['Account']['credits'] ?></td>
+
+		</tr>
+		<? } /*foreach website */ ?>
+	<?php } /* foreach daily stat */ ?>
+		</tbody>
+		</table>
+	<?php } else {
+		  if (isset($websites) && count($websites) > 0) {
+		?>
+	        <table id="website_table" class="tablesorter">
+                <thead>
+                        <tr>
+                        <th>ID</th>
+                        <th>Website</th>
+                        <th>Hub</th>
+                        <th>Status</th>
+                        <th>Traffic to</th>
+                        <th>Traffic from</th>
+                        <th>Ret. Rate</th>
+                        <th>W Clicks</th>
+                        <th>W Display</th>
+                        <th>W CTR</th>
+                        <th>Credits</th>
+                        <th>Total traffic from</th>
+                        <th>Total traffic to</th>
+                        <th>Total RT</th>
+                        </tr>
+                </thead>
+                <tbody>
+		  <?
+				foreach($websites as $website) {
+					if (empty($website['Website']['name'])) {
+						$website_name = $website['Website']['url'];
+					} else {
+						$website_name = $website['Website']['name'];
+					}
+					$incoming = $website['Account']['incoming'];
+					$outgoing = $website['Account']['outgoing'];
+
+					$wincoming=  $website['Widget']['incoming'];
+					$wdisplay = $website['Widget']['display'];
+
+			?>
+		<tr>
+		  <td><?=$website['Website']['id']?></td>
+		  <td><?=$website_name?></td>
+		  <td><?=$convert->domain_name($website['Website']['domain_primary'])?></td>
+		  <td><?=$convert->website_status($website['Website']['status'])?></td>
+		  <td><?=$outgoing?></td>
+		  <td><?=$incoming?></td>
+		  <td><? echo $incoming ? round((($outgoing/$incoming)*100), 2) : 0?></td>
+		  <td><?=$wincoming?></td>
+		  <td><?=$wdisplay?></td>
+		  <td><? echo $wdisplay ? round((($wincoming/$wdisplay)*100), 3) : 0?></td>
+		  <td><? echo $website['Account']['credits'] ?></td>
+		  <td><?php echo isset($website['Total']['incoming']) ? $website['Total']['incoming'] : ''; ?></td>
+		  <td><?php echo isset($website['Total']['outgoing']) ? $website['Total']['outgoing'] : ''; ?></td>
+		  <td><?php echo isset($website['Total']['incoming']) && $website['Total']['incoming'] > 0 ? round(($website['Total']['outgoing']/$website['Total']['incoming']) * 100, 0) : 0; ?>%</td>
+		</tr>
+			<? } ?>
+		</tbody>
+		</table>
+<?php } /*if daily_breakdown*/ ?>
+		<? }?>
+	</div>
+
+<style>
+
+</style>
+	<div>
+		<form id="save_report" style="display: none; padding: 30px 10px;" method="post" action="/management/save_report">
+			<div class="group">
+				<label for="report_name">Name:</label>
+				<input class="report_name" name="report_name" />
+				<input class="clear_report_input button" type="button" value="Clear" />
+			</div>
+			<div class="group">
+				<label>Saved reports:</label>
+				<div class="ddown_container">
+					<dl class="dropdown dropdown_save_report_names">
+						<dt><a href="#"><span class="selected">---</span></a></dt>
+						<dd>
+							<ul style="display: none;">
+								<?php foreach ($report_list_names as $id => $name) : ?>
+								<li>
+									<a data-id="<?php echo $id; ?>" href="#"><?php echo ucfirst($name); ?></a>
+								</li>
+								<?php endforeach; ?>
+								<li>
+									<a data-id="-1" href="#">Clear selection</a>
+								</li>
+							</ul>
+						</dd>
+					</dl>
+				</div>
+			</div>
+			<div class="group-tools">
+				<input class="button" type="submit" onclick="save_report(); return false;" value="Save report" />
+				<input class="button" type="submit" onclick="cancel_save_report(); return false;" value="Cancel report" />
+				<span class="report_save_msg"></span>
+			</div>
+		</form>
+	</div>
+</div>
+<?php if (isset($data['filter_type']) && $data['filter_type'] == 'byWebsite') : ?>
+<script>
+	$(document).ready(function() {
+		$('#report_form a.report_by_website').click();
+	});
+</script>
+<?php endif; ?>
+<?php if (isset($data['report_id']) && $data['report_id'] > 0) : ?>
+<script>
+	$(document).ready(function() {
+		$('.dropdown_report_names > dd > ul > li > a[data-id=<?php echo $data['report_id']; ?>]').click();
+	});
+</script>
+<?php endif; ?>

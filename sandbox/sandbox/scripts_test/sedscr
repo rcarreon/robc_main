@@ -1,0 +1,10 @@
+#!/bin/bash
+
+        s/ MA/, Massachusets/
+        s/ PA/, Pensilvania/
+        s/ CA/, California/
+        s/ VA/, Virginia/
+        s/ OK/, Oklahoma/
+
+
+        

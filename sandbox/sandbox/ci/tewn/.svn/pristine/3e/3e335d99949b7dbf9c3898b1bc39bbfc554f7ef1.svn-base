@@ -1,0 +1,56 @@
+<?
+$javascript->link('bootstrap/external/jquery.tablesorter', false);
+$javascript->link('bootstrap/external/handlebars-v1.3.0', false);
+$javascript->link('bootstrap/admin/moderator_stats', false);
+?>
+<div class="container right-content">
+    <div class="row">
+        <div class="col-md-12">
+            <?php echo $breadcrumbs_component;?>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 form-group">
+            <?php echo $range_date_component ?>
+        </div>
+        <div class="col-md-2 form-group">
+            <button id="update" class="btn btn-primary btn-block" type="button" data-loading-text="Loading...">Update</button>
+        </div>
+    </div>
+
+    <div class="row" id="content_moderator_stats">
+    </div>
+</div>
+
+<script id="moderators_stats" type="text/x-handlebars-template">
+    <div class="col-md-12">
+        <div class="table-responsive">
+            <table id="moderators_table" class="table table-striped table-bordered table-striped table-animated tablesorter">
+                <thead>
+                    <tr>
+                        <th class="text-center">ID</th>
+                        <th class="text-center">User</th>
+                        <th class="text-center">Last Login</th>
+                        <th class="text-center">Approved</th>
+                        <th class="text-center">Edited</th>
+                        <th class="text-center">Denied</th>
+                        <th class="text-center">Total Changes</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {{#each moderators_stats}}
+                    <tr>
+                        <td class="text-right">{{id}}</td>
+                        <td>{{username}}</td>
+                        <td class="text-center">{{last_login}}</td>
+                        <td class="text-right">{{approved}}</td>
+                        <td class="text-right">{{edited}}</td>
+                        <td class="text-right">{{denied}}</td>
+                        <td class="text-right">{{total_changes}}</td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</script>

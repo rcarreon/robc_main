@@ -1,0 +1,90 @@
+<?php
+
+app::import("vendor","webservice");
+
+/*
+ * This class is intended to manage Open Graph protocol (http://ogp.me/)
+ * To use it, we just need to open a page $location, then try to access open graph <meta> tags:
+ * 
+ * $Og = new opengraphComponent();
+ * $Og->open("http://www.imdb.com/list/voCA4OW3Suo/#lb-2");
+ * 
+ * $description = $Og->description;
+ * $url = $Og->url;
+ * 
+ * or
+ * 
+ * $metas = $Og->getAll();
+ */
+class opengraphComponent extends Webservice{
+
+	private $content; //Will store the source code of the opened website.
+	private $matches; //Will store the meta tags matches
+
+	public function  __construct($location = null){
+		if(is_null($location) === false){
+			$this->open($location);
+		}
+	}
+
+	/*
+	 * This action opens the website $location and stores the code source in $this->content
+	 * for fetching the open graph <meta> tags
+	 */
+	public function open($location){
+		try {
+			$this->content = $this->getResponse($location);
+		} Catch(Exception $e) {
+			$this->content = false;
+		}
+		$this->get_meta_tags();
+	}
+
+	/*
+	 * returns all the open graph <meta> tags
+	 */
+	public function getAll(){
+		$this->validate_content();
+
+		return $this->matches;
+	}
+
+	/*
+	 * for accesing open graph <meta> tags
+	 */
+	public function __get($name){
+		$this->validate_content();
+
+		if(isset($this->matches[$name])){ 
+			$meta_tag = $this->matches[$name]; //the meta tag was found
+		}else{
+			$meta_tag = false; //the meta tag wasn't found
+		}
+
+		return $meta_tag;
+	}
+
+	/*
+	 * This action fetches all the open graph <meta> tags of the website.
+	 */
+	private function get_meta_tags(){
+		preg_match_all('<meta property="og:(.*?)" content="(.*?)">', $this->content, $matches);
+
+		if(isset($matches[1], $matches[2])){ //if there is a open graph <meta> tags
+			$results = array(); 
+			foreach($matches[1] as $key => $match){
+				$results[$match] = $matches[2][$key]; //Storing all the open graph <meta> tags 
+			}
+		}else{
+			$results = array();
+		}
+
+		$this->matches = $results;
+	}
+
+	private function validate_content(){
+		if(is_null($this->content) === true){
+			throw new exception("We can't fetch open graphs <meta> tags without content to look for tags.");
+		}
+	}
+}

@@ -1,0 +1,47 @@
+</head>
+<body>
+              <script type ="text/javascript">
+
+		  if(document.body){
+			  if(document.all){
+				  document.body.onload = init_function;
+			  } else {
+				  document.body.setAttribute("onload","init_function()");
+			  }
+		  }
+        </script>
+					
+		
+<div id="header">
+	<div class="header_wrapper">
+		<div class="logo"><a href="http://crowdignite.com/"><img src="http://<?=CDN_URL?>/img/<?=DOMAIN?>/logo_small.jpg" id="logo"></a></div>		
+    	<div id="topnav">    
+		<div id="webmaster_area">
+<?
+		$session->activate();			  
+        if (!$session->check('User')) {
+?>
+			<div><b><a href="http://<?=MANAGEMENT_URL?>/login">Login</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href="http://get.crowdignite.com" target="_blank">Join Crowd Ignite</a></b></div>
+<?
+		 } else {
+?>
+			<div><b><a href="/dashboard">Dashboard</a>&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;<a href="/logout">Logout</a></b></div>
+<?
+	         }
+?>
+		</div>
+    	</div>
+		<?
+		if( isset($preview_style) ) {
+			if( $preview_style == 22 || $preview_style == 29) {
+				echo '<div class="ad_leaderboard">';
+				echo "<div id='div-gpt-ad-0'></div>";
+			    echo '</div>';
+			}
+		}
+		?>
+<?
+		echo $this->element("tabs");
+?>
+	</div>					
+</div>

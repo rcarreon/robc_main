@@ -1,0 +1,77 @@
+ci.namespace('ci.HashChange');
+
+(function($){
+    $.fn.hashchange = function(settings) {
+        var _settings = $.extend({}, $.fn.hashchange.default_settings, settings);
+        var _o_hash = new ci.HashChange(_settings);
+        _o_hash.init();
+        return _o_hash;
+    };
+
+    $.fn.hashchange.default_settings = {
+        force_change : false,
+        default_hash : '',
+        onChange     : '',
+        done         : ''
+    };
+})(jQuery);
+
+/**
+ * Constructor of the class
+ *
+ * @param {object} settings List of settings
+ */
+ci.HashChange = function(settings){
+    this._settings    = settings;
+
+    if(this._settings.default_hash != '') {
+        history.pushState('', '', location.pathname + this._settings.default_hash);
+        $(this._settings.default_hash.replace("#", ".")).click();
+    }
+};
+
+ci.HashChange.prototype.setHash = function(hash, callback) {
+    var _self                    = this;
+    _self._settings.force_change = true;
+
+    if (ci.isFunction(callback)) {
+        _self._settings.done = callback;
+    }
+
+    window.location.hash = hash;
+
+    $(window).trigger('hashchange');
+};
+
+ci.HashChange.prototype.reset = function() {
+    var _self = this;
+
+    _self._settings.force_change = false;
+    _self._settings.done         = '';
+};
+
+ci.HashChange.prototype.init = function() {
+    var _self = this;
+
+    $(window).bind('hashchange', function(){
+        var hash = window.location.hash;
+
+        if(_self._settings.default_hash == hash && _self._settings.force_change === false) {
+            return;
+        }
+
+        if (ci.isFunction(_self._settings.onChange)) {
+            _self._settings.onChange();
+        }
+
+        _self._settings.default_hash = hash;
+
+        $(hash.replace("#", ".")).click();
+
+        if (ci.isFunction(_self._settings.done)) {
+            _self._settings.done();
+        }
+
+        _self.reset();
+    });
+};

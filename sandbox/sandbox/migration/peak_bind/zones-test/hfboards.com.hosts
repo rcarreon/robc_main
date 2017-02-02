@@ -1,0 +1,64 @@
+$TTL 86400
+hfboards.com.		IN      SOA     hfboards.com. root.hfboards.com. (
+                        2014062500	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+hfboards.com.		IN	NS              app3v-dns.tp.prd.lax.craveonline.com.
+hfboards.com.		IN	NS              app4v-dns.tp.prd.lax.craveonline.com.
+hfboards.com.		IN	NS              app1v-dns.tp.prd.lax.craveonline.com.
+hfboards.com.		IN	NS              app2v-dns.tp.prd.lax.craveonline.com.
+hfboards.com.		IN	MX      1	aspmx.l.google.com.
+hfboards.com.		IN	MX      5	alt1.aspmx.l.google.com.
+hfboards.com.		IN	MX      5	alt2.aspmx.l.google.com.
+hfboards.com.		IN	MX      10	aspmx2.googlemail.com.
+hfboards.com.		IN	MX      10	aspmx3.googlemail.com.
+hfboards.com.		IN	MX      10	aspmx4.googlemail.com.
+hfboards.com.		IN	MX      10	aspmx5.googlemail.com.
+;
+; local host
+;
+local           IN      A       127.0.0.1
+localhost       IN      A       127.0.0.1
+loghost         IN      A       127.0.0.1
+;
+;
+; hosts
+; hfboards.com.		IN	A	69.61.39.163
+; new
+hfboards.com.		IN	A	72.172.76.31	
+; old
+;hfboards.com.		IN	A	66.180.202.85	
+tech1.hfboards.com.	IN	A	66.154.15.26 
+tech2.hfboards.com.	IN	A	69.61.38.225
+tech3.hfboards.com.	IN	A	69.61.38.196
+tech4.hfboards.com.	IN	A	69.61.38.202
+tech5.hfboards.com.	IN	A	69.61.39.184
+tech6.hfboards.com.	IN	A	66.154.48.71
+; www.hfboards.com.	IN	A	69.61.39.163
+;
+; old
+;www.hfboards.com.	IN	A	66.180.202.85
+;
+; new
+www.hfboards.com.	IN	A	72.172.76.31
+www2.hfboards.com.	IN	A	72.172.76.31
+
+dev                     IN      A       66.180.202.130
+;stg			IN	A	10.2.10.87
+; wildcard
+; *			IN	A	69.61.39.163
+;
+; old
+;*			IN	A	66.180.202.85
+;
+; new
+*			IN	A	72.172.76.31
+
+; txt entries
+hfboards.com.		IN	TXT	"v=spf1 include:gnmedia.net ip4:i66.180.202.0/24 ip4:66.154.0.0/18 a mx include:aspmx.googlemail.com ~all"
+
+lax.hfboards.com.                        IN      A       72.172.76.116

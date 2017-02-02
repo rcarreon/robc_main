@@ -1,0 +1,35 @@
+<?php
+/**
+ * Logger Storage Interface
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger
+ * @package  Logger_Storage
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+/**
+ * Logger Storage Interface
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger
+ * @package  Logger_Storage
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+interface Logger_Storage_Interface
+{
+    /**
+     * Saves a value
+     *
+     * @param mixed $value The mixed value to be saved
+     *
+     * @return boolean True if value was saved
+     */
+    public function save($value);
+}

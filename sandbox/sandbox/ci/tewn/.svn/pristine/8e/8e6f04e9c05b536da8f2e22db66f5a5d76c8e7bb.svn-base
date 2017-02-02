@@ -1,0 +1,19 @@
+<?php
+App::import('Component', 'CIWebsites');
+
+class CIWebsitesSelectComponent extends CIWebsitesComponent
+{
+    protected function initView()
+    {
+        $this->view = 'components/websites/select';
+    }
+
+    public function process()
+    {
+        $multiple = $this->options->get('multiple', false);
+
+        $return = parent::process();
+        $return['options']['multiple'] = $multiple === false ? '' : ' multiple';
+        return $return;
+    }
+}

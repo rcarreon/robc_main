@@ -1,0 +1,45 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html>
+<head>
+<?
+echo $this->element("chartbeat_start");
+?>
+<title><? echo $title_for_layout ?></title>
+<meta name="description" content="<? echo $title_for_layout ?>">
+<meta name="keywords" content="video games, video, game, reviews, cheats, downloads, previews, videos, community, forums">
+<meta name="robots" content="all" />
+<meta HTTP-EQUIV="Window-target" CONTENT="_top">
+
+<?
+    if (false === $isIpad)
+    {
+        echo '<meta name="viewport" content="width=device-width">';
+    }
+
+	if ($canonical) {
+		echo '<link rel="canonical" href="'.$canonical.'"/>';
+	}
+?>
+
+<link rel="alternate" type="application/rss+xml" title="Game Revolution RSS Feed" href="http://feeds.feedburner.com/GameRevolution" />
+<?
+	$html->css('reset', null, null, false);
+	$html->css('text', null, null, false);
+	$html->css('default', null, null, false);
+	$html->css('crowdignite', null, null, false);
+	$html->css(DOMAIN.'/style', null, null, false);
+
+	$javascript->link('jquery', false);
+
+	echo $asset->scripts_for_layout();
+
+	echo $this->element("analytic_outbound_tracker");
+	echo $this->element(DOMAIN."/analytics");
+	
+	/* Google asynch GPT header */
+	if( isset($preview_style) ) { // Ads only on Landing pages
+		echo $this->element(DOMAIN."/ads/google_gpt_header");
+	}		
+?>
+
+</head>

@@ -1,0 +1,140 @@
+<?php
+
+namespace CI\Category\DataSource;
+
+use CI\Category;
+
+class MyArray extends \CI\Category\DataSource
+{
+    protected $aAll = array(
+        'id'   => Category::ALL,
+        'name' => 'All',
+    );
+    protected $aOffbeat = array(
+        'id'   => Category::OFFBEAT,
+        'name' => 'Offbeat',
+    );
+    protected $aSports = array(
+        'id'   => Category::SPORTS,
+        'name' => 'Sports',
+    );
+    protected $aGaming = array(
+        'id'   => Category::GAMING,
+        'name' => 'Gaming',
+    );
+    protected $aLifestyle = array(
+        'id'   => Category::LIFESTYLE,
+        'name' => 'Life Style',
+    );
+    protected $aMedia = array(
+        'id'   => Category::MEDIA,
+        'name' => 'Media',
+    );
+    protected $aCelebrities = array(
+        'id'   => Category::CELEBRITIES,
+        'name' => 'Celebrities',
+    );
+    protected $aTechnology = array(
+        'id'   => Category::TECHNOLOGY,
+        'name' => 'Technology',
+    );
+    protected $aMensEntertainment = array(
+        'id'   => Category::MENS_ENTERTAINMENT,
+        'name' => 'Mens Entertainment',
+    );
+    protected $aBeauty = array(
+        'id'   => Category::BEAUTY,
+        'name' => 'Beauty',
+    );
+    protected $aFood = array(
+        'id'   => Category::FOOD,
+        'name' => 'Food',
+    );
+    protected $aParenting = array(
+        'id'   => Category::PARENTING,
+        'name' => 'Parenting',
+    );
+    protected $aDeals = array(
+        'id'   => Category::DEALS,
+        'name' => 'Deals',
+    );
+    protected $aMusic = array(
+        'id'   => Category::MUSIC,
+        'name' => 'Music',
+    );
+    protected $aTravel = array(
+        'id'   => Category::TRAVEL,
+        'name' => 'Travel',
+    );
+    protected $aCasualGames = array(
+        'id'   => Category::CASUAL_GAMES,
+        'name' => 'Casual Games',
+    );
+    protected $aPets = array(
+        'id'   => Category::PETS,
+        'name' => 'Pets',
+    );
+    protected $aHome = array(
+        'id'   => Category::HOME,
+        'name' => 'Home',
+    );
+    protected $aHealth = array(
+        'id'   => Category::HEALTH,
+        'name' => 'Health',
+    );
+    protected $aDiy = array(
+        'id'   => Category::DIY,
+        'name' => 'Do It Yourself',
+    );
+    protected $aOutdoors = array(
+        'id'   => Category::OUTDOORS,
+        'name' => 'Outdoors',
+    );
+    protected $aAnime = array(
+        'id'   => Category::ANIME,
+        'name' => 'Anime',
+    );
+    protected $aAutomotive = array(
+        'id'   => Category::AUTOMOTIVE,
+        'name' => 'Automotive',
+    );
+    protected $aUrban = array(
+        'id'   => Category::URBAN,
+        'name' => 'Urban',
+    );
+    protected $aNews = array(
+        'id'   => Category::NEWS,
+        'name' => 'News',
+    );
+
+    public function init()
+    {
+        $this->aCategories = array(
+            $this->aAll['id']               => $this->aAll,
+            $this->aOffbeat['id']           => $this->aOffbeat,
+            $this->aSports['id']            => $this->aSports,
+            $this->aGaming['id']            => $this->aGaming,
+            $this->aLifestyle['id']         => $this->aLifestyle,
+            $this->aMedia['id']             => $this->aMedia,
+            $this->aCelebrities['id']       => $this->aCelebrities,
+            $this->aTechnology['id']        => $this->aTechnology,
+            $this->aMensEntertainment['id'] => $this->aMensEntertainment,
+            $this->aBeauty['id']            => $this->aBeauty,
+            $this->aFood['id']              => $this->aFood,
+            $this->aParenting['id']         => $this->aParenting,
+            $this->aDeals['id']             => $this->aDeals,
+            $this->aMusic['id']             => $this->aMusic,
+            $this->aTravel['id']            => $this->aTravel,
+            $this->aCasualGames['id']       => $this->aCasualGames,
+            $this->aPets['id']              => $this->aPets,
+            $this->aHome['id']              => $this->aHome,
+            $this->aHealth['id']            => $this->aHealth,
+            $this->aDiy['id']               => $this->aDiy,
+            $this->aOutdoors['id']          => $this->aOutdoors,
+            $this->aAnime['id']             => $this->aAnime,
+            $this->aAutomotive['id']        => $this->aAutomotive,
+            $this->aUrban['id']             => $this->aUrban,
+            $this->aNews['id']              => $this->aNews,
+        );
+    }
+}

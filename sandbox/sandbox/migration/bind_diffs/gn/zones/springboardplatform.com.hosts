@@ -1,0 +1,121 @@
+$TTL 300
+springboardplatform.com.    IN    SOA    springboardplatform.com. root.springboardplatform.com. (
+                                                  2015022501     ; serial
+                                                  28800          ; refresh
+                                                  14400          ; retry
+                                                  3600000        ; expire
+                                                  86400 )        ; minimum
+
+springboardplatform.com.                          IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+springboardplatform.com.                          IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+springboardplatform.com.                          IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+springboardplatform.com.                          IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+
+springboardplatform.com.                          IN    MX 10    cluster9.us.messagelabs.com.
+springboardplatform.com.                          IN    MX 20    cluster9a.us.messagelabs.com.
+
+
+;PRD
+springboardplatform.com.                          IN    A        72.172.76.155
+origin.springboardplatform.com.                   IN    CNAME    springboardplatform.com.
+origin.media.springboardplatform.com.             IN    CNAME    springboardplatform.com.
+publishers.springboardplatform.com.               IN    A        72.172.76.156
+www.springboardplatform.com.                      IN    CNAME    wpc.F127.edgecastcdn.net.
+cms.springboardplatform.com.                      IN    CNAME    wpc.F127.edgecastcdn.net.
+cdn.springboardplatform.com.                      IN    CNAME    wpc.F127.edgecastcdn.net.
+hls.springboardplatform.com.         IN      CNAME       wpc.F127.edgecastcdn.net.
+*.springboardplatform.com.                        IN    CNAME    wpc.F127.edgecastcdn.net.
+
+;STG
+stg.springboardplatform.com.             IN      A       72.172.76.164
+;stg.springboardplatform.com.             IN      CNAME       wpc.F127.edgecastcdn.net.
+stg.publishers.springboardplatform.com.           IN    A        72.172.76.174
+stg.media.springboardplatform.com.                IN    CNAME    stg.springboardplatform.com.
+stg.cms.springboardplatform.com.         IN      CNAME       wpc.F127.edgecastcdn.net.
+*.stg.springboardplatform.com.                    IN    CNAME  wpc.F127.edgecastcdn.net.  
+stg.cdn.springboardplatform.com.         IN      CNAME       wpc.F127.edgecastcdn.net.
+hls.stg.springboardplatform.com.         IN      CNAME       wpc.F127.edgecastcdn.net.
+
+;DEV
+dev.media.springboardplatform.com.                IN    CNAME    app1v-media.sbv.dev.lax.gnmedia.net.
+*.dev.springboardplatform.com.                    IN    CNAME    app1v-media.sbv.dev.lax.gnmedia.net.
+dev.springboardplatform.com.                      IN    CNAME    app1v-media.sbv.dev.lax.gnmedia.net.
+dev.publishers.springboardplatform.com.           IN    CNAME    app1v-cms.sbv.dev.lax.gnmedia.net.
+dev.cms.springboardplatform.com.                  IN    CNAME    app1v-media.sbv.dev.lax.gnmedia.net.
+dev.cdn.springboardplatform.com.                  IN    CNAME    app1v-media.sbv.dev.lax.gnmedia.net.
+
+;UAT
+uat.publishers.springboardplatform.com.           IN    CNAME   app5v-cms.sbv.stg.lax.gnmedia.net.
+
+;UID
+aarwine.publishers.springboardplatform.com.       IN    CNAME    uid1v-aarwine.sbv.dev.lax.gnmedia.net.
+aarwine.cms.springboardplatform.com.              IN    CNAME    uid1v-aarwine.sbv.dev.lax.gnmedia.net.
+aarwine.cdn.springboardplatform.com.              IN    CNAME    uid1v-aarwine.sbv.dev.lax.gnmedia.net.
+aarwine.springboardplatform.com.                IN    CNAME    uid1v-aarwine.sbv.dev.lax.gnmedia.net.
+*.aarwine.springboardplatform.com.                IN    CNAME    uid1v-aarwine.sbv.dev.lax.gnmedia.net.
+
+dstankovic.publishers.springboardplatform.com.    IN    CNAME    uid1v-dstankovic.sbv.dev.lax.gnmedia.net.
+dstankovic.cms.springboardplatform.com.           IN    CNAME    uid1v-dstankovic.sbv.dev.lax.gnmedia.net.
+dstankovic.cdn.springboardplatform.com.           IN    CNAME    uid1v-dstankovic.sbv.dev.lax.gnmedia.net.
+dstankovic.springboardplatform.com.           IN    CNAME    uid1v-dstankovic.sbv.dev.lax.gnmedia.net.
+*.dstankovic.springboardplatform.com.           IN    CNAME    uid1v-dstankovic.sbv.dev.lax.gnmedia.net.
+
+mtodorovic.publishers.springboardplatform.com.    IN    CNAME    uid1v-mtodorovic.sbv.dev.lax.gnmedia.net.
+mtodorovic.cms.springboardplatform.com.           IN    CNAME    uid1v-mtodorovic.sbv.dev.lax.gnmedia.net.
+mtodorovic.cdn.springboardplatform.com.           IN    CNAME    uid1v-mtodorovic.sbv.dev.lax.gnmedia.net.
+mtodorovic.springboardplatform.com.           IN    CNAME    uid1v-mtodorovic.sbv.dev.lax.gnmedia.net.
+*.mtodorovic.springboardplatform.com.           IN    CNAME    uid1v-mtodorovic.sbv.dev.lax.gnmedia.net.
+
+npetkoski.publishers.springboardplatform.com.     IN    CNAME    uid1v-npetkoski.sbv.dev.lax.gnmedia.net.
+npetkoski.cms.springboardplatform.com.            IN    CNAME    uid1v-npetkoski.sbv.dev.lax.gnmedia.net.
+npetkoski.cdn.springboardplatform.com.            IN    CNAME    uid1v-npetkoski.sbv.dev.lax.gnmedia.net.
+npetkoski.springboardplatform.com.            IN    CNAME    uid1v-npetkoski.sbv.dev.lax.gnmedia.net.
+*.npetkoski.springboardplatform.com.            IN    CNAME    uid1v-npetkoski.sbv.dev.lax.gnmedia.net.
+
+pmilosevic.publishers.springboardplatform.com.    IN    CNAME    uid1v-pmilosevic.sbv.dev.lax.gnmedia.net.
+pmilosevic.cms.springboardplatform.com.           IN    CNAME    uid1v-pmilosevic.sbv.dev.lax.gnmedia.net.
+pmilosevic.cdn.springboardplatform.com.           IN    CNAME    uid1v-pmilosevic.sbv.dev.lax.gnmedia.net.
+pmilosevic.springboardplatform.com.           IN    CNAME    uid1v-pmilosevic.sbv.dev.lax.gnmedia.net.
+*.pmilosevic.springboardplatform.com.           IN    CNAME    uid1v-pmilosevic.sbv.dev.lax.gnmedia.net.
+
+mjovanovic.publishers.springboardplatform.com.    IN    CNAME    uid1v-mjovanovic.sbv.dev.lax.gnmedia.net.
+mjovanovic.cms.springboardplatform.com.           IN    CNAME    uid1v-mjovanovic.sbv.dev.lax.gnmedia.net.
+mjovanovic.cdn.springboardplatform.com.           IN    CNAME    uid1v-mjovanovic.sbv.dev.lax.gnmedia.net.
+mjovanovic.springboardplatform.com.           IN    CNAME    uid1v-mjovanovic.sbv.dev.lax.gnmedia.net.
+*.mjovanovic.springboardplatform.com.           IN    CNAME    uid1v-mjovanovic.sbv.dev.lax.gnmedia.net.
+
+;TitanWP Migration
+bta.home.springboardplatform.com.                 IN    A        10.11.234.71
+dev.home.springboardplatform.com.                 IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.home.springboardplatform.com.                 IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.home.springboardplatform.com.                 IN    A        72.172.76.151
+;home.springboardplatform.com.                    IN    A        72.172.76.136
+home.springboardplatform.com.                     IN    A        72.172.76.151
+
+origin-dev.home.springboardplatform.com.          IN    CNAME    dev.home.springboardplatform.com.
+cdn1-dev.home.springboardplatform.com.            IN    CNAME    dev.home.springboardplatform.com.
+cdn2-dev.home.springboardplatform.com.            IN    CNAME    dev.home.springboardplatform.com.
+cdn3-dev.home.springboardplatform.com.            IN    CNAME    dev.home.springboardplatform.com.
+
+origin-stg.home.springboardplatform.com.          IN    CNAME    stg.home.springboardplatform.com.
+cdn1-stg.home.springboardplatform.com.            IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-stg.home.springboardplatform.com.            IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-stg.home.springboardplatform.com.            IN    CNAME    wac.EE35.edgecastcdn.net.
+
+origin.home.springboardplatform.com.              IN    CNAME    prd.home.springboardplatform.com.
+cdn1-www.home.springboardplatform.com.            IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-www.home.springboardplatform.com.            IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-www.home.springboardplatform.com.            IN    CNAME    wac.EE35.edgecastcdn.net.
+;END TitanWP
+
+
+;DEV SSL
+ssl1.springboardplatform.com.                     IN    CNAME    wildcard.springboardplatform.com.edgekey.net.
+devssl.springboardplatform.com.                   IN    CNAME    app1v-media.sbv.dev.lax.gnmedia.net.
+devssl.media.springboardplatform.com.             IN    CNAME    app1v-media.sbv.dev.lax.gnmedia.net.
+stgssl.media.springboardplatform.com.             IN    CNAME    stg.springboardplatform.com.
+deploy.springboardplatform.com.          IN      CNAME       app1v-deploy.sbv.prd.lax.gnmedia.net.
+stg.www.springboardplatform.com.         IN      CNAME       wpc.F127.edgecastcdn.net.
+origin-stg.media.springboardplatform.com. IN    CNAME stg.springboardplatform.com.
+social.springboardplatform.com.          IN      CNAME       springboardplatform.com.
+social-stg.springboardplatform.com.      IN      CNAME       stg.springboardplatform.com.

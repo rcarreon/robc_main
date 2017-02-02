@@ -1,0 +1,68 @@
+<?php echo $this->element('crowdignite/backend2_toolbar', array("tab" => $tab, "user" => $user)); ?>
+
+<div class="row supercontainer">
+    <div class="side-column">
+        <span class="title icon icon-link">Analysis By</span>
+        <ul class="list">
+            <li class="active"><a href="/analysis/websites">Websites</a></li>
+            <li><a href="/analysis/hubs">Hubs</a></li>
+            <li><a href="/analysis/widgets">Widgets</a></li>
+            <li><a href="/analysis/lpwebsites">Website distribution</a></li>
+            <li><a href="/analysis/lpcoverage">Hubs distribution</a></li>
+            <li><a href="/analysis/tpcategory">Traffic categories</a></li>
+        </ul> <!-- list -->
+    </div> <!-- side-column -->
+    <div class="content-column">
+        <div class="options-bar">
+            <form>
+                <div class="controls controls-chosen">
+                    <label for="">Websites</label>
+                    <select id="website_select" class="chosen-select" data-placeholder="Choose a website..." multiple="multiple">
+                            <?php foreach ($website_list as $id => $name): ?>
+                                <option value="<?php echo $id; ?>"><?php echo $name; ?></option>
+                            <?php endforeach ?>
+                    </select>
+                </div>
+                <div class="controls">
+                    <a id="analyse_websites" class="button" href="javascript:;"><span class="label">Get Analysis</span></a>
+                </div>
+                <div class="controls">
+                    <a id="clear_analyse_websites" class="button" href="javascript:;"><span class="label">Clear Results</span></a>
+                </div>
+                <div class="controls">
+                    <a id="share_link" class="button" href="javascript:;"><span class="label">Share Link</span></a>
+                </div>
+                <div class="controls">
+                    <label>LP content colors: </label>
+                    <span class="badge green tooltip" title="More than 100 links on the landing page">&nbsp;&nbsp;&nbsp;</span>
+                    <span class="badge orange tooltip" title="Less than 100 links on the landing page">&nbsp;&nbsp;&nbsp;</span>
+                    <span class="badge red tooltip" title="Not enough content in landing page (< 30 links)">&nbsp;&nbsp;&nbsp;</span>
+                </div>
+            </form>
+        </div> <!-- options-bar -->
+        <div class="container">
+            <table class="tablesorter analysis">
+                <thead>
+                    <th>ID</th>
+                    <th>Website</th>
+                    <th style="width: 250px;">Whitelist</th>
+                    <th style="width: 250px;">Blacklist</th>
+                    <th class="tooltip" title="All pages running on widgets of the website (could have duplicates by type)">Widget Pages</th>
+                    <th style="width: 250px;" class="tooltip" title="Non duplicate pages running in widgets of the website">Unique Widget Pages</th>
+                    <th style="width: 250px;">Intersects</th>
+                </thead>
+                <tbody id="tbody_results"></tbody>
+            </table>
+        </div> <!-- container -->
+    </div> <!-- content-column -->
+</div>  <!-- row supercontainer -->
+
+<div id="share_link_dialog" title="Website Analysis Link" style="display: none;">
+    <img src="/img/crowdignite/icons/link.png"><input type="text" readonly="true" />
+</div>
+
+<script>
+    <?php if (isset($websites)): ?>
+        var CIStartProcess = "<?php echo $websites; ?>";
+    <?php endif; ?>
+</script>

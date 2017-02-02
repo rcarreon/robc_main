@@ -1,0 +1,56 @@
+<style>
+/* template 3 */
+body {
+	background: url("http://cdn.crowdignite.com/img/thefashionspot/tfs-logo.jpg") no-repeat scroll center top #FAF8FB; 
+}
+.container_12 .grid_12 {
+	width: 955px;
+}
+
+.container_12 .grid_3 {
+	width: 960px;
+	margin-left: 5px;
+	 margin-bottom: 0px;
+}
+
+.container_12 .grid_3 .grid_3 {
+	width: 210px;
+	float: left;
+}
+
+.grid_3 .item {
+	margin-left: 0px;
+}
+
+.grid_7 {
+	margin-left: 0px;
+}
+
+.container_12 .grid_7 {
+	width: 575px;
+	float: left;
+}
+
+.container_12 .grid_5 {
+	width: 315px;
+	margin-right: 4px;
+}
+
+.grid_7 .item {
+	margin-bottom: 0px;
+}
+
+.grid_5 .item {
+	margin-bottom: 0px;
+}
+
+.container_12 .grid_3 .grid_3 img {
+	width: 200px;
+}
+#links_content {
+	margin-left: 0px;
+	background-color: #FFF;
+	padding-bottom: 10px;
+}
+
+</style>

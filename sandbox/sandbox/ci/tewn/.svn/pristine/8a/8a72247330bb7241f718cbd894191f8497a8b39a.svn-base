@@ -1,0 +1,287 @@
+ci.namespace('ci.Tags');
+
+(function($){
+    var LIMIT = 20;
+
+    var TEMPLATE_TAGS   = 'tpl-tags';
+    var TEMPLATE_ERROR  = 'error';
+
+    ci.Tags = function() {
+        this.offset   = 0;
+        this.template = {
+            TEMPLATE_TAGS   : undefined,
+            TEMPLATE_ERROR  : undefined,
+        };
+    };
+
+    ci.Tags.prototype.load = function() {
+        var _self = this;
+        $.ajax({
+            url      : '/tags/action/get',
+            cache    : false,
+            dataType : 'json',
+            data     : {
+                limit : LIMIT + 1,
+                offset : this.offset
+            }
+        }).done(function(response){
+            if(response.hasOwnProperty('status') && response.status == 'ok') {
+                var template = _self.getTemplate(TEMPLATE_TAGS);
+
+                if (response.data.tags.length > LIMIT) {
+                    $('.next').removeClass('hidden');
+                    response.data.tags.pop();
+                } else {
+                    $('.next').addClass('hidden');
+                }
+
+                if (_self.offset >= LIMIT ) {
+                    $('.previous').removeClass('hidden');
+                } else {
+                    $('.previous').addClass('hidden');
+                }
+
+                $('#table-tags').html(template(response.data));
+                $('.tablesorter').tablesorter({
+                    headers: {
+                        4 : { sorter: false }
+                    }
+                });
+
+                $('[data-toggle="tooltip"]').tooltip();
+            }
+        });
+    };
+
+    ci.Tags.prototype.getTemplate = function(name) {
+        if (ci.isUndefined(this.template[name])) {
+            this.template[name] = Handlebars.compile($('#' + name).html());
+        }
+
+        return this.template[name];
+    };
+
+    ci.Tags.prototype.next = function() {
+        this.offset += LIMIT;
+        this.load();
+    };
+
+    ci.Tags.prototype.previous = function() {
+        this.offset -= LIMIT;
+        this.load();
+    };
+
+    ci.Tags.prototype.edit = function(id, name) {
+        var _self = this;
+        $.ajax({
+            url      : '/tags/action/update',
+            type     : 'POST',
+            cache    : false,
+            dataType : 'json',
+            data     : {
+                id: id,
+                name: name
+            }
+        }).done(function(response){
+            $('#modal-edit').modal('hide');
+
+            if (response.hasOwnProperty('status') && response.status == 'ok') {
+                var $row   = $('#tag-' + id);
+
+                $row.children(':last').data('name', name);
+                $row.addClass('success').find('.name').text(name);
+                setTimeout(function(){
+                    $row.removeClass('success');
+                }, 1000);
+
+                $('.tablesorter').trigger('update');
+            } else {
+                var template      = _self.getTemplate(TEMPLATE_ERROR);
+                var $container    = $('.table-responsive').parent();
+                response.error_id = 'update';
+                $container.prepend(template(response));
+
+                setTimeout(function(){
+                    $container.find('#danger-msg-update').alert('close');
+                }, 3000);
+            }
+        });
+    };
+
+    ci.Tags.prototype.deleteTag = function(id) {
+        var _self = this;
+        $.ajax({
+            url      : '/tags/action/delete',
+            type     : 'POST',
+            cache    : false,
+            dataType : 'json',
+            data     : {id : id}
+        }).done(function(response){
+            $('#modal-delete').modal('hide');
+
+            if (response.hasOwnProperty('status') && response.status == 'ok') {
+                var $row = $('#tag-' + id);
+
+                $row.addClass('success').fadeOut(1000);
+                $('.tablesorter').trigger('update');
+            } else {
+                var template      = _self.getTemplate(TEMPLATE_ERROR);
+                var $container    = $('.table-responsive').parent();
+                response.error_id = 'delete';
+                $container.prepend(template(response));
+
+                setTimeout(function(){
+                    $container.find('#danger-msg-delete').alert('close');
+                }, 3000);
+            }
+        });
+    };
+
+    ci.Tags.prototype.searchByName = function(name, callback) {
+        var _self = this;
+        $.ajax({
+            url : '/tags/action/search_by_name',
+            type : 'GET',
+            cache : false,
+            dataType : 'json',
+            data : {name : name}
+        }).done(function(response){
+            if (response.hasOwnProperty('status') && response.status == 'ok') {
+                if (ci.isFunction(callback)) {
+                    callback(response.data.tags);
+                }
+            }
+        });
+    };
+
+    ci.Tags.prototype.moveTagTo = function(currentId, newId) {
+        $.ajax({
+            url      : '/tags/action/move_tag_to',
+            type     : 'POST',
+            dataType : 'json',
+            data     : {
+                current_id : currentId,
+                new_id     : newId
+            },
+        }).done(function(response) {
+            $('#modal-transfer').modal('hide');
+
+            if (response.hasOwnProperty('status') && response.status == 'ok') {
+                var $row = $('#tag-' + currentId);
+
+                $row.addClass('success').fadeOut(1000);
+                $('.tablesorter').trigger('update');
+            }
+        });
+    };
+})(jQuery);
+
+$(document).ready(function(){
+    var tags            = new ci.Tags();
+    var $modal_edit     = $('#modal-edit');
+    var $modal_delete   = $('#modal-delete');
+    var $modal_transfer = $('#modal-transfer');
+
+    tags.load();
+
+    $('.next a').on('click', function(event){
+        event.preventDefault();
+        tags.next();
+    });
+
+    $('.previous a').on('click', function(event){
+        event.preventDefault();
+        tags.previous();
+    });
+
+    $modal_edit.on('show.bs.modal', function(event){
+        var $this      = $(this);
+        var $element   = $(event.relatedTarget).parent();
+        var $input     = $this.find('[name="name"]');
+        var $btn_update = $this.find('.btn-update');
+
+        $input.val($element.data('name'));
+        $btn_update.on('click', function(){
+            $(this).button('loading');
+            tags.edit($element.data('id'), $input.val());
+        });
+
+        $input.on('keypress', function(event){
+            // 13 = Key Enter
+            if (event.which == 13) {
+                $btn_update.trigger('click');
+            }
+        });
+    });
+
+    $modal_edit.on('hidden.bs.modal', function(){
+        $('.btn-update').button('reset').off('click');
+        $(this).find('[name="name"]').off('keypress');
+    });
+
+    $modal_delete.on('show.bs.modal', function(event){
+        var $this      = $(this);
+        var $element   = $(event.relatedTarget).parent();
+        var $btn_delete = $this.find('.btn-delete');
+
+        $btn_delete.on('click', function(){
+            $btn_delete.button('loading');
+            tags.deleteTag($element.data('id'));
+        });
+    });
+
+    $modal_delete.on('hidden.bs.modal', function(){
+        $('.btn-delete').button('reset').off('click');
+    });
+
+    $modal_transfer.on('show.bs.modal', function(event){
+        var $btn_move_to = $(this).find('.btn-move-to');
+        var $element   = $(event.relatedTarget).parent();
+        var $select    = $('#select-tag');
+
+        var selectize = $select.selectize({
+            valueField  : 'id',
+            labelField  : 'name',
+            searchField : 'name',
+            options     : [],
+            create      : false,
+            render      : {
+                option : function(item, escape) {
+                    return '<div>' + escape(item.name) + '</div>';
+                }
+            },
+            load        : function(query, callback) {
+                if (false == ci.isString(query) && false == query.length) {
+                    return callback();
+                }
+
+                tags.searchByName(query, callback);
+            }
+        });
+
+        selectize = selectize[0].selectize;
+
+        selectize.on('item_add', function() {
+            $btn_move_to.removeAttr('disabled')
+        });
+
+        selectize.on('item_remove', function() {
+            $btn_move_to.attr('disabled', 'disabled');
+        });
+
+        $btn_move_to.on('click', function() {
+            var new_id     = parseInt($select.val());
+            var current_id = $element.data('id');
+            $(this).button('loading');
+
+            tags.moveTagTo(current_id, new_id);
+        });
+    });
+
+    $modal_transfer.on('hidden.bs.modal', function(){
+        var selectize = $('#select-tag').selectize({});
+        selectize     = selectize[0].selectize;
+        selectize.destroy();
+        $(this).find('.btn-move-to').button('reset').off('click');
+    });
+});

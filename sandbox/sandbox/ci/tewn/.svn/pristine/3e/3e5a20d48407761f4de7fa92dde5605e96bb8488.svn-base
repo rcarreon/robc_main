@@ -1,0 +1,39 @@
+<phpunit bootstrap="./bootstrap.php"
+    colors="true"
+    convertErrorsToExceptions="true"
+    convertNoticesToExeptions="true"
+    convertWarningsToExceptions="true"
+    sintaxCheck="false"
+    backupGlobals="false"
+    backupStaticAttributes="false"
+    processIsolation="true">
+
+    <testsuites>
+        <testsuite name="CrowdIgnite">
+            <directory>./library</directory>
+        </testsuite>
+    </testsuites>
+
+    <filter>
+        <whitelist>
+            <directory suffix=".php">../library</directory>
+            <exclude>
+                <directory>../library/PDL</directory>
+                <directory>../library/SimplePie</directory>
+            </exclude>
+         </whitelist>
+    </filter>
+
+    <logging>
+        <log type="coverage-html" target="../build/coverage"
+             charset="UTF-8" yui="true" hightlight="true"
+             lowupperbound="35" highlowerbound="70"
+             title="CrowdIgnite"/>
+        <log type="coverage-clover" target="../build/logs/clover.xml"/>
+        <log type="junit" target="../build/logs/junit.xml" logIncompleteSkipped="false"/>
+    </logging>
+
+    <php>
+        <includePath>../library</includePath>
+    </php>
+</phpunit>

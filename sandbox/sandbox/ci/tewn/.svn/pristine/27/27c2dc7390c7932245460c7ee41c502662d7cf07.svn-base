@@ -1,0 +1,108 @@
+<?
+
+class TagsController extends AppController
+{
+	var $name = 'Tags';
+	var $uses = array('Tag', 'PageTag');
+	var $components = array("Date");
+	var $helpers = array('Html');
+
+
+	/* Gets string of names and returns array of ids */
+	function tag_ids_by_names($tag_names) {
+		$all_tags = $this->Tag->get_tags_active();
+		$tag_names = explode(",",$tag_names);
+		$out = array();
+
+        foreach($all_tags as $tag){
+        	foreach($tag_names as $name) {
+        		if(strtolower($tag['Tag']['name']) == strtolower($name)){
+        			$out[] = $tag['Tag']['id'];
+        		}
+        	}
+        	//	echo 'tags['.$tag['Tag']['id'].']="'.$tag['Tag']['name'].'"';
+        }
+		return $out;
+	}
+
+	/* Updates tags on a Page */
+	function update_page_tags($page_id, $tag_ids) {
+		$this->PageTag->delete_cache_all_by_page_id($page_id);
+		$current_tags = $this->PageTag->get_all_page_id($page_id); // Get current tags in page
+		$current_tag_ids = array();
+
+		foreach($current_tags as $current_tag) {
+			$current_tag_ids[] = $current_tag['PageTag']['tag_id'];
+		}
+
+		$save_tags = array_diff($tag_ids, $current_tag_ids); // Array of New Tag ids for saving
+		$remove_tags = array_diff($current_tag_ids, $tag_ids); // Array of Tags Removed by the user
+
+		// Delete Removed tags
+		$this->PageTag->remove_tags_by_page_id($page_id, $remove_tags);
+
+		// Save Tags
+		$save_data = array();
+		foreach($tag_ids as $id) { // fill array to save Tags
+			if(in_array($id, $save_tags)) {
+				$save_data[] = array("page_id" => $page_id, "tag_id" => $id, "created" => $this->Date->now());
+			}
+		}
+		if(count($save_data)>0) {
+			$rc = $this->PageTag->saveAll($save_data);
+		}
+		$this->PageTag->delete_cache_all_by_page_id($page_id);
+		return $save_data;
+	}
+
+	/* Adds new tags to the Tag table */
+	function update_tag_table($tag_names) {
+		$tag_names = array_map('ucfirst', explode(',', $tag_names)); // Make array of user's tags for query
+		$match_tags = $this->Tag->get_tags_active($tag_names); // Get the matching tags from the db
+
+		$match_tags_names = array();
+		foreach($match_tags as $tag) {
+			$match_tags_names[] = $tag['Tag']['name'];
+		}
+
+		// Save Tags
+		$tag_names = array_map('strtolower', $tag_names); // convert user's tags to lowercase for array_diff
+		$save_tags = array_diff($tag_names, array_map('strtolower',$match_tags_names)); // Array of the New tag names for saving
+
+		$save_data = array();
+		foreach($save_tags as $tag) { // fill array to save Tags
+			if(trim($tag)!="") {
+				$save_data[] = array("name" => ucwords(trim($tag)), "type" => TAG_TYPE_TAG);
+			}
+		}
+		if(count($save_data)>0) {
+			$rc = $this->Tag->saveAll($save_data);
+		}
+		return $save_data;
+	}
+
+	/* Returns the current list of Tag Names for a page */
+	function list_page_tags($page_id) {
+		$page_tags = $this->PageTag->get_all_page_id($page_id); // Get page's tags
+
+		$page_tag_ids = array();
+		foreach($page_tags as $tag) {
+			$page_tag_ids[] = $tag['PageTag']['tag_id']; // Get only the ids
+		}
+
+		$tags = $this->Tag->get_tags_by_id($page_tag_ids);
+		$out = array();
+		foreach($tags as $tag) {
+			$out[] = $tag['Tag']['name']; // Get the page's tags' names
+		}
+		return $out;
+	}
+
+	function delete($tag_id) {
+		$this->Tag->remove($tag_id);
+		$this->redirect('/management/tags');
+	}
+}
+
+
+?>

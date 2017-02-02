@@ -1,0 +1,73 @@
+#!/bin/bash
+#script  para Cycler error Detector,  lo que esta hasta ahorita es demasiado sencillo
+#pero el chiste es meterle  codigo y estarlo reforzando cualquier cosa, que se necesite, agregar
+#modificar , quitar adelante.
+if [ $# -ne 1 ]
+then 
+       echo "Usage $0 - Path of file "
+       exit 1
+fi
+while read line  
+do
+FIREFOX=`which /usr/bin/firefox`
+CONTENT_HTTP=`curl -ILs $line | grep HTTP | grep 200 > /dev/null ; echo $?`
+CONTENT_HTML=`curl -Ls $line | egrep -i --color=always 'error|sorry'`
+CONTENT_SERV=`curl -ILs $line | grep 'X-Served-By'`
+        if [ $CONTENT_HTTP -eq 0  ]
+        then
+                echo "There is no  error in the http protocol for $line " 
+                if [ `$CONTENT_HTML ; echo $?` -gt 1 ]
+                then
+                        echo "There is a error on html for $line"          
+                        echo  $CONTENT_HTML
+                        `$FIREFOX $line`
+			if [ `$CONTENT_SERV ; echo $?` -gt 0 ]
+                        then
+                                `$CONTENT_SERV`
+                                echo "Probably the error came from $CONTENT_SERV"
+                        else
+                                echo "There is not a X-Sever on the headers"
+			fi
+                else
+                        echo "There seems to be no error at all"
+        fi
+
+
+
+
+        else
+                echo "There might be an error on the $line" 
+
+                `$FIREFOX $line &`
+
+
+        fi
+done <  $1
+
+
+
+function Get_Hosts{
+#this function is to get the servers using vipvisual 
+curl -ls vipvisual.gnmedia.net/extractServer?value=$1 | tail -1 | sed 's/<[^>]*>//g;s/ //g;s/com/com\n/g;s/net/net\n/g'
+}
+
+function loggin {
+#the main point on this  function is to get the logs out of the server to see wich one is teh broken one
+#in this part we are taling about the app servers 
+#this example is for sheknows , the point is to get the server , store them in a file an then read those servers 
+#from the function and merge it with the script per se.
+for x in {1..5};
+do
+        for y in {1..2}
+        do
+        SSH="app${x}v-sk.wuo.lax${y}.gnmedia.net"
+        echo "Log from $SSH"
+        echo   `ssh $SSH  'tail /app/log/wheretheothersockwent.sheknows.error.log | grep --color=always '13:0[0-9]''`
+
+        done
+done
+
+
+
+}
+

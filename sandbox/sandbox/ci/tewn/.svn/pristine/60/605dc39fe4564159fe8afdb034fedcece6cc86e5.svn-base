@@ -1,0 +1,50 @@
+<?php
+    $javascript->link('bootstrap/external/handlebars-v1.3.0', false);
+    $javascript->link('bootstrap/ci/hashchange', false);
+    $javascript->link('bootstrap/widgets/index.js', false);
+
+    $html->css('bootstrap/widgets/index', 'stylesheet', null, false);
+?>
+<div class="container right-content">
+    <div id="table-widgets" class="row"></div>
+    <div class="row">
+        <div class="col-md-12">
+            <nav>
+                <ul class="pager">
+                    <li class="previous hidden">
+                        <a href="#"><span aria-hidden="true">&larr;</span> Previous</a>
+                    </li>
+                    <li class="next hidden">
+                        <a href="#">Next <span aria-hidden="true">&rarr;</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modal-delete" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+            <span class="sr-only">Close</span>
+        </button>
+        <h4 class="modal-title" id="modal-delete">Delete Widget</h4>
+      </div>
+      <div class="modal-body">
+        Are you sure to delete the widget ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary btn-delete" data-loading-text="Deleting...">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<?php
+echo $this->element('handlebars/widgets/index');
+echo $this->element('tpl_error');
+?>

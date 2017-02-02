@@ -1,0 +1,18 @@
+<?php
+$memcache_config_test = array(
+    'local' => array(
+        array('localhost.test', 11211),
+    ),
+
+    'dev' => array(
+        array('mem1v-ci.ci.dev.lax.gnmedia.net.test', 11211),
+    ),
+
+    'stg' => array(
+        array('mem1v-ci.ci.stg.lax.gnmedia.net.test', 11211),
+        array('mem2v-ci.ci.stg.lax.gnmedia.net.test', 11211),
+        array('mem3v-ci.ci.stg.lax.gnmedia.net.test', 11211),
+    ),
+);
+
+return $memcache_config_test;

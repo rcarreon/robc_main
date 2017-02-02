@@ -1,0 +1,13 @@
+#!/bin/bash
+
+
+{ date; (w | awk '{ print $1 }'); uptime; } > uno 
+
+
+
+echo " Info storaged "
+
+
+
+
+exit

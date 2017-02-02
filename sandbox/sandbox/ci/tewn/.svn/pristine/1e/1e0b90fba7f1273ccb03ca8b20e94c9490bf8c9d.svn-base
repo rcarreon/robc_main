@@ -1,0 +1,195 @@
+<?php
+/**
+ * Memcached key generator.
+ *
+ * PHP Version 5.3
+ *
+ * @category CI
+ * @package  CI_Memcached
+ * @author   Jorge Cortes <jorge.cortes@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+namespace CI\Memcached;
+
+/**
+ * Memcached key generator.
+ *
+ * PHP Version 5.3
+ *
+ * @category CI
+ * @package  CI_Memcached
+ * @author   Jorge Cortes <jorge.cortes@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+class KeyGen
+{
+    protected $sName;
+    protected $nVersion;
+    protected $aValues;
+    protected $sSeparator = ':';
+    protected $nMaxKeyLength = 32;
+
+    /**
+     * Constructor.
+     *
+     * @param mixed   $mValues  Values
+     * @param string  $sName    Name of the key
+     * @param integer $nVersion Version of the cache
+     */
+    public function __construct($mValues = array(), $sName = '', $nVersion = 0)
+    {
+        $this->setValues($mValues);
+        $this->setName($sName);
+        $this->setVersion($nVersion);
+    }
+
+    /**
+     * Set the values.
+     *
+     * @param mixed $mValues The values
+     *
+     * @return KeyGen
+     */
+    public function setValues($mValues = array())
+    {
+        if (is_array($mValues)) {
+            $this->aValues = $mValues;
+        } else {
+            $this->aValues = array($mValues);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set the name.
+     *
+     * @param string $sName The name
+     *
+     * @return KeyGen
+     */
+    public function setName($sName)
+    {
+        $this->sName = $sName;
+        return $this;
+    }
+
+    /**
+     * Set the version.
+     *
+     * @param integer $nVersion The version of the cache
+     *
+     * @return KeyGen
+     */
+    public function setVersion($nVersion)
+    {
+        $this->nVersion = $nVersion;
+        return $this;
+    }
+
+    /**
+     * Get the values.
+     *
+     * @return array
+     */
+    public function getValues()
+    {
+        return $this->aValues;
+    }
+
+    /**
+     * Get the name.
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->sName;
+    }
+
+    /**
+     * Get the version.
+     *
+     * @return integer
+     */
+    public function getVersion()
+    {
+        return $this->nVersion;
+    }
+
+    /**
+     * Generate the key
+     *
+     * @return string The key
+     */
+    public function generate()
+    {
+        $sKey = $this->sName . $this->sSeparator . $this->sSeparator;
+
+        $sValues = $this->valuesToString($this->aValues);
+
+        $sKey .= $this->fixLength($sValues);
+
+        if ($this->nVersion > 0) {
+            $sKey .= $this->sSeparator . 'v' . $this->nVersion;
+        }
+
+        return $sKey;
+    }
+
+    /**
+     * Transform the values to a string.
+     *
+     * @param array $aValues The values
+     *
+     * @return string The string generated
+     */
+    protected function valuesToString($aValues)
+    {
+        $sResult = '';
+        foreach ($aValues as $mValue) {
+            if (null === $mValue) {
+                continue;
+            }
+            if (is_array($mValue)) {
+                $mValue = $this->arrayToString($mValue);
+            }
+            $sResult .= $mValue . $this->sSeparator;
+        }
+        $sResult = rtrim($sResult, $this->sSeparator);
+        return $sResult;
+    }
+
+    /**
+     * Transform an array to string.
+     *
+     * @param array $aValues The array
+     *
+     * @return string          The string
+     */
+    protected function arrayToString(array $aValues)
+    {
+        // order values to mantain same
+        // key with same array values
+        asort($aValues);
+        return implode('-', $aValues);
+    }
+
+    /**
+     * Fix the length of the key.
+     *
+     * @param string $sKey The key
+     *
+     * @return string       The key
+     */
+    protected function fixLength($sKey)
+    {
+        if (strlen($sKey) > $this->nMaxKeyLength) {
+            $sKey = md5($sKey);
+        }
+        return $sKey;
+    }
+}

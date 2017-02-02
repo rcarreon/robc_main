@@ -1,0 +1,69 @@
+<?php
+
+App::import('Controller', 'Actions');
+
+class UsersActionsController extends ActionsController
+{
+    var $uses = array('User');
+
+    public function update_your_password()
+    {
+        $params           = new \CI\ArrayManipulator(empty($this->params['form']) ? array() : $this->params['form']);
+        $error            = false;
+        $user_id          = $params->get('id', 0);
+        $password         = trim($params->get('password', ''));
+        $new_password     = trim($params->get('new_password', ''));
+        $retype_password  = trim($params->get('retype_password', ''));
+        $terms            = $params->get('terms', false);
+        $answer['status'] = 'error';
+
+        if (empty($user_id) || empty($password) || empty($new_password) || empty($retype_password)) {
+            $error = true;
+            $answer['message'] = 'Not enough info';
+        }
+
+        if (!$error && $terms == false) {
+            $error = true;
+            $answer['message'] = 'Please accept the terms and conditions';
+        }
+
+        if(!$error && $new_password != $retype_password) {
+            $error = true;
+            $answer['message'] = 'Passwords do not match. Please try again';
+        }
+
+        if(!$error && $new_password == $password) {
+            $error = true;
+            $answer['message'] = 'The new and the old password are the same';
+        }
+
+        $user = null;
+
+        if (!$error) {
+            $user = $this->User->findById($user_id);
+        }
+
+        if (!$error && !empty($user)) {
+            $date = new \CI\Date();
+            $this->User->set(
+                array(
+                    'id' => $user_id,
+                    'password' => $new_password,
+                    'terms' => '1',
+                    'terms_accept' => $date->now()
+                )
+            );
+            $this->Session->activate();
+
+            if ($this->User->save() != false && $this->User->update_login_data($user, $this->Session)){
+                $answer['status']       = 'ok';
+                $answer['message']      =  'Your password has been changed.';
+                $answer['redirect_url'] = $this->User->get_redirect_url_before_login($user_id, $this->Session);
+            } else {
+                $answer['message'] = 'Can\'nt init session correctly';
+            }
+        }
+
+        echo json_encode($answer);
+    }
+}

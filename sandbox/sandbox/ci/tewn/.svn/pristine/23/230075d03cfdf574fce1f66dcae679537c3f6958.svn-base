@@ -1,0 +1,12 @@
+<?php
+
+namespace CI\Config\System\Setting\Exception;
+
+class Undefined extends \CI\Exception
+{
+    const KEY_OR_HUB = 0;
+
+    protected $errors = array(
+        self::KEY_OR_HUB => 'Not valid key or Hub'
+    );
+}

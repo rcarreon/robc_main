@@ -1,0 +1,93 @@
+<?php
+
+namespace CI;
+
+abstract class Chart
+{
+    const REQUEST_ALL = 'all';
+
+    private $_aModels = array();
+    private $_aComponents = array();
+
+    /**
+     * Models in this chart
+     * @param string $sKey   The model name
+     * @param object $oModel The model object
+     */
+    public function addModel($sKey, \object $oModel)
+    {
+        if (!is_string($sKey)) {
+            throw new \CI\String\Exception(\CI\String\Exception::NOT_VALID, $sKey);
+        }
+        $this->_aModels[$sKey] = $oModel;
+        return $this; // for chain methods
+    }
+
+    /**
+     * Gets a model loaded by its key
+     * @param  string $sKey The key of the model
+     * @return object The model loaded
+     */
+    public function getModel($sKey)
+    {
+        if (!is_string($sKey)) {
+            throw new \CI\String\Exception(\CI\String\Exception::NOT_VALID, $sKey);
+        }
+        if (!isset($this->_aModels[$sKey])) {
+            throw new \CI\Chart\Exception(Exception::NOT_EXIST_MODEL, $sKey);
+        }
+        return $this->_aModels[$sKey];
+    }
+
+    /**
+     * Components in this Chart
+     * @param string $sKey       The component name
+     * @param object $oComponent The component object
+     */
+    public function addComponent($sKey, \object $oComponent)
+    {
+        if (!is_string($sKey)) {
+            throw new \CI\String\Exception(\CI\String\Exception::NOT_VALID, $sKey);
+        }
+        $this->_aComponents[$sKey] = $oComponent;
+        return $this; // for chain methods
+    }
+
+    /**
+     * Get a component in this Chart
+     * @param  string $sKey The key of the component
+     * @return object The component
+     */
+    public function getComponent($sKey)
+    {
+        if (!is_string($sKey)) {
+            throw new \CI\String\Exception(\CI\String\Exception::NOT_VALID, $sKey);
+        }
+        if (!isset($this->_aComponents[$sKey])) {
+            throw new \CI\Chart\Exception(Exception::NOT_EXIST_COMPONENT, $sKey);
+        }
+        return $this->_aComponents[$sKey];
+    }
+
+    /**
+     * Get an interval by timeunit
+     * @param  integer $nTimeUnit The time unit to use for the interval
+     * @return integer
+     */
+    protected function getTimeInterval($nTimeUnit)
+    {
+        $nInterval = 0;
+        switch ($nTimeUnit) {
+            case \CI\Date::TIME_UNIT_HOUR:
+                $nInterval = 3600; /*60 minutes*/
+                break;
+            case \CI\Date::TIME_UNIT_DAY:
+                $nInterval = 86400; /*24 hours*/
+                break;
+            default:
+                throw new \CI\Date\Exception(\CI\Date\Exception::TIME_UNIT_NOT_ALLOWED, $nTimeUnit);
+                break;
+        }
+        return $nInterval;
+    }
+}

@@ -1,0 +1,160 @@
+<?php
+    echo $this->element("dashboard2_toolbar", array("tab" => "help"));
+?>
+
+<div id="content_area">
+    <div id="faq">
+        <h3>How do I get my pages approved?</h3>
+
+        While we know there are good intentions with uploading your content daily it could be to the detriment of returns.  Replacing content on a daily basis can in fact negatively affect return rate.  Once the system recognizes that a certain piece of content is working it seeds it more to get you the desired returns.
+
+        Switching out content daily does not give the system ample time to recognize performance and thus it seeds content blindly. A weekly desired upload of a dozen or so URL's can be send for our AM team to look through so we can replace under-performing pieces to quickadd@crowdignite.com .
+
+        <h3>I clicked on "Get code" but I can't get any code</h3>
+
+        This process can take up from a few seconds to several minutes, but no longer than 10 minutes. If after that time you still get no code it could be a couple of issues.
+        <ol>
+            <li>The web address of your site was entered incorrectly. Crowd Ignite can't get information to choose content for the widget if it can't access a valid address.</li>
+            <li>Server might be busy with many tasks at that point therefore unavailable to respond.</li>
+        </ol>
+
+        If web address is correct and you've made a second attempt after a considerable time and still get no code, please contact Support.
+
+        <h3>What is the return rate?</h3>
+
+        The return rate is how much traffic we send back to you vs how much you send to us.  The math formula looks like:
+
+        Return Rate = Traffic We Send You / Traffic You Send Us
+
+        Return rate fluctuates as we do a lot of testing of your content.
+
+        <h3>How does custom CSS work?</h3>
+
+        Custom CSS makes use of ID specific elements. All elements are associated with the widget ID. Every time you edit your widget, and the end of the URL you'll se a number, this is the widget ID.
+
+        To modify an element you must use either or both of the following methods:
+
+        #widget_table_[widget ID] [elements to modify]
+
+        #_ci_widget_div_[widget ID] [elements to modify]
+
+        On a practical example, if you'd like to modify the separation between the cells on widget 56897 then you can accomplish it in two ways:
+
+
+        #widget_table_56897 tr td { width: 100px; }
+        #_ci_widget_div_56897 table tr td { width: 100px; }
+
+        This causes the exact same effect though changes in syntax might make it easier to reach certain elements.
+
+        <h3>Is removing the 'Powered by Crowd Ignite' link against the agreement?</h3>
+
+        No, you are free to remove that from your widget.
+
+        <h3>How often do you change the links on my account?</h3>
+
+        It depends.  We try finding links which will perform the best both on our end and when they click through to your site (we want high pages-per-visit coming from our traffic).
+
+        Additionally, we try swapping out links which are not time relevant anymore.  However, if we have found a good set of links we don't mess with a good thing and don't swap them too often.
+
+        If you'd like them swapped, you can always delete them yourself under the pages tab.  Just understand that traffic will be down while we try finding more good links.
+
+        <h3>Why is a website 'Down'?</h3>
+
+        The 'Down' label implies a particular website was active and exchanging traffic but ceases to do for an extended period of time.
+
+        Usually when traffic exchange resumes the website will go automatically active in 24 hours. If such is not the case please contact support@crowdignite.com.
+
+        <h3>Why does my account say 'Denied'?</h3>
+
+        Unfortunately, we can't accept all sites, so if your site says Denied it was likely denied for one of the following reasons:
+
+        <ul>
+            <li>Not enough traffic.  We need over 50k pageviews a month to work well.</li>
+            <li>Content is not suitable.  We need content which people browsing the internet will click. Reference material or products won't work</li>
+            <li>Explicit content. Content is pushing the envelope too much.</li>
+        </ul>
+
+        You should have received an email stating why you weren't accepted, but we do make mistakes.  If you think yours was a mistake, please send us an email.
+
+        <h3>How long does it take to approve an account?</h3>
+
+        It can take up to 2 business days to get an account approved.
+
+        <h3>How do I delete a website?</h3>
+
+        If you want to delete one of your websites in the dashboard, please contact us.
+
+        <h3>How do I specify what my site is about?</h3>
+
+        While signing up you are given a drop-down list of categories, choose the one that relates the closest to your main topic. If your website features  varied content choose the one that you want your site to be associated with.
+
+        Either way our account management team takes care of reviewing each site and pairing it with the proper categories.
+
+        <h3>How long does it take before I start receiving traffic?</h3>
+
+        Once your site is approved, it generally takes a 3-4 days for us to test out your content to see where it will perform well.   There will be a trickle of traffic during that time.  Once we find the best fit, traffic will start increasing rapidly so expect a slow traffic income the first few days.
+
+        <h3>How do I change the category of my site or sites?</h3>
+
+        In your user dashboard there is a tab called Websites. There you can add different websites that can be classified in different categories. For instance you might one want widget with exclusive home content while other for exclusive cooking content. You can add your site two times with a different label (same web address) and request a category change.
+
+        <h3>How do I create a widget?</h3>
+
+        In order to create a widget, you must first have a website added in your dashboard. Once you have a website, you may follow these steps to create a widget:
+
+        <ol>
+            <li>In your dashboard, select the Widgets tab.</li>
+            <li>Click the Create Widget button.</li>
+            <li>Follow the three steps in the widget creation screen.</li>
+            <li>Click the Get the Widget code button.</li>
+            <li>Copy the widget code and paste it in your website's HTML.</li>
+            <li>Your widget should be visible in your website.</li>
+        </ol>
+
+        <h3>Why is my website not going active?</h3>
+
+        If you are a new registered user websites will remain Inactive if no activity is registered, most commonly, we don't see a widget loaded on the page. Once a widget is loaded it will automatically go Active in 24 hours. If the site remains Inactive another source might be that Crowd Ignite doesn't detect enough statistical data. A registering site must prove at least 50k unique visitors monthly.
+
+        In the case you hit or go above the number, please contact Support.
+
+        <h3>How do I add pages or content?</h3>
+
+        In your user dashboard there's a tab labelled pages; you will be shown what website (or websites) are currently in your account and at the right-hand you'll see the option Add page. You'll be prompted to a screen where you need to:
+        <ul>
+            <li>Write a title</li>
+            <li>Input the page/story web address</li>
+            <li>Add an image</li>
+            <li>Choose demographic details such as content rating, age and sex.</li>
+            <li>The process is very simple and helps speed up page cycling or adding new pages.</li>
+        </ul>
+
+        <h3>My account is "Inactive", how do I make it "Active" again?</h3>
+
+        A site goes to Inactive if we haven't seen a widget load in 48 hours.  To make the site Active again, simply make sure a widget is loading on your site. It will be marked Active in 24 hours and will start receiving traffic again.
+
+        <h3>Widget doesn't display</h3>
+
+        A widget might not load due to invalid JavaScript. The main reason is incomplete or altered code. This may require some technical knowledge. Here's a quick guideline:
+        <ol>
+            <li>Make sure to copy and paste correctly from the Widget Creation tool.</li>
+            <li>Account might be inactive.</li>
+            <li>If code is complete, see if your CMS (Content Management System or Blog System) is not adding HTML tags by default.</li>
+            <li>A solution to undesired automatic code is by saving the JavaScript tags in a different place and referencing the single tag on your page.</li>
+            <li>Make sure there are no JavaScript minifyers acting, that completely invalidates it.</li>
+            <li>Conflicting elements could cause the widget to disappear if for any reason width or height get larger than layout.</li>
+        </ol>
+
+        Widget might not have created correctly. Try making a new one.
+
+        <h3>Sending traffic to Crowd Ignite?</h3>
+
+        Sometimes it might be felt that you are sending more to us than what we are sending back and that notion may have some basis on reality but only under extraordinary circumstances.
+
+        Our platform works under the rule that you get what you send. 10 clicks a week will hardly provide good return rate and this might be for varying reasons, such as the widget not being placed in a high visibility location, near the space of the story or alongside too many ads.
+
+        The second could be because the publisher is not providing enough stories for the system to be fed and therefore exposed to other visitors. Staying up to date or having a nice history of articles will always help counter that.
+
+        If none of this works please contact Support.
+    </div>
+</div>
+

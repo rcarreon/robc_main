@@ -1,0 +1,171 @@
+<?
+
+/* Domain name of the Solr server */
+define('SOLR_SERVER_HOSTNAME', 'memcached1.crowdignite.com');
+
+/* Whether or not to run in secure mode */
+define('SOLR_SECURE', false);
+
+/* HTTP Port to connection */
+define('SOLR_SERVER_PORT', ((SOLR_SECURE) ? 8443 : 8080));
+
+/* HTTP connection timeout */
+define('SOLR_SERVER_TIMEOUT', 10);
+
+/*
+ * Solr functions
+ *
+ */
+class SolrComponent extends Object {
+    var $client = null;
+
+    function startup(&$controller) {
+
+	}
+
+    function SolrComponent() {
+    	if (UNIT_TEST) {
+			return;
+		}
+
+        $options = array
+            (
+                'hostname' => SOLR_SERVER_HOSTNAME,
+                'port'     => SOLR_SERVER_PORT,
+             );
+
+        if (Configure::read('local') || Configure::read('dev')) {
+        	$options['hostname'] = '192.168.112.44';
+        }
+
+        $client = new SolrClient($options);
+
+        $this->client = $client;
+
+        return $this;
+    }
+
+    function add_page($id, $title, $website_id, $domain_bitfield, $category, $demographic_sex, $content_rating, $text = NULL) {
+        if (UNIT_TEST || Configure::read('dev') || Configure::read('staging')) {
+            return;
+        }
+
+        $page = new SolrInputDocument();
+        $domains = array();
+
+		for ($i = 0; $i < DOMAIN_NUMBER; $i++) {
+            if ($domain_bitfield & 1 << $i) {
+				$page->addField('domain_id', $i);
+            }
+        }
+
+        $page->addField('id', $id);
+        $page->addField('title', $title);
+        $page->addField('website_id', $website_id);
+        $page->addField('category', $category);
+        $page->addField('demographic_sex', $demographic_sex);
+        $page->addField('content_rating', $content_rating);
+        $page->addField('text', $text);
+
+        $this->lastResponse = $this->client->addDocument($page);
+        $this->client->commit();
+        $this->client->optimize();
+		//$updateResponse->getResponse();
+		return $this->lastResponse->success();
+    }
+
+	function get_last_response() {
+		print_r($this->lastResponse->getResponse());
+	}
+
+    function remove_page($id) {
+        if (UNIT_TEST || Configure::read('dev') || Configure::read('staging')) {
+            return;
+        }
+
+        $rc = $this->client->deleteById($id);
+        $this->client->commit();
+        //        print_r($rc->getResponse());
+    }
+
+    function query($text, $domain_bitfield, $website_id, $category, $demographic_sex, $content_rating, $limit = 10) {
+
+		//echo $text."::: ";
+
+        $search = "q=(";
+		$text = preg_replace("/([^a-z0-9]+)/", " ", html_entity_decode(strtolower(trim($text))));
+        $texts = explode(" ", $text);
+		if (!count($texts)) {
+			return NULL;
+		}
+		$word_search = "";
+        foreach ($texts as $text) {
+            if (!$text) {
+                continue;
+            }
+            if (Configure::read('local') || Configure::read('dev')) {
+            	$word_search .= "title:".$text." description:".$text." ";
+            } else {
+            	$word_search .= "title:".$text." text:".$text." ";
+            }
+        }
+		if ($word_search == "") {
+			return NULL;
+		}
+		$search .= $word_search;
+		$search .= ")";
+
+		$filter = "qf=(";
+		$filter .= "category:".$category." ";
+        $filter .= "NOT website_id:".$website_id." ";
+
+		// Domain Bitfield
+		$filter .= "AND ( ";
+		$filter .= "domain_id:(";
+		$hit = 0;
+        for ($i = 0; $i < DOMAIN_NUMBER; $i++) {
+            if ($domain_bitfield & 1 << $i) {
+				if ($hit) {
+					//$filter .= ", ";
+				}
+				$hit = 1;
+				$filter .= $i." ";
+			}
+        }
+		$filter .= ")) "; // Close off domain bitfield
+
+		// Content Rating
+		if ($content_rating < WEBSITE_CONTENT_MENS) {
+			$filter .= "AND ( content_rating:(";
+			switch ($content_rating) {
+			case WEBSITE_CONTENT_R:
+			case WEBSITE_CONTENT_PG13:
+				$filter .= WEBSITE_CONTENT_R." ";
+			case WEBSITE_CONTENT_G:
+				$filter .= WEBSITE_CONTENT_PG13." ".WEBSITE_CONTENT_G;
+			}
+			$filter .= "))"; // Close off content rating
+		}
+
+		$filter .= ")"; // Close off query filter
+
+		$search .= " ".$filter;
+
+        //echo " Search: ".$search."<br>\n";
+
+        $query = new SolrQuery($search);
+        $query->setStart(0);
+
+        $query->setRows($limit);
+        $query->addField('category')->addField('title')->addField('id')->addField('website_id')->addField("content_rating")->addField('score');
+
+        $query_response = $this->client->query($query);
+
+        $response = $query_response->getResponse();
+
+        return $response;
+    }
+
+
+}
+?>

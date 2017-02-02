@@ -1,0 +1,18 @@
+<?php
+
+class StaticControllerTestCase extends CakeTestCase {
+	var $fixtures = array('app.log');
+
+	function startTest() {
+		App::import('Controller', 'Static');
+		$this->Static = new StaticController();
+		$this->Static->constructClasses();
+		$this->Static->autoRender = false;
+	}
+
+	function endTest() {
+		unset($this->Static);
+		ClassRegistry::flush();
+	}
+}
+?>

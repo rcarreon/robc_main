@@ -1,0 +1,26 @@
+<?php echo '<?xml version="1.0" encoding="utf-8"?>'; ?>
+<response>
+	<status><?php echo $result['status']; ?></status>
+	<?php if (isset($result['result'])): ?>
+	<result>
+	<?php foreach($result['result'] as $page): ?>
+		<page>
+			<title><![CDATA[<?php echo utf8_encode($page['title']); ?>]]></title>
+			<description><![CDATA[<?php echo utf8_encode($page['description']); ?>]]></description>
+			<image><?php echo $page['image']; ?></image>
+			<link><?php echo $page['link']; ?></link>
+			<url><?php echo $page['url']; ?></url>
+			<category><?php echo $page['category']; ?></category>
+			<category_id><?php echo $page['category_id']; ?></category_id>
+			<subcategory><?php echo $page['subcategory']; ?></subcategory>
+			<?php if (isset($page['trending'])): ?>
+			<trending><?php echo $page['trending']; ?></trending>
+			<?php endif; ?>
+		</page>
+	<?php endforeach; ?>
+	</result>
+	<?php endif; ?>
+	<?php if (isset($result['message'])): ?>
+	<message><?php echo $result['message']?></message>
+	<?php endif; ?>
+</response>

@@ -1,0 +1,152 @@
+<?php
+    $javascript->link('bootstrap/external/handlebars-v1.3.0', false);
+    $javascript->link('bootstrap/external/highcharts', false);
+    // $javascript->link('bootstrap/external/handlebars/ifcond.js', false);
+    $javascript->link('bootstrap/external/jquery.tablesorter', false);
+    $javascript->link('bootstrap/ci/chartify', false);
+    $javascript->link('bootstrap/ci/hashchange', false);
+    $javascript->link('bootstrap/external/date/moment', false);
+    $javascript->link('bootstrap/external/handlebars/format', false);
+    $javascript->link('bootstrap/admin_websites/report', false);
+
+    $html->css('bootstrap/admin_websites/report', 'stylesheet', null, false);
+ ?>
+<div class="container-fluid right-content">
+    <!-- <div class="right-content col-sm-offset-1 col-sm-11 col-md-11"> -->
+        <div class="row">
+            <div id="breadcrumb" class="col-md-12 col-sm-12">
+                <?php echo $breadcrumbs_component;?>
+            </div>
+        </div>
+        <div id="list-filters" class="row">
+            <div class="col-sm-2 col-md-2 form-group">
+                <label>Hubs</label>
+                <?php echo $hubs_select_component; ?>
+            </div>
+            <div class="col-sm-2 col-md-2 form-group">
+                <label>Status</label>
+                <?php echo $website_status_select_component; ?>
+            </div>
+            <div class="col-sm-2 col-md-2 form-group">
+                <label>Category</label>
+                <?php echo $categories_select_component; ?>
+            </div>
+            <div class="col-sm-2 col-md-2 form-group">
+                <label>Display</label>
+                <select id="select-display" class="selectpicker show-tick" data-width="100%" multiple data-selected-text-format="count > 3">
+                    <optgroup label="General">
+                        <option>!</option>
+                        <option>Age</option>
+                        <option>Tier</option>
+                        <option value="credits">Credits</option>
+                        <option value="return_rate">Return Rate</option>
+                        <option>Pending</option>
+                    </optgroup>
+                    <optgroup label="Yestarday Stats">
+                        <option value="yestarday_to">To</option>
+                        <option value="yestarday_from">From</option>
+                        <option>Return Rate</option>
+                        <option >LP CTR</option>
+                        <option >LP Impressions</option>
+                        <option >W CTR</option>
+                        <option >W Impressions</option>
+                        <option >Gen RR</option>
+                    </optgroup>
+                    <optgroup label="Priority">
+                        <option>Widget</option>
+                        <option>Landing Page</option>
+                    </optgroup>
+                </select>
+            </div>
+            <div class="col-md-2 col-sm-2 margin-top-30" id="needs-attention"></div>
+            <div class="col-sm-2 col-md-2">
+                <button id="btn-update" class="btn btn-primary btn-block" type="button" data-loading-text="Loading...">Update</button>
+            </div>
+        </div>
+        <div id="table-websites" class="row">
+            <!-- <div class="col-md-12">
+                <div class="alert alert-info" role="alert">
+                    Select a hub from the sidebar
+                </div>
+            </div> -->
+        </div>
+    <!-- </div> -->
+</div>
+
+<div id="modal-charts" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="modal-charts" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+            <span class="sr-only">Close</span>
+        </button>
+        <h4 class="modal-title">Charts of <span id="modal-website-name"></span></h4>
+      </div>
+      <div class="modal-body">
+        <div class="row" id="modal-all-charts">
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-body chart" id="tpm">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-body chart" id="ctr"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-body chart" id="return_rate"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-body chart" id="credits"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-body chart" id="traffic"></div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="panel panel-default">
+                    <div class="panel-body chart" id="widget_impressions"></div>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modal-full-stats" tabindex="-1" role="dialog" aria-labelledby="modal-full-stats" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+            <span class="sr-only">Close</span>
+        </button>
+        <h4 class="modal-title" id="modal-edit-tag">
+            <span>Full stats of </span><span id="modal-website-name"></span>
+        </h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<?php
+    echo $this->element('handlebars/admin_websites/report');
+    echo $this->element('handlebars/admin_websites/full_stats');
+    echo $this->element('handlebars/admin_websites/needs_attention');
+?>

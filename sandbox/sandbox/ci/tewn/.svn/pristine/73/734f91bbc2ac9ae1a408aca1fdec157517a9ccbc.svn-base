@@ -1,0 +1,56 @@
+<?php
+class HistoryIventoryControllerTest extends CakeTestCase {
+	var $HistoryInventory = null;
+	var $HistoryStat = null;
+	var $fixtures = array('app.history_credit', 'app.history_widget', 'app.account', 'app.website',
+		'app.page', 'app.history_widget_analytic', 'app.history_stat', 'app.widget', 'app.user', 'app.stats_account',
+		'app.stats_widget');
+
+	function startTest() {
+		App::import('Controller', 'HistoryInventory');
+		$this->HistoryInventory = new HistoryInventoryController();
+		$this->HistoryInventory->constructClasses();
+		$this->HistoryInventory->autoRender = false;
+	}
+
+	function testHistoryInventoryControllerInstance() {
+		$this->assertTrue(is_a($this->HistoryInventory, 'HistoryInventoryController'));
+	}
+
+	function testHistoryInventoryActualAggregate(){
+		$num_days = 14;
+		$results = $this->HistoryInventory->actual_aggregate("", 1, $num_days, null);
+		//echo "<pre>"; print_r($results); echo "</pre>";
+		$this->assertTrue(!empty($results));
+	}
+
+	function testHistoryInventoryTPMCalculate(){
+		$outgoing = 1000;
+		$display = 5000;
+		$results = $this->HistoryInventory->tpm_calculate($outgoing, $display);
+
+		$expected = 200;
+
+		$this->assertEqual($results, $expected);
+	}
+
+	function testHistoryInventoryTPMDay(){
+		$website_id = 6;
+		$date = date("Y-m-d G:i:s", strtotime("2011-09-08 18:20:25"));
+		$stats = array("200", "derp", "foo", "bar");
+		App::import("Model", "HistoryStat");
+		$this->HistoryStat = new HistoryStat();
+
+		$this->HistoryStat->set_tpm_stats_cache($website_id, $date, $stats);
+
+		$results = $this->HistoryInventory->tpm_day($website_id, $date);
+		$expected = 0;
+
+		$this->assertEqual($results, $expected);
+	}
+
+
+	function endTest() {
+		unset($this->HistoryInventory);
+	}
+}

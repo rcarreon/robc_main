@@ -1,0 +1,118 @@
+<?php
+class PageTag extends AppModel {
+
+	var $name = 'PageTag';
+
+	function get_all_page_id($page_id) {
+		$tags = $this->get_cache_all_by_page_id($page_id);
+
+		// Validate empty and not array because array empty means that database
+		// doesn't have data
+		if (empty($tags) && !is_array($tags)) {
+			$conditions = array("page_id" => $page_id, "visible" => true);
+			$params = array("conditions" => $conditions);
+			$tags = $this->find("all", $params);
+			if (!empty($tags)) {
+				$this->set_cache_all_by_page_id($page_id, $tags);
+			}
+		}
+
+		return $tags;
+	}
+
+	private function get_cache_key_all_by_page_id($page_id)
+	{
+		$key_gen = new CI\Memcached\KeyGen($page_id, 'page_tag_get_all_page_id', 1);
+		return $key_gen->generate();
+	}
+
+	public function get_cache_all_by_page_id($page_id)
+	{
+		$cache_key = $this->get_cache_key_all_by_page_id($page_id);
+		return $this->memcached_get_json($cache_key);
+	}
+
+	public function set_cache_all_by_page_id($page_id, $tags)
+	{
+		$cache_key = $this->get_cache_key_all_by_page_id($page_id);
+		return $this->memcached_set_json($cache_key, $tags, 10 * 60 /*10 Minutes*/);
+	}
+
+	public function delete_cache_all_by_page_id($page_id)
+	{
+		$cache_key = $this->get_cache_key_all_by_page_id($page_id);
+		return $this->memcached_delete($cache_key);
+	}
+
+	public function get_count_group_by_tag_id()
+	{
+		$params = array(
+			'fields'     => array('tag_id', 'COUNT(PageTag.tag_id) AS count'),
+			'conditions' => array('visible' => true),
+			'group'      => 'tag_id',
+		);
+		$page_tags_temp = $this->find('all', $params);
+		$page_tags = array();
+		foreach ($page_tags_temp as $page_tags_count) {
+			$page_tags[$page_tags_count['PageTag']['tag_id']] = $page_tags_count[0]['count'];
+		}
+		unset($page_tags_temp);
+		return $page_tags;
+	}
+
+	function remove_tags_by_page_id($page_id, $tag_ids) {
+		$conditions = array(
+			"page_id" => $page_id,
+			"tag_id" => $tag_ids
+			);
+		$this->deleteAll( $conditions, false);
+	}
+
+    public function move_to($current_id, $new_id)
+    {
+        if (!is_numeric($current_id)) {
+            $this->invalidate('current_id', 'Current tag id is not numeric');
+            return false;
+        }
+
+        if (!is_numeric($new_id)) {
+            $this->invalidate('new_id', 'New tag id is not numeric');
+            return false;
+        }
+
+        App::import('model','Tag');
+        $tag = new Tag();
+        $tag->id = $new_id;
+
+        if (!$tag->exists()) {
+            $this->invalidate('new_id', 'New tag id does not exists');
+            return false;
+        }
+
+        $pages  = $this->findAllByTagId($current_id, 'page_id');
+
+        if (! empty($pages)) {
+            // Disable the tag in all the pages
+            $this->updateAll(array('visible' => 0), array('tag_id' => $current_id));
+            $tag->delete_tag($current_id);
+
+            $list_values = array();
+
+            $sql = 'INSERT INTO page_tags (page_id, tag_id, visible, created) VALUES ';
+            foreach ($pages as $page) {
+                $value         = "(%d, %d, 1, NOW())";
+                $page_id       = $page['PageTag']['page_id'];
+                $list_values[] = sprintf($value, $page_id, $new_id);
+
+                $this->delete_cache_all_by_page_id($page_id);
+            }
+
+            $sql .= join(',', $list_values) . ' ON DUPLICATE KEY UPDATE visible = VALUES(visible);';
+
+            return is_array($this->query($sql));
+        }
+
+        return false;
+    }
+}
+?>

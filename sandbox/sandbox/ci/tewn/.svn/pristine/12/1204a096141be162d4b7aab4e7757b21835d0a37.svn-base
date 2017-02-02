@@ -1,0 +1,49 @@
+<?php
+namespace CI\Demographic;
+
+abstract class DataSource implements \Iterator
+{
+    protected $aDemographic;
+
+    public function __construct()
+    {
+        $this->init();
+    }
+
+    public function rewind()
+    {
+        return reset($this->aDemographic);
+    }
+
+    public function current()
+    {
+        return current($this->aDemographic);
+    }
+
+    public function key()
+    {
+        return key($this->aDemographic);
+    }
+
+    public function next()
+    {
+        return next($this->aDemographic);
+    }
+
+    public function valid()
+    {
+        return key($this->aDemographic) !== null;
+    }
+
+    public function getById($nId)
+    {
+        $nId = $nId;
+        if (isset($this->aDemographic[$nId])) {
+            return $this->aDemographic[$nId];
+        }
+
+        return null;
+    }
+
+    abstract public function init();
+}

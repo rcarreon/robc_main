@@ -1,0 +1,1103 @@
+
+<link href="/js/chosen/chosen.css" rel="stylesheet" type="text/css" />
+<script src="/js/jquery.blockUI.min.js" type="text/javascript"></script>
+<script src="/js/chosen/chosen.jquery.min.0.9.1.js" type="text/javascript"></script>
+<script src="/js/chosen/ajax-chosen.js" type="text/javascript"></script>
+<?
+	echo $this->element('crowdignite/analytics');
+?>
+<style>
+<!--
+.chzn-select-moderate { width:200px;}
+.transfer_account_id_selected {
+	color:red;
+	display:block;
+}
+-->
+</style>
+<script>
+$(document).ready(function() {
+
+	$(".transfer_account_chosen").ajaxChosen({
+		method: 'GET',
+		url: '/websites/getaccounts',
+		dataType: 'json'
+	}, function (data) {
+		var terms = {};
+
+		$.each(data, function (i, val) {
+			terms[val['Website']['account_id']] = val['Website']['url'];
+		});
+
+		return terms;
+	}).bind("change",function(){
+		var selected = $(".transfer_account_chosen").find(":selected").attr("value");
+		$(".transfer_account_id_selected").html("New transfer account ID: " + selected);
+	});
+
+	$("input#input_remove_transfer").bind("change", function(){
+		if ($(this).is(":checked")) {
+			$("div#to_remove_transfer_message").html('' +
+			'<div style="background-color:#f55;color:#fff;padding:10px;margin:10px 0 10px 0;position:">' +
+			'The transfer will be removed after saving changes.' +
+			'</div>' +
+			'');
+		} else {
+			$("div#to_remove_transfer_message").html('');
+		}
+	});
+
+	$("div.chzn-search > input").css("width","auto");
+	$("div.chzn-drop").css("width","auto");
+
+	jQuery("#save_email_response").click(function(){
+		fill_deny_form();
+	});
+
+	jQuery("#no_email_response").click(function(){
+		close_deny_form();
+	});
+
+    jQuery(".website_moderate").click(function(){
+        if( !jQuery(this).hasClass("selected") ) {
+            jQuery('.website_moderate').removeClass('selected').find('table.contain').hide();
+            jQuery(this).find('table.contain').show();
+            jQuery(this).find('.chzn-select-moderate').chosen();
+            jQuery(this).addClass('selected');
+            var alexaSpan = jQuery(this).find('table.contain span.alexa');
+           	var domname = jQuery.trim( jQuery(this).find('#top_area span.url').text());
+			var domainPattern = /^(https?:\/\/)?((?:[a-z0-9-]+\.)+(?:com|net|org))(?:\/|$)/i
+			if(domname.match(domainPattern) && alexaSpan.html()=="" ){
+		        $.ajax({
+		            type: "POST",
+		            url: "/websites/alexaajax",
+		            data: {
+		                domain: domname
+		            },
+		            success: function(data){
+		            	var arank = jQuery.parseJSON(data);
+		            	alexaSpan.html(addCommas(arank.popularity));
+		            }
+		        });
+            }
+        }
+    });
+
+	jQuery(".advanced_tab").click(function(){
+		if( !jQuery(this).parent().parent().hasClass('expanded') ) {
+			jQuery(this).parent().parent().addClass('expanded');
+			jQuery(this).parent().find('div.lastcol_content').show();
+			jQuery(this).parent().parent().css("width", "300px" );
+		} else {
+			jQuery(this).parent().find('div.lastcol_content').hide();
+			jQuery(this).parent().parent().removeClass('expanded');
+			jQuery(this).parent().parent().css("width", "10px" );
+		}
+	});
+
+	jQuery(".btn_toggle").click(function(){
+            var parentdiv = jQuery(this).parent().parent().parent();
+            if( parentdiv.hasClass("selected") ) {
+                parentdiv.removeClass('selected').find('table.contain').hide();
+                return false;
+            }
+        });
+
+        jQuery("#btn_regular_expressions").click(function(){
+            if( jQuery("#regular_expressions").css("display") != "none" ) {
+                jQuery(this).html('Show Regular Expression Examples');
+            }else {
+                jQuery(this).html('Hide Regular Expression Examples');
+            }
+            jQuery("#regular_expressions").toggle();
+            return false;
+        });
+
+        if ( jQuery(".website_moderate").size() == 1 ) {
+            jQuery(".website_moderate").find('table.contain').show();
+        };
+
+        jQuery(".primary_domain").change(function() {
+
+            var primary_domain = jQuery(this).val();
+            var website_id = jQuery(this).data("websiteid");
+            var cat_allowed_wrapper = jQuery('.categories_allowed_wrapper_'+website_id);
+            var cat_website_wrapper = jQuery('.website_categories_wrapper_'+website_id);
+
+            $.ajax({
+                type: "POST",
+                url: "/websites/moderate_get_allowed_categorytree",
+                data: {
+                    domain: primary_domain
+                },
+                success: function(j){
+                    cat_allowed_wrapper.html(j);
+                    $('ul.categorytree').categorytree();
+                }
+            });
+
+            $.ajax({
+                type: "POST",
+                url: "/websites/moderate_get_website_categories",
+                data: {
+                    domain: primary_domain
+                },
+                success: function(k){
+                    cat_website_wrapper.html(k);
+                }
+            });
+
+        });
+
+		function addCommas(nStr) {
+			nStr += '';
+			x = nStr.split('.');
+			x1 = x[0];
+			x2 = x.length > 1 ? '.' + x[1] : '';
+			var rgx = /(\d+)(\d{3})/;
+			while (rgx.test(x1)) {
+				x1 = x1.replace(rgx, '$1' + ',' + '$2');
+			}
+			return x1 + x2;
+		}
+
+		$('#WebsiteCategory').change(function(){
+			var subcat_select = $(this).parents('form').find('#WebsiteSubcategory');
+			var category = $(this).val();
+
+            $.ajax({
+                type: "POST",
+                url: "/websites/subcategories_by_category",
+                data: {
+                    category: category
+                },
+                success: function(data){
+                    var subcategories = jQuery.parseJSON(data);
+                    subcat_select.html('');
+                    subcat_select.append('<option value=""></option>'); //empty option
+					$.each(subcategories, function(name, id) {
+						subcat_select.append('<option value="'+id+'">'+name+'</option>');
+					});
+                }
+            });
+		});
+
+		$('ul.categorytree').categorytree();
+
+});
+
+function confirm_delete() {
+    var r = confirm("Are you sure you want to delete");
+    return r;
+}
+
+function fill_deny_form() {
+		document.getElementById("send_mail_"+window.website_id).value = 1;
+		document.getElementById("deny_reason_"+window.website_id).value = jQuery("#response").text();
+		jQuery("#reason_button_"+window.website_id).html = "Change Reason";
+		jQuery.unblockUI();
+	}
+
+	function close_deny_form() {
+		document.getElementById("send_mail_"+window.website_id).value = 0;
+		jQuery.unblockUI();
+	}
+
+	function get_deny_reason(website_id) {
+		window.website_id = website_id;
+
+		jQuery.blockUI({ message:jQuery("#responseDiv"), css: {top: '100px', left: '22%', width:'670px', height:'360px'} });
+
+		return false;
+	}
+
+	function update_deny_response() {
+		var reason;
+
+		reason = document.getElementById("deny_reasons").value;
+
+		switch(reason) {
+		case 'traffic':
+			reason_text = "There is not enough traffic.  50k pageviews/month is the minimum";
+			break;
+		case 'foreign':
+			reason_text = "There is not enough US Traffic.  We have not branched out to foreign sites yet.";
+			break;
+		case 'explicit':
+			reason_text = "The content is too explicit.  It is pushing the envelope too much.";
+			break;
+		case 'content':
+			reason_text = "The content is not a good fit for the site.";
+			break;
+		default:
+			reason_text = "";
+		}
+
+		jQuery("#response").text(reason_text);
+	}
+
+        function block_button(website_id) {
+		var field;
+
+		field = document.getElementById("website_button_busy_"+website_id);
+                jQuery(field).show();
+
+		field = document.getElementById("website_button_on_"+website_id);
+                jQuery(field).hide();
+
+	}
+
+        function unblock_button(website_id) {
+		var field;
+
+		field = document.getElementById("website_button_on_"+website_id);
+                jQuery(field).show();
+
+		field = document.getElementById("website_button_busy_"+website_id);
+                jQuery(field).hide();
+
+	}
+
+	function flag_website(website_id, user_id){
+		$.ajax({
+			type: "POST",
+			url: "/users/flag_website/"+website_id+"/"+user_id,
+			cache: false,
+			success: function(html){
+				alert("This Website has been flagged for you.");
+			}
+		});
+	}
+
+	function unflag_website(website_id, user_id){
+		$.ajax({
+			type: "POST",
+			url: "/users/unflag_website/"+website_id+"/"+user_id,
+			cache: false,
+			success: function(html){
+				alert("This Website has been unflagged for you.");
+			}
+		});
+	}
+
+/* Category Tree */
+(function($){
+	$.fn.categorytree = function() {
+		return this.each(function() {
+
+			obj = $(this);
+			var checkboxes = $('input[type="checkbox"]', obj);
+			var spans = $('span', obj);
+			var category_all = $('#WebsiteAllowedCategories0', obj);
+
+			$(checkboxes).each (
+				function () {
+					$(this).bind('click change', function (){
+						if($(this).is(':checked')) {
+							if($(this).is(':not(#WebsiteAllowedCategories0')) { // If it's not the All checkbox
+								category_all.removeAttr('checked', 'checked');
+								$(this).parents('ul').find('li').css('color','black');
+							}
+							// Check descendents
+							//$(this).siblings('ul').find('input[type="checkbox"]').attr('checked', 'checked');
+							// Check parent category
+							$(this).parents('ul').siblings('input[type="checkbox"]').attr('checked', 'checked');
+
+							// Grey out parent category
+							$(this).parent().parent().parent().css('color', 'grey');
+							$(this).parent().parent().css('color', 'black');
+						} else {
+							// Uncheck descendents
+							$(this).parent().css('color','black');
+							$(this).siblings('ul').find('input[type="checkbox"]').removeAttr('checked', 'checked');
+
+							//If all subcats in same level are not selected, uncheck the parent category
+							var bros = $(this).parent().siblings('li').children('input[type="checkbox"]');
+							var uncheck_dad = 0;
+							$(bros).each(function() {
+								if($(this).is(':checked')) uncheck_dad = 1;
+							});
+							if(!uncheck_dad) {
+								// $(this).parent().parent().siblings('input[type="checkbox"]').removeAttr('checked', 'checked');
+								// Don't uncheck, just change color back to black
+								$(this).parent().parent().parent().css('color', 'black');
+							};
+						}
+					});
+				}
+			);
+
+			$(spans).each(
+				function() {
+					var subs = $(this).siblings('ul');
+					if(subs.height() > 1) {
+						$(this).parent().removeClass('expanded').addClass('contracted');
+						subs.hide();
+					}
+				}
+			);
+
+			$(spans).click(function() {
+				var subs = $(this).siblings('ul');
+				if(subs.length) {
+					$(this).siblings('ul').slideToggle();
+					if(subs.height() > 1) {
+						$(this).parent().removeClass('expanded').addClass('contracted');
+					} else {
+						$(this).parent().removeClass('contracted').addClass('expanded');
+					}
+				}
+			});
+
+			/* All categories checkbox*/
+			$(category_all).click(function(){
+				if($(this).is(':checked')) {
+					$(this).parent().siblings('li').find('input[type="checkbox"]').removeAttr('checked', 'checked');
+					$(this).parent().siblings('li').css('color','grey');
+					//$(this).parent().siblings('li').children('input[type="checkbox"]').attr('disabled', 'disabled');
+				} else {
+					//$(this).parent().siblings('li').children('input[type="checkbox"]').removeAttr('disabled', 'disabled');
+					$(this).parent().siblings('li').css('color','black');
+				}
+			});
+			return false;
+		});
+	}
+})(jQuery);
+</script>
+<div class="row main">
+<div id="content" class="column grid_12">
+
+<?
+	echo $this->element("management_toolbar", array("tab" => "none", "user" => $user));
+?>
+	<div class="column grid_12">
+
+	<h3 class="topContent">Moderate Websites</h3>
+
+
+	 <div class="row" id="content_area">
+	 <div style="margin-top:12px; margin-left:12px" class="accordion">
+<?
+echo "<ul id='regex_tools'>";
+echo "<li><a id='rtool' href='http://spaweditor.com/scripts/regex/index.php' target=_blank>Regular Expression Tool</a></li>";
+echo "<li><a href='#' id='btn_regular_expressions'>Show Regular Expression Examples</a></li></ul>";
+echo "<br class='clearfloat' />";
+echo "<div id='regular_expressions' style=\"display:none\">";
+echo "<br/>";
+echo "<ul>";
+foreach ($common_regexs as $regex) {
+	echo "<li><span>";
+	echo $regex;
+	echo "</span></li>";
+}
+echo "</ul>";
+echo "<br/>";
+echo "</div>";
+?>
+
+<?php
+	$session->activate();
+	if ($session->check('Message.flash')) {
+		$session->flash();
+	}
+
+	foreach($websites as $website) {
+        echo '<div class="website_moderate">';
+		echo $ajax->form('/websites/approve', 'Post', array('url' => '/websites/approve', 'update' => 'moderate_'.$website['Website']['id'], 'model' => 'Websites', 'before' => 'block_button('.$website['Website']['id'].')', 'complete' => 'unblock_button('.$website['Website']['id'].')'));
+    ?>
+    <?php if (WEBSITE_STATUS_NEW == $website['Website']['status']) : ?>
+        <script type="text/javascript">
+            $(document).ready(function(){
+                $('#WebsiteSendMail_<?php echo $website["Website"]["id"]; ?>').change(function(){
+                    $('#send_mail_<?php echo $website["Website"]["id"]; ?>').attr('checked', $(this).attr('checked'));
+                });
+            });
+        </script>
+    <?php endif; ?>
+		 <div id="top_area">
+		     <span class="btn_toggle">X</span>
+		     <span class="">Website Name&nbsp;
+		        <? echo $form->text('Website.name', array('size' => '20', 'value' => $website['Website']['name'])); ?>
+		        <? echo $form->error('Website.name', NULL, array('class' => 'error_message')); ?>
+		     </span>
+		     <span class="url_input">URL&nbsp;
+		        <?
+				  echo $form->hidden('Website.id', array('value' => $website['Website']['id']));
+				  echo $form->text('Website.url', array('size' => '20', 'value' => $website['Website']['url']));
+				  echo $form->error('Website.url', NULL, array('class' => 'error_message'));
+		        ?>
+		     </span>
+		     <span class="url">
+		        <?  /* Click through */
+		        echo "<a target='_blank' href='http://".$website['Website']['url']."'>".$website['Website']['url']."</a>";
+		        ?>
+		     </span>
+		 </div>
+	<table class="contain">
+    	<tr>
+		<td class="padd bordered">
+			<table width=100%>
+				<tr>
+			      	<td colspan="2">
+	                     Primary domain:<br/>
+	                            <?
+	                            echo $form->select('Website.domain_primary', $convert->domain_select(), $website['Website']['domain_primary'], array( 'class'=>'primary_domain', 'data-websiteid'=>$website['Website']['id']) );
+	                            ?>
+	                    <span class="line"></span>
+		            </td>
+                </tr>
+                <tr>
+					<td>
+            	        <b>Cross-Domains</b> <br/>(domains we share links with):<br/>
+						<?
+						foreach ($domains as $bit => $domain) {
+							$options = array("value" => $bit);
+							if ($website['Website']['domain_bitfield'] & $bit) {
+								$options["checked"] = 1;
+							}
+							echo $form->checkbox('Website.domain_'.$domain, $options);
+							echo ucwords($domain)." ";
+							echo "<br/>";
+						}
+						?>
+					</td>
+                    <td>
+                        <b>Categories allowed<br/>on website's widget</b>:<br/>
+                        <div class="categories_allowed_wrapper_<?=$website['Website']['id']?>">
+                        <?php
+                        $domain_id = $website['Website']['domain_primary'];
+                        $categories = $convert->category_domain_select($domain_id, $category_component);
+                        $selected_subcategories = $website['Website']['allowed_subcategories'];
+
+						echo '<ul class="categorytree">'; //categories
+						echo '<li class="expanded"><ul>';
+					    foreach ($categories as $id => $category) {
+					          $bit = 1 << $id;
+					          $options = array("value" => $bit);
+					  		  if($website['Website']['allowed_categories_bitfield'] & $bit){$options["checked"] = 1;}
+					          echo '<li><span></span>';
+					          echo $form->checkbox('Website.allowed_categories_'.$id, $options);
+					          echo ucwords($category);
+
+					          echo "<ul>"; //subcategories
+                              if (isset($all_subcategories[$id])) {
+    					          foreach($all_subcategories[$id] as $subid => $subcategory) {
+    					          	$options = array(
+                                        'value'   => $subid,
+                                        'checked' => isset($selected_subcategories[$subid]),
+                                    );
+    					            echo '<li><span></span>';
+    				          		echo $form->checkbox('Website.allowed_subcategories_'.$subid, $options);
+    				          		echo ucwords($subcategory), '</li>';
+    					          }
+                              }
+                              echo "</ul></li>";
+                        }
+					    echo "</ul>";
+					    echo "</li></ul>";
+
+						/*
+                        foreach ($categories as $id => $category) {
+                              $bit = 1 << $id;
+                              $options = array("value" => $bit);
+                              if ($website['Website']['allowed_categories_bitfield'] & $bit) {
+                                  $options["checked"] = 1;
+                              }
+                              echo $form->checkbox('Website.allowed_categories_'.$id, $options);
+                              echo ucwords($category)." ";
+                              echo "<br/>";
+                        }
+                        */
+                        ?>
+                        </div>
+                    </td>
+            	</tr>
+			</table>
+			<span class="line"></span>
+			<? /*
+			<table>
+				<tr>
+					<td>
+						<b>Subcategories Allowed on website's widget:</b>
+					</td>
+					<td>
+
+            			echo $form->select('Website.allowed_subcategories', $convert->subcategories($all_subcategories),
+            				$convert->subcategories($website['Website']['allowed_subcategories']), array(
+            				'multiple'	=> true,
+            				'selected'	=> $convert->subcategories($website['Website']['allowed_subcategories']),
+            				'class'		=> 'chzn-select-moderate'
+            				));
+
+	       			</td>
+    	   		</tr>
+       		</table>
+	       	<span class="line"></span>
+	       	*/
+       		?>
+			<table>
+		        <tr>
+		            <td>Sex</td>
+		            <td>
+	                <?
+					echo $form->select('Website.demographic_sex', $convert->demographic_sex_select(), $website['Website']['demographic_sex']);
+	                ?>
+                    </td>
+	            </tr>
+                <tr>
+		            <td>Category</td>
+		            <td>
+                        <div class="website_categories_wrapper_<?=$website['Website']['id']?>">
+		                <?
+		                $categories = $convert->category_domain_select($domain_id, $category_component);
+		                echo $form->select('Website.category', $categories, $website['Website']['category']);
+		                ?>
+                        </div>
+		            </td>
+		        </tr>
+                <tr>
+	                <td>Content Rating</td>
+	                <td>
+	                <?
+					echo $form->select('Website.content_rating', $convert->content_rating_select(), $website['Website']['content_rating']);
+	                ?>
+		            </td>
+		        </tr>
+				<tr>
+					<td>Subcategory</td>
+					<td><?php echo $form->select('Website.subcategory', $convert->subcategories($website['Website']['subcategories']), $website['Website']['subcategory']); ?>
+				</tr>
+			</table>
+
+        </td>
+
+		<td class="padd bordered">
+			Traffic from <?php echo $website['Website']['name']?> : <b><?=$website['Account']['incoming']?></b><br/>
+            <br/>
+            <span class="line"></span>
+            <br/>
+            Website status:
+            <div id="moderate_<?=$website['Website']['id']?>" class="website_status">
+                   <b><?=$convert->website_status($website['Website']['status'])?></b>
+            </div>
+            <? if ($website['Website']['status'] == WEBSITE_STATUS_NEW && $website['Website']['user_id'] == 0) { ?>
+            <br/>
+            <div class="website_user_field">
+            	<label>Username</label> <input type="text" name="data[User][username]">
+            </div>
+            <br/>
+            <div class="website_user_field">
+            	<label>Password</label> <input type="text" name="data[User][password]">
+            </div>
+            <br/>
+            <div class="website_user_field">
+            	<label>Email</label> <input type="text" name="data[User][email]">
+            </div>
+            <? } ?>
+            <span class="line"></span>
+            <br/>
+            <?
+			/* Unique traffic */
+			echo "Alexa Rank: <span class='alexa'></span><br/>";
+			echo "Tier: <b>".(($website['Website']['tier'] <= 0) ? 'n/a' : $website['Website']['tier'])."</b><br/>";
+			echo "Compete Visitors: <b>".$website['Website']['uv']."</b><br/>";
+			echo "Created: <b>".$convert->format_date($website['Website']['created'])."</b><br/>";
+			echo '<span class="line"></span>';
+			?>
+
+            <?
+			/* Common links */
+			echo "<a href='/management/pages/".$website['Website']['id']."'>Active Pages</a><br/>";
+			echo "<a href='/pages/moderate/".$website['Website']['id']."'>Pending Pages</a><br/>";
+			echo "<a href='/pages/add/".$website['Website']['id']."'>Add Page</a><br/>";
+			echo "<a href='/management/widget_analytics_website/".$website['Website']['id']."'>Where Links Running</a><br/>";
+			echo "<a href='/management/widget_analytics/".$website['Website']['id']."'>Pages Running in Widget</a><br/>";
+			echo "<a href='/pages/cache_clear_website/".$website['Website']['id']."'>Clear All Pages Caches</a><br/>";
+			echo "<a href='/widget_engine/clear_cache/".$website['Website']['id']."'>Clear All Widget Instances</a><br/>";
+			echo '<a href="/history_credits/clear_yesterday_stats/', $website['Account']['id'], '">Clear Yesterday Stats</a><br/>';
+			echo "<a href='/management/website/".$website['Website']['id']."'>Website Stats Charts</a><br/>";
+			echo "<a href='/dashboard/design/".$website['Website']['id']."'>Branded Landing Page</a><br/>";
+
+			echo '<span class="line"></span>';
+			echo "<a href='/websites/welcome_email/".$website['Website']['id']."' onclick=\"return confirm('Are you sure about this? you\'re going to re send the Welcome Email for this Website');\">Re Send 'Welcome email'</a><br/>";
+	        ?>
+            <span class="line"></span><br/>
+
+            <table border="0" width="100%">
+                <tr>
+                        <td>Impressions Since Last Rebalance: <b><?=$impressions_since_rebalance?></b></td>
+  				</tr>
+                <tr>
+                        <td>Last Rebalance: <b><?=$convert->format_date($time_since_rebalance)?></b></td>
+  				</tr>
+
+
+			<div id="website_button_on_<?=$website['Website']['id']?>">
+            <table border="0" width="100%">
+                <tr>
+                        <td colspan="2">
+                        <?
+                          if (isset($website['Website']['status']) &&
+                              $website['Website']['status'] == WEBSITE_STATUS_NEW) {
+                                  echo $form->checkbox('Website.send_mail', array('checked' => true, 'id' => 'WebsiteSendMail_' . $website['Website']['id']));
+                                  echo " Send Email&nbsp;";
+                          }
+
+
+                        ?>
+                        <br/>
+                        <span class="line"></span>
+                        <br/>
+                        </td>
+                </tr>
+                <tr>
+                        <td colspan="2">
+                        <?
+
+                          if (isset($website['Website']['status']) &&
+                              $website['Website']['status'] == WEBSITE_STATUS_NEW) {
+                                  $form_text = "Approve";
+                          } else {
+                                  $form_text = "Update";
+                          }
+                          echo $form->submit($form_text, array('class' => 'btn_control accept awesome purple'));
+                          echo $form->end();
+
+                        ?>
+                        </td>
+                </tr>
+                <tr>
+                        <td>
+                        <?
+                          // Deny form
+                          echo $ajax->form('/websites/deny', 'Post', array('url' => '/websites/deny',
+                                                                           'update' => 'moderate_'.$website['Website']['id'],
+                                                                           'model' => 'Websites'));
+                          echo $form->hidden('Website.id', array('value' => $website['Website']['id']));
+                          echo $form->checkbox('Website.send_mail', array('id' => "send_mail_" . $website['Website']['id'], 'checked' => true, 'class' => 'hide'));
+                          echo $form->hidden('Website.reason', array('id' => "deny_reason_".$website['Website']['id']));
+                          echo $form->submit("Deny", array('class' => 'btn_control deny awesome purple'));
+                          echo $form->end();
+                        ?>
+                        </td>
+                        <td>
+                        <?
+                          // Deny Reason Email
+                          //echo '<div class="awesome purple btn_reason" id="reason_button_'.$website['Website']['id'].'" onclick="get_deny_reason('.$website['Website']['id'].');">Set Reason Email</div>';
+                        ?>
+                        </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                    <?
+                      // Suspend form
+                      echo $ajax->form('/websites/suspend', 'Post', array('url' => '/websites/suspend', 'update' => 'moderate_'.$website['Website']['id'], 'model' => 'Websites'));
+                      echo $form->hidden('Website.id', array('value' => $website['Website']['id']));
+                      echo $form->submit("Suspend", array('class' => 'btn_control suspend awesome purple'));
+                      echo $form->end();
+
+                    ?>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                    	<?
+                        if ($website['Website']['status'] != WEBSITE_STATUS_DOWN) {
+                          // Down form
+                          echo $ajax->form('/websites/down', 'Post', array('url' => '/websites/down', 'update' => 'moderate_'.$website['Website']['id'], 'model' => 'Websites'));
+                          echo $form->hidden('Website.id', array('value' => $website['Website']['id']));
+                          echo $form->submit("Down", array('class' => 'btn_control down awesome purple'));
+                          echo $form->end();
+                        } else {
+                          // Resume form
+                          echo $ajax->form('/websites/resume', 'Post', array('url' => '/websites/resume', 'update' => 'moderate_'.$website['Website']['id'], 'model' => 'Websites'));
+                          echo $form->hidden('Website.id', array('value' => $website['Website']['id']));
+                          echo $form->submit("Resume", array('class' => 'btn_control accept awesome purple'));
+                          echo $form->end();
+
+
+                        }
+              			?>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <?
+                          echo $ajax->form('/websites/delete', 'Post', array('url' => '/websites/delete',
+                                                                             'update' => 'moderate_'.$website['Website']['id'],
+                                                                             'model' => 'Websites',
+                                                                             'confirm' => 'You sure you want to delete?'
+                                                                             ));
+                          echo $form->hidden('Website.id', array('value' => $website['Website']['id']));
+                          echo $form->submit("Delete", array('class' => 'btn_control delete awesome purple') );
+                          echo $form->end();
+                        ?>
+                    </td>
+                </tr>
+
+            </table>
+            </div>
+            <div id="website_button_busy_<?=$website['Website']['id']?>" style="display:none">
+                      <img id="preview_image_busy" src="/img/wait.gif">
+            </div>
+
+            <span class="line"></span><br/>
+            <a href="/widgets/create/0/<?php echo $website['Website']['id']; ?>" class="btn_control awesome purple" style="padding: 6px 5px 6px 18px; color: #FFF !important;">Add widget</a>
+		</td>
+
+		<td class="padd lastcol">
+			<div class="lastcol_wrap">
+			<div class="advanced_tab"></div>
+			<div class="lastcol_content">
+				<?
+				/* IDs */
+				echo "ID: <b>", $website['Website']['id'], "</b><br/>";
+				echo "Account ID: <b>", $website['Account']['id'], '</b>';
+				echo '<span class="line"></span>';
+
+				/* Refers */
+				if ($website['Website']['refer_id']) {
+					echo "<div id='refer_website'>";
+					echo "Refer: <b>".$website['Website']['refer_website']."</b>&nbsp;";
+					echo $ajax->link("Clear", "/accounts/clear_refer/".$website['Account']['id'],
+						array('style' => 'color:#000', 'update' => 'refer_website'),
+						"Are you sure you want to clear?");
+
+					echo "<br/>";
+					echo "Refer's email: <b>".$website['Website']['refer_email']."</b><br/>";
+					echo "</div>";
+				}
+				echo "Username: <b>{$website['User']['username']}</b><br />";
+				echo "Admin Email: <b>".$website['Website']['email']."</b><br>";
+				echo '<span class="line"></span>';
+				?>
+	            URL Regex<br/>
+            <?
+            echo $form->text('Website.url_regex', array('size' => '40', 'value' => $website['Website']['url_regex']));
+	        echo $form->error('Website.url_regex', NULL, array('class' => 'error_message'));
+        	?>
+            <br/><br/>
+            Title Regex<br/>
+            <?
+   			echo $form->text('Website.title_regex', array('size' => '40', 'value' => $website['Website']['title_regex']));
+        	echo $form->error('Website.title_regex', NULL, array('class' => 'error_message'));
+        	?>
+            <br/>
+            <span class="line"></span>
+            <br/>
+			<?
+			/* Subdomain */
+			/*
+        		echo "Is a subdomain<br/>";
+        		echo $form->checkbox('Website.subdomain', array('selected' => $website['Website']['subdomain']));
+			echo "<br/><br/>";
+			*/
+			/* Featured Bonus */
+    		echo "Featured bonus ";
+    		echo $form->text('Account.featured', array('size' => '5', 'value' => $website['Account']['featured']));
+            echo '<span class="line"></span>';
+
+			/* Transfer Account */
+			if ($website['Account']['transfer_account_id']) {
+				if ($website['Account']['transfer_website']['Website']['name']) {
+					$transfer_website = $website['Account']['transfer_website']['Website']['name'];
+				} else {
+					$transfer_website = $website['Account']['transfer_website']['Website']['id'];
+				}
+			} else {
+				$transfer_website = "";
+			}
+			echo "Transfer Website: <a href='/management/website/".$website['Account']['transfer_website']['Website']['id']."'>".$transfer_website."</a><br>";
+			echo "Transfer Account ID: \n";
+			echo $website['Account']['transfer_account_id'] . "<br>\n";
+			echo "<select class=\"transfer_account_chosen\" style=\"width:220px;\" name=\"data[Account][transfer_account_id]\"></select> <span class=\"transfer_account_id_selected\"></span>\n";
+
+			if ($website['Account']['transfer_account_id']) {
+				echo "<label for='input_remove_transfer'>Check this if you want to remove the transfer</label> <input type='checkbox' name='data[Account][remove_transfer]' id='input_remove_transfer' />\n";
+				echo "<div id='to_remove_transfer_message'></div>";
+			}
+
+			echo '<span class="line"></span>';
+
+			/* Paid */
+			echo "<!--";
+			if ($website['Account']['paid']) {
+				$options['checked'] = 1;
+			} else {
+				$options = array();
+			}
+
+			echo $form->checkbox('Account.paid', $options);
+			echo "Paid by us<br/>";
+
+			/* Buying */
+			if ($website['Account']['buying']) {
+				$options['checked'] = 1;
+			} else {
+				$options = array();
+			}
+			echo $form->checkbox('Account.buying',  $options);
+			echo "Buying Traffic from us<br/>";
+            echo '<span class="line"></span>';
+
+			echo "-->";
+			/* Ranked */
+			if ($website['Website']['ranked']) {
+				$options['checked'] = 1;
+			} else {
+				$options = array();
+			}
+			echo $form->checkbox('Website.ranked',  $options);
+			echo "Eligible in Ranker Script";
+			echo '<span class="line"></span>';
+
+			?>
+            <table border="0">
+            	<tr>
+            		<td>
+            			Blacklist
+            		</td>
+            		<td>
+            			<?
+            			echo $form->select('Website.blacklist', $websites_select, explode(",",$website['Website']['blacklist']), array(
+            				'multiple'	=> true,
+            				'selected'	=> explode(",",$website['Website']['blacklist']),
+            				'class'		=> 'chzn-select-moderate'
+            				));
+            				?>
+            			</td>
+            		</tr>
+            	<tr>
+            		<td>
+            			Whitelist
+            		</td>
+            		<td>
+            			<?
+            			echo $form->select('Website.whitelist', $websites_select, explode(",",$website['Website']['whitelist']), array(
+            				'multiple'	=> true,
+            				'selected'	=> explode(",",$website['Website']['whitelist']),
+            				'class'		=> 'chzn-select-moderate'
+            				));
+            				?>
+            			</td>
+            		</tr>
+            		<tr>
+                	<td>
+                		Custom UTM
+                	</td>
+                	<td>
+			            <?
+			            echo $form->text('Website.custom_utm', array('size' => '40', 'value' => $website['Website']['custom_utm']));
+			            echo $form->error('Website.custom_utm', NULL, array('class' => 'error_message'));
+			            ?>
+			        </td>
+			    </tr>
+            		<tr>
+                	<td>
+                		Disable UTM
+                	</td>
+                	<td>
+                		<?
+                		if ($website['Website']['disable_utm']) {
+                			$options['checked'] = 1;
+                		} else {
+                			$options = array();
+                		}
+                		echo $form->checkbox('Website.disable_utm', $options);
+                		?>
+                	</td>
+                </tr>
+                <tr>
+                	<td>
+                		Nice Links
+                	</td>
+                	<td>
+                		<?
+                		if ($website['Website']['nice_links']) {
+                			$options['checked'] = 1;
+                		} else {
+                			$options = array();
+                		}
+                		echo $form->checkbox('Website.nice_links', $options);
+                		?>
+                	</td>
+                </tr>
+
+                <tr>
+                	<td>
+                		LP style ID
+                	</td>
+                	<td>
+                		<?
+                		echo $form->text('Website.landing_page_style_id', array('size' => '5', 'value' => $website['Website']['landing_page_style_id']));
+                		?>
+                	</td>
+                </tr>
+				<tr>
+					<td>nofollow</td>
+					<td><?php
+						$chkbox_options = array();
+						if ($website['Website']['url_nofollow']) {
+							$chkbox_options['checked'] = 1;
+						}
+						echo $form->checkbox('Website.url_nofollow', $chkbox_options);
+					?></td>
+				</tr>
+				<tr>
+					<td colspan="2">
+						<?php
+							$WebsiteSettings->setBits($website['Website']['settings']);
+							$chkbox_options = array();
+							if ($WebsiteSettings->isShowBranding()) {
+								$chkbox_options['checked'] = 1;
+							}
+							echo $form->checkbox('Website.show_branding', $chkbox_options) . 'Show Branding';
+						?><br />
+					</td>
+				</tr>
+                <tr>
+                	<td colspan="2">
+                		<span class="line"></span>
+                	</td>
+                </tr>
+                <tr>
+                	<td>Monitor website</td>
+                	<td>
+                		<?
+						echo $convert->user_flagged_websites($user['User'], $website['Website']['id']);
+						?>
+					</td>
+                </tr>
+				<tr>
+                	<td colspan="2">
+                		<span class="line"></span>
+                	</td>
+                </tr>
+                <tr>
+                	<td colspan="2">
+                		<strong>Account</strong>
+                	</td>
+                </tr>
+                <tr>
+                	<td>
+                		Refer Transfer Rate
+                	</td>
+                	<td>
+                		<?
+                		echo $form->text('Account.refer_transfer_rate', array('size' => '10', 'value' => $website['Account']['refer_transfer_rate']));
+                		?>
+                	</td>
+                </tr>
+                <tr>
+                	<td>
+                		Refer ID
+                	</td>
+                	<td>
+                		<?
+                		echo $form->text('Account.refer_id', array('size' => '10', 'value' => $website['Account']['refer_id']));
+                		?>
+                	</td>
+                </tr>
+                <tr>
+                	<td>
+                		Rate
+                	</td>
+                	<td>
+                		<?
+                		echo $form->text('Account.rate', array('size' => '10', 'value' => $website['Account']['rate']));
+                		?>
+                	</td>
+                </tr>
+                <tr>
+                	<td>Notes
+                	</td>
+                	<td>
+                		<? echo $form->textarea('Website.notes', array('value' => $website['Website']['notes'], 'cols'=> 25, 'rows' => 4)); ?>
+                	</td>
+                </tr>
+
+            </table>
+        	</div><? //lastcol_content ?>
+        	</div><? //lastcol_wrap ?>
+       	</td><? //lastcol ?>
+	</tr>
+
+	<?
+    $widgets = $website['Website']['widgets'];
+    if( sizeof($widgets)>0 ) {
+        echo '<tr>
+                <td class="widget_header" colspan="3">
+    	            Website Widgets
+                </td>
+              </tr>';
+    }
+
+    foreach ($widgets as $widget) {
+	?>
+	<tr>
+		<td colspan="3">
+			<table class="widget_table">
+				<tr>
+					<td class="widget_line">
+					    <?
+			                      echo "Name: <b>".$widget['Widget']['name']."</b><br/>";
+			                      echo "ID: <b>".$widget['Widget']['id']."</b><br/>";
+			                      echo "Widget Style ID: <b>".$widget['Widget']['widget_style_id'] ."</b><br/>";
+			                      echo "Dimensions: <b>".$widget['Widget']['width']."x".$widget['Widget']['height']."</b><br/>";
+
+						?>
+					</td>
+					<td class="widget_line">
+					    <?
+			                      echo "<a href='/management/widget_pages_analytics/".$website['Website']['id']."/" . $widget['Widget']['id'] . "'>Pages Running in Widget</a><br/>";
+			                      echo "<a href='http://".ENGINE_URL."/widget_engine/rebalance/".$website['Website']['id']."'>Rebalance</a><br/>";
+								  echo "<a href='/widgets/create/".$widget['Widget']['id']."'>Edit</a><br/>";
+							      echo "<a href='/widgets/delete/".$widget['Widget']['id']."' onclick='return confirm_delete();'>Delete</a>";
+
+						?>
+					</td>
+					<td class="widget_line">
+					    <?
+			                      echo "Impressions: <b>".$widget['Widget']['display'] ."</b><br/>";
+			                      echo "Last Used: <b>".$convert->format_date($widget['Widget']['last_used'])."</b><br/>";
+			                      echo "Status: <b>".$convert->widget_status($widget['Widget']['status'])."</b><br/>";
+						?>
+					</td>
+				</tr>
+			</table>
+		</td>
+	</tr>
+
+	<?
+	}
+	?>
+	</table><!--table .contain-->
+
+
+
+
+<?
+		echo $form->end();
+    	echo "</div>"; // .website_moderate
+	} // eo foreach
+?>
+
+</div>
+</div>
+</div>
+
+<span id=responseDiv style="display:none;cursor:default;">
+	<h3>Reason for denial</h3>
+	<p style="margin-top:18px;">
+	<select id="deny_reasons" onchange="update_deny_response()">
+		<option select></option>
+		<option value="traffic">Not Enough Traffic</option>
+		<option value="foreign">Not US Focused</option>
+		<option value="explicit">Explicity Content</option>
+		<option value="content">Content Does Not Match</option>
+	</select>
+	<textarea style="width:650px;height:190px;" id="response"></textarea>
+	<p style="margin-top:18px;"><div class="awesome purple" id="save_email_response" onclick="fill_deny_form();">Save Reason</div>
+	<p style="margin-top:18px;"><div class="awesome purple" id="no_email_response" onclick="close_deny_form();">Clear Reason</div>
+ </span>

@@ -1,0 +1,808 @@
+<?php
+class Page extends AppModel {
+
+	var $name = 'Page';
+	var $validate = array(
+		'website_id' => array('numeric'),
+		'status' => array('numeric'),
+		'title' => array('notEmpty'),
+		'url' => array('rule' => array('validate_url', false),
+					   'message' => 'URL is incorrectly formatted. Make sure it starts with "http://"'
+					   )
+	);
+
+	public function findById($page_id)
+	{
+		plat_assert($page_id);
+
+		// Add multiple categories
+		$page = $this->find('first', array(
+            'fields' => array(
+            	'Page.*',
+            	'ci_ci_fn_select_page_categories(Page.id) as categories',
+            	'ci_ci_fn_select_page_subcategories(Page.id) as subcategories',
+            ),
+            'conditions' => array('Page.id' => $page_id),
+        ));
+        $page['Page']['categories']    = empty($page[0]['categories']) ? array() : explode(',', $page[0]['categories']);
+        $page['Page']['subcategories'] = empty($page[0]['subcategories']) ? array() : explode(',', $page[0]['subcategories']);
+
+        //remove calculated values
+        unset($page[0]);
+
+        return $page;
+	}
+
+	public function get_categories($page_id)
+	{
+		$return = array();
+		$categories = $this->query_read("SELECT ci_ci_fn_select_page_categories({$page_id}) as categories", false);
+		if (!empty($categories[0][0])) {
+			$categories = array_shift($categories[0][0]);
+			$return = explode(',', $categories);
+		}
+		return $return;
+	}
+
+	function get_approved() {
+		return $this->get_active_by_website_id();
+	}
+
+	function count_by_website_id($website_id, $status) {
+		$conditions = array("website_id" => $website_id,
+							"status" => $status,
+							"visible" => true
+							);
+
+		$count = $this->find("count", array("conditions" => $conditions));
+
+		return $count;
+	}
+
+	function get_active_by_website_id($website_id = 0, $domain_bit = 0, $categories = 0, $subcategories = 0) {
+
+		$website_list = is_array($website_id) ? implode(',', $website_id) : $website_id;
+		if (empty($website_id)) {
+			$Website = ClassRegistry::init("Website");
+			$websites = $Website->running();
+			$website_list = implode(',', Set::classicExtract($websites, '{n}.Website.id'));
+		}
+
+		plat_assert($website_list);
+
+		$categories = empty($categories) ? '' : implode(',', $categories);
+		$subcategories = empty($subcategories) ? '' : implode(',', $subcategories);
+
+		$query = "CALL ci_ci_sp_select_pages_candidate_analytics('{$website_list}', '{$categories}', '{$subcategories}', {$domain_bit})";
+		$pages = $this->query_read($query, false);
+		if (empty($pages)) {
+			$pages = array();
+		}
+
+		if (is_array($pages)) {
+			for($i = 0, $total = count($pages); $i < $total; $i++) {
+				$pages[$i]['Page']['categories'] = explode(',', $pages[$i][0]['categories']);
+				$pages[$i]['Page']['subcategories'] = explode(',', $pages[$i][0]['subcategories']);
+			}
+		}
+
+		return $pages;
+    }
+
+	function get_paused_by_website_id($website_id) {
+		$pages = $this->find("all", array("conditions" =>
+						  array("website_id" => $website_id,
+							"status" => PAGE_STATUS_PAUSED),
+						  "fields" => array("id", "domain_bitfield", "category", "demographic_sex", "content_rating")));
+
+		return $pages;
+	}
+
+	function get_by_link_string($links_string) {
+		$links = explode(" ", $links_string);
+
+		// Build query of IDs
+		$first = 1;
+		$ids = "";
+		foreach ($links as $link) {
+			if (!$link) {
+				continue;
+			}
+			if (!$first) {
+				$ids .= " OR ";
+			}
+			$ids .= "id = ".$link;
+
+			$first = 0;
+
+			if (DEBUG_MULTIDOMAIN) {
+			  // Make sure we aren't trying to pull pages which aren't for our domain
+			  $debug_query = "SELECT * FROM pages WHERE id = ".$link." AND domain_bitfield & ".DOMAIN_BIT;
+			  $res = $this->query($debug_query);
+			  plat_assert($res);
+			}
+
+		}
+
+		$query = "SELECT id, website_id, url, title, image, image_server, title_url FROM pages AS Page WHERE ".$ids." ORDER BY created DESC";
+
+		return $this->query_read($query);
+	}
+
+	function get_by_link_array($links) {
+		if (!is_array($links)) {
+			$links = array($links);
+		}
+
+		// Build query of IDs
+		$first = 1;
+		$ids = "";
+		foreach ($links as $link) {
+			if (!$link) {
+				continue;
+			}
+			if (!$first) {
+				$ids .= ", ";
+			}
+			$ids .= $link." ";
+
+			$first = 0;
+
+			if (DEBUG_MULTIDOMAIN) {
+			  // Make sure we aren't trying to pull pages which aren't for our domain
+			  $debug_query = "SELECT * FROM pages WHERE id = ".$link." AND domain_bitfield & ".DOMAIN_BIT;
+			  $res = $this->query($debug_query);
+			  plat_assert($res);
+			}
+		}
+
+		$query = "SELECT id, website_id, url, title, image, image_server, title_url FROM pages AS Page WHERE id IN (".$ids.") ORDER BY created DESC";
+
+		return $this->query($query);
+	}
+
+    function get_lifetime_impressions($website_id) {
+        $return = array();
+
+        if ($website_id < 0) {
+            return $return;
+        }
+
+        $query = "SELECT valid.id, (SELECT SUM(p.impressions) FROM pages p WHERE p.website_id = {$website_id} AND p.url = valid.url) AS impressions
+            FROM pages AS valid
+            WHERE website_id = {$website_id} AND status = " . PAGE_STATUS_APPROVED . " GROUP BY valid.url";
+        $data = $this->query_read($query, false);
+
+        if (!empty($data)) {
+            foreach ($data as $page) {
+                $return[$page['valid']['id']] = (int) $page[0]['impressions'];
+            }
+        }
+
+        return $return;
+    }
+
+	function add_page($url, $website_id, $impressions = 1) {
+		$data = array(
+			'Page' => array(
+				'website_id'  => $website_id,
+				'status'      => PAGE_STATUS_PENDING,
+				'url'         => $url,
+				'impressions' => $impressions,
+				'visible'     => true,
+				'ranked'      => 1,
+			),
+		);
+
+		$this->create($data);
+
+		plat_assert(
+			$this->save(),
+			print_r(array($data, $this->validationErrors), true),
+			false
+		);
+
+		return $this->id;
+	}
+
+	function get_pending($website_id = 0) {
+		$conditions = array("status" => PAGE_STATUS_PENDING, "visible" => true);
+
+		if ($website_id) {
+			array_push($conditions, array("website_id" => $website_id));
+		}
+
+		$pages = $this->find("all", array("conditions" => $conditions,
+						  "order" => "impressions DESC",
+						  "limit" => 20
+						 ));
+		return $pages;
+	}
+
+	function get_pending_moderation($website_id = 0) {
+		$conditions = array("status" => PAGE_STATUS_PENDING_MODERATION, "visible" => true);
+
+		if ($website_id) {
+			array_push($conditions, array("website_id" => $website_id));
+		}
+
+		$pages = $this->find("all", array("conditions" => $conditions,
+						  "order" => "impressions DESC",
+						  "limit" => 20
+						 ));
+		return $pages;
+	}
+
+	/* Returns the pending pages with pagination support. AZ292 */
+	function get_pending_paged($website_id=0, $limit=8, $page=1, $offset='') {
+		$conditions = array("status" => PAGE_STATUS_PENDING, "visible" => true);
+
+		if ($website_id) {
+			array_push($conditions, array("website_id" => $website_id));
+		}
+
+		$pages = $this->find("all", array("conditions" => $conditions,
+						'order' => "impressions DESC",
+						'limit' => $limit,
+						'page' => $page,
+						'offset'=> $offset
+						 ));
+		return $pages;
+	}
+
+	/* Returns pages pending moderation (Pages User has requested) with pagination support. AZ292 */
+	function get_pending_moderation_paged($website_id=0, $limit=8, $page=1, $offset='') {
+		$conditions = array("status" => PAGE_STATUS_PENDING_MODERATION, "visible" => true);
+
+		if ($website_id) {
+			array_push($conditions, array("website_id" => $website_id));
+		}
+
+		$pages = $this->find("all", array("conditions" => $conditions,
+						"order" => "impressions DESC",
+						'limit' => $limit,
+						'page' => $page,
+						'offset'=> $offset
+						 ));
+		return $pages;
+	}
+
+	function get_running($website_id) {
+		$pages = $this->find("all", array(
+						 "conditions" => array(
+								   "website_id" => $website_id,
+								   "status" => array(PAGE_STATUS_APPROVED),
+								   "visible" => true)));
+		return $pages;
+	}
+
+	function get_active($website_id) {
+		$pages = $this->find(
+			"all",
+			array(
+				"fields" => array('Page.id', 'Page.impressions', 'Page.url', 'Page.website_id'),
+				"conditions" => array(
+					"website_id" => $website_id,
+					"status" => array(PAGE_STATUS_APPROVED, PAGE_STATUS_PENDING),
+					"visible" => true
+				)
+			)
+		);
+		return $pages;
+	}
+
+	function get_rankable_pages($date, $website_id) {
+		return $this->find('list', array(
+			'fields' => 'id',
+			'conditions' => array(
+				'website_id' => $website_id,
+				'visible' => true,
+				'or' => array(
+					'status' => PAGE_STATUS_APPROVED,
+					'and' => array(
+						'status' => PAGE_STATUS_PENDING,
+						'created >' => $date,
+						'impressions >' => 50,
+					),
+				),
+			),
+		));
+	}
+
+	/**
+	 * Get the page from the db or the memcached using the
+	 * page_id or the page_url_title.
+	 *
+	 * @param mixed $value The page id or the url title
+	 *
+	 * @return array
+	 */
+	function get_by_id_or_url_title($value)
+	{
+		if (!is_numeric($value)) {
+			$value = $this->get_id_by_url_title($value);
+		}
+
+		$page = $this->get_by_id($value);
+
+		return $page;
+	}
+
+	/**
+	 * Get the page_id using the title_url as
+	 * the filter
+	 *
+	 * @param string $url_title The title of the url
+	 *
+	 * @return integer
+	 */
+	function get_id_by_url_title($url_title)
+	{
+		$oKeyGen = new \CI\Memcached\KeyGen($url_title, 'page_get_id_by_url_title', 1);
+		$key = $oKeyGen->generate();
+
+		$page_id = $this->memcached_get($key);
+
+		if (!$page_id) {
+			$page = $this->find(
+				'first',
+				array(
+					'fields' => array('id'),
+					'conditions' => array('title_url' => $url_title),
+				)
+			);
+
+			if (!empty($page['Page']['id'])) {
+				$page_id = $page['Page']['id'];
+				$this->memcached_set($key, $page_id, 10 * 60 /*10 Minutes*/);
+			}
+		}
+
+		return $page_id;
+	}
+
+	/**
+	 * Get the page using the page_id from the memcached
+	 * or the db
+	 *
+	 * @param integer $page_id The page id
+	 *
+	 * @return array
+	 */
+	function get_by_id($page_id)
+	{
+		$oKeyGen = new \CI\Memcached\KeyGen($page_id, 'page_get_by_id', 3);
+		$key     = $oKeyGen->generate();
+		$page    = $this->memcached_get_json($key);
+
+		if (!$page) {
+			$page = $this->findById($page_id);
+			if (!empty($page)) {
+				$this->memcached_set_json($key, $page, 10 * 60 /*10 Minutes*/);
+			}
+		}
+
+		return $page;
+	}
+
+	function get_top() {
+		/*
+		 * Get the top pages by click through
+		 */
+		$pages = $this->find("all", array("conditions" =>
+						  array("visible" => true,
+							"top <>" => 0
+							  ),
+						  "order" => "top DESC"));
+
+
+		return $pages;
+
+	}
+
+	function get_latest($time, $impressions = 1) {
+		$pages = $this->find("all", array("conditions" => array(
+											  "impressions >=" => $impressions,
+											  "created >" => $time,
+											  "visible" => 1),
+										  "order" => "created DESC"));
+		return $pages;
+	}
+
+	function get_newest_active() {
+		$pages = $this->find("all", array("conditions" => array(
+							  "status" => PAGE_STATUS_APPROVED,
+							  "visible" => true),
+							  "order" => "created DESC",
+							  "limit" => 50
+							  ));
+		return $pages;
+	}
+
+	public function get_newest($status, $rating = null, $domain_bit = null, $category_id = null, $subcategory_id = null, $page = 1, $limit = DEFAULT_HOMEPAGE_LINKS, $ranked = 0, $tags = '') {
+
+		$offset     = empty($page) ? 0 : ($page - 1) * $limit;
+		$domain_bit = empty($domain_bit) ? 1 << DOMAIN_ID_CROWD_IGNITE : (int) $domain_bit;
+		$rating     = empty($rating) ? implode(',', array(WEBSITE_CONTENT_G, WEBSITE_CONTENT_PG13)) : implode(',', $rating);
+
+		$query = "CALL ci_ci_sp_select_retrieve_pages_ranked({$status}, {$domain_bit}, {$ranked}, {$ranked}, 'DESC', 'created', {$limit}, {$offset}, '{$category_id}', '{$subcategory_id}', '$tags', '$rating')";
+		$pages = $this->query_read($query, false);
+
+		if (is_array($pages)) {
+			array_walk($pages, function (&$page) {
+				$page['Page']['categories'] = $page[0]['categories'];
+				$page['Page']['subcategories'] = $page[0]['subcategories'];
+				$page['Page']['subcategory_names'] = $page[0]['subcategory_names'];
+			});
+		}
+
+		return $pages;
+	}
+
+	public function get_popular($status, $rating = null, $domain_bit = null, $category_id = null, $subcategory_id = null, $page = 1, $limit = DEFAULT_HOMEPAGE_LINKS, $ranked = 0, $tags = '') {
+		$offset     = empty($page) ? 0 : ($page - 1) * $limit;
+		$domain_bit = empty($domain_bit) ? 1 << DOMAIN_ID_CROWD_IGNITE : (int) $domain_bit;
+		$rating     = empty($rating) ? implode(',', array(WEBSITE_CONTENT_G, WEBSITE_CONTENT_PG13)) : implode(',', $rating);
+
+		$query = "CALL ci_ci_sp_select_retrieve_pages_ranked({$status}, {$domain_bit}, {$ranked}, {$ranked}, 'DESC', 'rank', {$limit}, {$offset}, '{$category_id}', '{$subcategory_id}', '$tags', '$rating')";
+		$pages = $this->query_read($query, false);
+
+		if (is_array($pages)) {
+			array_walk($pages, function (&$page) {
+				$page['Page']['categories'] = $page[0]['categories'];
+				$page['Page']['subcategories'] = $page[0]['subcategories'];
+				$page['Page']['subcategory_names'] = $page[0]['subcategory_names'];
+			});
+		}
+
+		return $pages;
+	}
+
+	function add_to_top_list($id) {
+		if (!$id) {
+			return;
+		}
+		$query = "UPDATE pages SET top = NOW() WHERE id = ".$id;
+
+		$this->query($query);
+	}
+
+	function save_impressions($page_id, $count) {
+		$query = "UPDATE pages SET impressions = ".$count.", modified = NOW() WHERE id = ".$page_id." AND ".$count." > impressions";
+
+		$this->query($query);
+	}
+
+	function increment_impressions($page_id, $count) {
+		$query = "UPDATE pages SET impressions = impressions + ".$count.", modified = NOW() WHERE id = ".$page_id;
+
+		$this->query($query);
+	}
+
+	function update_domain($website_id, $domain_bitfield) {
+		$query = "UPDATE pages SET domain_bitfield = ".$domain_bitfield." WHERE website_id = ".$website_id;
+
+		$this->query($query);
+	}
+
+	function get_websites_by_rank($website_id, $status = PAGE_STATUS_PENDING) {
+		$conditions = array('website_id' => $website_id,
+							'status' => $status,
+							'rank >' => 0
+							);
+
+		$params = array("conditions" => $conditions,
+						"limit" => 20,
+						"order" => "rank DESC"
+			);
+
+		$pages = $this->find("all", $params);
+
+		return $pages;
+	}
+
+	function get_by_rank($status, array $content_rating = array(WEBSITE_CONTENT_G,WEBSITE_CONTENT_PG13), $domain_bitfield, $category, $subcategory, $page, $limit, $ranked, $tags = '')
+	{
+		$offset     = empty($page) ? 0 : ($page - 1) * $limit;
+		$domain_bit = empty($domain_bit) ? 1 << DOMAIN_ID_CROWD_IGNITE : (int) $domain_bit;
+		$rating     = empty($rating) ? implode(',', array(WEBSITE_CONTENT_G, WEBSITE_CONTENT_PG13)) : implode(',', $rating);
+
+		$query = "CALL ci_ci_sp_select_retrieve_pages_ranked({$status}, {$domain_bit}, {$ranked}, 1, 'DESC', 'rank', {$limit}, {$offset}, '{$category_id}', '{$subcategory_id}', '$tags', '$rating')";
+		$pages = $this->query_read($query, false);
+
+		if (is_array($pages)) {
+			array_walk($pages, function (&$page) {
+				$page['Page']['categories'] = $page[0]['categories'];
+				$page['Page']['subcategories'] = $page[0]['subcategories'];
+				$page['Page']['subcategory_names'] = $page[0]['subcategory_names'];
+			});
+		}
+
+		return $pages;
+	}
+
+	function get_social($website_id, $cutoff, $page_status = -1, $limit = 0, $canonical_only = 0) {
+		App::import('Model', 'Setting');
+		$Setting = new Setting();
+
+		$conditions = array(
+			"visible" => TRUE,
+			"website_id" => $website_id,
+			);
+
+		switch ($page_status) {
+			case PAGE_STATUS_APPROVED:
+				$conditions['status'] = PAGE_STATUS_APPROVED;
+				break;
+			case PAGE_STATUS_PENDING:
+				$conditions['status'] = PAGE_STATUS_PENDING;
+				$conditions['impressions >='] = $Setting->get('SOCIAL_MINIMUM_IMPRESSIONS');
+				$conditions['modified >='] = $cutoff;
+				break;
+			default:
+				break;
+		}
+
+		if ($canonical_only) {
+			$conditions[0] = 'url = canonical';
+		}
+
+		$params = array(
+			"conditions" => $conditions,
+			"fields" => array('Page.id, Page.url, Page.website_id')
+		);
+		if ($limit) {
+			$params['limit'] = $limit;
+		}
+
+		$pages = $this->find("all", $params);
+		return $pages;
+	}
+
+	function get_freshness($status, $website_id = 0) {
+		$query = "SELECT FROM_UNIXTIME(AVG(UNIX_TIMESTAMP(created))) AS avg_created FROM pages AS Page WHERE status = ".$status;
+		if ($website_id) {
+			$query .= " AND website_id = ".$website_id;
+		}
+
+		$ret = $this->query($query);
+
+		if (!$ret || !$ret[0][0]['avg_created']) {
+			return 0;
+		}
+
+		$start_ts = strtotime($ret[0][0]['avg_created']);
+		$end_ts = strtotime("now");
+
+		$diff = $end_ts - $start_ts;
+
+		return round($diff / 86400);
+	}
+
+	function get_by_page_tags($page_tags) {
+		$ids = array();
+		foreach ($page_tags as $page_tag) {
+			$ids[] = $page_tag['PageTag']['page_id'];
+		}
+
+		$conditions = array("id" => $ids);
+
+		return $this->find("all", array("conditions" => $conditions));
+	}
+
+	function outgoing_click($id, $increment = 1) {
+		plat_assert(is_numeric($id));
+		plat_assert(is_numeric($increment));
+
+		$query = "UPDATE pages SET out_clicks = out_clicks + ".$increment." WHERE id = ".$id;
+
+		$this->query($query);
+	}
+
+	function latest_moderated($user_id, $websites = 0, $website_id = 0) {
+		$conditions = array("moderator_user_id" => $user_id,
+							"status" => PAGE_STATUS_APPROVED,
+							"visible" => 1);
+
+		if ($website_id) {
+			$conditions['website_id'] = $website_id;
+		}
+
+		$options = array("conditions" => $conditions,
+						 "limit" => 10,
+						 "order" => "moderator_modified DESC");
+
+		if ($websites) {
+			$options['group'] = "website_id";
+		}
+
+		$pages = $this->find("all", $options);
+
+		return $pages;
+	}
+
+	public function get_all_stats_grouped_by_moderator($start_date, $end_date)
+	{
+		$stats_by_user = array();
+		App::import('Vendor', 'Carbon', array('file' => 'Carbon.php'));
+		$start_date = \Carbon\Carbon::parse($start_date);
+		$end_date   = \Carbon\Carbon::parse($end_date);
+
+		if ($start_date->diffInDays($end_date) >= 0) {
+			$query = "CALL ci_ci_sp_select_moderator_stats('%s', '%s')";
+			$stats_by_user = $this->query_read(sprintf($query, $start_date, $end_date), false);
+		}
+		return $stats_by_user;
+	}
+
+	function point($id) {
+		$conditions = array(
+			"visible" => 1,
+			"id" => $id
+							);
+
+		$point = $this->find("first", array("conditions" => $conditions, "order" => "created DESC"));
+
+		$stats['impressions'] = $point['Page']['impressions'];
+		$stats['out_clicks'] = $point['Page']['out_clicks'];
+
+		return $stats;
+	}
+
+	/* Delete and cleanup functions */
+	function delete_pending_old_pages($num_days) {
+		plat_assert($num_days);
+
+		$date = date("Y-m-d G:i:s", strtotime("-".$num_days." days today midnight"));
+
+		$query = "DELETE FROM pages WHERE modified < '".$date."' AND status = ".PAGE_STATUS_PENDING;
+
+		$this->query($query);
+	}
+
+	function delete_pending_single_impression_pages() {
+		$query = "DELETE FROM pages WHERE impressions = 1 AND status = ".PAGE_STATUS_PENDING;
+
+		$this->query($query);
+	}
+
+
+	/* Validation Functions */
+	function validate_url($data, $required = false) {
+		$parsed = parse_url($data['url']);
+
+		if (isset($parsed['host'])) {
+			return true;
+		}
+
+		return false;
+	}
+
+	/* Memcache Functions */
+	function cache_count_get($page) {
+		$key = $this->page_count_key($page['Page']['url']);
+
+		return $this->memcached_get($key);
+	}
+
+	function update_view_count($url) {
+		App::import('Component', 'CakeMemcache');
+		$this->CakeMemcache =& new CakeMemcacheComponent(null);
+
+		$key = $this->page_count_key($url);
+
+		$rc = $this->CakeMemcache->increment($key);
+
+		// Object either got evicted, or else doesn't exist
+		// yet. Either way check the database to create
+		if (!$rc) {
+			$count = $this->field("impressions", array("url" => $url));
+			if (!$count) {
+				return 0;
+			}
+
+			// This should be an add
+			$this->CakeMemcache->set($key, $count);
+		}
+
+		return 1;
+	}
+
+    public function title_url($title_in, $id_in = 0) {
+        $title_out = preg_replace("/([^a-z0-9]+)/", "_", html_entity_decode(strtolower($title_in)));
+        $title_out = preg_replace("/_$/", "", $title_out);
+        $title_out = preg_replace("/^_/", "", $title_out);
+
+        $i = 1;
+        $unique = "";
+
+        do {
+            $url = $this->findByTitleUrl($title_out.$unique);
+            if (!$url || $url['Page']['id'] == $id_in) {
+                $title_out .= $unique;
+                break;
+            }
+            $i++;
+            $unique = "_".$i;
+        } while ($i < 1000);
+
+
+        return $title_out;
+    }
+
+	function get_meta_cache($page_id) {
+		$key = $this->page_meta_key($page_id);
+
+		return $this->memcached_get_json($key);
+	}
+
+	function set_meta_cache($page_id, $meta) {
+		$key = $this->page_meta_key($page_id);
+
+		plat_assert($meta['page_id']);
+
+		$this->memcached_set_json($key, $meta);
+	}
+
+	function clear_meta_cache($page_id) {
+		$key = $this->page_meta_key($page_id);
+
+		$this->memcached_delete($key);
+	}
+
+	function get_title_cache($page) {
+		$key = $this->page_title_key($page['Page']['url']);
+
+		return $this->memcached_get($key);
+	}
+
+	function set_title_cache($page, $title, $expire = 0) {
+		$key = $this->page_title_key($page['Page']['url']);
+
+		$this->memcached_set($key, $title, $expire);
+	}
+
+	function clear_title_cache($page) {
+		$key = $this->page_title_key($page['Page']['url']);
+
+		$this->memcached_delete($key);
+	}
+
+	function get_page_id_cache($url) {
+		$key = $this->page_id_key($url);
+
+		return $this->memcached_get($key);
+	}
+
+	function set_page_id_cache($url, $page_id) {
+		$key = $this->page_id_key($url);
+
+		$this->memcached_set($key, $page_id);
+	}
+
+	function clear_page_id_cache($url) {
+		$key = $this->page_id_key($url);
+
+		$this->memcached_delete($key);
+	}
+
+	/* Memcached Keys */
+	function page_count_key($url) {
+		return "page_count::".$url;
+	}
+
+	function page_meta_key($page_id) {
+		return "page_meta::".$page_id;
+	}
+
+	function page_title_key($url) {
+		return "page_title::".md5($url);
+	}
+
+	function page_id_key($url)
+	{
+		$md5 = new CI\Filter\String\Md5();
+		return 'page_id::' . $md5->filter($url);
+	}
+}
+?>

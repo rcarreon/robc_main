@@ -1,0 +1,170 @@
+<?
+	function tab_selected($status_a, $status_b) {
+		// Hack for casting issue
+		if ($status_a === "all" &&
+		    $status_b === 0) {
+			return "tab_unselected";
+		}
+
+		if ($status_a == $status_b) {
+			$selected_class = "tab_selected";
+		} else {
+			$selected_class = "tab_unselected";
+		}
+		return $selected_class;
+	}
+
+?>
+<script src="/js/jquery.blockUI.min.js" type="text/javascript"></script>
+<script type="text/javascript" src="/js/highcharts.src.js"></script>
+<script type="text/javascript" src="/js/chartify.js"></script>
+<script>
+jQuery(document).ready(function() {
+
+    jQuery.blockUI.defaults.overlayCSS = {};
+    jQuery.blockUI.defaults.css = {};
+
+
+    //jQuery("#timeChoices").change(function(){ get_graph_data(); });
+
+    get_graph_data();
+
+});
+
+    function get_graph_data() {
+
+	// Block out to wait on update
+	jQuery("#graph_type").block({ message:jQuery("#waiting_div_type"), css: {width:'210px', height:'50px'}  });
+	jQuery("#graph_actual").block({ message:jQuery("#waiting_div_actual"), css: {width:'210px', height:'50px'}  });
+
+	// Get time
+	var now = new Date();
+	now.setHours(0);
+	now.setMinutes(0);
+
+	var startTime = Math.ceil(now.getTime()/1000);
+	var endTime = Math.ceil(now.getTime()/1000);
+
+	domain = <?=$domain?>;
+	intersect = "category";
+
+	/* Chart Widget Type */
+	chartify('graph_type', startTime, endTime, '/widget_instances/chart_type', "Widget Type", "Impressions", "pie", 0, 0, "type", false, <?=TIME_UNIT_DAY?>, function(){ jQuery("#graph_type").unblock(); });
+
+	chartify('graph_actual', startTime, endTime, '/history_inventory/chart', "Category", "Impressions", "column", "all", 0, "actual", false, <?=TIME_UNIT_DAY?>, function(){ jQuery("#graph_actual").unblock(); }, domain, intersect);
+    }
+
+
+
+</script>
+
+
+<div class="row main">
+<div id="content" class="column grid_12">
+
+<?
+	echo $this->element("management_toolbar", array("tab" => "home"));
+?>
+
+	<!-- Domain -->
+	<table cellpadding=0 border=0>
+	  <tr>
+	    <td>
+	      <? $selected_class = tab_selected($domain, "all"); ?>
+	      <div class="tab <?=$selected_class?>" id="">
+		<a class="<?=$selected_class?>" href="/management/websites/<?=DOMAIN_ID_ALL?>">All</a>
+	      </div>
+	    </td>
+	    <?
+		$all_domain_bits = $domain_component->getAllBits();
+		foreach ($all_domain_bits as $domain_bit) {
+			$domain_name = $convert->domain_name_bit($domain_bit);
+			$domain_id = $domain_component->bitToId($domain_bit);
+	    ?>
+	    <td>
+	      <? $selected_class = tab_selected($domain, $domain_id); ?>
+	      <div class="tab_small <?=$selected_class?>" id="">
+		<a class="<?=$selected_class?>" href="/management/inventory/<?=$domain_id?>/<?=$category?>"><?=$domain_name?></a>
+	      </div>
+	    </td>
+	    <?
+		}
+	    ?>
+	</tr>
+	</table>
+
+	<!-- Category -->
+	<!--
+	<table cellpadding=0 border=0>
+	<tr>
+	<?
+		$categories = $convert->category_select_short();
+		foreach ($categories as $cat_id => $cat) {
+			$selected_class = tab_selected($category, $cat_id);
+	?>
+		<td>
+		 <div class="<?=$selected_class?> tab_small" id="">
+			 <a class="<?=$selected_class?>" href="/management/websites/<?=$status?>/<?=$hub?>/<?=$cat_id?>"><?=$cat?></a>
+		</div>
+		</td>
+		<?
+				}
+		?>
+	</tr>
+	</table>
+-->
+<div class="row">
+
+  <div class="column grid_12">
+
+	<h3 class="topContent">Inventory</h3>
+
+
+	 <div class="row" id="content_area">
+
+
+	    <div class="grid_6">
+	      <p style="margin-top:24px;">
+
+		<div class="graphs" style="margin-left:20px;">
+
+		  <!-- Widget Type Graph -->
+		  <p style="margin-top:20px;">
+	            <div id="graph_type" style="width:500px;height:360px;margin-top:12px;"></div>
+	            <div id="legend_type" style="margin-top:12px;margin-left:24px;"></div>
+		  </p>
+		</div>
+	      </p>
+	    </div>
+
+	    <div class="grid_6">
+	        <p style="margin-top:24px;">
+
+		  <div class="graphs" style="margin-left:20px;">
+		    Actual
+
+		    <!-- Actual  -->
+		    <p style="margin-top:20px;">
+		      <div id="graph_actual" style="width:500px;height:360px;margin-top:12px;"></div>
+		      <div id="legend_actual" style="margin-top:12px;margin-left:24px;"></div>
+		    </p>
+		</div>
+	      </p>
+	    </div>
+
+	 </div>
+</div> <!--  end of content column -->
+
+</div> <!--  end of content row -->
+
+<!-- Waiting Divs -->
+<div id="waiting_div_type" style="display:none;cursor:default">
+Refreshing...
+<p><img src="/img/progress2.gif" width="180">
+</div>
+
+<div id="waiting_div_actual" style="display:none;cursor:default">
+Refreshing...
+<p><img src="/img/progress2.gif" width="180">
+</div>
+

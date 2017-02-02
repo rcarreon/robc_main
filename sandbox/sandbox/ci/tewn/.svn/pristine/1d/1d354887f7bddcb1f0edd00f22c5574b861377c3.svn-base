@@ -1,0 +1,21 @@
+<style>
+.container_12 .grid_12 {
+	background:#fff;
+    width: 953px;
+}
+#links_content {
+    border-radius:0!important;
+    -moz-border-radius:0!important;
+    -webkit-border-radius:0!important;
+    margin-left: 5px;
+    margin-top: 0px;
+    padding-bottom: 0px;
+    padding-top: 0px;
+}
+.bottom_content_spacer {
+  margin-left: 0;
+  min-height: 5px;
+  padding: 0;
+  width: 958px !important;
+}
+</style>

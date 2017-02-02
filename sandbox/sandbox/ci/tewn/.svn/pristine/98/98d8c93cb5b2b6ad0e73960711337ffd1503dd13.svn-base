@@ -1,0 +1,221 @@
+<?php
+
+namespace CI\Stats;
+use CI\Validator\Options;
+use CI\Stats;
+
+class Account extends Stats
+{
+    const TYPE_STATS            = 0;
+    const TYPE_AVERAGE          = 1;
+    const TYPE_GROUP_BY_ACCOUNT = 2;
+
+
+    protected $aDefaultConditions = array(
+        'type' => self::TYPE_STATS
+    );
+
+    public function __construct()
+    {
+        $this->cleanConditions();
+    }
+
+    /**
+     * Get a representation of empty stats
+     * @return array Empty stats
+     */
+    public function getEmptyStats()
+    {
+        return array(
+            'incoming' => 0,
+            'outgoing' => 0,
+            'credits'  => 0,
+        );
+    }
+
+    /**
+     * Validates the conditions to start processing
+     * @return boolean True if the conditions validates, False if not
+     */
+    protected function validateConditions()
+    {
+        $oValidator = new Options();
+        $oValidator->setOptions(
+            array(
+                'account_id'     => 'required',
+                'type'           => 'required|numeric',
+                'start_range'    => 'required|string',
+                'end_range'      => 'required|string',
+                'model'          => 'required',
+                'days'           => 'numeric', // optional
+            )
+        );
+
+        $bValid = $oValidator->isValid($this->aConditions);
+        $this->setErrors(array_values($oValidator->getMessages()));
+
+        return $bValid;
+    }
+
+    /**
+     * Process the conditions to obtain data
+     * @return mixed Stats data
+     */
+    protected function process()
+    {
+        $sStart     = $this->aConditions['start_range'];
+        $sEnd       = $this->aConditions['end_range'];
+        $mAccountId = $this->aConditions['account_id'];
+        $oAccount   = null;
+
+        $oAccount = new Account\Delta($this->aConditions['model']);
+
+        $mResult = null;
+        if ($this->aConditions['type'] == self::TYPE_AVERAGE) {
+            $nDays = $this->aConditions['days'];
+            $mResult = $oAccount->getAverage($mAccountId, $sStart, $nDays);
+        } else if ($this->aConditions['type'] == self::TYPE_GROUP_BY_ACCOUNT) {
+            $mResult = $oAccount->getStats($mAccountId, $sStart, $sEnd, true);
+        } else {
+            $mResult = $oAccount->getStats($mAccountId, $sStart, $sEnd);
+        }
+
+        return $mResult;
+    }
+
+    /**
+     * Sets the account id condition
+     *
+     * @param integer $nAccoutId The account ID as numeric
+     *
+     * @return CI\Stats\Account
+     */
+    public function setAccountId($nAccoutId)
+    {
+        $this->addCondition(array('account_id' => $nAccoutId));
+        return $this;
+    }
+
+    /**
+     * Sets the accounts ids condition
+     *
+     * @param array $aAccountsIds The account ID as an array with a list of accounts ids
+     *
+     * @return CI\Stats\Account
+     */
+    public function setAccountsIds(array $aAccountsIds)
+    {
+        $this->addCondition(array('account_id' => $aAccountsIds));
+        return $this;
+    }
+
+    /**
+     * Set the model to get data
+     *
+     * @param object $oModel    The delta model
+     *
+     * @return CI\Stats\Account
+     */
+    public function setModel($oModel)
+    {
+        $this->addCondition(array('model' => $oModel));
+        return $this;
+    }
+
+    /**
+     * Sets a range of dates to get stats
+     *
+     * @param string $sStart Start date
+     * @param string $sEnd   End date
+     *
+     * @return CI\Stats\Account
+     */
+    public function setDateRange($sStart, $sEnd)
+    {
+        $this->addCondition(
+            array(
+                'start_range' => $sStart,
+                'end_range'   => $sEnd,
+                'days'        => $this->_nNumDays($sStart, $sEnd),
+            )
+        );
+        return $this;
+    }
+
+    /**
+     * Sets a date to get stats by a time unit
+     *
+     * @param string  $sDate     The date to get stats
+     * @param integer $nTimeUnit The unit time to use for this point
+     *
+     * @return CI\Stats\Account
+     */
+    public function setDate($sDate, $nTimeUnit = Stats::UNIT_DAY)
+    {
+        $sStartFormatDate = $nTimeUnit == Stats::UNIT_DAY ? 'Y-m-d 00:' : 'Y-m-d H:';
+        $sEndFormatDate   = $nTimeUnit == Stats::UNIT_DAY ? 'Y-m-d 23:' : 'Y-m-d H:';
+        $this->addCondition(
+            array(
+                'start_range' => date($sStartFormatDate.'00:00', strtotime($sDate)),
+                'end_range'   => date($sEndFormatDate.'59:59', strtotime($sDate)),
+                'days'        => 1,
+            )
+        );
+        return $this;
+    }
+
+    /**
+     * Sets average in a range of dates
+     *
+     * @return CI\Stats\Account
+     */
+    public function setTypeAverage()
+    {
+        $this->addCondition(array('type' => self::TYPE_AVERAGE));
+        return $this;
+    }
+
+    /**
+     * Set the result as stats
+     * @return CI\Stats\Account
+     */
+    public function setTypeStats()
+    {
+        $this->addCondition(array('type' => self::TYPE_STATS));
+        return $this;
+    }
+
+    public function setGroupByAccount()
+    {
+        $this->addCondition(array('type' => self::TYPE_GROUP_BY_ACCOUNT));
+        return $this;
+    }
+
+    /**
+     * Clears the conditions
+     * @return CI\Stats\Account
+     */
+    public function cleanConditions()
+    {
+        $this->setConditions(array());
+        return $this;
+    }
+
+    /**
+     * Gets the number of days between 2 dates
+     *
+     * @param string $sStart Start date
+     * @param string $sEnd   End date
+     *
+     * @return integer Number of days
+     */
+    private function _nNumDays($sStart, $sEnd)
+    {
+        $oStart = new \DateTime(date('Y-m-d', strtotime($sStart)));
+        $oEnd = new \DateTime(date('Y-m-d', strtotime($sEnd)));
+        $interval = $oStart->diff($oEnd);
+
+        // Add 1 since this in inclusive
+        return $interval->invert ? $interval->days * -1 : $interval->days + 1;
+    }
+}

@@ -1,0 +1,158 @@
+<html>
+<head>
+
+<title>Reference of Crowd Ignite Remote Landing Page</title>
+
+<!-- Required JS files -->
+<script type="text/javascript" src="http://code.jquery.com/jquery-1.4.4.js"></script> 
+<script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js"></script>
+<script type="text/javascript" src="http://crowdignite.com/js/crowdignite_hub.js"></script>
+
+<!--
+
+	The load works like this:
+
+	1.) The URL for the request to the Crowd Ignite server is created from the incoming link
+	2.) An AJAX call is made to the server
+	3.) The Crowd Ignite server gets all the link info needed and auto-crops any images that are needed
+	4.) The Crowd Ignite server returns a JSON object with data (format below)
+	5.) The JS pulls the data it needs out of the JSON object
+	6.) That data is used to populate a jQuery HTML template
+	7.) The populated template is injected into a DIV
+
+	What needs to be done to use this code
+
+	1.) Fill in the clicked/general/featured widths & heights with image sizes that will be used in that section
+	2.) Put the appropriate DIVs where you want on the page and assign a style to them
+	3.) If there is some crazy URL being used, then the load_url parsing may need to be changed (unlikely)
+
+	JSON format:
+	# Clicked page is the page that was clicked on the widget		   
+	clicked_page -> url
+	             -> image
+	             -> title
+	# General pages are pages which should be relevant content to the clicked page
+	general_page -> url
+	             -> image
+	             -> title
+	# Featured pages are "special" pages which we are trying extra hard to push traffic to
+	# They don't always have much relevance to the clicked page		    
+	featured_page -> url
+	              -> image
+	              -> title
+-->
+<script>
+	// Create the link to load
+	var parsed_url = parseURL(window.location);
+	var seg_len = parsed_url.segments.length;
+	var load_url = "http://crowdignite.com/v/"+parsed_url.segments[seg_len-2]+"/"+parsed_url.segments[seg_len-1]+"?outputtype=JSONP&callback=?";
+
+	// Fill this is for what is used 
+	var clicked_width = 350;	// in pixels
+	var clicked_height = 240;	// in pixels
+	var general_width = 250;	// in pixels
+	var general_height = 150;	// in pixels
+	var featured_width = 350;	// in pixels
+	var featured_height = 240;	// in pixels
+
+	jQuery.getJSON(			
+		load_url,
+		{clicked_width:clicked_width, 
+		clicked_height:clicked_height,
+		general_width:general_width,
+		general_height:general_height,
+		featured_width:featured_width,
+		featured_height:featured_height},
+		function (json) {
+			// Display clicked page
+			var cp = new Object();
+			cp.url = json.clicked_page.url;
+			cp.image = json.clicked_page.image;
+			cp.title = json.clicked_page.title;
+			jQuery("#clicked_row").template("clicked_row_template");
+			jQuery.tmpl("clicked_row_template", cp).appendTo(jQuery("#clicked"));
+
+			// Display general pages
+			var general_links = new Array();
+			$(json.general_pages).each(function(){
+					var p = new Object();
+					p.url = this.url;
+					p.image = this.image;
+					p.title = this.title;
+					general_links.push(p);
+			});
+			jQuery("#general_row").template("general_row_template");
+			jQuery.tmpl("general_row_template", general_links).appendTo(jQuery("#general"));
+
+			// Display featured pages
+			var featured_links = new Array();
+			$(json.featured_pages).each(function(){
+					var p = new Object();
+					p.url = this.url;
+					p.image = this.image;
+					p.title = this.title;
+					featured_links.push(p);
+			});
+			jQuery("#featured_row").template("featured_row_template");
+			jQuery.tmpl("featured_row_template", featured_links).appendTo(jQuery("#featured"));
+		});
+</script>	 
+
+<!-- 
+	Template for clicked row 
+	${url} - The clicked link outgoing URL
+	${image} - The clicked link requested image		
+	${title} - The Title for the link
+-->
+<script id="clicked_row" type="text/x-jquery-tmpl">
+	<li>	<a href="${url}" rel="nofollow" target="_blank">
+			<img src="${image}" border=0>
+		</a>		
+		<a href="${url}" rel="nofollow" target="_blank">${title}</a>			
+	</li>
+</script>
+
+<!-- 
+	Template for a general link 
+	${url} - The link outgoing URL
+	${image} - The link requested image		
+	${title} - The title for the link
+-->
+<script id="general_row" type="text/x-jquery-tmpl">
+	<li>	<a href="${url}" rel="nofollow" target="_blank">
+			<img src="${image}" border=0>
+		</a>		
+		<a href="${url}" rel="nofollow" target="_blank">${title}</a>			
+	</li>
+</script>
+
+<!-- 
+	Template for a featured link 
+	${url} - The link outgoing URL
+	${image} - The link requested image		
+	${title} - The title for the link
+-->
+<script id="featured_row" type="text/x-jquery-tmpl">
+	<li>	<a href="${url}" rel="nofollow" target="_blank">
+			<img src="${image}" border=0>
+		</a>		
+		<a href="${url}" rel="nofollow" target="_blank">${title}</a>			
+	</li>
+</script>
+
+</head>
+
+<body>
+			
+	<h1>Clicked</h1>	 
+	<div id="clicked"><!-- This div will be filled in w/ the populated clicked row template --></div>		
+	<br><br>
+
+	<h1>General Links</h1>
+	<div id="general"><!-- This div will be filled in w/ the populated general row template --></div>
+	<br><br>
+
+	<h1>Featured</h1>
+	<div id="featured"><!-- This div will be filled in w/ the populated featured row template --></div>
+</body>
+</html>

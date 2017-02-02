@@ -1,0 +1,13 @@
+.ci-background::before {
+    content: ' ';
+    background: url(/img/bootstrap/flame_cartoon.png) no-repeat center center;
+    position: absolute;
+    top: 267px;
+    left: 50%;
+    width: 187px;
+    height: 267px;
+    margin-left: -94px;
+    margin-top: -134px;
+    opacity: 0.25;
+    filter: alpha(opacity=25);
+}

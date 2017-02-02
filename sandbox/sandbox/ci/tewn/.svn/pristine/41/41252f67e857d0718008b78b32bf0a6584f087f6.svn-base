@@ -1,0 +1,61 @@
+.table tbody>tr>td.vert-align {
+    vertical-align: middle;
+}
+
+.main-container {
+    padding-top: 15px;
+}
+
+.btn-default {
+    color: #333 !important;
+}
+
+.content-column {
+    background: #fff;
+}
+
+.main-container a,
+.main-container a:active,
+.main-container a:visited {
+    color: #428bca;
+}
+
+.multiselect-container li label {
+    font-weight: normal;
+}
+
+li.multiselect-all label {
+    font-weight: bold;
+}
+
+.caretdown {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    margin-left: 2px;
+    vertical-align: middle;
+    border-right: 4px solid transparent;
+    border-left: 4px solid transparent;
+    border-bottom: 4px solid #000;
+}
+
+.header .caret {
+    margin-top: 10px;
+}
+
+.header .caretdown {
+    margin-right: -10px;
+    margin-top: 4px;
+}
+
+.header.headerSortDown .caret {
+    display: none;
+}
+
+.header.headerSortUp .caretdown {
+    display: none;
+}
+
+.header.headerSortDown .caretdown {
+    margin-right: 0;
+}

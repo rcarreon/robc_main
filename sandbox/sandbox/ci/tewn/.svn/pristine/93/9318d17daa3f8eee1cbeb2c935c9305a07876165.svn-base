@@ -1,0 +1,10 @@
+var async_code = "<script type='text\/javascript'>\n";
+async_code += "var _CI = _CI || {};\n";
+async_code += "(function() {\n";
+async_code += "var script = document.createElement('script');\n";
+async_code += "ref = document.getElementsByTagName('script')[0];\n";
+async_code += "_CI.counter = (_CI.counter) ? _CI.counter + 1 : 1;\n";
+async_code += "document.write('<div id=\"_CI_widget_');\n";
+async_code += "document.write(_CI.counter+'\"><\/div>');\n";
+async_code += "script.type = 'text\/javascript';\n";
+async_code += "script.src = 'http://<?=WIDGET_URL?>/widgets/";

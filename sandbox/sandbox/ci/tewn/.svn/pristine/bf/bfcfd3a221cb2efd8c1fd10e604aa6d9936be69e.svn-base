@@ -1,0 +1,76 @@
+<?php
+
+namespace CI\Cron;
+use CI\IO\StdOutput;
+use CI\IO\Facade\Output;
+use CI\Database\Facade\Database;
+use CI\Component\Facade\Tier as TierComponent;
+
+class Tier extends \CI\Cron
+{
+    const WEBSITE_STATUS_ACTIVE = 0;
+
+    public function updateCommand($nLimit = 1000)
+    {
+        $nOffset = 0;
+
+        do {
+            Output::info('Getting active websites...');
+
+            $aWebsites = $this->getWebsites($nLimit, $nOffset);
+            $this->processWebsites($aWebsites);
+            $nOffset += $nLimit;
+        } while (count($aWebsites) >= $nLimit);
+
+        Output::success('Done!');
+    }
+
+    protected function getWebsites($nLimit = 1000, $nOffset = 0)
+    {
+        $nStatus = self::WEBSITE_STATUS_ACTIVE;
+        $sQuery  = "SELECT id, url FROM websites WHERE status = {$nStatus} LIMIT {$nOffset}, {$nLimit}";
+
+        return Database::query($sQuery);
+    }
+
+    protected function processWebsites($aWebsites)
+    {
+        if (!empty($aWebsites)) {
+            $aUpdateBatch = array();
+            $oAlexaRank   = new \CI\Http\Service\Alexa();
+
+            Output::info('Processing websites...');
+
+            foreach ($aWebsites as $nIndex => $aWebsite) {
+                try {
+                    Output::put('.', '', false);
+                    $nTier          = TierComponent::getFromUrl($aWebsite['url'], $oAlexaRank);
+                    $aUpdateBatch[] = "({$aWebsite['id']},{$nTier})";
+
+                    if ($nIndex % 50 == 0) {
+                        Output::put('');
+                        Output::info('Sleeping...');
+                        sleep(1);
+                    }
+                } catch(\Exception $oEx) {
+                    Output::put('');
+                    Output::warning(__METHOD__ . ' - Url: ' . $aWebsite['url']  . ' Message: ' . $oEx->getMessage());
+                }
+            }
+
+            Output::put('');
+            Output::info('Saving websites...');
+            $this->saveWebsites($aUpdateBatch);
+        }
+    }
+
+    protected function saveWebsites($aBatchUpdate)
+    {
+        if (!empty($aBatchUpdate)) {
+            $sUpdateQuery = 'INSERT INTO websites (id, tier) VALUES ' .
+                implode(',', $aBatchUpdate) . ' ON DUPLICATE KEY UPDATE tier = VALUES(tier)';
+
+            Database::execute($sUpdateQuery);
+        }
+    }
+}

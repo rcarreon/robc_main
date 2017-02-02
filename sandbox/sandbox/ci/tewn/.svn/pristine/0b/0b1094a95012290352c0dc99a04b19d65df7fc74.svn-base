@@ -1,0 +1,15 @@
+<style>
+/* Grid Full sk*/
+#links_content {
+	margin-left: 15px!important;
+    margin-top: 5px;
+    padding-bottom: 10px;
+    padding-top: 10px;
+    border-radius:6px 6px 0 0;
+    -moz-border-radius: 6px 6px 0 0;
+    -webkit-border-radius: 6px 6px 0 0;
+}
+.container_12 .grid_12 {
+    width: 1020px!important;
+}
+</style>

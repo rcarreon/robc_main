@@ -1,0 +1,126 @@
+<div class="container">
+    <div class="campaign-option campaign-show-by">
+        Show by:
+        <select id="show_by" class="input">
+                <option id='CPC_FILTER_VIEW_BY_CAMPAIGNS' value="<?php echo CPC_FILTER_VIEW_BY_CAMPAIGNS?>" >Campaigns</option>
+                <option id='CPC_FILTER_VIEW_BY_COUNTRY' value="<?php echo CPC_FILTER_VIEW_BY_COUNTRY?>" >Country</option>
+            </select>
+    </div>
+    <div class="campaign-option campaign-filter">
+        Filter by:
+            <select id="status" class="input">
+                <option id='CPC_CAMPAIGN_STATUS_ALL' value="<?php echo CPC_CAMPAIGN_STATUS_ALL?>" >All</option>
+                <option id='CPC_CAMPAIGN_STATUS_ACTIVE' value="<?php echo CPC_CAMPAIGN_STATUS_ACTIVE?>" >Active</option>
+                <option id='CPC_CAMPAIGN_STATUS_PAUSED' value="<?php echo CPC_CAMPAIGN_STATUS_PAUSED?>" >Paused</option>
+                <option id='CPC_CAMPAIGN_STATUS_INACTIVE' value="<?php echo CPC_CAMPAIGN_STATUS_INACTIVE?>" >Inactive</option>
+            </select>
+    </div>
+    <div class="controls-bar">
+        <a id="cpc_export" class="btn right" href="/cpc/export/<?php echo $website_id ?>/<?=strtotime("midnight -14 days")?>">Export to Excel</a>
+        <br class="clearfloat"/>
+    </div>
+    <span id="error-campaign-status" class="msg error hide"></span>
+    <div id="third-party-campaign-list"></div>
+    <div id="show-filter-info-by"></div>
+    <div id="campaigns-container"></div>
+</div>
+<br class="clearfloat"/>
+
+<script id="tpl-third-party-campaigns-list" type="text/x-handlebars-template">
+{{#each campaign}}
+<div class="block-container third-party">
+    <h2 class="campaign_title">
+        <span class="title">
+            <span>{{title}}</span><br><small>Provider: {{ provider }}</small>
+        </span><span id="buttons_campagin_change_status_{{ id }}" data-id="{{ id }}" class="campaign_buttons_status">{{#if is_not_active}}<button type="button" class="active status btn" data-status="0">Active</button>{{/if}}{{#if is_not_paused}}<button type="button" class="paused status btn" data-status="1">Pause</button>{{/if}}{{#if is_not_inactive}}<button type="button" class="inactive status btn" data-status="2">Inactive</button>{{/if}}</span>
+        <span class="edit-campaign float-right">
+            <button type="button" class="edit btn" data-id="{{ id }}">Edit</button>
+        </span>
+        <span class="details float-right">
+            <span class="date">
+                <span class="float-left"><strong>Flight:</strong></span>
+                <span class="float-right">{{ flight_date }}</span>
+            </span><span class="cpc">
+                <span class="float-left"><strong>CPC:</strong></span>
+                <span class="float-right">{{ cpc }}</span>
+            </span>
+            <span class="budget"><span class="float-left"><strong></strong></span><span class="float-right"></span></span>
+        </span>
+    </h2>
+</div>
+<br>
+{{/each}}
+</script>
+
+<script id="tpl-show-filter-info-by" type="text/x-handlebars-template">
+<div class="table">
+    <table id="tablesorter_show_filter_info" class="tablesorter">
+    <input type="hidden" id="country-page" name="page" value={{data.pagination.current}} />
+        <thead>
+            <tr>
+                <th>Country</th>
+                <th>Widget Imps</th>
+                <th>Widget Clicks</th>
+                <th>Widget CTR</th>
+                <th>LP Imps</th>
+                <th>LP Clicks</th>
+                <th>LP CTR</th>
+                <th>Avg CPC</th>
+                <th>Spent</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each data.report}}
+            <tr>
+                <td>{{ name }}</td>
+                <td>{{ widget_imps }}</td>
+                <td>{{ widget_clicks }}</td>
+                <td>{{ widget_ctr }}</td>
+                <td>{{ lp_imps }}</td>
+                <td>{{ lp_clicks }}</td>
+                <td>{{ lp_ctr }}%</td>
+                <td>${{ avg_cpc }}</td>
+                <td>${{ spent }}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+        {{#if data.footer }}
+        <tr class="subtotal">
+            <td>{{ data.footer.title }}</td>
+            <td>{{ data.footer.widget_imps }}</td>
+            <td>{{ data.footer.widget_clicks }}</td>
+            <td>{{ data.footer.widget_ctr }}</td>
+            <td>{{ data.footer.lp_imps }}</td>
+            <td>{{ data.footer.lp_clicks }}</td>
+            <td>{{ data.footer.lp_ctr }}%</td>
+            <td class="country-tooltip-note" data-note="This is a total sum">${{ data.footer.avg_cpc }} *</td>
+            <td>${{ data.footer.spent }}</td>
+        </tr>
+        {{/if}}
+    </table>
+
+    {{#if data.pagination.numbers}}
+        {{#with data.pagination}}
+        <div class="pagination">
+            {{#if hasPrevious}}
+            <span><a href="page:1" data-page="1">&laquo; First</a></span>
+            <a href="page:{{previous}}" data-page="{{previous}}">&lt; Previous</a>
+            {{/if}}
+            <div class="numbers">
+                {{#each numbers}}
+                    {{#if selected}}
+                        <span class="current">{{page}}</span>
+                    {{else}}
+                        <span><a href="page:{{page}}" data-page="{{page}}">{{page}}</a></span>
+                    {{/if}}
+                {{/each}}
+            </div>
+            {{#if hasNext}}
+                <a href="page:{{next}}" data-page="{{next}}">Next &gt;</a>
+                <span><a href="page:{{last}}" data-page="{{last}}">Last &raquo;</a></span>
+            {{/if}}
+        </div>
+        {{/with}}
+    {{/if}}
+</div>
+</script>

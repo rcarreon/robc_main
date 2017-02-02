@@ -1,0 +1,68 @@
+<?php
+
+require_once 'citools.php';
+require_once 'logger/analytic/element/interface.php';
+require_once 'logger/analytic/element/abstract.php';
+require_once 'logger/analytic/element/userid.php';
+
+class LoggerAnalyticElementUserIdTest extends PHPUnit_Framework_TestCase
+{
+	public function testInitialValue()
+	{
+		$element = new Logger_Analytic_Element_UserId('userid_element_test');
+		$this->assertTrue(strlen($element->build()) === 32);
+		$userid = md5('Hello World');
+		$element->registerValue($userid);
+		$this->assertTrue($element->build() === $userid);
+	}
+
+	public function testIpAddressUserId()
+	{
+		$_SERVER['REMOTE_ADDR'] = '127.0.0.1';
+		$userid = md5(''.session_id().'_'.$_SERVER['REMOTE_ADDR']);
+		$element = new Logger_Analytic_Element_UserId('userid_element_test');
+		$this->assertTrue($element->build() === $userid);
+
+		$_SERVER['HTTP_X_FORWARDED_FOR'] = '127.0.0.2';
+		$userid = md5(''.session_id().'_'.$_SERVER['HTTP_X_FORWARDED_FOR']);
+		$element = new Logger_Analytic_Element_UserId('userid_element_test');
+		$this->assertTrue($element->build() === $userid);
+
+		$_SERVER['HTTP_CLIENT_IP'] = '127.0.0.3';
+		$userid = md5(''.session_id().'_'.$_SERVER['HTTP_CLIENT_IP']);
+		$element = new Logger_Analytic_Element_UserId('userid_element_test');
+		$this->assertTrue($element->build() === $userid);
+	}
+
+	public function testFailUserIdWithSimpleString()
+	{
+		$userid = 'Fake string';
+		$element = new Logger_Analytic_Element_UserId('userid_element_test');
+		$this->assertFalse($element->build() === $userid);
+	}
+
+	public function testFailUserIdWithNotAlphaNumericString()
+	{
+		$userid = 'ABC./,()(*) string';
+		$element = new Logger_Analytic_Element_UserId('userid_element_test');
+		$this->assertFalse($element->build() === $userid);
+	}
+
+	public function testFailUserIdWithBigString()
+	{
+		$userid = 'this is a big string, because the class require 32 characters but this string is bigger';
+		$element = new Logger_Analytic_Element_UserId('userid_element_test');
+		$this->assertFalse($element->build() === $userid);
+	}
+
+	public function testFormat()
+	{
+		$format = array('separator' => '|', 'item' => '[%s]');
+		$element = new Logger_Analytic_Element_UserId(
+			'userid_element_test', $format
+		);
+		$userid = md5('Hello World');
+		$element->registerValue($userid);
+		$this->assertTrue($element->build() === "[{$userid}]");
+	}
+}

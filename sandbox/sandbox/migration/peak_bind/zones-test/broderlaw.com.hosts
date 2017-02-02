@@ -1,0 +1,27 @@
+$TTL 86400
+broderlaw.com.	IN      SOA     broderlaw.com. root.broderlaw.com. (
+                        2014071100; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+broderlaw.com.     IN      NS              app3v-dns.tp.prd.lax.gorillanation.com.
+broderlaw.com.     IN      NS              app4v-dns.tp.prd.lax.gorillanation.com.
+broderlaw.com.     IN      NS              app1v-dns.tp.prd.lax.gorillanation.com.
+broderlaw.com.     IN      NS              app2v-dns.tp.prd.lax.gorillanation.com.
+broderlaw.com.     IN      MX      10       cluster9.us.messagelabs.com.
+broderlaw.com.     IN      MX      20       cluster9a.us.messagelabs.com.
+;
+; local host
+;
+local           IN      A       127.0.0.1
+localhost       IN      A       127.0.0.1
+loghost         IN      A       127.0.0.1
+;
+;
+; hosts
+mail.broderlaw.com.	IN	A	63.139.86.10	
+
+; This domain is used for email-only. Don't remove it.

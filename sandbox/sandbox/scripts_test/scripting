@@ -1,0 +1,9 @@
+#!/bin/bash	
+
+my_name="Roberto Carreon"
+so="fedora v14"
+
+
+echo " my name is $my_name and my OS is $so "
+
+exit 

@@ -1,0 +1,80 @@
+<?php
+
+namespace Test\CPC;
+
+/**
+ * @group CPC
+ * @group CPC_Observer
+ */
+class ObserverTest extends \PHPUnit_Framework_TestCase
+{
+    public function testEventAddShouldReturnTrue()
+    {
+        $oObserver = new ObserverFake();
+
+        $this->assertTrue($oObserver->trigger(ObserverFake::CPC_CAMPAIGN_EVENT_ADD, array()));
+    }
+
+    public function testEventChangeStatusShouldReturnTrue()
+    {
+        $oObserver = new ObserverFake();
+
+        $this->assertTrue($oObserver->trigger(ObserverFake::CPC_CAMPAIGN_EVENT_CHANGE_STATUS, array()));
+    }
+
+    public function testEventEditShouldReturnTrue()
+    {
+        $oObserver = new ObserverFake();
+
+        $this->assertTrue($oObserver->trigger(ObserverFake::CPC_CAMPAIGN_EVENT_EDIT, array()));
+    }
+
+    /**
+     * @expectedException \CI\CPC\Exception
+     * @expectedExceptionCode \CI\CPC\Exception::MISSING_EVENT
+     */
+    public function testWrongEventShouldThrowException()
+    {
+        $oObserver = new ObserverFake();
+
+        $this->assertTrue($oObserver->trigger(25, array()));
+    }
+}
+
+class ObserverFake extends \CI\CPC\Observer
+{
+    public function __construct()
+    {
+        $this->oAnalytic = new AnalyticObserverFake();
+    }
+}
+
+class AnalyticObserverFake extends \CI\CPC\Analytic
+{
+    public function __construct() {}
+
+    public function create($nWebsiteId, $aPages)
+    {
+        return $this;
+    }
+
+    public function turnOff($nWebsiteId, $aPages)
+    {
+        return $this;
+    }
+
+    protected function isValidAccount($aAccount)
+    {
+        return $this;
+    }
+
+    public function turnOn($aPages)
+    {
+        return $this;
+    }
+
+    public function updateByStatus($nStatus, $nCampaignId)
+    {
+        return $this;
+    }
+}

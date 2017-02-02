@@ -1,0 +1,38 @@
+
+document.writeln("<div style='<?=$widget_style['WidgetStyle']['extra']?>' >");
+document.writeln("<table class='raaze_widget_table' id='raaze_widget_table_<?=$widget['Widget']['id']?>' style='border-collapse: separate; border-spacing:5px' cellpadding='3' cellspacing='3' border=0>");
+
+<?
+	$j = 0;
+    $output = "";
+	for ($i = 0; $i < $widget['Widget']['rows']; $i++) {
+		$output .= "<tr>";
+        for ($k = 0; $k < $widget['Widget']['columns']; $k++) {
+			if (empty($links[$j])) {
+				continue;
+			}
+			// Set up links and images
+			$outgoing_link = "http://raaze.com/v/".$widget['Widget']['id']."/".$links[$j]['Page']['id'];
+			$image_source = "http://cdn.raaze.com".$image->zoom_crop($links[$j]['Page']['image'], $widget['Widget']['image_width'], $widget['Widget']['image_height'], true, array(), true, true, $links[$j]['Page']['image_server'], false, true);
+
+            $output .= "<td valign=top align=center>";
+			$output .= "<a href='".$outgoing_link."' target=_blank><img src='".$image_source."' width='".$widget['Widget']['image_width']."' height='".$widget['Widget']['image_height']."' border=0></a>";
+			$output .= "<br><div style='clear:both;margin-top:0px;'>";
+			$output .= "<a href='".$outgoing_link."' style='font-size: ".$widget_style['WidgetStyle']['font_size']."px; color:#".$widget_style['WidgetStyle']['text_color'].";' target=_blank>".addslashes($links[$j]['Page']['title'])."</a>";
+            $output .= "</div>";
+			$output .= "</td>";
+			$j++;
+		}
+		$output .= "</tr>";
+	}
+	 
+    if (0 && $widget['Widget']['powered']) {
+		$output .= "<tr><td colspan=".$widget['Widget']['columns']."><center>";
+		$output .= "<a href='http://raaze.com/webmasters' target=_blank>Powered by Raaze.com</a>";
+        $output .= "</center></td></tr>";
+	 }
+?>
+	document.writeln("<?=$output?>");
+document.writeln("</table></div>");
+
+

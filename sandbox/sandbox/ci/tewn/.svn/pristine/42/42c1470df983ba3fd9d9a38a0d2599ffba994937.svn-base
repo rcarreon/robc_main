@@ -1,0 +1,56 @@
+<?php
+
+namespace Test\Stats\Account;
+use CI\Stats\Account\Delta as AccountDeltaStats;
+
+/**
+ * @group stats
+ * @group stats_account
+ * @group stats_account_delta
+ */
+class StatsAccountDeltaTest extends \PHPUnit_Framework_TestCase
+{
+    protected $oStats = null;
+
+    public function setUp()
+    {
+        $oModel = new DeltaMockModel();
+        $this->oStats = new AccountDeltaStats($oModel);
+    }
+
+    public function testGetStats()
+    {
+        $aExpected = array(
+            'incoming' => 0,
+            'outgoing' => 0,
+            'credits'  => 0,
+        );
+
+        $aResult = $this->oStats->getStats(0, '', '');
+
+        $this->assertEquals($aExpected, $aResult);
+    }
+
+    public function testEmptyAverage()
+    {
+        $aExpected = array('incoming' => 0, 'outgoing' => 0);
+        $aResult   = $this->oStats->getAverage(0, '', '', 0);
+
+        $this->assertEquals($aExpected, $aResult);
+    }
+}
+
+class DeltaMockModel extends AccountDeltaStats
+{
+    
+    public function __construct(){}
+    public function find($type, $params)
+    {
+        return false;
+    }
+
+    public function query_read($query, $cache_query)
+    {
+        return false;
+    }
+}

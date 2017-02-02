@@ -1,0 +1,98 @@
+<?php
+
+namespace CI\Memcached;
+
+class Watchdog
+{
+    private $_oCache         = null;
+    private $_nSafeTime      = 60; /* Seconds */
+    private $_nLastHeartbeat = 0;
+    private $_aKeys          = array();
+
+    public function __construct($oCache, $sKey, $nSafeTime = 60)
+    {
+        $this->_oCache = $oCache;
+        $this->setSafeTime($nSafeTime);
+        $this->createKeys($sKey);
+    }
+
+    public function setSafeTime($nSafeTime)
+    {
+        $this->_nSafeTime = $nSafeTime;
+        return $this;
+    }
+
+    public function getSafeTime()
+    {
+        return $this->_nSafeTime;
+    }
+
+    protected function createKeys($sKey)
+    {
+        $oKeyGen = new KeyGen();
+        $oKeyGen->setName('watchdog');
+        $this->_aKeys = array(
+            'heartbeat' => $oKeyGen->setValues(array('hearbeat', $sKey))->generate(),
+            'stop'      => $oKeyGen->setValues(array('stop', $sKey))->generate(),
+        );
+    }
+
+    public function heartbeat()
+    {
+        $bResult = true;
+
+        if (time() - $this->_nLastHeartbeat > $this->_nSafeTime) {
+            $this->_nLastHeartbeat = time();
+            $bResult = $this->_oCache->set($this->_aKeys['heartbeat'], $this->_nLastHeartbeat);
+        }
+
+        return $bResult;
+    }
+
+    /**
+     * We get the last heartbeat and compare with the actual
+     * time if the comparison is higher than the time to look
+     * we notice that the key is not alive
+     *
+     * @param  integer $nTime Number of seconds to look
+     *
+     * @return boolean True if its alive
+     */
+    public function isAlive($nTime = 600)
+    {
+        $bAlive = false;
+        $this->_nLastHeartbeat = $this->_oCache->get($this->_aKeys['heartbeat']);
+
+        if ($this->_nLastHeartbeat) {
+            if (time() - $this->_nLastHeartbeat < $nTime) {
+                $bAlive = true;
+            }
+        }
+
+        return $bAlive;
+    }
+
+    public function kill()
+    {
+        return $this->_oCache->delete($this->_aKeys['heartbeat']);
+    }
+
+    public function stop()
+    {
+        return $this->_oCache->set($this->_aKeys['stop'], time());
+    }
+
+    public function isStopping()
+    {
+        $bStopped  = false;
+        $nStopping = $this->_oCache->get($this->_aKeys['stop']);
+
+        if ($nStopping) {
+            $this->_oCache->delete($this->_aKeys['stop']);
+            $this->_oCache->delete($this->_aKeys['heartbeat']);
+            $bStopped = true;
+        }
+
+        return $bStopped;
+    }
+}

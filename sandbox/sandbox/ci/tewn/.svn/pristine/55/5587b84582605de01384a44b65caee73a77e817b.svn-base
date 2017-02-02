@@ -1,0 +1,297 @@
+(function($){
+    var tpl_top_websites_credits = Handlebars.compile($('#tpl-top-websites-credits').html());
+
+    $.fn.ciHandleClicks = function(settings) {
+        return this.each(function(){
+            var $elem = $(this);
+            var _settings = $.extend({}, $.fn.ciHandleClicks.default_settings, settings || {});
+
+            var ci_clicks = new CIHandleClicks(_settings, $elem);
+            ci_clicks.init();
+            $elem.data('_ciHandleClicks', ci_clicks);
+        });
+    }
+
+    $.fn.ciHandleClicks.default_settings = {
+        selected_class          : 'active',
+        disabled_class          : 'disabled',
+        default_container       : '#charts',
+        dynamic_container       : '#dynamic-container',
+        addition_click_elements : '',
+        onClick                 : ''
+    };
+
+    function CIHandleClicks(settings, $elem) {
+        this.settings = settings;
+        this.$elem    = $elem;
+
+        return this;
+    }
+
+    CIHandleClicks.prototype = {
+        init : function() {
+            var _self = this;
+
+            _self.$elem.find('a').click(function(event){
+                if (ci.isUndefined(event.isTrigger)) {
+                    return;
+                }
+
+                var $this = $(this);
+
+                if ($this.data('type') == 'section') {
+                    $(_self.settings.dynamic_container).removeClass('hidden');
+                    $(_self.settings.default_container).hide();
+                } else {
+                    $(_self.settings.dynamic_container).addClass('hidden');
+                    $(_self.settings.default_container).show();
+                }
+
+                if (ci.isFunction(_self.settings.onClick)) {
+                    _self.settings.onClick();
+                }
+
+                var $li = _self.$elem.find('li');
+
+                if ($this.is('a')) {
+                    $li.removeClass(_self.settings.selected_class);
+                    $this.parent().addClass(_self.settings.selected_class);
+                }
+
+                _self.$elem.trigger('changeState', [this, _self]);
+            });
+
+            $(_self.settings.addition_click_elements).click(function(){
+                _self.$elem.find('li.' + _self.settings.selected_class + ' a').click();
+            });
+        }
+    }
+
+    var current_ajax = {};
+    var selected_hub = -1;
+    var setHub = function(hub) {
+        selected_hub = hub;
+    }
+
+    var loadSubPages = function(page, callback) {
+        var url = '';
+
+        switch(page) {
+            case 'general_stats' :
+                url = '/admin/action/general_stats';
+                break;
+        }
+
+        $('#dynamic-container').load(url, function(){
+            if (ci.isFunction(callback)) {
+                callback();
+            }
+        });
+    }
+
+    var loadCharts = function(callback) {
+        var $charts_containers = $('#tpm-chart, #ctr-chart, #return-rate-chart, #credits-chart, #io-chart, #display-chart, #display-type-chart, #ctr-type-chart, #generated-return-rate-chart');
+
+        $charts_containers.find('.highcharts-container').remove();
+        $charts_containers.addClass('preloading');
+
+        var params = {
+            start: $('.bs-daterange').data('daterangepicker').startDate.format('YYYY-MM-DD'),
+            end  : $('.bs-daterange').data('daterangepicker').endDate.format('YYYY-MM-DD'),
+            time : $('#interval-type').val()
+        };
+
+        if (selected_hub >= 0) {
+            params.hubs = selected_hub;
+            $('#generated-return-rate-chart').parent().parent().removeClass('hidden');
+        } else {
+            $('#generated-return-rate-chart').parent().parent().addClass('hidden');
+        }
+
+        current_ajax = $.ajax({
+            url     : '/history_stats/charts_data',
+            data    : params,
+            success : function(data) {
+                var tpm   = [], ctr = [], rr = [], grr = [], credits = [], traffic = [], impressions = [], display_types = [], ctr_types = [];
+                var start = $('.bs-daterange').data('daterangepicker').startDate;
+                var chart = {'pointInterval': data.interval * 1000, 'pointStart': start.valueOf(), 'type': 'line'};
+
+                for (name in data.data) {
+                    tpm.push($.extend({'name': name, 'data': data.data[name].tpm}, chart));
+                    ctr.push($.extend({'name': name, 'data': data.data[name].widget_ctr}, chart));
+                    rr.push($.extend({'name': name + ' Return Rate', 'data': data.data[name].return_rate}, chart));
+                    rr.push($.extend({'name': name + ' Total Return Rate', 'data': data.data[name].total_return_rate}, chart));
+                    grr.push($.extend({'name': name + ' Generated Return Rate', 'data': data.data[name].generated_return_rate}, chart));
+                    credits.push($.extend({'name': name, 'data': data.data[name].credits}, chart));
+                    traffic.push($.extend({'name': 'Traffic from ' + name, 'data': data.data[name].traffic_from}, chart));
+                    traffic.push($.extend({'name': 'Traffic to ' + name, 'data': data.data[name].traffic_to}, chart));
+                    impressions.push($.extend({'name': name, 'data': data.data[name].widget_impressions}, chart));
+                    display_types.push($.extend({'name': name + ' Basic', 'data': data.data[name].display_basic}, chart));
+                    display_types.push($.extend({'name': name + ' Contextual', 'data': data.data[name].display_contextual}, chart));
+                    display_types.push($.extend({'name': name + ' Similar', 'data': data.data[name].display_similar}, chart));
+                    ctr_types.push($.extend({'name': name + ' Basic', 'data': data.data[name].ctr_basic}, chart));
+                    ctr_types.push($.extend({'name': name + ' Contextual', 'data': data.data[name].ctr_contextual}, chart));
+                    ctr_types.push($.extend({'name': name + ' Similar', 'data': data.data[name].ctr_similar}, chart));
+                }
+
+                $charts_containers.removeClass('preloading');
+
+                $('#tpm-chart').ciChartify({
+                    title : 'TPM',
+                    data  : tpm
+                });
+                $('#ctr-chart').ciChartify({
+                    title : 'Widget Click Through Rate',
+                    data  : ctr
+                });
+                $('#return-rate-chart').ciChartify({
+                    title : 'Return Rate',
+                    data  : rr
+                });
+                $('#credits-chart').ciChartify({
+                    title : 'Credits',
+                    data  : credits,
+                    plotOptions : {
+                        series : {
+                            marker: {
+                                states: {
+                                    hover: {
+                                        fillColor: '#207AD1'
+                                    },
+                                }
+                            },
+                            cursor: 'pointer',
+                            point : {
+                                events : {
+                                    click : function(e) {
+                                        var date = this.x;
+                                        var params = {
+                                            hub  : selected_hub,
+                                            date : Highcharts.dateFormat('%Y-%m-%d', date)
+                                        };
+
+                                        $.get('/admin/action/credits_by_hub_date', params).done(function(response){
+                                            if (response.status == 'ok') {
+                                                response.data.date = Highcharts.dateFormat('%A, %b %e, %Y', date);
+
+                                                $('#modal-credits .modal-content').html(tpl_top_websites_credits(response.data));
+                                                $('#modal-credits').modal('show');
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                $('#io-chart').ciChartify({
+                    title : 'Traffic From/To',
+                    data  : traffic
+                });
+                $('#display-chart').ciChartify({
+                    title : 'Widget Impressions',
+                    data  : impressions
+                });
+                $('#display-type-chart').ciChartify({
+                    title : 'Widget Type Impressions',
+                    data  : display_types
+                });
+                $('#ctr-type-chart').ciChartify({
+                    title : 'Widget Type CTR',
+                    data  : ctr_types
+                });
+                $('#generated-return-rate-chart').ciChartify({
+                    title : 'Generated Return Rate',
+                    data  : grr
+                });
+
+                if (ci.isFunction(callback)) {
+                    callback();
+                }
+            }
+        });
+    }
+
+    $('.btn-sidebar-toggle').click(function() {
+
+        var window_width = $(window).width();
+        if (window_width > 768 && window_width <  992) {
+            $('.right-content').toggleClass('col-sm-offset-2');
+            $('.right-content').toggleClass('col-sm-offset-1');
+        }
+
+        if(window_width < 992)  {
+            if ($('#menu-collapse-container').hasClass('in')) {
+                $('#btn-nav-toggle').click();
+            }
+        }
+
+        $('#nav-sidebar').toggleClass('sidebar-show');
+    });
+
+    $('#btn-nav-toggle').click(function(){
+        if($(window).width() < 992)  {
+            if ($('#nav-sidebar').hasClass('sidebar-show')) {
+                $('.btn-sidebar-toggle').click();
+            }
+        }
+    })
+
+    var $date_range = $('.bs-daterange');
+    $date_range.daterangepicker({
+        format       : 'MM/DD/YYYY',
+        buttonClasses: ['btn btn-default'],
+        applyClass   : 'btn-small btn-primary',
+        cancelClass  : 'btn-small',
+        separator    : ' to ',
+        startDate    : moment().subtract(7, 'days'),
+        endDate      : moment(),
+        maxDate      : moment(),
+        opens        : 'center'
+    });
+
+    $('.bs-daterange-icon').click(function(){
+        $date_range.click();
+    });
+
+    $(".selectpicker").selectpicker();
+
+    $('#nav-sidebar').ciHandleClicks({
+        addition_click_elements: '#update-charts',
+        default_container      : '#charts',
+        dynamic_container      : '#dynamic-container',
+        onClick                : function (){
+            if ($('#nav-sidebar').hasClass('sidebar-show')) {
+                $('.btn-sidebar-toggle').click();
+            }
+        }
+    }).on('changeState', function(e, obj, plugin) {
+        var btn  = $('#update-charts');
+        var $obj = $(obj);
+        var type = $obj.data('type');
+
+        btn.button('loading');
+
+        if (ci.isFunction(current_ajax.abort)) {
+            current_ajax.abort();
+        }
+
+        if (type == 'hubs') {
+            setHub($obj.data('id'));
+            loadCharts(function(){btn.button('reset')});
+        } else if (type == 'section') {
+            loadSubPages($obj.data('section'), function(){btn.button('reset')});
+        }
+    });
+
+    var hash = window.location.hash ? window.location.hash : "#all";
+    $(window).hashchange({
+        default_hash : hash
+    });
+
+    $(document).keypress(function( event ) {
+        if ( event.which == 98 ) {
+            $('.preloading').toggleClass('flame');
+        }
+    });
+})(jQuery);

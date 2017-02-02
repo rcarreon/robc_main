@@ -1,0 +1,28 @@
+<?php
+
+class DevelopersReports extends AppModel
+{
+    public $name     = 'DevelopersReports';
+    public $useTable = false;
+
+    public function get_wrong_widget_analytics()
+    {
+        $query = "SELECT Website.id, Website.name, Website.domain_bitfield, count(Website.id) AS total
+            FROM websites Website
+            JOIN widget_analytics WidgetAnalytic ON Website.id = WidgetAnalytic.shown_website_id
+            JOIN pages Page ON WidgetAnalytic.page_id = Page.id
+            WHERE WidgetAnalytic.visible = 1
+                AND (Page.domain_bitfield & (1 << Website.domain_primary) = 0)
+                AND Website.status = " . WEBSITE_STATUS_ACTIVE . "
+            GROUP BY Website.id
+            ORDER BY total DESC";
+        $analytics = $this->query_read($query, false);
+
+        foreach ($analytics as &$analytic) {
+            $analytic['Website']['total'] = $analytic[0]['total'];
+            unset($analytic[0]);
+        }
+
+        return $analytics;
+    }
+}

@@ -1,0 +1,18 @@
+<?php
+
+namespace Test\Geo;
+
+/**
+ * @group Geo
+ */
+class ServiceTest extends \PHPUnit_Framework_TestCase
+{
+    public function testGetCountryShouldReturnIso()
+    {
+        $sIp = '13.123.123.123';
+        $sExpected = 'US';
+        $oService  = new \CI\Geo\Service(new \CI\Geo\Adapter\MaxMind());
+
+        $this->assertEquals($sExpected, $oService->getCountry($sIp));
+    }
+}

@@ -1,0 +1,12 @@
+<?
+
+        echo $this->element("header", array("title_for_layout" => $title_for_layout));
+
+        echo $this->element("toolbar");
+
+        echo $content_for_layout;
+
+        echo $this->element("right_sidebar");
+
+        echo $this->element("footer");
+?>

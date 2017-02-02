@@ -1,0 +1,4 @@
+#!/bin/bash
+
+../cake/console/cake testsuite app all
+#../cake/console/cake testsuite app case models/account

@@ -1,0 +1,121 @@
+hb_templates_subcategories = {};
+
+var init_templates = function() {
+        hb_templates_subcategories['subcategories_list']     = Handlebars.compile(jQuery('#tpl-subcategories-selected-list').html());
+        hb_templates_subcategories['subcategories_checkbox'] = Handlebars.compile(jQuery('#tpl-subcategories-checkbox').html());
+};
+
+var init_selected_subcategories = function(category, page_id) {
+    var parent_id         = 'subcategories-' + page_id;
+    var container         = 'selected-subcategories-' + page_id;
+    var subcategory_label = 'subcategory-label-' + page_id;
+    var $container        = jQuery('#' + container + ' ul');
+    var subcategory_data  = jQuery('#' + subcategory_label).data('subcategories');
+
+    for(var key in subcategory_data) {
+        jQuery('#' + parent_id + ' input[type=checkbox][value='  + subcategory_data[key].id + ']').attr('checked', true);
+    }
+
+    jQuery('#' + subcategory_label).data('subcategories', []);
+
+    var context    = {
+        categories:[
+            {
+                name: category,
+                parent_id: parent_id,
+                subcategories: subcategory_data
+            }
+        ]
+    };
+
+    $container.html(hb_templates_subcategories.subcategories_list(context));
+};
+
+var load_subcategories = function() {
+    var page_id       = $(this).data('page');
+    var category_id   = $(this).val();
+    var category_name = $(this).find('option:selected').text();
+    var parent_id     = 'subcategories-' + page_id;
+    var container     = 'selected-subcategories-' + page_id;
+
+    jQuery('#' + parent_id + ', #' + container).hide();
+
+    if (category_id != '') {
+        jQuery('#loading-subcategories-' + page_id).show();
+
+        $.ajax({
+            type: "POST",
+            url: "/websites/subcategories_by_category",
+            data: {
+                category: category_id
+            },
+            dataType: "json",
+            success: function(data) {
+                var context = {subcategories: []};
+                for (var name in data) {
+                    context.subcategories.push({
+                        category_name: category_name,
+                        id: data[name],
+                        name: name,
+                        page_id: page_id,
+                    });
+                }
+
+                jQuery('#loading-subcategories-' + page_id).fadeOut(function(){
+                    jQuery('#' + parent_id).html(hb_templates_subcategories.subcategories_checkbox(context));
+                    jQuery('#' + parent_id + ', #' + container).fadeIn();
+                    init_selected_subcategories(category_name, page_id);
+                });
+            }
+        });
+    } else {
+        jQuery('#' + parent_id).html(hb_templates_subcategories.subcategories_checkbox({}));
+    }
+};
+
+var load_page_subcategories = function() {
+    jQuery('.page_category').each(load_subcategories);
+};
+
+var subcategory_checkbox_change = function() {
+    var $checkbox         = jQuery(this);
+    var $container        = jQuery('#' + $checkbox.data('container') + ' ul');
+    var parent_id         = $checkbox.parent().parent().attr('id');
+    var subcategory_label = 'subcategory-label-' + $checkbox.data('page_id');
+    var $parent           = jQuery('#' + parent_id);
+    var context           = {
+        categories:[
+            {
+                name: jQuery(this).data('category'),
+                parent_id: parent_id,
+                subcategories:[]
+            }
+        ]
+    };
+
+    $parent.find('input:checked').each(function(){
+        context.categories[0].subcategories.push({
+            name: jQuery(this).data('name'),
+            id: jQuery(this).val()
+        });
+    });
+
+    $container.html(hb_templates_subcategories.subcategories_list(context));
+};
+
+var selected_subcategory_click = function(){
+    var $current_element = jQuery(this);
+    var $checkbox = jQuery('#' + $current_element.data('parent') + ' input[type=checkbox][value='  + $current_element.data('id') + ']');
+
+    $checkbox.removeAttr('checked');
+    $current_element.remove();
+};
+
+jQuery(document).ready( function(){
+    init_templates();
+    load_page_subcategories();
+
+    jQuery('.page_category').change(load_subcategories);
+    jQuery('.checkbox-container').delegate('input[type=checkbox]', 'click', subcategory_checkbox_change);
+    jQuery('.selected-subcategories').delegate('li[data-type=subcategory]', 'click', selected_subcategory_click);
+});

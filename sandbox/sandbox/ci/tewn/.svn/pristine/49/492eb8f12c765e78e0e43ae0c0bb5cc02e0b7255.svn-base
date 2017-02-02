@@ -1,0 +1,32 @@
+<?php
+class Ranker extends AppModel {
+
+	var $useTable = false;
+	var $name = 'Ranker';
+
+	/* Memcached functions */
+	function get_website_stats_cache($website_id, $date) {
+		$key = $this->website_stats_key($website_id, $date);
+
+		return $this->memcached_get_json($key);
+	}
+
+	function set_website_stats_cache($website_id, $date, $stats) {
+		$key = $this->website_stats_key($website_id, $date);
+
+		// Expire in 10 minutes
+		$this->memcached_set_json($key, $stats, 60*10);
+	}
+
+	function clear_website_stats_cache($website, $date) {
+		$key = $this->website_stats_tpm_key($website['Website']['id'], $date);
+		$this->memcached_delete($key);
+	}
+
+	/* Cache Key function */
+	function website_stats_key($website_id, $date) {
+		return "ranker_website_stats::".$website_id.":".$date;
+	}
+
+}
+?>

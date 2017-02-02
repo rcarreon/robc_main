@@ -1,0 +1,26 @@
+/* dashboard_pages.js */
+jQuery(document).ready(function() { 						   
+    $("#website_table").tablesorter({
+        widgets: ['zebra'],
+        widgetZebra: {css: ["NormRow","AltRow"]} // css classes to apply to rows                
+    });
+    $("#page_table").tablesorter({
+        widgets: ['zebra'],
+        widgetZebra: {css: ["NormRow","AltRow"]} // css classes to apply to rows                
+    });
+    
+    /* Panes */
+    jQuery(".hub_list li a").click(function() {
+        jQuery(".hub_list li").removeClass('tab_selected');
+        jQuery(this).parent().addClass('tab_selected');
+        jQuery('.pane').hide();
+        var pane_name = ".table_container div#"+ $(this).attr('class');
+        jQuery(pane_name).fadeIn(); //css('display','inline-block');
+    });
+    jQuery('#add_pages').show();
+
+    function confirm_delete() {
+        var r = confirm("Are you sure you want to delete");
+        return r;
+    }
+});

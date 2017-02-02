@@ -1,0 +1,55 @@
+<?php
+    $link_attributes = 'href="' . $page['Page']['ctr_link'];
+    $extra_params = empty($extra_params) ? array() : $extra_params;
+
+    if (false == $isHomepage) {
+        $extra_params['refer'] = $refer_link;
+        $link_attributes = '"data-link="' . $page['Page']['ctr_link'] . 'href="' . $page['Page']['url'] ;
+    }
+
+    if (! empty($extra_params)) {
+        $link_attributes .= '?' . http_build_query($extra_params);
+    }
+
+    $link_attributes .= '"';
+?>
+
+<a class="page_link" target="_blank" rel="nofollow" <?php echo $link_attributes; ?> >
+    <div class="card <?php if($is_clicked_page && $preview_style == 28){ echo 'clicked_page';}?>">
+        <?php
+            if($is_clicked_page):
+        ?>
+                <div class="flame">
+                    <img src="http://<?=CDN_URL?>/img/flame.png" />
+                </div>
+        <?php
+            endif;
+        ?>
+        <div class="image">
+            <?php
+                $image_property = "src='" . $image_src . "'";
+                if (1 == $paginate_current) {
+                    $image_property = "data-src='" . $image_src . "'";
+                }
+            ?>
+
+            <img <?php echo $image_property;?> />
+        </div>
+        <div class="box">
+            <div class="bar">
+                <span class="plus">+</span>
+                <span class="full">READ MORE</span>
+            </div>
+            <div class="page">
+                <div class="title"><?php echo $wordsNumber->filter($page['Page']['title'], $words_limit); ?></div>
+                <?php
+                    if ( ! empty($page['Page']['description']) && (! isset($preview_style) || $preview_style == 26 || $is_clicked_page) ):
+                ?>
+                        <div class="description"><?php echo $page['Page']['description'];?></div>
+                <?php
+                    endif;
+                ?>
+            </div>
+        </div>
+    </div>
+</a>

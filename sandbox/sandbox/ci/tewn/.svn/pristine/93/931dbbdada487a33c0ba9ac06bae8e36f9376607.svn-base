@@ -1,0 +1,81 @@
+<div id="rss" class="pane">
+    <h4>RSS Feeds</h4>
+    <form id="rss_feed_form_add" name="feed" action="/feed/add" class="feed_form">
+        <h4>Add new feed</h4>
+        <div class="divider">
+            <label for="name">Name</label>
+            <input type="text" name="data[Feed][name]">
+            <label for="">Website</label>
+            <select id="add-website-select-rss-feed" style="width:200px;" name="data[Feed][website_id]" class="chosen-select" data-placeholder="Choose a website...">
+                <?php foreach ($websites as $website): ?>
+                <option data-category="<?php echo $website['Website']['category']; ?>" value="<?php echo $website['Website']['id']; ?>"><?php echo $website['Website']['name']; ?></option>
+                <?php endforeach ?>
+            </select>
+            <label for="category">Category</label>
+            <select name="data[Feed][category]">
+                <?php foreach ($categories as $category_id => $category_name) : ?>
+                <option value="<?php echo $category_id; ?>"><?php echo $category_name; ?></option>
+                <?php endforeach; ?>
+            </select>
+            <label for="days"># of Days till Expiration</label>
+            <input type="text" name="data[Feed][expiration_days]" size="3">
+            <label for="url">Url</label>
+            <input type="text" name="data[Feed][url]" size="60">
+            <label class="checkbox">
+                <input type="checkbox" value="1" name="data[Feed][whitelist]">Whitelist
+            </label>
+            <input type="submit" class="button" value="Add">
+        </div>
+    </form>
+
+    <form id="rss_feed_form_edit" name="feed_edit" action="/feed/edit" class="feed_form">
+        <h4>Edit feed</h4>
+        <div class="divider">
+            <input type="hidden" name="data[Feed][id]" value="0">
+            <label for="name">Name</label>
+            <input type="text" name="data[Feed][name]">
+            <label for="website">Website</label>
+            <select id="edit-website-select-rss-feed" style="width:200px;" name="data[Feed][website_id]" class="chosen-select" data-placeholder="Choose a website...">
+                <?php foreach ($websites as $website): ?>
+                <option data-category="<?php echo $website['Website']['category']; ?>" value="<?php echo $website['Website']['id']; ?>"><?php echo $website['Website']['name']; ?></option>
+                <?php endforeach ?>
+            </select>
+            <label for="category">Category</label>
+            <select name="data[Feed][category]">
+                <?php foreach ($categories as $category_id => $category_name) : ?>
+                <option value="<?php echo $category_id; ?>"><?php echo $category_name; ?></option>
+                <?php endforeach; ?>
+            </select>
+            <label for="days"># of Days till Expiration</label>
+            <input type="text" name="data[Feed][expiration_days]" size="3">
+            <label for="url">Url</label>
+            <input type="text" name="data[Feed][url]" size="60">
+            <label class="checkbox">
+                <input type="checkbox" value="1" name="data[Feed][whitelist]">Whitelist
+            </label>
+            <input type="submit" class="button" value="Save">
+            <a class="button cancel" href="#">Cancel</a>
+        </div>
+    </form>
+
+    <div class="errors">
+        <ul></ul>
+    </div>
+
+    <br>
+    <div class="short_table">
+        <h4>RSS feeds</h4>
+        <table>
+            <tbody>
+                <tr class="divider">
+                    <td class="title">Name</td>
+                    <td class="title">Website</td>
+                    <td class="title">Category</td>
+                    <td class="title">URL</td>
+                    <td class="title">Whitelist</td>
+                    <td class="title">Action</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,104 @@
+<?php
+
+require_once 'ciexception.php';
+require_once 'logger/storage/exception/file.php';
+require_once 'logger/storage/interface.php';
+require_once 'logger/storage/abstract.php';
+require_once 'logger/storage/file.php';
+
+class LoggerStorageFileTest extends PHPUnit_Framework_TestCase
+{
+    protected $fileName = 'ci_logger_tmp.log';
+
+    public function testConstructDestruct()
+    {
+        $path = $this->path('/tmp/');
+        $logger = new Logger_Storage_File(array('filepath' => $path));
+    }
+
+    public function testSave()
+    {
+        $path = $this->path('/tmp/');
+        if (file_exists($path)) {
+            unlink($path);
+        }
+        $logger = new Logger_Storage_File(array('filepath' => $path));
+        $this->assertTrue($logger->save("Hello World\n"));
+    }
+
+    /**
+     * @expectedException Logger_Storage_Exception_File
+     */
+    public function testNonExistPath()
+    {
+        $logger = new Logger_Storage_File(
+            array('filepath' => $this->path('/non_exist_dir/'))
+        );
+    }
+
+    /**
+     * @expectedException Logger_Storage_Exception_File
+     */
+    public function testNonWritePath()
+    {
+        $path = $this->path('/usr/');
+        $logger = new Logger_Storage_File(array('filepath' => $path));
+    }
+
+    /**
+     * @expectedException Logger_Storage_Exception_File
+     */
+    public function testNonWriteCreationPath()
+    {
+        $path = $this->path('/non_exist_dir/');
+        $logger = new Logger_Storage_File(
+            array('filepath' => $path, 'create' => true)
+        );
+    }
+
+    public function testCreatePath()
+    {
+        $path = $this->path('/tmp/testCreatePath/');
+        $logger = new Logger_Storage_File(
+            array('filepath' => $path, 'create' => true)
+        );
+        $this->assertTrue($logger->save("Hello World\n"));
+    }
+
+    /**
+     * @expectedException Logger_Storage_Exception_File
+     */
+    public function testFileWrongPermissions()
+    {
+        $path = '/tmp/ci_not_write_log.log';
+        if (!file_exists($path)) {
+            touch($path);
+            chmod($path, 0444);
+        }
+        $logger = new Logger_Storage_File(array('filepath' => $path));
+    }
+
+    public function tearDown()
+    {
+        // Cleaning the files created
+        $this->cleanFile('/tmp/ci_not_write_log.log');
+        $this->cleanFile($this->path('/tmp/'));
+        $path = $this->path('/tmp/testCreatePath/');
+        if (file_exists($path)) {
+            unlink($path);
+            rmdir(dirname($path));
+        }
+    }
+
+    public function cleanFile($path)
+    {
+        if (file_exists($path)) {
+            unlink($path);
+        }
+    }
+
+    public function path($dir)
+    {
+        return $dir.$this->fileName;
+    }
+}

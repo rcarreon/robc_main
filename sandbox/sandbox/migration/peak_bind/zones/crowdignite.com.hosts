@@ -1,0 +1,221 @@
+$TTL 86400
+crowdignite.com.        IN      SOA     crowdignite.com. root.crowdignite.com. (
+                                                2015011200     ; serial
+                                                28800          ; refresh
+                                                14400          ; retry
+                                                3600000        ; expire
+                                                86400 )          ; minimum
+
+; name servers and mail servers
+;
+crowdignite.com.                                IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+crowdignite.com.                                IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+crowdignite.com.                                IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+crowdignite.com.                                IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+
+
+crowdignite.com.                             IN    MX 10    cluster9.us.messagelabs.com.
+crowdignite.com.                             IN    MX 20    cluster9a.us.messagelabs.com.
+
+crowdignite.com.                                IN    A        72.172.76.148
+
+cdn.crowdignite.com.                       IN    CNAME    crowdignite.edgesuite.net.
+cdn1.crowdignite.com.                      IN    CNAME    crowdignite.edgesuite.net.
+cdn2.crowdignite.com.                      IN    CNAME    crowdignite.edgesuite.net.
+cdn3.crowdignite.com.                      IN    CNAME    crowdignite.edgesuite.net.
+cdn4.crowdignite.com.                      IN    CNAME    crowdignite.edgesuite.net.
+cube.crowdignite.com.                      IN    A        50.97.91.146
+db.crowdignite.com.                        IN    A        174.122.201.106
+dev-engine.crowdignite.com.                IN    A        174.122.202.204
+dev-widget.crowdignite.com.                IN    A        174.122.202.205
+engine.crowdignite.com.                    IN    A        72.172.76.150
+management.crowdignite.com.                IN    A        72.172.76.150
+ftp.crowdignite.com.                       IN    A        174.122.202.250
+;get.crowdignite.com.                      IN    A        174.122.202.251
+;get.crowdignite.com.                       IN    A        72.172.76.148
+lists.crowdignite.com.                     IN    A        174.122.202.250
+mail.crowdignite.com.                      IN    A        174.122.202.250
+memcached1.crowdignite.com.                IN    A        174.123.27.250
+origin.crowdignite.com.                    IN    A        72.172.76.148
+thecelebritycafe.crowdignite.com.               IN    A        72.172.76.148
+webmail.crowdignite.com.                   IN    A        174.122.202.250
+widget.crowdignite.com.                    IN    A        72.172.76.147
+www.crowdignite.com.                       IN    A        72.172.76.148
+
+;
+;stg
+;
+
+stg.widget.crowdignite.com.                IN    A        72.172.76.169
+stg.crowdignite.com.                       IN    A        72.172.76.171
+stg.origin.crowdignite.com.                IN    A        72.172.76.171
+stg.cdn.crowdignite.com.                   IN    CNAME    crowdignite.edgesuite.net.
+stg.cdn1.crowdignite.com.                   IN    CNAME    crowdignite.edgesuite.net.
+stg.cdn2.crowdignite.com.                   IN    CNAME    crowdignite.edgesuite.net.
+stg.cdn3.crowdignite.com.                   IN    CNAME    crowdignite.edgesuite.net.
+stg.cdn4.crowdignite.com.                   IN    CNAME    crowdignite.edgesuite.net.
+stg.thecelebritycafe.crowdignite.com.      IN    A        10.11.134.169
+;stg.get.crowdignite.com.                  IN    A        10.11.134.169
+stg.engine.crowdignite.com.                IN    A        10.11.134.34
+stg.management.crowdignite.com.            IN    A        10.11.134.34
+
+;
+;dev
+;
+
+dev.widget.crowdignite.com.                IN    A        10.11.234.30
+dev.crowdignite.com.                       IN    A        10.11.234.44
+dev.origin.crowdignite.com.                IN    A        10.11.234.44
+dev.cdn.crowdignite.com.                   IN    A        10.11.234.44
+dev.cdn1.crowdignite.com.                   IN    A        10.11.234.44
+dev.thecelebritycafe.crowdignite.com.      IN    A        10.11.234.44
+dev.engine.crowdignite.com.                IN    A        10.11.234.80
+dev.management.crowdignite.com.            IN    A        10.11.234.80
+
+;
+;uid
+;
+;chaggstrom.sbx.crowdignite.com.                 	IN    CNAME    uid1v-chaggstrom.ci.dev.lax.gnmedia.net. ;decomm
+;chaggstrom.sbx.www.crowdignite.com.                 IN    CNAME    uid1v-chaggstrom.ci.dev.lax.gnmedia.net. ;decomm
+;chaggstrom.sbx.widget.crowdignite.com.              IN    CNAME    uid1v-chaggstrom.ci.dev.lax.gnmedia.net. ;decomm
+;chaggstrom.sbx.origin.crowdignite.com.              IN    CNAME    uid1v-chaggstrom.ci.dev.lax.gnmedia.net. ;decomm
+;chaggstrom.sbx.cdn.crowdignite.com.                 IN    CNAME    uid1v-chaggstrom.ci.dev.lax.gnmedia.net. ;decomm
+;chaggstrom.sbx.management.crowdignite.com.          IN    CNAME    uid1v-chaggstrom.ci.dev.lax.gnmedia.net. ;decomm
+;chaggstrom.sbx.thecelebritycafe.crowdignite.com.    IN    CNAME    uid1v-chaggstrom.ci.dev.lax.gnmedia.net. ;decomm
+ddurand.sbx.crowdignite.com.                    	IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+ddurand.sbx.www.crowdignite.com.                    IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+ddurand.sbx.widget.crowdignite.com.                 IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+ddurand.sbx.origin.crowdignite.com.                 IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+ddurand.sbx.cdn.crowdignite.com.                    IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+ddurand.sbx.cdn1.crowdignite.com.                    IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+ddurand.sbx.management.crowdignite.com.             IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+ddurand.sbx.thecelebritycafe.crowdignite.com.       IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+;fdavis.sbx.crowdignite.com.                     	IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+;fdavis.sbx.www.crowdignite.com.                     IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+;fdavis.sbx.widget.crowdignite.com.                  IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+;fdavis.sbx.origin.crowdignite.com.                  IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+;fdavis.sbx.cdn.crowdignite.com.                     IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+;fdavis.sbx.cdn1.crowdignite.com.                     IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+;fdavis.sbx.management.crowdignite.com.              IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+;fdavis.sbx.thecelebritycafe.crowdignite.com.        IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+fgonzalez.sbx.crowdignite.com.                  	IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+fgonzalez.sbx.www.crowdignite.com.                  IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+fgonzalez.sbx.widget.crowdignite.com.               IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+fgonzalez.sbx.origin.crowdignite.com.               IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+fgonzalez.sbx.cdn.crowdignite.com.                  IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+fgonzalez.sbx.cdn1.crowdignite.com.                  IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+fgonzalez.sbx.management.crowdignite.com.           IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+fgonzalez.sbx.thecelebritycafe.crowdignite.com.     IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+jcortes.sbx.crowdignite.com.                    	IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcortes.sbx.www.crowdignite.com.                    IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcortes.sbx.widget.crowdignite.com.                 IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcortes.sbx.origin.crowdignite.com.                 IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcortes.sbx.cdn.crowdignite.com.                    IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcortes.sbx.cdn1.crowdignite.com.                    IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcortes.sbx.management.crowdignite.com.             IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcortes.sbx.thecelebritycafe.crowdignite.com.       IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.crowdignite.com.                  	IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.www.crowdignite.com.                  IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.widget.crowdignite.com.               IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.origin.crowdignite.com.               IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.cdn.crowdignite.com.                  IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.cdn1.crowdignite.com.                  IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.management.crowdignite.com.           IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.thecelebritycafe.crowdignite.com.     IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.crowdignite.com.                 	IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.www.crowdignite.com.                 IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.widget.crowdignite.com.              IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.origin.crowdignite.com.              IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.cdn.crowdignite.com.                 IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.cdn1.crowdignite.com.                 IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.management.crowdignite.com.          IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.thecelebritycafe.crowdignite.com.    IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.crowdignite.com.                	IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.www.crowdignite.com.                IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.widget.crowdignite.com.             IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.origin.crowdignite.com.             IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.cdn.crowdignite.com.                IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.cdn1.crowdignite.com.                IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.management.crowdignite.com.         IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.thecelebritycafe.crowdignite.com.   IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+;mpatino.sbx.crowdignite.com.                    	IN    CNAME    uid1v-mpatino.ci.dev.lax.gnmedia.net. ;decomm
+;mpatino.sbx.www.crowdignite.com.                    IN    CNAME    uid1v-mpatino.ci.dev.lax.gnmedia.net. ;decomm
+;mpatino.sbx.widget.crowdignite.com.                 IN    CNAME    uid1v-mpatino.ci.dev.lax.gnmedia.net. ;decomm
+;mpatino.sbx.origin.crowdignite.com.                 IN    CNAME    uid1v-mpatino.ci.dev.lax.gnmedia.net. ;decomm
+;mpatino.sbx.cdn.crowdignite.com.                    IN    CNAME    uid1v-mpatino.ci.dev.lax.gnmedia.net. ;decomm
+;mpatino.sbx.management.crowdignite.com.             IN    CNAME    uid1v-mpatino.ci.dev.lax.gnmedia.net. ;decomm
+;mpatino.sbx.thecelebritycafe.crowdignite.com.       IN    CNAME    uid1v-mpatino.ci.dev.lax.gnmedia.net. ;decomm
+;rvicchiullo.sbx.crowdignite.com.                	IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net. ;decomm
+;rvicchiullo.sbx.www.crowdignite.com.                IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net. ;decomm
+;rvicchiullo.sbx.widget.crowdignite.com.             IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net. ;decomm
+;rvicchiullo.sbx.origin.crowdignite.com.             IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net. ;decomm
+;rvicchiullo.sbx.cdn.crowdignite.com.                IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net. ;decomm
+;rvicchiullo.sbx.cdn1.crowdignite.com.                IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net. ;decomm
+;rvicchiullo.sbx.management.crowdignite.com.         IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net. ;decomm
+;rvicchiullo.sbx.thecelebritycafe.crowdignite.com.   IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net. ;decomm
+ssalazar.sbx.crowdignite.com.                   	IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+ssalazar.sbx.www.crowdignite.com.                   IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+ssalazar.sbx.widget.crowdignite.com.                IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+ssalazar.sbx.origin.crowdignite.com.                IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+ssalazar.sbx.cdn.crowdignite.com.                   IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+ssalazar.sbx.cdn1.crowdignite.com.                   IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+ssalazar.sbx.management.crowdignite.com.            IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+ssalazar.sbx.thecelebritycafe.crowdignite.com.      IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+uacosta.sbx.crowdignite.com.                    	IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+uacosta.sbx.www.crowdignite.com.                    IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+uacosta.sbx.widget.crowdignite.com.                 IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+uacosta.sbx.origin.crowdignite.com.                 IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+uacosta.sbx.cdn.crowdignite.com.                    IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+uacosta.sbx.cdn1.crowdignite.com.                    IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+uacosta.sbx.management.crowdignite.com.             IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+uacosta.sbx.thecelebritycafe.crowdignite.com.       IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+
+;
+; #### Hosted on Titan Wordpress
+;
+get.crowdignite.com.                            IN    A        72.172.76.151
+
+bta.get.crowdignite.com.                        IN    A        10.11.234.71
+dev.get.crowdignite.com.                        IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.get.crowdignite.com.                        IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.get.crowdignite.com.                        IN    A        72.172.76.151
+www.get.crowdignite.com.                        IN    A        72.172.76.151
+
+origin.bta.get.crowdignite.com.                 IN    CNAME    bta.get.crowdignite.com.
+cdn1-bta.get.crowdignite.com.                   IN    CNAME    bta.get.crowdignite.com.
+cdn2-bta.get.crowdignite.com.                   IN    CNAME    bta.get.crowdignite.com.
+cdn3-bta.get.crowdignite.com.                   IN    CNAME    bta.get.crowdignite.com.
+
+origin-dev.get.crowdignite.com.                 IN    CNAME    dev.get.crowdignite.com.
+cdn1-dev.get.crowdignite.com.                   IN    CNAME    dev.get.crowdignite.com.
+cdn2-dev.get.crowdignite.com.                   IN    CNAME    dev.get.crowdignite.com.
+cdn3-dev.get.crowdignite.com.                   IN    CNAME    dev.get.crowdignite.com.
+
+origin-stg.get.crowdignite.com.                 IN    CNAME    stg.get.crowdignite.com.
+cdn1-stg.get.crowdignite.com.                   IN    CNAME    pebblebed.edgesuite.net.
+cdn2-stg.get.crowdignite.com.                   IN    CNAME    pebblebed.edgesuite.net.
+cdn3-stg.get.crowdignite.com.                   IN    CNAME    pebblebed.edgesuite.net.
+
+origin.get.crowdignite.com.                     IN    CNAME    prd.get.crowdignite.com.
+cdn1-www.get.crowdignite.com.                   IN    CNAME    pebblebed.edgesuite.net.
+cdn2-www.get.crowdignite.com.                   IN    CNAME    pebblebed.edgesuite.net.
+cdn3-www.get.crowdignite.com.                   IN    CNAME    pebblebed.edgesuite.net.
+
+dev.m.get.crowdignite.com.                      IN    CNAME    dev.get.crowdignite.com.
+stg.m.get.crowdignite.com.                      IN    CNAME    stg.get.crowdignite.com.
+www.m.get.crowdignite.com.                      IN    CNAME    prd.get.crowdignite.com.
+;m.get.crowdignite.com.                         IN    CNAME    prd.get.crowdignite.com.
+;
+; #### End Titan Wordpress
+;
+
+*.widget.crowdignite.com.                  IN    A        10.11.234.30
+*.www.crowdignite.com.                     IN    A        10.11.234.44
+*.get.crowdignite.com.                     IN    A        10.11.234.44
+reviews.crowdignite.com.                        IN    CNAME    uid2v-chaggstrom.tp.dev.lax.gnmedia.net.
+gist.crowdignite.com.                    IN      CNAME       app1v-gist.ci.prd.lax.gnmedia.net.
+
+
+peak.crowdignite.com.				IN 	A	204.11.222.33
+peak.management.crowdignite.com.		IN	A	204.11.222.34
+peak.widget.crowdignite.com.			IN	A	204.11.222.35

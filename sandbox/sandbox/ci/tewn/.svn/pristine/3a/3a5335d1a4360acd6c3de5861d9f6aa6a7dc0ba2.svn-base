@@ -1,0 +1,495 @@
+<?php
+
+App::import('Controller', 'Actions');
+
+class AnalysisActionsController extends ActionsController
+{
+    public $uses       = array('Page', 'Website', 'PageTag', 'LandingPageAnalytic', 'Widget');
+    public $components = array('Intersects', 'Dictionary');
+
+    public function rebalance()
+    {
+        $params = new CI\ArrayManipulator($this->params['form']);
+        $domain   = $params->get('domain', -1);
+        $category = $params->get('category', -1);
+
+        if ($domain >= 0 && $category >= 0) {
+            App::import('Controller', 'LandingPageEngine');
+            $LandingPageEngine = new LandingPageEngineController();
+            $LandingPageEngine->constructClasses();
+            $LandingPageEngine->beforeFilter();
+
+            $LandingPageEngine->test($domain, $category);
+
+            $intersect_id = $this->Intersects->get_id_by_intersect(
+                array(
+                    'category' => $category,
+                    'demographic_sex' => 0,
+                    'content_rating' => $content_rating,
+                )
+            );
+            $rand_seed = $this->getSeed($intersect, $domain_id);
+            $key = $this->LandingPageAnalytic->lp_pages_num_chunks_key($intersect_id, $domain_id, $rand_seed);
+            $this->LandingPageAnalytic->memcached_delete($key);
+        }
+    }
+
+    public function get_intersection_data()
+    {
+        $params         = new CI\ArrayManipulator($this->params['url']);
+        $domain         = $params->get('domain', 0);
+        $category       = $params->get('category', 0);
+        $content_rating = $params->get('content_rating', 0);
+        $website_id     = $params->get('website_id', 0);
+
+        $pages = $this->Page->find(
+            'list',
+            array(
+                'fields'     => array('id', 'category'),
+                'conditions' => array(
+                    'visible'    => 1,
+                    'status'     => PAGE_STATUS_APPROVED,
+                    'website_id' => $website_id,
+                ),
+            )
+        );
+
+        App::import('Helper', 'Convert');
+        $Convert = new ConvertHelper();
+
+        $oHub = new CI\Hub(new CI\Hub\DataSource\MyArray());
+        $Domains = new CI\ArrayManipulator($oHub->getAllActiveHubsName());
+
+        $response = array(
+            'domain' => array(
+                'id'   => $domain,
+                'name' => $Domains->get($domain, "Unknown ({$domain})"),
+            ),
+            'category' => array(
+                'id'   => $category,
+                'name' => $Convert->category($category),
+            ),
+            'content_rating' => array(
+                'id'   => $content_rating,
+                'name' => $Convert->content_rating($content_rating),
+            ),
+            'website_id' => $website_id,
+        );
+
+        // Whitelist and Blacklist are empty because the stored procedure has a validation to
+        // return only a website with empty whitelist and blacklist
+        $whitelist = '';
+        $blacklist = '';
+
+        $clicked_page = array();
+        $clicked_page_data = $this->Page->query_read("CALL ci_ci_sp_select_intersection_pages({$domain}, {$content_rating}, {$category}, {$website_id})");
+
+        if (!empty($clicked_page_data)) {
+            $clicked_page = $clicked_page_data[0];
+            $clicked_page['Page']['widget_id'] = $clicked_page['widgets']['widget_id'];
+        }
+
+        if (!empty($clicked_page)) {
+            $intersect = array(
+                'category'        => $category,
+                'demographic_sex' => $clicked_page['Page']['demographic_sex'],
+                'content_rating'  => $content_rating,
+            );
+            $rand_seed = $this->getSeed($intersect, $domain);
+            $weight_pages = $this->LandingPageAnalytic->intersect_weight_filter_pages(
+                $intersect,
+                1 << $domain, // domain bit
+                $rand_seed,
+                $clicked_page['Page']['subcategory'],
+                $this->getTags($clicked_page),
+                $whitelist,
+                $blacklist,
+                $clicked_page
+            );
+
+            $types = array(
+                LINK_TYPE_BASIC       => "Basic",
+                LINK_TYPE_CONTEXTUAL  => "Contextual",
+                LINK_TYPE_SIMILAR     => "Similar",
+                LINK_TYPE_TAG         => "Tag",
+                LINK_TYPE_SUBCATEGORY => "Subcategory",
+            );
+
+            $pages_ids = array();
+            $slots = $this->getSlots(array_keys($pages), $weight_pages);
+            foreach ($slots as $page_id => $data) {
+                $slot = $data['slot'];
+                $weight = $data['weight'];
+                $adjusted = $data['adjusted_weight'];
+                $page  = $this->getPage($slot);
+                $pages_ids[] = $page_id;
+                $ctr = empty($data['clicks']) ? 0 : intval($data['clicks']) / intval($data['impressions']) * 100;
+                $ctr = number_format($ctr, 2).'%';
+
+                $response['pages'][] = array(
+                    'id'          => $page_id,
+                    'slot'        => $data['slot'],
+                    'page'        => $this->getPage($data['slot']),
+                    'previous'    => $data['websites'],
+                    'clicks'      => $data['clicks'],
+                    'impressions' => $data['impressions'],
+                    'ctr'         => $ctr,
+                    'type'        => $types[$data['type']],
+                    'weight'      => array(
+                        'original' => $data['weight'],
+                        'adjusted' => $data['adjusted_weight'],
+                    ),
+                );
+            }
+            $response['link'] = $this->getLink($domain, $clicked_page, $rand_seed).'?pids='.implode(',', $pages_ids);
+        } else {
+            $response = array('error' => 'No clicked page available');
+        }
+
+        echo json_encode($response);
+    }
+
+    public function get_coverage_analytics()
+    {
+        global $global_strict_categories;
+        $params         = new CI\ArrayManipulator($this->params['url']);
+        $website_id     = $params->get('website_id', 0);
+        $domain_id      = $params->get('domain_id', -1);
+        $category       = $params->get('category', -1);
+        $content_rating = $params->get('content_rating', -1);
+        $exclude        = $params->get('exclude_penalized', 0);
+        $response       = array('analytics' => array());
+
+        if ($domain_id > -1) {
+            $analytics = $this->LandingPageAnalytic->get_analytics_coverage($domain_id, $category, $content_rating, $website_id, intval($exclude) == 1 ? true : false);
+
+            $types = $this->Dictionary->get_dictionary(DictionaryComponent::TYPE_LINK);
+            $domains = $this->Dictionary->get_dictionary(DictionaryComponent::TYPE_DOMAIN);
+            $categories = $this->Dictionary->get_dictionary(DictionaryComponent::TYPE_CATEGORY);
+            $content_ratings = $this->Dictionary->get_dictionary(DictionaryComponent::TYPE_CONTENT);
+
+            foreach ($analytics as $analytic) {
+                $is_wrong = false;
+                if (in_array($analytic['LandingPageAnalytic']['category'], $global_strict_categories) &&
+                    $analytic['LandingPageAnalytic']['category'] !== $analytic['Page']['category']) {
+                    $is_wrong = true;
+                }
+                $response['analytics'][] = array(
+                    'id'                     => $analytic['LandingPageAnalytic']['id'],
+                    'type'                   => $types[$analytic['LandingPageAnalytic']['type']],
+                    'type_id'                => $analytic['LandingPageAnalytic']['type'],
+                    'domain'                 => $domains[$domain_id],
+                    'domain_id'              => $domain_id,
+                    'category'               => $categories[$analytic['LandingPageAnalytic']['category']],
+                    'category_id'            => $analytic['LandingPageAnalytic']['category'],
+                    'page_id'                => $analytic['Page']['id'],
+                    'page_title'             => $analytic['Page']['title'],
+                    'page_category'          => $categories[$analytic['Page']['category']],
+                    'page_category_id'       => $analytic['Page']['category'],
+                    'page_content_rating'    => $content_ratings[$analytic['Page']['content_rating']],
+                    'page_content_rating_id' => $analytic['Page']['content_rating'],
+                    'website'                => $analytic['Website']['name'],
+                    'website_id'             => $analytic['Website']['id'],
+                    'is_basic'               => $analytic['LandingPageAnalytic']['type'] == LINK_TYPE_BASIC,
+                    'is_wrong'               => $is_wrong,
+                );
+            }
+        }
+
+        echo json_encode($response);
+    }
+
+    public function get_coverage_categories()
+    {
+        global $global_strict_categories;
+        $params     = new CI\ArrayManipulator($this->params['url']);
+        $website_id = $params->get('website_id', 0);
+        $domain_id  = $params->get('domain_id', -1);
+        $response   = array('avg' => 0, 'points' => array(), 'strict' => array());
+
+        if ($domain_id > -1) {
+
+            $analytics = $this->LandingPageAnalytic->get_analytics_coverage($domain_id, -1, -1, $website_id, false);
+
+            App::import('Helper', 'Convert');
+            $Convert = new ConvertHelper();
+
+            $category_distribution = array();
+            foreach ($analytics as $analytic) {
+                $analytic = $analytic['LandingPageAnalytic'];
+                $category = $Convert->category_short($analytic['category']);
+                $type = in_array($analytic['category'], $global_strict_categories) ? 'strict' : 'points';
+                if (isset($category_distribution[$type][$category])) {
+                    $category_distribution[$type][$category]++;
+                } else {
+                    $category_distribution[$type][$category] = 1;
+                }
+            }
+
+            $average = 0;
+            if (!empty($category_distribution)) {
+                $sum = array_sum($category_distribution['points']) + array_sum($category_distribution['strict']);
+                $count = count($category_distribution['points']) + count($category_distribution['strict']);
+                $average = intval($sum / $count);
+            }
+
+            $response['avg'] = $average;
+            foreach ($category_distribution as $type => $categories) {
+                foreach ($categories as $category => $count) {
+                    $response[$type][] = array($category, $count);
+                    $response['average'][] = array($category, $average);
+                }
+            }
+        }
+
+        echo json_encode($response);
+    }
+
+    protected function get_traffic_categories_data($categories, $start_date, $end_date, $by_day)
+    {
+        $Date  = new CI\Date();
+        $sp = "CALL dw_ci_sp_select_categories_stats('{$categories}', '{$by_day}', '{$start_date}', '{$end_date}');";
+
+        $this->loadModel('Stats');
+        $analytics = $this->Stats->query_read($sp, false);
+
+        $life_time = array();
+        $temp = $this->Website->query_read(
+            'SELECT category, SUM(impressions) as impressions, SUM(out_clicks) as clicks
+             FROM pages WHERE category IS NOT NULL GROUP BY category'
+        );
+        if ($temp) {
+            foreach ($temp as $lf) {
+                $life_time[$lf['pages']['category']] = $lf[0];
+            }
+        }
+
+        $data = array();
+        if ($analytics) {
+            $category_names = $this->Dictionary->get_dictionary(DictionaryComponent::TYPE_CATEGORY);
+            foreach ($analytics as $analytic) {
+                $category_id = $analytic['stats']['category'];
+                if (empty($by_day)) {
+                    $analytic[0]['category_id'] = $category_id;
+                    $analytic[0]['category'] = $category_names[$category_id];
+                    $analytic[0]['lf_impressions'] = $life_time[$category_id]['impressions'];
+                    $analytic[0]['lf_clicks'] = $life_time[$category_id]['clicks'];
+                    $data[] = $analytic[0];
+                } else {
+                    $analytic['stats']['date'] = $Date->format($analytic['stats']['stats_date']);
+                    $analytic['stats']['category_id'] = $category_id;
+                    $analytic['stats']['category'] = $category_names[$category_id];
+                    $data[] = $analytic['stats'];
+                }
+            }
+        }
+
+        return $data;
+    }
+
+    public function get_traffic_categories()
+    {
+        $Date  = new CI\Date();
+        $start = $Date->oFormat->dateStart($Date->getDaysAgo(7));
+        $end   = $Date->oFormat->dateEnd($Date->today());
+
+        $params     = new CI\ArrayManipulator($this->params['form']);
+        $categories = $params->get('categories', '');
+        $start_date = $params->get('start', $start);
+        $end_date   = $params->get('end', $end);
+        $by_day     = $params->get('day_by_day', '');
+
+        $data = $this->get_traffic_categories_data($categories, $start_date, $end_date, $by_day);
+
+        echo json_encode(
+            array(
+                'status' => empty($data) ? 'error' : 'ok',
+                'by_day' => !empty($by_day),
+                'data'   => $data,
+            )
+        );
+    }
+
+    public function export_traffic_categories()
+    {
+        $Date  = new CI\Date();
+        $start = $Date->oFormat->dateStart($Date->getDaysAgo(7));
+        $end   = $Date->oFormat->dateEnd($Date->today());
+
+        $params     = new CI\ArrayManipulator($this->params['url']);
+        $categories = $params->get('categories', '');
+        $start_date = $params->get('start', $start);
+        $end_date   = $params->get('end', $end);
+        $by_day     = $params->get('day_by_day', '');
+
+        $data = $this->get_traffic_categories_data($categories, $start_date, $end_date, $by_day);
+
+        App::import('Vendor', 'phpexcel', array('file' => 'PHPExcel.php'));
+        $excel = new PHPExcel();
+
+        $excel->getProperties()->setCreator("Crowdignite");
+        $excel->getProperties()->setTitle("CPC Report");
+        $excel->getProperties()->setSubject("CPC Campaigns Report");
+        $excel->getDefaultStyle()->getFont()->setName('Arial')->setSize(12);
+        $excel->setActiveSheetIndex(0);
+
+        $row   = 2;
+        $sheet = $excel->getActiveSheet();
+        if (empty($by_day)) {
+            $sheet->setCellValue("A1", 'Category');
+            $sheet->setCellValue("B1", 'LP Clicks');
+            $sheet->setCellValue("C1", 'LP Impressions');
+            $sheet->setCellValue("D1", 'Widget Clicks');
+            $sheet->setCellValue("E1", 'Widget impressions');
+            $sheet->setCellValue("F1", 'Life time clicks');
+            $sheet->setCellValue("G1", 'Life time impressions');
+            $sheet->getStyle("A1:G1")->getFont()->setBold(true);
+            foreach ($data as $analytic) {
+                $sheet->setCellValue("A{$row}", $analytic['category']);
+                $sheet->setCellValue("B{$row}", $analytic['landing_page_clicks']);
+                $sheet->setCellValue("C{$row}", $analytic['landing_page_impressions']);
+                $sheet->setCellValue("D{$row}", $analytic['widget_clicks']);
+                $sheet->setCellValue("E{$row}", $analytic['widget_impressions']);
+                $sheet->setCellValue("F{$row}", $analytic['lf_clicks']);
+                $sheet->setCellValue("G{$row}", $analytic['lf_impressions']);
+                $row++;
+            }
+        } else {
+            $by_day = '_'.$by_day;
+            $sheet->setCellValue("A1", 'Date');
+            $sheet->setCellValue("B1", 'Category');
+            $sheet->setCellValue("C1", 'LP Clicks');
+            $sheet->setCellValue("D1", 'LP Impressions');
+            $sheet->setCellValue("E1", 'Widget Clicks');
+            $sheet->setCellValue("F1", 'Widget impressions');
+            $sheet->getStyle("A1:F1")->getFont()->setBold(true);
+            foreach ($data as $analytic) {
+                $sheet->setCellValue("A{$row}", date('d/m/Y H:iA', strtotime($analytic['stats_date'])));
+                $sheet->setCellValue("B{$row}", $analytic['category']);
+                $sheet->setCellValue("C{$row}", $analytic['landing_page_clicks']);
+                $sheet->setCellValue("D{$row}", $analytic['landing_page_impressions']);
+                $sheet->setCellValue("E{$row}", $analytic['widget_clicks']);
+                $sheet->setCellValue("F{$row}", $analytic['widget_impressions']);
+                $row++;
+            }
+        }
+
+        $date_format = $Date->today();
+        // Redirect output to a client’s web browser (Excel5)
+        header('Content-Type: application/vnd.ms-excel');
+        header("Content-Disposition: attachment;filename=\"{$date_format}_traffic_categories{$by_day}.xls\"");
+        header('Cache-Control: max-age=0');
+
+        $objWriter = PHPExcel_IOFactory::createWriter($excel, 'Excel5');
+        $objWriter->save('php://output');
+    }
+
+    protected function getSlots($active_pages, $landing_page_analytics)
+    {
+        $other = array();
+        $slots = array();
+
+        $oHub = new CI\Hub(new CI\Hub\DataSource\MyArray());
+        $domains = new CI\ArrayManipulator($oHub->getAllActiveHubsName());
+
+        $other = array();
+        foreach ($landing_page_analytics as $index => $page) {
+            $page_id = $page['LandingPageAnalytic']['page_id'];
+            if (in_array($page_id, $active_pages)) {
+                $other_pages = implode(',', $other);
+                $websites = $this->Website->query_read("CALL ci_ci_sp_select_pages_per_website('{$other_pages}')");
+
+                $other = array();
+                $website_names = array();
+                if ($websites) {
+                    foreach ($websites as $website) {
+                        $website = $website['web_pages'];
+                        $credits = 0;
+                        if (intval($website['credits']) > 0) {
+                            $credits = number_format(intval($website['credits']) / 10, 2);
+                        }
+                        $website_names[] = implode('|', array(
+                            'name'           => $website['name'],
+                            'domain'         => $domains->get($website['domain'], "Unknown ({$website['domain']})"),
+                            'featured'       => floatval($website['featured']),
+                            'credits'        => $credits,
+                            'analytics'      => intval($website['total']),
+                            'website_id'     => $website['id'],
+                        ));
+                    }
+                }
+
+                $website_names = empty($website_names) ? false : implode('::', $website_names);
+
+                $slots[$page_id] = array(
+                    'slot'            => $index + 1,
+                    'weight'          => $page['LandingPageAnalytic']['weight'],
+                    'adjusted_weight' => $page['LandingPageAnalytic']['adjusted_weight'],
+                    'clicks'          => $page['LandingPageAnalytic']['num_ctr'],
+                    'impressions'     => $page['LandingPageAnalytic']['num_display'],
+                    'type'            => $page['LandingPageAnalytic']['type'],
+                    'websites'        => $website_names,
+                );
+            } else {
+                $other[] = $page_id;
+            }
+        }
+        return $slots;
+    }
+
+    protected function getLink($domain, $page, $rand_seed)
+    {
+        $Hub = new CI\Hub(new CI\Hub\DataSource\MyArray());
+        $environment_prefix = ENVIRONMENT_PREFIX;
+        $landing_page = $Hub->idToLandingpage($domain);
+        if (is_null($landing_page)) {
+            $landing_page = 'crowdignite.com';
+        }
+        $url = 'http://'.$environment_prefix.$landing_page;
+        return $url . "/v/{$page['Page']['widget_id']}/{$page['Page']['id']}/{$rand_seed}";
+    }
+
+    protected function getSeed($intersect, $domain_id, $index = NULL) {
+        $intersect_id = $this->Intersects->get_id_by_intersect($intersect);
+        /* See if we need to create an index */
+        if (!$index) {
+            $index = mt_rand(1, DEFAULT_LANDING_PAGE_RANDOM_SEEDS);
+        }
+
+        /* Get the seed */
+        $seed = $this->LandingPageAnalytic->cached_seed_get($intersect_id, $domain_id, $index);
+        if ($seed) {
+            return $seed;
+        }
+
+        // Pick a new one
+        $seed = mt_rand(1, 10000);
+
+        // Cache it
+        $this->LandingPageAnalytic->cached_seed_set($intersect_id, $domain_id, $index, $seed);
+
+        return $seed;
+    }
+
+    protected function getTags($page) {
+        $page_id = $page['Page']['id'];
+        $tags = $this->PageTag->get_all_page_id($page_id);
+
+        $return = array();
+        foreach ($tags as $tag) {
+            $return[] = $tag['PageTag']['tag_id'];
+        }
+
+        return $return;
+    }
+
+    protected function getPage($slot)
+    {
+        if ($slot == 0) return 0;
+        $slot -= 29;
+        if ($slot <= 0) return 1;
+        $tmp = intval($slot / 20);
+        if ($slot % 20 > 0) $tmp += 1;
+        return $tmp + 1;
+    }
+}

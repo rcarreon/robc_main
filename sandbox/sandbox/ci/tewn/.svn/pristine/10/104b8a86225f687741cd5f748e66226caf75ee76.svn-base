@@ -1,0 +1,112 @@
+<?php
+
+namespace CI\Distribution;
+
+require_once __DIR__ . "/../PDL/BetaDistribution.php";
+
+class Bayesian
+{
+    const MAX_WEIGHT = 1000;
+
+    const TYPE_WIDGET_ANALYTIC       = 'WidgetAnalytic';
+    const TYPE_LANDING_PAGE_ANALYTIC = 'LandingPageAnalytic';
+
+    const FIELD_CTP = 'ctp';
+    const FIELD_CTR = 'ctr';
+
+
+    protected $nPriors  = 1000;
+    protected $elements = array();
+    protected $sTypeAnalytic;
+
+    public function __construct($sTypeAnalytic)
+    {
+        $this->sTypeAnalytic = $sTypeAnalytic;
+    }
+
+    public function setPriors($nPriors)
+    {
+        if (is_numeric($nPriors)) {
+            $this->nPriors = $nPriors;
+        }
+
+        return $this;
+    }
+
+    public function simulate($aLinks, $sSuccessField, $sWeightField)
+    {
+        $this->elements = $aLinks;
+        $oStorage = $this->init($sSuccessField, $sWeightField);
+
+        // Each success gives them some weight
+        // The result of this simulation will be the weight put into widget analytics.
+        // When we have the proportional weight picker, it will show the results on the widget
+        // in the right combination.
+        for ($i = 0; $i < self::MAX_WEIGHT; $i++) {
+            $nIndex = $this->recommendation($oStorage);
+            if ($nIndex >= 0) {
+                $this->elements[$nIndex][$this->sTypeAnalytic][$sWeightField]++;
+            }
+        }
+        unset($oStorage);
+
+        return $this->elements;
+    }
+
+    protected function init($sSuccessField, $sWeightField)
+    {
+        $oStorage = new \SplObjectStorage();
+        for ($i = 0, $nCount = count($this->elements); $i < $nCount; $i++) {
+            $oLink = new \StdClass();
+            $oLink->distSuccess = 0;
+            $oLink->distFail    = 0;
+
+            if (self::FIELD_CTP == $sSuccessField && is_null($this->elements[$i][self::FIELD_CTP])) {
+                // Keep old weight because the CTP from vw is null and we might keep the index of $this->elements
+                $oStorage->attach($oLink);
+                continue;
+            }
+            // Validate the ctp from vowpal wabbit == 0, and give 0.001 of ctp
+            if (self::FIELD_CTP == $sSuccessField && ($this->elements[$i][$sSuccessField] == 0)) {
+                $this->elements[$i][$sSuccessField] = 0.001;
+            }
+
+            $this->elements[$i][$this->sTypeAnalytic][$sWeightField] = 0;
+            $aLink = $this->elements[$i][$this->sTypeAnalytic];
+
+            if ($aLink['num_ctr'] > $aLink['num_display']) {
+                $aLink['num_display'] += $aLink['num_ctr'];
+            }
+
+            $nSuccess = 1000 * $this->elements[$i][$sSuccessField];
+
+            $oLink->distSuccess = $nSuccess + $aLink['num_ctr'];
+            $oLink->distFail    = (1000 - $nSuccess) + ($aLink['num_display'] - $aLink['num_ctr']);
+
+            $oStorage->attach($oLink);
+            unset($aLink, $oLink);
+        }
+        return $oStorage;
+    }
+
+    protected function recommendation($oStorage)
+    {
+        $nMax      = 0;
+        $nMaxIndex = -1;
+
+        foreach ($oStorage as $nIndex => $oLink) {
+            if ($oLink->distSuccess <= 0 || $oLink->distFail <= 0) {
+                continue;
+            }
+            $oBeta   = new \BetaDistribution($oLink->distSuccess, $oLink->distFail);
+            $nSample = $oBeta->RNG();
+
+            if ($nSample > $nMax) {
+                $nMax      = $nSample;
+                $nMaxIndex = $nIndex;
+            }
+        }
+
+        return $nMaxIndex;
+    }
+}

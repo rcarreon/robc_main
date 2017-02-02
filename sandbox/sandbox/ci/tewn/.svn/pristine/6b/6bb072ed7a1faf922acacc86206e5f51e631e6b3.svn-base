@@ -1,0 +1,30 @@
+<?php
+
+namespace CI\Report;
+
+class Convert
+{
+    public function timeUnitToString($nTimeUnit)
+    {
+        $sReturn = '';
+
+        switch ($nTimeUnit) {
+            case \CI\Report::TIME_UNIT_HOUR:
+                $sReturn = \CI\Report::HOURLY;
+                break;
+            case \CI\Report::TIME_UNIT_WEEK:
+                $sReturn = \CI\Report::WEEKLY;
+                break;
+            case \CI\Report::TIME_UNIT_MONTH:
+                $sReturn = \CI\Report::MONTHLY;
+                break;
+
+            default:
+            case \CI\Report::TIME_UNIT_DAY:
+                $sReturn = \CI\Report::DAILY;
+                break;
+        }
+
+        return $sReturn;
+    }
+}

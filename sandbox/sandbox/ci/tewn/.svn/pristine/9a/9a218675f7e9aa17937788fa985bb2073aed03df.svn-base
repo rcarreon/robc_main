@@ -1,0 +1,6 @@
+<style>
+#header { width:80%; min-width: 900px; }
+#navbar { width:100%; }
+#interior_content { margin-left:0; }
+.item:hover div.text p a { color:#c13d55!important; }
+</style>

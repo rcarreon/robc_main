@@ -1,0 +1,32 @@
+<?
+	echo '<?xml-stylesheet type="text/xsl" href="/css/sitemap.xsl"?>';
+?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+<url>
+	<loc>http://<?=LANDING_PAGE?>/</loc>
+	<changefreq>hourly</changefreq>
+	<priority>1.0</priority>
+</url>
+
+<!-- Pages -->
+<?
+	foreach ($pages as $page) {
+        if (isset($page['Page']['moderator_modified'])) {
+            $modified = $page['Page']['moderator_modified'];
+        } else {
+            $modified = $page['Page']['created'];
+        }
+
+?>
+<url>
+<loc>http://<?=LANDING_PAGE?>/<?=$page['Page']['title_url']?></loc>
+  <lastmod><?php echo $time->toAtom($modified); ?></lastmod>
+<changefreq>daily</changefreq>
+<priority>0.8</priority>
+</url>
+<? } ?>
+
+
+</urlset>
+

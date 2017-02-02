@@ -1,0 +1,145 @@
+<?
+
+class LogsController extends AppController
+{
+	var $name = 'Logs';
+	var $uses = array('Log');
+	var $helpers = array('Html');
+
+	function linux_loadavg() {
+		$load = sys_getloadavg();
+		return max((float)$load[0], (float)$load[1], (float)$load[2]);
+	}
+
+	private function in_url($url) {
+		$regex = "#/(v)/([0-9]+)/[0-9]+/[0-9]+/[0-9]+/[0-9]+\?[0-9a-z=\?]*#";
+
+		preg_match($regex, $url, $matches);
+		if (!empty($matches[2])) {
+			// Skip infinite scrolls
+			if (strstr("infinite=1", $url)) {
+				return 0;
+			}
+
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
+	private function out_url($url) {
+		if (substr($url, 0, 6) == '/link/') {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
+
+	private function calc_return_rate($out, $in) {
+		if ($in) {
+			// Add 20% on for the false positives on spiders
+			// This is an estimation
+			return round((($out / $in) * 120), 2);
+		} else {
+			// Infinity
+			return "&#8734";
+		}
+	}
+
+	private function calc_load($count, $seconds) {
+		if ($seconds) {
+			return round(($count/$seconds), 2);
+		} else {
+			return 0;
+		}
+	}
+
+	function load($wide = 0) {
+		// Presets
+		$short_count = 1000;
+		$medium_count = 20000;
+		$long_count = 50000;
+
+		// Counts
+		$short_in = 0;
+		$short_out = 0;
+		$medium_in = 0;
+		$medium_out = 0;
+		$long_in = 0;
+		$long_out = 0;
+
+		$pages = $this->Log->get_pages_second($long_count);
+
+		// Count up Return Rate
+		$count = 0;
+		foreach($pages as $page) {
+			if ($page['logs']['refer'] == "-") {
+				continue;
+			}
+
+			// Short
+			if ($count < $short_count) {
+				if ($this->in_url($page['logs']['url'])) {
+					$short_in++;
+				} elseif ($this->out_url($page['logs']['url'])) {
+					$short_out++;
+				}
+			}
+
+			// Medium
+			if ($count < $medium_count) {
+				if ($this->in_url($page['logs']['url'])) {
+					$medium_in++;
+				} elseif ($this->out_url($page['logs']['url'])) {
+					$medium_out++;
+				}
+			}
+
+			// Long
+			if ($count < $long_count) {
+				if ($this->in_url($page['logs']['url'])) {
+					$long_in++;
+				} elseif ($this->out_url($page['logs']['url'])) {
+					$long_out++;
+				}
+			}
+
+			$count++;
+
+		}
+
+		// Set return rates
+		$this->set("short_rr", $this->calc_return_rate($short_out, $short_in));
+		$this->set("medium_rr", $this->calc_return_rate($medium_out, $medium_in));
+		$this->set("long_rr", $this->calc_return_rate($long_out, $long_in));
+
+		//print_r($pages);
+
+		// Short Pages Per Second
+		$date1 = strtotime($pages[$short_count-1]['logs']['created']);
+		$date2 = strtotime($pages[$short_count-1][0]['now']);
+		$seconds = $date2 - $date1;
+
+		$this->set("short_load", $this->calc_load($short_count, $seconds));
+
+		// Medium Pages Per Second
+		$date1 = strtotime($pages[$medium_count-1]['logs']['created']);
+		$seconds = $date2 - $date1;
+
+		$this->set("long_load", $this->calc_load($medium_count, $seconds));
+
+		// Long Pages Per Second
+		$date1 = strtotime($pages[$long_count-1]['logs']['created']);
+		$seconds = $date2 - $date1;
+
+		$this->set("extra_long_load", $this->calc_load($long_count, $seconds));
+
+
+		$this->set("load", $this->linux_loadavg());
+		$this->set("wide", $wide);
+
+		$this->set("pages", $pages);
+	}
+}
+
+?>

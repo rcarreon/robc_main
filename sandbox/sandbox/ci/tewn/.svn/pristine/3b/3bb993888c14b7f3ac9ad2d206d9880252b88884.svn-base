@@ -1,0 +1,45 @@
+jQuery(document).ready(function(){
+
+    $new('input[name="data[User][terms]"]').click(function() {
+        $new('#submit').toggleClass('disabled');
+    });
+
+    $new('#submit').click(function() {
+       if (false == $new('#submit').hasClass('disabled')){
+            var user_id         = $new('input[name="data[User][id]"]').val();
+            var password        = $new('input[name="data[User][password]"]').val();
+            var new_password    = $new('input[name="data[User][new_password]"]').val();
+            var retype_password = $new('input[name="data[User][retype_password]"]').val();
+            var terms           = $new('input[name="data[User][terms]"]').prop('checked');
+
+            $new.ajax({
+                url: "/users/action/update_your_password",
+                type: 'POST',
+                data: {
+                    id: user_id,
+                    password: password,
+                    new_password: new_password,
+                    retype_password: retype_password,
+                    terms: terms
+                },
+                dataType: "json"
+            }).done(function(response){
+                if (response.status == 'ok') {
+                    alert(response.message);
+                    window.location.href = response.redirect_url;
+                } else if (response.status == 'error') {
+                    var error_html = '<div class="control">' +
+                        '<span class="bold red margin">'+ response.message +'</span>' +
+                        '</div>';
+                    var error_element = $new('#error');
+                    error_element.removeClass('hide');
+                    $new('#error').html(error_html).fadeIn();
+                }
+            });
+       }
+    });
+
+    $new('#close').click(function() {
+        window.location.href = '/'
+    });
+});

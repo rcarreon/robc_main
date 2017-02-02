@@ -1,0 +1,14 @@
+<?php
+
+/* Prev */
+if (isset($paginator) && $paginator->hasPrev()) {
+	echo $html->link("<< Prev Page", "/".$type."/page:".($paginator->current() - 1), array("class" => "paginate"));
+	echo "&nbsp;&nbsp;&nbsp;";
+}
+
+/* Next */
+if (isset($paginator) && $paginator->hasNext()) {
+	echo "&nbsp;&nbsp;&nbsp;";
+	echo $html->link("Next Page >>", "/".$type."/page:".($paginator->current() + 1), array("class" => "paginate"));
+}
+?>

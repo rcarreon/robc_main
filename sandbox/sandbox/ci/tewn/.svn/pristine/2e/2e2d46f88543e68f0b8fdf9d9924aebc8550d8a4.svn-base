@@ -1,0 +1,50 @@
+<?php
+/**
+ * Logger Analytic Element Interface
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger_Analytic
+ * @package  Logger_Analytic_Element
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+/**
+ * Logger Analytic Element Interface
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger_Analytic
+ * @package  Logger_Analytic_Element
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+interface Logger_Analytic_Element_Interface
+{
+    /**
+     * Gets the name of the element
+     *
+     * @return string Name of element
+     */
+    public function getName();
+
+    /**
+     * Register the value into the element
+     *
+     * @param mixed $value The value to be registered
+     *
+     * @return void
+     */
+    public function registerValue($value);
+
+    /**
+     * Builds the output string of this element
+     *
+     * @return string
+     */
+    public function build();
+
+}

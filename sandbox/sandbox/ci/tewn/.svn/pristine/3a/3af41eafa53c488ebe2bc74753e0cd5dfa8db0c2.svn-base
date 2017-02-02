@@ -1,0 +1,40 @@
+<script src="http://<?php echo CDN_URL; ?>/js/subcategories.js"></script>
+<script type="text/x-handlebars-template" id="tpl-subcategories-checkbox">
+    {{#each subcategories}}
+    <label>
+        <input type="checkbox"
+               name="data[Page][subcategories][]"
+               data-name="{{name}}"
+               data-page_id="{{page_id}}"
+               data-container="selected-subcategories-{{page_id}}"
+               data-category="{{category_name}}"
+               value="{{id}}">
+        {{name}}
+    </label>
+    {{/each}}
+</script>
+
+<script type="text/x-handlebars-template" id="tpl-subcategories-selected-list">
+    <input type="hidden" name="data[Page][category_ids]" value="{{ids.categories}}">
+    <input type="hidden" name="data[Page][subcategory_ids]" value="{{ids.subcategories}}">
+    {{#each categories}}
+    <ul>
+        <li class="category" data-type="category" data-parent="{{parent_id}}" data-name="{{name}}">
+            <span>{{name}}</span>
+            <a class="selected-close">
+                <span class="text-icon">×</span>
+            </a>
+        </li>
+            {{#each subcategories}}
+            <li data-type="subcategory" data-parent="{{../parent_id}}" data-category="{{../name}}" data-name="{{name}}" data-id="{{id}}">
+                <span>{{name}}</span>
+                <a class="selected-close">
+                    <span class="text-icon">×</span>
+                </a>
+            </li>
+            {{/each}}
+    </ul>
+    {{else}}
+    <ul></ul>
+    {{/each}}
+</script>

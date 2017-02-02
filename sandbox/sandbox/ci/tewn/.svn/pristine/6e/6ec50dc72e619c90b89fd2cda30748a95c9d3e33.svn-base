@@ -1,0 +1,98 @@
+<?php
+namespace Test\RSS;
+use \CI\RSS\Reader;
+
+/**
+ * @group rss
+ */
+class ReaderTest extends \PHPUnit_Framework_TestCase
+{
+    protected $oReader;
+
+    public function setUp()
+    {
+        $this->oReader = new ReaderMock();
+    }
+
+    public function testReadShouldReturnArray()
+    {
+        $oCategories = $this->getMockBuilder('\SimplePie_Category')
+                            ->disableOriginalConstructor()
+                            ->getMock();
+        $oCategories->expects($this->any())
+                    ->method('get_label')
+                    ->will($this->returnValue('sometag'));
+
+        $oItem = $this->getMockBuilder('\SimplePie_Item')
+                      ->disableOriginalConstructor()
+                      ->getMock();
+        $oItem->expects($this->any())
+              ->method('get_title')
+              ->will($this->returnValue('some string'));
+        $oItem->expects($this->any())
+              ->method('get_link')
+              ->will($this->returnValue('some string'));
+        $oItem->expects($this->any())
+              ->method('get_date')
+              ->will($this->returnValue('some string'));
+        $oItem->expects($this->any())
+              ->method('get_description')
+              ->will($this->returnValue('some string'));
+
+        $oItem->expects($this->any())
+              ->method('get_categories')
+              ->will($this->returnValue(array($oCategories)));
+
+
+        $oFeed = $this->getMock('\SimplePie');
+        $oFeed->expects($this->any())->method('set_feed_url');
+        $oFeed->expects($this->any())->method('enable_cache');
+        $oFeed->expects($this->any())->method('init');
+        $oFeed->expects($this->any())->method('handle_content_type');
+
+        $oFeed->expects($this->any())
+              ->method('sanitize')
+              ->will($this->returnValue('description'));
+
+        $oFeed->expects($this->any())
+              ->method('get_items')
+              ->will($this->returnValue(array($oItem)));
+
+        $this->oReader->setSimplePie($oFeed);
+
+        $this->assertInternalType('array', $this->oReader->read());
+    }
+
+    /**
+     * @expectedException \CI\RSS\Exception
+     * @expectedExceptionCode \CI\RSS\Exception::SIMPLE_PIE
+     */
+    public function testReadShouldThrowException()
+    {
+        $oFeed = $this->getMock('\SimplePie');
+        $oFeed->expects($this->any())->method('set_feed_url');
+        $oFeed->expects($this->any())->method('enable_cache');
+        $oFeed->expects($this->any())->method('init');
+        $oFeed->expects($this->any())->method('handle_content_type');
+        $oFeed->error = 'this is the error msg';
+
+        $this->oReader->setSimplePie($oFeed);
+        $this->oReader->read();
+    }
+}
+
+class ReaderMock extends Reader
+{
+    public function setSimplePie(\SimplePie $oSimplePie)
+    {
+        parent::setSimplePie($oSimplePie);
+    }
+
+    public function requestImages($sUrl)
+    {
+        return array(
+                     'og'      => '/the/image/to/og',
+                     'twitter' => '/the/image/to/twitter'
+                    );
+    }
+}

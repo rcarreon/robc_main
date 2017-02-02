@@ -1,0 +1,582 @@
+<?php
+
+namespace Test\Formulas;
+
+class WidgetTest extends \PHPUnit_Framework_TestCase
+{
+    public function test2()
+    {
+        $nExpected     = 0.892;
+        $nAccountCount = 50;
+        $nRank         = 10;
+        $bPaid         = false;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 0, 'buying' => false);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(2))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(2, 0.3));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test1()
+    {
+        $nExpected     = 0.7;
+        $nAccountCount = 0;
+        $nRank         = 10;
+        $bPaid         = false;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 0, 'buying' => false);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(1))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(0.3));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test32()
+    {
+        $nExpected     = 0.7;
+        $nAccountCount = 0;
+        $nRank         = 0;
+        $bPaid         = false;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 0, 'buying' => false);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(2))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(0.3, 0));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test41()
+    {
+        $nExpected     = 0.7;
+        $nAccountCount = 0;
+        $nRank         = 10;
+        $bPaid         = false;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 2, 'buying' => false);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(2))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(0.3, 0));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test42()
+    {
+        $nExpected     = 0.892;
+        $nAccountCount = 50;
+        $nRank         = 10;
+        $bPaid         = false;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 2, 'buying' => false);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(3))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(2, 0.3, 0));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test432()
+    {
+        $nExpected     = -0.7;
+        $nAccountCount = 0;
+        $nRank         = 0;
+        $bPaid         = false;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 2, 'buying' => false);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(3))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(2, 0.3, 0));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test52()
+    {
+        $nExpected     = 1.192;
+        $nAccountCount = 50;
+        $nRank         = 10;
+        $bPaid         = false;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 0, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(3))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(2, 0.3, 0.3));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test51()
+    {
+        $nExpected     = 1;
+        $nAccountCount = 0;
+        $nRank         = 10;
+        $bPaid         = false;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 0, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(2))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(0.3, 0.3));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test532()
+    {
+        $nExpected     = -0.4;
+        $nAccountCount = 0;
+        $nRank         = 0;
+        $bPaid         = false;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 0, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(3))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(2, 0.3, 0.3));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test541()
+    {
+        $nExpected     = 1;
+        $nAccountCount = 0;
+        $nRank         = 10;
+        $bPaid         = false;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 2, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(3))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(0.3, 0, 0.3));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test542()
+    {
+        $nExpected     = 1.192;
+        $nAccountCount = 50;
+        $nRank         = 10;
+        $bPaid         = false;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 2, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(4))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(2, 0.3, 0, 0.3));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test5432()
+    {
+        $nExpected     = -0.4;
+        $nAccountCount = 0;
+        $nRank         = 0;
+        $bPaid         = false;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 2, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(4))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(2, 0.3, 0, 0.3));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test62()
+    {
+        $nExpected = 1.992;
+        $nAccountCount = 50;
+        $nRank         = 10;
+        $bPaid         = true;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 0, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(4))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(2, 0.3, 0.3, 0.8));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test61()
+    {
+        $nExpected     = 1.8;
+        $nAccountCount = 0;
+        $nRank         = 10;
+        $bPaid         = true;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 0, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(3))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(0.3, 0.3, 0.8));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test632()
+    {
+        $nExpected     = 0.4;
+        $nAccountCount = 0;
+        $nRank         = 0;
+        $bPaid         = true;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 0, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(4))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(2, 0.3, 0.3, 0.8));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test641()
+    {
+        $nExpected     = 1.9;
+        $nAccountCount = 0;
+        $nRank         = 10;
+        $bPaid         = true;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 2, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(4))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(0.3, 0, 0.8, 0.4));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test642()
+    {
+        $nExpected     = 1.292;
+        $nAccountCount = 50;
+        $nRank         = 10;
+        $bPaid         = true;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 2, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(5))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(2, 0.3, 0, 0.2, 0.2));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test6432()
+    {
+        $nExpected     = 0.4;
+        $nAccountCount = 0;
+        $nRank         = 0;
+        $bPaid         = true;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 2, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(5))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(2, 0.3, 0, 0.8, 0.3));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test652()
+    {
+        $nExpected     = 1.992;
+        $nAccountCount = 50;
+        $nRank         = 10;
+        $bPaid         = true;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 0, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(4))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(2, 0.3, 0.3, 0.8));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test651()
+    {
+        $nExpected     = 1.8;
+        $nAccountCount = 0;
+        $nRank         = 10;
+        $bPaid         = true;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 0, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(3))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(0.3, 0.3, 0.8));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test6532()
+    {
+        $nExpected     = 0.4;
+        $nAccountCount = 0;
+        $nRank         = 0;
+        $bPaid         = true;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 0, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(4))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(2, 0.3, 0.3, 0.8));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test6541()
+    {
+        $nExpected     = 1.8;
+        $nAccountCount = 0;
+        $nRank         = 10;
+        $bPaid         = true;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 2, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(4))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(0.3, 0, 0.3, 0.8));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test6542()
+    {
+        $nExpected     = 3.992;
+        $nAccountCount = 50;
+        $nRank         = 10;
+        $bPaid         = true;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 2, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(5))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(2, 0.3, true, 0.3, 0.8));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+
+    public function test65432()
+    {
+        $nExpected     = 0.4;
+        $nAccountCount = 0;
+        $nRank         = 0;
+        $bPaid         = true;
+        $nDomaindId    = 0;
+        $aAccount      = array('featured' => 2, 'buying' => true);
+        $oWidget       = $this->getMockBuilder('\CI\Formulas\Widget')
+                              ->setMethods(array('getSettingObject'))
+                              ->getMock();
+        $oSetting      = $this->getMockBuilder('\CI\Config\System\Setting')
+                              ->setMethods(array('get'))
+                              ->getMock();
+        $oSetting->expects($this->exactly(5))
+                 ->method('get')
+                 ->will($this->onConsecutiveCalls(2, 0.3, 0, 0.3, 0.8));
+        $oWidget->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $nResult = $oWidget->getWeightModifier($aAccount, $nRank, $nAccountCount, $bPaid);
+        $this->assertEquals($nExpected, $nResult, "expected {$nExpected}");
+    }
+}

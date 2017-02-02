@@ -1,0 +1,223 @@
+<?php
+namespace Test;
+
+use CI\VowpalWabbit\Data\Set;
+
+/**
+ * @group vowpalwabbit
+ */
+class SetTest extends \PHPUnit_Framework_TestCase
+{
+    private $_oData;
+
+    public function setUp() {
+        $this->_oData = new Set();
+    }
+
+    public function testSetLabel() {
+        $nLabel = 1;
+
+        $this->_oData->setLabel($nLabel);
+
+        $this->assertAttributeEquals($nLabel, '_nLabel', $this->_oData);
+    }
+
+    /**
+     * @expectedException CI\VowpalWabbit\Data\Set\Exception
+     * @expectedExceptionCode CI\VowpalWabbit\Data\Set\Exception::INVALID_LABEL
+     */
+    public function testThrowExceptionWithInvalidLabel() {
+        $this->_oData->setLabel("9");
+    }
+
+    /**
+     * @expectedException CI\VowpalWabbit\Data\Set\Exception
+     * @expectedExceptionCode CI\VowpalWabbit\Data\Set\Exception::INVALID_FEATURE
+     *
+     * @dataProvider getInvalidFeatureValues
+     */
+    public function testThrowExceptionWithInvalidFeatureValues($aFeatures) {
+        $this->_oData->addFeatures($aFeatures);
+    }
+
+    public function testAddFeature() {
+        $aExpected = array();
+        $aExpected[] = array('namespace1' => 'Price:3.5 Square:45.56 Total');
+        $aExpected[] = array('namespace2' => 'Foot:0.045 Weight:654.45');
+
+        $this->_oData->addFeatures($this->getFeaturesNamespaceOne());
+        $this->_oData->addFeatures($this->getFeaturesNamespaceTwo());
+
+        $this->assertEquals($aExpected, $this->_oData->toArray());
+        $this->assertInternalType('array', $this->_oData->toArray());
+    }
+
+    public function testEmptyArrayFeatures() {
+        $this->assertEquals(array(), $this->_oData->toArray());
+        $this->assertInternalType('array', $this->_oData->toArray());
+    }
+
+    public function testSetImportance() {
+        $nImportance = 1;
+
+        $this->_oData->setImportance($nImportance);
+
+        $this->assertAttributeEquals($nImportance, '_nImportance', $this->_oData);
+    }
+
+    /**
+     * @expectedException CI\VowpalWabbit\Data\Set\Exception
+     * @expectedExceptionCode CI\VowpalWabbit\Data\Set\Exception::INVALID_IMPORTANCE
+     */
+
+    public function testThrowExceptionWithInvalidImportance() {
+        $this->_oData->setImportance("9");
+    }
+
+    public function testSetBaseWithFloat() {
+        $nBase = 0.45;
+        $this->_oData->setBase($nBase);
+
+        $this->assertAttributeEquals($nBase, '_nBase', $this->_oData);
+        $this->assertAttributeInternalType('float', '_nBase', $this->_oData);
+    }
+
+    public function testSetBaseWithInteger() {
+        $nBase = 45;
+        $this->_oData->setBase($nBase);
+
+        $this->assertAttributeEquals($nBase, '_nBase', $this->_oData);
+        $this->assertAttributeInternalType('integer', '_nBase', $this->_oData);
+    }
+
+    /**
+     * @expectedException CI\VowpalWabbit\Data\Set\Exception
+     * @expectedExceptionCode CI\VowpalWabbit\Data\Set\Exception::INVALID_BASE
+     * @dataProvider getInvalidImportanceValue
+     */
+    public function testThrowExceptionWithInvalidImpatanceValue($nImportance) {
+        $this->_oData->setBase($nImportance);
+    }
+
+     /**
+     * @expectedException CI\VowpalWabbit\Data\Set\Exception
+     * @expectedExceptionCode CI\VowpalWabbit\Data\Set\Exception::INVALID_TAG
+     * @dataProvider getInvalidTagValue
+      */
+    public function testThrowExceptionWithInvalidTagValue($sTag) {
+        $this->_oData->setTag($sTag);
+    }
+
+    public function testSetTagWithApostrophe() {
+        $sTag = "'Name";
+        $this->_oData->setTag($sTag);
+
+        $this->assertAttributeEquals($sTag, '_sTag', $this->_oData);
+    }
+
+    public function testSetTagWithoutApostrophe() {
+        $sTag = "Name";
+
+        $this->_oData->setTag($sTag);
+
+        $this->assertAttributeEquals("'" . $sTag, '_sTag', $this->_oData);
+    }
+
+    /**
+     *
+     * @expectedException CI\VowpalWabbit\Data\Set\Exception
+     * @expectedExceptionCode CI\VowpalWabbit\Data\Set\Exception::ERR_BUILD_DATASET
+     */
+    public function testThrowExceptionWithUnnecessaryInfo() {
+        $this->_oData->toString();
+    }
+
+    public function testBasicToString() {
+        $sExpected = '1 |namespace1 Price:3.5 Square:45.56 Total';
+        $aFeatures = $this->getFeaturesNamespaceOne();
+
+        $this->_oData->setLabel(1)
+                     ->addFeatures($aFeatures);
+
+        $this->assertEquals($sExpected, $this->_oData->toString());
+    }
+
+    public function testToStringWithImportance() {
+        $sExpected = '1 2 |namespace1 Price:3.5 Square:45.56 Total';
+
+        $this->_oData->setLabel(1)
+                     ->setImportance(2)
+                     ->addFeatures($this->getFeaturesNamespaceOne());
+        $this->assertEquals($sExpected, $this->_oData->toString());
+    }
+
+    public function testToStringWithBase() {
+        $sExpected = '1 2 0.5 |namespace1 Price:3.5 Square:45.56 Total';
+
+        $this->_oData->setLabel(1)
+                     ->setImportance(2)
+                     ->setBase(0.5)
+                     ->addFeatures($this->getFeaturesNamespaceOne());
+
+        $this->assertEquals($sExpected, $this->_oData->toString());
+    }
+
+    public function testToStringWithTag() {
+        $sExpected = "1 2 0.5 'my_tag |namespace1 Price:3.5 Square:45.56 Total";
+
+        $this->_oData->setLabel(1)
+                     ->setImportance(2)
+                     ->setBase(0.5)
+                     ->setTag('my_tag')
+                     ->addFeatures($this->getFeaturesNamespaceOne());
+
+        $this->assertEquals($sExpected, $this->_oData->toString());
+    }
+
+    public function testToStringWithMultipleNamespaces() {
+        $sExpected = '1 |namespace1 Price:3.5 Square:45.56 Total |namespace2 Foot:0.045 Weight:654.45';
+
+        $this->_oData->setLabel(1)
+                     ->addFeatures($this->getFeaturesNamespaceOne())
+                     ->addFeatures($this->getFeaturesNamespaceTwo());
+
+        $this->assertEquals($sExpected, $this->_oData->toString());
+    }
+
+    public function getFeaturesNamespaceOne() {
+        return array('namespace1' => 'Price:3.5 Square:45.56 Total');
+    }
+
+    public function getFeaturesNamespaceTwo() {
+          return array('namespace2' => 'Foot:0.045 Weight:654.45');
+    }
+
+    public function getInvalidFeatureValues() {
+        return array(
+            array(array(1, 'test')),
+            array(array("namespace", 1)),
+            array(array()),
+            array(array(1,1)),
+        );
+    }
+
+    public function getInvalidTagValue() {
+        return array(
+            array(""),
+            array(8),
+            array(false)
+        );
+    }
+
+    public function getInvalidImportanceValue() {
+        return array(
+            array("0.25"),
+            array(false),
+            array(true)
+        );
+    }
+
+    public function tearDown() {
+        $this->_oData = null;
+    }
+}

@@ -1,0 +1,328 @@
+html { 
+/*	background: url('/img/globetrotting/globetrotting_logo.png') repeat-y scroll center top #222;*/
+       background: #dcf0fb;
+}
+
+body {
+	margin: 0 auto;
+	padding: 0;
+	color:#333;
+	background-image:url("/img/globetrotting/globetrotting_logo.png");
+	background-position: center top;
+	background-repeat: no-repeat;
+	background-attachment:scroll;
+	font-family: Helvetica, Arial, sans-serif;
+	text-align:center;
+	empty-cells:show;
+}
+
+img {
+	border: none;
+}
+
+.text { 
+	display: table;
+	height: auto;
+	overflow: visible;
+}
+
+.text a { 
+	color: #3B5998;
+	font-size: 18px;
+	font-weight: 700;
+	text-decoration: none;
+	vertical-align: middle;
+}
+
+.text a:hover { 
+	color: #3B5998;
+	font-size: 18px;
+	font-weight: 700;
+	text-decoration: underline;
+	vertical-align: middle;
+}
+
+#links
+{
+	margin-left:30px;
+	height:30px;
+	font-size:18px;
+	color: #3B5998; 
+	text-shadow: 3px 3px 7px #111;
+}
+
+/* MAIN NAVIGATION */
+.main {
+	position: relative;
+        /*padding-top: 130px;*/
+}
+
+#content {
+	margin-left:auto;
+	margin-right: auto;
+	margin-top: 5px;
+}
+
+.bottom_content_spacer
+{
+	-moz-border-radius:0 0 28px 28px ; 
+	-webkit-border-radius:0 0 28px 28px ;
+	border-radius:0 0 28px 28px ;   
+	min-height: 5px;
+	behavior: url(/css/PIE.htc);
+	width: 100%;
+	background-color: #FFF;
+	margin-left: 0px;
+	margin-bottom: 10px;
+	float: left;
+}
+
+#paginate
+{ 
+	color: #3B5998;
+	font-weight: bold;
+	font-size: 20px;
+	padding-top: 10px;
+	padding-bottom: 15px;
+	background-color: #dcf0fb;
+}
+#paginate a
+{ 
+	color: #3B5998;
+	font-size: 20px;
+	font-weight:bold;
+	text-decoration: underline;
+}
+#footer
+{
+	width:100%;
+	height:auto;
+	background-color:#e2e2e2;
+	text-align:center;
+	margin-left: auto;
+	margin-right: auto;
+	float: left;
+	font-size: 12px;  
+}
+
+#footer a {
+	color: black;
+	font-size: 12px;
+}
+
+#footer a:hover {
+	color: #5e75a0;
+}
+
+#footer table td { 
+	padding: 10px;
+}
+
+.item { 
+        background: #fff;
+}
+
+#header { 
+	height: 145px;
+}
+
+
+/* Globetrotting new design */
+/* Overwrites: globetrotting/style.css */
+div[class*=container_]{background-color: transparent;}
+html{background:#fff;}
+body{color:#434343; background-image:url(/img/globetrotting/redesign_back.jpg);background-position:center top;background-repeat:repeat-x;background-attachment:scroll; font-family:"Trebuchet MS", Arial, Helvetica, sans-serif; text-align:center;empty-cells:show;margin:0 auto;padding:0;}
+#header{background:url(/img/globetrotting/redesign_header.jpg) no-repeat top left; height:123px; margin:0 auto; position:relative; width:960px; }
+#footer{width:100%;height:60px;background:#e2e2e2 url(/img/globetrotting/redesign_footer.jpg) repeat-x;text-align:center;margin:0 auto;font-size:12px;}
+#footer #logo{background:url(/img/globetrotting/redesign_footerlogo.jpg) no-repeat; height:50px; width:250px;}
+/* End Overwrites */
+/* New classes for redesign*/
+#header #logo{ background:url(/img/globetrotting/redesign_logo.png) no-repeat; border:0; display:block; margin:14px 0 0; height:56px; width:401px;}
+#header div#searchbox { height: 31px; width:227px; }
+#header div#searchbox form { background:url(/img/globetrotting/redesign_search.jpg) no-repeat; height: 31px; margin:24px 0 0 60px; padding:0; text-align: left; width: 227px; }
+#header div#searchbox #s { border:0; color: #7fb8e1; font-size: 14px; height: 18px; margin:5px 0 0 6px; width: 195px; }
+#header div#searchbox #searchsubmit { background:#fff url(/img/globetrotting/redesign_glass.jpg) no-repeat; border:0; cursor:pointer; height:15px; width:15px; text-indent:-5000px; }
+#header div#menu { margin:10px 0 0; padding:0; text-align:left; }
+#header div#menu ul { font-size:14px; height:16px; margin:0; padding:5px 0 0 0; }
+#header div#menu ul li{ height:16px; float:left; line-height:1em; list-style:none; margin:0; padding:0; border-right:1px dotted #afafaf; }
+#header div#menu ul li:last-child{ border:none;}
+#header a, #footer a { color:#434343; display:inline-block; height:14px;  margin:0 20px; text-decoration:none; }
+#header a:hover, #footer a:hover { color:#666;  }
+#header div#login { margin:10px 0 0; text-align:right; }
+#header div#login a{ display:inline; color:#328fd6; margin:0;}
+#header div#login a:hover { color:#0f6db5;}
+#paginate { background:transparent; font-size:16px; line-height:18px; }
+#paginate a { color:#0094d3; font-size:14px; font-weight:bold; text-decoration:none; margin:0; padding:0; }
+#paginate a:hover { color:#46b9ea; }
+#paginate span, #paginate div { display:inline-block; height:18px; margin:0 8px; line-height:18px; vertical-align:top;}
+#paginate span.btn { width:18px; height:18px; margin:0 2px; }
+#paginate span.next { background:url(/img/globetrotting/btn_next.jpg) no-repeat; }
+#paginate span.first { background:url(/img/globetrotting/btn_first.jpg) no-repeat; }
+#paginate span.previous { background:url(/img/globetrotting/btn_previous.jpg) no-repeat; }
+#paginate span.last { background:url(/img/globetrotting/btn_last.jpg) no-repeat; }
+#paginate span.separator { width:1px; border-left:1px dotted #b2b2b2; margin:0 7px; }
+#paginate span.current { color:#333; }
+#paginate div.buttons { margin:0 15px;}
+#footer #copyright { font-size:14px; margin-top:11px; text-align: right; line-height:1.3em;}
+#footer #copyright a { margin:0 10px; font-weight:bold; }
+#footer #copyright span.separator{ border-right:1px dotted #333; display:inline-block; height:14px; width:1px; }
+#footer .small { font-size:8px; }
+/* End New classes */
+
+/* signup */
+div.main #content form div.submit input{
+    background: url(/img/globetrotting/btnsignup.png) no-repeat;
+    border:none;
+    height: 69px;
+    margin-top:10px;
+    text-indent: -9999px;
+    width:282px;
+}
+div.main #content form div.submit input:hover {
+    background-position:0 -68px;
+}
+
+div.row { width:960px; margin:0 auto; }
+div.row #content { background: #FFF; margin:0 auto; padding: 0 10px 10px 10px; width: 942px; }
+
+.grid_12 .grid_3 { margin-right:5px; }
+div.row #content ul {
+    background:#fff;
+    -moz-border-radius: 10px; /* Firefox */
+    -webkit-border-radius: 10px; /* Safari, Chrome */
+    border-radius: 10px; /* CSS3 */
+}
+/* Eo signup */
+
+h3.topContent { display: none; }
+div.row #content ul, div.main  #content li { list-style: none;  }
+div.row #content .column { width:920px; }
+div.row #content .column  div#footer { border:0; background:none!important; }
+div.submit { padding-left:125px; text-align:left; }
+div.submit input:hover {
+    background-position:0 -68px;
+}
+#create_form ul li.last {
+    height: 7em!important;
+    padding-bottom:2em!important;
+
+}
+div.row #content ul {
+    background:#fff;
+    box-shadow:0 1px 3px #999999;
+    -moz-border-radius: 3px; /* Firefox */
+    -webkit-border-radius: 3px; /* Safari, Chrome */
+    border-radius:3px; /* CSS3 */
+}
+/* signup 2 part */
+#create_form {  position:relative;}
+#create_form ul { padding-top:20px; }
+#create_form .title {
+    width:95%;
+    margin:10px auto 10px;
+    padding:10px 0;
+    /*border-bottom:1px solid #ccc;*/
+}
+#create_form .title h2 {
+    background:url(/img/crowdignite/ci_fire_icon.png) no-repeat 0 5px;
+    color:#333;
+    display:block;
+    margin:0;
+    padding:0 0 0 25px;
+    font-size:27px;
+    letter-spacing: -0.05em;
+}
+#create_form .title p {
+    color:#666;
+    font-size:14px;
+    line-height: 1em;
+    margin:2px 0 10px 0;
+    padding-left:25px;
+    text-align:left;
+}
+#create_form div.control {
+    position:relative;
+    display:block;
+    float:left;
+    line-height:2em;
+    margin:0;
+    padding:0;
+}
+#create_form label.error {
+    background:#FFF2BF url(/img/crowdignite/icon_deny.png) no-repeat 5px 5px;
+    border:1px solid #e5d595;
+    color:#900;
+    display:block;
+    font-size:14px;
+    line-height:1.1em;
+    margin:0;
+    padding:6px 0 6px 29px;
+    position: absolute;
+    text-align:left;
+    top: 0;
+    left:280px;
+    width: 350px;
+    z-index: 100;
+}
+#create_form ul {
+    width: 100%;min-height:400px;
+}
+#create_form ul li {
+    width:95%;
+    margin:0 auto;
+}
+#create_form ul.form>li {
+    height:3em;
+    padding:1em 0 0.2em 0;
+}
+#create_form ul.form>li>label {
+    color:#333;
+    float:left;
+    line-height:2em;
+    margin:0;
+    padding:0 30px 0 0;
+    text-align:right;
+    width:120px;
+}
+#create_form ul.form li span.terms {
+    color:#333;
+    font-size:14px;
+    display: inline-block;
+    padding-left:8px;
+}
+#create_form ul.form li label.terms a { color:#333!important; text-decoration: underline; }
+#create_form ul li.alt {
+    background:#fff;
+}
+#create_form ul li.focus_line {
+    background:#fdf7df;
+}
+#create_form div.join_text {
+    position:absolute;
+    right:30px;
+    text-align:left;
+    top:110px;
+    width:380px;
+}
+#create_form div.join_text #img_what_is_ci {
+    background: url("/img/crowdignite/what_is_ci.png") no-repeat;
+    display: inline-block;
+    height: 205px;
+    margin:10px -10px 0 0;
+    width: 374px;
+}
+#create_form div.join_text h2 {
+    color:#E26832;
+    font-size: 25px;
+    letter-spacing:-0.03em;
+    padding:0;
+}
+#create_form div.join_text p {
+    color:#333;
+    font-size:14px;
+    width:90%;
+}
+#create_form div.join_text p a {
+    color:#E26832;
+    text-decoration:none;
+}

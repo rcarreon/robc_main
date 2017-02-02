@@ -1,0 +1,67 @@
+<style>
+#header {
+    height:48px; 
+    padding:0 0 4px 0;
+}
+#header .logo { 
+    display:block;
+    position:absolute;
+    top:-6px;
+    left:0px;
+}
+.wf-active #header .poweredby {
+    color:#888;
+    display:inline-block!important;
+    font-family:"Open Sans", Arial, sans-serif;
+    font-size:12px;
+    position:absolute;
+    left:145px;
+    letter-spacing: -0.01em;
+    top:15px;
+}
+.wf-active #header .poweredby span {
+    line-height: 25px;
+    float:left;
+}
+.wf-active #header .poweredby a {
+    background:url(/img/craveonline/ci_small_logo_pinterest.png) 0 bottom no-repeat;
+    color:transparent;
+    display: inline-block;    
+    height:21px;
+    margin:0 0 0 5px;
+    text-decoration: none;
+    width:60px;
+}
+.wf-active #header .poweredby a:hover {
+    background-position: 0 top;
+    text-decoration: underline;
+}
+#tabs { display:none;}
+#paginate { display:none; }
+#footer {
+    background: none repeat scroll 0 0 #666;
+    border-top: 1px solid #333333;
+    box-shadow: 0 -1px 5px #333; 
+    color: #000;
+    display:none;
+    width: 100%;
+}
+#footer a { color:#000; text-decoration:none;}
+#footer a { color:#000!important; text-decoration:underline;}
+#footer div.info div { color:#333; font-size:11px;  margin:10px 0 0!important; text-align:center!important; width: 100%;}
+#infscr-loading {
+    background:url(/img/crowdignite/pinterest_ajax_loader.gif) center center no-repeat;
+    bottom: -80px;
+    display:inline-block;
+    height:70px;
+    left:50%;
+    margin:20px 0;
+    position: absolute;
+    text-align: center;
+    width:32px;
+}
+#infscr-loading div,
+#infscr-loading img {
+    display: none;
+}
+</style>

@@ -1,0 +1,72 @@
+<?php
+
+namespace CI;
+
+
+class Formulas
+{
+    public static function getCtr($nImpressions, $nClicks, $bPercentage = false)
+    {
+        $nCtr =  self::getDivision($nClicks, $nImpressions);
+
+        if ($bPercentage) {
+            $nCtr = self::getPercentage($nCtr);
+        }
+
+        return $nCtr;
+    }
+
+    public static function getReturnRate($nOutgoing, $nIncoming, $bPercentage = false)
+    {
+        $nReturnRate = self::getDivision($nOutgoing, $nIncoming);
+
+        if ($bPercentage) {
+            $nReturnRate = self::getPercentage($nReturnRate);
+        }
+
+        return $nReturnRate;
+    }
+
+    public static function getTpm($nOutgoing, $nImpressions)
+    {
+        $nTPM = self::getDivision($nOutgoing, $nImpressions) * 1000;
+
+        return $nTPM;
+    }
+
+    public static function getGeneratedReturnRate($nTraffic, $nIncoming, $bPercentage = false)
+    {
+        $nGeneratedReturnRate = self::getDivision($nTraffic, $nIncoming);
+
+        if ($bPercentage) {
+            $nGeneratedReturnRate = self::getPercentage($nGeneratedReturnRate);
+        }
+
+        return $nGeneratedReturnRate;
+    }
+
+    public static function getDivision($nDividend, $nDivisior)
+    {
+        if (! is_numeric($nDivisior) || ! is_numeric($nDividend)) {
+            return 0;
+        }
+
+        if ($nDivisior == 0) {
+            return 0;
+        }
+
+        return $nDividend / $nDivisior;
+    }
+
+    public static function getTrafficDelta($nTraffic, $nOutgoing, $nIncoming)
+    {
+        $nGeneratedReturnRate = self::getGeneratedReturnRate($nTraffic, $nIncoming);
+        $nReturnRate          = self::getReturnRate($nOutgoing, $nIncoming);
+        return ($nGeneratedReturnRate - $nReturnRate) * $nIncoming;
+    }
+
+    public static function getPercentage($nValue)
+    {
+        return round($nValue * 100, 2);
+    }
+}

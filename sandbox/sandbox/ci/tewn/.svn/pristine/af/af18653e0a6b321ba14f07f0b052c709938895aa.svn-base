@@ -1,0 +1,403 @@
+<?php
+
+namespace CI\VowpalWabbit\Parser\LandingPage\Paid;
+use CI\VowpalWabbit\Parser\Common;
+use CI\VowpalWabbit\Parser\Builder;
+use CI\File\Exception;
+use CI\VowpalWabbit\Parser\LandingPage\Paid\Clicks;
+
+class Correlator extends Common
+{
+    const CONSOLIDATE_FILE       = 'vwLandingPagePaid.';
+    const TIME_RANGE             = 1800;
+    const EMPTY_TITLE            = 'empty_title';
+    const TOTAL_BUFFER_READ      = 65536;
+    const TOTAL_TMP_FILE_LINES   = 49999;
+    const EXPECTED_LINK_ELEMENTS = 40;
+
+    protected $oLandingPageClicks;
+    protected $sPrefixName    = 'lppaidimpression.log.';
+    protected $sServerPattern = "/^app[\d].*ci.ci./";
+    protected $aKeys = array(
+        'unix_time_stamp',
+        'user_id',
+        'refering_page_id',
+        'ip_address',
+        'landing_page_layout_id',
+        'paid_link_id_1',
+        'paid_link_id_2',
+        'paid_link_id_3',
+        'paid_link_id_4',
+        'paid_link_id_5',
+        'paid_link_id_6',
+        'paid_link_id_7',
+        'paid_link_id_8',
+        'paid_link_id_9',
+        'paid_link_id_10',
+        'paid_link_id_11',
+        'paid_link_id_12',
+        'paid_link_id_13',
+        'paid_link_id_14',
+        'paid_link_id_15',
+        'paid_link_id_16',
+        'paid_link_id_17',
+        'paid_link_id_18',
+        'paid_link_id_19',
+        'paid_link_id_20',
+        'paid_link_id_21',
+        'paid_link_id_22',
+        'paid_link_id_23',
+        'paid_link_id_24',
+        'paid_link_id_25',
+        'paid_link_id_26',
+        'paid_link_id_27',
+        'paid_link_id_28',
+        'paid_link_id_29',
+        'paid_link_id_30',
+        'paid_link_id_31',
+        'paid_link_id_32',
+        'paid_link_id_33',
+        'paid_link_id_34',
+        'paid_link_id_35',
+        'paid_link_id_36',
+        'paid_link_id_37',
+        'paid_link_id_38',
+        'paid_link_id_39',
+        'paid_link_id_40',
+        'paid_link_campaign_id_1',
+        'paid_link_campaign_id_2',
+        'paid_link_campaign_id_3',
+        'paid_link_campaign_id_4',
+        'paid_link_campaign_id_5',
+        'paid_link_campaign_id_6',
+        'paid_link_campaign_id_7',
+        'paid_link_campaign_id_8',
+        'paid_link_campaign_id_9',
+        'paid_link_campaign_id_10',
+        'paid_link_campaign_id_11',
+        'paid_link_campaign_id_12',
+        'paid_link_campaign_id_13',
+        'paid_link_campaign_id_14',
+        'paid_link_campaign_id_15',
+        'paid_link_campaign_id_16',
+        'paid_link_campaign_id_17',
+        'paid_link_campaign_id_18',
+        'paid_link_campaign_id_19',
+        'paid_link_campaign_id_20',
+        'paid_link_campaign_id_21',
+        'paid_link_campaign_id_22',
+        'paid_link_campaign_id_23',
+        'paid_link_campaign_id_24',
+        'paid_link_campaign_id_25',
+        'paid_link_campaign_id_26',
+        'paid_link_campaign_id_27',
+        'paid_link_campaign_id_28',
+        'paid_link_campaign_id_29',
+        'paid_link_campaign_id_30',
+        'paid_link_campaign_id_31',
+        'paid_link_campaign_id_32',
+        'paid_link_campaign_id_33',
+        'paid_link_campaign_id_34',
+        'paid_link_campaign_id_35',
+        'paid_link_campaign_id_36',
+        'paid_link_campaign_id_37',
+        'paid_link_campaign_id_38',
+        'paid_link_campaign_id_39',
+        'paid_link_campaign_id_40',
+        'utm_source_page',
+        'utm_medium_page',
+        'utm_campain_page',
+        'domain_bitfield',
+        'style_id',
+        'paid_link_title_1',
+        'paid_link_title_2',
+        'paid_link_title_3',
+        'paid_link_title_4',
+        'paid_link_title_5',
+        'paid_link_title_6',
+        'paid_link_title_7',
+        'paid_link_title_8',
+        'paid_link_title_9',
+        'paid_link_title_10',
+        'paid_link_title_11',
+        'paid_link_title_12',
+        'paid_link_title_13',
+        'paid_link_title_14',
+        'paid_link_title_15',
+        'paid_link_title_16',
+        'paid_link_title_17',
+        'paid_link_title_18',
+        'paid_link_title_19',
+        'paid_link_title_20',
+        'paid_link_title_21',
+        'paid_link_title_22',
+        'paid_link_title_23',
+        'paid_link_title_24',
+        'paid_link_title_25',
+        'paid_link_title_26',
+        'paid_link_title_27',
+        'paid_link_title_28',
+        'paid_link_title_29',
+        'paid_link_title_30',
+        'paid_link_title_31',
+        'paid_link_title_32',
+        'paid_link_title_33',
+        'paid_link_title_34',
+        'paid_link_title_35',
+        'paid_link_title_36',
+        'paid_link_title_37',
+        'paid_link_title_38',
+        'paid_link_title_39',
+        'paid_link_title_40',
+        'to_pub_id'
+    );
+
+    /**
+     * Constructor of the class
+     *
+     * @param string $sDate date we will be process
+     *
+     * @return  Consolidate object.
+     */
+    public function __construct($sDate)
+    {
+        $this->sDate = $sDate;
+        $this->sDateFile = $this->increment30Minutes($sDate);
+
+        if (empty($this->sErrorLogPath)) {
+            $this->sErrorLogPath = parent::LANDIN_PAGE_ERROR_LOG_PATH;
+        }
+
+        parent::__construct();
+    }
+
+    /**
+     * Getting the clicks object
+     *
+     * @return Clicks object
+     */
+    protected function getClickObject()
+    {
+        if (empty($this->oLandingPageClicks)) {
+            $this->oLandingPageClicks = Builder::getClick($this->sDate, Builder::PARSER_TYPE_LANDING_CPC);
+        }
+
+        return $this->oLandingPageClicks;
+    }
+
+    /**
+     * Getting the Clicks
+     *
+     * @return array with tha data of the Clicks.
+     */
+    protected function getClicks()
+    {
+        $aReturn = array();
+
+        try {
+            $oLandingPageClicks = $this->getClickObject();
+            $aReturn = $oLandingPageClicks->readLog();
+        } catch(Exception $oFileNotFoundException) {
+            $oDate = new \CI\Date();
+            $oLogger = $this->getLogger(self::TYPE_LOGGER_ERROR);
+            $oLogger->log($oDate->now() . ' ' .__METHOD__ . ' We don\'t found Clicks ' . $oFileNotFoundException);
+        }
+
+        return $aReturn;
+    }
+
+    /**
+     * Process the log
+     *
+     * @param integer $nLimit number of lines
+     *
+     * @return boolean TRUE if everithing did correct.
+     * @throws Exception when the file can't be read
+     */
+    public function process($nLimit = null)
+    {
+        $bReturn = false;
+        $aPhysicalFiles = $this->getAllLogs($this->sDateFile);
+        $nTotalElementsExpected = count($this->aKeys);
+
+        $aLandingPageClicks = $this->getClicks();
+
+        foreach ($aPhysicalFiles as $sFilePath) {
+            $oHandle = @fopen($sFilePath, "r");
+
+            if (false !== $oHandle) {
+                $oLine = null;
+                $nTotal = 0;
+
+                while (!feof($oHandle)) {
+                    $sLine = stream_get_line($oHandle, self::TOTAL_BUFFER_READ, PHP_EOL);
+
+                    if (!empty($sLine)) {
+                        $aLine = explode(',', $sLine);
+                        $nTotalLine = count($aLine);
+
+                        if ($nTotalLine > $nTotalElementsExpected) {
+                            $oLogger = $this->getLogger(self::TYPE_LOGGER_FAILED);
+                            $oLogger->log($sLine);
+                            continue;
+                        }
+
+                        $aLine = $this->_cutOrFillData($aLine);
+
+                        foreach ($aLine as $key => $value) {
+                            $value = $this->sanitaze($value);
+                            $aLine[$key] =$value;
+                        }
+
+                        $oLine = array_combine($this->aKeys, $aLine);
+                        $oLine = (object) $oLine;
+                        $sWasClicked = 0;
+
+                        if (!$this->isInTimeFrame($oLine->unix_time_stamp, self::TIME_RANGE)) {
+                            $oLogger = $this->getLogger(self::TYPE_LOGGER_FAILED);
+                            $oLogger->log($sLine);
+                            continue;
+                        }
+
+                        $nTotalElements = 40;
+
+                        for ($nPos = 1;$nPos <= $nTotalElements; $nPos++) {
+
+                            $oLine->link_id = $oLine->{'paid_link_id_' . $nPos};
+                            $sKeyClick = $oLine->user_id . '-' . $oLine->link_id;
+
+                            if (isset($aLandingPageClicks[$sKeyClick])) {
+                                    $sWasClicked = 1;
+                            }
+
+                            $oLine->was_clicked = $sWasClicked;
+
+                            if (empty($oLine->{'paid_link_title_' . $nPos})) {
+                                $oLine->link_title = self::EMPTY_TITLE;
+                            } else {
+                                $oLine->link_title = $oLine->{'paid_link_title_' . $nPos};
+                            }
+
+                            $this->sentToFile($oLine);
+                            $sWasClicked = 0;
+                        }
+
+                        $nTotal++;
+                        $bReturn = true;
+
+                        if (null !== $nLimit && $nTotal >= $nLimit) {
+                            break;
+                        }
+                    }
+                }
+
+                $bBeforeFinish = true;
+                $this->sentToFile(null, $bBeforeFinish);
+                fclose($oHandle);
+            }
+        }
+
+
+        if (!$bReturn) {
+            $print = print_r($aPhysicalFiles, true);
+            throw new Exception(Exception::FILE_NOT_FOUND, $print);
+        } else {
+            $this->cleanUp();
+        }
+        return $bReturn;
+    }
+
+    protected function cleanUp()
+    {
+        $this->moveDoneFiles($this->sDateFile);
+        $oLandingPageClicks = $this->getClickObject();
+        $oLandingPageClicks->cleanUp();
+    }
+
+    /**
+     * Send one line of the consolidation info to a Vowpal wabbit file.
+     *
+     * @param stdClass $oLine with the consolidation info from widgets and clicks
+     * @param boolean $bSendAllTheBuffer true if you will be send all the data on the buffer
+     *
+     * @return void.
+     */
+    protected function sentToFile($oLine, $bSendAllTheBuffer = false)
+    {
+        if (!$bSendAllTheBuffer) {
+            $sLine = $this->_getVWStringFormat($oLine) . "\n";
+            $this->_aFileBuffer[] = $sLine;
+        }
+
+        if (isset($this->_aFileBuffer[self::TOTAL_TMP_FILE_LINES]) || $bSendAllTheBuffer) {
+
+            $sPhysicalFile = $this->_getConsolidateFileName();
+            file_put_contents($sPhysicalFile, $this->_aFileBuffer, FILE_APPEND);
+            unset($this->_aFileBuffer);
+        }
+
+    }
+
+    private function _getVWStringFormat($oLine)
+    {
+        $sReturn ='';
+        $sPreLine = "%s " .
+            "|a_referring_site pub_id_%s " .
+            "|b_impression_to page_id_%s pub_id_%s ".
+            "|c_title_to %s " ;
+
+        $sReturn = sprintf(
+            $sPreLine,
+            $oLine->was_clicked,
+            $oLine->refering_page_id,
+            $oLine->link_id,
+            $oLine->to_pub_id,
+            $oLine->link_title
+        );
+
+        return $sReturn;
+    }
+
+    /**
+     * Get the file name  and path  of the consolidate file.
+     *
+     * @return string all the path and file.
+     */
+    private function _getConsolidateFileName()
+    {
+        return $this->sPath. '/' . self::CONSOLIDATE_FILE . $this->sDate;
+    }
+
+    /**
+     * Data to be cut or fill respect of the size of $this->aKeys
+     *
+     * @param array $aData to be cut or Fill
+     *
+     * @return array
+     */
+    private function _cutOrFillData(array $aData)
+    {
+        $nTotalItems = count($this->aKeys);
+        $nTotalData = count($aData);
+
+        if ($nTotalItems < $nTotalData) {
+            $aData = array_slice($aData, 0, $nTotalItems);
+        } else if ($nTotalData < $nTotalItems) {
+            $nMissing = $nTotalItems - $nTotalData;
+            $aTemp = array_fill(0, $nMissing, ' ');
+            $aData  = array_merge($aData, $aTemp);
+        }
+
+        return $aData;
+    }
+
+    private function _fillDateInfo($oLine)
+    {
+        if (empty($oLine->fillDate)) {
+            $oDateFormat = new \CI\Date\Format();
+            $oLine->fillDate = $oDateFormat->format($oLine->unix_time_stamp, 'G,D,n,j');
+        }
+
+        return $oLine;
+    }
+}

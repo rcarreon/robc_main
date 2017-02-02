@@ -1,0 +1,26 @@
+$TTL 86400
+sanmarcossweeps.com.	IN      SOA     sanmarcossweeps.com. root.sanmarcossweeps.com. (
+                        2014060900	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+sanmarcossweeps.com.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+sanmarcossweeps.com.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+sanmarcossweeps.com.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+sanmarcossweeps.com.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+sanmarcossweeps.com.     IN      MX      10      cluster9.us.messagelabs.com.
+sanmarcossweeps.com.     IN      MX      20      cluster9a.us.messagelabs.com.
+
+
+
+
+www.sanmarcossweeps.com.                 IN      CNAME       cdn.campaigns.craveonline.com.
+staging.sanmarcossweeps.com.             IN      CNAME       staging.campaigns.craveonline.com.
+demo.sanmarcossweeps.com.                IN      CNAME       cdn.campaigns.craveonline.com.
+dev.sanmarcossweeps.com.                 IN      CNAME       app1v-dh.si.dev.lax.gnmedia.net.

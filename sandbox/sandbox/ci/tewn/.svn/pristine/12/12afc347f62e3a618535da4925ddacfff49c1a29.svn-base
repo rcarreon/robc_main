@@ -1,0 +1,53 @@
+<h4>Page search for: "<? echo $term; ?>"</h4>&nbsp;<a href="#" class="button" id="collapse_all">Collapse Results</a>
+<?
+    if (false === empty($pages)) {
+        echo '<table class="tablesorter" id="page_search"><thead>';
+        echo '<th>&nbsp;</th>';
+        echo '<th>Image</th>';
+        echo '<th>Page</th>';
+        echo '<th>Website</th>';
+        echo '<th>Hub</th>';
+        echo '<th>Category</th>';
+        echo '<th class="align_center">Actions</th>';
+        echo '</thead><tbody>';
+        $c = 0;
+        $image_assets = new \CI\Asset\Image();
+
+        foreach ($pages as $page) {
+            if (empty($page['Page']['image'])) {
+                $image_url = '/img/crowdignite/page_image_not_found.jpg';
+            } else {
+                $image_url = $image_assets->getUrl(
+                    array(
+                        'page_id' => $page['Page']['id'],
+                        'type' => \CI\Asset\Image::URL_RELATIVE,
+                        'image' => $page['Page']['image']
+                    )
+                );
+            }
+
+            $display = $page['Page']['title'];
+            $alt = "NormRow";
+            if($c%2) $alt = "AltRow";
+            echo '<tr class="'.$alt.'">';
+            echo '<td class="align_center"><a class="collapse_line" href="#">Collapse</a></td>';
+            echo '<td class="image">'.
+                '<a href="'."/pages/moderate/".$page['Page']['website_id']."/".$page['Page']['id'].'"><img width="100" src="' . $image_url . '"/></a>'.
+                '</td>';
+
+            echo '<td class="page_title"><span>'.$html->link($display, "/pages/moderate/".$page['Page']['website_id']."/".$page['Page']['id'], array('class' => 'title', 'title' => $page['Page']['title_url'])).'</span>';
+            echo '<span class="url"><a target="_blank" href="'.$page['Page']['url'].'">'.$page['Page']['url'].'</a></span>';
+            echo '<span class="description">'.$page['Page']['description'].'</span>';
+            echo '</td>';
+            echo '<td>'. "<a class='' title='Edit Website' href='/management/website/".$page['Page']['website_id']." '>" . $page['websites']['name']. '</td>';
+            echo '<td>'. $convert->domain_name($page['websites']['domain_primary']). '</td>';
+            echo '<td>'. $convert->category($page['websites']['category']). '</td>';
+            echo "<td class='align_center'><a class='info_icon icon_edit' title='Edit Page' href='/pages/moderate/".$page['Page']['website_id']." '>Edit Page</a>";
+            echo "<a class='info_icon icon_page_world' title='Edit Website' href='/management/website/".$page['Page']['website_id']." '>Edit Website</a></td>";
+            echo '</tr>';
+            $c++;
+        }
+        echo '</tbody>';
+        echo '</table>';
+    }
+?>

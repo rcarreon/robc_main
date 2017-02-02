@@ -1,0 +1,61 @@
+<?php
+App::import('Component', 'Ti');
+
+class ListWebsitesComponent extends TiComponent
+{
+    public    $components    = array('Dictionary');
+    public    $helpers       = array();
+    protected $domain_names  = null;
+    protected $website_model = null;
+
+    protected function init()
+    {
+        $this->view          = 'ti/list_websites';
+        $this->website_model = ClassRegistry::init('Website');
+        $this->domain_names  = $this->Dictionary->get_dictionary(DictionaryComponent::TYPE_DOMAIN);
+        $this->domain_names  = new CI\ArrayManipulator($this->domain_names);
+    }
+
+    protected function process()
+    {
+        $conditions = array(
+            'visible' => 1,
+            'status'  => $this->options->get('status', array(WEBSITE_STATUS_ACTIVE)),
+        );
+
+        $domains = $this->options->get('domains', array());
+        if (is_array($domains) && !empty($domains)) {
+            $conditions['domain_primary'] = $domains;
+        }
+
+        $websites = $this->website_model->find(
+            'all',
+            array(
+                'fields' => array('id', 'name', 'domain_primary'),
+                'conditions' => $conditions,
+            )
+        );
+
+        $website_list = array();
+        foreach ($websites as $website) {
+            $website = new CI\ArrayManipulator($website['Website']);
+            $website->setValidationType(CI\ArrayManipulator::ARRAY_EMPTY);
+            $domain_id = $website->get('domain_primary', -1, CI\ArrayManipulator::ARRAY_ISSET);
+            $domain  = $this->domain_names->get($domain_id, 'Unknown Domain ('. $domain_id .')');
+            $website_list[$domain][$website->get('id')] = $website->get(
+                'name', 'Empty Name ('. $website->get('id') .')'
+            );
+        }
+
+        $multiple = $this->options->get('multiple', false);
+
+        return array(
+            'list'    => $website_list,
+            'options' => array(
+                'name'        => $this->name,
+                'website_ids' => $this->options->get('website_ids', array()),
+                'multiple'    => $multiple === false ? '' : ' multiple',
+            )
+        );
+    }
+}

@@ -1,0 +1,165 @@
+<?php
+/**
+ * Class used to create a socket to get/send information to another
+ * host
+ *
+ * @category CI
+ * @package  CI_Socket
+ * @author   Jorge Rodriguez <jorge.rodriguez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+namespace CI;
+
+use CI\Socket\Exception as SocketException;
+
+class Socket
+{
+    const TYPE_TCP = SOCK_STREAM;
+    const TYPE_UDP = SOCK_DGRAM;
+
+    private $_oResource;
+    private $_sHost;
+    private $_nPort;
+    private $_nType;
+
+    /**
+     * Create the instance of the class
+     *
+     * @param string  $sHost The host name or ip address where we are
+     *                       going to connect
+     * @param integer $nPort The port number
+     * @param integer $nType Type of socket that we want to create.
+     * @throws CI\Socket\Exception When one of the parameters are invalid.
+     *
+     * @return void
+     */
+    public function __construct($sHost, $nPort, $nType)
+    {
+        if (false == is_string($sHost) || empty($sHost)) {
+            throw new SocketException(SocketException::INVALID_HOST, $sHost);
+        }
+
+        if (false == is_int($nPort) || $nPort < 1 ) {
+            throw new SocketException(SocketException::INVALID_PORT, (string) $nPort);
+        }
+
+        if (self::TYPE_TCP !== $nType && self::TYPE_UDP !== $nType) {
+            throw new SocketException(SocketException::INVALID_TYPE, $nType);
+        }
+
+        $this->_sHost = $sHost;
+        $this->_nPort = (int) $nPort;
+        $this->_nType = $nType;
+    }
+
+    protected function create()
+    {
+        $nProtocol = (self::TYPE_TCP === $this->_nType) ? SOL_TCP : SOL_UDP;
+        $this->_oResource = socket_create(AF_INET, $this->_nType, $nProtocol);
+
+        if (false === $this->_oResource) {
+            throw new SocketException(SocketException::ERR_CREATE, __METHOD__ . ' ' . $this->_getErrorMessage());
+        }
+    }
+
+    public function close()
+    {
+        if ($this->isOpen()) {
+            socket_close($this->_oResource);
+            return true;
+        }
+
+        return false;
+    }
+
+    public function connect()
+    {
+        $bConnect = false;
+
+        if (false === $this->isOpen()) {
+            $this->create();
+
+            $bConnect = @socket_connect($this->_oResource, $this->_sHost, $this->_nPort);
+
+            if (false === $bConnect) {
+                $sMessage = __METHOD__ . ' ' . $this->_getErrorMessage();
+                $this->close();
+                throw new SocketException(SocketException::ERR_CONNECT, $sMessage);
+            }
+
+        }
+
+        return $bConnect;
+    }
+
+    /**
+     * Writes to the socket given a $sRequest
+     *
+     * @param string $sRequest
+     *
+     * @return integer Return the number of bytes successfully written
+     * on the socket.
+     */
+    public function write($sRequest)
+    {
+        $nLength = strlen($sRequest);
+
+        if (false === is_string($sRequest) || $nLength < 1 ) {
+            return 0;
+        }
+
+        $mWrite = @socket_write($this->_oResource, $sRequest, $nLength);
+
+        if (false === $mWrite || is_null($mWrite)) {
+            $sMessage = __METHOD__ . ' ' . $this->_getErrorMessage();
+            $this->close();
+            throw new SocketException(SocketException::ERR_WRITE, $sMessage);
+        }
+
+        return $mWrite;
+    }
+
+    /**
+     * Reads from the socket.
+     *
+     * @param integer $nLength The maximun number of bytes that we are going
+     * to try to read.
+     *
+     * @retun string The data string or false on failure
+     */
+    public function read($nLength = 2048)
+    {
+        $mResponse = @socket_read($this->_oResource, $nLength);
+
+        if (false === $mResponse || is_null($mResponse)) {
+            $sMessage = __METHOD__ . ' '. $this->_getErrorMessage();
+            $this->close();
+            throw new SocketException(SocketException::ERR_READ, $sMessage);
+        }
+
+        return $mResponse;
+    }
+
+    public function isOpen()
+    {
+        return is_resource($this->_oResource);
+    }
+
+    private function _getErrorMessage()
+    {
+        $nCode    = socket_last_error($this->_oResource);
+        $sMessage = 'code[' . $nCode . '] ' . socket_strerror($nCode);
+        $sMessage .= ' Host=' . $this->_sHost . ' Port=' . $this->_nPort;;
+
+        socket_clear_error($this->_oResource);
+
+        return $sMessage;
+    }
+
+    public function __destruct()
+    {
+        $this->close();
+    }
+}

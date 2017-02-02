@@ -1,0 +1,243 @@
+<?php
+include_once (ROOT . DS . APP_DIR . DS . "global_defines.php");
+
+abstract class EngineController extends AppController {
+
+	abstract protected function timer_start();
+	abstract protected function timer_stop();
+	abstract protected function batch_data($batch, $data);
+	abstract protected function save_item($identifier, $item);
+
+	function daemon($script, $extra = null) {
+		set_time_limit(0);
+		ini_set('memory_limit', '1024M');
+
+		App::import('Component', 'Watchdog');
+		$watchdog =& new WatchdogComponent();
+
+		$key = $this->params['controller'] . '_' . $script . ($extra == null ? '' : '_' . $extra);
+		if ($watchdog->is_alive($key)) {
+			echo 'The script ', $key, ' is still alive.', PHP_EOL;
+			exit;
+		}
+
+		for ($i = 0; $i < 1000; $i++) {
+			$watchdog->heartbeat($key);
+			if ($extra == null) {
+				$pause = call_user_func(array($this, $script));
+			} else {
+				$pause = call_user_func(array($this, $script), $extra);
+			}
+			if ($pause) {
+				sleep($pause);
+			} else {
+				sleep(2);
+			}
+		}
+		// we stop the watchdog for this daemon run
+		$watchdog->stop($key);
+	}
+
+	function process_queues($queue_name, $timers = 1, $watchdog_key = '', $batch_size = 200000, $batch_pop = 50) {
+		$this->debug = 1;
+		Configure::write('debug', 1);
+
+		if ($timers) {
+			$this->timer_start();
+		}
+
+		if (!empty($watchdog_key)) {
+			App::import('Component', 'Watchdog');
+			$watchdog =& new WatchdogComponent();
+		}
+
+		if (Configure::read('queue_kestrel')) {
+			App::import('Component', 'QueueKestrel');
+			$this->Queue =& new QueueKestrelComponent($queue_name);
+		} else {
+			App::import('Component', 'Queue');
+			$this->Queue =& new QueueComponent($queue_name);
+		}
+
+		$all_done = 0;
+
+		do {
+			if (!empty($watchdog_key)) {
+				$watchdog->heartbeat($watchdog_key);
+			}
+			$rc = $this->Queue->lock();
+			if ($rc) {
+				// Lock is taken. Try again later
+				echo "Lock taken\n";
+				exit();
+			}
+			$batch = array();
+			$count = 0;
+			// Track time
+			$time = time();
+			do {
+				$datas = $this->Queue->pop($batch_pop);
+
+				if (!$datas) {
+					$all_done = 1;
+					break;
+				}
+
+				foreach ($datas as $data) {
+					if (!empty($watchdog_key)) {
+						$watchdog->heartbeat($watchdog_key);
+					}
+					$batch = $this->batch_data($batch, $data);
+					$count++;
+
+					if (($count % ($batch_size/100)) == 0) {
+						$tmp_time = time();
+						$this->debug("Pop: ".(($count/$batch_size) * 100)."% - ".($tmp_time - $time)." seconds\n");
+						$time = $tmp_time;
+					}
+					if ($count >= $batch_size) {
+						break 2;
+					}
+				}
+				$this->Queue->lock(1);
+			} while ($datas);
+			$this->Queue->unlock();
+
+			$this->debug("Popped: ".$count."\n");
+
+			$displays = array();
+
+			$loops = 0;
+			foreach($batch as $identifier => $item) {
+				plat_assert($count);
+
+				$this->save_item($identifier, $item);
+
+				if (($loops++ % ($batch_size/100)) == 0) {
+				    $this->debug("Save: ".(($loops/$batch_size) * 100)."%\n");;
+				}
+			}
+
+			$this->debug("Saved ".count($batch)." items\n");
+
+		} while ($all_done == 0);
+
+		if ($timers) {
+			$this->timer_stop();
+		}
+
+		return $all_done;
+	}
+
+	function accounts_priority($domain_bit) {
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+		$domain_id = $oHub->bitToId($domain_bit);
+
+		$accounts = $this->accounts_get($domain_bit);
+		$account_count = count($accounts);
+
+		if ($account_count == 0) {
+			$priority = array();
+		}
+
+		$count = 0;
+
+		foreach ($accounts as $account) {
+			$modifier = $this->get_weight_modifier($account, $count, $account_count, $domain_id);
+
+			$priority[$account['Account']['id']] = $modifier;
+
+			$count++;
+		}
+
+		arsort($priority);
+
+		return $priority;
+	}
+
+	/*
+	 * Gets the accounts with selected domain in cross domain order by priority
+	 */
+	function accounts_get($domain_bit, $website = 0) {
+		$accounts_by_credits = $this->Account->top($domain_bit);
+        return $this->sort_accounts_priority($accounts_by_credits, $website);
+	}
+
+    /*
+     * Gets the accounts with selected primary domain in priority order
+     */
+    function accounts_get_by_primary_domain($domain_id, $website = 0) {
+        $accounts_by_credits = $this->Account->top_by_primary($domain_id);
+        return $this->sort_accounts_priority($accounts_by_credits, $website);
+    }
+
+    /*
+     * Sort accounts by priority order by credits and incoming
+     */
+    public function sort_accounts_priority(array $accounts_by_credits, $website = 0) {
+        // Get the ordered list of accounts by credits first
+        // Split off the accounts that have low credits to be
+        // ordered in a different way
+        global $HistoryCredits;
+
+        $credit_cutoff        = $this->Setting->get('ACCOUNT_CREDITS_CUTOFF');
+        $yesterday            = $this->Date->yesterday();
+        $accounts_out         = array();
+        $accounts_by_incoming = array();
+
+        foreach ($accounts_by_credits as $account) {
+            $skip = $this->account_skip($account, $website);
+            if ($skip) {
+                continue;
+            }
+
+            if ($account['Account']['credits'] > $credit_cutoff) {
+                array_push($accounts_out, $account);
+            } else {
+                array_push($accounts_by_incoming, $account);
+            }
+        }
+
+        // Initialize stats day cache
+        $accounts_ids = array();
+        foreach ($accounts_by_incoming as $account) {
+            $accounts_ids[] = $account['Account']['id'];
+        }
+
+        // Order the low credit list of accounts by incoming
+        // sent yesterday
+        $i = 0;
+
+        foreach ($accounts_by_incoming as $account) {
+            $stats = $HistoryCredits->stats_day($account['Account']['id'], $yesterday);
+            $accounts_by_incoming[$i++]['incoming'] = $stats['incoming'];
+        }
+
+        uasort($accounts_by_incoming, "incoming_rate");
+
+        foreach($accounts_by_incoming as $account) {
+            if ($account['incoming'] > 0 || (isset($account['Account']['featured']) && $account['Account']['featured'])) {
+                unset($account['incoming']);
+                array_push($accounts_out, $account);
+            }
+        }
+
+        return $accounts_out;
+    }
+
+	function debug($string) {
+		if ($this->debug) {
+			echo $string;
+			flush();
+		}
+	}
+}
+
+function incoming_rate($a, $b) {
+	if ($a['incoming'] == $b['incoming']) {
+		return 0;
+	}
+	return ($a['incoming'] > $b['incoming']) ? -1 : 1;
+}
+
+?>

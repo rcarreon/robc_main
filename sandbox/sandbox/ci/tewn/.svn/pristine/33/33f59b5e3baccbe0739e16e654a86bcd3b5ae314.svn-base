@@ -1,0 +1,13 @@
+<?php
+namespace CI\VowpalWabbit;
+
+class Exception extends \CI\Exception
+{
+    const ERROR_WRITE   = 1;
+    const ERROR_CONNECT = 2;
+
+    protected $aErrors = array(
+        self::ERROR_WRITE   => "Couldn't write everyting to VowpalWabbit (%s bytes writed)",
+        self::ERROR_CONNECT => "Connection Error: %s",
+    );
+}

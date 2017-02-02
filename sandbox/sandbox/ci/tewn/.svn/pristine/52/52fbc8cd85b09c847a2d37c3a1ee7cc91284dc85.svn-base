@@ -1,0 +1,9 @@
+<html>
+<head></head>
+<body>
+<center>
+        <h1>Today's Best of the Web</h1>
+	<script src='http://<?=WIDGET_URL?>/widgets/<?=$widget_id?>' type='text/javascript'></script>
+</center>
+</body>
+</html>

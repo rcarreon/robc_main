@@ -1,0 +1,128 @@
+<?php
+
+namespace Test\VowpalWabbit\Parser\LandingPage\Paid;
+use CI\VowpalWabbit\Parser\LandingPage\Paid\Correlator;
+use CI\VowpalWabbit\Parser\LandingPage\Paid\Clicks;
+
+/**
+ * @group VowpalWabbit
+ * @group Correlator
+ * @group LandingPage
+ */
+
+class CorrelatorTest extends \PHPUnit_Framework_TestCase
+{
+    protected $oCorrelator;
+    /**
+     * Initializing the test
+     *
+     * @return void.
+     */
+    public function setUp()
+    {
+        $this->oCorrelator = new CorrelatorMock('20131030_05:00');
+    }
+
+    /**
+     * Testing the lecture of one line of the  Landing Page log
+     *
+     * @return void
+     */
+    public function testRowsOfoneItemFromLog()
+    {
+        $bExpected = true;
+        $nLimit = 1;
+        $oResult = $this->oCorrelator->process($nLimit);
+
+        $this->assertEquals($bExpected, $oResult, 'we are no getting the expected object ');
+    }
+
+    /**
+     * Testing the lecture of one line of the  Landing Page log
+     *
+     * @return void
+     */
+    public function testLoadAllTheFile()
+    {
+        $bExpected = true;
+        $nLimit = 10000;
+        $oResult = $this->oCorrelator->process($nLimit);
+
+        $this->assertEquals($bExpected, $oResult, 'we are no getting the expected object ');
+    }
+
+    /**
+     * Testing the Sanitation of our strings
+     *
+     * @return void
+     */
+    public function testSanitaze()
+    {
+        $sExpected = '0';
+        $sBad = '0    ';
+        $sReturn = $this->oCorrelator->sanitaze($sBad);
+
+        $this->assertEquals($sExpected, $sReturn, 'did not sanitaze correctly');
+    }
+
+    /**
+     * Testing the exception
+     *
+     * @expectedException CI\File\Exception
+     *
+     * @return void.
+     */
+    public function testFileException()
+    {
+        $this->oCorrelator = new CorrelatorMock('20000816_12:00');
+        $this->oCorrelator->process();
+    }
+}
+
+/**
+ * Mockup of the class Correlator to rewrite some variables.
+ */
+class CorrelatorMock extends Correlator
+{
+    /**
+     * Rewrite the __construct to rewrite tha path to read the logs
+     *
+     * @param $sDate date to be proccess
+     *
+     * @return void.
+     */
+    public function __construct($sDate)
+    {
+        $this->sMountLogs = LIBRARY_DIR . '../tests/resources/mnt/crowdignite/';
+        parent::__construct($sDate);
+    }
+
+    /**
+     * Getting the clicks object
+     *
+     * @return Clicks object
+     */
+    protected function getClickObject()
+    {
+        return new ClicksMock($this->sDate);
+    }
+
+    public function isInTimeFrame($nFirst, $nSecond){
+        return true;
+    }
+
+    public function moveDoneFiles($bVar = false)
+    {
+        //rewrite this function, to dont move any File
+    }
+
+    protected function getClicks()
+    {
+        return array();
+    }
+
+   protected function sentToFile($oLine, $bSendAllTheBuffer = false)
+    {
+        //rewrite this function
+    }
+}

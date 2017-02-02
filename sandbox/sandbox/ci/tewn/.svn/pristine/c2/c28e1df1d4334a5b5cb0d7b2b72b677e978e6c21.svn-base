@@ -1,0 +1,1 @@
+<script type="text/javascript" src="http://<?=CDN_URL?>/js/social_networks.js" async="true"></script>

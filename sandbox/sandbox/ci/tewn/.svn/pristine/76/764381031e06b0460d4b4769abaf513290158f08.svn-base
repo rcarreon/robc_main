@@ -1,0 +1,62 @@
+<?php
+class LandingPageControllerTestCase extends CakeTestCase {
+	
+	var $fixtures = array(
+		'app.landing_page_instance','app.page','app.website','app.widget','app.account',
+		'app.widget_analytic','app.log','app.contextual_engine','app.landing_page_style',
+		'app.landing_page_analytic', 'app.page_tag'
+	);
+
+	function startTest() {
+		App::import('Controller', 'LandingPage');
+		$this->LandingPage = new LandingPageController();
+		$this->LandingPage->constructClasses();
+		$this->LandingPage->autoRender = false;
+	}
+
+	function endTest() {
+		unset($this->LandingPage);
+		ClassRegistry::flush();
+	}
+
+	function testIndex() {
+
+	}
+
+	function testLoadImageHelper() {
+
+	}
+
+	function testCropPageImage() {
+
+	}
+
+	function testCropAllImage() {
+
+	}
+
+	function testCreateJsonPage() {
+
+	}
+
+	function testCreateCanonicalPage() {
+
+	}
+
+	function testHomepage() {
+
+	}
+
+	function testWithin() {
+
+	}
+
+	function testSpider() {
+
+	}
+
+	function testRss() {
+
+	}
+
+}

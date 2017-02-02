@@ -1,0 +1,445 @@
+<?php
+/**
+ * Test hub.
+ *
+ * PHP Version 5.3
+ *
+ * @category Test
+ * @package  Test_Test
+ * @author   Jorge Cortes <jorge.cortes@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+namespace Test\Hub;
+use CI\Hub;
+
+/**
+ * Test hub.
+ *
+ * PHP Version 5.3
+ *
+ * @category Test
+ * @package  Test_Test
+ * @author   Jorge Cortes <jorge.cortes@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+class HubTest extends \PHPUnit_Framework_TestCase
+{
+    private $nBitfield = 2177;
+    private $nBit      = 8;
+
+    private $nHubOne = 0;
+    private $nHubTwo = 2;
+    private $nHubThr = 3;
+
+    private $aDomainIds    = array();
+    private $aDomainsArray = array();
+
+    private $oHub;
+
+    public function setUp()
+    {
+        $this->oHub = new Hub(new MyTestDataSource);
+
+        $this->aDomainIds = array(
+            $this->nHubOne,
+            $this->nHubTwo,
+            $this->nHubThr,
+        );
+
+        $this->aDomainsArray = array (
+            'domain_hub1'  => '1',
+            'domain_hub2'  => '4',
+            'domain_hub3'  => '8',
+            'domain_hub4'  => '16',
+            'domain_hub5'  => '32',
+            'domain_hub6'  => '64',
+            'domain_hub7'  => '128',
+            'domain_hub8'  => '256',
+            'domain_hub9'  => '512',
+            'domain_hub10' => '1024',
+            'domain_hub11' => '2048',
+        );
+    }
+
+    function testGetAllBitsWithAll()
+    {
+        $sExpected = "[1,4,8,16,32,64,128,256,512,1024,2048]";
+        $aBits = $this->oHub->getAllBits(Hub::DOMAIN_ID_ALL);
+        $sResult = json_encode($aBits);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testGetAllBitsWithDomain()
+    {
+        $sExpected = "[1,128,2048]";
+        $aBits = $this->oHub->getAllBits($this->nBitfield);
+        $sResult = json_encode($aBits);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testGetAllBitsWithNullValue()
+    {
+        $sExpected = "[]";
+        $aBits = $this->oHub->getAllBits(null);
+        $sResult = json_encode($aBits);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testGetAllBitsWithEmptyValue()
+    {
+        $sExpected = "[]";
+        $aBits = $this->oHub->getAllBits('');
+        $sResult = json_encode($aBits);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testGetAllActiveBits()
+    {
+        $sExpected = "[1,4,8,16,32,64,128,2048]";
+        $aActiveBits = $this->oHub->getAllActiveBits();
+        $sResult = json_encode($aActiveBits);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testNameWithAnId()
+    {
+        $sExpected = 'hub3';
+        $sResult = $this->oHub->name($this->nHubThr);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testNameWithNullValue()
+    {
+        $sExpected = 'hub1';
+        $sResult = $this->oHub->name(null);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testNameWithEmptyValue()
+    {
+        $sExpected = 'hub1';
+        $sResult = $this->oHub->name('');
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testNameWithInexistentId()
+    {
+        $sExpected = null;
+        $sResult = $this->oHub->name(1000);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testGetAllIds()
+    {
+        $sExpected = "[0,2,3,4,5,6,7,8,9,10,11]";
+        $aAllIds = $this->oHub->getAllIds();
+        $sResult = json_encode($aAllIds);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testGetBitsDomainArrayWithArrayValue()
+    {
+        $sExpected = 4093;
+        $sResult = $this->oHub->getBitsDomainArray($this->aDomainsArray);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testGetBitsDomainArrayWithNull()
+    {
+        $sExpected = 0;
+        $sResult = $this->oHub->getBitsDomainArray(null);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testGetBitsDomainArrayWithEmptyArrayValue()
+    {
+        $sExpected = 0;
+        $sResult = $this->oHub->getBitsDomainArray(array());
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testGetBitsDomainArrayWithFalseValue()
+    {
+        $sExpected = 0;
+        $sResult = $this->oHub->getBitsDomainArray(false);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testGetIdsDomainArrayWithArrayValue()
+    {
+        $sExpected = '[0,2,3,4,5,6,7,8,9,10,11]';
+        $aIdsDomain = $this->oHub->getIdsDomainArray($this->aDomainsArray);
+        $sResult = json_encode($aIdsDomain);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testGetIdsDomainArrayWithEmptyArrayValue()
+    {
+        $sExpected = '[]';
+        $aIdsDomain = $this->oHub->getIdsDomainArray(array());
+        $sResult = json_encode($aIdsDomain);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testGetIdsDomainArrayWithNullValue()
+    {
+        $sExpected = '[]';
+        $aIdsDomain = $this->oHub->getIdsDomainArray(null);
+        $sResult = json_encode($aIdsDomain);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testGetIdsDomainArrayWithFalseValue()
+    {
+        $sExpected = '[]';
+        $aIdsDomain = $this->oHub->getIdsDomainArray(false);
+        $sResult = json_encode($aIdsDomain);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testBitsToIdArrayWithIntegerValue()
+    {
+        $sExpected = '[0,7,11]';
+        $aBits = $this->oHub->bitsToIdArray($this->nBitfield);
+        $sResult = json_encode($aBits);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testBitsToIdArrayWithNullValue()
+    {
+        $sExpected = '[]';
+        $aBits = $this->oHub->bitsToIdArray(null);
+        $sResult = json_encode($aBits);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testBitsToIdArrayWithFalseValue()
+    {
+        $sExpected = '[]';
+        $aBits = $this->oHub->bitsToIdArray(false);
+        $sResult = json_encode($aBits);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testBitsToIdArrayWithZeroValue()
+    {
+        $sExpected = '[]';
+        $aBits = $this->oHub->bitsToIdArray(0);
+        $sResult = json_encode($aBits);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdArrayToBitsWithArrayValue()
+    {
+        $sExpected = 13;
+        $sResult = $this->oHub->idArrayToBits($this->aDomainIds);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdArrayToBitsWithEmptyArrayValue()
+    {
+        $sExpected = 0;
+        $sResult = $this->oHub->idArrayToBits(array());
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdArrayToBitsWithFalseValue()
+    {
+        $sExpected = 0;
+        $sResult = $this->oHub->idArrayToBits(false);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdArrayToBitsWithNullValue()
+    {
+        $sExpected = 0;
+        $sResult = $this->oHub->idArrayToBits(null);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdArrayToBitsArrayWithArrayValue()
+    {
+        $sExpected = '[1,4,8]';
+        $aBitsArray = $this->oHub->idArrayToBitsArray($this->aDomainIds);
+        $sResult = json_encode($aBitsArray);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdArrayToBitsArrayWithEmptyArrayValue()
+    {
+        $sExpected = '[]';
+        $aBitsArray = $this->oHub->idArrayToBitsArray(array());
+        $sResult = json_encode($aBitsArray);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdArrayToBitsArrayWithNullValue()
+    {
+        $sExpected = '[]';
+        $aBitsArray = $this->oHub->idArrayToBitsArray(null);
+        $sResult = json_encode($aBitsArray);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdArrayToBitsArrayWithFalseValue()
+    {
+        $sExpected = '[]';
+        $aBitsArray = $this->oHub->idArrayToBitsArray(false);
+        $sResult = json_encode($aBitsArray);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testBitsToBitsArrayWithIntegerValue()
+    {
+        $sExpected = '[1,128,2048]';
+        $aBitsArray = $this->oHub->bitsToBitsArray($this->nBitfield);
+        $sResult = json_encode($aBitsArray);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testBitsToBitsArrayWithNullValue()
+    {
+        $sExpected = '[]';
+        $aBitsArray = $this->oHub->bitsToBitsArray(null);
+        $sResult = json_encode($aBitsArray);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testBitsToBitsArrayWithFalseValue()
+    {
+        $sExpected = '[]';
+        $aBitsArray = $this->oHub->bitsToBitsArray(false);
+        $sResult = json_encode($aBitsArray);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testBitsToBitsArrayWithZeroValue()
+    {
+        $sExpected = '[]';
+        $aBitsArray = $this->oHub->bitsToBitsArray(0);
+        $sResult = json_encode($aBitsArray);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdToBitWithIntegerValue()
+    {
+        $sExpected = 8;
+        $sResult = $this->oHub->idToBit($this->nHubThr);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdToBitWithNullValue()
+    {
+        $sExpected = 1;
+        $sResult = $this->oHub->idToBit(null);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdToBitWithFalseValue()
+    {
+        $sExpected = 1;
+        $sResult = $this->oHub->idToBit(false);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdToBitWithInexistantId()
+    {
+        $sExpected = 1099511627776;
+        $sResult = $this->oHub->idToBit(1000);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testBitToIdWithIntegerValue()
+    {
+        $sExpected = $this->nHubThr;
+        $sResult = $this->oHub->bitToId($this->nBit);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    function testBitToIdWithZeroValue()
+    {
+        $this->oHub->bitToId(0);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    function testBitToIdWithNullValue()
+    {
+        $this->oHub->bitToId(null);
+    }
+
+    function testBitToIdWithABigInteger()
+    {
+        $sExpected = 12;
+        $sResult = $this->oHub->bitToId(1000000000000);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdToLandingpageWithIntegerValue()
+    {
+        $sExpected = 'hub3.com';
+        $sResult = $this->oHub->idToLandingpage($this->nHubThr);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdToLandingpageWithNullValue()
+    {
+        $sExpected = 'hub1.com';
+        $sResult = $this->oHub->idToLandingpage(null);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdToLandingpageWithFalseValue()
+    {
+        $sExpected = 'hub1.com';
+        $sResult = $this->oHub->idToLandingpage(false);
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    function testIdToLandingpageWithInexistantValue()
+    {
+        $sExpected = null;
+        $sResult = $this->oHub->idToLandingpage(1000);
+        $this->assertEquals($sExpected, $sResult);
+    }
+}
+
+class MyTestDataSource extends \CI\Hub\DataSource
+{
+    protected $aHubOne = array('id' => 0, 'name' => 'Hub 1', 'short_name' => 'hub1', 'landing_page' => 'hub1.com', 'status' => 1);
+    protected $aHubTwo = array('id' => 2, 'name' => 'Hub 2', 'short_name' => 'hub2', 'landing_page' => 'hub2.com', 'status' => 1);
+    protected $aHubThr = array('id' => 3, 'name' => 'Hub 3', 'short_name' => 'hub3', 'landing_page' => 'hub3.com', 'status' => 1);
+    protected $aHubFou = array('id' => 4, 'name' => 'Hub 4', 'short_name' => 'hub4', 'landing_page' => 'hub4.com', 'status' => 1);
+    protected $aHubFiv = array('id' => 5, 'name' => 'Hub 5', 'short_name' => 'hub5', 'landing_page' => 'hub5.com', 'status' => 1);
+    protected $aHubSix = array('id' => 6, 'name' => 'Hub 6', 'short_name' => 'hub6', 'landing_page' => 'hub6.com', 'status' => 1);
+    protected $aHubSev = array('id' => 7, 'name' => 'Hub 7', 'short_name' => 'hub7', 'landing_page' => 'hub7.com', 'status' => 1);
+    protected $aHubEig = array('id' => 8, 'name' => 'Hub 8', 'short_name' => 'hub8', 'landing_page' => 'hub8.com', 'status' => 0);
+    protected $aHubNin = array('id' => 9, 'name' => 'Hub 9', 'short_name' => 'hub9', 'landing_page' => 'hub9.com', 'status' => 0);
+    protected $aHubTen = array('id' => 10, 'name' => 'Hub 10', 'short_name' => 'hub10', 'landing_page' => 'hub10.com', 'status' => 0);
+    protected $aHubEle = array('id' => 11, 'name' => 'Hub 11', 'short_name' => 'hub11', 'landing_page' => 'hub11.com', 'status' => 1);
+
+    public function init()
+    {
+        $this->aHubs = array(
+            $this->aHubOne['id'] => $this->aHubOne,
+            $this->aHubTwo['id'] => $this->aHubTwo,
+            $this->aHubThr['id'] => $this->aHubThr,
+            $this->aHubFou['id'] => $this->aHubFou,
+            $this->aHubFiv['id'] => $this->aHubFiv,
+            $this->aHubSix['id'] => $this->aHubSix,
+            $this->aHubSev['id'] => $this->aHubSev,
+            $this->aHubEig['id'] => $this->aHubEig,
+            $this->aHubNin['id'] => $this->aHubNin,
+            $this->aHubTen['id'] => $this->aHubTen,
+            $this->aHubEle['id'] => $this->aHubEle,
+        );
+    }
+}

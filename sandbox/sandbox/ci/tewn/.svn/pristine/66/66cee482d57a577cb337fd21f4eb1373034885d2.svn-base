@@ -1,0 +1,23 @@
+<?php
+/**
+ * Logger Interface
+ *
+ * PHP Version 5.3
+ *
+ * @category Logger
+ * @package  Logger
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+interface Logger_Interface
+{
+    /**
+     * Saves data
+     *
+     * @param string $message The message to be logged
+     *
+     * @return boolean True if message logged succesfully
+     */
+    public function log($message);
+}

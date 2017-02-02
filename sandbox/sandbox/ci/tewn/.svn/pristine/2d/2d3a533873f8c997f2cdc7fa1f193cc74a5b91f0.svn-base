@@ -1,0 +1,9 @@
+<?php
+    $sphinx_config = array(
+        'local' => 'spx1v-ci.ci.dev.lax.gnmedia.net',
+        'dev'   => 'spx1v-ci.ci.dev.lax.gnmedia.net',
+        'stg'   => 'spx1v-ci.ci.stg.lax.gnmedia.net',
+        'prd'   => 'spx1v-ci.ci.prd.lax.gnmedia.net'
+    );
+
+return $sphinx_config[ENVIRONMENT];

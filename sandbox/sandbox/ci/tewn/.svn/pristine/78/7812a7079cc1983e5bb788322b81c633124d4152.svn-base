@@ -1,0 +1,178 @@
+<?php
+
+namespace CI;
+
+class Database
+{
+    const DB_READ  = 'read';
+    const DB_WRITE = 'write';
+
+    const SERVER_AWAY = 2006;
+
+    private $_aConn   = array();
+    private $_aConfig = array();
+
+    private $_sCurrentConfig     = null;
+    private $_oCurrentConnection = null;
+
+    private $_nTries      = 0;
+    private $_nTriesLimit = 3;
+
+    public function __construct(array $aConfig)
+    {
+        $this->_aConfig[self::DB_WRITE] = $aConfig['write'];
+        $this->_aConfig[self::DB_READ]  = $aConfig['read'];
+    }
+
+    public function __destruct()
+    {
+        foreach ($this->_aConn as $oConnection) {
+
+            if (is_resource($oConnection)) {
+                $oConnection = null;
+            }
+        }
+        $this->_aConn = array();
+    }
+
+    private function _connect($sConfig)
+    {
+        $oConnection = isset($this->_aConn[$sConfig]) ? $this->_aConn[$sConfig] : null;
+
+        if (!is_resource($oConnection)) {
+            $aConfig = $this->_aConfig[$sConfig];
+            $sDSN = "mysql:dbname={$aConfig['database']};host={$aConfig['host']}";
+
+            try {
+                $oConnection = new \PDO($sDSN, $aConfig['login'], $aConfig['password']);
+            } catch (PDOException $ePDO) {
+                $sMessage = $this->_configToString($sConfig).', '.  $ePDO->getMessage();
+                throw new Database\Exception(Database\Exception::ERROR_CONNECT, $sMessage);
+            }
+
+            $this->_aConn[$sConfig] = $oConnection;
+        }
+        return $oConnection;
+    }
+
+    private function _configToString($sConfig)
+    {
+        $aConfig = $this->_aConfig[$sConfig];
+        return json_encode(
+            array(
+                'host' => $aConfig['host'],
+                'user' => $aConfig['login'],
+                'db'   => $aConfig['database'],
+            )
+        );
+    }
+
+    protected function getCurrentConnection($sConfig)
+    {
+        if (empty($this->_sCurrentConfig)) {
+            $this->_sCurrentConfig = $sConfig;
+        }
+
+        if (empty($this->_aConn[$this->_sCurrentConfig])) {
+            $this->_connect($this->_sCurrentConfig);
+        }
+
+        return $this->_aConn[$this->_sCurrentConfig];
+    }
+
+    public function read()
+    {
+        $this->_sCurrentConfig = self::DB_READ;
+        return $this;
+    }
+
+    public function write()
+    {
+        $this->_sCurrentConfig = self::DB_WRITE;
+        return $this;
+    }
+
+    public function query($sQuery)
+    {
+        $aResult = array();
+
+        try {
+            $oRead     = $this->getCurrentConnection(self::DB_READ);
+            $oStatment = $oRead->prepare($sQuery);
+
+            if ($oStatment === false || $oStatment->execute() === false) {
+                $sMessage = $this->_configToString($this->_sCurrentConfig).' oRead->error ' .
+                    print_r($oRead->errorInfo(), true) .  ' oStatment->error ' .
+                    print_r($oStatment->errorInfo(), true);
+                throw new Database\Exception(Database\Exception::ERROR_READ, $sMessage);
+            } else {
+                while ($aRow = $oStatment->fetch(\PDO::FETCH_ASSOC)) {
+                    $aResult[] = $aRow;
+                }
+
+                $oStatment->closeCursor();
+            }
+        } catch (\Exception $e) {
+            if ($this->serverHasGoneAway($oRead) || $this->serverHasGoneAway($oStatment)) {
+                $this->_nTries++;
+
+                if ($this->_nTries < $this->_nTriesLimit) {
+                    $aResult = $this->query($sQuery);
+                }
+            } else {
+                $sMessage = $this->_configToString($this->_sCurrentConfig).' oRead->error ' .
+                    print_r($oRead->errorInfo(), true) .  ' oStatment->error ' .
+                    print_r($oStatment->errorInfo(), true);
+                throw new Database\Exception(Database\Exception::ERROR_READ, $sMessage);
+            }
+        }
+
+        $this->resetDefaults();
+        return $aResult;
+    }
+
+    protected function serverHasGoneAway($oPDO)
+    {
+        $aError = $oPDO->errorInfo();
+        return (isset($aError[1]) &&  $aError[1] == self::SERVER_AWAY);
+    }
+
+    protected function resetDefaults()
+    {
+        $this->_sCurrentConfig = null;
+        $this->_nTries = 0;
+    }
+
+    public function execute($sQuery)
+    {
+        try {
+            $oWrite    = $this->getCurrentConnection(self::DB_WRITE);
+            $oStatment = $oWrite->prepare($sQuery);
+
+            if ($oStatment === false || $oStatment->execute() === false) {
+                $sMessage = $this->_configToString($this->_sCurrentConfig).' oWrite->error ' .
+                    print_r($oWrite->errorInfo(), true) .  ' oStatment->error ' .
+                    print_r($oStatment->errorInfo(), true);
+                throw new Database\Exception(Database\Exception::ERROR_WRITE, $sMessage);
+            } else {
+                $oStatment->closeCursor();
+            }
+
+        } catch (\Exception $e) {
+            if ($this->serverHasGoneAway($oWrite) || $this->serverHasGoneAway($oStatment)) {
+                $this->_nTries++;
+
+                if ($this->_nTries < $this->_nTriesLimit) {
+                    $this->execute($sQuery);
+                }
+            } else {
+                $sMessage = $this->_configToString($this->_sCurrentConfig).' oWrite->error ' .
+                    print_r($oWrite->errorInfo(), true) .  ' oStatment->error ' .
+                    print_r($oStatment->errorInfo(), true);
+                throw new Database\Exception(Database\Exception::ERROR_WRITE, $sMessage);
+            }
+        }
+
+        $this->resetDefaults();
+    }
+}

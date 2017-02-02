@@ -1,0 +1,60 @@
+<?php
+/* SVN FILE: $Id$ */
+/* Website Test cases generated on: 2010-03-09 20:18:33 : 1268187513*/
+class WebsiteTestCase extends CakeTestCase {
+	var $Website = null;
+	var $fixtures = array('app.website');
+
+	function startTest() {
+		$this->Website =& ClassRegistry::init('Website');
+	}
+
+	function testWebsiteInstance() {
+		$this->assertTrue(is_a($this->Website, 'Website'));
+	}
+
+	function testWebsiteFind() {
+		$this->Website->recursive = -1;
+		$results = $this->Website->find('first');
+		$this->assertTrue(!empty($results));
+
+		$expected = array('Website' => array(
+			'id' => 1,
+			'domain_primary' => 3,
+			'domain_bitfield' => 12,
+			'user_id' => 1,
+			'account_id' => 1,
+			'status' => WEBSITE_STATUS_ACTIVE,
+			'name' => 'Chuggin Monkeys',
+			'url' => 'chugginmonkeys.com',
+			'landing_page_style_id' => 1,
+			'subdomain' => FALSE,
+			'content_rating' => WEBSITE_CONTENT_PG13,
+			'category' => CATEGORY_OFFBEAT,
+			'demographic_sex' => DEMOGRAPHIC_SEX_MALE,
+			'subcategory' => 0,
+			'strict_category' => 0,
+			'allowed_categories_bitfield' => 32,
+			'disable_utm' => 0,
+			'custom_utm' => NULL,
+			'nice_links' => 0,
+			'title_regex' => NULL,
+			'url_nofollow' => 0,
+			'url_regex' => "%https?://?[a-z0-9-.]+(/[a-z0-9_-]+(/[a-z0-9_]+)?)(/[0-9]+?)?%i",
+			'blacklist' => NULL,
+			'whitelist' => NULL,
+			'ranked' => 0,
+			'notes' => 'lorem ipsum factum est',
+			'tier' => 3,
+			'last_social_rebalance' => null,
+			'modified' => '2011-10-12 13:55:42',
+			'created' => '2010-03-10 07:27:00',
+			'visible' => TRUE,
+            'settings'=> 1,
+            'tracking' => 0
+		));
+
+		$this->assertEqual($expected, $results);
+	}
+}
+?>

@@ -1,0 +1,38 @@
+<?php
+class LandingPageEngine extends AppModel {
+
+	var $useTable = false;
+	var $name = 'LandingPageEngine';
+
+	/* Memcached functions */
+	function get_instance_view_count($intersect_id, $domain_bitfield) {
+		$key = $this->instance_view_key($intersect_id, $domain_bitfield);
+
+		return $this->memcached_get($key);
+	}
+
+	function increment_instance_view_count($intersect_id, $domain_bitfield, $count) {
+		App::import('Component', 'CakeMemcache');
+		$this->CakeMemcache =& new CakeMemcacheComponent(null);
+
+		$key = $this->instance_view_key($intersect_id, $domain_bitfield);
+
+		$rc = $this->CakeMemcache->increment($key, $count);
+		if (!$rc) {
+			$this->CakeMemcache->set($key, $count);
+		}
+	}
+
+	function clear_instance_view_count($intersect_id, $domain_bitfield) {
+		$key = $this->instance_view_key($intersect_id, $domain_bitfield);
+
+		$this->memcached_delete($key);
+	}
+
+	/* Cache Key function */
+	function instance_view_key($intersect_id, $domain_bitfield) {
+		return "instance_view_count::".$intersect_id.":".$domain_bitfield;
+	}
+
+}
+?>

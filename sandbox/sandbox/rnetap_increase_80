@@ -1,0 +1,23 @@
+#!/bin/bash
+	echo "This tiny script will increase the a volume size using rnetapp"
+	echo "Need the name of the filer as it is"
+		read filer
+	echo "Now could you please provide the name of the volume"
+		read volume 
+	#### Sanity checks pending ###
+##	echo "checking volume against filer"
+##	CHECK_VOLUME=`sudo rnetapp $filer volume list | grep $volume |awk '{print $1,$4}'| sed -e 's/%//g' | awk '{if($2 > 90){print $1,$2}else if ($2 < 90){print $1 "\t is under 90%"}}'`
+	
+	PAR=`sudo rnetapp $filer  volume list| grep $volume | awk '{print $3}'| sed -e 's/[GM]//g'`
+	TA2R=`expr $PAR/.80`
+	A2I=`expr $PAR - $TA2R`
+	INCREASE= `sudo rnetapp $filer volume size $volume +$A2Ig`
+need to finish this ...! 2night  give Rey tips 
+
+
+PAR  -- Previous Amount Reached 
+TA2R -- Total Amount 2 be reach
+A2I  -- Amount to increase
+
+formulas      	TA2R = PAR/(wanted percent/100) 
+		A2I  = PAR - TA2R

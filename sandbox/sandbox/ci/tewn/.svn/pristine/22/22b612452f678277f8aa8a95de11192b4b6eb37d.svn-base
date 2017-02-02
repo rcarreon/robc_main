@@ -1,0 +1,607 @@
+<script>
+<!--
+	// Javascript Vars
+	var status = <?=$status?>;
+	var hub = <?=$hub?>;
+	var category = <?=$category?>;
+	var ATTENTION_LEVEL_IMMEDIATE = <?=ATTENTION_LEVEL_IMMEDIATE?>;
+	var ATTENTION_LEVEL_WARNING =  <?=ATTENTION_LEVEL_WARNING?>;
+	var ATTENTION_LEVEL_NOTICE = <?=ATTENTION_LEVEL_NOTICE?>;
+
+	var ATTENTION_PENDING_PAGES = <?=ATTENTION_PENDING_PAGES?>;
+	var ATTENTION_PENDING_MODERATION = <?=ATTENTION_PENDING_MODERATION?>;
+	var ATTENTION_RETURN_RATE = <?=ATTENTION_RETURN_RATE?>;
+	var ATTENTION_LP_PERFORMANCE = <?=ATTENTION_LP_PERFORMANCE?>;
+	var ATTENTION_ENOUGH_LANDING_PAGE_IMPRESSIONS = <?=ATTENTION_ENOUGH_LANDING_PAGE_IMPRESSIONS?>;
+	var ATTENTION_W_PERFORMANCE = <?=ATTENTION_W_PERFORMANCE?>;
+	var ATTENTION_ENOUGH_WIDGET_IMPRESSIONS = <?=ATTENTION_ENOUGH_WIDGET_IMPRESSIONS?>;
+
+	var weekago = <?=strtotime("-7 days")?>;
+	var TIME_UNIT_DAY = <?=TIME_UNIT_DAY?>;
+-->
+</script>
+
+<?
+	echo $this->element('crowdignite/backend2_toolbar', array("tab" => "websites", "user" => $user));
+
+	function tab_selected($status_a, $status_b) {
+		// Hack for casting issue
+		if ($status_a === DOMAIN_ID_ALL &&
+		    $status_b === 0) {
+			return "tab_unselected";
+		}
+
+		if ($status_a == $status_b) {
+			$selected_class = "tab_selected";
+		} else {
+			$selected_class = "tab_unselected";
+		}
+		return $selected_class;
+	}
+
+	if (isset($user) && $user['User']['domain_bitfield'] == -1) {
+		$full_admin = 1;
+	} else {
+		$full_admin = 0;
+	}
+
+?>
+
+
+
+
+	 <div class="row supercontainer" id="content_area">
+
+	  	<div class="hubs_column">
+	  		<ul class="hub_list">
+	  			<li class="title t_hubs">Hubs</li>
+				<?
+				if ($user['User']['domain_bitfield'] == DOMAIN_ID_ALL) {
+				?>
+					<? $selected_class = tab_selected($hub, DOMAIN_ID_ALL); ?>
+					<li class="<?=$selected_class?>">
+						<a href="/management/websites2/<?=$status?>/<?=$hub?>/<?=$category?>">All</a>
+					</li>
+				<?
+					$all_domain_bits = $domain_component->getAllActiveBits();
+					foreach ($all_domain_bits as $domain_bit) {
+						$domain_name = $convert->domain_name_bit($domain_bit);
+						$domain_id = $domain_component->bitToId($domain_bit);
+						$selected_class = tab_selected($hub, $domain_id);
+				?>
+						<li class="<?=$selected_class?>">
+							<a href="/management/websites2/<?=$status?>/<?=$domain_id?>"><?=$domain_name?></a>
+						</li>
+				<?
+					}
+				}
+				?>
+			</ul><!-- hub_list -->
+	  	</div>
+
+	    <div class="websites_column">
+
+	    	<div id="status_bar">
+	    		<div class="ddown_container ddown_container3">
+		    		<span>Hubs</span>
+					<dl class="dropdown dropdown3">
+					    <dt><a href="#"><span>Select Hub</span></a></dt>
+					    <dd>
+					        <ul>
+							<?
+							if ($user['User']['domain_bitfield'] == DOMAIN_ID_ALL) {
+								$selected_class = tab_selected($hub, DOMAIN_ID_ALL);
+							?>
+								<li class="<?=$selected_class?>">
+									<a href="/management/websites/<?=$status?>/<?=$hub?>/<?=$category?>">All</a>
+								</li>
+							<?
+							//$all_domain_bits = $domain_component->getAllBits($user['User']['domain_bitfield']);
+							foreach ($all_domain_bits as $domain_bit) {
+								$domain_name = $convert->domain_name_bit($domain_bit);
+								$domain_id = $domain_component->bitToId($domain_bit);
+								?>
+								<? $selected_class = tab_selected($hub, $domain_id); ?>
+								<li class="<?=$selected_class?>">
+									<a href="/management/websites2/<?=$status?>/<?=$domain_id?>"><?=$domain_name?></a>
+								</li>
+							<?
+								}
+							}
+							?>
+					        </ul>
+					    </dd>
+					</dl>
+				</div>
+				<div class="ddown_container">
+		    		<span>Status</span>
+					<dl class="dropdown dropdown1">
+					    <dt><a href="#"><span>Select status</span></a></dt>
+					    <dd>
+					        <ul>
+					        	<? $selected_class = tab_selected($status, WEBSITE_STATUS_ACTIVE); ?>
+					            <li class="<?=$selected_class?>"><a href="/management/websites2/<?=WEBSITE_STATUS_ACTIVE?>/<?=$hub?>/<?=$category?>">Active</a></li>
+					            <? $selected_class = tab_selected($status, WEBSITE_STATUS_NEW); ?>
+					            <li class="<?=$selected_class?>"><a href="/management/websites2/<?=WEBSITE_STATUS_NEW?>/<?=$hub?>/<?=$category?>">New</a></li>
+					            <? $selected_class = tab_selected($status, WEBSITE_STATUS_DENIED); ?>
+					            <li class="<?=$selected_class?>"><a href="/management/websites2/<?=WEBSITE_STATUS_DENIED?>/<?=$hub?>/<?=$category?>">Denied</a></li>
+					            <? $selected_class = tab_selected($status, WEBSITE_STATUS_SUSPENDED); ?>
+					            <li class="<?=$selected_class?>"><a href="/management/websites2/<?=WEBSITE_STATUS_SUSPENDED?>/<?=$hub?>/<?=$category?>">Suspended</a></li>
+					            <? $selected_class = tab_selected($status, WEBSITE_STATUS_PAUSED); ?>
+					            <li class="<?=$selected_class?>"><a href="/management/websites2/<?=WEBSITE_STATUS_PAUSED?>/<?=$hub?>/<?=$category?>">Paused</a></li>
+					            <? $selected_class = tab_selected($status, WEBSITE_STATUS_INACTIVE); ?>
+					            <li class="<?=$selected_class?>"><a href="/management/websites2/<?=WEBSITE_STATUS_INACTIVE?>/<?=$hub?>/<?=$category?>">Inactive</a></li>
+					            <? $selected_class = tab_selected($status, WEBSITE_STATUS_DOWN); ?>
+					            <li class="<?=$selected_class?>"><a href="/management/websites2/<?=WEBSITE_STATUS_DOWN?>/<?=$hub?>/<?=$category?>">Down</a></li>
+					            <? $selected_class = tab_selected($status, WEBSITE_STATUS_TRANSFER); ?>
+					            <li class="<?=$selected_class?>"><a href="/management/websites2/<?=WEBSITE_STATUS_TRANSFER?>/<?=$hub?>/<?=$category?>">Transfer</a></li>
+					        </ul>
+					    </dd>
+					</dl>
+				</div>
+				<div class="ddown_container">
+					<!-- Category -->
+					<span>Category</span>
+					<dl class="dropdown dropdown2">
+					    <dt><a href="#"><span>Select Category</span></a></dt>
+					    <dd>
+					        <ul>
+							<?
+								foreach ($categories as $cat_id) {
+									$cat = $convert->category($cat_id);
+									$selected_class = tab_selected($category, $cat_id);
+							?>
+									<li class="<?=$selected_class?>">
+										<a class="<?=$selected_class?>" href="/management/websites2/<?=$status?>/<?=$hub?>/<?=$cat_id?>"><?=$cat?></a>
+							        </li>
+							<?
+								}
+							?>
+					        </ul>
+					    </dd>
+					</dl>
+				</div>
+
+				<div class="ddown_container">
+					<!-- Columns -->
+					<span>Display</span>
+					<dl class="dropdown dropdown4">
+					    <dt><a href="#"><span>Columns</span></a></dt>
+					    <dd>
+					        <ul style="display: none;">
+							</ul>
+					    </dd>
+					</dl>
+				</div>
+
+				<div class="ddown_container" id="attention">
+						<span title="Needs Immediate Attention" id="needs_attention_immediate" class="immediate tooltip"><font></font></span>
+						<span title="Warnings" id="needs_attention_warning" class="warning tooltip"><font></font></span>
+						<span title="Notices" id="needs_attention_notice" class="notice tooltip"><font></font></span>
+						<span title="Total Attention Notices" id="needs_attention_count" class="total tooltip"><font></font></span>
+				</div>
+    		</div> <!-- Status bar -->
+
+
+
+		<? /*
+		if (count($inactive_websites)) {
+				echo "<tr><td colspan=4><b>New Inactive</b></td></tr>";
+				foreach ($inactive_websites as $website) {
+					echo "<tr><td colspan=4 align=left><a href='/websites/moderate/".$website['Website']['id']."'>".$website['Website']['name']."</a></td></tr>";
+				}
+		}
+		if (count($active_websites)) {
+				echo "<tr><td colspan=4><b>(Possible) New Active</b></td></tr>";
+				foreach ($active_websites as $website) {
+					echo "<tr><td colspan=4 align=left><a href='/websites/moderate/".$website['Website']['id']."'>".$website['Website']['name']."</a></td></tr>";
+				}
+		}
+		*/
+		?>
+		<div class="table_container">
+
+	        <table id="website_table" class="tablesorter" width=100% cellspacing=0>
+                <thead>
+                        <tr>
+                        <th class="tooltip col_1" title="Website ID number">ID</th>
+                        <th class="col_2">Site</th>
+                        <th class="col_3">!</th>
+				<!--<th>Email</th>-->
+                        <th class="tooltip col_4" title="Active pages in the system which CI is trying to send traffic to">Act.</th>
+                        <th class="tooltip col_5" title="Pages pending moderation">Pnd.</th>
+                        <th class="tooltip col_6" title="Pages that the publisher has requested be put into the system">Mod.</th>
+                        <th class="tooltip col_7" title="Credits or balance of how many visitors we owe a publisher">Crd.</th>
+				<!--
+                        <th>Out</th>
+                        <th>In</th>-->
+                        <th class="tooltip col_8" title="Website Return Rate">Ret. Rate</th>
+                        <th class="tooltip col_9" title="Yesterday Out - Number of visitors sent to the publisher yesterday">YOut</th>
+                        <th class="tooltip col_10" title="Yesterday In - Number of visitors received from the publisher yesterday">YIn</th>
+                        <th class="tooltip col_11" title="Yesterday Return Rate">YRR</th>
+                        <th class="tooltip col_12" title="Landing Page Priority">LP Prty</th>
+                        <th class="tooltip col_13" title="Widget Priority">W Prty</th>
+                        <th class="tooltip col_14" title="Yesterday Landing Page Click Through Rate">Y. LP CTR</th>
+                        <th class="tooltip col_15" title="Yesterday Landing Page Impressions">Y. LP Imp</th>
+                        <th class="tooltip col_16" title="Yesterday Widget Click Through Rate">Y. W CTR</th>
+                        <th class="tooltip col_17" title="Yesterday Widget Page Impressions">Y. W Imp</th>
+                        <th class="tooltip col_18" title="Overall average time in the system">Age</th>
+                        </tr>
+		</thead>
+                <tbody>
+<?
+	$count = 0;
+	/* Websites */
+	foreach($websites as $website) {
+			$count++;
+
+			if (empty($website['Website']['name'])) {
+				$website_name = $website['Website']['url'];
+			} else {
+				$website_name = $website['Website']['name'];
+			}
+?>
+				<tr id="website_row_<?=$website['Website']['id']?>" class="website_row">
+				<!-- Website ID -->
+			        <td id="website_id_<?=$website['Website']['id']?>" class="col_1" align="center"><a href="/websites/moderate/<?=$website['Website']['id']?>"><?=$website['Website']['id']?></a></td>
+
+                                <!-- Website name -->
+        			<td align="left" class="websitename col_2" id="websitename-<?=$website['Website']['id']?>">
+<a href="http://<?=$website['Website']['url']?>"><?=$website_name?></a>&nbsp;
+<div class="website_icon_buttons">
+<a id="show_notes_link" href="#" onclick="show_notes(<?=$website['Website']['id']; ?>)" title="Add Notes">
+							<img src='/img/crowdignite/<? if($website['Website']['notes'] == "" || is_null($website['Website']['notes'])){ echo "icon_page_edit_off.png"; }else{ echo "icon_page_edit.png"; }?>' width="16" height="16" alt="Add Notes">
+						</a>
+						<?= $convert->user_flagged_websites($user['User'], $website['Website']['id']); ?>
+						<a class="icon_button" href="/pages/add/<?=$website['Website']['id']?>" Title="Add Page">
+							<img src='/img/crowdignite/icon_page_add.png' alt="Add Page" />
+						</a>
+			        	<a class="icon_button" href="#" onclick="show_full_stats(<?=$website['Website']['id']?>); return false;" title="Full Stats">
+			        		<img src='/img/crowdignite/icon_chart_curve.png' alt="Full Stats" />
+			        	</a>
+			        	<a onclick="show_chart_popup(<?=$website['Website']['id']?>,3); return false;" href="#">
+			        		<img src='/img/crowdignite/icon_chart_line.png' alt="Charts" />
+			        	</a>
+</div>
+   					</td>
+
+				<!-- Needs Attention -->
+				<td id="attention_level_<?=$website['Website']['id']?>" class="col_3" align="center"></td>
+
+                                <!-- Email -->
+				<!--
+				<td align="center"><a href="mailto:<?=$website['Website']['email']?>"><?=$website['Website']['email']?></a></td>-->
+
+                                <!-- Pages active -->
+				<td align="center"  class="col_4"><a href="/management/pages/<?=$website['Website']['id']?>"><?=$website['Website']['page_active'];?></a></td>
+
+                                <!-- Pages pending -->
+				<td class="pages_pending_<?=$website['Website']['id']?> col_5" align="center">
+					<a href="/pages/moderate/<?=$website['Website']['id']?>"><?=$website['Website']['page_pending'];?></a>
+				</td>
+
+                <!-- Pages pending -->
+                <td class="pending_moderation_<?=$website['Website']['id']?> col_6" align="center">
+                	<a href="/pages/moderate/<?=$website['Website']['id']?>"><?=$website['Website']['page_pending_moderation'];?></a>
+                </td>
+
+                <!-- Credits -->
+				<td align="center" class="col_7">
+				<a href="/accounts/credit/<?=$website['Account']['id']?>"><?
+				if ($website['Account']['credits'] < 0) {
+					echo 0;
+				} else {
+					echo number_format($website['Account']['credits']/10);
+				}
+				?></a></td>
+
+			        <!-- Outgoing / Incoming -->
+				<!--
+				<td align="center"><?=number_format($website['Account']['outgoing'])?></td>
+				<td align="center"><?=number_format($website['Account']['incoming'])?></td>
+				-->
+
+                                <!-- Return Rate -->
+        			<td align="center" class="col_8">
+				  <a href="#" onclick="show_chart_popup(<?=$website['Website']['id']?>); return false;"><?
+	        		if ($website['Account']['incoming']) {
+		        		echo round(($website['Account']['outgoing']/$website['Account']['incoming']) * 100, 0);
+			        } else {
+				        echo "0";
+        			}
+	        		?>%</a>
+		        	</td>
+
+			        <!-- Yesterday Incoming / Outgoing -->
+				<td align="center" id="yout_<?=$website['Website']['id']?>" class="col_9">
+									<div class="preloader"></div>
+                                    <a href="#" style="display:none;" onclick="show_chart_popup(<?=$website['Website']['id']?>,1); return false;">
+                                    </a>
+                                </td>
+				<td align="center" id="yin_<?=$website['Website']['id']?>" class="col_10">
+									<div class="preloader"></div>
+                                    <a href="#" style="display:none;" onclick="show_chart_popup(<?=$website['Website']['id']?>,1); return false;">
+                                    </a>
+                                </td>
+
+				<!-- Yesterday Return Rate -->
+        			<td id="yrr_<?=$website['Website']['id']?>" class="col_11" align="center">
+        				<div class="preloader"></div>
+		        	</td>
+
+				<!-- Landing Page Priority -->
+        		<td align="center" class="col_12"><?=round($website['Website']['lp_priority'], 3)?></td>
+
+				<!-- Widget Priority -->
+				<td align="center" class="col_13"><?=round($website['Website']['widget_priority'], 3)?></td>
+
+
+				<!-- Rolling Landing Page CTR -->
+				<td id="y_r_lp_ctr_<?=$website['Website']['id']?>" align="center" class="col_14">
+					<div class="preloader"></div>
+				</td>
+
+				<!-- Rolling Landing Page Impressions -->
+				<td id="y_r_lp_imp_<?=$website['Website']['id']?>" align="center" class="col_15">
+					<div class="preloader"></div>
+					<a href="/management/landing_page_analytics/0/<?=$website['Website']['domain_primary']?>"></a>
+				</td>
+
+			        <!-- Rolling Widget CTR -->
+				<td id="y_r_w_ctr_<?=$website['Website']['id']?>" align="center" class="col_16">
+					<div class="preloader"></div>
+                    <a href="#" onclick="show_chart_popup(<?=$website['Website']['id']?>,2); return false;"></a>
+                                </td>
+
+				<!-- Rolling Widget Impressions -->
+				<td id="y_r_w_imp_<?=$website['Website']['id']?>" align="center" class="col_17">
+					<div class="preloader"></div>
+					<a href="/management/widget_analytics_website/<?=$website['Website']['id']?>"></a></td>
+
+			        <!-- Page Freshness -->
+				<td align="center" class="col_18"><?=round($website['Website']['freshness'], 2)?></td>
+			</tr>
+<?
+		}
+?>
+
+                </tbody>
+				<tfoot>
+		            <tr>
+						<td class="col_1" align="center"><?=$count?></td>
+						<td class="col_2"align="center"></td>
+						<td class="col_3" align="center"></td>
+						<!--<td align="center"></td>-->
+						<td class="col_4" align="center"><?=$convert->round_nice($total_stats['page_active'])?></td>
+						<td class="col_5" align="center"><?=$convert->round_nice($total_stats['page_pending'])?></td>
+						<td class="col_6" align="center"><?=number_format($total_stats['page_pending_moderation'])?></td>
+						<td class="col_7" align="center"><?=$convert->round_nice($total_stats['credits']/10)?></td>
+						<!--
+						<td align="center"><?=number_format($total_stats['outgoing'])?></td>
+						<td align="center"><?=number_format($total_stats['incoming'])?></td>
+						-->
+						<td class="col_8" align="center" id="yrr_total"></td>
+						<td class="col_9" align="center" id="yout_total"><? //=$convert->round_nice($total_stats['youtgoing'])?></td>
+						<td class="col_10" align="center" id="yin_total"><? //=$convert->round_nice($total_stats['yincoming'])?></td>
+						<td class="col_11" align="center" id="yrp_total"><b>
+							<? //=($total_stats['yincoming'] ? round($total_stats['youtgoing']/$total_stats['yincoming'], 2)*100 : 0)?></b>
+						</td>
+						<td class="col_12" align="center"></td>
+						<td class="col_13" align="center"></td>
+						<td class="col_14" align="center" id="ylpctr_total">
+							<? //echo ($total_stats['y_lp_imp'] ? (round(($total_stats['y_lp_ctr']/$total_stats['y_lp_imp']), 2)*100) : 0)?></td>
+						<td class="col_15" align="center" id="y_lp_imp_total"><? //=$convert->round_nice($total_stats['y_lp_imp'])?></td>
+						<td class="col_16" align="center" id="ywctr_total"><? //echo ($total_stats['y_w_imp'] ? (round(($total_stats['y_w_ctr']/$total_stats['y_w_imp']), 4)*100) : 0);?></td>
+						<td class="col_17" align="center" id="y_w_imp_total"><? //=$convert->round_nice($total_stats['y_w_imp'])?></td>
+						<td class="col_18" align="center"><?=round($total_stats['freshness'], 2)?></td>
+						<?php /* <td align="center"></td>
+			            <td align="center"></td> */ ?>
+
+		            </tr>
+				</tfoot>
+               </table>
+           </div> <!-- table_container -->
+	    </div>  <!--  end left column -->
+
+	 </div>
+
+</div> <!--  end of content column -->
+
+</div> <!--  end of content row -->
+
+<?
+	/* Websites */
+	foreach($websites as $website) {
+
+			if (empty($website['Website']['name'])) {
+				$website_name = $website['Website']['url'];
+			} else {
+				$website_name = $website['Website']['name'];
+			}
+
+			$row_color="white";
+
+			$attention = 0; //$website['Website']['needs_attention'];
+
+			$td_attention = 'style="background-color: #cc9999;"'; // red
+
+
+			if ($website['Account']['featured']) {
+				$website_id_color = 'style="background-color: #b4d9a6;"'; //green
+			} else {
+				$website_id_color = $row_color;
+			}
+?>
+			<div class=full_stats id="full_stats_<?=$website['Website']['id']?>" style="display:none;color:black; align:center;">
+
+			<table border=0>
+			<tr><td colspan="2" class="align_right"><a class="btn_close" href="#" onclick="jQuery.unblockUI(); return false;">Close</a></td></tr>
+			<tr>
+                <!-- Website name -->
+				<td>Website Name</td>
+        			<td <?=$row_color?> align="left" class="websitename" id="websitename-<?=$website['Website']['id']?>">
+        			<a href="http://<?=$website['Website']['url']?>"><?=$website_name?></a>
+        		</td>
+			</tr>
+			<tr>
+                <!-- Website Log -->
+				<td>Website Page Log</td>
+        			<td <?=$row_color?> align="left" class="websitepagelog"><a href="/management/website_log/<?=$website['Website']['id']?>">Log</a></td>
+			</tr>
+
+			<tr>
+				<!-- Needs Attention -->
+				<td>Needs Attention</td>
+				<td class="needs_attention" <?=$row_color?> align="center"></td>
+			</tr>
+			<tr>
+                <!-- Email -->
+				<td>Email</td>
+				<td <?=$row_color?> align="center"><a href="mailto:<?=$website['Website']['email']?>"><?=$website['Website']['email']?></a></td>
+			</tr>
+			<tr>
+                <!-- Pages active -->
+				<td>Pages Active</td>
+				<td <?=$row_color?> align="center"><a href="/management/pages/<?=$website['Website']['id']?>"><?=$website['Website']['page_active'];?></a></td>
+			</tr>
+			<tr>
+                <!-- Pages pending -->
+				<td>Pages Pending</td>
+				<td class="pages_pending_<?=$website['Website']['id']?>" <?=$convert->needs_attention($attention, ATTENTION_PENDING_PAGES, $td_attention, $row_color)?> align="center"><a href="/pages/moderate/<?=$website['Website']['id']?>"><?=$website['Website']['page_pending'];?></a></td>
+			</tr>
+			<tr>
+                <!-- Pages Pending Moderation -->
+				<td>Pages Pending Moderation</td>
+                <td class="pending_moderation_<?=$website['Website']['id']?>" <?=$convert->needs_attention($attention, ATTENTION_PENDING_MODERATION, $td_attention, $row_color)?> align="center"><a href="/pages/moderate/<?=$website['Website']['id']?>"><?=$website['Website']['page_pending_moderation'];?></a></td>
+			</tr>
+			<tr>
+                <!-- Credits -->
+				<td>Credits</td>
+				<td <?=$row_color?> align="center">
+				<a href="/accounts/credit/<?=$website['Account']['id']?>"><?
+				if ($website['Account']['credits'] < 0) {
+					echo 0;
+				} else {
+					echo number_format($website['Account']['credits']/10);
+				}
+				?></a></td>
+			</tr>
+			<tr>
+			    <!-- Outgoing / Incoming -->
+				<td>Outgoing Total</td>
+				<td <?=$row_color?> align="center"><?=number_format($website['Account']['outgoing'])?></td>
+			</tr>
+			<tr>
+				<td>Incoming Total</td>
+				<td <?=$row_color?> align="center"><?=number_format($website['Account']['incoming'])?></td>
+			</tr>
+			<tr>
+                <!-- Return Rate -->
+				<td>Return Rate</td>
+        			<td <?=$row_color?> align="center">
+        			<?
+	        		if ($website['Account']['incoming']) {
+		        		echo round(($website['Account']['outgoing']/$website['Account']['incoming']) * 100, 0);
+			        } else {
+				        echo "0";
+        			}
+	        		?>%
+		        	</td>
+			</tr>
+			<tr>
+			    <!-- Yesterday Incoming / Outgoing -->
+				<td>Outgoing Yesterday</td>
+				<td class="youtgoing" <?=$row_color?> align="center"></td>
+			</tr>
+			<tr>
+				<td>Incoming Yesterday</td>
+				<td class="yincoming" <?=$row_color?> align="center"></td>
+			</tr>
+			<tr>
+				<!-- Yesterday Return Rate -->
+				<td>Return Rate Yesterday</td>
+        			<td class="yrr" <?=$convert->needs_attention($attention, ATTENTION_RETURN_RATE, $td_attention, $row_color)?> align="center"></td>
+			</tr>
+			<? /*
+			<tr>
+			        <!-- Rolling Landing Page CTR -->
+				<td>Rolling LP CTR</td>
+				<td <?=$convert->needs_attention($attention, ATTENTION_LP_PERFORMANCE, $td_attention, $row_color)?> align="center"><?=round(($website['Website']['landing_page_ctr'] * 100), 2)?>%</td>
+			</tr>
+
+			<tr>
+				<!-- Rolling Landing Page Impressions -->
+				<td>Rolling LP Impressions</td>
+				<td <?=$convert->needs_attention($attention, ATTENTION_ENOUGH_LANDING_PAGE_IMPRESSIONS, $td_attention, $row_color)?> align="center"><a href="/management/landing_page_analytics/0/<?=$website['Website']['domain_primary']?>"><?=number_format(round($website['Website']['r_lp_imp']))?></a></td>
+			</tr>
+			*/ ?>
+			<tr>
+				<!-- Yesterdays LP Impressions -->
+				<td>Yesterdays LP Impressions</td>
+				<td class="y_r_lp_imp" <?=$row_color?> align="center"></a></td>
+			</tr>
+			<tr>
+				<!-- Yesterdays LP CTR -->
+				<td>Yesterdays LP CTR</td>
+				<td class="y_r_lp_ctr" <?=$row_color?> align="center"></td>
+			</tr>
+			<? /*
+			<tr>
+			        <!-- Rolling Widget CTR -->
+				<td>Rolling Widget CTR</td>
+				<td <?=$row_color?> align="center"><?=round(($website['Website']['widget_ctr'] * 100), 2)?>%</td>
+			</tr>
+			<tr>
+				<!-- Rolling Widget Impressions -->
+				<td>Rolling Widget Impressions</td>
+				<td <?=$row_color?> align="center"><a href="/management/widget_analytics_website/<?=$website['Website']['id']?>"><?=number_format(round($website['Website']['r_w_imp']/1000))?>k</a></td>
+			</tr>
+			*/ ?>
+			<tr>
+				<!-- Yesterdays Widget Impressions -->
+				<td>Yesterdays Widget Impressions</td>
+				<td class="y_r_w_imp" <?=$row_color?> align="center"></td>
+			</tr>
+			<tr>
+				<!-- Yesterdays Widget CTR -->
+				<td>Yesterdays Widget CTR</td>
+				<td class="y_r_w_ctr" <?=$row_color?> align="center"></td>
+			</tr>
+			<tr>
+				<!-- Approx Traffic from Landing Pages -->
+				<td>Approx Traffic from LP</td>
+				<td class="aprox_lp_traffic" <?=$row_color?> align="center"><? //=number_format(intval($website['Website']['y_r_lp_imp'] * $website['Website']['y_r_lp_ctr']))?></td>
+			</tr>
+			<tr>
+				<!-- Approx Traffic from Widgets -->
+				<td>Approx Traffic from Widgets</td>
+				<td class="aprox_w_traffic" <?=$row_color?> align="center"><? //=number_format(intval($website['Website']['y_r_w_imp'] * $website['Website']['y_r_w_ctr']))?></td>
+			</tr>
+			<tr>
+			        <!-- Page Freshness -->
+				<td>Average Page Age</td>
+				<td <?=$row_color?> align="center"><?=round($website['Website']['freshness'], 2)?> days</td>
+			</tr>
+			<tr>
+			        <!-- Pages Add -->
+				<td>Add Page Manually</td>
+	        		<td <?=$row_color?> align="center">
+				<div class="awesome purple"><a href="/pages/add/<?=$website['Website']['id']?>" style="color:white">Add</a></div>
+        			</td>
+
+			</tr>
+			<tr>
+			        <!-- Ranker -->
+				<td>Ranker Eligible</td>
+	        		<td <?=$row_color?> align="center">
+				<a href="/websites/moderate/<?=$website['Website']['id']?>"><?=$website['Website']['ranked']?></a>
+        			</td>
+
+			</tr>
+			</table>
+		</div>
+<?
+		}
+?>
+<div id="show_notes" style="display:none;color:black; align:center;">
+</div>

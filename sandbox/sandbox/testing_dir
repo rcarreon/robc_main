@@ -1,0 +1,10 @@
+#!/bin/bash
+#FILE="/home/rcarreon/test"
+if  test -e $*
+then
+echo "el directorio ya existe"
+exit 1 
+else 
+`touch $@`
+echo "el archivo ha sido creado "
+fi 

@@ -1,0 +1,127 @@
+<?php
+
+namespace CI\Filter\Url;
+use CI\String\Exception as StringException;
+
+class Utm implements \CI\Filter
+{
+    protected $bForLogs = false;
+
+    /**
+     * Array of elements to search and remove
+     * from the params of a url
+     *
+     * @var array
+     */
+    protected $aToRemove = array(
+        'utm'          => 0,
+        'utm_source'   => 0,
+        'utm_campaign' => 0,
+        'utm_medium'   => 0,
+        'utm_term'     => 0,
+        'utm_content'  => 0,
+        'icid'         => 0,
+    );
+
+    /**
+     * Filter a url to remove the params related with
+     * utm campaign
+     *
+     * @param string $sValue The value to apply this filter
+     *
+     * @return string The filtered $sValue
+     */
+    public function filter($sValue)
+    {
+        if (false === is_string($sValue)) {
+            throw new StringException(StringException::NOT_VALID, gettype($sValue));
+        }
+
+        $aParams = parse_url($sValue);
+
+        if (isset($aParams['query'])) {
+            $sValue = $this->stripQueryFromUrl($sValue);
+            $aQuery = $this->getQueryElements($aParams['query']);
+            $aQuery = $this->removeUtmParams($aQuery);
+            $sValue = $this->buildUrl($sValue, $aQuery);
+        }
+
+        return $sValue;
+    }
+
+    /**
+     * Strip the query from the url
+     *
+     * @param string $sUrl The url to remove the query from
+     *
+     * @return string
+     */
+    protected function stripQueryFromUrl($sUrl)
+    {
+        return substr($sUrl, 0, strpos($sUrl, '?'));
+    }
+
+    /**
+     * Create the array of elements from the query string
+     *
+     * @param string $sQuery string of query params
+     *
+     * @return array
+     */
+    protected function getQueryElements($sQuery)
+    {
+        $aQueryElements = array();
+        parse_str($sQuery, $aQueryElements);
+        return $aQueryElements;
+    }
+
+    /**
+     * Remove the list of utm params from the query
+     *
+     * @param array $aQueryElements The array of elements from the query
+     *
+     * @return array
+     */
+    protected function removeUtmParams($aQueryElements)
+    {
+        return array_diff_key($aQueryElements, $this->aToRemove);
+    }
+
+    /**
+     * Build the query with the elements and validate
+     * if is not for the logs to decode the query
+     *
+     * @param array $aQueryElements Elements to create the query
+     *
+     * @return string
+     */
+    protected function buildQuery($aQueryElements)
+    {
+        $sQuery  = http_build_query($aQueryElements);
+
+        if (!$this->bForLogs) {
+            $sQuery = urldecode($sQuery);
+        }
+
+        return $sQuery;
+    }
+
+    /**
+     * Build the url with the base url and the
+     * query params.
+     *
+     * @param string $sBase  Base url
+     * @param string $sQuery Query params
+     *
+     * @return string
+     */
+    protected function buildUrl($sBase, $sQuery = '')
+    {
+        if (!empty($sQuery)) {
+            $sQuery  = $this->buildQuery($sQuery);
+            $sBase .= '?' . $sQuery;
+        }
+
+        return $sBase;
+    }
+}

@@ -1,0 +1,17 @@
+<script type="text/x-handlebars-template" id="tpl-report-list-select">
+    <select class="selectpicker" id="report-list" name="report-list" data-live-search="true" data-width="100%">
+        <option value="-1">Nothing selected</option>
+    {{#each this}}
+        <optgroup label="{{@key}}">
+        {{#each this}}
+            <option value="{{id}}"
+            {{#if delete}}
+                data-content="<button class='btn btn-xs btn-danger delete-report' data-id='{{id}}'><i class='fa fa-trash-o'></i></button>&nbsp;&nbsp;{{name}}">{{name}}</option>
+            {{else}}
+                data-content="<button class='btn btn-xs btn-default' disabled='disabled'><i class='fa fa-sign-in'></i></button>&nbsp;&nbsp;{{name}}">{{name}}</option>
+            {{/if}}
+        {{/each}}
+        </optgroup>
+    {{/each}}
+    </select>
+</script>

@@ -1,0 +1,22 @@
+<div class="row main">
+    <div id="content" class="column grid_12">
+        <h3 class="topContent"></h3>
+        <div class="row" id="content_area">
+            <div class="column grid_12">
+                <div style="margin-left:30px;margin-top:18px;padding:12px;font-size:12px;">
+                    <h2>Third-party online advertising</h2>
+                    <br>
+                    <p>Some of the advertisements you see on the Site are selected and delivered by third parties, such as ad networks, advertising agencies, advertisers, and audience segment providers. These third parties may collect information about you and your online activities, either on the Site or on other websites, through cookies, web beacons, and other technologies in an effort to understand your interests and deliver to you advertisements that are tailored to your interests.</p>
+                    <br>
+                    <p>Please remember that Evolve does not have access to, or control over, the information these third parties may collect. The information practices of these third parties are not covered by this privacy policy. </p>
+                    <br>
+                    <p>These third parties may offer you a way to choose not to have your information used for advertising purposes. Some of these companies participate in the Self-Regulatory Program for Online Behavioral Advertising, which offers a single location where users can make choices about the use of their information for ad targeting.  To learn more, please go to <a href="http://www.aboutads.info/choices" target="_blank">www.aboutads.info/choices</a>.  For more information about disabling cookies completely, please visit the <a href="/privacy#your_choices" target="_blank">“Your choices”</a> section of the privacy policy.</p>
+                    <br>
+                    <p>Please note that if you choose to opt out of having your information used to deliver advertisements tailored to your interests, you will continue to see advertisements on the Site, but these advertisements may not be as relevant to you.</p>
+                </div>
+
+            </div>
+        </div>
+        <h3 class="bottomContent"></h3>
+    </div>
+</div>

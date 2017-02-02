@@ -1,0 +1,25 @@
+$TTL    86400 
+evolveplatform.net. IN      SOA     evolveplatform.net. root.evolveplatform.net. (
+                                             2015020501  ; serial
+                                             28800       ; refresh
+                                             14400       ; retry
+                                             3600000     ; expire
+                                             86400 )     ; minimum
+
+evolveplatform.net.                          IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+evolveplatform.net.                          IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+evolveplatform.net.                          IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+evolveplatform.net.                          IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+evolveplatform.net.                          IN    MX 10    cluster9.us.messagelabs.com.
+evolveplatform.net.                          IN    MX 20    cluster9a.us.messagelabs.com.
+
+; #### TitanWP
+evolveplatform.net.                          IN    A        72.172.76.151
+bta.evolveplatform.net.                      IN    A        10.11.234.71
+dev.evolveplatform.net.                      IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.evolveplatform.net.                      IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.evolveplatform.net.                      IN    A        72.172.76.151
+www.evolveplatform.net.                      IN    A        72.172.76.151
+
+; #### End TitanWP

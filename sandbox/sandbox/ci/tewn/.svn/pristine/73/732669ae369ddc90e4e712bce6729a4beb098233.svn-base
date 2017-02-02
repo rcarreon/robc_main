@@ -1,0 +1,311 @@
+<?php
+
+namespace Test;
+
+class EngineTest extends \PHPUnit_Framework_TestCase
+{
+    public function testOrderByIncomingRate()
+    {
+        $aExpected = array(
+            array('incoming' => 10, 'name'=> 'ten'),
+            array('incoming' => 7, 'name'=> 'seven'),
+            array('incoming' => 6, 'name'=> 'six'),
+            array('incoming' => 4, 'name'=> 'four'),
+            array('incoming' => 2, 'name'=> 'two'),
+            array('incoming' => 1, 'name'=> 'one')
+        );
+        $oEngine = $this->getMockForAbstractClass('\CI\Engine');
+        $aResult = $oEngine->orderByIncomingRate(array(
+            array('incoming' => 6, 'name'=> 'six'),
+            array('incoming' => 2, 'name'=> 'two'),
+            array('incoming' => 7, 'name'=> 'seven'),
+            array('incoming' => 1, 'name'=> 'one'),
+            array('incoming' => 10, 'name'=> 'ten'),
+            array('incoming' => 4, 'name'=> 'four')
+        ));
+        $this->assertEquals($aExpected, $aResult);
+    }
+
+    public function testSortAccountsPriority()
+    {
+        $aExpected = array(
+            array(
+                'website_id' => '2094',
+                'id'         => '2387',
+                'credits'    => '2266595',
+                'buying'     => '0',
+                'paid'       => '0',
+                'featured'   => '1'
+            ),
+            array(
+                'website_id' => '309',
+                'id'         => '319',
+                'credits'    => '2212935',
+                'buying'     => '0',
+                'paid'       => '0',
+                'featured'   => '0'
+            ),
+            array(
+                'website_id' => '1578',
+                'id'         => '1668',
+                'credits'    => '2179430',
+                'buying'     => '0',
+                'paid'       => '0',
+                'featured'   => '0'
+            ),
+            array(
+                'website_id' => '13407',
+                'id'         => '25115',
+                'credits'    => '1937000',
+                'buying'     => null,
+                'paid'       => null,
+                'featured'   => null
+            ),
+            array(
+                'website_id' => '227',
+                'id'         => '228',
+                'credits'    => '34',
+                'buying'     => '0',
+                'paid'       => '0',
+                'featured'   => '0',
+            ),
+            array(
+                'website_id' => '45678',
+                'id'         => '567889',
+                'credits'    => '11',
+                'buying'     => '0',
+                'paid'       => '0',
+                'featured'   => '1.5'
+            ),
+            array(
+                'website_id' => '16631',
+                'id'         => '29143',
+                'credits'    => '40',
+                'buying'     => null,
+                'paid'       => null,
+                'featured'   => '0.5'
+            ),
+
+            array(
+                'website_id' => '16795',
+                'id'         => '29319',
+                'credits'    => '60',
+                'buying'     => null,
+                'paid'       => null,
+                'featured'   => null
+            )
+        );
+        $oSetting = $this->getMockBuilder('\CI\Config\System\Setting')
+                          ->setMethods(array('get'))
+                          ->getMock();
+        $oSetting->expects($this->any())
+                 ->method('get')
+                 ->will($this->returnValue(200));
+        $oMetricsDaily = $this->getMockBuilder('\CI\Stats\Website\Metrics\Daily')
+                              ->setMethods(array('getFromDate'))
+                              ->getMock();
+        $oMetricsDaily->expects($this->any())
+                      ->method('getFromDate')
+                      ->will($this->onConsecutiveCalls(
+            array(
+                'incoming' => 2015
+            ),
+            array(
+                'incoming' => 3489
+            ),
+            array(
+                'incoming' => 3489
+            ),
+            array(
+                'incoming' => 56789
+            )
+        ));
+
+        $oEngine = $this->getMockBuilder('\CI\Engine')
+                        ->setMethods(array('getMetricsDailyObject', 'getSettingObject'))
+                        ->getMock();
+        $oEngine->expects($this->exactly(9))
+                ->method('skipAccount')
+                ->will($this->onConsecutiveCalls(true, false, false, false, false, false, false, false, false));
+        $oEngine->expects($this->once())
+                ->method('getSettingObject')
+                ->will($this->returnValue($oSetting));
+        $oEngine->expects($this->once())
+                ->method('getMetricsDailyObject')
+                ->will($this->returnValue($oMetricsDaily));
+
+        $aAccounts = array(
+            array(
+                'website_id' => '666',
+                'id'         => '666',
+                'credits'    => '2',
+                'buying'     => '0',
+                'paid'       => '0',
+                'featured'   => null
+            ),
+            array(
+                'website_id' => '16795',
+                'id'         => '29319',
+                'credits'    => 60,
+                'buying'     => null,
+                'paid'       => null,
+                'featured'   => null,
+            ),
+            array(
+                'website_id' => '2094',
+                'id'         => '2387',
+                'credits'    => '2266595',
+                'buying'     => '0',
+                'paid'       => '0',
+                'featured'   => '1'
+            ),
+            array(
+                'website_id' => '309',
+                'id'         => '319',
+                'credits'    => '2212935',
+                'buying'     => '0',
+                'paid'       => '0',
+                'featured'   => '0'
+            ),
+            array(
+                'website_id' => '1578',
+                'id'         => '1668',
+                'credits'    => '2179430',
+                'buying'     => '0',
+                'paid'       => '0',
+                'featured'   => '0'
+            ),
+            array(
+                'website_id' => '13407',
+                'id'         => '25115',
+                'credits'    => '1937000',
+                'buying'     => null,
+                'paid'       => null,
+                'featured'   => null
+            ),
+            array(
+                'website_id' => '16631',
+                'id'         => '29143',
+                'credits'    => '40',
+                'buying'     => null,
+                'paid'       => null,
+                'featured'   => '0.5'
+            ),
+            array(
+                'website_id' => '45678',
+                'id'         => '567889',
+                'credits'    => '11',
+                'buying'     => '0',
+                'paid'       => '0',
+                'featured'   => '1.5'
+            ),
+            array(
+                'website_id' => '227',
+                'id'         => '228',
+                'credits'    => '34',
+                'buying'     => '0',
+                'paid'       => '0',
+                'featured'   => '0'
+            )
+        );
+
+        $aResult = $oEngine->sortAccountsPriority($aAccounts);
+
+        $this->assertEquals($aExpected, $aResult);
+    }
+
+    public function testGetAccountsByPriority()
+    {
+        $aExpected = array(
+            2387  => 4,
+            3628  => 1.9817647058824,
+            2490  => 1.9764705882353,
+            15450 => 1.8494117647059,
+            14315 => 1.8447058823529,
+            19910 => 1.7482352941176,
+            15442 => 1.7311764705882,
+            304   => 1.7294117647059,
+            21151 => 1.6911764705882,
+            21824 => 1.6682352941176,
+            28907 => 1.6652941176471,
+            3169  => 1.6017647058824,
+        );
+        $nDomainBit = 1;
+
+        $oAccount = $this->getMockBuilder('\CI\Component\Account')
+                         ->setMethods(array('getRunningByDomainBit'))
+                         ->getMock();
+        $oAccount->expects($this->once())
+                 ->method('getRunningByDomainBit')
+                 ->will($this->returnValue(
+                    array(
+                        array('id' => 21151, 'website_id' => 39),
+                        array('id' => 2490, 'website_id' => 3),
+                        array('id' => 28907, 'website_id' => 31),
+                        array('id' => 2387, 'website_id' => 32),
+                        array('id' => 3628, 'website_id' => 33),
+                        array('id' => 15450, 'website_id' => 34),
+                        array('id' => 14315, 'website_id' => 35),
+                        array('id' => 19910, 'website_id' => 36),
+                        array('id' => 304, 'website_id' => 38),
+                        array('id' => 15442, 'website_id' => 37),
+                        array('id' => 3169, 'website_id' => 378),
+                        array('id' => 21824, 'website_id' => 50),
+                    )
+                 )
+        );
+        $oFormulas = $this->getMockBuilder('\CI\Formulas\Widget')
+                          ->setMethods(array('getWeightModifier'))
+                          ->getMock();
+
+        $oEngine = $this->getMockBuilder('\CI\Engine')
+                        ->setMethods(array('getWeightModifier', 'getAccountObject'))
+                        ->getMock();
+        $oEngine->expects($this->exactly(12))
+                ->method('getWeightModifier')
+                ->will($this->onConsecutiveCalls(
+                    1.6911764705882,
+                    1.9764705882353,
+                    1.6652941176471,
+                    4,
+                    1.9817647058824,
+                    1.8494117647059,
+                    1.8447058823529,
+                    1.7482352941176,
+                    1.7294117647059,
+                    1.7311764705882,
+                    1.6017647058824,
+                    1.6682352941176
+                )
+        );
+        $oEngine->expects($this->once())
+                ->method('getAccountObject')
+                ->will($this->returnValue($oAccount));
+        $aResult = $oEngine->getAccountsByPriority($nDomainBit);
+        $this->assertEquals($aExpected, $aResult);
+    }
+
+    // The code below was copy from http://stackoverflow.com/questions/8040296/mocking-concrete-method-in-abstract-class-using-phpunit
+    // to can rewrite the methods from abstract class
+    public function getMock($originalClassName, $methods = array(), array $arguments = array(), $mockClassName = '', $callOriginalConstructor = TRUE, $callOriginalClone = TRUE, $callAutoload = TRUE, $cloneArguments = false) {
+        if ($methods !== null) {
+            $methods = array_unique(array_merge($methods,
+                    self::getAbstractMethods($originalClassName, $callAutoload)));
+        }
+        return parent::getMock($originalClassName, $methods, $arguments, $mockClassName, $callOriginalConstructor, $callOriginalClone, $callAutoload);
+    }
+
+    public static function getAbstractMethods($class, $autoload=true) {
+        $methods = array();
+        if (class_exists($class, $autoload) || interface_exists($class, $autoload)) {
+            $reflector = new \ReflectionClass($class);
+            foreach ($reflector->getMethods() as $method) {
+                if ($method->isAbstract()) {
+                    $methods[] = $method->getName();
+                }
+            }
+        }
+        return $methods;
+    }
+
+}

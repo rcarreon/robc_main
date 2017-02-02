@@ -1,0 +1,29 @@
+<?php
+/* SVN FILE: $Id$ */
+/* WebsitesController Test cases generated on: 2010-03-06 14:47:50 : 1267908470*/
+
+class WebsitesControllerTest extends CakeTestCase {
+	var $Websites = null;
+	var $fixtures = array(
+		'app.website', 'app.page', 'app.account',
+		'app.widget', 'app.widget_analytic', 'app.user',
+		'app.landing_page_analytic', 'widget_rebalance',
+		'metric_log', 'app.tag', 'app.website_allowed_tag', 'app.settings'
+	);
+
+	function startTest() {
+		App::import('Controller', 'Websites');
+		$this->Websites = new WebsitesController();
+		$this->Websites->constructClasses();
+		$this->Websites->autoRender = false;
+	}
+
+	function testWebsitesControllerInstance() {
+		$this->assertTrue(is_a($this->Websites, 'WebsitesController'));
+	}
+
+	function endTest() {
+		unset($this->Websites);
+	}
+}
+?>

@@ -1,0 +1,78 @@
+jQuery(function() {
+    (function() {
+       // Define which url we want to add
+       var url = '/js/backend2/analysis.js';
+
+        // adding the script tag to the head as suggested before
+       var head = document.getElementsByTagName('head')[0];
+       var script = document.createElement('script');
+       script.type = 'text/javascript';
+       script.src = url;
+
+       // then bind the event to the callback function
+       // there are several events for cross browser compatibility
+       var callback = function() {
+            CI.Analysis.Process.spinElement = 'div.content-column';
+            CI.Analysis.Builder.buildElement = '#tbody_results';
+
+            // Abort a pending request
+            $(window).unload(function() { CI.setRequest(null); });
+
+            $(".chosen-select").chosen({max_selected_options: 5});
+            $("#analyse_websites").click(function() {
+                var websites = $("#website_select").val();
+                if (null == websites) {
+                    return false;
+                }
+                CI.setRequest(CI.Analysis.Process.websites(websites));
+                return false;
+            });
+
+            $("#clear_analyse_websites").click(function() {
+                if (confirm('Are you sure you want to clear all the results?')) {
+                    $('#tbody_results').html('');
+                }
+                return false;
+            });
+
+            $("#share_link_dialog input[type=text]").click(function(){
+                this.select();
+            });
+
+            $("#share_link").click(function() {
+                if (!window.location.origin) {
+                    window.location.origin = window.location.protocol + "//" + window.location.host;
+                }
+                var url = window.location.origin + '/analysis/websites/' + $("#website_select").val();
+                $("#share_link_dialog input[type=text]").val(url);
+                $("#share_link_dialog").dialog({
+                    height: 70,
+                    width: 300,
+                    resizable: false,
+                    position: {
+                        my: "left top",
+                        at: "center",
+                        of: "#share_link"
+                    }
+                });
+            });
+
+            $(".tooltip").qtip({
+                position: { my:'bottom center', at:'top center' },
+                style: { classes: 'ui-tooltip-plain' }
+            });
+
+            if ('undefined' !== typeof CIStartProcess) {
+                $("#website_select").val(CIStartProcess.split(','));
+                $("#website_select").trigger("liszt:updated");
+                CI.Analysis.Process.websites(CIStartProcess);
+            }
+       };
+
+       script.onreadystatechange = callback;
+       script.onload = callback;
+
+       // fire the loading
+       head.appendChild(script);
+    })();
+});

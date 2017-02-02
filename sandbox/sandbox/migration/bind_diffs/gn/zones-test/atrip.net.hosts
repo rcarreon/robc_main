@@ -1,0 +1,39 @@
+$TTL 86400
+atrip.net.		IN      SOA     atrip.net. root.atrip.net. (
+                        2014061900	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+atrip.net.	IN	NS		app3v-dns.tp.prd.lax.craveonline.com.
+atrip.net.	IN	NS		app4v-dns.tp.prd.lax.craveonline.com.
+atrip.net.	IN	NS		app1v-dns.tp.prd.lax.craveonline.com.
+atrip.net.	IN	NS		app2v-dns.tp.prd.lax.craveonline.com.
+atrip.net.	IN	MX	1	mail.craveonline.com.
+;
+; local host
+;
+local           IN      A       127.0.0.1
+localhost       IN      A       127.0.0.1
+loghost         IN      A       127.0.0.1
+;
+;
+; hosts
+;ns1.atrip.net.		IN	A	67.18.216.74
+;atrip.net.		IN      A       67.18.216.74 
+;ftp.atrip.net.		IN	A	67.18.216.74
+;actiontrip.atrip.net.	IN	A	67.18.216.74
+;atrip02.atrip.net.	IN	A	67.18.216.74
+;atforums.atrip.net.	IN	A	67.18.216.74
+ns1.atrip.net.         IN      A       72.172.76.21 
+atrip.net.             IN      A       72.172.76.21
+;new.atrip.net.         IN      A       10.2.10.194
+;newqa.atrip.net.       IN      A       10.2.10.194
+ftp.atrip.net.         IN      A       72.172.76.21
+actiontrip.atrip.net.  IN      A       72.172.76.21
+atrip02.atrip.net.     IN      A       72.172.76.21
+atforums.atrip.net.    IN      A       72.172.76.21
+mail.atrip.net.		IN	CNAME	atrip.net.
+www.atrip.net.		IN      CNAME   atrip.net.

@@ -1,0 +1,231 @@
+<?php
+
+class Setting extends AppModel {
+
+    const TYPE_TRAFFIC_LANDING = 'landing_page';
+    const TYPE_TRAFFIC_WIDGET = 'widget';
+
+    var $name = 'Setting';
+    var $validate = array(
+        'website' => array(
+            'rule' => 'url')
+    );
+
+	/*
+	 * receives an array with the settings to store.
+	 * if the key exists, set_all will updated it, if not it'll will add it.
+	 */
+	public function set_all(Array $tunables) {
+
+		$settings = array();
+		$settings_to_add = array();
+
+		foreach ($tunables as $name => $value) {
+			$setting = $this->get_setting($name);
+
+			if (isset($setting['Setting'])) {
+				// update it
+				$this->id = $setting['Setting']['id'];
+				$rc = $this->saveField('value', $value, true);
+				if ($rc) {
+					$this->set_setting_cache($name, $value);
+				}
+			} else {
+				// add it
+				$setting['value'] = $value;
+				$settings_to_add[] = $setting;
+			}
+		}
+
+		// add the new settings
+		if ($settings_to_add) {
+			$rc = $this->saveAll($settings_to_add);
+			if ($rc) {
+				foreach($settings_to_add as $setting) {
+					$this->set_setting_cache($setting['name'], $setting['value']);
+				}
+			}
+		}
+	}
+
+	/*
+	 * stores the tunables per hub
+	 */
+	public function set_all_per_hub($hub_id, $settings) {
+		$new_settings = array();
+		foreach ($settings as $name => $value) {
+			$new_settings[$name . '_hub_' . $hub_id] = $value;
+		}
+
+		$this->set_all($new_settings);
+	}
+
+	/*
+	 * returns the value of a key, with the filter() applied.
+	 */
+	public function get($name) {
+		$result = $this->get_setting_cache($name);
+
+		// if setting is not cached
+		if (false === $result) {
+			$setting = $this->get_setting($name);
+
+			if (isset($setting['Setting']['value'])) {
+				$result = $this->filter($name, $setting['Setting']['value']);
+				// store it in memcached
+				$this->set_setting_cache($name, $result);
+			} else {
+				$result = null;
+			}
+		}
+
+		return $result;
+	}
+
+	/*
+	 * returns a key in the way that cakephp returns it from db
+	 */
+	private function get_setting($name) {
+		$result = $this->findByName($name);
+
+		if (!$result) {
+			plat_assert(false, 'the constant ' . $name . ' does not exist in Settings table.', true);
+		}
+
+		return $result;
+	}
+
+	/*
+	 * To apply operations to some keys before to serve the data
+	 */
+	private function filter($name, $value) {
+		$result = $value;
+
+		switch ($name) {
+			case 'RANK_TRAFFIC_HISTORY':
+				$result = $this->get('RANK_TRAFFIC_PERIOD') * $value;
+				break;
+			case 'SOCIAL_TRAFFIC_HISTORY':
+				$result = $this->get('SOCIAL_TRAFFIC_PERIOD') * $value;
+				break;
+		}
+
+		return $result;
+	}
+
+	public function validate($name, $value)
+	{
+		$error_message = '';
+
+		switch ($name) {
+			case 'cpc_landing_page_percentage_of_paid_links':
+				if (!ctype_digit($value) || ($value < 0 || $value > 100)) {
+					$error_message = "The value for {$name} is not valid, must be a numeric value between 0 and 100.";
+				}
+				break;
+            case 'WIDGET_CATEGORY_BOOST':
+                if (!is_numeric($value) || ($value < 0 || $value > 100)) {
+                    $error_message = "The value for {$name} is not valid, must be a numeric value between 0 and 100.";
+                }
+                break;
+            case 'WIDGET_TRAFFIC_TO_PEAK':
+                if (!ctype_digit($value) || ($value < 0 || $value > 100)) {
+                    $error_message = "The value for {$name} is not valid, must be a numeric value between 0 and 100.";
+                }
+                break;
+            case 'LANDING_TRAFFIC_TO_PEAK':
+                if (!ctype_digit($value) || ($value < 0 || $value > 100)) {
+                    $error_message = "The value for {$name} is not valid, must be a numeric value between 0 and 100.";
+                }
+                break;
+            case 'DRIVE_TRAFFIC':
+                if (! empty($value)) {
+                    $oValidation = Validation::getInstance();
+
+                    foreach($value as $row_data) {
+                        $bUrlValid = false;
+
+                        if (empty($row_data['type']) || $row_data['type'] != self::TYPE_TRAFFIC_WIDGET && $row_data['type'] != self::TYPE_TRAFFIC_LANDING) {
+                            $error_message = "The type in {$name} is invalid, must be landing page or widget";
+                            break;
+                        }
+
+                        if (! isset($row_data['percentage']) || !ctype_digit($row_data['percentage']) || ($row_data['percentage'] < 0 || $row_data['percentage'] > 100)) {
+                            $error_message = "The percentage for {$name} is not valid, must be a numeric value between 0 and 100.";
+                            break;
+                        }
+
+                        // Validate url
+                        if (! empty($row_data['url'])) {
+                            $url = sprintf($row_data['url'], 'validateurl.com');
+                            $bUrlValid = $oValidation->url($url);
+                        }
+
+                        if (! $bUrlValid){
+                            $error_message = "The url for {$name} is invalid";
+                            break;
+                        }
+
+                    }
+                }
+                break;
+		}
+
+		return $error_message;
+	}
+
+	function tunable($tunable, $domain_id) {
+
+		switch ($tunable) {
+		case 'WIDGET_PENALIZE':
+			return $this->get('widget_penalize_hub_'.$domain_id);
+			break;
+		case 'WIDGET_PENALIZE_THRESHOLD':
+			return $this->get('widget_penalize_threshold_hub_'.$domain_id);
+			break;
+		case 'WIDGET_PENALIZE_SMALL_SITE':
+			return $this->get('widget_penalize_small_site_hub_'.$domain_id);
+			break;
+		case 'WIDGET_PENALIZE_SMALL_SITE_THRESHOLD':
+			return $this->get('widget_penalize_small_site_threshold_hub_'.$domain_id);
+			break;
+		case 'LANDING_PAGE_PENALIZE':
+			return $this->get('landing_page_penalize_hub_'.$domain_id);
+			break;
+		case 'LANDING_PAGE_PENALIZE_THRESHOLD':
+			return $this->get('landing_page_penalize_threshold_hub_'.$domain_id);
+			break;
+		case 'LANDING_PAGE_PENALIZE_SMALL_SITE':
+			return $this->get('landing_page_penalize_small_site_hub_'.$domain_id);
+			break;
+		case 'LANDING_PAGE_PENALIZE_SMALL_SITE_THRESHOLD':
+			return $this->get('landing_page_penalize_small_site_threshold_hub_'.$domain_id);
+			break;
+		case 'IDEAL_RETURN_RATE':
+			return $this->get('ideal_return_rate_hub_'.$domain_id);
+			break;
+		default:
+			plat_assert(0);
+		}
+	}
+
+	private function get_setting_cache($name) {
+		$key = $this->setting_key($name);
+
+		return $this->memcached_get($key);
+	}
+
+	private function set_setting_cache($name, $value) {
+		$key = $this->setting_key($name);
+
+		$this->memcached_set($key, $value);
+	}
+
+	private function setting_key($name) {
+		return 'setting::'.md5($name);
+	}
+
+	private function setting_hub_key($name, $hub_id) {
+		return 'setting::'.md5($name.'_hub_'.$hub_id);
+	}
+}

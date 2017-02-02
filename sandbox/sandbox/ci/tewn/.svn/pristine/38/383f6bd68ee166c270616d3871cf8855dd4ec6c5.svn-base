@@ -1,0 +1,2236 @@
+<?php
+include_once (ROOT . DS . APP_DIR . DS . "global_defines.php");
+
+class PagesController extends AppController {
+
+    const SEARCH_BY_NAME = 'name';
+    const SEARCH_BY_ID = 'id';
+
+    const PAGE_RATING_BIGGER_THAN_WEBSITE = 0;
+    const WEBSITE_RATING_BIGGER_THAN_PAGE = 0;
+
+    var $name = 'Pages';
+    var $uses = array("Website", "Page", 'LandingPageAnalytic', 'Account', "Log", "WidgetAnalytic", "User", "Widget", "ContextualEngine", "MetricLog", 'SocialPage', 'HistorySocial', 'Tag', 'PageTag', 'Stats', 'StatsPage');
+    var $helpers = array("Html", "Ajax", "Form", "Convert", "Javascript", "Paginator");
+    var $components = array("RequestHandler", "Intersects", "Analytic", "Pingback", "Timer", "Date");
+    var $pageTitle = SITE_NAME;
+    var $CakeMemcache = NULL;
+
+    var $cache_on = 1;
+    private $is_admin = false;
+    private $is_curator = false;
+
+
+    function beforeFilter() {
+        $this->Session->activate();
+        $user = $this->Session->read('User');
+        $this->set_types_user($user);
+        $this->is_admin = $this->User->isAdmin($user['id'], $user['admin']);
+        $this->is_curator = $this->User->isCurator($user['id'], $user['admin']);
+
+        App::import('Controller', 'ContextualEngine');
+        global $ContextualEngine;
+        $ContextualEngine = new ContextualEngineController;
+        $ContextualEngine->constructClasses();
+
+        App::import('Controller', 'HistoryCredits');
+        global $HistoryCredits;
+        $HistoryCredits = new HistoryCreditsController;
+        $HistoryCredits->constructClasses();
+
+        App::import('Controller', 'SocialPages');
+        global $SocialPages;
+        $SocialPages = new SocialPagesController;
+        $SocialPages->constructClasses();
+
+        App::import('Controller', 'HistorySocial');
+        global $HistorySocial;
+        $HistorySocial = new HistorySocialController;
+        $HistorySocial->constructClasses();
+
+        App::import('Controller', 'Tags');
+        global $Tags;
+        $Tags = new TagsController;
+        $Tags->constructClasses();
+
+        $this->layout = DOMAIN.'/default';
+    }
+
+    function get_web_page($url) {
+        App::import('vendor', 'curl');
+        return Curl::instance()->get_headers($url);
+    }
+
+    function convert_special($data) {
+        $search = array('&#8216;',
+                chr(96),
+                '&#8217;',
+                '&#8222;',
+                '&#8221;',
+                '&#8220;',
+                '&#8230;',
+                '&#8211;',
+                '&#8242;',
+                '’',
+                '‘',
+                '“',
+                '”',
+                '″',
+                '…',
+                '’',
+                '–',
+                '&amp;',
+                '&#8212',
+                );
+
+        $replace = array(    "'",
+                     "'",
+                     "'",
+                     '"',
+                     '"',
+                     '"',
+                     '...',
+                     '-',
+                     "'",
+                     "'",
+                     "'",
+                     '"',
+                     '"',
+                     '"',
+                     '...',
+                     "'",
+                     '-',
+                     '&',
+                     '-',
+                     );
+
+        return str_replace($search, $replace, $data);
+    }
+
+
+    function scrape_title($page) {
+        $store_db = false;
+        $empty_title = 'ci_empty_page_title';
+
+        if (isset($page['Page']['title_regex'])) {
+            $regex_title = $page['Page']['title_regex'];
+        } else {
+            $regex_title = $this->Website->field("title_regex", array("id" => $page['Page']['website_id']));
+        }
+
+        if (!$regex_title) {
+            $regex_title = '#<title[^>]*>(.*?)</title>#';
+        }
+
+        $title_cache = $this->Page->get_title_cache($page);
+        if ($title_cache) {
+            return $title_cache == $empty_title ? '' : $title_cache;
+        } else {
+            $start = microtime(true);
+            echo 'Getting page (', $page['Page']['url'], '): ';
+            $webpage = $this->get_web_page($page['Page']['url']);
+            echo (microtime(true) - $start), "<br/>\n";
+            if ($webpage['errno']) {
+                echo 'Error in page ', $page['Page']['url'], ": ", $webpage['errno'], "<br/>\n";
+                $this->log($page['Page']['url'].": ".$webpage['errno'], "pages");
+                // we cache the title response as empty for 1 day
+                $this->Page->set_title_cache($page, $empty_title, DAYS * 1);
+                return '';
+            }
+            $content = $webpage['content'];
+            $store_db = true;
+        }
+
+        preg_match($regex_title, $content, $matches);
+
+        if (!isset($matches[1])) {
+            // Fall back to a generic regex
+            $regex_title = '#<title[^>]*>(.*?)</title>#';
+            preg_match($regex_title, $content, $matches);
+        }
+
+        if (!isset($matches[1]) || empty($matches[1])) {
+            // we cache the title response as empty for 1 day
+            $this->Page->set_title_cache($page, $empty_title, DAYS * 1);
+            return '';
+        }
+
+        $title = $this->convert_special($matches[1]);
+        $title = trim($title);
+
+        $this->Page->set_title_cache($page, $title);
+
+        if ($store_db) {
+            $this->Page->id = $page['Page']['id'];
+            $this->Page->saveField('title', $title);
+        }
+
+        return $title;
+    }
+
+    function get_title($page_id) {
+        Configure::write('debug', 0);
+
+        $page = $this->Page->findById($page_id);
+
+        if (empty($page['Page']['title'])) {
+            $title = $this->scrape_title($page);
+        } else {
+            $title = $page['Page']['title'];
+        }
+
+        $this->set("title_out", $title);
+    }
+
+    function scrape_description($page) {
+        App::import('Component', 'opengraph');
+
+        $og = new opengraphComponent($page['Page']['url']);
+
+        $description = $og->description;
+
+        return $description ? $description : '';
+    }
+
+    function scrape_info($page) {
+        App::import('Component', 'opengraph');
+
+        $og = new opengraphComponent($page['Page']['url']);
+
+        $info['image'] = $og->image;
+        $info['description'] = $og->description;
+        $info['title'] = $og->title;
+        $info['url'] = $og->url;
+
+        return $info;
+    }
+
+    function get_description($page_id) {
+        Configure::write('debug', 0);
+
+        $page = $this->Page->findById($page_id);
+
+        $title = $this->scrape_description($page);
+
+        $this->set("description_out", $title);
+    }
+
+    function get_info($page_id) {
+
+        Configure::write('debug', 0);
+        $page = $this->Page->findById($page_id);
+
+        $info = array();
+
+        if (empty($page['Page']['title'])) {
+            $info['title'] = $this->scrape_title($page);
+        } else {
+            $info['title'] = $page['Page']['title'];
+        }
+
+        $info['description'] = $this->scrape_description($page);
+
+        $this->autoRender = false;
+        echo json_encode($info);
+    }
+
+    function title_url($title_in, $id_in = 0) {
+        return $this->Page->title_url($title_in, $id_in);
+    }
+
+    function moderate($website_id = 0, $page_id = 0, $social = 0) {
+        global $SocialPages;
+        global $Tags;
+
+        $this->Log->page_view();
+        $this->MetricLog->log(LOG_TYPE_PAGE_VIEW, $website_id, $page_id);
+
+        // Check if admin
+        if (!$this->is_curator) {
+            $this->saveUrl($_SERVER['REQUEST_URI']);
+            $this->redirect("/login");
+            exit();
+        }
+
+        if (!$page_id && !$website_id) {
+            $websites = $this->Website->find("all", array("conditions" => array(
+                                          "status" => WEBSITE_STATUS_ACTIVE,
+                                          "visible" => true)));
+            $pages = array();
+            /* Get all the pages that the user added */
+            foreach ($websites as $website) {
+                // This needs to change to top posts
+                $tmp_pages = $this->Page->get_pending_moderation($website['Website']['id']);
+
+                foreach ($tmp_pages as $tmp) {
+                    array_push($pages, $tmp);
+                }
+            }
+
+            /* All the other pages that are pending moderation */
+            foreach ($websites as $website) {
+                // This needs to change to top posts
+                $tmp_pages = $this->Page->get_websites_by_rank($website['Website']['id'], PAGE_STATUS_PENDING);
+
+                foreach ($tmp_pages as $tmp) {
+                    array_push($pages, $tmp);
+                }
+            }
+        } elseif ($page_id) {
+            $this->Page->bindModel(
+                array(
+                    'hasOne' => array(
+                        'User' => array(
+                            'className'  => 'User',
+                            'conditions' => 'Page.moderator_user_id = User.id',
+                            'foreignKey' => false
+                        )
+                    )
+                )
+            );
+
+            $pages = $this->Page->find(
+                'all',
+                array(
+                    'conditions' => array(
+                        'Page.id' => $page_id
+                    )
+                )
+            );
+        } else {
+            $pages = array();
+
+            /* Pages User has requested */
+            $tmp_pages = $this->Page->get_pending_moderation($website_id);
+            foreach ($tmp_pages as $tmp) {
+                array_push($pages, $tmp);
+            }
+
+            /* All the other pages */
+            if ($social) {
+                $tmp_pages = $SocialPages->get_website_pages_by_social($website_id, PAGE_STATUS_PENDING, 20, 1);
+            } else {
+                $tmp_pages = $this->Page->get_websites_by_rank($website_id, PAGE_STATUS_PENDING);
+            }
+            foreach ($tmp_pages as $tmp) {
+                array_push($pages, $tmp);
+            }
+
+        }
+        $websites = array();
+
+        $i = 0;
+        foreach ($pages as $page) {
+            $websites[$page['Page']['website_id']] = $this->Website->findById($page['Page']['website_id']);
+            plat_assert($websites[$page['Page']['website_id']]);
+        }
+
+        /* XXX remove this section when subcategories get ajax loaded */
+        $count = count($pages);
+        $asset_image = new \CI\Asset\Image();
+
+        $this->loadModel('PageCategory');
+        $this->loadModel('PageSubcategory');
+
+        for ($i = 0; $i < $count; $i++) {
+            $page = $pages[$i];
+
+            $pages[$i]['Page']['tags'] = array();
+            $pages[$i]['Page']['tags'] = $Tags->list_page_tags($page['Page']['id']);
+            $pages[$i]['Page']['categories'] = $this->PageCategory->get_with_name_by_page_id($page['Page']['id']);
+            $pages[$i]['Page']['subcategories'] = $this->PageSubcategory->get_visible_by_page_id($page['Page']['id']);
+
+            // asign the  path of all the images to don't call any class to generate this on moderate.ctp
+            $pages[$i]['Page']['image_url'] = $asset_image->getUrl(
+                array(
+                    'page_id' => $pages[$i]['Page']['id'],
+                    'type' => \CI\Asset\Image::URL_RELATIVE,
+                    'image' => $pages[$i]['Page']['image'],
+                    'extra_parameters' => array(
+                        't' => strtotime($pages[$i]['Page']['moderator_modified'])
+                    )
+                )
+            );
+        }
+
+        $this->Session->activate();
+        $user = $this->Session->read('User');
+        $user = $this->User->findById($user['id']);
+        $all_tags = $this->Tag->get_tags_active();
+
+        $this->set('user', $user);
+        $this->set('all_tags', $all_tags);
+        $this->set('social', $social);
+        $this->set('pages', $pages);
+        $this->set('websites', $websites);
+        $this->set('website_id', $website_id);
+        $this->set('isHomepage', false);
+        $this->set('preview_style', false);
+    }
+
+    /*
+     * This action is waiting for $_POST data with the file to be uploaded to img/upload/tmp
+     * This file is intended to be used on the add() action (in the case we don't want to use
+     * and http url as a image source).
+     */
+    public function upload_image(){
+        $this->autoRender = false;
+        Configure::write('debug', 0);
+
+        try{
+            $image_manipulator = new \CI\Image\Manipulator();
+            $img_path = $image_manipulator->importFromStream(true);
+            $result = array('success' => $img_path);
+        }Catch(Exception $e){
+            $result = array("error" => print_r($e->getTrace(), true));
+        }
+
+        echo json_encode($result);
+    }
+
+    function by_category() {
+        if (isset($this->params['form']['category']) && isset($this->params['form']['limit'])) {
+            $oForm = new \CI\ArrayManipulator($this->params['form']);
+
+            $hub_id             = (int) $oForm->get('hub', 0);
+            $category_id        = (int) $oForm->get('category', 0);
+            $content_raiting_id = (int) $oForm->get('raiting', 0);
+            $website_status     = (int) $oForm->get('website_status', 0);
+            $limit              = (int) $oForm->get('limit', 0);
+            $mismatch_rating    = (int) $oForm->get('mistmatch', 0);
+            $zero_stats         = (boolean) $oForm->get('only_zero_stats', false);
+
+            $fields   = array(
+                'Page.id',
+                'Page.title',
+                'Page.title_url',
+                'Page.url',
+                'Page.website_id',
+                'Page.image',
+                'Page.description',
+                'Page.category',
+                'Page.subcategory',
+                'Page.content_rating',
+                'Page.created',
+                'websites.name',
+                'websites.category',
+                'websites.domain_primary',
+                'websites.status',
+                'websites.content_rating'
+            );
+
+            $params = array(
+                'joins' => array(
+                    array(
+                        'table' => 'websites',
+                        'type'=> 'INNER',
+                        'conditions' => array(
+                            'websites.id = Page.website_id',
+                        )
+                    )
+                )
+            );
+
+            $params['conditions'] = array(
+                'Page.status'   => PAGE_STATUS_APPROVED,
+                'Page.visible'  => 1,
+            );
+
+            if ($zero_stats) {
+                $created = date('Y-m-d H:i:s', strtotime('-2 week'));
+                $exclude_ids = $this->get_websites_ids_with_non_zero_clicks();
+                $params['conditions']['Page.id NOT'] = $exclude_ids;
+                $params['conditions']['Page.created < '] = $created;
+            }
+
+            if ($hub_id > DOMAIN_ID_ALL) {
+                $params['conditions']['websites.domain_primary'] = $hub_id;
+            }
+            if ($category_id > CATEGORY_ALL) {
+                $params['conditions']['Page.category'] = $category_id;
+            }
+            if ($website_status == WEBSITE_STATUS_ACTIVE) {
+                $params['conditions']['websites.status'] = WEBSITE_STATUS_ACTIVE;
+            } else if ($website_status > WEBSITE_STATUS_ACTIVE) {
+                $params['conditions']['websites.status <>'] = WEBSITE_STATUS_ACTIVE;
+            }
+            if ($content_raiting_id >= WEBSITE_CONTENT_G) {
+                $params['conditions']['Page.content_rating'] = $content_raiting_id;
+                if ($mismatch_rating == self::PAGE_RATING_BIGGER_THAN_WEBSITE) {
+                    $params['conditions']['websites.content_rating <'] = $content_raiting_id;
+                } else if ($mismatch_rating == self::WEBSITE_RATING_BIGGER_THAN_PAGE) {
+                    $params['conditions']['websites.content_rating >'] = $content_raiting_id;
+                }
+            }
+            if (isset($this->params['form']['page'])) {
+                $params['page'] = (int) $this->params['form']['page'];
+            }
+
+            $params['fields'] = $fields;
+            $params['limit']  = $limit;
+
+            $this->paginate = $params;
+            $pages = $this->paginate('Page');
+
+            $this->set("pages", $pages);
+            $this->set('all_subcategories', $this->Tag->all_subcategory_list());
+            $this->layout = 'ajax';
+        }
+    }
+
+    function get_websites_ids_with_non_zero_clicks()
+    {
+        $this->loadModel('StatsWidgetPages');
+
+        $end_date   = time();
+        $start_date = strtotime('-2 week');
+        $return     = array();
+        $key        = $this->StatsWidgetPages->key_websites_ids_with_non_zero_clicks();
+
+        if ($this->cache_on) {
+            $websites_ids = $this->StatsWidgetPages->memcached_get_json($key);
+        }
+
+        if (empty($websites_ids)) {
+            $params = array(
+                'fields'     => array('page_id', 'website_id'),
+                'conditions' => array(
+                    'created BETWEEN ? AND ?' => array($start_date, $end_date),
+                    'clicks >' => 0,
+                ),
+            );
+
+            $websites_ids = $this->StatsWidgetPages->find(
+                'list',
+                $params
+            );
+
+            if ($this->cache_on && $websites_ids !== false) {
+                $this->StatsWidgetPages->memcached_set_json($key, $websites_ids, 300); // cache the data for 5 minutes
+            }
+        }
+
+        if ($websites_ids !== false) {
+            $return = array_keys($websites_ids);
+        }
+
+        return $return;
+    }
+
+    function verify_page_url()
+    {
+        Configure::write('debug', 0);
+        $this->autoRender = false;
+        $page = false;
+
+        if (!empty($_POST['url'])) {
+            $url  = $_POST['url'];
+            $page = $this->Page->find(
+                'first',
+                array(
+                    'fields' => array(
+                        'id',
+                    ),
+                    'conditions' => array(
+                        'url'    => $url,
+                        'status' => array(
+                            PAGE_STATUS_APPROVED,
+                            PAGE_STATUS_DENIED,
+                        )
+                    ),
+                )
+            );
+        }
+
+        return json_encode(
+            array(
+                'result' => $page ? 1 : 0,
+            )
+        );
+    }
+
+    function add($website_id = 0) {
+        $this->Session->activate();
+
+        //for access this action, the user must be logged in.
+        if ($this->is_logged() === false) {
+            $this->Session->setFlash(__("Please use your Username and Password to access this section.", true));
+            $this->saveUrl($_SERVER['REQUEST_URI'], $this->Session);
+            $this->redirect("/login");
+            exit(0);
+        }
+
+        // Get user
+        $user = $this->Session->read('User');
+
+        /* Check permissions, $user is not at leess curator, but maybe it's a publisher */
+        if (!$this->is_curator ) {
+            $website = $this->Website->find("first", array("conditions" => array(
+                                         "id" => isset($this->data['Page']['website_id'])?$this->data['Page']['website_id']:$website_id,
+                                         "user_id" => $user['id'])));
+            if (!$website) {
+                $this->Session->setFlash(__("Permission error.", true));
+                $this->saveUrl($_SERVER['REQUEST_URI'], $this->Session, $user);
+                $this->redirect("/login");
+                exit(0);
+            }
+        }
+
+        //if user is authenticated, we continue with adding flow...
+
+        global $ContextualEngine;
+        global $Tags;
+        $this->Log->page_view();
+
+        $page = null;
+        if ($this->data) {
+            if ($this->_isRequestJson()) {
+                Configure::write ( 'debug', 0 );
+                $this->autoRender = false;
+                header('Content-Type: application/json');
+            }
+            /* Check if we already have this page */
+            if (isset($this->data['Page']['id'])){
+                $page = $this->Page->findById($this->data['Page']['id']);
+            } else {
+                $page = $this->Page->findByUrl($this->data['Page']['url']);
+            }
+
+            if ($page) {
+                // For all users double check that
+                // this page is already valid
+                if (!$this->is_curator) {
+                    $message = "'".$this->data['Page']['url']."'";
+                    $end = 0;
+                    switch ($page['Page']['status']) {
+                    case PAGE_STATUS_APPROVED:
+                        $message .= " is already in system and active";
+                        $end = 1;
+                        break;
+                    case PAGE_STATUS_PENDING_MODERATION:
+                        $message .= " was previously added and is pending moderation";
+                        $end = 1;
+                        break;
+                    }
+
+                    if ($end) {
+                        $this->Session->activate();
+                        $this->Session->setFlash(__($message, true));
+                        $this->redirect("/pages/flashed");
+                        exit();
+                    }
+                }
+                $this->data['Page']['id'] = $page['Page']['id'];
+            }
+
+            if (!isset($website)) {
+                $website_id = $this->data['Page']['website_id'];
+                $website = $this->Website->findById($website_id);
+            }
+
+            /* Process Image */
+            // Get image
+            $image = null;
+
+            try{
+                $image_manipulator = new \CI\Image\Manipulator();
+
+                if (strpos(trim($this->data['Page']['image']), "http") === 0) {
+                    //if the image starts with http:// it obviusly is a external file
+
+                    $image = $image_manipulator->import($this->data['Page']['image']);
+                } else {
+                    /* it could be that we're moderating a Page without needing to upload
+                    an image, because The Page already has it (or maybe don't). */
+                    $image = str_replace('/img/','' ,$this->data['Page']['image']);
+
+                    // So we ask: Does the Page has already stored an image?
+                    if(empty($image)){
+                        // The Page doesn't have it.
+                        throw new exception ("Upload an image before Adding the Page.");
+                    // Checking if file exists physically on the UGC.
+                    }else if(file_exists(ROOT . DS . APP_DIR . DS . 'webroot/img/' . $image) === false){
+                        throw new exception ("Upload an image before Adding the Page. the image didn't upload");
+                    }
+                }
+
+                $nX1 = (int) $this->data['Page']['x1'];
+                $nX2 = (int) $this->data['Page']['x2'];
+                $nY1 = (int) $this->data['Page']['y1'];
+                $nY2 = (int) $this->data['Page']['y2'];
+
+                if ($nX2 > 0 && $nY2 > 0) {
+                    $image_with_complete_path = $image_manipulator->getImagesPath() . $image;
+                    $image_manipulator->cropImage(
+                        $image_with_complete_path,
+                        $nX1,
+                        $nX2,
+                        $nY1,
+                        $nY2
+                    );
+                }
+
+                if(!empty($image) && !empty($page['Page']['image']) && $page['Page']['image'] != $image){
+                    $old_image_with_complete_path = $image_manipulator->getImagesPath() . $page['Page']['image'];
+                    //removing old file, it'll be replaced bye the new one.
+                    $image_manipulator->delete($old_image_with_complete_path);
+                }
+            }Catch(Exception $e){
+                $this->Session->activate();
+                $this->Session->setFlash(__($e->getMessage(), true));
+                $this->redirect("/pages/flashed");
+                exit();
+            }
+
+            /* Save */
+            if (isset($this->data['Page']['id'])) {
+                $page = $this->Page->findById($this->data['Page']['id']);
+
+                if (empty($page['Page']['title_url'])) {
+                    $this->data['Page']['title_url'] = $this->title_url($this->data['Page']['title']);
+                }
+                if ($page['Page']['status'] == PAGE_STATUS_APPROVED) {
+                    $page_updated = 1;
+                } else {
+                    $page_updated = 0;
+                }
+
+                $new_page = 0;
+            } else {
+                $page_updated = 0;
+                $new_page = 1;
+                $this->data['Page']['title_url'] = $this->title_url($this->data['Page']['title']);
+            }
+            $this->data['Page']['domain_bitfield'] = $website['Website']['domain_bitfield'];
+            $this->data['Page']['image'] = $image;
+            $this->data['Page']['visible'] = true;
+            $this->data['Page']['created'] = $this->Date->now();
+            $this->data['Page']['ranked'] = 1;
+            $this->data['Page']['title'] = $this->convert_special($this->data['Page']['title']);
+            $this->data['Page']['description'] = $this->convert_special($this->data['Page']['description']);
+            $this->data['Page']['url'] = trim($this->data['Page']['url']);
+            $this->data['Page']['moderator_user_id'] = $user['id'];
+            $this->data['Page']['moderator_modified'] = $this->Date->now();
+            if ($this->data['Page']['expire']) {
+                $this->data['Page']['expire'] = $this->Date->time_format($this->data['Page']['expire']);
+            } else {
+                $this->data['Page']['expire'] = NULL;
+            }
+
+            if ($this->is_curator) {
+                $page_status = PAGE_STATUS_APPROVED;
+            } else {
+                // Need to moderate non-admin pages
+                $page_status = PAGE_STATUS_PENDING_MODERATION;
+            }
+            $this->data['Page']['status'] = $page_status;
+
+            // Save it
+            $rc = $this->Page->save($this->data);
+
+            if ($rc) {
+                //if we saved it correctly...
+                $page_id = $this->Page->id;
+
+                // Put it into contextual matching
+                if ($this->is_curator) {
+                    $page = $this->data;
+                    $page['Page']['id'] = $page_id;
+                    $ContextualEngine->page_add($page);
+                }
+
+                /* Clear caches */
+                if (isset($page['Page']['id']) && $page['Page']['id']) {
+                    $this->Page->clear_meta_cache($page['Page']['id']);
+                    $page = $this->Page->find_master("first", array("conditions" =>
+                        array("id" => $page['Page']['id'])
+                            ));
+                    $this->Page->clear_meta_cache($page['Page']['title_url']);
+
+                    $page_id = $page['Page']['id'];
+                }
+
+                if ($page_updated == 0) {
+                    $this->MetricLog->log(LOG_TYPE_PAGE_ADD, $website_id, $page_id);
+                } else {
+                    $this->MetricLog->log(LOG_TYPE_PAGE_UPDATE, $website_id, $page_id);
+                }
+
+                /* Put the page in analytics */
+                if ($new_page && $this->is_curator) {
+                    App::import('Component', 'QueueKestrel');
+                    $this->Queue =& new QueueKestrelComponent("new_page");
+                    $this->Queue->push($page_id);
+                }
+
+                /* Categories and Subcategories */
+                $this->loadModel('PageCategory');
+                $this->loadModel('PageSubcategory');
+                $category_ids = explode(',', $this->data['Page']['category_ids']);
+                $subcategory_ids = explode(',', $this->data['Page']['subcategory_ids']);
+                $this->PageCategory->update_by_page_id($page_id, $category_ids);
+                $this->PageSubcategory->update_by_page_id($page_id, $subcategory_ids);
+
+                /* Tags */
+                if ($this->is_curator) {
+                    $page_tag_names = strtolower($_POST["page_tags"]);
+                    $page_tag_names = array_unique(explode(',', $page_tag_names));
+                    $page_tag_names = implode(',', $page_tag_names);
+
+                    $Tags->update_tag_table($page_tag_names);
+                    $page_tag_ids = $Tags->tag_ids_by_names($page_tag_names);
+                    $Tags->update_page_tags($page_id, $page_tag_ids);
+                }
+
+                if ($this->is_curator) {
+                    $message = " added succesfully";
+                } else {
+                    $message = " sent for approval";
+                }
+
+                if ($this->is_curator) {
+                    $message = " added succesfully";
+                } else {
+                    $message = " sent for approval";
+                }
+
+                // Log the save
+                $this->log("[".$user['username']."] Add: ".$website['Website']['name']." - ".$this->data['Page']['title'], "page_moderate");
+
+                if ($this->_isRequestJson()) {
+                    $aResponse = array(
+                        'status' => 'ok',
+                        'msg'    => $message,
+                        'page'   => array(
+                            'id'    => $page_id,
+                            'title' => $this->data['Page']['title'],
+                        ),
+                    );
+
+                    echo json_encode($aResponse);
+                    exit;
+                } else {
+                    $this->Session->activate();
+                    $this->Session->setFlash(__('"'.$this->data['Page']['title'].'"'.$message, true));
+                    $this->redirect("/pages/flashed");
+                }
+            } else {//if saving failed...
+                $fields = $this->Page->invalidFields();
+                $message = array_pop($fields);
+
+                if ($this->_isRequestJson()) {
+                    $aResponse = array(
+                        'status' => 'error',
+                        'msg'    => $message,
+                    );
+
+                    echo json_encode($aResponse);
+                    exit;
+                } else {
+                    $this->Session->activate();
+                    $this->Session->setFlash(__($message, true));
+                    $this->redirect("/pages/flashed");
+                }
+            }
+        } else {//if we doesn't have data on $_POST ($this->data)
+            $this->MetricLog->log(LOG_TYPE_PAGE_VIEW, $website_id);
+
+            $over = 0;
+
+            $website = $this->Website->findById($website_id);
+
+            if (!$this->is_curator) {
+                $target = $this->target_num_links($website);
+                $have = $this->Page->get_running($website_id);
+
+                if ($target < count($have)) {
+                    $over = 1;
+                }
+            }
+
+            $all_tags = $this->Tag->get_tags_active();
+
+            $user = $this->Session->read('User');
+            $user = $this->User->findById($user['id']);
+
+            $website_url = '';
+
+            if (isset($website['Website']['url'])) {
+                $website_url = trim($website['Website']['url']);
+                if (false === strpos('://', $website_url)) {
+                    $website_url = 'http://' . $website_url;
+                }
+
+                $website_url = parse_url($website_url);
+                $website_url = str_replace('www.', '', $website_url['host']);
+            }
+
+            $this->set("website_url", $website_url);
+            $this->set("website", $website);
+            $this->set("over", $over);
+            $this->set("is_admin", $this->is_admin);
+            $this->set("user", $user);
+            $this->set("all_tags", $all_tags);
+            $this->set('isHomepage', false);
+            $this->set('preview_style', false);
+        }
+    }
+
+    private function _isRequestJson() {
+        return $this->RequestHandler->isAjax() && isset($this->data['Form']['request_format']) && $this->data['Form']['request_format'] == 'json';
+    }
+
+    function target_num_links($website) {
+        global $HistoryCredits;
+
+        $yesterday = $this->Date->yesterday();
+
+        $yesterday_stats = $HistoryCredits->stats_day($website['Website']['account_id'], $yesterday);
+
+        if ($yesterday_stats['incoming'] < 50) {
+            return 5;
+        }
+        if ($yesterday_stats['incoming'] < 100) {
+            return 10;
+        }
+
+        return PHP_INT_MAX;
+    }
+
+    function initialize_title_url() {
+        // Should never need this again, but
+        // keep around just in case
+        //
+        plat_assert(0);
+        $pages = $this->Page->find("all", array("conditions" => array("status <>" => PAGE_STATUS_PENDING)));
+
+        foreach($pages as $page) {
+            echo $page['Page']['title']." - ";
+            $title_url = $this->title_url($page['Page']['title']);
+            echo $title_url."<br>";
+
+            $this->Page->id = $page['Page']['id'];
+            $this->Page->saveField("title_url", $title_url);
+        }
+    }
+
+    function deny_in_bulk($pages_str){
+        if (!$this->is_curator) {
+            $this->saveUrl($_SERVER['REQUEST_URI']);
+            $this->redirect("/login");
+            exit();
+        }
+
+        $this->MetricLog->log(LOG_TYPE_PAGE_DENY_BULK);
+
+        $this->RequestHandler->renderAs($this, 'ajax');
+        $this->layout = 'ajax';
+        $pages_array = explode(',', $pages_str);
+        $pages = array();
+        foreach($pages_array as $page_id){
+            $page = $this->Page->findById($page_id);
+            array_push($pages, $page);
+        }
+
+        foreach($pages as $page){
+            $rc = $this->process_deny($page);
+        }
+
+        if($rc){
+            return TRUE;
+        }
+
+    }
+
+    private function process_deny($page){
+        $this->Session->activate();
+        $user = $this->Session->read('User');
+
+        if ($page['Page']['status'] == PAGE_STATUS_APPROVED) {
+            $this->remove_circulation($page['Page']['id'], PAGE_STATUS_DENIED);
+        } else {
+            // Log it
+            $this->moderate_log($page['Page']['id'], PAGE_STATUS_DENIED);
+        }
+
+        /* Save */
+        $page['Page']['moderator_user_id'] = $user['id'];
+        $page['Page']['moderator_modified'] = $this->Date->now();
+        $page['Page']['status'] = PAGE_STATUS_DENIED;
+        $rc = $this->Page->save($page);
+
+        return $rc;
+    }
+
+
+    function deny() {
+        $this->Log->page_view();
+
+        // Check if admin
+        if (!$this->is_curator) {
+            $this->saveUrl($_SERVER['REQUEST_URI']);
+            $this->redirect("/login");
+            exit();
+        }
+
+        if ($this->data) {
+            $page = $this->Page->findById($this->data['Page']['id']);
+
+            $this->Session->activate();
+            $user = $this->Session->read('User');
+
+            if ($page['Page']['status'] == PAGE_STATUS_APPROVED) {
+                $this->remove_circulation($page['Page']['id'], PAGE_STATUS_DENIED);
+            } else {
+                // Log it
+                $this->moderate_log($page['Page']['id'], PAGE_STATUS_DENIED);
+            }
+
+            /* Save */
+            $this->data['Page']['moderator_user_id'] = $user['id'];
+            $this->data['Page']['moderator_modified'] = $this->Date->now();
+            $this->data['Page']['status'] = PAGE_STATUS_DENIED;
+            $rc = $this->Page->save($this->data);
+
+            if ($rc) {
+                $website = $this->Website->findById($page['Page']['website_id']);
+                if ($page['Page']['title'] != NULL) {
+                    $title = $page['Page']['title'];
+                } else {
+                    $title = $page['Page']['url'];
+                }
+
+                $this->MetricLog->log(LOG_TYPE_PAGE_DENY, $page['Page']['website_id'], $page['Page']['id']);
+
+                $this->Session->setFlash(__('Denied', true));
+                $this->redirect("/pages/flashed");
+            } else {
+                plat_assert(0);
+            }
+        }
+    }
+
+    function duplicate() {
+        $this->Log->page_view();
+
+        // Check if admin
+        if (!$this->is_curator) {
+            $this->saveUrl($_SERVER['REQUEST_URI']);
+            $this->redirect("/login");
+            exit();
+        }
+
+        if ($this->data) {
+            $this->Session->activate();
+            $user = $this->Session->read('User');
+
+            $page = $this->Page->findById($this->data['Page']['id']);
+            if ($page['Page']['status'] == PAGE_STATUS_APPROVED) {
+                $this->remove_circulation($page['Page']['id'], PAGE_STATUS_DUPLICATE);
+            } else {
+                // Log it
+                $this->moderate_log($page['Page']['id'], PAGE_STATUS_DUPLICATE);
+            }
+
+            /* Save */
+            $this->data['Page']['moderator_user_id'] = $user['id'];
+            $this->data['Page']['moderator_modified'] = $this->Date->now();
+            $this->data['Page']['status'] = PAGE_STATUS_DUPLICATE;
+            $rc = $this->Page->save($this->data);
+
+            if ($rc) {
+                $website = $this->Website->findById($page['Page']['website_id']);
+                if ($page['Page']['title'] != NULL) {
+                    $title = $page['Page']['title'];
+                } else {
+                    $title = $page['Page']['url'];
+                }
+
+                $this->MetricLog->log(LOG_TYPE_PAGE_DENY, $page['Page']['website_id'], $page['Page']['id']);
+
+                $this->Session->setFlash(__('Marked Duplicate', true));
+                $this->redirect("/pages/flashed");
+            } else {
+                plat_assert(0);
+            }
+
+        }
+    }
+
+    function flashed() {
+        $this->Session->activate();
+        $this->RequestHandler->renderAs($this, 'ajax');
+    }
+
+    function get_intersect($page) {
+        $intersect = array(
+            'category' => $page['Page']['category'],
+            'demographic_sex' => $page['Page']['demographic_sex'],
+            'content_rating' => $page['Page']['content_rating'],
+            );
+
+        return $intersect;
+    }
+
+    /* Honey Pot. This is a hidden link which only bots will find */
+    function hp($widget_id, $page_id) {
+        $spider = $this->spider();
+
+        if (!$spider) {
+            // @see http://book.cakephp.org/1.3/en/The-Manual/Developing-with-CakePHP/Global-Constants-and-Functions.html#env
+            $user_agent = env('HTTP_USER_AGENT');
+            $http_via = env('HTTP_VIA');
+            $ip_address = get_ip(); // from global_defines.php
+            $this->Widget->bindModel(array('belongsTo' => array('Website')));
+            $widget = $this->Widget->findById($widget_id);
+            $data = array(
+                "Website: {$widget['Website']['name']}",
+                "URL: /{$widget_id}/{$page_id}/",
+                "Website ID: {$widget['Website']['id']}",
+                "Widget ID: {$widget_id}",
+                "Page ID: {$page_id}",
+                "USER-AGENT: {$user_agent}",
+                "VIA: {$http_via}",
+                "IP: {$ip_address}",
+            );
+            $this->log(implode(' ', $data), "honeypot");
+        }
+
+        $this->redirect("/");
+        exit();
+    }
+
+    function link($page_key = 0, $intersect_id = 0, $analytic_id = 0, $widget_analytic_id = 0, $paid_link = 0, $campaign_id = 0) {
+        $update_cache = false;
+        $spider = $this->spider();
+
+        if (!$spider) {
+            $this->Analytic->ctr(0);
+        }
+
+        $this->Log->page_view();
+
+        /* Pull from params */
+        if (!$intersect_id && !$page_key) {
+            $intersect_id = $this->params['intersect'];
+            $page_key = $this->params['link'];
+            if (isset($this->params['analytic_id'])) {
+                $analytic_id = $this->params['analytic_id'];
+            } else {
+                $analytic_id = 0;
+            }
+
+            if (isset($this->params['paid_link'])) {
+                $paid_link = $this->params['paid_link'];
+            }
+
+            if (isset($this->params['campaign_id'])) {
+                $campaign_id = $this->params['campaign_id'];
+            }
+
+            $widget_analytic_id = isset($this->params['widget_analytic_id']) ? $this->params['widget_analytic_id'] : 0;
+        }
+
+        /* This is the outgoing page meta info */
+        $cache = $this->Page->get_meta_cache($page_key);
+        if ($cache) {
+            $page_id = $cache['page_id'];
+            $account_id = $cache['account_id'];
+            $page_url = $cache['page_url'];
+            $website_id = isset($cache['website_id']) ? $cache['website_id'] : 0;
+            if ($website_id === 0) {
+                $update_cache = true;
+                $website_id = $this->Page->field('website_id', array('id' => $page_id));
+            }
+        } else {
+            if (is_numeric($page_key)) {
+                $page = $this->Page->findById($page_key);
+                $page_id = $page_key;
+            } else {
+                $page = $this->Page->findByTitleUrl($page_key);
+                $page_id = isset($page['Page']['id']) ? $page['Page']['id'] : 0;
+            }
+            if ($page_id !== 0) {
+                $page_url   = $page['Page']['url'];
+                $website_id = $page['Page']['website_id'];
+                $account_id = $this->Website->field("account_id", array("id" => $page['Page']['website_id']));
+            }
+        }
+
+        plat_assert($page_id);
+
+        /* Update accounting */
+        if (!$spider) {
+            $this->_registerLPLoggerClick($page_id, $intersect_id, $paid_link, $campaign_id);
+            /* Update analytic */
+            if ($intersect_id) {
+                /* Get intersect */
+                $intersect = $this->Intersects->get_intersect_by_id($intersect_id);
+                /* Increment Clicks */
+                $this->LandingPageAnalytic->ctr_count_increment($intersect, $page_id, DOMAIN_BIT, $analytic_id);
+
+                // here increment clicks on the new way
+                $analytic_data = $this->LandingPageAnalytic->findById($analytic_id);
+                if (empty($analytic_data)) {
+                    $analytic_data = array(
+                        'LandingPageAnalytic' => array(
+                            'type' => 0,
+                            'key'  => 0,
+                        )
+                    );
+                }
+                $this->Stats->increment_landing_page_stats(
+                    date('Y-m-d 00:00:00'),
+                    $page_id,
+                    $website_id,
+                    DOMAIN_BIT,
+                    $intersect,
+                    $analytic_data['LandingPageAnalytic']['type'],
+                    $analytic_data['LandingPageAnalytic']['key'],
+                    1,
+                    0
+                );
+                if ($paid_link) {
+                    $this->loadModel('CPCCampaign');
+                    $campaign_data = $this->CPCCampaign->findById($campaign_id);
+                    $cpc = 0;
+
+                    if (!empty($campaign_data['CPCCampaign']['click_budget'])) {
+                        $cpc = $campaign_data['CPCCampaign']['click_budget'];
+                    }
+
+                    $this->loadModel('CpcLandingPage');
+                    $paid_link_page = array(
+                        'Page' => array(
+                            'id'          => $page_id,
+                            'campaign_id' => $campaign_id,
+                            'cpc'         => $cpc,
+                            'website_id'  => $website_id
+                        ),
+                    );
+                    $this->CpcLandingPage->send_to_queue(array($paid_link_page), CpcLandingPage::TYPE_CLICK);
+                }
+            }
+
+            /* Update widget analytic ctr traffic */
+            $this->WidgetAnalytic->ctr_traffic_count_increment($widget_analytic_id);
+            $widget_analytic = $this->WidgetAnalytic->find('first', array('conditions' => array('id' => $widget_analytic_id)));
+            if ($widget_analytic) {
+                $widget_analytic = $widget_analytic['WidgetAnalytic'];
+                $wa_website_id = $this->Page->field('website_id', array('id' => $widget_analytic['page_id']));
+                $this->Stats->increment_widget_stats(
+                    date('Y-m-d 00:00:00'), $widget_analytic['page_id'], $wa_website_id,
+                    $widget_analytic['domain_bitfield'], $widget_analytic['shown_website_id'],
+                    $widget_analytic['type'], $widget_analytic['key'], 0, 0, 1
+                );
+            }
+
+            if (ACCOUNT_DEFERRED_CREDIT) {
+                if (isset($_COOKIE['account'])) {
+                    /* Update the accounting */
+                    $this->Account->incoming_click($_COOKIE['account']);
+                    setcookie("account", "", time() - 3600, "/"); // Delete cookie
+                }
+            }
+
+            $this->Account->outgoing_click($account_id);
+
+            $this->outgoing_click_queue($page_id);
+
+            if (!empty($_GET['article_id'])) {
+                $this->loadModel('CustomLandingPage');
+                $article = $this->CustomLandingPage->findById($_GET['article_id']);
+
+                if (! empty($article)) {
+                    $this->loadModel('StatsArticle');
+                    $date = \Carbon\Carbon::now()->format('Y-m-d H:00:00');
+                    $this->StatsArticle->increment_stats($date, $article['CustomLandingPage'], array('traffic' => 1));
+                }
+            }
+
+        }
+
+        /* Send them on their merry way */
+        if (!$cache || $update_cache) {
+            $cache = array();
+            $cache['page_id'] = $page_id;
+            $cache['account_id'] = $account_id;
+            $cache['page_url'] = $page_url;
+            $cache['website_id'] = $website_id;
+
+            $this->Page->set_meta_cache($page_key, $cache);
+        }
+
+        /* Add UTM source on */
+        $page_url = $this->set_url_parameters($page_url, $account_id);
+
+        if ($this->using_ie()) {
+            $this->set("link", $page_url);
+            $this->layout = "none";
+        } else {
+            $this->redirect($page_url);
+            exit();
+        }
+    }
+
+    private function _registerLPLoggerClick($page_id, $intersect_id, $paid_link, $campaign_id)
+    {
+        if (ENABLE_LOGGER) {
+            App::Import(
+                'Vendor',
+                'CI_Library',
+                array(
+                    'file' => 'crowdignite/library/autoload.php'
+                )
+            );
+            $storage = new Logger_Storage_File(
+                array(
+                    'filepath' => '/var/vw-log-ramdisk/lpclick.log'
+                )
+            );
+            $logger = new Logger_Analytic_LandingPage(new Logger($storage));
+            // remove click information
+
+            $logger->registerElementValue('link_click_page_id', $page_id);
+            $logger->save();
+
+            if (!empty($paid_link)) {
+                $storage = new Logger_Storage_File(
+                    array(
+                        'filepath' => '/var/vw-log-ramdisk/lppaidclick.log'
+                    )
+                );
+                $logger_paid = new Logger_Analytic_LandingPage_Click_Paid(new Logger($storage));
+                $logger_paid->registerElementValue('link_click_page_id', $page_id);
+                $logger_paid->registerElementValue('campaign_id', $campaign_id);
+                $logger_paid->save();
+            }
+        }
+    }
+
+    /* Outgoing Click Queue functions */
+    function outgoing_click_queue($page_id) {
+        if (Configure::read('queue_kestrel')) {
+            App::import('Component', 'QueueKestrel');
+            $this->Queue =& new QueueKestrelComponent("outgoing_click");
+        } else {
+            App::import('Component', 'Queue');
+            $this->Queue =& new QueueComponent("outgoing_click");
+        }
+        $this->Queue->push($page_id);
+    }
+
+    function outgoing_click_persist() {
+        $this->Timer->start(TIMER_OUTGOING_CLICK_PERSIST);
+        set_time_limit(TIME_LIMIT_OUTGOING_CLICK_PERSIST);
+        ini_set('memory_limit', MEMORY_LIMIT_OUTGOING_CLICK_PERSIST.'M');
+
+        if (Configure::read('queue_kestrel')) {
+            App::import('Component', 'QueueKestrel');
+            $this->Queue =& new QueueKestrelComponent("outgoing_click");
+        } else {
+            App::import('Component', 'Queue');
+            $this->Queue =& new QueueComponent("outgoing_click");
+        }
+
+        // Pull instance counts from memcached
+        $rc = $this->Queue->lock();
+        if ($rc) {
+            // Lock is taken. Try again later
+            echo "Lock taken";
+            exit();
+        }
+
+        $pages = array();
+        do {
+            $page_id = $this->Queue->pop();
+            if ($page_id) {
+                if (empty($pages[$page_id])) {
+                    $pages[$page_id] = 0;
+                }
+                $pages[$page_id]++;
+            }
+            $this->Queue->lock(1);
+        } while ($page_id);
+        $this->Queue->unlock();
+
+        // Update the database
+        foreach($pages as $page_id => $count) {
+            $this->Page->outgoing_click($page_id, $count);
+        }
+
+        $data = $this->Timer->set_memory_limit();
+        $this->Timer->stop_save($data);
+    }
+
+    function set_url_parameters($url, $account_id) {
+        /* Check to see if we should add UTM sources on a site */
+        $website = $this->Website->findByAccountId($account_id);
+        $disable_utm = $website['Website']['disable_utm'];
+        if ($disable_utm) {
+            return $url;
+        }
+
+        $custom_utm = $website['Website']['custom_utm'];
+        if ($custom_utm) {
+            $url = $this->add_custom_utm($url, $custom_utm);
+            return $url;
+        }
+
+        /* UTM Source */
+        $url = $this->add_url_parameter($url, "utm_source", "crowdignite.com");
+
+        /* UTM Source */
+        $url = $this->add_url_parameter($url, "utm_medium", "referral");
+
+        /* UTM Source */
+        $url = $this->add_url_parameter($url, "utm_campaign", "crowdignite.com");
+
+        return $url;
+    }
+
+    function add_custom_utm($url, $custom) {
+        parse_str($custom, $output);
+
+        foreach ($output as $utm => $value) {
+            $url = $this->add_url_parameter($url, $utm, $value, false);
+        }
+
+        return $url;
+    }
+
+    function add_url_parameter($url, $name, $value, $safe = true) {
+        $parsed = parse_url($url);
+
+        if (isset($parsed['query'])) {
+            $query_string = $parsed['query'];
+            $query = $this->url_query_to_array($query_string);
+        } else {
+            $query = array();
+        }
+
+        // Set new value
+        $query[$name] = $value;
+
+
+        plat_assert($parsed['host']);
+
+        $new_url = $parsed['scheme']."://".$parsed['host'].$parsed['path'];
+        $new_url .= "?".$this->parse_parameters($query, $safe);
+
+        if (isset($parsed['fragment'])) {
+            $new_url .= "#".$parsed['fragment'];
+        }
+
+        return $new_url;
+    }
+
+    function parse_parameters($query, $safe = true) {
+        $parameters = http_build_query($query);
+
+        if ($safe == false) {
+            $characters = array(
+                '%7C' => '|'
+            );
+            $parameters = str_replace(array_keys($characters), array_values($characters), $parameters);
+        }
+
+        return $parameters;
+    }
+
+    function url_query_to_array($query) {
+        $queryParts = explode('&', $query);
+
+        $params = array();
+        foreach ($queryParts as $param) {
+            if (strpos($param, '=')) {
+                $item = explode('=', $param);
+                $params[$item[0]] = $item[1];
+            } else {
+                $params[$param] = '';
+            }
+        }
+
+        return $params;
+    }
+
+    function spider() {
+        // Valid domains
+        global $all_landing_pages;
+        $validator_not_empty = new CI\Validator\NotEmpty();
+        $validator_browser   = new CI\Validator\Browser();
+        $validator_referer   = new CI\Validator\Referer();
+
+        $validator_referer->setAllowedDomains($all_landing_pages);
+        $validator_referer->allowDomain('www.totallyher.com');
+
+        $user_agent_validator = new CI\Validator\Container();
+        $user_agent_validator->addRule($validator_not_empty, true);
+        $user_agent_validator->addRule($validator_browser, true);
+
+        $referer_validator = new CI\Validator\Container();
+        $referer_validator->addRule($validator_not_empty, true);
+        $referer_validator->addRule($validator_referer, true);
+
+        $user_agent = isset($_SERVER['HTTP_USER_AGENT'])
+            ? $_SERVER['HTTP_USER_AGENT']
+            : '';
+
+        $referer = isset($_SERVER['HTTP_REFERER'])
+            ? $_SERVER['HTTP_REFERER']
+            : '';
+
+        if ($user_agent_validator->isValid($user_agent)
+            && $referer_validator->isValid($referer)
+        ) {
+            return 0;
+        }
+
+        return 1;
+    }
+
+    /* Cleans up old pages which are taking up space */
+    function clean_lru() {
+        /* Timers & Limits */
+        $this->Timer->start(TIMER_CLEAN_LRU);
+        set_time_limit(TIME_LIMIT_CLEAN_LRU);
+        ini_set('memory_limit', MEMORY_LIMIT_CLEAN_LRU.'M');
+
+        $script_total = 2;
+        $script_count = 0;
+        $this->Timer->progress_set(0);
+        $this->Timer->running_set();
+
+        // Delete single impression pages that are pending
+        $this->Page->delete_pending_single_impression_pages();
+
+        $this->Timer->progress_set(50);
+        $this->Timer->running_set();
+
+        // Delete pages which are pending after 30 days
+        $this->Page->delete_pending_old_pages(30);
+
+        $this->Timer->progress_set(100);
+        /* Save off timer */
+        $data = $this->Timer->set_memory_limit();
+        $this->Timer->stop_save($data);
+
+        $this->autoRender = false;
+        echo 'Done';
+    }
+
+    function retire_expired() {
+        set_time_limit(0);
+        ini_set('memory_limit','160M');
+        $this->autoRender = false;
+
+        $date = $this->Date->now();
+        $pages = $this->Page->find(
+            'list',
+            array(
+                'fields' => array('id', 'title'),
+                'conditions' => array(
+                    'visible' => 1,
+                    'status' => PAGE_STATUS_APPROVED,
+                    'expire <' => $date
+                )
+            )
+        );
+
+        foreach ($pages as $id => $title) {
+            echo "Retiring: " . $title . "<br>\n";
+            $this->retire($id);
+        }
+    }
+
+    function retire_old() {
+        // Don't do this unless know what the hell you're doing
+        exit();
+
+        $date = $this->Date->days_ago(14);
+        $pages = $this->Page->find("all", array("conditions" => array(
+                                "visible" => true,
+                                "status" => PAGE_STATUS_APPROVED,
+                                "created <" => $date)));
+
+        foreach ($pages as $page) {
+            echo "Retiring: ".$page['Page']['title']."<br>\n";
+            $this->retire($page['Page']['id']);
+        }
+    }
+
+    function retire($page_id) {
+        plat_assert($page_id);
+
+        $this->MetricLog->log(LOG_TYPE_PAGE_RETIRE, 0, $page_id);
+
+        $this->_remove_circulation($page_id, PAGE_STATUS_EXPIRED);
+    }
+
+    function pause($page_id) {
+        plat_assert($page_id);
+
+        $this->MetricLog->log(LOG_TYPE_PAGE_PAUSE, 0, $page_id);
+
+        $this->remove_circulation($page_id, PAGE_STATUS_PAUSED);
+    }
+
+    function delete($page_id) {
+        $this->MetricLog->log(LOG_TYPE_PAGE_DELETE, 0, $page_id);
+
+        // Remove from circulation
+        $this->remove_circulation($page_id, PAGE_STATUS_PAUSED);
+
+        // Send back to where we came from
+        $this->redirect($_SERVER['HTTP_REFERER']);
+    }
+
+    function remove_circulation($page_id, $status) {
+        plat_assert($page_id);
+
+        // Check if admin
+        $this->Session->activate();
+        $user = $this->Session->read('User');
+
+        if (!$this->is_curator) {
+                        // Check to see if the logged in user owns
+                        // this page
+                        $page = $this->Page->findById($page_id);
+                        $website = $this->Website->find("all", array("conditions" => array(
+                                         "id" => $page['Page']['website_id'],
+                                         "user_id" => $user['id'])));
+                        if (!$website) {
+                            $this->redirect("/login");
+                            exit();
+                        }
+        }
+
+        $this->_remove_circulation($page_id, $status);
+    }
+
+    private function _remove_circulation($page_id, $status) {
+        global $ContextualEngine;
+
+        // Log it
+        $this->moderate_log($page_id, $status);
+
+        // Page
+        $this->Page->id = $page_id;
+        $this->Page->saveField("visible", false);
+        $this->Page->saveField("top", NULL);
+        $this->Page->saveField("status", $status);
+
+        // Contextual Engine
+        $ContextualEngine->page_remove($page_id);
+
+        // Widget Analytics
+        $this->WidgetAnalytic->updateAll(
+            array('visible' => 0),
+            array(
+                'page_id' => $page_id,
+                'visible' => 1,
+            )
+        );
+        // Landing Page Analytics
+        $this->LandingPageAnalytic->updateAll(
+            array('visible' => 0),
+            array(
+                'page_id' => $page_id,
+                'visible' => 1,
+            )
+        );
+    }
+
+    function resume($page_id) {
+        plat_assert($page_id);
+
+        $this->MetricLog->log(LOG_TYPE_PAGE_RESUME, 0, $page_id);
+
+        $this->add_backin_circulation($page_id, PAGE_STATUS_APPROVED);
+    }
+
+    function add_backin_circulation($page_id, $status) {
+        global $ContextualEngine;
+        plat_assert($page_id);
+
+        // Check if admin
+        $this->Session->activate();
+        $user = $this->Session->read('User');
+
+        if (!$this->is_curator) {
+            $this->saveUrl($_SERVER['REQUEST_URI'], $this->Session, $user);
+            $this->redirect("/login");
+        }
+
+        // Page
+        $this->Page->id = $page_id;
+        $this->Page->saveField("visible", true);
+        $this->Page->saveField("status", $status);
+
+        // Contextual Engine
+        $page = $this->Page->findById($page_id);
+        $ContextualEngine->page_add($page);
+
+        // Log it
+        $this->moderate_log($page_id, $status);
+
+        // Widget Analytics
+        $analytics = $this->WidgetAnalytic->findAllByPageId($page_id);
+        foreach ($analytics as $analytic) {
+            $this->WidgetAnalytic->id = $analytic['WidgetAnalytic']['id'];
+            $this->WidgetAnalytic->saveField("visible", true);
+        }
+
+        // Landing Page Analytics
+        $analytics = $this->LandingPageAnalytic->findAllByPageId($page_id);
+        foreach ($analytics as $analytic) {
+            $this->LandingPageAnalytic->id = $analytic['LandingPageAnalytic']['id'];
+            $this->LandingPageAnalytic->saveField("visible", true);
+        }
+    }
+
+    function moderate_log($page_id, $status) {
+        $this->Session->activate();
+        $user = $this->Session->read('User');
+
+        if ($user) {
+            $username = $user['username'];
+        } else {
+            $username = "Engine";
+        }
+
+        $page = $this->Page->findById($page_id);
+        $website = $this->Website->findById($page['Page']['website_id']);
+
+        switch ($status) {
+        case PAGE_STATUS_APPROVED:
+            $status = "Add";
+            break;
+        case PAGE_STATUS_DENIED:
+            $status = "Denied";
+            break;
+        case PAGE_STATUS_PENDING:
+            $status = "Pending";
+            break;
+        case PAGE_STATUS_EXPIRED:
+            $status = "Expired";
+            break;
+        case PAGE_STATUS_DUPLICATE:
+            $status = "Duplicate";
+            break;
+        case PAGE_STATUS_PAUSED:
+            $status = "Paused";
+            break;
+        default:
+            break;
+        }
+
+        $this->log("[".$username."] ".$status.": ".$website['Website']['name']." - ".$page['Page']['title'], "page_moderate");
+    }
+
+    /* Goes through memcached and stores it to the database */
+    function persist_cache() {
+        return 0;   // Now gets this info off of the queues
+
+        /* Timer & Limits */
+        $this->Timer->start(TIMER_PERSIST_CACHE);
+        set_time_limit(TIME_LIMIT_PERSIST_CACHE);
+        ini_set('memory_limit', MEMORY_LIMIT_PERSIST_CACHE.'M');
+
+        $this->Log->page_view();
+
+        $websites = $this->Website->active('Website.id');
+
+        $script_total = count($websites);
+        $script_count = 0;
+        $this->Timer->progress_set(0);
+        $this->Timer->running_set();
+
+        $oDate = new CI\Date();
+        $date_format = $oDate->oFormat->dateStart($oDate->today());
+        foreach ($websites as $website) {
+            $time_start = microtime(true);
+            $pages = $this->Page->get_active($website['Website']['id']);
+
+            foreach ($pages as $page) {
+                $count = $this->Page->cache_count_get($page);
+
+                if ($count && $count > $page['Page']['impressions']) {
+                    $this->Page->save_impressions($page['Page']['id'], $count);
+                    $this->StatsPage->increment_stats($date_format, $page['Page'], $count);
+                }
+            }
+            $script_count++;
+            $this->Timer->progress_set($script_count, $script_total);
+            $this->Timer->running_set();
+        }
+
+        /* Save off timer */
+        $data = $this->Timer->set_memory_limit();
+        $this->Timer->stop_save($data);
+    }
+
+    function search() {
+        if (!empty($this->params['form']['query'])) {
+            $this->MetricLog->log(LOG_TYPE_PAGE_SEARCH);
+
+            App::import('Sanitize');
+            $term = Sanitize::escape($this->params['form']['query']);
+            $searchBy = self::SEARCH_BY_NAME;
+
+            if (isset($this->params['form']['searchBy'])) {
+                $searchBy = Sanitize::escape($this->params['form']['searchBy']);
+            }
+
+            $fields = array('Page.id', 'Page.title', 'Page.title_url', 'Page.url',
+                            'Page.website_id', 'Page.image', 'Page.description',
+                            'Page.category', 'websites.name','websites.category',
+                            'websites.domain_primary'
+                           );
+
+            $params = array(
+                            'joins' => array(
+                                array(
+                                    'table' => 'websites',
+                                    'type'=> 'INNER',
+                                    'conditions' => array(
+                                        'websites.id = Page.website_id'
+                                    )
+                                )
+                            ));
+
+            if (self::SEARCH_BY_ID == $searchBy) {
+                $params['conditions'] = array('Page.id' => $term);
+                $params['fields'] = $fields;
+            } else {
+                $params['conditions'] = array(
+                                            'OR' => array(
+                                                'Page.title_url LIKE' => '%'.$term.'%',
+                                                'Page.title LIKE' => '%'.$term.'%',
+                                                'Page.url LIKE' => '%'.$term.'%'
+                                                )
+                                            );
+                $params['fields'] = $fields;
+                $params['limit'] = 50;
+            }
+
+            $res = $this->Page->find('all', $params);
+
+            $this->set("pages", $res);
+            $this->set("term", $term);
+            $this->layout = 'ajax';
+        }
+    }
+
+    function remove_rank($page_id) {
+        $this->Log->page_view();
+
+        // Check if admin
+        if (!$this->is_curator) {
+            $this->saveUrl($_SERVER['REQUEST_URI']);
+            $this->redirect("/login");
+            exit();
+        }
+
+        $this->MetricLog->log(LOG_TYPE_PAGE_RANKER_REMOVE);
+
+        $this->Page->id = $page_id;
+        $rc = $this->Page->saveField("ranked", 0);
+
+        if ($rc) {
+            $this->Session->activate();
+            $this->Session->setFlash(__('Removed', true));
+            $this->redirect("/pages/flashed");
+        }
+    }
+
+    /* Helper function */
+    function stristr_array($haystack, $needle) {
+        if (!is_array($haystack)) {
+            return false;
+        }
+
+        foreach ($haystack as $element) {
+            if (strstr($needle, $element)) {
+                return $element;
+            }
+        }
+    }
+
+    function test() {
+        for ($i = 0; $i < 10000; $i++) {
+            $this->Page->find("all", array("conditions" => array("id" => $i),
+                               "comment" => __FILE__.":".__LINE__));
+        }
+    }
+    function info() {
+        $this->layout = "none";
+    }
+
+    function version() {
+        $this->layout = "none";
+    }
+
+    function using_ie()
+    {
+        $u_agent = $_SERVER['HTTP_USER_AGENT'];
+        $ub = FALSE;
+        if (preg_match('/MSIE/i',$u_agent)) {
+            $ub = TRUE;
+        }
+
+        return $ub;
+    }
+
+    function load_page_stats($pages, $rolling_ctr = 1) {
+        /* Get the rolling CTR for these pages */
+        $count  = count($pages);
+        $fields = $this->LandingPageAnalytic->get_all_fields();
+
+        // Overall CTR on landing page
+        for ($i = 0; $i < $count; $i++) {
+            $params = array(
+                            "fields"     => $fields,
+                            "conditions" => array(
+                                                  "page_id" => $pages[$i]['Page']['id'],
+                                                   "visible" => true,
+                                                  ),
+                            );
+            $stats = $this->LandingPageAnalytic->find("all", $params);
+            $ctr = 0;
+            $num_display = 0;
+            foreach ($stats as $stat) {
+                // Skip 0 intersect
+                if ($stat['LandingPageAnalytic']['category'] == 0 &&
+                    $stat['LandingPageAnalytic']['demographic_sex'] == 0 &&
+                    $stat['LandingPageAnalytic']['content_rating'] == 0) {
+                    continue;
+                }
+                $ctr += $stat['LandingPageAnalytic']['num_ctr'];
+                $num_display += $stat['LandingPageAnalytic']['num_display'];
+            }
+
+            if ($num_display) {
+                $pages[$i]['Page']['lp_ctr'] = $ctr / $num_display;
+            } else {
+                $pages[$i]['Page']['lp_ctr'] = 0;
+            }
+
+            $pages[$i]['Page']['lp_impressions'] = $num_display;
+        }
+
+        if ($rolling_ctr) {
+            // Rolling CTR on landing page
+            for ($i = 0; $i < $count; $i++) {
+                $stats = $this->RequestAction("/history_landing_page_analytics/stats_days_landing_page/".$pages[$i]['Page']['id']."/".MANAGEMENT_LANDING_PAGE_ROLLING_DAYS);
+                if ($stats['num_display']) {
+                    $ctr = $stats['num_ctr'] / $stats['num_display'];
+                } else {
+                    $ctr = 0;
+                }
+
+                $pages[$i]['Page']['lp_rolling_impressions'] = $stats['num_display'];
+                $pages[$i]['Page']['lp_rolling_ctr'] = $ctr;
+
+            }
+        }
+
+        // Overall CTR on widgets
+        for ($i = 0; $i < $count; $i++) {
+            $stats = $this->WidgetAnalytic->find("all", array("conditions" => array("page_id" => $pages[$i]['Page']['id'],
+                                                 "visible" => true)));
+            $ctr = 0;
+            $num_display = 0;
+            foreach ($stats as $stat) {
+                $ctr += $stat['WidgetAnalytic']['num_ctr'];
+                $num_display += $stat['WidgetAnalytic']['num_display'];
+            }
+
+            if ($num_display) {
+                $pages[$i]['Page']['widget_ctr'] = $ctr / $num_display;
+            } else {
+                $pages[$i]['Page']['widget_ctr'] = 0;
+            }
+
+            $pages[$i]['Page']['widget_impressions'] = $num_display;
+        }
+
+        // Rolling CTR on Widget
+        if ($rolling_ctr) {
+            for ($i = 0; $i < $count; $i++) {
+                $stats = $this->RequestAction("/history_widget_analytics/stats_days/".$pages[$i]['Page']['id']."/0/".MANAGEMENT_WIDGET_ROLLING_DAYS);
+
+                if ($stats['num_display']) {
+                    $ctr = $stats['num_ctr'] / $stats['num_display'];
+                } else {
+                    $ctr = 0;
+                }
+
+                $pages[$i]['Page']['widget_rolling_impressions'] = $stats['num_display'];
+                $pages[$i]['Page']['widget_rolling_ctr'] = $ctr;
+            }
+        }
+
+        return $pages;
+    }
+
+    function cache_clear() {
+        $this->autoRender = false;
+
+        App::Import('Helper', 'Asset');
+        $oAsset = new AssetHelper();
+        $oAsset->clearAssetsCache();
+
+        Configure::write('debug', 2);
+
+        // Clear specific keys
+        Cache::delete('cake_core_core_paths');
+        Cache::delete('cake_core_core_paths_expires');
+        Cache::delete('cake_core_default_en_us');
+        Cache::delete('cake_core_default_en_us_expires');
+        Cache::delete('cake_core_dir_map');
+        Cache::delete('cake_core_dir_map_expires');
+        Cache::delete('cake_core_file_map');
+        Cache::delete('cake_core_file_map_expires');
+        Cache::delete('cake_core_object_map');
+
+        // Clear specific model keys
+        Cache::delete('cake_model_audit_server_audit_list');
+        Cache::delete('cake_model_audit_server_audit_list_expires');
+        Cache::delete('cake_model_audit_server_logs');
+        Cache::delete('cake_model_audit_server_logs_expires');
+
+        Cache::delete('cake_model_default_accounts');
+        Cache::delete('cake_model_default_accounts_expires');
+        Cache::delete('cake_model_default_analytics');
+        Cache::delete('cake_model_default_analytics_expires');
+        Cache::delete('cake_model_default_cpc_campaign');
+        Cache::delete('cake_model_default_cpc_campaign_expires');
+        Cache::delete('cake_model_default_cpc_campaign_pages');
+        Cache::delete('cake_model_default_cpc_campaign_pages_expires');
+        Cache::delete('cake_model_default_feeds');
+        Cache::delete('cake_model_default_feeds_expires');
+        Cache::delete('cake_model_default_landing_page_analytics');
+        Cache::delete('cake_model_default_landing_page_analytics_expires');
+        Cache::delete('cake_model_default_landing_page_rebalances');
+        Cache::delete('cake_model_default_landing_page_rebalances_expires');
+        Cache::delete('cake_model_default_landing_page_styles');
+        Cache::delete('cake_model_default_landing_page_styles_expires');
+        Cache::delete('cake_model_default_metric_logs');
+        Cache::delete('cake_model_default_metric_logs_expires');
+        Cache::delete('cake_model_default_notes');
+        Cache::delete('cake_model_default_notes_expires');
+        Cache::delete('cake_model_default_page_subcategory');
+        Cache::delete('cake_model_default_page_subcategory_expires');
+        Cache::delete('cake_model_default_page_tags');
+        Cache::delete('cake_model_default_page_tags_expires');
+        Cache::delete('cake_model_default_pages');
+        Cache::delete('cake_model_default_pages_expires');
+        Cache::delete('cake_model_default_rankers');
+        Cache::delete('cake_model_default_rankers_expires');
+        Cache::delete('cake_model_default_settings');
+        Cache::delete('cake_model_default_settings_expires');
+        Cache::delete('cake_model_default_social_pages');
+        Cache::delete('cake_model_default_social_pages_expires');
+        Cache::delete('cake_model_default_stats');
+        Cache::delete('cake_model_default_stats_accounts');
+        Cache::delete('cake_model_default_stats_accounts_expires');
+        Cache::delete('cake_model_default_stats_expires');
+        Cache::delete('cake_model_default_tags');
+        Cache::delete('cake_model_default_tags_expires');
+        Cache::delete('cake_model_default_tewn_list');
+        Cache::delete('cake_model_default_tewn_list');
+        Cache::delete('cake_model_default_tewn_list_expires');
+        Cache::delete('cake_model_default_tewn_list_expires');
+        Cache::delete('cake_model_default_users');
+        Cache::delete('cake_model_default_users_expires');
+        Cache::delete('cake_model_default_website_allowed_tags');
+        Cache::delete('cake_model_default_website_allowed_tags_expires');
+        Cache::delete('cake_model_default_websites');
+        Cache::delete('cake_model_default_websites_allowed_tags');
+        Cache::delete('cake_model_default_websites_expires');
+        Cache::delete('cake_model_default_widget_analytics');
+        Cache::delete('cake_model_default_widget_analytics_expires');
+        Cache::delete('cake_model_default_widget_rebalances');
+        Cache::delete('cake_model_default_widget_rebalances_expires');
+        Cache::delete('cake_model_default_widget_styles');
+        Cache::delete('cake_model_default_widget_styles_expires');
+        Cache::delete('cake_model_default_widgets');
+        Cache::delete('cake_model_default_widgets_expires');
+        Cache::delete('cake_model_default_custom_landing_page');
+        Cache::delete('cake_model_default_custom_landing_page_expires');
+        Cache::delete('cake_model_default_developers_reports');
+        Cache::delete('cake_model_default_developers_reports_expires');
+        Cache::delete('cake_model_default_debugbar_collector');
+        Cache::delete('cake_model_default_debugbar_collector_expires');
+        Cache::delete('cake_model_default_debugbar_usage');
+        Cache::delete('cake_model_default_debugbar_usage_expires');
+
+        Cache::delete('cake_model_warehouse_history_socials');
+        Cache::delete('cake_model_warehouse_history_socials_expires');
+        Cache::delete('cake_model_warehouse_history_stats');
+        Cache::delete('cake_model_warehouse_history_stats_expires');
+        Cache::delete('cake_model_warehouse_history_timers');
+        Cache::delete('cake_model_warehouse_history_timers_expires');
+        Cache::delete('cake_model_warehouse_stats_accounts');
+        Cache::delete('cake_model_warehouse_stats_accounts_expires');
+        Cache::delete('cake_model_warehouse_stats_cpc_landing_page_device_expires');
+        Cache::delete('cake_model_warehouse_stats_page');
+        Cache::delete('cake_model_warehouse_stats_page_expires');
+        Cache::delete('cake_model_warehouse_stats_widgets_account');
+        Cache::delete('cake_model_warehouse_stats_widgets_account');
+        Cache::delete('cake_model_warehouse_stats_widgets_account_expires');
+        Cache::delete('cake_model_warehouse_stats_widgets_account_expires');
+        Cache::delete('cake_model_warehouse_warehouse_list');
+        Cache::delete('cake_model_warehouse_warehouse_list_expires');
+        Cache::delete('cake_model_warehouse_stats_article');
+        Cache::delete('cake_model_warehouse_stats_article_expires');
+
+        apc_clear_cache();
+        apc_clear_cache('user');
+        apc_clear_cache('opcode');
+        echo "APC cache cleared.\n";
+    }
+
+    function cache_clear_website($website_id) {
+        $pages = $this->Page->findAllByWebsiteId($website_id);
+        $widgets = $this->Widget->findAllByWebsiteId($website_id);
+
+        foreach ($pages as $page) {
+            // Clear meta cache
+            $this->Page->clear_meta_cache($page['Page']['id']);
+
+            // Clear Page scraped title cache
+            $this->Page->clear_title_cache($page);
+
+            // Clear contextual engine
+            $this->ContextualEngine->clear_lp_page_links_cache($page['Page']['id']);
+            foreach ($widgets as $widget) {
+                $this->ContextualEngine->clear_page_links_cache($widget['Widget']['id'], $page['Page']['url']);
+            }
+
+        }
+
+        // Clear similar engine
+        $this->RequestAction("/similar_engine/clear_cache/".$website_id);
+
+    }
+
+    function cache_clear_key($key) {
+        if (!isset($this->CakeMemcache) || $this->CakeMemcache === NULL) {
+            App::import('Component', 'CakeMemcache');
+            $this->CakeMemcache = new CakeMemcacheComponent(1/*session servers*/);
+        }
+
+        // Clear on memcached
+        $rc = $this->CakeMemcache->delete($key);
+        Cache::delete($key);
+
+        echo "Deleting: ".$key." ".$rc."\n";
+
+        // Clear on APC
+        if (!Configure::read('local')) {
+            apc_delete($key);
+        }
+    }
+
+    function latest_modified_pages($website_id, $user_id, $flagged = 0){
+        $this->layout = 'ajax';
+
+        $this->MetricLog->log(LOG_TYPE_PAGE_VIEW, $website_id);
+
+        $pages = $this->Page->latest_moderated($user_id, 0, $website_id);
+
+        $pages = $this->load_page_stats($pages);
+
+        $this->set('website_id', $website_id);
+        $this->set('flagged', $flagged);
+        $this->set('Pages', $pages);
+    }
+
+    /* Returns a JSON object with the list of all pages pending moderation. AZ292 */
+    function moderate_pending_pages() {
+        Configure::write('debug', 0);
+        $this->autoRender = false;
+
+        $website_id = 0;
+        $page = 0;
+        $type_of_post = 0;
+
+        $website_id = $_POST['website_id'];
+        $page = $_POST['page'];
+        $all_pages = $_POST['all_pages'];
+
+        $limit = '8'; // elements per page
+        if($all_pages=="1") $limit = '0';
+
+        if ($website_id) {
+            $pages = array();
+            /* All the other pages pending mod */
+            $tmp_pages = $this->Page->get_pending_paged($website_id, $limit, $page, '');
+            foreach ($tmp_pages as $tmp) {
+                array_push($pages, $tmp);
+            }
+        }
+        echo json_encode($pages);
+    }
+
+    /* Returns a JSON object with the list of pages the User has requested to be moderated. AZ292 */
+    function moderate_user_pages() {
+        Configure::write('debug', 0);
+        $this->autoRender = false;
+
+        $website_id = 0;
+        $page = 0;
+        $type_of_post = 0;
+
+        $website_id = $_POST['website_id'];
+        $page = $_POST['page'];
+        $all_pages = $_POST['all_pages'];
+
+        $limit = '8'; // elements per page
+        if($all_pages=="1") $limit = '0';
+
+        if ($website_id) {
+            $pages = array();
+            $tmp_pages = $this->Page->get_pending_moderation_paged($website_id, $limit, $page, '');
+            foreach ($tmp_pages as $tmp) {
+                array_push($pages, $tmp);
+            }
+        }
+        echo json_encode($pages);
+    }
+
+
+    public function check_images()
+    {
+        $this->autoRender = false;
+
+        $base_path = WWW_ROOT.IMAGES_URL;
+        $pages = $this->Page->find(
+            'all',
+            array(
+                'fields' => array('id', 'image', 'website_id', 'title'),
+                'conditions' => array(
+                    'visible' => true,
+                    'status'  => PAGE_STATUS_APPROVED
+                ),
+            )
+        );
+
+        foreach ($pages as $page) {
+            $id         = $page['Page']['id'];
+            $image      = $page['Page']['image'];
+            $website_id = $page['Page']['website_id'];
+            $title      = $page['Page']['title'];
+            $fullfile   = $base_path.$image;
+
+            if (!file_exists($fullfile) or !is_file($fullfile)) {
+                $path = '/pages/moderate/'.$website_id.'/'.$id;
+                echo '<a href="'.$path.'">'.$title.'</a><br/>'.PHP_EOL;
+            }
+        }
+    }
+}
+
+?>

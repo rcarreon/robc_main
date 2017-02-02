@@ -1,0 +1,1 @@
+<?php header('Content-type: application/rss+xml'); ?><? echo $content_for_layout ?>

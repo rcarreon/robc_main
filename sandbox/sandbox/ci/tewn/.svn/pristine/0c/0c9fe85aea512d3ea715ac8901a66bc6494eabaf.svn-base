@@ -1,0 +1,73 @@
+<?php
+
+namespace CI\Stats\Widget;
+
+class Delta extends Adapter
+{
+    const WIDGET_FIELD  = 0;
+    const WEBSITE_FIELD = 1;
+
+    public function getStats($nWidgetId, $sStartDate, $sEndDate)
+    {
+        return $this->_getStatsBy(self::WIDGET_FIELD, $nWidgetId, $sStartDate, $sEndDate);
+    }
+
+    public function getStatsByWebsite($nWebsiteId, $sStartDate, $sEndDate)
+    {
+        return $this->_getStatsBy(self::WEBSITE_FIELD, $nWebsiteId, $sStartDate, $sEndDate);
+    }
+
+    private function _getStatsBy($nField, $nId, $sStartDate, $sEndDate)
+    {
+        $oDateFormat = new \CI\Date\Format();
+        $nId         = intval($nId);
+        $sStartDate  = $oDateFormat->datetime($sStartDate);
+        $sEndDate    = $oDateFormat->datetime($sEndDate);
+        $nStartDate  = strtotime($sStartDate);
+        $nEndDate    = strtotime($sEndDate);
+        $sFieldId    = 'widget_id';
+
+        if ($nField === self::WEBSITE_FIELD) {
+            $sFieldId = 'website_id';
+        }
+
+        $sQuery = "SELECT
+                IFNULL(SUM(display), 0) as display,
+                IFNULL(SUM(incoming), 0) as incoming,
+                IFNULL(SUM(display_basic), 0) as display_basic,
+                IFNULL(SUM(display_contextual), 0) as display_contextual,
+                IFNULL(SUM(display_similar), 0) as display_similar,
+                IFNULL(SUM(display_tag), 0) as display_tag,
+                IFNULL(SUM(incoming_basic), 0) as incoming_basic,
+                IFNULL(SUM(incoming_contextual), 0) as incoming_contextual,
+                IFNULL(SUM(incoming_similar), 0) as incoming_similar,
+                IFNULL(SUM(incoming_tag), 0) as incoming_tag
+            FROM stats_widgets_account
+            WHERE
+                {$sFieldId} = {$nId}
+                AND created BETWEEN {$nStartDate} AND {$nEndDate};";
+        $aStats = $this->oModel->query_read($sQuery, false);
+
+        if (is_array($aStats)) {
+            // 2 array_shift because of the cake model behaviour
+            $aStats = array_shift($aStats);
+            $aStats = array_shift($aStats);
+        } else {
+            $aStats = $this->getEmptyStats();
+        }
+
+        // we return everything as integer
+        return array(
+            'display'             => (int) $aStats['display'],
+            'incoming'            => (int) $aStats['incoming'],
+            'display_basic'       => (int) $aStats['display_basic'],
+            'display_contextual'  => (int) $aStats['display_contextual'],
+            'display_similar'     => (int) $aStats['display_similar'],
+            'display_tag'         => (int) $aStats['display_tag'],
+            'incoming_basic'      => (int) $aStats['incoming_basic'],
+            'incoming_contextual' => (int) $aStats['incoming_contextual'],
+            'incoming_similar'    => (int) $aStats['incoming_similar'],
+            'incoming_tag'        => (int) $aStats['incoming_tag'],
+        );
+    }
+}

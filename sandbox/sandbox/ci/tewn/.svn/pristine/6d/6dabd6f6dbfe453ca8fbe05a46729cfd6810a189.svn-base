@@ -1,0 +1,26 @@
+<?php
+
+namespace CI\Http\Service;
+use CI\Http\Service;
+use CI\Http\Facade\Server;
+
+class Bidtellect extends Service
+{
+    protected $sUrl     = 'http://api.bidtellect.com/ServerClient/WebFeed.json';
+    protected $sToken   = 'A9E8B08E-8118-4E14-BFBC-7A421C17D372';
+    protected $sMethod  = Service::METHOD_GET;
+
+    public function __construct($aOptions)
+    {
+        $aOptions           = new \CI\ArrayManipulator($aOptions);
+        $this->aArgs['t']   = $this->sToken;
+        $this->aArgs['p1']  = 'slot_'.$aOptions->get('slot', 0);
+        $this->aArgs['w1']  = $aOptions->get('width', 0);
+        $this->aArgs['h1']  = $aOptions->get('height', 0);
+        $this->aArgs['s']   = 'LandingPage';
+        $this->aArgs['pub'] = 'crowdignite';
+        $this->aArgs['ip']  = $aOptions->get('test', false) ? '50.79.148.241' : Server::getClientIp();
+        $this->aArgs['ua']  = Server::getElement('HTTP_USER_AGENT');
+        $this->aArgs['url'] = Server::getCurrentUrl();
+    }
+}

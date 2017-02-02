@@ -1,0 +1,501 @@
+/**
+ * Crowdignite Namespace
+ * @type {Object}
+ */
+var CI = CI || {};
+
+/**
+ * XMLHttpRequest request for ajax call
+ * @type {XMLHttpRequest}
+ */
+CI.xhr_request = null;
+
+/**
+ * Sets a request and abort a previous one
+ * @param {XMLHttpRequest} request The request to set
+ */
+CI.setRequest = function(request) {
+    if (this.xhr_request != null && this.xhr_request.readyState < 4) {
+        this.xhr_request.abort();
+    }
+    this.xhr_request = request;
+};
+
+/**
+ * Create or re-define CI Analysis Namespaces
+ * @type {Object}
+ */
+CI.Analysis = {
+    Process: {
+        spinElement: ''
+    },
+    Builder: {
+        buildElement: '',
+        Columns: {}
+    }
+};
+
+/***********
+ * PROCESS *
+ ***********/
+
+/**
+ * Process execution
+ * TODO: add callbacks for errors and complete actions
+ *       maybe other for success other than builder callback
+ * @see    http://api.jquery.com/jQuery.ajax/#jqXHR
+ * @param  {string}   url       Url to process data
+ * @param  {object}   data      Data to be processed
+ * @param  {callback} fnBuilder Builder callback to build data processed
+ * @return {jqXHR}
+ */
+CI.Analysis.Process.execute = function(url, data, fnBuilder) {
+    var spinElement = this.spinElement;
+    $(spinElement).spin('large');
+    return jQuery.ajax(url, {
+        data: data,
+        dataType: "json",
+        type: 'post',
+        complete: function() {},
+        error: function() {},
+        success: function(data) {
+            fnBuilder.call(CI.Analysis.Builder, data, function() {
+                return $(spinElement).spin(false);
+            });
+        }
+    });
+}
+
+/**
+ * Process websites information
+ * @see    CI.Analysis.Process.execute
+ * @param  {array} websites  Websites ID's to process
+ * @return {jqXHR}
+ */
+CI.Analysis.Process.websites = function(websites) {
+    return this.execute('/analysis/websites', {"websites": websites}, CI.Analysis.Builder.websites);
+};
+
+/**
+ * Process websites from a hub with a specific status
+ * @see    CI.Analysis.Process.execute
+ * @param  {integer} hub     The hub to process
+ * @param  {integer} status  The status of website to filter
+ * @return {jqXHR}
+ */
+CI.Analysis.Process.hub = function(hub, status) {
+    return this.execute('/analysis/hubs', {"hub": hub, "status": status}, CI.Analysis.Builder.websites);
+};
+
+/**
+ * Process widgets information
+ * @see    CI.Analysis.Process.execute
+ * @param  {array}  websites  Widgets ID's to process
+ * @return {jqXHR}
+ */
+CI.Analysis.Process.widgets = function(widgets) {
+    return this.execute('/analysis/widgets', {"widgets": widgets}, CI.Analysis.Builder.widgets);
+}
+
+/************
+ * BUILDERS *
+ ************/
+
+/**
+ * Builder execution
+ * @param  {array}                       items         The items to build (processed data from CI.Analysis.Process)
+ * @param  {CI.Analysis.Builder.Columns} ColumnBuilder The Columns Builder to build data
+ * @param  {callback}                    fnFinish      The callback to finish building data
+ * @return {mixed}                                     The callback return data
+ */
+CI.Analysis.Builder.execute = function(items, ColumnBuilder, fnFinish) {
+    var table = $(this.buildElement);
+    for (var i = 0; i < items.length; i++) {
+        var element = items[i];
+        var columns = ColumnBuilder.columns(element);
+        var row = (i % 2 == 0) ? '<tr class="AltRow">' : '<tr>';
+        table.append(row + "<td>" + columns.join("</td><td>") + "</td></tr>");
+    }
+    return fnFinish();
+}
+
+/**
+ * Websites builder
+ * @see    CI.Analysis.Builder.execute
+ * @param  {array}    items    The items to build (processed data from CI.Analysis.Process)
+ * @param  {callback} fnFinish The callback to finish building data
+ * @return {mixed}             The callback return data
+ */
+CI.Analysis.Builder.websites = function(items, fnFinish) {
+    return this.execute(items, CI.Analysis.Builder.Columns.website, fnFinish);
+}
+
+/**
+ * Widgets builder
+ * @see    CI.Analysis.Builder.execute
+ * @param  {array}    items    The items to build (processed data from CI.Analysis.Process)
+ * @param  {callback} fnFinish The callback to finish building data
+ * @return {mixed}             The callback return data
+ */
+CI.Analysis.Builder.widgets = function(items, fnFinish) {
+    return this.execute(items, CI.Analysis.Builder.Columns.widget, fnFinish);
+}
+
+/**
+ * Tools to print html elements
+ * to be used inside Builder Columns
+ * @type {Object}
+ */
+CI.Analysis.Builder.Columns.tools = {
+    /**
+     * Just an end of line
+     * @type {String}
+     */
+    eol: '<br/>',
+
+    /**
+     * Gets the text as bold
+     * @param  {string} text The text to make bold
+     * @return {string}
+     */
+    bold: function(text) {
+        return '<b>' + text + '</b>';
+    },
+
+    /**
+     * Gets the italic version of the text
+     * @param  {string} text The text to make italic
+     * @return {string}
+     */
+    italic: function(text) {
+        return '<i>' + text + '</i>';
+    },
+
+    /**
+     * Creates a link with the given url and text
+     * @param  {string} text The text inside the link
+     * @param  {string} url  The url of this link
+     * @return {string}
+     */
+    link: function(text, url) {
+        return '<a target="_blank" href ="' + url + '">' + text + '</a>';
+    },
+
+    /**
+     * Creates a span dom string
+     * @param  {string} text The text inside the span
+     * @param  {string} id   The ID of this span
+     * @return {string}
+     */
+    span: function(text, id) {
+        return ((id == undefined) ? '<span>' : '<span id="' + id + '">') + text + '</span>';
+    },
+
+    /**
+     * Creates an anchor with click behaviour (not a link)
+     * @param  {string} text    The text to be inside this anchor
+     * @param  {string} onclick The code to execute in the click event
+     * @param  {string} id      The id of this element (if any)
+     * @return {string}
+     */
+    anchor: function(text, onclick, id) {
+        id = (id == undefined ? '' : ' id=' + id);
+        return '<a' + id + ' href ="#" onclick="' + onclick + ' return false;">' + text + '</a>';
+    },
+
+    /**
+     * Creates a hidden span
+     * @param  {string} text The text to display inside this span
+     * @param  {string} id   The id of this span element
+     * @return {string}
+     */
+    hspan: function(text, id) {
+        id = ((id == undefined) ? '>' : ' id="' + id + '">');
+        return '<span style="display: none;"' + id + text + '</span>';
+    },
+
+    /**
+     * Creates an span with custom class attribute
+     * @param  {string} text         The text to be inside this span element
+     * @param  {string} custom_class The custom class to apply to this span element
+     * @return {string}
+     */
+    cspan: function(text, custom_class) {
+        return '<span class="' + custom_class + '">' + text + '</span>';
+    }
+}
+
+/**
+ * Builds the columns for a website
+ * @type    {Object}
+ * @extends {CI.Analysis.Builder.Columns.tools}
+ */
+CI.Analysis.Builder.Columns.website = $.extend({}, CI.Analysis.Builder.Columns.tools, {
+
+    /**
+     * Gets all the column values for this Columns Builder
+     * @param  {array} data The data processed by a Process
+     * @return {array}      The column values (html)
+     */
+    columns: function(data) {
+        return [
+            this.id(data),
+            this.website(data),
+            this.whitelist(data),
+            this.blacklist(data),
+            this.widgetPages(data),
+            this.uniqueWidgetPages(data),
+            this.intersects(data)
+        ];
+    },
+
+    /**
+     * Column ID
+     * @param  {array}  data  The data processed by a Process
+     * @return {string}       HTML string code for the column
+     */
+    id: function(data) {
+        return this.link(data.website.id, '/management/website/' + data.website.id);
+    },
+
+    /**
+     * Column Website
+     * @param  {array}  data  The data processed by a Process
+     * @return {string}       HTML string code for the column
+     */
+    website: function(data) {
+        var website = data.website;
+        return this.bold(website.name) + this.eol +
+            website.domain + this.eol +
+            this.italic(this.bold('category') + this.eol + website.category);
+    },
+
+    /**
+     * Column Whitelist
+     * @param  {array}  data  The data processed by a Process
+     * @return {string}       HTML string code for the column
+     */
+    whitelist: function(data) {
+        var count = data.website.whitelist == '' ? 0 : data.website.whitelist.split(', ').length;
+        var text = this.bold(count + ' Websites');
+        if (count > 0) {
+            var id = 'ci_website_' + data.website.id + '_whitelist';
+            var onclick = "$('#"+ id +"').show('slow'); $(this).hide();";
+            text += this.eol + this.anchor('Show whitelist...', onclick) +
+                this.hspan(data.website.whitelist, id);
+        }
+        return text;
+    },
+
+    /**
+     * Column Blacklist
+     * @param  {array}  data  The data processed by a Process
+     * @return {string}       HTML string code for the column
+     */
+    blacklist: function(data) {
+        var count = data.website.blacklist == '' ? 0 : data.website.blacklist.split(', ').length;
+        var text = this.bold(count + ' Websites');
+        if (count > 0) {
+            var id = 'ci_website_' + data.website.id + '_blacklist';
+            var onclick = "$('#"+ id +"').show('slow'); $(this).hide();";
+            text += this.eol + this.anchor('Show blacklist...', onclick) +
+                this.hspan(data.website.blacklist, id);
+        }
+        return text;
+    },
+
+    /**
+     * Column widget pages
+     * @param  {array}  data  The data processed by a Process
+     * @return {string}       HTML string code for the column
+     */
+    widgetPages: function(data) {
+        var text = this.link(
+            this.bold(data.pages.count + ' Pages'),
+            '/management/widget_analytics/' + data.website.id
+        ) + this.eol;
+        for(var i = 0; i < data.pages.types.length; i++) {
+            var type = data.pages.types[i];
+            text += type.type + ': ' + type.count + this.eol;
+        }
+        return text;
+    },
+
+    /**
+     * Column unique widget pages
+     * @param  {array}  data  The data processed by a Process
+     * @return {string}       HTML string code for the column
+     */
+    uniqueWidgetPages: function(data) {
+        var index = 0;
+        var hidden_span = '';
+        var text = this.bold(data.pages.unique_count + ' Pages') + this.eol;
+        for(index = 0; index < data.pages.website_pages.length; index++) {
+            var pages = data.pages.website_pages[index];
+            var wid = 'website_' + data.website.id + '_list';
+            var pwid = wid + '_' + pages.website_id;
+            var websites_show_onclick = "$('#"+wid+"').show('slow'); $('#link_"+wid+"').hide();";
+            var websites_hide_onclick = "$('#"+wid+"').hide(); $('#link_"+wid+"').show();";
+            var pages_show_onclick = "$('#"+pwid+"').toggle('slow');";
+            text += this.bold(
+                this.italic(
+                    this.anchor(
+                        'From website ' + pages.website_id + ': ' + pages.pages_id.length + ' pages',
+                        pages_show_onclick
+                    )
+                )
+            ) + this.eol;
+            var links = [];
+            for (var i = 0; i < pages.pages_id.length; i++) {
+                var page_id = pages.pages_id[i];
+                links.push(
+                    this.link(
+                        page_id, '/pages/moderate/'+pages.website_id+'/'+page_id
+                    )
+                );
+            };
+            text += this.hspan(links.join(', ') + this.eol, pwid);
+            if (index == 2) {
+                text += this.anchor('View ' + (data.pages.website_pages.length - (index + 1)) +
+                    ' more...', websites_show_onclick, 'link_' + wid);
+                text += '<span style="display: none;" id="' + wid + '">';
+            }
+        }
+        if (index >= 2) {
+            text += this.anchor('Hide details...', websites_hide_onclick) + '</span>';
+        }
+        return text;
+    },
+
+    /**
+     * Column Intersects
+     * @param  {array}  data  The data processed by a Process
+     * @return {string}       HTML string code for the column
+     */
+    intersects: function(data) {
+        var text = '';
+        for (var i = 0; i < data.intersects.length; i++) {
+            var intersect = data.intersects[i];
+            var id = 'lp_links_' + data.website.id + '_' + intersect.category + '_' + intersect.content;
+            var onclick = "$('#"+id+"').toggle('slow');";
+            text += this.bold(
+                'Category ' + intersect.names.category + ' (' + intersect.names.content + ')'
+            ) + this.eol;
+            text += this.anchor('Generated by ' + intersect.links.length + ' pages', onclick) + this.eol;
+            var links = [];
+            for(var j = 0; j < intersect.links.length; j++) {
+                var page_id = intersect.links[j];
+                links.push(
+                    this.link(
+                        page_id, '/pages/moderate/0/'+page_id
+                    )
+                );
+            }
+
+            if (links.length > 0) {
+                text += this.hspan(links.join(', ') + this.eol, id);
+            }
+
+            var status = 'success';
+            if (intersect.pages < 30) {
+                status = 'danger';
+            } else if (intersect.pages < 100) {
+                status = 'risk';
+            }
+            text += this.cspan(this.bold('LP Content: ' + intersect.pages + ' pages'), status) + this.eol;
+
+            var memcache_text = '';
+            if (intersect.cached === null) {
+                memcache_text = 'Empty random seed';
+            } else if (intersect.cached < 0) {
+                memcache_text = 'Empty memcache data';
+            } else {
+                memcache_text = intersect.cached + ' pages';
+            }
+
+            text += this.italic(this.bold('Memcache: ') + memcache_text) + this.eol + this.eol;
+        }
+        return text;
+    }
+});
+
+/**
+ * Builds the columns for a widget
+ * @type    {Object}
+ * @extends {CI.Analysis.Builder.Columns.tools}
+ */
+CI.Analysis.Builder.Columns.widget = $.extend({}, CI.Analysis.Builder.Columns.tools, {
+
+    /**
+     * Gets all the column values for this Columns Builder
+     * @param  {array} data The data processed by a Process
+     * @return {array}      The column values (html)
+     */
+    columns: function(data) {
+        return [
+            this.widget(data),
+            this.website(data),
+            this.lastUsed(data),
+            this.stats(data)
+        ];
+    },
+
+    /**
+     * Column Widget
+     * @param  {array}  data  The data processed by a Process
+     * @return {string}       HTML string code for the column
+     */
+    widget: function(data) {
+        var widget = data.widget;
+        var color_status = 'success';
+        if (widget.status == 1) {
+            color_status = 'risk';
+        } else if (widget.status == 2) {
+            color_status = 'danger';
+        }
+        return this.link(this.bold('ID: ') + widget.id, '/widgets/create/' + widget.id) + this.eol +
+            this.bold('Name: ') + widget.name + this.eol +
+            this.bold('Size: ') + widget.width + 'x' + widget.height + this.eol +
+            this.bold('Number of links: ') + widget.num_links + this.eol +
+            this.bold('Status: ') + this.bold(this.cspan(widget.status_name, color_status));
+    },
+
+    /**
+     * Column Website
+     * @param  {array}  data  The data processed by a Process
+     * @return {string}       HTML string code for the column
+     */
+    website: function(data) {
+        var website = data.website;
+        return this.link(this.bold(website.name + '(' + website.id + ')'), '/management/website/' + website.id) +
+            this.eol + this.bold('Hub: ') + website.domain + this.eol +
+            this.bold('Category: ') + website.category_name + this.eol +
+            this.bold('Content Rating: ') + website.content_name;
+    },
+
+    /**
+     * Column Last Used
+     * @param  {array}  data  The data processed by a Process
+     * @return {string}       HTML string code for the column
+     */
+    lastUsed: function(data) {
+        return this.bold('Created: ') + data.widget.created + this.eol +
+            this.bold('Last Used: ') + data.widget.last_used;
+    },
+
+    /**
+     * Column Stats
+     * @param  {array}  data  The data processed by a Process
+     * @return {string}       HTML string code for the column
+     */
+    stats: function(data) {
+        var widget = data.widget;
+        var stats = data.stats;
+        return 'LIFE TIME' + this.eol +
+            this.italic(this.bold('Display: ') + widget.display) + this.eol +
+            this.italic(this.bold('Incoming: ') + widget.incoming) + this.eol + this.eol +
+            'YESTERDAY' + this.eol +
+            this.italic(this.bold('Display: ') + stats.display) + this.eol +
+            this.italic(this.bold('Incoming: ') + stats.incoming);
+    }
+});

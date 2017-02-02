@@ -1,0 +1,15 @@
+/* Backend General JS */
+jQuery(document).ready(function() {
+
+	/* Mobile nav bar */
+	jQuery('.btn-navbar').click(function(){
+		var tabnav = jQuery('.tabnav');
+		if( tabnav.hasClass('collapsed') ) {
+			tabnav.slideUp().removeClass('collapsed');			
+		} else {
+			tabnav.slideDown().addClass('collapsed');			
+		}
+		return false;
+	});
+
+});

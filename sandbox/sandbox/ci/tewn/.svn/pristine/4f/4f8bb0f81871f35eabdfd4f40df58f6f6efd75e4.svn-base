@@ -1,0 +1,34 @@
+<?php
+
+require_once 'logger/analytic/element/interface.php';
+require_once 'logger/analytic/element/abstract.php';
+require_once 'logger/analytic/element/basic.php';
+
+class LoggerAnalyticElementBasicTest extends PHPUnit_Framework_TestCase
+{
+	public function testValue()
+	{
+		$element = new Logger_Analytic_Element_Basic('basic_element_test');
+		$element->registerValue(1234);
+		$this->assertTrue($element->build() === '1234');
+		$element->registerValue('hello world');
+		$this->assertTrue($element->build() === 'hello world');
+	}
+
+	public function testFormat()
+	{
+		$format = array('separator' => '|', 'item' => '[%s]');
+		$element = new Logger_Analytic_Element_Basic(
+			'basic_element_test', $format
+		);
+		$element->registerValue(123);
+		$element->registerValue(456);
+		$this->assertTrue($element->build() === '[456]');
+	}
+
+	public function testEmptyValue()
+	{
+		$element = new Logger_Analytic_Element_Basic('basic_element_test');
+		$this->assertTrue($element->build() === '');
+	}
+}

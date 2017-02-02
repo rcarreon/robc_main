@@ -1,0 +1,50 @@
+<style>
+body { background:#eee; }
+#header {
+    background: #fff;
+    height:50px; 
+}
+#header a {
+    background:url(/img/momtastic/logo_small.jpg) no-repeat;
+    display:block;
+    height:50px!important;
+    width:193px!important;
+    position:absolute;
+    top:3px;
+    left:1%;
+}
+#header ul.navigation { 
+    background:none;
+    left:auto; right:3%;
+    top:13px;
+    height:40px;
+    margin:0;
+    position: absolute;
+    width:400px;
+}
+#header ul.navigation li { background:none; float:left; }
+#header ul.navigation a {
+    background:none;
+    color:#666;
+    width:90px!important;
+    height:25px!important;
+    position:relative;
+    text-decoration:none;
+    top:auto;
+    left:auto;
+    width:50px!important;
+}
+#header ul.navigation a:hover { color:#444; text-decoration:underline;}
+#paginate { display:block; margin: 0; padding-top: 10px; width:100%;}
+#footer {
+    color: #000;
+    display:block;
+    padding:20px 0;
+    width: 100%;
+}
+#footer a { color:#000; text-decoration:none;}
+#footer a { color:#000!important; text-decoration:underline;}
+#footer div.info div { color:#333; font-size:11px;  margin:10px 0 0!important; text-align:center!important; width: 100%;}
+.grid_12 .large_item a.button { background: #1a688e; border-bottom: 1px solid #003c5a; }
+.grid_12 .large_item a.button span { text-shadow: 0 1px 1px #003c5a; }
+</style>

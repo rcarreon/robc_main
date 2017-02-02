@@ -1,0 +1,708 @@
+/* backend2 - index.js */
+jQuery(document).ready(function() {
+
+    blockui_overlayCSS = jQuery.blockUI.defaults.overlayCSS;
+
+    jQuery.blockUI.defaults.overlayCSS = {};
+    jQuery.blockUI.defaults.css = {};
+
+
+    //jQuery("#timeChoices").change(function(){ get_graph_data(); });
+
+    /* Dropdowns */
+    $(".dropdown dt a").click(function() {
+        $(this).parent().parent().find("dd ul").toggle();
+    });
+
+    $(".dropdown dd ul li a").click(function() {
+        var text = $(this).html();
+        $(this).parent().parent().parent().parent().find("dt a span").html(text);
+        $(this).parent().parent().parent().parent().find("dd ul").hide();
+    });
+
+    function getSelectedValue(id) {
+        return $("#" + id).find("dt a span.value").html();
+    }
+
+    $(document).bind('click', function(e) {
+        var $clicked = $(e.target);
+        if (! $clicked.parents().hasClass("dropdown"))
+            $(".dropdown dd ul").hide();
+    });
+
+    /* Change intevals */
+    jQuery(".interval_hour").click(function() {
+        $('input:radio[name=selector_time_unit]')[0].checked = true;
+    });
+    jQuery(".interval_day").click(function() {
+        $('input:radio[name=selector_time_unit]')[1].checked = true;
+    });
+
+    /* Change websites/hubs to chart */
+    jQuery("a.all_websites").click(function() {
+        jQuery("#website_checkboxes").hide();
+        jQuery("#hub_checkboxes").hide();
+        jQuery("input:radio[name=selector_websites]")[0].checked = true;
+    });
+    jQuery("a.individual_websites").click(function() {
+        jQuery("#website_checkboxes").show();
+        jQuery("#hub_checkboxes").hide();
+        jQuery("input:radio[name=selector_websites]")[1].checked = true;
+    });
+    jQuery("a.individual_hubs").click(function() {
+        jQuery("#website_checkboxes").hide();
+        jQuery("#hub_checkboxes").show();
+        jQuery("input:radio[name=selector_websites]")[2].checked = true;
+    });
+
+    /* Panes */
+    jQuery(".hub_list li a").click(function() {
+        jQuery(".hub_list li").removeClass('tab_selected');
+        jQuery(this).parent().addClass('tab_selected');
+        jQuery('.pane').hide();
+        var pane_name = ".table_container div#"+ $(this).attr('class');
+        jQuery(pane_name).fadeIn(); //css('display','inline-block');
+
+    });
+
+    /* Load hub charts only when the tab is clicked  */
+    jQuery('.hub_charts').click(function() {
+        if( !jQuery('#hub_charts').hasClass('loaded') ) {
+            get_graph_data_hubs();
+            jQuery('#hub_charts').addClass('loaded')
+        }
+    })
+
+    /* Tablesorter */
+    $(".tablesorter").tablesorter({
+        widgets: ['zebra'],
+        widgetZebra: {css: ["NormRow","AltRow"]} // css classes to apply to rows
+    });
+
+    /* Run report */
+    jQuery("#run_report").click(function() {
+        run_report();
+        // get_graph_data_hubs(); // Too slow
+    });
+
+    /************************************************ RSS Ingestion code *****************************************/
+    $('#rss_feed_form_add').submit(function(event) {
+        event.preventDefault();
+
+        var form = $(this);
+
+        form.find('input[type=submit]').attr('disabled', true).addClass('disabled');
+        add_new_feed(form);
+    });
+
+    $('#rss_feed_form_edit').submit(function(event) {
+        event.preventDefault();
+
+        var form = $(this);
+
+        form.find('input[type=submit]').attr('disabled', true).addClass('disabled');
+        update_feed(form);
+    });
+
+    $('#rss .short_table a.delete').live('click', function(event){
+        event.preventDefault();
+
+        $.ajax({
+            url: this.href,
+            dataType: 'json'
+        }).done(function(data){
+            if (undefined !== data.error) {
+                show_errors(data.error);
+            } else {
+                hide_errores();
+                load_rss_feeds();
+            }
+        });
+    });
+
+    $('#rss .short_table a.rename').live('click', function(event){
+        event.preventDefault();
+
+        $('#rss_feed_form_add').hide();
+        clear_form('rss_feed_form_edit');
+        $('#rss_feed_form_edit').show();
+
+        $.ajax({
+            url: '/feed/get/' + $(this).data('id'),
+            dataType: 'json'
+        }).done(function(data){
+            if ('ok' !== data.status) {
+                show_errors(data.error);
+            } else {
+                hide_errores();
+                prepare_edit_form(data.feed);
+            }
+        });
+    });
+
+    $('#rss #rss_feed_form_edit a.cancel').live('click', function(event){
+        event.preventDefault();
+
+        $('#rss_feed_form_edit').hide();
+        $('#rss_feed_form_add').show();
+    });
+
+    $('#rss .feed_form select[name="data[Feed][website_id]"]').live('change', function() {
+        var website_id = $(this).val();
+        var category_id = $(this).find('option[value=' + website_id + ']').data('category');
+        $(this).parent().find('select[name="data[Feed][category]"]').val(category_id);
+    })
+
+    $('#rss .feed_form').each(function(){
+        var $form = $(this);
+        var website_id = $form.find('select[name="data[Feed][website_id]"]').val();
+        var category_id = $form.find('select[name="data[Feed][website_id]"] option[value=' + website_id + ']').data('category');
+
+        $form.find('select[name="data[Feed][category]"]').val(category_id);
+    });
+
+    $("#add-website-select-rss-feed").chosen({allow_single_deselect: true});
+    $("#edit-website-select-rss-feed").chosen({allow_single_deselect: true});
+
+    var aUrl = $(location).attr('href').split("#");
+    if ( aUrl.length == 2 ) {
+        $('.' + aUrl[1]).click();
+    } else {
+        $('.general_stats').click();
+    }
+
+    load_rss_feeds();
+    /********************************************** END RSS Ingestion code *********************************************************/
+    loadQueueSizes();
+    loadSimilarPagesCount();
+});
+
+    /************************************************ RSS Ingestion code ***********************************************************/
+    /**
+     * Set the error list and display the error box
+     */
+    function show_errors(errors) {
+        var errors_container = $('#rss div.errors');
+        var items = [];
+
+        errors_container.find('ul li').remove();
+        $(errors).each(function(key, value){
+            items.push('<li>' + value.msg + '</li>');
+		});
+
+		items = items.join('');
+		errors_container.find('ul').append(items);
+		errors_container.show('fast');
+	}
+
+	/**
+	 * Hide the error box
+	 */
+	function hide_errores() {
+		var errors_container = $('#rss div.errors');
+		errors_container.hide('fast');
+	}
+
+	/**
+	 * Add a new feed with the selected data for the current user
+	 */
+	function add_new_feed(form) {
+		$('#rss_feed_form_add input').removeClass('error');
+		$('#rss_feed_form_add select').removeClass('error');
+
+		$.ajax({
+			url: '/feed/add',
+			type: 'POST',
+			dataType: 'json',
+			data: form.serialize()
+		}).done(function(data){
+			if ('ok' !== data.status) {
+				show_errors(data.error);
+				$(data.error).each(function(key, value){
+					$('#rss_feed_form_add [name="' + value.name + '"]').addClass('error');
+				});
+			} else {
+				clear_form('rss_feed_form_add');
+				load_rss_feeds();
+				hide_errores();
+			}
+			form.find('input[type=submit]').attr('disabled', false).removeClass('disabled');
+		});
+	}
+
+	/**
+	 * Realize the request to update the data of the selected
+	 * feed with the new data
+	 */
+	function update_feed(form) {
+		$('#rss_feed_form_edit input').removeClass('error');
+
+		$.ajax({
+			url: '/feed/update',
+			type: 'POST',
+			dataType: 'json',
+			data: form.serialize()
+		}).done(function(data){
+			if ('ok' !== data.status) {
+				show_errors(data.error);
+				$(data.error).each(function(key, value){
+					$('#rss_feed_form_edit [name="' + value.name + '"]').addClass('error');
+				});
+			} else {
+				clear_form('rss_feed_form_edit');
+				load_rss_feeds();
+				hide_errores();
+				$('#rss_feed_form_edit').hide();
+				$('#rss_feed_form_add').show();
+			}
+			form.find('input[type=submit]').attr('disabled', false).removeClass('disabled');
+		});
+	}
+
+	/**
+	 * Clean the fields of the selected form
+	 */
+	function clear_form(form_id) {
+		$('#' + form_id + ' input[type="text"]').val('');
+		$('#' + form_id + ' input[type="hidden"]').val('');
+		$('#' + form_id + ' input[type="checkbox"]').removeAttr('checked');
+	}
+
+	/**
+	 * Clean the edit form and load the data of the feed to
+	 * be edited
+	 */
+	function prepare_edit_form(data) {
+		var edit_form = $('#rss_feed_form_edit');
+
+		edit_form.find('input[name="data[Feed][id]"]').val(data.id);
+		edit_form.find('input[name="data[Feed][name]"]').val(data.name);
+		edit_form.find('select[name="data[Feed][website_id]"]').val(data.website_id);
+		$("#edit-website-select-rss-feed").trigger("liszt:updated");
+        edit_form.find('select[name="data[Feed][category]"]').val(data.category);
+		edit_form.find('input[name="data[Feed][expiration_days]"]').val(data.expiration_days);
+		edit_form.find('input[name="data[Feed][url]"]').val(data.url);
+		edit_form.find('input[type="checkbox"]').removeAttr('checked');
+		if (1 == data.whitelist) {
+			edit_form.find('input[type="checkbox"]').attr('checked', true);
+		}
+	}
+
+	/**
+	 * Update the list of feeds for the current user
+	 */
+	function load_rss_feeds() {
+		$.ajax({
+			url: '/feed/lists',
+			dataType: 'json'
+		}).done(function(data) {
+			$('#rss .short_table tr.childs').remove();
+
+			var item = [];
+			$(data).each(function(key, value) {
+				item.push('<tr class="childs">' +
+					'<td>' + value.name + '</td>' +
+					'<td><a href="/management/website/'+ value.website_id +'">' + value.website + '</a></td>' +
+					'<td>' + value.category + '</td>' +
+					'<td><a target="_blank" href="' + value.url + '">' + value.url + '</a></td>' +
+					'<td><span class="info_icon icon_' + (value.whitelist == 0 ? 'in' : '') + 'active"></span></td>' +
+					'<td>' +
+						'<a class="button rename tooltip" alt="Edit this feed." data-id="' + value.id + '" href="/feed/edit/' + value.id + '">' +
+							'<span class="icon"></span>' +
+						'</a>' +
+						'<a class="button delete tooltip" alt="Edit this feed." href="/feed/delete/' + value.id + '">' +
+							'<span class="icon"></span>' +
+						'</a>' +
+					'</td>' +
+				'</tr>');
+			});
+			item = item.join('');
+
+			$('#rss .short_table table tbody').append(item);
+		});
+	}
+	/********************************************** END RSS Ingestion code *********************************************************/
+
+
+	function loadQueueSizes() {
+		$.ajax({
+			url: '/management/get_queues_sizes',
+			dataType: 'json'
+		}).done(function(data_query) {
+			var queue_sizes = "";
+
+			for (var prop in data_query) {
+                var total = 0;
+                var queue = data_query[prop];
+
+                for(var server in queue) {
+                    total += queue[server];
+                }
+
+				queue_sizes += '<tr><td class="title">' + prop + '</td><td>' + total + '</td></tr>';
+			}
+
+			$('tr.queue_sizes').after(queue_sizes);
+		});
+	}
+
+	function loadSimilarPagesCount() {
+		$.ajax({
+			url: '/management/get_similar_pages_counts',
+			dataType: 'json'
+		}).done(function(data_query) {
+			if (undefined != data_query['landing_page']) {
+				$('td.similar_page_count_landing_page').text(data_query['landing_page']);
+			}
+			if (undefined != data_query['widget']) {
+				$('td.similar_page_count_widget').text(data_query['widget']);
+			}
+		});
+	}
+
+	function calculateRange(input) {
+		var sdate = jQuery("#start_datepicker").datepicker("getDate");
+		var edate = jQuery("#end_datepicker").datepicker("getDate");
+
+		if ( edate < sdate ) {
+			jQuery("#end_datepicker").datepicker("setDate","0");
+		}
+
+	}
+
+	function get_graph_data(list, is_hubs)
+	{
+		jQuery("#start_datepicker").val( jQuery('#start_daterangepicker').val() );
+		jQuery("#end_datepicker").val( jQuery('#end_daterangepicker').val() );
+		var start = jQuery("#start_datepicker").datepicker("getDate");
+		var end = jQuery("#end_datepicker").datepicker("getDate");
+
+		var params = {
+			start: $.datepicker.formatDate('yy-mm-dd', start),
+			end  : $.datepicker.formatDate('yy-mm-dd', end),
+			time : jQuery("input[name=selector_time_unit]:checked").val() == 1 ? 'hourly' : 'daily'
+		};
+
+		params.websites = params.hubs = '';
+		if (is_hubs) {
+			params.hubs = list;
+		} else if (list != 'all') {
+			params.websites = list;
+		}
+
+		block_charts();
+		jQuery.get('/history_stats/charts_data', params, function(data) {
+			var chart = {'pointInterval': data.interval * 1000, 'pointStart': start.getTime(), 'type': 'line'};
+			var tpm = [], ctr = [], rr = [], credits = [], traffic = [], impressions = [], display_types = [], ctr_types = [];
+			for (name in data.data) {
+				tpm.push(jQuery.extend({'name': name, 'data': data.data[name].tpm}, chart));
+				ctr.push(jQuery.extend({'name': name, 'data': data.data[name].widget_ctr}, chart));
+				rr.push(jQuery.extend({'name': name + ' Return Rate', 'data': data.data[name].return_rate}, chart));
+				rr.push(jQuery.extend({'name': name + ' Total Return Rate', 'data': data.data[name].total_return_rate}, chart));
+				credits.push(jQuery.extend({'name': name, 'data': data.data[name].credits}, chart));
+				traffic.push(jQuery.extend({'name': 'Traffic from ' + name, 'data': data.data[name].traffic_from}, chart));
+				traffic.push(jQuery.extend({'name': 'Traffic to ' + name, 'data': data.data[name].traffic_to}, chart));
+				impressions.push(jQuery.extend({'name': name, 'data': data.data[name].widget_impressions}, chart));
+				display_types.push(jQuery.extend({'name': name + ' Basic', 'data': data.data[name].display_basic}, chart));
+				display_types.push(jQuery.extend({'name': name + ' Contextual', 'data': data.data[name].display_contextual}, chart));
+				display_types.push(jQuery.extend({'name': name + ' Similar', 'data': data.data[name].display_similar}, chart));
+				ctr_types.push(jQuery.extend({'name': name + ' Basic', 'data': data.data[name].ctr_basic}, chart));
+				ctr_types.push(jQuery.extend({'name': name + ' Contextual', 'data': data.data[name].ctr_contextual}, chart));
+				ctr_types.push(jQuery.extend({'name': name + ' Similar', 'data': data.data[name].ctr_similar}, chart));
+			}
+			createChart('graph_tpm', 'TPM', 'Impressions', 'lineLegend', tpm, true, []);
+			createChart('graph_ctr', 'Widget Click Through Rate', 'Rate', 'lineLegend', ctr, true, []);
+			createChart('graph_return_rate', 'Return Rate', 'Rate', 'lineLegend', rr, true, []);
+			createChart('graph_credits', 'Credits', 'Credits', 'lineLegend', credits, true, []);
+			createChart('graph_io', 'Traffic From/To', 'Traffic From/To', 'lineLegend', traffic, true, []);
+			createChart('graph_display', 'Widget Impressions', 'Impressions', 'lineLegend', impressions, true, []);
+			createChart('graph_display_type', 'Widget Type Impressions', 'Impressions', 'lineLegend', display_types, true, []);
+			createChart('graph_ctr_type', 'Widget Type CTR', 'Click-Through-Rate', 'lineLegend', ctr_types, true, []);
+
+			createChart('graph_tpm_small', 'TPM', 'Impressions', 'line', tpm, false, []);
+			createChart('graph_ctr_small', 'Widget Click Through Rate', 'Rate', 'line', ctr, false, []);
+			createChart('graph_return_rate_small', 'Return Rate', 'Rate', 'line', rr, false, []);
+			createChart('graph_credits_small', 'Credits', 'Credits', 'line', credits, false, []);
+			createChart('graph_io_small', 'Traffic From/To', 'Traffic From/To', 'line', traffic, false, []);
+			createChart('graph_display_small', 'Widget Impressions', 'Impressions', 'line', impressions, false, []);
+			createChart('graph_display_type_small', 'Widget Type Impressions', 'Impressions', 'line', display_types, false, []);
+			createChart('graph_ctr_type_small', 'Widget Type CTR', 'Click-Through-Rate', 'line', ctr_types, false, []);
+			unblock_charts();
+		}, 'json');
+	}
+
+	function block_charts()
+	{
+		// Block out to wait on update
+		jQuery("#graph_tpm").block({ message:jQuery("#waiting_div_tpm"), css: {width:'210px', height:'50px'}  });
+		jQuery("#graph_return_rate").block({ message:jQuery("#waiting_div_return_rate"), css: {width:'210px', height:'50px'}  });
+		jQuery("#graph_ctr").block({ message:jQuery("#waiting_div_ctr"), css: {width:'210px', height:'50px'}  });
+		jQuery("#graph_io").block({ message:jQuery("#waiting_div_io"), css: {width:'210px', height:'50px'}  });
+		jQuery("#graph_credits").block({ message:jQuery("#waiting_div_credits"), css: {width:'210px', height:'50px'}  });
+		jQuery("#graph_display").block({ message:jQuery("#waiting_div_display"), css: {width:'210px', height:'50px'}  });
+		jQuery("#graph_display_type").block({ message:jQuery("#waiting_div_display_type"), css: {width:'210px', height:'50px'}  });
+		jQuery("#graph_ctr_type").block({ message:jQuery("#waiting_div_ctr_type"), css: {width:'210px', height:'50px'}  });
+
+		// Small charts
+		jQuery("#graph_tpm_small").block({ message:jQuery("#waiting_div_tpm_small"), css: {width:'50px', height:'50px'}  });
+		jQuery("#graph_return_rate_small").block({ message:jQuery("#waiting_div_return_rate_small"), css: {width:'50px', height:'50px'}  });
+		jQuery("#graph_ctr_small").block({ message:jQuery("#waiting_div_ctr_small"), css: {width:'50px', height:'50px'}  });
+		jQuery("#graph_io_small").block({ message:jQuery("#waiting_div_io_small"), css: {width:'50px', height:'50px'}  });
+		jQuery("#graph_credits_small").block({ message:jQuery("#waiting_div_credits_small"), css: {width:'50px', height:'50px'}  });
+		jQuery("#graph_display_small").block({ message:jQuery("#waiting_div_display_small"), css: {width:'50px', height:'50px'}  });
+		jQuery("#graph_display_type_small").block({ message:jQuery("#waiting_div_display_type_small"), css: {width:'50px', height:'50px'}  });
+		jQuery("#graph_ctr_type_small").block({ message:jQuery("#waiting_div_ctr_type_small"), css: {width:'50px', height:'50px'}  });
+	}
+
+	function unblock_charts()
+	{
+		// Block out to wait on update
+		jQuery("#graph_tpm").unblock();
+		jQuery("#graph_return_rate").unblock();
+		jQuery("#graph_ctr").unblock();
+		jQuery("#graph_io").unblock();
+		jQuery("#graph_credits").unblock();
+		jQuery("#graph_display").unblock();
+		jQuery("#graph_display_type").unblock();
+		jQuery("#graph_ctr_type").unblock();
+
+		// Small charts
+		jQuery("#graph_tpm_small").unblock();
+		jQuery("#graph_return_rate_small").unblock();
+		jQuery("#graph_ctr_small").unblock();
+		jQuery("#graph_io_small").unblock();
+		jQuery("#graph_credits_small").unblock();
+		jQuery("#graph_display_small").unblock();
+		jQuery("#graph_display_type_small").unblock();
+		jQuery("#graph_ctr_type_small").unblock();
+	}
+
+	function get_graph_data_hubs()
+	{
+		jQuery("#start_datepicker").val( jQuery('#start_daterangepicker').val() );
+		jQuery("#end_datepicker").val( jQuery('#end_daterangepicker').val() );
+		var start = jQuery("#start_datepicker").datepicker("getDate");
+		var end = jQuery("#end_datepicker").datepicker("getDate");
+
+		var params = {
+			start: $.datepicker.formatDate('yy-mm-dd', start),
+			end  : $.datepicker.formatDate('yy-mm-dd', end),
+			time : jQuery("input[name=selector_time_unit]:checked").val() == 1 ? 'hourly' : 'daily'
+		};
+
+		params.hubs = 'all';
+		params.websites = '';
+
+		// Block charts
+		jQuery("#graph_tpm_hub").block({ message:jQuery("#waiting_div_tpm_hub"), css: {width:'50px', height:'50px'}  });
+		jQuery("#graph_return_rate_hub").block({ message:jQuery("#waiting_div_return_rate_hub"), css: {width:'50px', height:'50px'}  });
+		jQuery("#graph_ctr_hub").block({ message:jQuery("#waiting_div_ctr_hub"), css: {width:'50px', height:'50px'}  });
+		jQuery("#graph_io_hub").block({ message:jQuery("#waiting_div_io_hub"), css: {width:'50px', height:'50px'}  });
+		jQuery("#graph_credits_hub").block({ message:jQuery("#waiting_div_credits_hub"), css: {width:'50px', height:'50px'}  });
+		jQuery("#graph_display_hub").block({ message:jQuery("#waiting_div_display_small"), css: {width:'50px', height:'50px'}  });
+		jQuery("#graph_display_type_hub").block({ message:jQuery("#waiting_div_display_type_small"), css: {width:'50px', height:'50px'}  });
+		jQuery("#graph_ctr_type_hub").block({ message:jQuery("#waiting_div_ctr_type_small"), css: {width:'50px', height:'50px'}  });
+
+		jQuery.get('/history_stats/charts_data', params, function(data) {
+			var chart = {'pointInterval': data.interval * 1000, 'pointStart': start.getTime(), 'type': 'line'};
+			var tpm = [], ctr = [], rr = [], credits = [], traffic = [], impressions = [], display_types = [], ctr_types = [];
+			for (name in data.data) {
+				tpm.push(jQuery.extend({'name': name, 'data': data.data[name].tpm}, chart));
+				ctr.push(jQuery.extend({'name': name, 'data': data.data[name].widget_ctr}, chart));
+				rr.push(jQuery.extend({'name': name + ' Return Rate', 'data': data.data[name].return_rate}, chart));
+				rr.push(jQuery.extend({'name': name + ' Total Return Rate', 'data': data.data[name].total_return_rate}, chart));
+				credits.push(jQuery.extend({'name': name, 'data': data.data[name].credits}, chart));
+				traffic.push(jQuery.extend({'name': 'Traffic from ' + name, 'data': data.data[name].traffic_from}, chart));
+				traffic.push(jQuery.extend({'name': 'Traffic to ' + name, 'data': data.data[name].traffic_to}, chart));
+				impressions.push(jQuery.extend({'name': name, 'data': data.data[name].widget_impressions}, chart));
+				display_types.push(jQuery.extend({'name': name + ' Basic', 'data': data.data[name].display_basic}, chart));
+				display_types.push(jQuery.extend({'name': name + ' Contextual', 'data': data.data[name].display_contextual}, chart));
+				display_types.push(jQuery.extend({'name': name + ' Similar', 'data': data.data[name].display_similar}, chart));
+				ctr_types.push(jQuery.extend({'name': name + ' Basic', 'data': data.data[name].ctr_basic}, chart));
+				ctr_types.push(jQuery.extend({'name': name + ' Contextual', 'data': data.data[name].ctr_contextual}, chart));
+				ctr_types.push(jQuery.extend({'name': name + ' Similar', 'data': data.data[name].ctr_similar}, chart));
+			}
+			createChart('graph_tpm_hub', 'TPM', 'Impressions', 'line', tpm, false, []);
+			createChart('graph_ctr_hub', 'Widget Click Through Rate', 'Rate', 'line', ctr, false, []);
+			createChart('graph_return_rate_hub', 'Return Rate', 'Rate', 'line', rr, false, []);
+			createChart('graph_credits_hub', 'Credits', 'Credits', 'line', credits, false, []);
+			createChart('graph_io_hub', 'Traffic From/To', 'Traffic From/To', 'line', traffic, false, []);
+			createChart('graph_display_hub', 'Widget Impressions', 'Impressions', 'line', impressions, false, []);
+			createChart('graph_display_type_hub', 'Widget Type Impressions', 'Impressions', 'line', display_types, false, []);
+			createChart('graph_ctr_type_hub', 'Widget Type CTR', 'Click-Through-Rate', 'line', ctr_types, false, []);
+
+			jQuery("#graph_tpm_hub").unblock();
+			jQuery("#graph_return_rate_hub").unblock();
+			jQuery("#graph_ctr_hub").unblock();
+			jQuery("#graph_io_hub").unblock();
+			jQuery("#graph_credits_hub").unblock();
+			jQuery("#graph_display_hub").unblock();
+			jQuery("#graph_display_type_hub").unblock();
+			jQuery("#graph_ctr_type_hub").unblock();
+		}, 'json');
+	}
+
+	function run_report() {
+		var website_list = "";
+		var selection = jQuery("input[name=selector_websites]:checked").val();
+
+		validate_dates();
+
+		if ( selection == "all") {
+			website_list = "all";
+			get_graph_data(website_list);
+			//get_small_graph_data(website_list);
+		} else if ( selection == "websites") {
+			// Get all the selected websites in a string
+			website_list = jQuery("#website_select").val().toString();
+			get_graph_data(website_list);
+			//get_small_graph_data(website_list);
+		} else if ( selection == "hubs" ) {
+			// Get all the selected hubs in a string
+			domains_list = jQuery("#hub_select").val().toString();
+			get_graph_data(domains_list, true);
+			//get_small_graph_data(domains_list, true);
+		}
+	}
+
+	/**
+	 * Validate the end date to avoid bigger dates than today
+	 */
+	function validate_dates() {
+		var end_date = Date.parse(jQuery('#end_daterangepicker').val());
+		var start_date = Date.parse(jQuery('#start_daterangepicker').val());
+		var yestarday = Date.parse('today');
+
+		if (end_date > yestarday) {
+			jQuery('#end_daterangepicker').val(yestarday.toString("M/d/yyyy"));
+			end_date = yestarday;
+		}
+		if (start_date > end_date) {
+			jQuery('#start_daterangepicker').val(end_date.toString("M/d/yyyy"));
+		}
+	}
+
+	function show_full_stats(website_id) {
+		$('body').spin('large');
+		$.ajax('/management/get_website_details/' + website_id, {
+			type: 'post',
+			cache: false,
+			dataType: 'json',
+			success: function(info) {
+				$('body').spin(false);
+				var site_details = $('#site_details');
+
+				site_details.find('.websitename > a')
+					.attr('href', '/management/website/' + website_id)
+					.text(info.name);
+
+				site_details.find('.site_name').text(info.name);
+
+				site_details.find('.websitepagelog > a')
+					.attr('href', '/management/website_log/' + website_id);
+
+				site_details.find('.websiteemail > a')
+					.attr('href', 'mailto:' + info.email)
+					.text(info.email);
+
+				site_details.find('.pages_active > a')
+					.attr('href', '/pages/moderate/' + website_id)
+					.text(info.page_active);
+
+				site_details.find('.pages_pending > a')
+					.attr('href', '/pages/moderate/' + website_id)
+					.text(info.page_pending);
+
+				site_details.find('.pending_moderation > a')
+					.attr('href', '/pages/moderate/' + website_id)
+					.text(info.page_pending_moderation);
+
+				site_details.find('.credits > a')
+					.attr('href', '/accounts/credit/' + info.account_id)
+					.text(info.credits);
+
+				site_details.find('.outgoing')
+					.text(info.outgoing);
+
+				site_details.find('.incoming')
+					.text(info.incoming);
+
+				site_details.find('.return_rate')
+					.text(info.return_rate);
+
+				site_details.find('.page_freshness')
+					.text(info.page_freshness);
+
+				site_details.find('.add_page > a')
+					.attr('href', '/pages/add/' + website_id)
+
+				site_details.find('.ranker_eligible > a')
+					.attr('href', '/websites/moderate/' + website_id)
+					.text(info.ranked);
+
+				jQuery.blockUI.defaults.overlayCSS = blockui_overlayCSS;
+				jQuery.blockUI({ message:$("#site_details"), css: { background:"#FFF", border:"2px #CCC solid", top:"20px", left:"50%", margin:"0 0 0 -220px", position:"fixed", width:'444px'}, overlayCSS: {}});
+				jQuery.blockUI.defaults.overlayCSS = {};
+			}
+		});
+	}
+
+	function show_chart_popup (website_id, type) {
+		close_str = '<div class="align_right"><a class="btn_close" href="#" onclick="jQuery.unblockUI(); return false;">Close</a></div>';
+		pop_str = '<div class="inside_block_ui">'+ close_str + '<div id="chart_popup_area" style="cursor: default;"></div>';
+		if(type==3) {
+			pop_str += '<div id="graph_tpm_widget" class="chart_small"></div><div id="graph_ctr_widget" class="chart_small"></div><div id="graph_return_rate_widget" class="chart_small"></div><div id="graph_credits_widget" class="chart_small"></div><div id="graph_io_widget" class="chart_small"></div><div id="graph_display_widget" class="chart_small"></div><br/>';
+		}
+		pop_str += '<br/></div>';
+
+		$('body').spin('large');
+		jQuery.blockUI.defaults.overlayCSS = blockui_overlayCSS;
+		jQuery.blockUI({ message:pop_str, css: { background:"transparent", border:"none", top:"20px", left:"50%", position:"fixed", width:'980px', height:'480px'}});
+		jQuery.blockUI.defaults.overlayCSS = {};
+		$('body').spin(false);
+
+		waiting_str = '<div style="cursor: default; margin:10px 0;"><img src="/img/crowdignite/website_ajax_loader_2.gif"></div>';
+		if(type!=3) {
+			jQuery("#chart_popup_area").block({ message:waiting_str, css: {width:'210px', height:'50px'} });
+		} else {
+			jQuery("#graph_tpm_widget, #graph_ctr_widget, #graph_return_rate_widget, #graph_credits_widget, #graph_io_widget, #graph_display_widget").block({ message:waiting_str, css: {width:'50px', height:'50px'} });
+		}
+
+		var now = new Date();
+		now.setHours(0);
+		now.setMinutes(0);
+
+		startTime = weekago;
+		var endTime = Math.ceil(now.getTime()/1000);
+		var website_list = "";
+
+		switch (type) {
+		case 3:
+			/* Chart TPM */
+			chartify('graph_tpm_widget', startTime, endTime, '/history_stats/chart', "TPM", "Impressions", "line", website_id, 0, "tpm", false,  TIME_UNIT_DAY, function(){ jQuery("#graph_tpm").unblock(); });
+
+			/* Chart Widget Click Through Rate */
+			chartify('graph_ctr_widget', startTime, endTime, '/history_widgets/chart', "Widget Click Through Rate", "Rate", "line", website_id, 0, "ctr", false,  TIME_UNIT_DAY, function(){ jQuery("#graph_ctr").unblock(); });
+
+			/* Chart Return Rate */
+			chartify('graph_return_rate_widget', startTime, endTime, '/history_credits/chart', "Return Rate", "Rate", "line", website_id, 0, "return_rate", false,  TIME_UNIT_DAY, function(){ jQuery("#graph_return_rate").unblock(); });
+
+			/* Chart Credits */
+			chartify('graph_credits_widget', startTime, endTime, '/history_credits/chart', "Credits", "Credits", "line", website_id, 0, "credits", false,  TIME_UNIT_DAY, function(){ jQuery("#graph_credits").unblock(); });
+
+			 /* Chart I/O */
+			chartify('graph_io_widget', startTime, endTime, '/history_credits/chart', "Traffic From/To", "Traffic From/To", "line", website_id, 0, "incoming,outgoing", false, TIME_UNIT_DAY, function(){ jQuery("#graph_io").unblock(); });
+
+			 /* Chart Widget Impressions */
+			chartify('graph_display_widget', startTime, endTime, '/history_widgets/chart', "Widget Impressions", "Impressions", "line", website_id, 0, "display", false,  TIME_UNIT_DAY,function(){ jQuery("#graph_display").unblock(); }); break;
+		case 2:
+			chartify('chart_popup_area', startTime, endTime, '/history_widgets/chart', "Widget CTR & Impressions", "Rate", "doubleline", website_id, 0, "ctr,display", false, TIME_UNIT_DAY, function(){ jQuery("#chart_popup_area").unblock(); }); break;
+
+		case 1:
+			chartify('chart_popup_area', startTime, endTime, '/history_credits/chart', "Traffic From/To", "I/O", "lineLegend", website_id, 0, "incoming,outgoing", true, TIME_UNIT_DAY, function(){ jQuery("#chart_popup_area").unblock(); }); break;
+
+		case 0:
+		default:
+			chartify('chart_popup_area', startTime, endTime, '/history_credits/chart', "Return Rate", "Rate", "line", website_id, 0, "return_rate", false, TIME_UNIT_DAY, function(){ jQuery("#chart_popup_area").unblock(); });
+		}
+	}

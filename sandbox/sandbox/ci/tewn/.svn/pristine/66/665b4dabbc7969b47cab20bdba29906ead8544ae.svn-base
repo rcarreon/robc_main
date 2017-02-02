@@ -1,0 +1,54 @@
+<?php
+/**
+ * Testing the factory class to generate the
+ * report setting classes
+ * PHP Version 5.3
+ *
+ * @category Test
+ * @package  Test\Report\Setting\Factory
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+namespace Test\Report\Setting;
+use CI\Report\Setting\Factory;
+
+/**
+ * Testing the factory class to generate the
+ * report setting classes
+ *
+ * @category Test
+ * @package  Test\Report\Setting\Factory
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ * @group    report
+ */
+class FactoryTest extends \PHPUnit_Framework_TestCase
+{
+	protected $oReportSettingFactory;
+
+	public function setUp()
+	{
+		$this->oReportSettingFactory = new Factory();
+	}
+
+	public function testReporSettingFactoryShouldReturnReportSettingHub()
+	{
+		$sExpected = '\CI\Report\Setting\Hub';
+
+		$oResult = $this->oReportSettingFactory->createReportSetting('report_by_hub');
+
+		$this->assertInstanceOf($sExpected, $oResult);
+	}
+
+	public function testReporSettingFactoryShouldReturnReportSettingWebsite()
+	{
+		$sExpected = '\CI\Report\Setting\Website';
+
+		$oResult = $this->oReportSettingFactory->createReportSetting('report_by_website');
+
+		$this->assertInstanceOf($sExpected, $oResult);
+	}
+}

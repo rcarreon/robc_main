@@ -1,0 +1,221 @@
+body {
+	margin: 0;
+	padding: 0;
+	font-family: Helvetica, Arial, sans-serif;
+	background: url("http://cdn.crowdignite.com/img/crowdignite/logo_small.jpg") no-repeat scroll center top #FAF8FB;
+}
+
+img {
+	border: none;
+}
+
+#navbar
+{
+	background-color: #c13d55;
+	width:1024px;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#header { 
+	height: 170px;
+	margin-bottom: 0;
+	width:1024px;
+	margin-left: auto;
+	margin-right: auto;
+        position:relative;
+}
+
+.text { 
+	display: table;
+	height: auto;
+	overflow: visible;
+}
+
+.text a { 
+	color: #393939;
+	font-size: 18px;
+	font-weight: 700;
+	text-decoration: none;
+	vertical-align: middle;
+}
+
+.text a:hover { 
+	font-size: 18px;
+	font-weight: 700;
+	text-decoration: underline;
+	vertical-align: middle;
+}
+
+#links
+{
+	margin-left:30px;
+	height:30px;
+	font-size:18px;
+	color: #ffffff; 
+	text-shadow: 3px 3px 7px #111;
+}
+
+/* MAIN NAVIGATION */
+.main {
+	position: relative;
+        /*padding-top: 130px;*/
+}
+
+.bottom_content_spacer
+{
+	-moz-border-radius:0 0 28px 28px ; 
+	-webkit-border-radius:0 0 28px 28px ;
+	border-radius:0 0 28px 28px ;   
+	min-height: 5px;
+	behavior: url(/css/PIE.htc);
+	width: 100%;
+	background-color: #FFF;
+	margin-left: 0px;
+	margin-bottom: 10px;
+}
+
+#paginate
+{ 
+	color: #393939;
+	font-weight: bold;
+	font-size: 20px;
+	padding-top: 10px;
+	padding-bottom: 15px;
+}
+#paginate a
+{ 
+	color: #393939;
+	font-size: 20px;
+	font-weight:bold;
+	text-decoration: underline;
+}
+#footer
+{
+	width:950px;
+	height:auto;
+    background: none repeat scroll 0 0 #666 !important;
+    text-align:center;
+    display: relative;
+    margin-left: auto;
+    margin-right: auto;
+    border-top: 1px solid #333333;
+    box-shadow: 0 -1px 5px #333;
+    color: #000;
+    width: 100%;
+    clear: both;
+}
+
+#footer a {
+	color: black;
+}
+
+#footer a:hover {
+	color: #5e75a0;
+}
+
+#footer table td { 
+	padding: 10px;
+}
+
+/* nav */
+ul.menu {
+  border: 1px solid #CBCACC;
+  height: 48px;
+  margin:0 auto;
+  width:958px;
+  position:absolute;
+  left:35px;
+  bottom:0;
+}
+ul.menu li {
+  list-style: none outside none;
+  margin: 0;
+  padding: 0;
+  background-position: right -48px;
+  float: left;
+  position: relative;
+  z-index: 501;
+  padding:0;
+  margin:0;
+  font-size:16px;
+  font-family:Arial,sans-serif;
+  text-transform: uppercase;
+}
+ul.menu li:hover {
+  background-position: right -96px;
+}
+ul.menu li a {
+  color: black;
+  cursor: pointer;
+  display: block;
+  height: 48px;
+  line-height: 48px;
+  padding: 0 13px 1px;
+  text-decoration: none;
+}
+/* signup */
+div.row { width:962px; margin:0 auto; }
+div.row #content { background: #FFF; margin:0 auto; padding: 0 10px 10px 10px; width: 942px; }
+div.row #content ul {
+    background:#fff;
+}
+div.row  #content ul, div.main  #content li { list-style: none;  }
+div.row #content ul li { margin:0; padding:5px 0 0; }
+div.row #content ul li h3.topContent {
+    display:none;
+}
+div.row #content #plainarea { margin-top:0; }
+div.row #content #plainarea h2 {
+    color:#688F93;
+    font-family:Arial,sans-serif;
+    font-size:36px;
+    font-weight:bold;
+    letter-spacing: -0.06em;
+}
+div.row #content #plainarea h2 b { font-size:1.1em; color:#775083; }
+div.row #content #plainarea h2 u { text-decoration: none; }
+div.row #content #plainarea td {
+     color:#333;
+     font-size:14px;
+     line-height: 1.3em;
+     padding-right:20px;
+     width:300px;
+}
+div.row #content #plainarea td>center { color:#775083; font-size:12px; font-weight: bold; }
+div.row #content #plainarea td>center>b>a{
+    display:inline-block;
+    height:60px;
+    text-indent: -9999px;
+    width:307px;
+}
+div.row #content #plainarea td>center>b>a:hover {
+    background-position: 0 -61px;
+}
+div.row #content center table td:first-child center { text-align: left; }
+div.row #content #plainarea table { margin-bottom:0; border-bottom:0px solid #c0d3da; width:96%;}
+div.row #content #plainarea table table { margin-bottom:20px; border:none; }
+div.row #content br { display:block; height: 0; }
+div.row #content table br { display:inline-block; height: auto; }
+div.row #content form { margin-left:30px; }
+div.row #content form table td { height: 33px; }
+div.row #content center center table td:last-child { color:#666!important; font-size:22px!important; }
+div.row #content center center table td:first-child b { margin-left:185px; font-size:16px;}
+div.row #content center center table td b { color:#775083; font-weight:bold; }
+div.row #content form input { background:#eee; border:1px solid #ccc; padding:4px; }
+div.row #content form div.submit { text-align: right; }
+div.main #content form div.submit input{
+    background: url(/img/thefashionspot/btnsignup.png) no-repeat;
+    border:none;
+    height: 69px;
+    margin-top:10px;
+    text-indent: -9999px;
+    width:282px;
+}
+div.main #content form div.submit input:hover {
+    background-position:0 -68px;
+}
+#footer { clear:both; background:transparent; border-top:0; padding-top:15px; }
+/* Eo signup */
+
+.grid_12 .grid_3 { margin-right:5px; }

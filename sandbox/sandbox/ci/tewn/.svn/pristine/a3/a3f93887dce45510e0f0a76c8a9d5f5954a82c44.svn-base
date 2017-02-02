@@ -1,0 +1,68 @@
+var ci = ci || {};
+
+ci.ModeratorStats = {
+    tpl_moderators_stats : {},
+    init_date_range_picker : function() {
+        var $date_range = $('.bs-daterange');
+        $date_range.daterangepicker({
+            format       : 'MM/DD/YYYY',
+            buttonClasses: ['btn btn-default'],
+            applyClass   : 'btn-small btn-primary',
+            cancelClass  : 'btn-small',
+            separator    : ' to ',
+            startDate    : $date_range.attr('data-start-date'),
+            endDate      : $date_range.attr('data-end-date'),
+            maxDate      : moment(),
+            opens        : 'center',
+            ranges: {
+                'This Month': [moment().startOf('month'), moment().endOf('month')],
+                'Last Month': [moment().subtract(1, 'month').startOf('month'), moment().subtract(1, 'month').endOf('month')]
+            }
+        });
+
+        $('.bs-daterange-icon').click(function(){
+            $date_range.click();
+        });
+    },
+    compile_templates : function() {
+        ci.ModeratorStats.tpl_moderators_stats = Handlebars.compile($('#moderators_stats').html());
+    },
+    load: function () {
+        var $date_range = $('.bs-daterange');
+        var params = {
+            start_date: $date_range.data('daterangepicker').startDate.format('YYYY-MM-DD'),
+            end_date  : $date_range.data('daterangepicker').endDate.format('YYYY-MM-DD'),
+        };
+
+        $('#update').button('loading');
+        $.get(
+            '/admin/action/moderator_stats',
+            params,
+            function(data){
+                if (data.status == "ok") {
+                    $('#content_moderator_stats').html(ci.ModeratorStats.tpl_moderators_stats(data.data));
+                    var $moderators_table = $("#moderators_table");
+
+                    if ($moderators_table.is('table')) {
+                        $moderators_table.tablesorter();
+                    }
+                }
+                $('#update').button('reset');
+            },
+            'json'
+        );
+
+    }
+}
+
+$(document).ready(function(){
+    ci.ModeratorStats.init_date_range_picker();
+    ci.ModeratorStats.compile_templates();
+    ci.ModeratorStats.load();
+
+    var $update_button = $('#update');
+
+    $update_button.on("click", function() {
+        ci.ModeratorStats.load();
+    });
+});

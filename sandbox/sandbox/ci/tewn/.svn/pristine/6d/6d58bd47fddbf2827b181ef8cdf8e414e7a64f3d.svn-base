@@ -1,0 +1,224 @@
+<link rel="stylesheet" type="text/css" href="/css/tablesort.css">
+</script><script type="text/javascript" src="/js/jquery.tablesorter.js"></script>
+<script>
+
+jQuery(document).ready(function() {
+
+	jQuery.tablesorter.addParser({
+		id: "commaDigit",
+		is: function(s, table) {
+		var c = table.config;
+		return jQuery.tablesorter.isDigit(s.replace(/,/g, ""), c);
+		},
+		format: function(s) {
+			return jQuery.tablesorter.formatFloat(s.replace(/,/g, ""));
+		},
+		type: "numeric"
+	});
+
+        $("#pages_table").tablesorter({
+                        headers:
+			{
+			7: { sorter: 'commaDigit' },
+			8: { sorter: 'commaDigit' },
+			9: { sorter: 'commaDigit' },
+			10: { sorter: 'commaDigit' },
+			11: { sorter: 'commaDigit' },
+			12: { sorter: 'commaDigit' },
+			13: { sorter: 'commaDigit' },
+					},
+			sortList: [11,0]
+				});
+});
+function deny(){
+	var allIDs = [];
+	$(".page_id:checked").each(function() {
+		allIDs.push($(this).val());
+	});
+
+	$.ajax({
+			type: "POST",
+			url: "/pages/deny_in_bulk/"+allIDs,
+			cache: false,
+			success: function(html){
+				alert("The selected pages have been deleted.");
+				$(".page_id:checked").each(function() {
+					$(this).parent().parent().hide();
+				});
+			}
+		});
+}
+</script>
+
+
+<div class="row main">
+<div id="content" class="column grid_12">
+
+<?
+	echo $this->element("management_toolbar", array("tab" => "credits"));
+?>
+
+<div class="row">
+
+  <div class="column grid_12">
+
+	<h3 class="topContent">Pages</h3>
+
+
+	 <div class="row" id="content_area">
+
+	    <div class="column grid_12">
+
+		<table>
+		<tr>
+		<td>Search:</td>
+		<td>
+		<?
+		echo $this->element("livesearch");
+		?>
+		</td>
+		</tr>
+		</table>
+	    <div style="margin-left:10px;margin-top:18px;">
+
+
+	 <h2><?=$website['Website']['name']?></h2>
+	 <br>
+
+	<table width=90%>
+	<tr>
+	<td valign=top>
+	 <a href="/pages/add/<?=$website_id?>">Add Page</a><br>
+	 <a href="/pages/moderate/<?=$website_id?>">Moderate Pending Pages</a><br>
+	 <a href="/websites/moderate/<?=$website_id?>">Website Edit</a><br>
+	</td>
+	<td valign=top>
+	<?
+	 if ($needs_attention_immediate) {
+		 echo "<font style='background-color: #FF7722;'>".$needs_attention_immediate."</font> pages need to be removed for sure<br>";
+	 }
+
+	 if ($needs_attention_warning) {
+		 echo "<font style='background-color: yellow;'>".$needs_attention_warning."</font> pages probably need to be removed<br>";
+	 }
+
+	?>
+
+	</td>
+	</tr>
+	</table>
+	<div id="delete_pages" class="awesome purple btn_control deny" onclick="deny();">Deny the selected Pages</div>
+	 <table id="pages_table" class="tablesorter">
+		<thead>
+			<tr>
+				<th></th>
+				<th title="Page ID">ID</th>
+				<th>Att</th>
+				<th title="Page Title">Title</th>
+				<th title="Category">Cat.</th>
+				<th title="Demographics: Sex">Demo. Sex</th>
+				<th title="Content Rating">Cont. Rate</th>
+				<th title="Lifetime Out Clicks">Life-<br/>time<br/>Out Clicks</th>
+				<th title="Lifetime Impressions">Life-<br/>time<br/>Impr.</th>
+				<th title="<?php echo MANAGEMENT_LANDING_PAGE_ROLLING_DAYS; ?> Days Landing Page Click Through Rate">
+					<?php echo MANAGEMENT_LANDING_PAGE_ROLLING_DAYS; ?> Days<br/>LP<br/>CTR
+				</th>
+				<th title="<?php echo MANAGEMENT_LANDING_PAGE_ROLLING_DAYS; ?> Days Landing Page Impressions">
+					<?php echo MANAGEMENT_LANDING_PAGE_ROLLING_DAYS; ?> Days<br/>LP Impr.
+				</th>
+				<th title="<?php echo MANAGEMENT_LANDING_PAGE_ROLLING_DAYS; ?> Days Widget Click Through Rate">
+					<?php echo MANAGEMENT_LANDING_PAGE_ROLLING_DAYS; ?> Days<br/>Wgt. CTR
+				</th>
+				<th title="<?php echo MANAGEMENT_LANDING_PAGE_ROLLING_DAYS; ?> Days Widget Impressions">
+					<?php echo MANAGEMENT_LANDING_PAGE_ROLLING_DAYS; ?> Days<br/>Wgt. Impr.
+				</th>
+				<th title="Age of Page">Age</th>
+				<th>Image</th>
+				<th title="Moderator">Mod.</th>
+			</tr>
+		</thead>
+		<tbody>
+<?
+	foreach ($pages as $page) {
+	 switch ($page['Page']['attention_level']) {
+	 case ATTENTION_LEVEL_IMMEDIATE:
+		$row_color = 'style="background-color: #FF7722;"';
+		 break;
+	 case ATTENTION_LEVEL_WARNING:
+		 $row_color = 'style="background-color: yellow;"';
+		 break;
+	 case ATTENTION_LEVEL_NOTICE:
+		 default:
+		 $row_color = '';
+	 }
+?>
+        <tr <?=$row_color?>>
+		<!-- checkbox for bulk deletion-->
+		<td <?=$row_color?>><input class="page_id" type="checkbox" name="page_id[]" value="<?=$page['Page']['id']?>"/></td>
+        <!-- ID -->
+        <td <?=$row_color?>><a href="/pages/moderate/<?=$page['Page']['website_id']?>/<?=$page['Page']['id']?>"><?=$page['Page']['id']?></td>
+
+	 <!-- Needs Attention -->
+        <td <?=$row_color?>><?=$page['Page']['attention_level']?></td>
+
+        <!-- Title -->
+        <td <?=$row_color?>><a href="<?=$page['Page']['url']?>"><?=$page['Page']['title']?></a></td>
+
+        <!-- Category -->
+        <td <?=$row_color?>><?=$convert->category_short($page['Page']['category'])?></td>
+
+        <!-- Demographic Sex -->
+        <td <?=$row_color?>><?=$convert->demographic_sex($page['Page']['demographic_sex'])?></td>
+
+        <!-- Content Rating -->
+	 <td <?=$row_color?>><?=substr($convert->content_rating($page['Page']['content_rating']),0, 5)?></td>
+
+        <!-- Out Clicks -->
+	<td <?=$row_color?>><?=number_format($page['Page']['out_clicks'])?></td>
+
+        <!-- Impressions -->
+	<td <?=$row_color?>><?=number_format($impressions_stats[$page['Page']['id']])?></td>
+
+        <!-- Landing Page CTR -->
+	 <td <?=$row_color?>><b><?=round(($page['Page']['lp_rolling_ctr'] * 100), 2)?>%</b></td>
+
+        <!-- Landing Page Impressions -->
+	<td <?=$row_color?>><?=number_format($page['Page']['lp_rolling_impressions'])?></td>
+
+        <!-- Widget CTR -->
+	<td <?=$row_color?>><b><?=round(($page['Page']['widget_rolling_ctr'] * 100), 2)?>%</b></td>
+
+        <!-- Widget Impressions -->
+	<td <?=$row_color?>><?=number_format($page['Page']['widget_rolling_impressions'])?></td>
+
+        <!-- Created -->
+        <td <?=$row_color?>><?=$page['Page']['created']?></td>
+
+        <!-- Image -->
+        <td <?=$row_color?>>
+	<div class="smallimage" style="background-image:url(<?php echo $page['Page']['image_url']?>);"></div>
+	</td>
+
+        <!-- Moderator -->
+        <td <?=$row_color?>>
+	<?=$page['User']['username']?>
+	</td>
+
+        </tr>
+
+<?
+        }
+?>
+        </tbody>
+	</table>
+	 </div>
+
+
+	<h3 class="bottomContent"></h3>
+
+</div> <!--  end of content column -->
+
+</div> <!--  end of content row -->
+
+
+

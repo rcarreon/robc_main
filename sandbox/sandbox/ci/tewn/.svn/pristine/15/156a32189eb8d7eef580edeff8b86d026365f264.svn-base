@@ -1,0 +1,14 @@
+<?php
+    if (!empty($DebugBarRenderer)) {
+        if (isset($page_number) && $page_number > 1) {
+            echo str_replace(
+                array('<script type="text/javascript">','</script>'),
+                array('<code id="debugbar_data">', '</code>'),
+                $DebugBarRenderer->render(false)
+            );
+        } else {
+            echo $DebugBarRenderer->renderHead();
+            echo $DebugBarRenderer->render();
+        }
+    }
+ ?>

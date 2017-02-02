@@ -1,0 +1,20 @@
+$TTL 86400
+thefashionspot.ca.     IN      SOA     thefashionspot.ca. root.thefashionspot.ca. (
+                           2014071100     ; serial
+                           28800          ; refresh
+                           14400          ; retry
+                           3600000        ; expire
+                           86400 )        ; minimum
+
+thefashionspot.ca.         IN    NS       app1v-dns.tp.prd.lax.thefashionspot.com.
+thefashionspot.ca.         IN    NS       app2v-dns.tp.prd.lax.thefashionspot.com.
+thefashionspot.ca.         IN    NS       app3v-dns.tp.prd.lax.thefashionspot.com.
+thefashionspot.ca.         IN    NS       app4v-dns.tp.prd.lax.thefashionspot.com.
+
+thefashionspot.ca.         IN    A        72.172.76.151       
+bta.thefashionspot.ca.     IN    A        10.11.234.71
+dev.thefashionspot.ca.     IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.thefashionspot.ca.     IN    CNAME    stg.pbwordpress.gnmedia.net.
+www.thefashionspot.ca.     IN    CNAME    thefashionspot.ca.
+forums                     IN    CNAME    forums.thefashionspot.com.
+coolguy.thefashionspot.ca. IN CNAME forums.thefashionspot.com.

@@ -1,0 +1,62 @@
+<?php
+
+namespace CI\Report;
+
+abstract class Setting
+{
+    /**
+     * Array of valid fields from the form
+     * for the settings of a report.
+     *
+     * @var array
+     */
+    protected $aValidFields;
+
+    /**
+     * Elements of the settings to be saved.
+     *
+     * @var array
+     */
+    protected $aElements = array();
+
+    /**
+     * Grab the elements from the form, and grab only
+     * the allowed for this filter.
+     *
+     * @param array $aElements Elements from the form
+     *
+     * @return CI\Report\Setting
+     */
+    public function populate(array $aElements)
+    {
+        if (!empty($aElements) && !empty($this->aValidFields)) {
+            $this->aElements = array_intersect_key(
+                $aElements,
+                array_flip($this->aValidFields)
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Return the elements in the object
+     *
+     * @return array
+     */
+    public function getElements()
+    {
+        return $this->aElements;
+    }
+
+    /**
+     * Return the array of elements for the setting in
+     * json format
+     *
+     * @return string The settings in Json
+     */
+    public function toString()
+    {
+        return json_encode($this->aElements);
+    }
+}

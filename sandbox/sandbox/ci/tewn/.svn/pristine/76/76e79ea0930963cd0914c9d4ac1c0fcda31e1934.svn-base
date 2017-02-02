@@ -1,0 +1,18 @@
+<?php
+
+class RankerControllerTestCase extends CakeTestCase {
+	var $fixtures = array('app.website', 'app.page', 'app.history_page', 'app.user');
+
+	function startTest() {
+		App::import('Controller', 'Ranker');
+		$this->Ranker =& new RankerController();
+		$this->Ranker->constructClasses();
+		$this->Ranker->autoRender = false;
+	}
+
+	function endTest() {
+		unset($this->Ranker);
+		ClassRegistry::flush();
+	}
+}
+?>

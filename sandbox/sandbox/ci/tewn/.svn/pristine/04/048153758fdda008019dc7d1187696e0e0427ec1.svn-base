@@ -1,0 +1,471 @@
+<?php
+
+include_once (ROOT . DS . APP_DIR . DS . "global_defines.php");
+include_once (ROOT . DS . APP_DIR . DS . "controllers/history_controller.php");
+
+/*
+ * High-level stats controller
+ *
+ * This is only used to go cross-stat-type boundaries
+ */
+class HistoryStatsController extends HistoryController {
+
+	var $name = 'HistoryStats';
+	var $uses = array("Account", "Website", "HistoryStat");
+	var $components = array('RequestHandler', 'History', 'Date', 'Timer');
+
+	var $cache_on = 1;
+	var $debug = 0;
+
+	function beforeFilter() {
+		// History Credits Controller
+		App::import('Controller', 'HistoryCredits');
+		global $HistoryCredits;
+		$HistoryCredits = new HistoryCreditsController;
+		$HistoryCredits->constructClasses();
+
+		// History Widgets Controller
+		App::import('Controller', 'HistoryWidgets');
+		global $HistoryWidgets;
+		$HistoryWidgets = new HistoryWidgetsController;
+		$HistoryWidgets->constructClasses();
+
+	}
+
+    /**
+     * NOTE: Use the controller charts_actions_controller::history instead of this
+     * function. We are migrating to bootstrap all the managment side
+     */
+	public function charts_data()
+	{
+        $this->cache_on = false;
+		$this->autoRender = false;
+		Configure::write("debug", 0);
+		$oDate = new \CI\Date();
+		$oHub  = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+
+		$today     = $oDate->today();
+		$params    = new \CI\ArrayManipulator($this->params['url']);
+		$params->setValidationType(\CI\ArrayManipulator::ARRAY_ISSET);
+
+		$start     = $oDate->oFormat->dateStart($params->get('start', $today));
+		$end       = $oDate->oFormat->dateEnd($params->get('end', $today));
+		$websites  = $params->get('websites', '');
+		$hubs      = $params->get('hubs', '');
+		$time_unit = $params->get('time', 'daily');
+
+		$oKey = new \CI\Memcached\KeyGen(array($hubs, $websites, $start, $end, $time_unit), __METHOD__);
+		$cache_key = $oKey->generate();
+		$this->loadModel('Stats');
+
+		$data = array();
+		if ($this->cache_on) {
+			$data = $this->Stats->memcached_get($cache_key);
+		}
+
+		if (empty($data)) {
+			$data = array(
+				'interval' => $this->chart_interval($time_unit == 'daily' ? 2 : 1),
+				'is_all' => $hubs === '' && empty($websites),
+				'is_hubs' => !empty($hubs) || $hubs == '0',
+				'is_websites' => !empty($websites) && empty($hubs),
+			);
+
+			$stats = array();
+			if ($data['is_all']) {
+				$stats = $this->Stats->getAll($start, $end, $time_unit);
+			} elseif ($data['is_hubs']) {
+				if (strtolower($hubs) == 'all') {
+					$hubs = $oHub->getAllActiveIds();
+				}
+				$stats = $this->Stats->getByHubs($hubs, $start, $end, $time_unit);
+			} else {
+				$stats = $this->Stats->getByWebsites($websites, $start, $end, $time_unit);
+			}
+
+			$key_stats = array(
+				'tpm', 'widget_ctr', 'return_rate', 'generated_return_rate', 'total_return_rate', 'credits', 'traffic_from', 'traffic_to', 'widget_impressions',
+				'display_basic', 'display_contextual', 'display_similar', 'ctr_basic', 'ctr_contextual',
+				'ctr_similar');
+			$empty_stats = array_fill_keys($key_stats, array());
+
+			$name = 'All';
+
+			foreach ($stats as $stat) {
+				if (isset($stat['stats'])) {
+					$stat = array_merge($stat[0], $stat['stats']);
+				} else {
+					$stat = $stat[0];
+				}
+
+				if ($data['is_hubs']) {
+					$name = $oHub->name($stat['hub']);
+				} else if ($data['is_websites']) {
+					$name = $stat['website_name'];
+				}
+				if (empty($data['data'][$name])) {
+					$data['data'][$name] = $empty_stats;
+				}
+
+				$data['data'][$name]['tpm'][] = (float)$stat['tpm'];
+				$data['data'][$name]['widget_ctr'][] = (float)$stat['ctr'];
+                $data['data'][$name]['return_rate'][] = (float)$stat['rr'];
+                $data['data'][$name]['total_return_rate'][] = (float)$stat['total_rr'];
+				$data['data'][$name]['generated_return_rate'][] = (float)$stat['gen_rr'];
+				$data['data'][$name]['credits'][] = (float)$stat['credits'];
+				$data['data'][$name]['traffic_from'][] = (float)$stat['traffic_from'];
+				$data['data'][$name]['traffic_to'][] = (float)$stat['traffic_to'];
+				$data['data'][$name]['widget_impressions'][] = (float)$stat['widget_impressions'];
+				$data['data'][$name]['display_basic'][] = (float)$stat['imp_basic'];
+				$data['data'][$name]['display_contextual'][] = (float)$stat['imp_contextual'];
+				$data['data'][$name]['display_similar'][] = (float)$stat['imp_similar'];
+				$ctr_basic = $stat['widget_basic_traffic_from'] == 0 ? 0 : (float)($stat['widget_basic_traffic_from'] / $stat['imp_basic'] * 100);
+				$data['data'][$name]['ctr_basic'][] = round($ctr_basic, 2);
+				$ctr_contextual = $stat['widget_contextual_traffic_from'] == 0 ? 0 : (float)($stat['widget_contextual_traffic_from'] / $stat['imp_contextual'] * 100);
+				$data['data'][$name]['ctr_contextual'][] = round($ctr_contextual, 2);
+				$ctr_similar = $stat['widget_similar_traffic_from'] == 0 ? 0 : (float)($stat['widget_similar_traffic_from'] / $stat['imp_similar'] * 100);
+				$data['data'][$name]['ctr_similar'][] = round($ctr_similar, 2);
+			}
+
+			if ($this->cache_on) {
+				$this->Stats->memcached_set($cache_key, $data, 1 * HOURS);
+			}
+		}
+
+		header("Pragma: no-cache");
+		header("Cache-Control: no-store, no-cache, max-age=0, must-revalidate");
+		header('Content-Type: application/json');
+		return json_encode($data);
+	}
+
+	function base_point($base_start, $datetime_start, $id) {}
+	function point($datetime_start, $datetime_end, $id) {}
+	function points_aggregate($points) {}
+	function stats_set($stats, $data) {}
+	function stats_non_zero($data) {}
+	function stats_init($stats) {}
+	function stats_add($stats, $data) {}
+	function stats_delta($stats, $base) {}
+	function stats_validate($stats, $info) {}
+	function stats_cache_get($id, $date) {}
+	function stats_cache_set($id, $date, $stats) {}
+
+	function chart_get_cache_all($day) {
+		$cache = $this->HistoryStat->get_tpm_chart_cache($day);
+
+		return $cache;
+	}
+
+	function chart_set_cache_all($day, $data) {
+		$this->HistoryStat->set_tpm_chart_cache($day, $data);
+	}
+
+	function chart_set_cache_domain($point, $data, $domain_id) {
+		$this->HistoryStat->set_chart_cache_domain($point, $data, $domain_id);
+	}
+
+	function chart_get_cache_domain($point, $domain_id) {
+		$this->HistoryStat->get_chart_cache_domain($point, $domain_id);
+	}
+
+	function chart_process_website($history, $website_id, $request, $point, $time_unit) {
+		$tpm = $this->stats_time($website_id, $point, $time_unit);
+
+		$history[$point][$website_id]['tpm'] = round($tpm, 2);
+
+		return $history;
+	}
+
+	function chart_process_all_increment($history, $stats, $day, $account) {
+		return $history;
+	}
+
+	function chart_process_domain_increment($history, $stats, $day, $account) {
+		return $history;
+	}
+
+
+	function chart_process_aggregate($website_ids, $day) {
+		$websites = array();
+
+		foreach ($website_ids as $website_id) {
+			$websites[] = $this->Website->findById($website_id);
+		}
+
+		$tpm = $this->tpm_aggregate_day($websites, $day);
+
+		return round($tpm, 2);
+	}
+
+	function chart_process_domain_aggregate($history, $website_ids, $day, $domain_id) {
+		$history[$day][$domain_id]['tpm'] = $this->chart_process_aggregate($website_ids, $day);
+
+		return $history;
+	}
+
+	function chart_process_all_aggregate($history, $website_ids, $day) {
+		$history[$day]['tpm'] = $this->chart_process_aggregate($website_ids, $day);
+
+		return $history;
+	}
+
+	function chart_initialize_stats() {
+		$stats = array();
+
+		$stats['tpm'] = 0;
+
+		return $stats;
+	}
+
+	function chart_initialize_cumulative_stats() {
+		$stats = array();
+
+		$stats['tpm'] = 0;
+
+		return $stats;
+	}
+
+	function chart_line_initialize() {
+		$line = array();
+
+		$line['tpm'] = array();
+
+		return $line;
+	}
+
+	function chart_line_data($line, $stats, $website_id, $request, $domain_id = false) {
+		$types = $request['types'];
+
+		if (false !== $website_id) {
+			$tpm = $stats[$website_id]['tpm'];
+		} else if (false !== $domain_id) {
+			$tpm = $stats[$domain_id]['tpm'];
+		} else {
+			$tpm = $stats['tpm'];
+		}
+
+		if (in_array("tpm", $types)) {
+			array_push($line['tpm'], $tpm);
+		}
+
+		return $line;
+	}
+
+	function get_return_rate($incoming, $outgoing) {
+		if ($incoming) {
+			$return_rate = $outgoing / $incoming;
+			$return_rate *= 100;
+		} else {
+			$return_rate = 0;
+		}
+
+		return $return_rate;
+	}
+
+	function chart_lines($out, $line, $website_id, $request, $domain_id = false, $time_unit) {
+		$types = $request['types'];
+
+		if (false !== $website_id) {
+			$name = $this->Website->field("name", array("id" => $website_id));
+			$id = $website_id;
+		} else if (false !== $domain_id) {
+			App::import('Helper', 'Convert');
+			$Convert = new ConvertHelper();
+
+			$name = $Convert->domain_name($domain_id);
+			$id = $domain_id;
+		} else {
+			$name = "All";
+			$id = "All";
+		}
+
+		$interval = $this->chart_interval($time_unit);
+
+		if (in_array("tpm", $types)) {
+			$out[] = array("website_id" => $id, "name" => $name, "interval" => $interval, "data" => $line['tpm'], "class" => "Website", "type" => "TPM");
+		}
+
+		return $out;
+	}
+
+	private function get_website_name($website_id) {
+		$website_object = $this->Website->findById($website_id);
+
+		if ($website_object['Website']['name']) {
+			return $website_object['Website']['name'];
+		} else {
+			return $website_object['Website']['url'];
+		}
+	}
+
+	private function get_time_out($day) {
+		plat_assert($day);
+		return (strtotime("midnight ".$day." UTC") * 1000);
+	}
+
+	/*
+	 * Returns an array of website IDs
+	 */
+	function get_websites($in_websites) {
+		plat_assert($in_websites);
+		plat_assert($in_websites != "all");
+
+		$websites = explode(",", $in_websites);
+
+		return $websites;
+	}
+
+	private function get_types($in_types) {
+		if (!empty($in_types)) {
+			$types = explode(",", $in_types);
+		} else {
+			$types = array("tpm");
+		}
+
+		return $types;
+	}
+
+	function tpm_aggregate_day($websites = null, $date = null) {
+		global $HistoryCredits;
+		global $HistoryWidgets;
+
+		$aggregate_outgoing = 0;
+		$aggregate_display = 0;
+
+		if (!$websites) {
+			$websites = $this->Website->find("all", array("conditions" => array(
+										  "status" => array(
+											  WEBSITE_STATUS_ACTIVE,
+											  WEBSITE_STATUS_TRANSFER),
+										  "visible" => TRUE)));
+		}
+
+		foreach ($websites as $website) {
+			$website_id = $website['Website']['id'];
+
+			$credit_stats = $HistoryCredits->stats_day($website['Website']['account_id'], $date);
+			$widget_stats = $HistoryWidgets->website_stats_day($website_id, $date);
+
+			$aggregate_outgoing += $credit_stats['outgoing'];
+			$aggregate_display += $widget_stats['display'];
+		}
+
+		$tpm = $this->tpm_calculate($aggregate_outgoing, $aggregate_display);
+
+		return $tpm;
+	}
+
+	public function tpm_calculate($outgoing, $display) {
+		if ($display) {
+			$display = $display / 1000;
+			return ($outgoing / $display);
+		} else {
+			return 0;
+		}
+	}
+
+	function stats_range($website_id, $datetime_start, $datetime_end) {
+		global $HistoryCredits;
+		global $HistoryWidgets;
+
+		$account_id = $this->Website->field("account_id", "id = ".$website_id);
+		$credit_stats = $HistoryCredits->stats_range($account_id, $datetime_start, $datetime_end);
+
+		$widget_stats = $HistoryWidgets->website_stats_range($website_id, $datetime_start, $datetime_end);
+
+		$tpm = $this->tpm_calculate($credit_stats['outgoing'], $widget_stats['display']);
+
+		return $tpm;
+	}
+
+	/*
+	 * Amount of traffic sent per thousand impressions
+	 */
+	function tpm_day($website_id, $date = null) {
+		$date = $this->Date->format($date);
+
+		/* Check the cache */
+		if ($date && !$this->Date->is_today($date) && $this->cache_on) {
+			$cache_stats = $this->HistoryStat->get_tpm_stats_cache($website_id, $date);
+			if ($cache_stats) {
+				return $cache_stats[0];
+			}
+		}
+
+		$account_id = $this->Website->field("account_id", "id = ".$website_id);
+		$credit_stats = $this->RequestAction("/history_credits/stats_day/".$account_id."/".$date);
+		$widget_stats = $this->RequestAction("/history_widgets/website_stats_day/".$website_id."/".$date);
+
+		$tpm = $this->tpm_calculate($credit_stats['outgoing'], $widget_stats['display']);
+
+		/* Put it into the cache */
+		if ($date && !$this->Date->is_today($date) && $this->cache_on) {
+			$this->HistoryStat->set_tpm_stats_cache($website_id, $date, $tpm);
+		}
+
+		return $tpm;
+	}
+
+	function clear_cache($date = null) {
+		$date = $this->Date->format($date);
+
+		$websites = $this->Website->find("all", array("conditions" => array("visible" => true)));
+
+		$this->History->clear_cache($date,
+						$websites,
+						array(&$this->HistoryStat, "clear_tpm_stats_cache"));
+
+		$start_time = strtotime($date);
+		$end_time = strtotime("midnight today");
+		$num_days = $this->Date->get_num_days_time($start_time, $end_time);
+		for ($i = 0; $i < $num_days; $i++) {
+			$day = $this->Date->date_add($date, $i);
+
+			$this->HistoryStat->clear_tpm_chart_cache($day);
+		}
+
+		$oHub = new \CI\Hub(new \CI\Hub\DataSource\MyArray());
+		$domains = $oHub->getAllIds();
+		foreach ($domains as $domain_id) {
+			$this->HistoryStat->clear_chart_cache_domain($date, $domain_id);
+		}
+	}
+
+	public function precache() {
+		/* Timers & Limits */
+		$this->Timer->start(TIMER_HISTORY_STATS_PRECACHE);
+		set_time_limit(TIME_LIMIT_HISTORY_STATS_PRECACHE);
+		ini_set('memory_limit', MEMORY_LIMIT_HISTORY_STATS_PRECACHE.'M');
+
+		$websites = $this->Website->find("all", array("conditions" => array("visible" => 1)));
+
+		$date = $this->Date->get_day_end($this->Date->get_yesterday());
+
+		$script_total = count($websites);
+		$script_count = 0;
+		$this->Timer->progress_set(0);
+		$this->Timer->running_set();
+		foreach($websites as $website) {
+			$time_start = microtime(true);
+
+			$this->tpm_day($website['Website']['id'], $date);
+
+			$script_count++;
+			$this->Timer->progress_set($script_count, $script_total);
+			$this->Timer->running_set();
+		}
+
+		/* Save off timer */
+		$data = $this->Timer->set_memory_limit();
+		$this->Timer->stop_save($data);
+
+		$this->autoRender = false;
+		echo 'Done';
+	}
+
+	function format_number($number) {
+		return round($number, 2);
+	}
+}
+
+?>

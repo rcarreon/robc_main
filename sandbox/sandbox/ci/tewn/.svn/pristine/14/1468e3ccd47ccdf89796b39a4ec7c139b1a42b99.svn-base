@@ -1,0 +1,62 @@
+
+<?
+echo $this->element('crowdignite/backend2_toolbar', array("tab" => "engine", "user" => $user));
+?>
+
+	<div id="content" class="column grid_12">
+
+
+
+
+						<div class="table_container">
+							<table id="engine_table" class="tablesorter">
+								<thead>
+									<tr>
+										<th>Engine</th>
+										<th>Progress</th>
+										<th>Running</th>
+										<th>Time</th>
+										<th>Max Time</th>
+										<th>Memory</th>
+										<th>Max Memory</th>
+										<th>Last Ran</th>
+										<? // <th>Status</th> ?>
+									</tr>
+								</thead>
+								<tbody>
+								<?php
+									$script_status = "";
+									foreach ($engine_scripts as $script) {
+										if (is_array($script)) {
+											echo $engine->data_row($script['title'], $script['url'], $script['data'], $script_status);
+										} else {
+											$script_status = $script;
+											echo $engine->header_row($script);
+										}
+									}
+								?>
+								</tbody>
+							</table>
+						</div>
+
+
+
+	</div>
+
+	<!--
+	<table id="lp_table" class="tablesorter" width=100% cellspacing=0 border=1 style="padding: 2px 4px 2px 4px; border: 1px solid #660000;">
+	  <th>Landing Page</th>
+	  <th>Rebalance</th>
+	<?
+	  // foreach ($domains as $bit => $domain_name) {
+		 //  $domain_id = $domain_component->bitToId($bit);
+		 //  $run = "/landing_page_engine/rebalance/0/".$domain_id;
+		 //  echo "<tr>";
+		 //  echo "<td>".$domain_name."</td>\n";
+		 //  echo "<td align=center><a href='http://".ENGINE_URL.$run."'>Run</a></td>\n";
+		 //  echo "</tr>";
+	  // }
+	?>
+	</table>
+	-->
+

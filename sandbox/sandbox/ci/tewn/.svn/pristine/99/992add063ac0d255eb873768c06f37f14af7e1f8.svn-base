@@ -1,0 +1,40 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en-gb" lang="en-gb">
+<head>
+<?
+echo $this->element("chartbeat_start");
+?>
+
+	<meta http-equiv="content-type" content="text/html; charset=utf-8" />
+	<title><? echo $title_for_layout ?></title>
+<?
+    if (false === $isIpad)
+    {
+        echo '<meta name="viewport" content="width=device-width">';
+    }
+
+	if ($canonical) {
+		echo '<link rel="canonical" href="'.$canonical.'"/>';
+	}
+?>
+	<link rel="alternate" type="application/rss+xml" title="Momtastic - RSS" href="http://feeds.feedburner.com/momtastic-articles?format=xml" />
+
+<?
+	$html->css('reset', null, null, false);
+	$html->css('text', null, null, false);
+	$html->css('default', null, null, false);
+	$html->css('crowdignite', null, null, false);
+        $html->css(DOMAIN.'/style', null, null, false);
+
+	$javascript->link('jquery', false);
+
+	echo $asset->scripts_for_layout();
+
+	echo $this->element("analytic_outbound_tracker");
+	echo $this->element(DOMAIN."/analytics");
+
+	/* Google asynch GPT header */
+	if( isset($preview_style) ) { // Ads only on Landing pages
+		echo $this->element(DOMAIN."/ads/google_gpt_header");
+	}		
+?>

@@ -1,0 +1,61 @@
+<?php
+namespace CI\VowpalWabbit\Parser;
+
+class Builder
+{
+    const PARSER_TYPE_WIDGET      = 1;
+    const PARSER_TYPE_LANDING     = 2;
+    const PARSER_TYPE_LANDING_CPC = 3;
+
+    const PARSER_WIDGET_DIRECTORY  = 'widgetanalytics/';
+    const PARSER_LANDING_DIRECTORY = 'landinganalytics/';
+
+    public static function getCorrelator($sDate, $nParserType)
+    {
+        $oCorrelator = null;
+
+        switch ($nParserType) {
+            case self::PARSER_TYPE_WIDGET:
+                $oCorrelator = new \CI\VowpalWabbit\Parser\Widget\Consolidate($sDate);
+                $oCorrelator->setMountLogs(self::PARSER_WIDGET_DIRECTORY);
+                break;
+
+            case self::PARSER_TYPE_LANDING_CPC:
+                $oCorrelator = new \CI\VowpalWabbit\Parser\LandingPage\Paid\Correlator($sDate);
+                $oCorrelator->setMountLogs(self::PARSER_LANDING_DIRECTORY);
+                break;
+
+            case self::PARSER_TYPE_LANDING:
+            default:
+                $oCorrelator = new \CI\VowpalWabbit\Parser\LandingPage\Correlator($sDate);
+                $oCorrelator->setMountLogs(self::PARSER_LANDING_DIRECTORY);
+                break;
+        }
+
+        return $oCorrelator;
+    }
+
+    public static function getClick($sDate, $nParserType)
+    {
+        $oClick = null;
+
+        switch ($nParserType) {
+            case self::PARSER_TYPE_WIDGET:
+                $oClick = new \CI\VowpalWabbit\Parser\Widget\Clicks($sDate);
+                break;
+
+            case self::PARSER_TYPE_LANDING_CPC:
+                $oClick = new \CI\VowpalWabbit\Parser\LandingPage\Paid\Clicks($sDate);
+                break;
+
+            case self::PARSER_TYPE_LANDING:
+            default:
+                $oClick = new \CI\VowpalWabbit\Parser\LandingPage\Clicks($sDate);
+                break;
+        }
+
+        $oClick->setMountLogs(self::PARSER_LANDING_DIRECTORY);
+
+        return $oClick;
+    }
+}

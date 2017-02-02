@@ -1,0 +1,65 @@
+<?php
+/**
+ * Crowdignite Autoloader
+ *
+ * PHP Version 5.3
+ *
+ * @category Autoloader
+ * @package  Crowdignite
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+// @codeCoverageIgnoreStart
+defined('LIBRARY_DIR') or define('LIBRARY_DIR', __DIR__ . '/');
+defined('CI_PREFIX') or define('CI_PREFIX', 'CI'); // The CI namespace prefix //
+
+/**
+ * Register the CI autoload library
+ */
+spl_autoload_register(
+    function ($class) {
+        loadNamespaceClasses($class);
+    }
+);
+
+spl_autoload_register(
+    function ($class) {
+        $class = explode('_', $class);
+        $filePath = array();
+        foreach ($class as $element) {
+            $filePath[] = strtolower($element);
+        }
+        $filePath = __DIR__.'/'.implode('/', $filePath).'.php';
+        if (file_exists($filePath)) {
+            include_once $filePath;
+        }
+    }
+);
+
+/**
+ * Load namespace classes
+ *
+ * @param string $class The class name
+ * 
+ * @return void
+ */ 
+function loadNamespaceClasses($class)
+{
+    if (strpos($class, CI_PREFIX) !== false) {
+        
+        // Remove 'CI\' from the class name //
+        $class = str_replace(CI_PREFIX . '\\', '', $class); 
+
+        $class = explode('\\', $class);
+        $filePath = implode('/', $class).'.php';
+        
+        if (file_exists(LIBRARY_DIR. $filePath)) {
+            include_once LIBRARY_DIR . $filePath;
+            return true;
+        }
+    }
+
+    return false;
+}
+// @codeCoverageIgnoreEnd

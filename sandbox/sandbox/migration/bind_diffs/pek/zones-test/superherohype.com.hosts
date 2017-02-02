@@ -1,0 +1,99 @@
+$TTL 86400
+superherohype.com.              IN      SOA     superherohype.com. root.superherohype.com. (
+                                                 2014071400     ; serial
+                                                 28800          ; refresh
+                                                 14400          ; retry
+                                                 3600000        ; expire
+                                                 86400 )        ; minimum
+
+; name servers and mail servers
+superherohype.com.                               IN    NS       app3v-dns.tp.prd.lax.craveonline.com.
+superherohype.com.                               IN    NS       app4v-dns.tp.prd.lax.craveonline.com.
+superherohype.com.                               IN    NS       app1v-dns.tp.prd.lax.craveonline.com.
+superherohype.com.                               IN    NS       app2v-dns.tp.prd.lax.craveonline.com.
+
+superherohype.com.                               IN    MX 10    cluster9.us.messagelabs.com.
+superherohype.com.                               IN    MX 20    cluster9a.us.messagelabs.com.
+
+; local host
+local                                            IN    A        127.0.0.1
+localhost                                        IN    A        127.0.0.1
+loghost                                          IN    A        127.0.0.1
+
+; hosts
+mail.superherohype.com.                          IN    CNAME    superherohype.com.
+
+dev.forums.superherohype.com.                    IN    A        10.11.234.117
+stg.forums.superherohype.com.            IN      A       72.172.76.19
+forums.superherohype.com.                        IN    A        72.172.76.114
+lax.forums.superherohype.com.                    IN    A        72.172.76.114
+
+
+; #### superherohype TitanWP
+superherohype.com.                               IN    A        72.172.76.151
+
+bta.superherohype.com.                           IN    A        10.11.234.71
+dev.superherohype.com.                           IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.superherohype.com.                           IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.superherohype.com.                           IN    A        72.172.76.151
+www.superherohype.com.                           IN    A        72.172.76.151
+
+origin.bta.superherohype.com.                    IN    CNAME    bta.superherohype.com.
+cdn1-bta.superherohype.com.                      IN    CNAME    bta.superherohype.com.
+cdn2-bta.superherohype.com.                      IN    CNAME    bta.superherohype.com.
+cdn3-bta.superherohype.com.                      IN    CNAME    bta.superherohype.com.
+
+origin-dev.superherohype.com.                    IN    CNAME    dev.superherohype.com.
+cdn1-dev.superherohype.com.                      IN    CNAME    dev.superherohype.com.
+cdn2-dev.superherohype.com.                      IN    CNAME    dev.superherohype.com.
+cdn3-dev.superherohype.com.                      IN    CNAME    dev.superherohype.com.
+
+origin-stg.superherohype.com.                    IN    CNAME    stg.superherohype.com.
+cdn1-stg.superherohype.com.                      IN    CNAME    pebblebed.edgesuite.net.
+cdn2-stg.superherohype.com.                      IN    CNAME    pebblebed.edgesuite.net.
+cdn3-stg.superherohype.com.                      IN    CNAME    pebblebed.edgesuite.net.
+
+origin.superherohype.com.                        IN    CNAME    prd.superherohype.com.
+cdn1-www.superherohype.com.                      IN    CNAME    pebblebed.edgesuite.net.
+cdn2-www.superherohype.com.                      IN    CNAME    pebblebed.edgesuite.net.
+cdn3-www.superherohype.com.                      IN    CNAME    pebblebed.edgesuite.net.
+
+dev.m.superherohype.com.                         IN    CNAME    dev.superherohype.com.
+stg.m.superherohype.com.                         IN    CNAME    stg.superherohype.com.
+www.m.superherohype.com.                         IN    CNAME    prd.superherohype.com.
+m.superherohype.com.                             IN    CNAME    prd.superherohype.com.
+; #### End TitanWP
+
+
+; new FE infrastructure -aib
+origin.campaigns.superherohype.com.              IN    A        72.172.76.121
+campaigns.superherohype.com.                     IN    CNAME    origin.campaigns.superherohype.com.
+cdn.campaigns.superherohype.com.                 IN    CNAME    cdn.campaigns.superherohype.com.edgesuite.net.
+staging.campaigns.superherohype.com.         IN    A        72.172.76.122
+
+assets                                           IN    A        72.172.76.110
+cdn.assets                                       IN    CNAME    cdn.assets.superherohype.com.edgesuite.net.
+origin.assets                                    IN    CNAME    assets
+staging.assets                                   IN    CNAME    staging.assets.superherohype.com.edgesuite.net.
+demo.assets                                      IN    CNAME    demo.assets.superherohype.com.edgesuite.net.
+origin.staging.assets                            IN    A        72.172.76.111
+
+priestcontest.superherohype.com.                 IN    CNAME    cdn.campaigns.superherohype.com.
+staging.priestcontest.superherohype.com.         IN    CNAME    staging.campaigns.superherohype.com.
+;demo.priestcontest.superherohype.com.           IN    CNAME    demo.campaigns.superherohype.com.
+www.greenhornetdvd.superherohype.com.            IN    CNAME    cdn.campaigns.superherohype.com.
+greenhornetdvd.superherohype.com.                IN    CNAME    cdn.campaigns.superherohype.com.
+staging.greenhornetdvd.superherohype.com.        IN    CNAME    staging.campaigns.superherohype.com.
+;demo.greenhornetdvd.superherohype.com.          IN    CNAME    demo.campaigns.superherohype.com.
+captainamerica3d.superherohype.com.              IN    CNAME    cdn.campaigns.superherohype.com.
+staging.captainamerica3d.superherohype.com.      IN    CNAME    staging.campaigns.superherohype.com.
+demo.captainamerica3d.superherohype.com.         IN    CNAME    demo.si.evolvemediallc.com.
+captainsweeps.superherohype.com.                 IN    CNAME    cdn.campaigns.superherohype.com.
+staging.captainsweeps.superherohype.com.         IN    CNAME    staging.campaigns.superherohype.com.
+demo.captainsweeps.superherohype.com.            IN    CNAME    demo.si.evolvemediallc.com.
+tf3thenet.superherohype.com.                     IN    CNAME    cdn.campaigns.superherohype.com.
+staging.tf3thenet.superherohype.com.             IN    CNAME    staging.campaigns.superherohype.com.
+demo.tf3thenet.superherohype.com.                IN    CNAME    demo.si.evolvemediallc.com.
+sailacross.superherohype.com.                    IN    CNAME    cdn.campaigns.superherohype.com.
+staging.sailacross.superherohype.com.            IN    CNAME    staging.campaigns.superherohype.com.
+demo.sailacross.superherohype.com.               IN    CNAME    demo.si.evolvemediallc.com.

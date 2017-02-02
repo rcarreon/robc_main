@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<ruleset name="Crowdignite">
+        <description>Crowdignite coding standard</description>
+        <rule ref="PEAR">
+            <exclude name="PEAR.Commenting.FileComment.Missing" />
+            <exclude name="PEAR.Commenting.ClassComment.Missing" />
+            <exclude name="PEAR.Commenting.FunctionComment.Missing" />
+            <exclude name="PEAR.WhiteSpace.ScopeIndent" />
+        </rule>
+
+        <!-- <rule ref="Generic.Functions.OpeningFunctionBraceBsdAllman"/> -->
+
+        <rule ref="Generic.Files.LineLength">
+            <properties>
+                <property name="lineLimit" value="120"/>
+                <property name="absoluteLineLimit" value="120"/>
+            </properties>
+        </rule>
+
+        <rule ref="Generic.WhiteSpace.ScopeIndent">
+            <properties>
+                <property name="indent" value="4"/>
+            </properties>
+        </rule>
+</ruleset>

@@ -1,0 +1,55 @@
+<style>
+/* Hybrid layout for Crowdignite with the colors of Totally Her & new logo */
+body, #interior_content { background:#fff;}
+#header {
+	height: 180px;
+	width:1157px;
+}
+#header div.logo{
+	background: url("/img/crowdignite/ci_girl_logo.png");
+	height:115px;
+	margin-left:70px;
+	margin-top:10px;
+	width:285px;
+}
+#header  div.logo a { display:none;}
+#webmaster_area {
+	display:none;
+}
+#topnav {
+	background: url("http://cdn.sheknows.com/redesign/header.png") no-repeat scroll center bottom transparent;
+	height:130px;
+}
+.top_content_spacer {
+	display: none;
+}
+#tabs {
+	background:#E44A8A;
+	margin-left:77px;
+	margin-top:10px;
+	height:50px;
+}
+.tab {	
+	border-right:1px solid #7D1225;
+     -moz-border-radius: 0 0 0 0!important;
+    -webkit-border-radius: 0 0 0 0!important;
+    -khtml-border-radius: 0 0 0 0!important;
+    border-radius: 0 0 0 0!important;	
+    height:50px;
+    margin:0;
+}
+.tab a {
+	font-family: Arial, sans-serif;
+	font-size:0.9em;
+	color:#FFF;
+	letter-spacing: -0.02em;
+	text-transform: uppercase;	
+}
+.tab:hover {
+	background:#BC2965;
+}
+.tab_unselected {
+	background:none;
+}
+.bottom_content_spacer { display:none;}
+</style>

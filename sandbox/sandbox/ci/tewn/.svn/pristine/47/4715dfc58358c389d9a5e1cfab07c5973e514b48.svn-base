@@ -1,0 +1,66 @@
+<?php
+/**
+ * Testing the Website class to get the clean the
+ * params from the array allowed by the Website reporty
+ * PHP Version 5.3
+ *
+ * @category Test
+ * @package  Test\Report\Setting\Website
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+namespace Test\Report\Setting;
+use CI\Report\Setting\Website;
+
+/**
+ * Testing the Website class to get the clean the
+ * params from the array allowed by the Website reporty
+ *
+ * @category Test
+ * @package  Test\Report\Setting\Factory
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ * @group    report
+ */
+class WebsiteTest extends \PHPUnit_Framework_TestCase
+{
+    protected $oSettingWebsite;
+
+    public function setUp()
+    {
+        $this->oSettingWebsite = new Website();
+        $aTestValues = array(
+            'invalid_param'   => 'value',
+            'other_invalid'   => 'value',
+            'type'            => 'value',
+            'websites_ids'    => 'value',
+            'daily_breakdown' => 'value',
+        );
+        $this->oSettingWebsite->populate($aTestValues);
+    }
+
+    public function testReportSettingWebsiteShouldReturnTheArrayOfValidElements()
+    {
+        $aExpected = array(
+            'type'            => 'value',
+            'daily_breakdown' => 'value',
+            'websites_ids'    => 'value',
+        );
+
+        $aResult = $this->oSettingWebsite->getElements();
+
+        $this->assertEquals($aExpected, $aResult);
+    }
+
+    public function testReportSettingWebsiteShouldReturnAValidJsonString()
+    {
+        $sExpected = '{"type":"value","websites_ids":"value","daily_breakdown":"value"}';
+
+        $sResult = $this->oSettingWebsite->toString();
+
+        $this->assertEquals($sExpected, $sResult);
+    }
+}

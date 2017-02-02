@@ -1,0 +1,50 @@
+<?php
+
+namespace CI\Error\Dealer;
+
+/**
+ * Mail class that deliver errors to an specified email.
+ */
+class Mail extends \CI\Error\Dealer
+{
+    /**
+     * @var string
+     */
+    protected $sRecipient;
+
+    /**
+     * @var string
+     */
+    protected $sSubject;
+
+    /**
+     * @see \CI\Error\Dealer::_construct()
+     */
+    public function __construct(\CI\Error\Formatter $oErrorFormatter)
+    {
+        parent::__construct($oErrorFormatter);
+
+        $this->sRecipient = 'DevelopmentCrowdIgnite@evolvemediallc.com';
+        $this->sSubject = '[BUG] Plat Assert Summary';
+    }
+
+    /**
+     * @see \CI\Error\Dealer::deal()
+     */
+    public function deal(array $aErrors)
+    {
+        parent::deal($aErrors);
+        $this->sendMail();
+    }
+
+    /**
+     * This function was created to be able to test the sending of a mail.
+     * @codeCoverageIgnore
+     *
+     * @return void
+     */
+    protected function sendMail()
+    {
+        mail($this->sRecipient, $this->sSubject, $this->sMessage);
+    }
+}

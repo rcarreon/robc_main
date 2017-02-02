@@ -1,0 +1,27 @@
+<?php
+App::import('Component', 'CIAbstract');
+
+abstract class CIContentRatingComponent extends CIAbstractComponent
+{
+    private $aContentRating;
+
+    public function setContentRating()
+    {
+        $oContent             = new \CI\Content\Rating();
+        $this->aContentRating = $oContent->getAll();
+    }
+
+    public function process()
+    {
+        $this->setContentRating();
+
+        return array(
+            'list'    => $this->aContentRating,
+            'options' => array(
+                'content_rating_id' => $this->options->get('content_rating_id'),
+                'name'              => $this->options->get('name'),
+                'id'                => $this->options->get('id')
+            )
+        );
+    }
+}

@@ -1,0 +1,54 @@
+#!/bin/bash
+#ip=$1
+#cale=${ip#*.*.*.*}
+#cale=$(echo $ip | cut -d . -f 4)
+#echo $cale
+ # find the hostname / A record to remove.
+#hostname=$(awk -v last=^${cale}  testing.net.rev)
+#echo "usage $0 ip record file"
+
+#hostname=$1
+#record=$2
+revfile=$3
+rec_search(){
+search=$(grep -e $hostname+ -e $record  testing.net.db | awk '{print $3}')
+       case $search in 
+        CNAME)
+              return 21
+              echo "CNAME"
+                ;;
+        A)      
+               return 22
+               echo "A"
+              ;;
+       PTR)    
+              return 23 
+              echo "PTR"
+               ;;
+        *)
+              return 99
+             echo "noting to do "
+	     ;;
+       esac
+}
+#IP=$(echo $1 | cut -d . -f 4)
+#TR=$(echo $2| tr [a-z] [A-Z] )
+add_rev () 
+        {
+		IP=`echo $1 | cur -d . -f 4`
+		TR=`echo $2 | tr [a-z] [A-Z]`
+	        #echo "usage $0 ip and record "
+        printf "$IP\t\tIN\t$TR\t\t\n" >> $revfile
+        echo $IP
+
+						}
+add_rev
+#calculate=$(ipcalc -c $1; echo $?)
+#output=$?
+#if [[ "$output" == "0" ]]; then 
+#	echo "$1 is correct"	
+#else 
+#	echo "$1 is incorrect"
+#                                                                                                                  
+#fi                
+

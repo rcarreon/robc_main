@@ -1,0 +1,54 @@
+<style>
+body {  }
+#header {
+    background: #fff!important;
+    height:50px; 
+}
+#header a {
+    background:url(/img/thefashionspot/logo_small.jpg) no-repeat;
+    display:block;
+    height:50px!important;
+    width:179px!important;
+    position:absolute;
+    top:3px;
+    left:1%;
+}
+#header ul.menu {
+    background:none;
+    border:none;
+    left:auto;
+    right:1%;
+    width:400px;
+}
+#header ul.menu li {
+    background:none;
+    border:none;
+}
+#header ul.menu li a { 
+    background:none;
+    position: relative;
+    left:auto;
+    top:auto;
+    width:auto!important;
+}
+
+#nav{
+    right:20px;
+    left:auto;
+    top:6px;
+}
+#nav ul li a:hover { background: none; text-decoration:none;}
+#paginate { display:block; margin: 0; padding-top: 10px; width:100%;}
+#footer {
+    color: #000;
+    display:block;
+    padding:20px 0;
+    width: 100%;
+}
+#footer a { color:#555276!important; text-decoration:none;}
+#footer a:hover { color:#555276!important; text-decoration:underline;}
+#footer div.info div { color:#333; font-size:11px;  margin:10px 0 0!important; text-align:center!important; width: 100%;}
+#footer center { display: block; color:#bbb; margin:0 auto; width:50%;}
+.grid_12 .large_item a.button { background: #a2a0b8; border-bottom: 1px solid #555276; }
+.grid_12 .large_item a.button span { text-shadow: 0 1px 1px #555276; }
+</style>

@@ -1,0 +1,183 @@
+<?php
+
+/*
+ * This class is intended to support development that requires to pull data from external locations. 
+ */
+class WebserviceHelper{
+
+	public function __construct(){
+
+	}
+
+	/* 
+	 * Private methods:
+	 */
+
+	/*
+	 * This function returns the content (as a string) of the content of a internal file ($what).
+	 */
+	public function get_internal_file($what){
+
+		if(file_exists($what) === FALSE){
+			Throw new exception("The file {$what} doesn't exists.\n");
+		}
+
+		$handle = @fopen($what, "r");
+		if ($handle) {
+			$content = null;
+			while (($buffer = fgets($handle)) !== false) {
+				$content .= $buffer;
+			}
+			if (!feof($handle)) {
+				Throw new exception("We can't read the entire file. Please contact an Administrator.\n"); 
+			}
+			fclose($handle);
+		}else{
+			Throw new exception("We can't read that file. Please contact an Administrator.\n"); 
+		}
+
+		return $content;
+	}
+
+	/*
+	 * Moves a file from the actual location ($what) to a new location ($where).
+	 * equivalent to "mv" linux command.
+	 */
+	public function move_file($what, $where){
+		try{
+			//getting contents of the file.
+			$content = $this->get_internal_file($what);
+			//saving the file on hard disk (if not exists).
+			$this->write_content_on_disk($content, $where);
+		}catch(Exception $e){
+			echo $e->getMessage();
+			exit(0);
+		}
+
+		//if moving the file was succesfully, we can delete the origin file.
+		unlink($what);
+	}
+
+	/*
+	 * Writes the content of a string ($content) in a file ($where).
+	 */
+	public function write_content_on_disk($content, $where){
+		if(file_exists($where) === FALSE){
+			file_put_contents($where, $content);
+		}else{
+			Throw new exception("We can't store that file on our databases because already exists. Please contact an Administrator.\n");
+		}
+		
+		return true;
+	}
+
+	/*
+	 * Opens the content of a external file (From the web) and store the content on a file.
+	 */
+	public function get_external_file($what, $where = null){
+		//1. getting info of the file to be downloaded.
+		$rCURL = curl_init();
+
+		curl_setopt($rCURL, CURLOPT_URL, $what);
+		curl_setopt($rCURL, CURLOPT_HEADER, 0);
+		curl_setopt($rCURL, CURLOPT_RETURNTRANSFER, 1);
+
+		$result = $this->curl_redir_exec($rCURL);
+
+		curl_close($rCURL);
+
+		if($result === FALSE){
+			Throw new exception("We can't open that image url. Please contact an Administrator.\n");
+		}
+
+		if(is_null($where)){
+			return $result; 
+		}else{
+			//saving the file on hard disk (if not exists) and if $where is not null.
+			$this->write_content_on_disk($result, $where);
+		}
+		
+
+		return true;
+	}
+
+	/*
+	 * This function tries to set the permissions to the file.
+	 */
+	public function try_to_set_chmod($what, $permissions = null){
+		if(is_null($permissions)){
+			$permissions = 0644;
+		}
+
+		$result = false;
+		if(chmod($what, $permissions)){
+			$result = true;
+		} 
+
+		return $result;
+	}
+
+	/*
+	 * this function gets the extension of the filename passed as argument without the dot.
+	 */
+	public function get_file_extension($filename){
+		$dot = strrpos($filename,".");
+
+		if($dot === FALSE){
+			throw new exception("Rename the file with the correct file extension, or contact an Administrator.\n");
+		}
+
+		return strtolower(substr($filename,$dot+1));
+	}
+
+	/*
+	 * Intended to do the same as curl_exec recursively when a redirect header exist.
+	 * Based on the comment http://au.php.net/manual/ro/function.curl-setopt.php#71313
+	 *
+	 */
+	function curl_redir_exec($ch)
+	{
+		static $curl_loops = 0;
+		static $curl_max_loops = 20;
+		if ($curl_loops++ >= $curl_max_loops)
+		{
+			$curl_loops = 0;
+			return FALSE;
+		}
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$data = curl_exec($ch); 
+
+		$separator = strpos($data, "\r\n\r\n");
+		$header = substr($data, 0, $separator);
+		$data = substr($data, $separator + 4);
+
+		 $http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+		if ($http_code == 301 || $http_code == 302)
+		{
+			$matches = array();
+			preg_match('/Location:(.*?)\n/i', $header, $matches);
+			$url = @parse_url(trim(array_pop($matches)));
+			if (!$url)
+			{
+				//couldn't process the url to redirect to
+				$curl_loops = 0;
+				return $data;
+			}
+			$last_url = parse_url(curl_getinfo($ch, CURLINFO_EFFECTIVE_URL));
+			if (!$url['scheme'])
+				$url['scheme'] = $last_url['scheme'];
+			if (!$url['host'])
+				$url['host'] = $last_url['host'];
+			if (!$url['path'])
+				$url['path'] = $last_url['path'];
+			$new_url = $url['scheme'] . '://' . $url['host'] . $url['path'] . (isset($url['query'])?'?'.$url['query']:'');
+			curl_setopt($ch, CURLOPT_URL, $new_url);
+			return $this->curl_redir_exec($ch);
+		} else {
+			$curl_loops=0;
+			return $data;
+		}
+	}
+}

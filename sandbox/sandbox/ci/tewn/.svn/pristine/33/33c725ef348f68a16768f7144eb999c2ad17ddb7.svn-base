@@ -1,0 +1,4 @@
+/* ie7 fixes */
+.grid_12 .grid_3 { margin-right:40px; }
+.top_content_spacer { display:none; }
+.grid_7 .image, .grid_5 .image { margin-right: 10px; }

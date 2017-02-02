@@ -1,0 +1,32 @@
+
+	<div id="footer" role="contentinfo">
+		<div id="colophon">
+
+<p align="center">
+<font style="font-size: 12px;" face="Arial"><a href="http://www.teenspot.com/about.html" target="_parent">About Us</a> | <a href="http://www.teenspot.com/contact.html" target="_parent">Contact</a> | <a href="http://www.teenspot.com/advertise.html" target="_parent">Advertise</a> | <a href="http://www.teenspot.com/terms.html" target="_parent">Terms of Use</a> | <a href="http://www.teenspot.com/privacy.html" target="_parent">Privacy Policy</a> | <a href="http://www.teenspot.com/safety.html" target="_parent">Safety</a><br>
+
+</font></p><center>
+<font style="font-size: 12px;" face="Arial"><br>
+		 © <?=date("Y")?> CRAFTEDBYTEENS, LLC. ALL RIGHTS RESERVED. TEENSPOT.COM IS A PROPERTY OF CRAFTEDBYTEENS, LLC.
+CRAFTEDBYTEENS, LLC IS A DIVISION OF ATOMICONLINE, LLC, AN EVOLVE MEDIA CORP. COMPANY
+</font>
+<br><br>
+		<a href="http://crowdignite.com/"><b>Powered by Crowd Ignite</b></a><br>
+		<a href="http://crowdignite.com/"><img src="http://<?=CDN_URL?>/img/crowdignite/logo_small.jpg" height="35"></a>
+<br><br><br>
+</center>
+<p></p>
+
+    </div>
+
+  </div>
+<?
+	echo $this->element(DOMAIN."/comscore");
+	echo $this->element("chartbeat_end");
+	echo "<!-- ".php_uname()." -->";
+	echo $this->element('fraud_logix');
+	echo $this->element('social_networks');
+?>
+
+</body>
+</html>

@@ -1,0 +1,31 @@
+<?php
+
+namespace CI\Test\Filter;
+
+/**
+ * @group filter
+ */
+class EmptyArrayTest extends \PHPUnit_Framework_TestCase
+{
+
+    public function testFilterSuccess()
+    {
+        $aExpected = array(
+            'cero' => '0',
+            'null' => 'null',
+            'empty' =>''
+        );
+
+        $oEmptyArray = new \CI\Filter\EmptyArray();
+        $aResult = $oEmptyArray->filter(
+            array(
+                'cero' => '0',
+                'null' => 'null',
+                'null-2' => null,
+                'empty' => ''
+            )
+        );
+
+        $this->assertEquals($aExpected, $aResult);
+    }
+}

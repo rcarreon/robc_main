@@ -1,0 +1,9 @@
+<?php
+
+namespace CI\Stats\Page;
+
+abstract class Adapter extends \CI\Model\Cake
+{
+    abstract public function getStats($nPageId, $sStartDate, $sEndDate);
+    abstract public function getStatsByWebsite($nWebsiteId, $sStartDate, $sEndDate);
+}

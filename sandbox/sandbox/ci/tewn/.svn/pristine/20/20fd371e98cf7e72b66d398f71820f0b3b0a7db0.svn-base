@@ -1,0 +1,41 @@
+#!/bin/bash
+
+PROJECT_ROOT="/app/shared/${USER}/public_html"
+
+usage() {
+cat << _eof
+Usage: ${0} -n <name> 
+
+OPTIONS:
+   -n      Name of the component
+
+_eof
+exit 1
+}
+
+if [[ $# -lt 1 ]]; then
+	usage
+fi
+
+while getopts ":n:" OPT; do
+	case ${OPT} in
+		n) COMPONENT_NAME=${OPTARG} ;;
+	esac
+done
+
+echo "Creating component: ${COMPONENT_NAME}"
+
+if [[ ! (${COMPONENT_NAME} =~ ^[a-z|_]+$) ]]; then
+    echo "You need to provide a valid filename: ${COMPONENT_NAME}"
+    exit 1
+fi
+
+if [[ -f "${PROJECT_ROOT}/app/controllers/components/ti/${COMPONENT_NAME}.php" ]]; then
+    echo "Component already exists: ${COMPONENT_NAME}"
+    exit 1
+fi
+
+touch "${PROJECT_ROOT}/app/controllers/components/ti/${COMPONENT_NAME}.php"
+touch "${PROJECT_ROOT}/app/views/elements/ti/${COMPONENT_NAME}.ctp"
+
+echo "Done!"

@@ -1,0 +1,144 @@
+<?php
+class HistoryLandingPageAnalyticsControllerTest extends CakeTestCase{
+	var $HistoryLPA = null;
+	var $fixtures = array(
+		'app.history_landing_page_analytic', 'app.landing_page_analytic',
+		'app.website', 'app.page', 'app.history_widget_analytic', 'app.page_tag',
+	);
+
+	function startTest() {
+		App::import('Controller', 'HistoryLandingPageAnalytics');
+		$this->HistoryLPA = new HistoryLandingPageAnalyticsController();
+		$this->HistoryLPA->constructClasses();
+		$this->autoRender = false;
+	}
+
+	function testHistoryLandingPAgeAnalyticsControllerInstance() {
+		$this->assertTrue(is_a($this->HistoryLPA, 'HistoryLandingPageAnalyticsController'));
+	}
+
+	function testHLPAStatsDaysWebsiteLandingPages(){
+		//$results = $this->HistoryLPA->update();
+		$website_id = 6;
+		$number_of_days = 3;
+		ob_start();
+		$results = $this->HistoryLPA->stats_days_website_landing_pages($website_id, $number_of_days);
+		ob_get_clean();
+		$this->assertTrue(!empty($results));
+		$expected = array('num_ctr'=>0, 'num_display'=>0);
+		$this->assertEqual($results, $expected);
+	}
+
+	function testHLPAStatsDaysWebsites(){
+		//$results = $this->HistoryLPA->update();
+		$website_id = 6;
+		$intersect = 1;
+		$number_of_days = 3;
+		ob_start();
+		$results = $this->HistoryLPA->stats_days_website($website_id, $intersect, $number_of_days);
+		ob_get_clean();
+
+		$this->assertTrue(!empty($results));
+	}
+
+	function testHLPAStatsTimeWebsites(){
+		//$results = $this->HistoryLPA->update();
+		$website_id = 6;
+		$intersect = 1;
+		$date_start = date('Y-m-d G:i:s', strtotime('-3 days'));
+		$date_end = date('Y-m-d G:i:s', strtotime('yesterday'));
+		ob_start();
+		$results = $this->HistoryLPA->stats_time_website($website_id, $intersect , $date_start, $date_end);
+		ob_get_clean();
+
+		$this->assertTrue(!empty($results));
+	}
+
+
+	function testHLPAStatsDayWebsite(){
+		//$results = $this->HistoryLPA->update();
+		$website_id = 6;
+		$intersect = 1;
+		$date = date('Y-m-d G:i:s', strtotime('yesterday noon'));
+
+		ob_start();
+		$results = $this->HistoryLPA->stats_day_website($website_id, $intersect, $date);
+		ob_get_clean();
+		$this->assertTrue(!empty($results));
+	}
+
+	function testHLPAStatsDayLandingPage(){
+		$page_id = 6;
+		$number_of_days = 1;
+
+		ob_start();
+		$results = $this->HistoryLPA->stats_days_landing_page($page_id, $number_of_days);
+		ob_get_clean();
+		$this->assertTrue(!empty($results));
+		$expected = array('num_ctr'=>0, 'num_display'=>0);
+		$this->assertEqual($results, $expected);
+	}
+
+	function testHLPAStatsDays(){
+		$page_id = 6;
+		$intersect =2;
+		$number_of_days = 1;
+
+		ob_start();
+		$results = $this->HistoryLPA->stats_days($page_id, $intersect, $number_of_days);
+		ob_get_clean();
+		$this->assertTrue(!empty($results));
+		$expected = array('num_ctr'=>0, 'num_display'=>0);
+
+		$this->assertEqual($expected, $results);
+	}
+
+	function testHLPAStatsTime(){
+		$page_id = 6;
+		$intersect = 2;
+		$date_start = date('Y-m-d G:i:s', strtotime('-3 days'));
+		$date_end = date('Y-m-d G:i:s', strtotime('yesterday'));
+
+		ob_start();
+		$results = $this->HistoryLPA->stats_time($page_id, $intersect, $date_start, $date_end);
+		ob_get_clean();
+		$expected = array('num_ctr' => 0, 'num_display' => 0);
+
+		$this->assertTrue(!empty($results));
+		$this->assertEqual($results, $expected);
+	}
+
+	function testHLPAStatsDay(){
+		$page_id = 6;
+		$intersect =2;
+		$date = date('Y-m-d G:i:s', strtotime('yesterday noon'));
+
+		ob_start();
+		$results = $this->HistoryLPA->stats_day($page_id, $intersect, $date);
+		ob_get_clean();
+		$this->assertTrue(!empty($results));
+		$expected = array('num_ctr'=>0, 'num_display'=>0);
+		$this->assertEqual($results, $expected);
+	}
+
+	function testHLPAStatsDayCTR(){
+		$page_id = 6;
+		$intersect = 2;
+		$number_of_days = 3;
+
+		ob_start();
+		$results = $this->HistoryLPA->stats_days_ctr($page_id, $intersect, $number_of_days);
+		ob_get_clean();
+
+		$this->assertEqual($results, 0);
+
+		if(is_array($results)){
+			$expected = array('num_ctr'=>0, 'num_display'=>0);
+			$this->assertEqual($results, $expected);
+		}
+	}
+
+	function endTest() {
+		unset($this->HistoryLPA);
+	}
+}

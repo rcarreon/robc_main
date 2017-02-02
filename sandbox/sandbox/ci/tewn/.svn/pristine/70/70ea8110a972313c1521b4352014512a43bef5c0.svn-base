@@ -1,0 +1,38 @@
+<ul class="nav nav-sidebar">
+    <li class="title">
+        <h2>
+            <span class="glyphicon glyphicon-th-list"></span> Reports by
+            <div class="pull-right btn-group">
+                <button class="btn btn-xs btn-default with-tooltip" data-toggle="modal" data-target="#modal-load-reports" data-placement="top" title="Open report">
+                    <span class="fa fa-folder-open-o"></span>
+                </button>
+                <button class="btn btn-xs btn-default btn-clean-form with-tooltip" data-placement="top" title="Reset report">
+                    <span class="fa fa-eraser"></span>
+                </button>
+            </div>
+        </h2>
+    </li>
+    <li>
+        <a class="report_by_hub" href="#report_by_hub">Hub</a>
+    </li>
+    <li>
+        <a class="report_by_website" href="#report_by_website">Website</a>
+    </li>
+    <li class="title">
+        <h2>
+            <span class="glyphicon glyphicon-th-list"></span> CI Stats
+        </h2>
+    </li>
+    <li>
+        <a class="ci_stats_report stats_system" href="#stats_system" >System</a>
+    </li>
+    <li>
+        <a class="ci_stats_report stats_by_hub" href="#stats_by_hub" >By Hub</a>
+    </li>
+    <li>
+        <a class="ci_stats_report stats_full_system" href="#stats_full_system" >Full System</a>
+    </li>
+    <li>
+        <a class="ci_stats_report stats_full_system_year" href="#stats_full_system_year" >Yearly</a>
+    </li>
+</ul>

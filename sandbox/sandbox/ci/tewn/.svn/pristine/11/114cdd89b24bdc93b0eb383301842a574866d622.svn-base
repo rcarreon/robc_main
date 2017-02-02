@@ -1,0 +1,50 @@
+<style>
+body { background:#666; }
+.wf-active .item div.text p a {
+    font-family:"Open Sans", Arial, sans-serif;
+    font-size:18px!important;
+    font-weight:700;
+    letter-spacing:-1px;
+    /* line-height:30px!important; */
+}
+#header {
+    background: #232323;
+    border-bottom: 1px solid #333333;
+    box-shadow: 0 1px 5px #222222; 
+}
+#header a {
+    background:url(/img/gamerevolution/gamerev_logo_sm.jpg) no-repeat;
+    display:block;
+    height:50px!important;
+    width:185px!important;
+    position:absolute;
+    top:0px;
+    left:1%;
+}
+#header div.navigation { background:none; left:auto; right:3%; width:auto; top:13px;}
+#header div.navigation a.top_button {
+    color:#ccc;
+    background:url("/img/gamerevolution/topnav_button_bg.png") no-repeat right top;
+    width:90px!important;
+    height:25px!important;
+    position:relative;
+    text-decoration:none;
+    text-shadow: 0 1px 1px #000; 
+    top:auto;
+    left:auto;
+}
+#header div.navigation a.top_button:hover { color:#fff;}
+#paginate { display:block; margin: 0; padding-top: 10px; width:100%;}
+#footer {
+    background: none repeat scroll 0 0 #232323;
+    border-top: 1px solid #333333;
+    box-shadow: 0 -1px 5px #333; 
+    color: #bbb;
+    padding:20px 0;
+    display:block;
+    width: 100%;
+}
+#footer a { color:#ccc; text-decoration:none;}
+#footer a:hover { color:#fff!important; text-decoration:underline;}
+#footer div.info div { color:#333; font-size:11px;  margin:10px 0 0!important; text-align:center!important; width: 100%;}
+</style>

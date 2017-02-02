@@ -1,0 +1,37 @@
+<?php
+
+namespace CI\Filter\String;
+use CI\String\Exception as StringException;
+
+class Replace implements \CI\Filter
+{
+    protected $aOld = array(',');
+    protected $aNew = array('_');
+
+    public function setOldData($aOld)
+    {
+        if (!is_array($aOld)) {
+            $aOld = array($aOld);
+        }
+        $this->aOld = $aOld;
+        return $this;
+    }
+
+    public function setNewData($aNew)
+    {
+        if (!is_array($aNew)) {
+            $aNew = array($aNew);
+        }
+        $this->aNew = $aNew;
+        return $this;
+    }
+
+    public function filter($sValue)
+    {
+        if (false === is_string($sValue)) {
+            throw new StringException(StringException::NOT_VALID, gettype($sValue));
+        }
+
+        return str_replace($this->aOld, $this->aNew, $sValue);
+    }
+}

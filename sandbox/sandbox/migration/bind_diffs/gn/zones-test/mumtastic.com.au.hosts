@@ -1,0 +1,40 @@
+$TTL 86400
+mumtastic.com.au.       IN      SOA     mumtastic.com.au. root.mumtastic.com.au. (
+                                                       2014071100     ; serial
+                                                       28800          ; refresh
+                                                       14400          ; retry
+                                                       3600000        ; expire
+                                                       86400 )        ; minimum
+
+
+mumtastic.com.au.                                      IN    NS       app3v-dns.tp.prd.lax.evolvemediallc.com.
+mumtastic.com.au.                                      IN    NS       app4v-dns.tp.prd.lax.evolvemediallc.com.
+mumtastic.com.au.                                      IN    NS       app1v-dns.tp.prd.lax.evolvemediallc.com.
+mumtastic.com.au.                                      IN    NS       app2v-dns.tp.prd.lax.evolvemediallc.com.
+mumtastic.com.au.                                      IN    MX 10    cluster9.us.messagelabs.com.
+mumtastic.com.au.                                      IN    MX 20    cluster9a.us.messagelabs.com.
+
+
+
+local                                                  IN    A        127.0.0.1
+localhost                                              IN    A        127.0.0.1
+loghost                                                IN    A        127.0.0.1
+
+
+mumtastic.com.au.                                      IN    A        72.172.76.151
+bta.mumtastic.com.au.                                  IN    A        10.11.234.71
+dev.mumtastic.com.au.                                  IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.mumtastic.com.au.                                  IN    CNAME    stg.pbwordpress.gnmedia.net.
+www.mumtastic.com.au.                                  IN    CNAME    mumtastic.com.au.
+
+
+origin.campaigns.mumtastic.com.au.                     IN    A        72.172.76.121
+campaigns.mumtastic.com.au.                            IN    CNAME    origin.campaigns.mumtastic.com.au.
+cdn.campaigns.mumtastic.com.au.                        IN    CNAME    cdn.campaigns.craveonline.com.edgesuite.net.
+staging.campaigns.mumtastic.com.au.                IN    A        72.172.76.122
+
+
+ozthegreatandpowerful.mumtastic.com.au.                IN    CNAME    cdn.campaigns.mumtastic.com.au.
+staging.ozthegreatandpowerful.mumtastic.com.au.        IN    CNAME    staging.campaigns.mumtastic.com.au.
+demo.ozthegreatandpowerful.mumtastic.com.au.           IN    CNAME    demo.si.evolvemediallc.com.
+dev.ozthegreatandpowerful.mumtastic.com.au.            IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.

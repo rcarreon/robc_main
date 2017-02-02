@@ -1,0 +1,6 @@
+{
+    "require": {
+        "maximebf/debugbar": "1.*",
+        "phpoffice/phpexcel": "dev-master"
+    }
+}

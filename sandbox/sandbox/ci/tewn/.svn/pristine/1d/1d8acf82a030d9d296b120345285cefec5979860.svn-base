@@ -1,0 +1,299 @@
+<?
+	echo $this->element('crowdignite/backend2_toolbar', array("tab" => "home", "user" => $user));
+
+	if ($full_chart) {
+	   $website_list = 'all,';
+	} else {
+	   $website_list = '';
+
+	   foreach($websites as $website) {
+		   $website_list .= $website['Website']['id'].",";
+	   }
+	}
+	$website_list = substr_replace($website_list, "", -1);
+?>
+
+<div class="row supercontainer" id="content_area">
+
+	<div class="hubs_column"> <!-- left col -->
+		<ul class="hub_list">
+			<li class="title t_info">Stats &amp; Tools</li>
+			<li><a class="general_stats" href="#general_stats">General Stats</a></li>
+			<li><a class="new_websites" href="#new_websites">New Websites</a></li>
+			<li><a class="history" href="#">History</a></li>
+			<?php if ($is_admin_user) : ?>
+			<li><a class="rss" href="#rss">RSS Feeds</a></li>
+			<?php endif; ?>
+			<li><a class="warnings" href="#warnings"><i class="icon icon-warning"></i>WARnings <span id="total_warnings"></span></a></li>
+		</ul>
+		<ul class="hub_list">
+			<li class="title t_charts">Charts</li>
+			<li class="tab_selected"><a class="all_charts" href="/admin">All Charts</a></li>
+		</ul>
+	</div>
+
+	<div class="websites_column"> <!-- right col -->
+		<div class="table_container">
+
+			<div id="general_stats" class="pane">
+				<div class="short_table stats">
+				  <h4>General Stats</h4>
+					  <table>
+							<tr class="divider">
+									<td class="title">
+										Active Sites
+									</td>
+									<td>
+											<?=$active_sites_count?>
+									</td>
+					</tr>
+							<tr>
+									<td class="title">
+										New Sites
+									</td>
+									<td>
+											<?=$new_sites_count?>
+									</td>
+					</tr>
+					<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+							<tr class="divider">
+									<td class="title">
+										Active pages
+									</td>
+									<td>
+											<?=$active_pages_count?>
+									</td>
+					</tr>
+							<tr>
+									<td class="title">
+									Pending Moderation pages
+									</td>
+									<td>
+											<?=$pending_moderation_pages_count?>
+									</td>
+					</tr>
+					<tr>
+						<td class="title">
+							Average Age of Active Pages
+						</td>
+						<td>
+							<?=$page_freshness?>
+						</td>
+					</tr>
+
+					<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+					<tr class="divider">
+						<td class="title">
+							Largest Landing Page rebalance count
+						</td>
+						<td>
+							<?=$landing_page_rebalance?>
+						</td>
+					</tr>
+
+					<tr>
+						<td class="title">
+							Largest Widget rebalance count
+						</td>
+						<td>
+							<?=$widget_rebalance?>
+						</td>
+					</tr>
+
+
+					<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+					<tr class="divider queue_sizes">
+						<td class="title font16">Queue Sizes</td>
+						<td></td>
+					</tr>
+					<tr><td>&nbsp;</td><td>&nbsp;</td></tr>
+
+					<tr class="divider similar_page_count">
+						<td class="title font16">Similar</td>
+						<td>&nbsp;</td>
+					</tr>
+					<tr>
+						<td class="title">
+							Similar Page Count Landing Pages
+						</td>
+						<td class="similar_page_count_landing_page">
+							empty
+						</td>
+					</tr>
+					<tr>
+						<td class="title">
+							Similar Page Count Widget
+						</td>
+						<td class="similar_page_count_widget">
+							empty
+						</td>
+					</tr>
+
+				</table>
+				</div><!-- stats -->
+
+				<div class="short_table cache">
+					<h4>Cache</h4>
+					<table>
+					    <tr class="divider">
+							<td>
+								<a href="/management/cache">Cache Management</a>
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<a href="/management/memcachedinfo">Key Management</a>
+							</td>
+						</tr>
+					</table>
+<? /*
+					<table>
+						<tr>
+							<td>
+								Memcached Server Size:
+							</td>
+							<td>
+								<?
+								foreach ($memcached_slab_stats as $memcached_server => $memcached_slab_stat) {
+									echo $memcached_server." => ".round($memcached_slab_stat['total_malloced']/(1024*1024))."MB<br>";
+								}
+								?>
+							</td>
+						</tr>
+					</table>
+*/ ?>
+				</div><!-- Cache -->
+
+				<div class="short_table misc">
+				  <h4>Misc Utilities</h4>
+				  <table>
+				    <tr class="divider">
+				      <td><a href="/management/tuned/7">Widget Tuned Metrics</a></td>
+				    </tr>
+				    <tr>
+				      <td><a href="/management/inventory">Inventory</a></td>
+				    </tr>
+				    <tr>
+				      <td><a href="/history_inventory/density">Inventory Density</a></td>
+				    </tr>
+				    <tr>
+				      <td><a href="/landing_page_analytics/fix_duplicates">Fix Landing Page Duplicates</a></td>
+				    </tr>
+				    <tr>
+				      <td><a href="/widget_analytics/fix_duplicates">Fix Widget Duplicates</a></td>
+				    </tr>
+				    <tr>
+				      <td><a href="/management/refers">Refers</a></td>
+				    </tr>
+				    <tr>
+				      <td><a href="/management/page_performers">Top Pages</a></td>
+				    </tr>
+				    <tr>
+				      <td><a href="/management/moderation">Moderator Stats</a></td>
+				    </tr>
+				    <tr>
+				      <td><a href="/management/queues">Queue Info</a></td>
+				    </tr>
+				    <tr>
+				      <td><a href="/management/rebalance_queue">Rebalance Queue Info</a></td>
+				    </tr>
+				    <tr>
+				      <td><a href="/management/subcategories">Subcategories</a></td>
+				    </tr>
+				    <tr>
+				      <td><a href="/management/tags">Tags</a></td>
+				    </tr>
+				  </table>
+				</div> <!-- Misc Utilies -->
+
+			</div> <!-- General Stats -->
+
+
+
+			<div id="history" class="pane">
+			<h4>History</h4>
+				<?
+				echo $this->element("engine_change_log");
+				?>
+			</div>
+
+			<div id="new_websites" class="pane">
+			 	<h4>New Websites</h4>
+			 	<table class="tablesorter">
+			 	<thead>
+			 		<tr>
+			 			<th>Website</th>
+			 			<th>Date Added</th>
+			 			<th>Incoming</th>
+			 		</tr>
+			 	</thead>
+			 	<tbody>
+				<?
+				// New websites
+				foreach ($new_websites as $website) {
+
+				?>
+				<tr>
+					<td>
+				<a href="/websites/moderate"><?=$website['Website']['url']?></a>&nbsp;&nbsp;&nbsp;
+					</td>
+					<td>
+						<?=$website['Website']['created']?>
+					</td>
+					<td>
+						<?=$website['Account']['incoming']?>
+					</td>
+				</tr>
+				<?
+				}
+				?>
+				</tbody>
+				</table>
+			</div>
+
+			<?php if ($is_admin_user) : ?>
+				<!-- RSS Feeds tab -->
+				<?php echo $this->element('crowdignite/rss_feed'); ?>
+				<!-- RSS Feeds tab -->
+			<?php endif; ?>
+
+
+			<!-- Warnings tab -->
+			<?php echo $this->element('crowdignite/warnings_tab'); ?>
+			<!-- Warnings tab -->
+
+		</div> <!-- table container -->
+
+	</div> <!-- websites_column - end of right col -->
+
+</div>
+
+<!-- Waiting Divs -->
+<div class="preloaderbox" id="waiting_div_tpm" style="display:none;cursor:default"></div>
+<div class="preloaderbox" id="waiting_div_return_rate" style="display:none;cursor:default"></div>
+<div class="preloaderbox" id="waiting_div_ctr" style="display:none;cursor:default;"></div>
+<div class="preloaderbox" id="waiting_div_io" style="display:none;cursor:default;"></div>
+<div class="preloaderbox" id="waiting_div_credits" style="display:none;cursor:default;"></div>
+<div class="preloaderbox" id="waiting_div_display" style="display:none;cursor:default;"></div>
+<div class="preloaderbox" id="waiting_div_display_type" style="display:none;cursor:default;"></div>
+<div class="preloaderbox" id="waiting_div_ctr_type" style="display:none;cursor:default;"></div>
+
+
+<div class="" id="waiting_div_tpm_small" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>
+<div class="" id="waiting_div_return_rate_small" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>
+<div class="" id="waiting_div_ctr_small" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>
+<div class="" id="waiting_div_io_small" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>
+<div class="" id="waiting_div_credits_small" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>
+<div class="" id="waiting_div_display_small" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>
+<div class="" id="waiting_div_display_type_small" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>
+<div class="" id="waiting_div_ctr_type_small" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>
+
+<div class="" id="waiting_div_tpm_hub" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>
+<div class="" id="waiting_div_return_rate_hub" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>
+<div class="" id="waiting_div_ctr_hub" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>
+<div class="" id="waiting_div_io_hub" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>
+<div class="" id="waiting_div_credits_hub" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>
+<div class="" id="waiting_div_display_hub" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>
+<div class="" id="waiting_div_display_type_hub" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>
+<div class="" id="waiting_div_ctr_type_hub" style="display:none;cursor:default"><img src="/img/crowdignite/website_ajax_loader_2.gif"/></div>

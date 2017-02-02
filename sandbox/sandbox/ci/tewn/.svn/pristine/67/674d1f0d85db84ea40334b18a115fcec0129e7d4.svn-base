@@ -1,0 +1,65 @@
+ci.namespace('ci.Sidebar');
+
+(function($){
+    var MAX_WIDTH_CELLPHONE = 768;
+    var MAX_WIDTH_TABLET    = 992;
+
+    $.fn.sidebar = function(settings) {
+        var $element = $(this);
+        var settings = $.extend(settings, $.fn.sidebar.default_settings);
+
+        var oSidebar = new ci.Sidebar($element, settings);
+
+        return {
+            on : function(event, callback) {
+                $element.on(event, callback);
+            },
+            data : function() {
+                return $element.find('li.' + settings.classNames.active + ' a').data();
+            }
+        };
+    }
+
+    $.fn.sidebar.default_settings = {
+        classNames : {
+            active   : 'active',
+            disabled : 'disabled'
+        }
+    }
+
+    ci.Sidebar = function($element, settings) {
+        this.$element = $element;
+        this.settings = settings;
+
+        this.$element.find('li a').on('click', this.settings, function(event){
+            var classActive = event.data.classNames.active;
+            var $anchor = $(this);
+
+            $element.find('.' + classActive).removeClass(classActive);
+            $anchor.parent().addClass(classActive);
+
+            $element.trigger('selected', $anchor.data());
+        });
+
+        $(window).on('resize', function(){
+            var width = $(window).width();
+
+            //Tablet screen size
+            if (width > MAX_WIDTH_CELLPHONE && width < MAX_WIDTH_TABLET) {
+                $element.trigger('resize.tablet');
+            }
+
+            // Desktop screen size
+            if (width > MAX_WIDTH_TABLET) {
+                $element.trigger('resize.desktop');
+            }
+
+            // Cellphone screen size
+            if (width < MAX_WIDTH_CELLPHONE) {
+                $element.trigger('resize.cellphone');
+            }
+        });
+    }
+})(jQuery);
+
+

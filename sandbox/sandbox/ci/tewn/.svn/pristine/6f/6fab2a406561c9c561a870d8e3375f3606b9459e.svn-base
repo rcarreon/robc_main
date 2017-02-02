@@ -1,0 +1,14 @@
+<?php
+
+namespace CI\Memcached;
+
+class Exception extends \CI\Exception
+{
+    const MISSING_CONFIG = 1;
+    const ERROR_SERVERS  = 2;
+
+    protected $aErrors = array(
+        self::MISSING_CONFIG => 'The memcached configuration is missing',
+        self::ERROR_SERVERS  => 'An error occurred trying to add memcached servers',
+    );
+}

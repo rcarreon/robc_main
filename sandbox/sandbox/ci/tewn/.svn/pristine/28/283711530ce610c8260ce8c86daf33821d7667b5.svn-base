@@ -1,0 +1,43 @@
+<?php
+
+App::import('Controller', 'Actions');
+
+class PagesActionsController extends ActionsController
+{
+    public $uses       = array('PageCategory', 'PageSubcategory', 'Tag');
+    public $components = array('Dictionary');
+
+    protected $permissions = array(
+        'get_category_subcategories' => User::PUBLISHER,
+    );
+
+    public function get_category_subcategories($page_id)
+    {
+        $parent_id = "subcategories-{$page_id}";
+        $categories = $this->PageCategory->get_with_name_by_page_id($page_id);
+        $subcategories = $this->PageSubcategory->get_visible_with_parent_by_page_id($page_id);
+
+        $data = array();
+        foreach ($categories as $category_id => $category_name) {
+            $category = array(
+                'id' => $category_id,
+                'name' => $category_name,
+                'parent_id' => $parent_id,
+                'subcategories' => array(),
+            );
+            if (isset($subcategories[$category_id])) {
+                foreach ($subcategories[$category_id] as $subcategory) {
+                    $category['subcategories'][] = array(
+                        'category_name' => $category_name,
+                        'id' => $subcategory['id'],
+                        'name' => $subcategory['name'],
+                        'page_id' => $page_id,
+                    );
+                }
+            }
+            $data[] = $category;
+        }
+
+        echo json_encode($data);
+    }
+}

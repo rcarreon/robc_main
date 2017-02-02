@@ -1,0 +1,5 @@
+[noc]
+app1v-noc.tp.dev.lax.gnmedia.net
+app1v-noc.tp.prd.lax.gnmedia.net
+[local]
+127.0.0.1

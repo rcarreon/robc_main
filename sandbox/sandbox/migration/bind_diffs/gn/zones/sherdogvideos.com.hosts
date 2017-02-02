@@ -1,0 +1,30 @@
+$TTL 3600
+sherdogvideos.com.		IN      SOA     sherdogvideos.com. root.sherdogvideos.com. (
+                        2015022400	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+sherdogvideos.com.     IN      NS              app3v-dns.tp.prd.lax.mmamasterllc.com.
+sherdogvideos.com.     IN      NS              app4v-dns.tp.prd.lax.mmamasterllc.com.
+sherdogvideos.com.     IN      NS              app1v-dns.tp.prd.lax.mmamasterllc.com.
+sherdogvideos.com.     IN      NS              app2v-dns.tp.prd.lax.mmamasterllc.com.
+sherdogvideos.com.     IN      MX      10       mail.sherdogvideos.com.
+;
+; local host
+;
+local           IN      A       127.0.0.1
+localhost       IN      A       127.0.0.1
+loghost         IN      A       127.0.0.1
+;
+;
+; hosts
+@		IN	A	72.172.76.82
+editors		IN	CNAME   dav-out.gnmedia.net.
+ftp		IN	A       66.180.202.229
+mail		IN	A       64.72.127.2
+; CDN
+www.origin	IN	A       72.172.76.82
+www		IN	CNAME   wac.EE35.edgecastcdn.net.

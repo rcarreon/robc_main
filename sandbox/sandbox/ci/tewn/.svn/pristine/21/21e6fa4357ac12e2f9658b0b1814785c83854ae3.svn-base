@@ -1,0 +1,36 @@
+<?php
+/**
+ * Words Number Cakephp Helper File
+ *
+ * PHP Version 5.3
+ *
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+
+/**
+ * Words Number Cakephp Helper Class
+ *
+ * PHP Version 5.3
+ *
+ * @author   Francisco Gonzalez <francisco.gonzalez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+class WordsNumberHelper extends AppHelper
+{
+    protected $oFilter;
+
+    public function __construct($options = null)
+    {
+        $this->oFilter = new \CI\Filter\String\WordsNumber();
+        parent::__construct($options);
+    }
+
+    public function filter($sValue, $nWords)
+    {
+        $this->oFilter->setWords($nWords);
+        return $this->oFilter->filter($sValue);
+    }
+}

@@ -1,0 +1,41 @@
+<? 
+$isflagged = $flagged == 1 ? "fw_" : "";  
+if(sizeof($Pages) < 1 ){
+	echo "<tr id='".$isflagged."top_5_pages_".$website_id."' class=\"top_5_pages\" style=\"display: table-row\"><td colspan=\"5\" class=\"latest_pages\">No results were found.</td></tr>";
+}else{ 
+?>
+	<tr id='<?=$isflagged; ?>top_5_pages_<?= $website_id; ?>' class="top_5_pages" style="display: table-row">
+	<td colspan="5">
+		<div class="latest_pages">
+		<table id="latest_pages_table" cellpadding="1" width=100% cellspacing="0" border="1" style="font-size:12px; padding: 2px 4px 2px 4px; border: 1px solid #660000;">
+			<thead>
+				<tr>
+					<th>ID</th>
+					<th>Page</th>
+					<th>LP CTR</th>
+					<th>LP Impr.</th>
+					<th>Wgt CTR</th>
+					<th>W Impr.</th>
+					<th>Image</th>
+				</tr>
+			</thead>
+			<tbody>
+				<? foreach($Pages as $page){
+					$image_html = $image->zoom_crop($page['Page']['image'], 140, 80, true, array(), true, false, $page['Page']['image_server'], false, true);
+					
+					echo "<tr>
+						<td><a href='/pages/moderate/".$page['Page']['website_id']."/".$page['Page']['id']."'>".$page['Page']['id']."</a></td>
+						<td><a href='/pages/moderate/".$page['Page']['website_id']."/".$page['Page']['id']."'>".$page['Page']['title']."</a></td>
+					<td>".round(($page['Page']['lp_rolling_ctr']*100), 2)."%</td>
+					<td>".number_format($page['Page']['lp_rolling_impressions'])."</td>
+					<td>".round(($page['Page']['widget_rolling_ctr']*100), 2)."%</td>
+					<td>".number_format($page['Page']['widget_rolling_impressions'])."</td>
+					<td><div class='smallimage' style='background-image:url(".$image_html.");'></div></td>						
+					</tr>";
+				} ?>
+			</tbody>
+		</table>
+		</div>
+	</td>
+	</tr>
+<? } ?>

@@ -1,0 +1,72 @@
+<div id="header">
+    <div id="wrapper">
+        <div id="logo">
+            <a class="logo_link" href="/">
+                <img src="http://<?=CDN_URL?>/img/<?=DOMAIN?>/logo/small.jpg"/>
+            </a>
+            <?php
+                if (DOMAIN_ID == DOMAIN_ID_NEWS) {
+            ?>
+                    <span class="beta">Beta</span>
+            <?php
+                }
+
+                if(false == $isHomepage && DOMAIN_ID != DOMAIN_ID_CROWD_IGNITE && $WebsiteSettings->isShowBranding()) {
+            ?>
+                    <div id="powerby">
+                        <span>powered by</span>
+                        <a href="http://get.crowdignite.com/" target="_blank">
+                            <img src="http://<?php echo CDN_URL;?>/img/craveonline/ci_small_logo_85x30.png" />
+                        </a>
+                    </div>
+            <?php
+                }
+            ?>
+
+        </div>
+        <?php
+        if ($isHomepage && DOMAIN_ID == DOMAIN_ID_CROWD_IGNITE) {
+        ?>
+            <div id="login">
+                <div>
+                    <?php
+                        $session->activate();
+                        if (!$session->check('User')) {
+                    ?>
+                            <div>
+                                <b>
+                                    <a class="user" href="http://<?=MANAGEMENT_URL?>/login">Login</a>
+                                    <div id="join">
+                                        <a href="http://get.crowdignite.com" target="_blank">Join Crowd Ignite</a>
+                                    </div>
+                                </b>
+                            </div
+>                    <?php
+                        } else {
+                    ?>
+                            <div>
+                                <b>
+                                    <a class="user" href="/dashboard">Dashboard</a>&nbsp;&nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp;&nbsp;<a class="user" href="/logout">Logout</a>
+                                </b>
+                            </div>
+                    <?php
+                        }
+                    ?>
+                </div>
+            </div>
+        <?php
+            }
+        ?>
+
+    <?php
+        if(isset($preview_style) ) {
+    ?>
+            <div class="ad_leaderboard">
+                <div id='<?php echo $google_tag_slot["div_id"]; ?>-1'></div>
+            </div>
+    <?php
+        }
+    ?>
+
+    </div>
+</div>

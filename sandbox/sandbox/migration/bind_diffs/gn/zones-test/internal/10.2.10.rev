@@ -1,0 +1,268 @@
+$TTL 3600 ; 1 day
+@      IN      SOA     gnmedia.net. root@gnmedia.net. (
+			2014052101	; Serial
+			36262		; Refresh
+			300		; Retry
+			3600000		; Expire
+			3600 )		; Minimum
+
+	IN	NS	app1v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app2v-dns.tp.prd.lax.gnmedia.net.
+	IN      NS      app3v-dns.tp.prd.lax.gnmedia.net.
+	IN      NS      app4v-dns.tp.prd.lax.gnmedia.net.
+
+1      IN      PTR	asa.core1.gnmedia.net.
+2	IN	PTR	int-vlan10.admin.core1.gnmedia.net.
+;3      IN      PTR	ace1.core2.gnmedia.net.
+;4      IN      PTR	ace1.lax1.gnmedia.net.
+;5      IN      PTR	ace1.lax2.gnmedia.net.
+;6      IN      PTR	ace2.core2-admin.gnmedia.net.
+7      IN      PTR	fwsm1.core1.gnmedia.net.
+8	IN	PTR	fwsm1.core2.gnmedia.net.
+9	IN	PTR	int-vlan10.admin.lax3.gnmedia.net.
+10	IN	PTR	acs.gnmedia.net.
+;11     IN      PTR	acs1.lax3.gnmedia.net.
+12      IN      PTR	natpool-1-vlan10-4.core.gnmedia.net.
+13	IN	PTR	int-vlan10.admin.lax1.gnmedia.net.
+14	IN	PTR	int-vlan10.admin.lax2.gnmedia.net.
+;15     IN      PTR	ace1.lax3 nat
+16	IN	PTR	natpool-1-vlan10-1.admin.core.gnmedia.net.
+17	IN	PTR	natpool-1-vlan10-4.admin.core.gnmedia.net.
+18      IN      PTR	natpool-1-vlan10-5.admin.core.gnmedia.net.
+;19      IN      PTR	natpool-2-vlan10-2.ap.core.gnmedia.net.	
+;20      IN      PTR	natpool-2-vlan10-3.ap.core.gnmedia.net.
+;21      IN      PTR     ops2.lax3.gnmedia.net.
+;22	IN	PTR	natpool-2-vlan10-1.legacy.core.gnmedia.net.
+;23      IN      PTR     ns1v.lax3.gnmedia.net. ;decomm
+;24      IN      PTR     ns2v.lax3.gnmedia.net. ;decomm
+;25      IN      PTR     ns0v.lax3.gnmedia.net. ;decomm
+;26      IN      PTR     ns0v-pub.lax3.gnmedia.net. ;decomm
+;27	IN	PTR	keywords.atomiconline.com.
+;28	IN	PTR	pxy1v-jm.sb.stg1.gnmedia.net. ;decomm
+;29	IN	PTR	pxy1v-jm.sb.stg2.gnmedia.net. ;decomm
+;30	IN	PTR	ops4.lax1.gnmedia.net. ;decomm
+;31	IN	PTR	ops4.lax2.gnmedia.net. ;decomm
+;32	IN	PTR	mon.lax3.gnmedia.net. ;decomm
+;33	IN	PTR	ops4.lax3.gnmedia.net. ;decomm
+;34	IN	PTR	ops5.lax1.gnmedia.net. ;decomm
+;35	IN	PTR	ops5.lax2.gnmedia.net. ;decomm
+;36	IN	PTR	ops5.lax3.gnmedia.net. ;decomm
+;37	IN	PTR	scm.lax3.gnmedia.net. ;decomm
+38	IN	PTR	int-vlan10.admin.core2.gnmedia.net.
+;39	IN	PTR	acs.lax1.b.gnmedia.net.
+;40	IN	PTR	acs.lax2.b.gnmedia.net.
+;41     IN      PTR	pxy1v.stg1.gnmedia.net. ;decomm
+;42     IN      PTR	pxy2v.stg2.gnmedia.net.
+;43     IN      PTR	pxy-xen2.stg1.gnmedia.net. ;decomm
+;44     IN      PTR	pxy-xen2.stg2.gnmedia.net.
+;45	IN	PTR	int-vlan10.ap.core2.gnmedia.net.
+;46	IN	PTR	int-vlan10.doublehelix.core2.gnmedia.net.
+;47	IN	PTR	int-vlan10.legacy.core2.gnmedia.net.
+;48 	IN	PTR	vip-app-sdc.ao.stg.lax.gnmedia.net.
+;49	IN	PTR	ap.ace1.core2.gnmedia.net.
+;50	IN	PTR	int-vlan10.doublehelix.core1.gnmedia.net.
+;51      IN      PTR     nfs1.lax1.gnmedia.net.
+;52	IN	PTR	acs.lax3.b.gnmedia.net. 
+;53      IN      PTR     nfs1.lax3.gnmedia.net.
+;54 power.lax1
+;55 power.lax2
+56     IN      PTR	msfc1.lax1.gnmedia.net.
+57     IN      PTR	msfc1.lax2.gnmedia.net.
+58	IN	PTR	msfc1.lax3.gnmedia.net.
+;59 power.lax3
+;60 ???
+;61      IN      PTR     ops2.lax2.gnmedia.net.
+;62      IN      PTR     pxy-xen2.lax2.gnmedia.net. ;decomm
+;63      IN      PTR     ns1v.lax2.gnmedia.net. ;decomm
+;64      IN      PTR     ns2v.lax2.gnmedia.net. ;decomm
+;65 ???
+;66      IN      PTR     ops-xen1.lax2.gnmedia.net. ;decomm
+;67      IN      PTR     ops-xen2.lax2.gnmedia.net. ;decomm
+;68 ???
+;69 ??? In use.
+;70	IN	PTR	int-vlan10.ap.core1.gnmedia.net.
+;71      IN      PTR     ops2.lax1.gnmedia.net.
+;72      IN      PTR     pxy-xen2.lax1.gnmedia.net. ;decomm
+;73	IN	PTR	
+;74	IN	PTR	ns2v.lax1.gnmedia.net. ;decomm
+;75	IN	PTR	ns1v.lax1.gnmedia.net. ;decomm
+;76 ???
+;77	IN	PTR	int-vlan10.10g.lax1.gnmedia.net.
+;78	IN	PTR	natpool-1-vlan10-1.10g.lax1.gnmedia.net.
+;79      IN      PTR     ops-xen1.lax1.gnmedia.net. ;decomm
+;80	IN	PTR
+;81      IN      PTR     nfs1.lax1.gnmedia.net.
+;82      IN      PTR     nfs1.lax2.gnmedia.net.
+;83	IN	PTR	dev3v.lax3.gnmedia.net. ;decomm
+;84	IN	PTR	zmanda-allstars.lax3.gnmedia.net. ;decomm
+85	IN	PTR	int-vlan10.gn1.core2.gnmedia.net.
+;86	IN	PTR	nfs1-rlm.lax3.gnmedia.net.
+;87 ???
+;88
+;89	IN	PTR	nat001-vlan10.gnmedia.net. 
+;90	IN	PTR	natpool-2-vlan10-1.ap.core.gnmedia.net.
+;91	IN	PTR	natpool-2-vlan10-2.ap.core.gnmedia.net.
+;92	IN	PTR	natpool-2-vlan10-3.ap.core.gnmedia.net.
+;93	IN	PTR	natpool-2-vlan10-4.ap.core.gnmedia.net.
+;94	IN	PTR	natpool-2-vlan10-5.ap.core.gnmedia.net.
+;95	IN	PTR	natpool-2-vlan10-6.ap.core.gnmedia.net.
+;96	IN	PTR	natpool-2-vlan10-7.ap.core.gnmedia.net.
+;97 Laptop use at colo 
+98	IN	PTR	int-vlan10.gn1.core1.gnmedia.net.
+;99	IN	PTR	int-vlan10.apstg.lax3.gnmedia.net.
+;100     IN      PTR     pxy.lax1.gnmedia.net.
+;101     IN      PTR     ops1.lax1.gnmedia.net. ;decomm
+;102     IN      PTR     ops1.lax2.gnmedia.net.
+;103     IN      PTR     ops1.lax3.gnmedia.net.
+;104 Ad Platform py1_stg1 vip
+;105 Ad Platform rb1_stg1 vip
+;106     IN      PTR     pxy2v.stg1.gnmedia.net. ;decomm
+;107     IN      PTR     pxy2v-vip1.stg1.gnmedia.net.
+;108     IN      PTR     pxy2v-vip2.stg1.gnmedia.net.
+;109     IN      PTR     pxy2v-vip3.stg1.gnmedia.net.
+;110 Ad Platform py1_stg2 vip
+;111     IN      PTR     app-xen2.lax3.gnmedia.net. ;decomm
+;112     IN      PTR     microsites1v.lax3.gnmedia.net. ;decomm
+;113     IN      PTR     app-xen5.stg1.gnmedia.net.
+;114     IN      PTR     microsites1v.stg1.gnmedia.net. ;decomm
+;115 Ad Platform rb1_stg2 vip
+;116     IN      PTR     pxy2v.stg2.gnmedia.net.
+;117     IN      PTR     pxy2v-vip1.stg2.gnmedia.net.
+;118     IN      PTR     pxy2v-vip2.stg2.gnmedia.net.
+;119     IN      PTR     pxy2v-vip3.stg2.gnmedia.net.
+;120     IN      PTR     pxy-xen2.dev1.gnmedia.net.
+;121     IN      PTR     pxy2v.lax1.gnmedia.net. ;decomm
+;122    IN      PTR	pxy2v.lax1 :1	adops
+;123    IN      PTR	pxy2v.lax1 :2	pubops
+;124    IN      PTR	pxy2v.lax1 :3	reports
+;125     IN      PTR     ops-xen2.lax1.gnmedia.net. ;decomm
+;126	IN	PTR	app-fe.sb.lax1.gnmedia.net.
+;127	IN	PTR	app-cms.sb.lax1.gnmedia.net.
+;128	IN	PTR	app-stats-cms.sb.lax1.gnmedia.net.
+;129	IN	PTR	app-stats-fe.sb.lax1.gnmedia.net.
+;130	IN	PTR	app-upl.sb.lax1.gnmedia.net.
+;131	IN	PTR	app-bld.sb.lax1.gnmedia.net.
+;132	IN	PTR	int-vlan10.sb.lax1.gnmedia.net.
+;133	IN	PTR	int-vlan10.sb.lax2.gnmedia.net.
+;134	IN	PTR	vip-app-mb-sdc.ao.stg.lax.gnmedia.net.
+;135	IN	PTR	app-media.sb.lax1.gnmedia.net.
+;136	IN	PTR	test-publishers.springboard.gorillanation.com.
+;137	IN	PTR	qt.lax3.gnmedia.net. ;decomm
+;138	IN	PTR	int-vlan10.legacy.core1.gnmedia.net.
+;139	IN	PTR	app1v-php1.lax1.gnmedia.net. ;decomm
+;140	IN	PTR	app1v-php1.lax2.gnmedia.net. ;decomm
+;141    IN      PTR	vip-pxy-jm.ao.stg.lax.gnmedia.net.
+;142    IN      PTR	pxy2v.lax2 :1	adops
+;143    IN      PTR	pxy2v.lax2 :2	pubops
+;144    IN      PTR	pxy2v.lax2 :3	reports
+;;145	IN	PTR	int-vlan10.legacy.lax3.gnmedia.net.
+;146     IN      PTR     pxy1v.dev1.gnmedia.net.
+;147     IN      PTR     pxy2v.dev1.gnmedia.net.
+;148	IN	PTR	smart-whois.lax3.gnmedia.net.
+;149	IN	PTR	rt.lax3.gnmedia.net. ;decomm
+;150	IN	PTR	domains.gnmedia.net.
+;151	IN	PTR	app-jm.sb.lax1.gnmedia.net. 
+;152	IN	PTR	app-jm.sb.lax2.gnmedia.net.
+;153	IN	PTR	rt2.lax3.gnmedia.net. ;decomm
+;154	IN	PTR	midtail1v.stg1.gnmedia.net. ;decomm
+;155	IN	PTR	natpool-1-vlan10-1.ap.core.gnmedia.net.
+;156	IN	PTR	ace-vlan10-natpool001.core.gnmedia.net.
+;157	IN	PTR	doublehelixnatpool01.lax.gnmedia.net.
+;158	IN	PTR	natpool-1-vlan10-1.doublehelix.core.gnmedia.net.
+159	IN	PTR	natpool-1-vlan10-1.gn1.core.gnmedia.net.
+;160	IN	PTR	acenatpool001.lax.gnmedia.net.
+;161	IN	PTR	natpool-1-vlan10-1.sb.core.gnmedia.net.
+;162	IN	PTR	natpool-1-vlan10-2.sb.core.gnmedia.net.
+;163	IN	PTR	natpool-1-vlan10-3.sb.core.gnmedia.net.
+;164	IN	PTR	natpool-1-vlan10-4.sb.core.gnmedia.net.
+;165	IN	PTR	natpool-1-vlan10-5.sb.core.gnmedia.net.
+;166	IN	PTR	natpool-1-vlan10-6.sb.core.gnmedia.net.
+;167	IN	PTR	natpool-1-vlan10-7.sb.core.gnmedia.net.
+;168	IN	PTR	natpool-1-vlan10-8.sb.core.gnmedia.net.
+;169	IN	PTR	natpool-1-vlan10-9.sb.core.gnmedia.net.
+;170	IN	PTR	int-vlan10.sb.core1.gnmedia.net.
+;171 lax1 py1 vip (ad platform)
+;172 lax1 rb1 vip (ad platform)
+;173 lax2 py1 vip (ad platform)
+;174 lax2 rb1 vip (ad platform)
+;175     IN      PTR     ops3.lax1.gnmedia.net.
+;176     IN      PTR     ops3.lax2.gnmedia.net.
+;177	IN	PTR	int-vlan10.sb.core2.gnmedia.net.
+;178     IN      PTR     pxy1v.sb.lax1.gnmedia.net. ;decomm
+;179     IN      PTR     pxy2v.sb.lax1.gnmedia.net. ;decomm
+;180	IN	PTR	app-fe.sb.lax2.gnmedia.net.
+;181	IN	PTR	app-cms.sb.lax2.gnmedia.net.
+;182	IN	PTR	app-stats-cms.sb.lax2.gnmedia.net.
+;183	IN	PTR	app-stats-fe.sb.lax2.gnmedia.net.
+;184	IN	PTR	app-upl.sb.lax2.gnmedia.net.
+;185	IN	PTR	app-bld.sb.lax2.gnmedia.net.
+;186 	IN	PTR	app-media.sb.lax2.gnmedia.net.
+;187 	IN	PTR	pxy-int.sb.lax1.gnmedia.net.
+;188	IN	PTR	pxy-int.sb.lax2.gnmedia.net.
+;189	IN	PTR	app1v-fe.gn.lax3.gnmedia.net. ;decomm
+;190	IN	PTR	app1v-fe.gn.stg1.gnmedia.net. ;decomm
+;191	IN	PTR	app-hfb.ao.lax1.gnmedia.net. 
+;192	IN	PTR	app-hfb.ao.lax2.gnmedia.net.
+;193	IN	PTR	
+;194	IN	PTR	vip-app-atp.ao.prd.lax.gnmedia.net.
+;;195	IN	PTR	natpool-1-vlan10-1.legacy.lax3.gnmedia.net.
+;196	IN	PTR	xen196.lax3.gnmedia.net. ;decomm
+;197 L4_LB_VIP_POLICY_FE_JM_DEV1 sb.ace1.swx3.gnmedia.net
+;198     IN      PTR     pxy1v.sb.lax2.gnmedia.net. ;decomm
+;199     IN      PTR     pxy2v.sb.lax2.gnmedia.net. ;decomm
+;200     IN      PTR     pxy.lax2.gnmedia.net.
+;201	IN	PTR	dev.joomla.gnmedia.net.
+;202	IN	PTR	
+;203 sherdog.com internal vip
+;204 search.atomiconline.com internal vip 
+;205	IN	PTR	
+;206	IN	PTR	xen-296.lax3.gnmedia.net.
+;207 parascale
+;208 	IN	PTR	vip-app-stats-cms.sbv.prd.lax.gnmedia.net.
+;209	IN	PTR	int-vlan10.sb.ace1.gnmedia.net.
+;210	IN	PTR	pxy3v.sb.lax1.gnmedia.net. ;decomm
+;211	IN	PTR	pxy3v.sb.lax2.gnmedia.net. ;decomm
+;212    IN      PTR     adops.dev1.gorillanation.com.
+;213	IN	PTR	app1v-fe.si.stg1.gnmedia.net. ;decomm
+;214	IN	PTR	app1v.sqlr-poc.gnmedia.net.
+;215	IN	PTR	sql1v.sqlr-poc.gnmedia.net.
+;216	IN	PTR	sql2v.sqlr-poc.gnmedia.net.
+;217 ???
+;218 app1v-php1.lax2 shared vip
+;219 app1v-py1.lax2 shared vip
+;220	IN	PTR	puppet.lax1.gnmedia.net.
+;221	IN	PTR	puppet.lax2.gnmedia.net.
+;222     IN      PTR     ops-xen1.lax3.gnmedia.net. ;decomm
+;223	IN	PTR	app-xen7.lax3.gnmedia.net.
+;224 fs.craveonline.com internal vip
+;225     IN      PTR     app-xen5.lax3.gnmedia.net. ;decomm
+;226     IN      PTR     www1v.lax3.gnmedia.net.
+;227     IN      PTR     ops-xen2.lax3.gnmedia.net. ;decomm
+;228     IN      PTR     sql-mal-ro.lax3.gnmedia.net.
+;229 	IN	PTR	www2v.lax3.gnmedia.net. ;decomm
+;230	IN	PTR	www3v.lax3.gnmedia.net.  ;decomm
+;231	IN	PTR	www4v.lax3.gnmedia.net.  ;decomm
+;232	IN	PTR	www1v.mal.lax3.gnmedia.net.
+;233	IN	PTR	sql1v.mal.lax3.gnmedia.net. ;decomm
+;234	IN	PTR	sql2v.mal.lax3.gnmedia.net. ;decomm
+;235	IN	PTR	sql3v.mal.lax3.gnmedia.net. ;decomm
+;236	IN	PTR	www2v.mal.lax3.gnmedia.net. ;decomm
+;237	IN	PTR	app-xen9.lax3.gnmedia.net. 
+;238	IN	PTR	xen238.lax3.gnmedia.net. ;decomm
+;239	IN	PTR	xen-624.lax3.gnmedia.net. ;decomm
+;240     IN      PTR     pxy1v.lax1.gnmedia.net. ;decomm
+;241     IN      PTR     pxy2v.lax2.gnmedia.net. ;decomm
+;242 pxy1v.lax2 eth0:1 adops
+;243 pxy1v.lax2 eth0:2 pubops
+;244 pxy1v.lax2.eth0:3 reports
+;245 lax1 TE shared env PHP vip
+;246	IN	PTR	mon.lax1.gnmedia.net. ;decomm
+;247	IN	PTR	mon.lax2.gnmedia.net. ;decomm
+;248 lax1 TE shared env python vip
+;249     IN      PTR     pxy1v.lax2.gnmedia.net. ;decomm
+;250     IN      PTR     dev1v.lax3.gnmedia.net. ;decomm
+;251 ???
+;252     IN      PTR     sql4v.mal.lax3.gnmedia.net. ;decomm
+253	IN	PTR	asa-fw2-gi1-1.gnmedia.net.
+254	IN	PTR	asa-fw1-gi1-1.gnmedia.net.
+;255	IN	PTR

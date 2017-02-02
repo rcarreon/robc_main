@@ -1,0 +1,52 @@
+<?php
+/**
+ * Bitwise File
+ *
+ * PHP Version 5.3
+ *
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+namespace CI;
+
+/**
+ * Bitwise Class
+ *
+ * PHP Version 5.3
+ *
+ * @author   Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://www.crowdignite.com
+ */
+class Bitwise
+{
+    public function bit($mNumbers)
+    {
+        $nBit = 0;
+        if(!is_array($mNumbers)) {
+            $mNumbers = array($mNumbers);
+        }
+        foreach ($mNumbers as $nNumber) {
+            if (is_numeric($nNumber)) {
+                $nBit |= 1 << (int) $nNumber;
+            }
+        }
+        return $nBit;
+    }
+
+    public function contains($mNumbers, $nBits)
+    {
+        $bContains = true;
+        if(!is_array($mNumbers)) {
+            $mNumbers = array($mNumbers);
+        }
+        foreach ($mNumbers as $nNumber) {
+            if (!($this->bit($nNumber) & $nBits)) {
+                $bContains = false;
+                break;
+            }
+        }
+        return $bContains;
+    }
+}

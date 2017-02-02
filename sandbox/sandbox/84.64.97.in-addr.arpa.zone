@@ -1,0 +1,22 @@
+$ORIGIN .
+$TTL 86400	; 1 day
+84.64.97.in-addr.arpa	IN SOA	gnmedia.net. root@gnmedia.net. (
+				2015030200 ; serial
+				36262      ; refresh (10 hours 4 minutes 22 seconds)
+				300        ; retry (5 minutes)
+				3600000    ; expire (5 weeks 6 days 16 hours)
+				3600       ; minimum (1 hour)
+				)
+			NS	app1v-dns.tp.prd.lax.gnmedia.net.
+			NS	app2v-dns.tp.prd.lax.gnmedia.net.
+			NS	app3v-dns.tp.prd.lax.gnmedia.net.
+			NS	app4v-dns.tp.prd.lax.gnmedia.net.
+$ORIGIN 84.64.97.in-addr.arpa
+
+
+;1              IN      PTR     vip-app-55-dh.si.stg.lax.gnmedia.net.
+107		IN	PTR	vip-app-ews.si.stg.lax.gnmedia.net.
+105		IN 	PTR	vip-app-dh.si.stg.lax.gnmedia.net.
+102		IN	PTR	vip-app-assets.si.stg.lax.gnmedia.net.
+116             IN      PTR     vip-app-mgmt.og.stg.lax.gnmedia.net.
+118             IN      PTR     vip-app-origin.og.stg.lax.gnmedia.net.

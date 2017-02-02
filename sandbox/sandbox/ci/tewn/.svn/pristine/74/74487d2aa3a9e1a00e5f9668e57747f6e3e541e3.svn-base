@@ -1,0 +1,131 @@
+<?php
+class ContextualEngineControllerTestCase extends CakeTestCase {
+	var $ContextualEngine = null;
+	var $fixtures = array('app.website', 'app.page', 'app.history_page', 'app.contextual_engine', 'app.account', 'app.widget',
+		'app.history_widget_analytic', 'app.history_credit', 'app.history_timer', 'app.widget_analytic', 'app.landing_page_analytic',
+		'app.log', 'app.user', 'app.metric_log', 'app.social_page', 'app.history_social', 'app.tag', 'app.page_tag', 'app.history_landing_page_analytic',
+		'app.landing_page_rebalance', 'app.widget_instance', 'app.history_widget', 'app.widget_rebalance', 'app.widget_rebalance', 'app.website_allowed_tag',
+		'app.settings'
+	);
+	var $page_id = 7293845;
+
+	function startTest() {
+		App::import('Controller', 'ContextualEngine');
+		$this->ContextualEngine = new ContextualEngineController();
+		$this->ContextualEngine->constructClasses();
+		$this->ContextualEngine->Component->initialize($this->Accounts);
+		$this->ContextualEngine->autoRender = false;
+		// $this->ContextualEngine->beforeFilter();
+	}
+
+	function endTest() {
+		unset($this->ContextualEngine);
+		ClassRegistry::flush();
+	}
+
+	function testLoad() {
+		App::import('Model', 'Page');
+
+        $oConfig = new \CI\Config();
+        $this->Sphinx = new \CI\Search\Sphinx($oConfig->get('sphinx'));
+
+		$this->Page = new Page();
+		$this->Page->useDbConfig = 'test_suite';
+
+		/*
+		 * 1. look for a page on mysql.
+		 * 2. make sure that page doesn't exists on sphinx.
+		 * - assert here.
+		 * 3. add it to sphinx.
+		 * 4. look for that page on sphinx.
+		 * - asert  here.
+		 */
+
+		// 1.
+		$page = $this->Page->find('first', array(
+			"fields" => array(
+				'title', 'description', 'website_id', 'domain_bitfield',
+				'category', 'demographic_sex', 'content_rating'
+			),
+			"conditions" => array(
+				"id" => 1
+			)
+		));
+		$page['Page']['id'] = $this->page_id;
+
+		// 2.
+		$this->Sphinx->connect();
+		$result = $this->Sphinx->getMysqlClient()->query("select * from contextual where id = {$this->page_id}");
+		$row = $result->fetch_object();
+		$this->assertTrue(!$row, "Page {$this->page_id} must not exist in sphinx.");
+
+		// 3.
+		$this->ContextualEngine->page_add($page);
+
+		// 4.
+		$result = $this->Sphinx->getMysqlClient()->query("select * from contextual where id = {$this->page_id}");
+		$row = $result->fetch_object();
+		$this->assertTrue($row,"Record {$this->page_id} must exist in sphinx");
+	}
+
+	function testPageRemove() {
+		/*
+		 * 1. look for the page on sphinx to see if it exists (it must exist).
+		 * - assert here.
+		 * 2. Remove the page from sphinx.
+		 * - assert here.
+		 */
+
+		// 1.
+		$this->Sphinx->connect();
+		$result = $this->Sphinx->getMysqlClient()->query("select * from contextual where id = {$this->page_id}");
+		$row = $result->fetch_object();
+		$assert = false;
+		if ($row) {
+			$assert = true;
+		}
+
+		$this->assertTrue($assert, "Page {$this->page_id} must exist in sphinx.");
+
+		// 2.
+		$result = $this->ContextualEngine->page_remove($this->page_id);
+
+		$result = $this->Sphinx->getMysqlClient()->query("select * from contextual where id = {$this->page_id}");
+		$row = $result->fetch_object();
+		$assert = false;
+		if (!$row) {
+			$assert = true;
+		}
+		$this->assertTrue($assert,"Record {$this->page_id} must NOT exist in sphinx");
+	}
+
+	function testQuery() {
+		App::import('Model','Website');
+		$this->Website = new Website();
+		$this->Website->useDbConfig = 'test_suite';
+
+		$website_id = 1;
+		$term = 'Will Ferrell as Bush w/ Jon Stewart';
+		$limit = 1;
+
+		/*
+		 * 1. find a website in mysql.
+		 * - assert here.
+		 * 2. run ContextualEngine->query(...)
+		 * - assert here.
+		 */
+
+		// 1.
+		$website = $this->Website->find('all', array(
+			"conditions" => array(
+				"id" => $website_id
+			)
+		));
+
+		// 2.
+		$result = $this->ContextualEngine->query($term, $website[0], $limit);
+
+		$this->assertTrue(count($result), "We know that the result from ->query(...) must be at least 7 rows...");
+	}
+}
+?>

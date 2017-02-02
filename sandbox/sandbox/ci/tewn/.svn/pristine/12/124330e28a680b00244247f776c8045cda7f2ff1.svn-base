@@ -1,0 +1,385 @@
+/* backend2 - report.js*/
+jQuery(document).ready(function() {
+
+	/* table sorter */
+	jQuery.tablesorter.addParser({
+		id: "commaDigit",
+		is: function(s, table) {
+		var c = table.config;
+		return jQuery.tablesorter.isDigit(s.replace(/,/g, ""), c);
+		},
+		format: function(s) {
+			return jQuery.tablesorter.formatFloat(s.replace(/,/g, ""));
+		},
+		type: "numeric"
+	});
+    $("#website_table").tablesorter({
+		widgets: ['zebra'],
+        widgetZebra: {css: ["NormRow","AltRow"]} // css classes to apply to rows
+    });
+
+
+    /* Date pickers */
+    /*
+	$( "#date_start" ).datepicker({
+		defaultDate: "-7d",
+		changeMonth: true,
+		numberOfMonths: 1,
+		minDate: "-5M",
+		maxDate: "0",
+		onClose: function( selectedDate ) {
+			$( "#date_end" ).datepicker( "option", "minDate", selectedDate );
+		}
+	});
+	$( "#date_end" ).datepicker({
+		defaultDate: "-1d",
+		changeMonth: true,
+		numberOfMonths: 1,
+		minDate: "-5M +3d",
+		maxDate: "0",
+		onClose: function( selectedDate ) {
+			$( "#date_start" ).datepicker( "option", "maxDate", selectedDate );
+		}
+	});*/
+
+	if ($('#date_start').val() == "" ) {
+		$('#date_start').val( Date.parse('today-7').toString("M/d/yyyy") );
+	}
+
+	if ($('#date_end').val() == "" ) {
+		$('#date_end').val( Date.parse('today-1').toString("M/d/yyyy") );
+	}
+
+	jQuery('#date_start, #date_end').daterangepicker( {
+		datepickerOptions: { minDate: Date.parse('-3months'), maxDate: Date.parse('today-1') } ,
+	});
+
+	/* Dropdowns */
+    $(".dropdown dt a").click(function() {
+        $(this).parent().parent().find("dd ul").toggle();
+	});
+
+    $(".dropdown dd ul li a").live('click', function() {
+        var text = $(this).html();
+        $(this).parent().parent().parent().parent().find("dt a span").html(text);
+		$(this).parent().parent().parent().parent().find("dd ul").hide();
+    });
+
+	$('.dropdown_report_names > dd > ul > li > a').live('click', function(){
+		var report_id = $(this).data('id');
+		if (report_id == -1) {
+			$('.dropdown_report_names .selected').text('---');
+		} else {
+			$('#save_report input[name=report_name]').val($(this).text());
+			$('#save_report input[name=report_name]').attr('readonly', 'readonly');
+			$('#report_id').val(report_id);
+			load_report(report_id);
+		}
+		$('.dropdown_save_report_names > dd > ul > li > a[data-id=' + report_id + ']').click();
+	});
+
+	$('.dropdown_save_report_names > dd > ul > li > a').live('click', function(){
+		var input_report_name = $('#save_report input[name=report_name]');
+		var report_id = $(this).data('id');
+
+		if (report_id == -1) {
+			$('.dropdown_save_report_names .selected').text('---');
+			input_report_name.val('');
+			input_report_name.removeAttr('readonly');
+			input_report_name.focus();
+		} else {
+			input_report_name.val($(this).text());
+			input_report_name.attr('readonly', 'readonly');
+		}
+
+		$('#report_id').val(report_id);
+	});
+
+	$('.group .clear_report_input').click(function(){
+		$('.dropdown_save_report_names > dd > ul > li > a[data-id=-1]').click();
+		return false;
+	});
+
+    function getSelectedValue(id) {
+        return $("#" + id).find("dt a span.value").html();
+    }
+
+    $(document).bind('click', function(e) {
+        var $clicked = $(e.target);
+        if (! $clicked.parents().hasClass("dropdown"))
+		$(".dropdown dd ul").hide();
+    });
+
+	/* Change websites/hubs to report */
+	var filterType = $("#filter_type_input");
+	jQuery("a.report_by_website").click(function() {
+		filterType.trigger('attr-change', this);
+		jQuery(".down_bywebsite").show();
+		jQuery("#domain_checkboxes").hide();
+		filterType.attr("value", "byWebsite");
+		jQuery('#website_details').hide();
+		jQuery('#daily_breakdown').show();
+	});
+	jQuery("a.report_by_hub").click(function() {
+		filterType.trigger('attr-change', this);
+		jQuery(".down_bywebsite").hide();
+		jQuery("#domain_checkboxes").show();
+		filterType.attr("value", "byHub");
+		jQuery('#website_details').show();
+		jQuery('#daily_breakdown').show();
+	});
+
+	var chosen = $(".chzn-select");
+	chosen.chosen();
+	chosen.ajaxChosen({
+		method: 'GET',
+		url: '/websites/getaccounts',
+		dataType: 'json'
+	}, function (data) {
+		var terms = {};
+
+		$.each(data, function (i, val) {
+			if (val['Website']['name'] != null && val['Website']['name'] != ''){
+				terms[val['Website']['id']] = val['Website']['name'];
+			}
+		});
+
+		return terms;
+	});
+
+	$('.dropdown_details input, .dropdown_hubs input, .chzn-select').change(function(){
+		$(this).trigger('attr-change', this);
+	});
+
+	$('.down_bywebsite').hide(); // hide Website chosen
+
+	//detect if filter is already set to hub or website
+	//var filters = new Filters("<?php echo isset($data["filter_type"])?$data["filter_type"]:''; ?>");
+
+	$(document).delegate('#filter_type_input, .chzn-select, .dropdown_details input, .dropdown_hubs input', 'attr-change', function(element){
+		if (!$(element).hasClass('.dropdown_report_names') && $('.dropdown_report_names').data('active') == true){
+			$('.dropdown_report_names > dd > ul > li > a[data-id=-1]').click();
+		}
+	});
+});
+
+function run_report_csv(){
+	jQuery("#export_csv").val(1);
+	$('#report_form').attr("action", "/management/export_report_csv");
+	run_report(1);
+}
+
+function load_report(report_id) {
+	$.ajax({
+		type: 'POST',
+		url: '/management/load_report',
+		data: {id: report_id}
+	}).done(function(response) {
+		$('.dropdown_report_names').data('active', false);
+		response = $.parseJSON(response);
+		clean_fields();
+		update_fields(response);
+		$('.dropdown_report_names').data('active', true);
+	});
+}
+
+function clean_fields() {
+	var form = $('#report_form').find('input[type=checkbox]').each(function(){
+		$(this).removeAttr('checked');
+ 	});
+}
+
+function update_fields(response) {
+	for (var property in response) {
+		switch(property) {
+			case 'filter_type' :
+				if (response[property] == 'byHub') {
+					$('#report_form a.report_by_hub').click();
+				} else {
+					$('#report_form a.report_by_website').click();
+				}
+				break;
+			case 'domains' :
+				var domains_list = response[property].split(',');
+				for (var domains in domains_list) {
+					$('#report_form input[value=' + domains_list[domains] + ']').attr('checked','checked');
+				}
+				break;
+			case 'websites':
+			case 'daily_breakdown':
+				$('#report_form input[name=' + property + ']').attr('checked','checked');
+				break;
+			case 'ReportByWebsites':
+				var chosen_html = '<option value=""></option>';
+				for (var website_id in response[property]['website_chosen']) {
+					chosen_html += '<option value="' + website_id + '" selected>' + response[property]['website_chosen'][website_id] + '</option>';
+				}
+				$('#website_chosen').html(chosen_html);
+				$("#website_chosen").trigger("liszt:updated");
+				break;
+		}
+	}
+}
+
+
+function delete_report(report_id) {
+	if (confirm('Are you shure to delete this report?')) {
+		$.ajax({
+			type: "POST",
+			url: "/management/delete_report",
+			dataType: 'json',
+			data: {id : report_id}
+		}).done(function(response) {
+			if (response.hasOwnProperty('error')) {
+				alert(response.error);
+			} else {
+				refresh_report_names();
+			}
+		});
+	}
+}
+
+function save_report() {
+	validate_dates();
+
+	var domain_list = '';
+	$("#domain_checkboxes :checked").each(function() {
+		domain_list = domain_list + $(this).val() + ",";
+	});
+	domain_list = domain_list.substring(0, domain_list.length-1);
+	$("#domains").val(domain_list);
+
+	var report_name = $('#save_report input[name=report_name]').val();
+	if (!report_name || /^\s*$/.test(report_name)) {
+		alert('Empty name not allowed, please verified.');
+		return false;
+	} else {
+		validate_report_name(report_name);
+		$('#report_form input[name=report_name]').val(report_name);
+	}
+
+	if ($('#report_form input[name=report_id]').val() != '-1') {
+		if (!confirm('A report configuration exists with the same name, do you want to overwrite it?')) {
+			return false;
+		}
+	}
+
+	$.ajax({
+		type: "POST",
+		url: "/management/save_report",
+		dataType: 'json',
+		data: $('#report_form').serialize()
+	}).done(function(response) {
+		if (response.error) {
+			$('.report_save_msg').text(response.error).addClass('error').css('display', 'block');
+		} else {
+			refresh_report_names(response.id);
+			$('.report_save_msg').text('Report saved...').addClass('ok').css('display', 'block');
+			setTimeout(cancel_save_report, 1000);
+		}
+	});
+
+	return false;
+}
+
+function validate_report_name(report_name) {
+	$('.dropdown_save_report_names > dd > ul > li > a').each(function(){
+		if ($(this).text().toLowerCase() == report_name.toLowerCase()) {
+			$(this).click();
+			return false;
+		}
+	});
+}
+
+function open_save_report() {
+	$.blockUI({ message: $("#save_report"), css: { top: '30px', width:'350px', height:'auto'} });
+}
+
+function cancel_save_report() {
+	$.unblockUI();
+	$('.report_save_msg').removeClass('ok').removeClass('error').hide();
+}
+
+function refresh_report_names(saved_id) {
+	$.ajax({
+		type: 'POST',
+		dataType: 'json',
+		url: '/management/report_name_list'
+	}).done(function(response){
+		var ul_html = '';
+		var ul_html_2 = '';
+
+		for (var key in response) {
+			var value = response[key][0].toUpperCase() + response[key].substring(1);
+			ul_html += '<li>' +
+				'<img class="left delete-report" src="/img/crowdignite/icon_delete.png" onclick="delete_report(' + key + '); return false;" />' +
+				'<a data-id="' + key + '" href="#">' + value + '</a>' +
+			'</li>';
+
+			ul_html_2 += '<li>' +
+				'<a data-id="' + key + '" href="#">' + value + '</a>' +
+			'</li>';
+		}
+
+		ul_html += '<li>' +
+				'<a data-id="-1" href="#">Clear selection</a>' +
+			'</li>';
+
+		ul_html_2 += '<li>' +
+				'<a data-id="-1" href="#">Clear selection</a>' +
+			'</li>';
+
+		$('.dropdown_report_names dd ul').html(ul_html);
+		$('.dropdown_save_report_names dd ul').html(ul_html_2);
+		$('.dropdown_report_names .selected').text('---');
+		$('.dropdown_save_report_names .selected').text('---');
+
+		if (undefined != saved_id) {
+			$('.dropdown_report_names > dd > ul > li > a[data-id=' + saved_id + ']').click();
+		} else {
+			$('.dropdown_report_names > dd > ul > li > a[data-id=-1]').click();
+		}
+	});
+}
+
+function run_report(export_csv) {
+	var domain_list = "";
+	validate_dates();
+
+	//we check to see if export_csv ==1, if it does then we send the data to the export_report_csv function
+	//if export_csv == 0 then we run the normal report
+	export_csv = typeof(export_csv) != 'undefined' ? export_csv : 0;
+
+	if (export_csv == 0) {
+		$('#report_form').attr("action", "/management/report");
+	} else {
+		$('#report_form').attr("action", "/management/export_report_csv");
+	}
+
+	// Get all the checked checked boxes
+	jQuery("#domain_checkboxes :checked").each(function() {
+		domain_list = domain_list + $(this).val() + ",";
+	});
+
+	// Remove the last commas
+	domain_list = domain_list.substring(0, domain_list.length-1);
+
+	jQuery("#domains").val(domain_list);
+}
+
+/**
+ * Validate the end date to avoid bigger dates than today
+ */
+function validate_dates() {
+	var end_date = Date.parse(jQuery('#date_end').val());
+	var start_date = Date.parse(jQuery('#date_start').val());
+	var yestarday = Date.parse('today-1');
+
+	if (end_date > yestarday) {
+		jQuery('#date_end').val(yestarday.toString("M/d/yyyy"));
+		end_date = yestarday;
+	}
+	if (start_date > end_date) {
+		jQuery('#date_start').val(end_date.toString("M/d/yyyy"));
+	}
+}

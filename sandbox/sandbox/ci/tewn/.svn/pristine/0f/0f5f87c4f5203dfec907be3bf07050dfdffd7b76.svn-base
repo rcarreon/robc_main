@@ -1,0 +1,68 @@
+<?php
+/**
+ * Page model to can use outside of cake code
+ *
+ * PHP Version 5.3
+ *
+ * @category CI
+ * @package  CI_Model_Cake
+ * @author   Julio Rodriguez <julio.rodriguez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+namespace CI\Model\Cake;
+
+/**
+ * Page model to can use outside of cake code
+ *
+ * PHP Version 5.3
+ *
+ * @category CI
+ * @package  CI_Model_Cake
+ * @author   Julio Rodriguez <julio.rodriguez@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+class Page extends \CI\Model\Cake
+{
+    protected $aRequiredMethods = array('find', 'query_read', 'field');
+
+    /**
+     * Get the title of one page
+     *
+     * @param integet $nPageId id page
+     *
+     * @return string the title of the page or empty string if didn't found
+     */
+    public function getTitleById($nPageId)
+    {
+        $sTitle = '';
+
+        if (is_numeric($nPageId) && ((int) $nPageId) > 0) {
+            $this->oModel->field('title', array('id' => $nPageId));
+        }
+
+        return $sTitle;
+    }
+
+    /**
+     * Get all the Page
+     *
+     * @param integet $nPageId id page
+     *
+     * @return Object standard|false
+     */
+    public function getById($nPageId)
+    {
+        if (!is_numeric($nPageId)) {
+            return false;
+        }
+
+        $oPage = $this->oModel->get_by_id($nPageId);
+        $oPage = (object) $oPage['Page'];
+
+        return $oPage;
+    }
+}

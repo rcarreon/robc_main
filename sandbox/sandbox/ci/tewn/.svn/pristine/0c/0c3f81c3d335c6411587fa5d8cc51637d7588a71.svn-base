@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en-gb">
+<head>
+<?
+echo $this->element("chartbeat_start");
+
+if (false === $isIpad)
+{
+    echo '<meta name="viewport" content="width=device-width">';
+}
+
+if ($canonical) {
+	echo '<link rel="canonical" href="'.$canonical.'"/>';
+}
+
+?>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+  <title><? echo $title_for_layout ?></title>
+<?
+	// CSS
+	$html->css('reset', null, null, false);
+	$html->css('text', null, null, false);
+	$html->css('default', null, null, false);
+	$html->css('crowdignite', null, null, false);
+        $html->css(DOMAIN.'/style', null, null, false);
+
+	$javascript->link('jquery', false);
+
+	echo $asset->scripts_for_layout();
+
+	echo $this->element("analytic_outbound_tracker");
+	echo $this->element(DOMAIN."/analytics");
+
+	/* Google asynch GPT header */
+	if( isset($preview_style) ) { // Ads only on Landing pages
+		echo $this->element(DOMAIN."/ads/google_gpt_header");
+	}		
+?>
+<!--[if IE 7]>
+        <link rel="stylesheet" type="text/css" href="/css/thefashionspot/ie7.css">
+<![endif]-->
+
+</head>
+

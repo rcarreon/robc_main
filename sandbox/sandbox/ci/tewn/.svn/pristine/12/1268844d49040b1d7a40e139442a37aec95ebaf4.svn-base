@@ -1,0 +1,14 @@
+<?php
+
+namespace CI\Excel;
+
+class Exception extends \CI\Exception
+{
+    const INCORRECT_NUMBER_COLUMS_ROW = 1;
+    const INVALID_FORMAT              = 2;
+
+    protected $aErrors = array(
+        self::INCORRECT_NUMBER_COLUMS_ROW => "One row don't have the required number of elements",
+        self::INVALID_FORMAT              => "Invalid format in one row"
+    );
+}

@@ -1,0 +1,12 @@
+<html>
+<head>
+</head>
+<body style="margin:0; padding:0;">
+<!-- BEGIN GN Ad Tag for Crowd Ignite - GameRevolution 728x90 ros -->
+<script type="text/javascript">
+if(typeof(gnm_ord)=='undefined') gnm_ord=Math.random()*10000000000000000; if(typeof(gnm_tile) == 'undefined') gnm_tile=1;
+document.write('<scr'+'ipt src="http://n4403ad.doubleclick.net/adj/gn.grcrowdignite.com/ros;sect=ros;mtfInline=true;sz=728x90;dc_ref='+encodeURIComponent(location.href)+';tile='+(gnm_tile++)+';ord='+gnm_ord+'?" type="text/javascript"></scr'+'ipt>');
+</script>
+<!-- END AD TAG -->
+</body>
+</html>

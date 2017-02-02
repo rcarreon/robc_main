@@ -1,0 +1,165 @@
+<?php
+
+use Carbon\Carbon;
+use CI\Asset\Image as AssetImage;
+use CI\Article;
+
+class CustomLandingPageController extends AppController
+{
+    public $uses       = array('CustomLandingPage', 'StatsArticle');
+    public $helpers    = array('Convert');
+    public $components = array('Intersects');
+
+    public function index($article_id)
+    {
+        $this->layout = "";
+        $custom_article = $this->CustomLandingPage->findById($article_id);
+        if (!empty($custom_article)) {
+            App::import('Vendor', 'Carbon', array('file' => 'Carbon.php'));
+            $status     = $custom_article['CustomLandingPage']['status'];
+            $start_date = Carbon::createFromTimestamp($custom_article['CustomLandingPage']['start_at']);
+            $end_date   = Carbon::createFromTimestamp($custom_article['CustomLandingPage']['end_at']);
+            if ($status == Article::STATUS_ACTIVE && Carbon::now()->gte($start_date) && Carbon::now()->lte($end_date)) {
+                $image_assets = new AssetImage();
+                $custom_article['CustomLandingPage']['image_url'] = $image_assets->getUrl(
+                    array(
+                        'page_id' => 'empty',
+                        'type' => AssetImage::URL_FULL,
+                        'image' => $custom_article['CustomLandingPage']['image'],
+                        'extra_parameters' => array(
+                            't' => \Carbon\Carbon::parse($custom_article['CustomLandingPage']['updated'])->timestamp,
+                        )
+                    )
+                );
+                $custom_article['CustomLandingPage']['body_text'] = nl2br($custom_article['CustomLandingPage']['body_text']);
+                $custom_article['CustomLandingPage']['created_date'] = Carbon::createFromTimestamp($custom_article['CustomLandingPage']['created_at'])->format('F j, Y');
+                $custom_article['CustomLandingPage']['intersect_id'] = $this->Intersects->get_id_by_intersect(
+                    array(
+                        'demographic_sex' => $custom_article['CustomLandingPage']['sex'],
+                        'category'        => $custom_article['CustomLandingPage']['category'],
+                        'content_rating'  => $custom_article['CustomLandingPage']['content_rating'],
+                    )
+                );
+                $this->set('article', $custom_article);
+                $landing_settings = array(
+                    "is_home_page" => true,
+                    "limit" => DEFAULT_LANDING_PAGE_GENERAL_LINKS,
+                );
+                $this->set('website_id', $custom_article['CustomLandingPage']['website_id']);
+                $this->set('category_id', $custom_article['CustomLandingPage']['category']);
+                $this->set("landing_settings", json_encode($landing_settings));
+                $this->set('isHomepage', false);
+                $this->set('preview_style', 22);
+
+                $landing_page_component = new \CI\Component\LandingPage();
+                if (!$landing_page_component->isSpider()) {
+                    // track impression on articles queue
+                    App::import('Component', 'QueueKestrel');
+                    $queue_stats = new QueueKestrelComponent("articles");
+                    $queue_stats->push(array(
+                        'id'       => $custom_article['CustomLandingPage']['id'],
+                        'website'  => $custom_article['CustomLandingPage']['website_id'],
+                        'domain'   => DOMAIN_ID,
+                        'category' => $custom_article['CustomLandingPage']['category'],
+                        'date'     => Carbon::now()->timestamp,
+                        'type'     => StatsArticle::TYPE_IMPRESSIONS,
+                    ));
+
+                    $cookie_key = "custom-lp-{$custom_article['CustomLandingPage']['id']}";
+
+                    // increment incoming and credits
+                    if (!isset($_COOKIE[$cookie_key])) {
+                        $this->loadModel('Website');
+                        $this->loadModel('Account');
+
+                        $account_id = $this->Website->field(
+                            'account_id', array('id' => $custom_article['CustomLandingPage']['website_id'])
+                        );
+
+                        /* Update the accounting */
+                        $this->Account->incoming_click($account_id);
+
+                        // This makes sure that if someone clicks a link twice they don't get 2 credits
+                        setcookie($cookie_key, true, time() + DAY_TIMESTAMP);
+                    }
+                }
+            } else {
+                $custom_article = false;
+            }
+        }
+
+        if (empty($custom_article)) {
+            $this->redirect('/');
+            exit;
+        }
+    }
+
+    public function readmore($article_id)
+    {
+        $url = '/';
+        $custom_article = $this->CustomLandingPage->findById($article_id);
+        if (!empty($custom_article)) {
+            App::import('Vendor', 'Carbon', array('file' => 'Carbon.php'));
+            $status     = $custom_article['CustomLandingPage']['status'];
+            $start_date = Carbon::createFromTimestamp($custom_article['CustomLandingPage']['start_at']);
+            $end_date   = Carbon::createFromTimestamp($custom_article['CustomLandingPage']['end_at']);
+            if ($status == Article::STATUS_ACTIVE && Carbon::now()->gte($start_date) && Carbon::now()->lte($end_date)) {
+                $landing_page_component = new \CI\Component\LandingPage();
+                if (!$landing_page_component->isSpider()) {
+                    // track click on articles queue
+                    App::import('Component', 'QueueKestrel');
+                    $queue_stats = new QueueKestrelComponent("articles");
+                    $queue_stats->push(array(
+                        'id'       => $custom_article['CustomLandingPage']['id'],
+                        'website'  => $custom_article['CustomLandingPage']['website_id'],
+                        'domain'   => DOMAIN_ID,
+                        'category' => $custom_article['CustomLandingPage']['category'],
+                        'date'     => Carbon::now()->timestamp,
+                        'type'     => StatsArticle::TYPE_CLICKS,
+                    ));
+                }
+                $url = $custom_article['CustomLandingPage']['readmore_link'];
+            }
+        }
+
+        $this->redirect($url);
+        exit; // exit by redirect
+    }
+
+    public function link($page_key)
+    {
+        $url = '/';
+        $this->loadModel('Page');
+        $this->loadModel('Website');
+        $cache = $this->Page->get_meta_cache($page_key);
+        if ($cache) {
+            $url = $cache['page_url'];
+            $website = $this->Website->findByAccountId($cache['account_id']);
+        } else {
+            if (is_numeric($page_key)) {
+                $page = $this->Page->findById($page_key);
+            } else {
+                $page = $this->Page->findByTitleUrl($page_key);
+            }
+            if (!empty($page['Page'])) {
+                $url = $page['Page']['url'];
+                $website = $this->Website->findById($page['Page']['website_id']);
+            }
+        }
+
+        $component_landing_page = new \CI\Component\LandingPage();
+
+        if ($url !== '/') {
+            $url = $component_landing_page->getUtmUrl($url, $website['Website']);
+        }
+
+        if ($component_landing_page->isIEBrowser() && $url !== '/') {
+            $this->layout = "none";
+            $this->set('link', $url);
+            $this->render('/pages/link');
+        } else {
+            $this->redirect($url);
+            exit;
+        }
+    }
+}

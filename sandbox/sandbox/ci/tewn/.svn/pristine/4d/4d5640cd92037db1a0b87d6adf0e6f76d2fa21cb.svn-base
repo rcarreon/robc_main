@@ -1,0 +1,64 @@
+<?php
+namespace Test\IO;
+use CI\IO\StdOutput;
+
+/**
+ * @group IO
+ */
+class StdOutputTest extends \PHPUnit_Framework_TestCase
+{
+    protected $oStdOutput;
+
+    public function setUp()
+    {
+        $this->oStdOutput = new StdOutput();
+    }
+
+    public function testPutOnlyWithMessage()
+    {
+        $sExpected = "This is a Message" . PHP_EOL;
+        $this->oStdOutput->put('This is a Message');
+
+        $this->expectOutputString($sExpected);
+    }
+
+    public function testPutOnlyWithMessageAndLabel()
+    {
+        $sExpected = "Label-1 This is a Message" . PHP_EOL;
+        $this->oStdOutput->put('This is a Message', 'Label-1');
+
+        $this->expectOutputString($sExpected);
+    }
+
+    public function testInfo()
+    {
+        $sExpected = "\033[1;37m\033[44m[INFO]\033[0m This_is_a_Message" . PHP_EOL;
+        $this->oStdOutput->info('This_is_a_Message');
+
+        $this->expectOutputString($sExpected);
+    }
+
+    public function testError()
+    {
+        $sExpected = "\033[0;30m\033[41m[ERROR]\033[0m This_is_a_Message" . PHP_EOL;
+        $this->oStdOutput->error('This_is_a_Message');
+
+        $this->expectOutputString($sExpected);
+    }
+
+    public function testSuccess()
+    {
+        $sExpected = "\033[0;30m\033[42m[SUCCESS]\033[0m This_is_a_Message" . PHP_EOL;
+        $this->oStdOutput->success('This_is_a_Message');
+
+        $this->expectOutputString($sExpected);
+    }
+
+    public function testWarning()
+    {
+        $sExpected = "\033[1;33m\033[40m[WARNING]\033[0m This_is_a_Message" . PHP_EOL;
+        $this->oStdOutput->warning('This_is_a_Message');
+
+        $this->expectOutputString($sExpected);
+    }
+}

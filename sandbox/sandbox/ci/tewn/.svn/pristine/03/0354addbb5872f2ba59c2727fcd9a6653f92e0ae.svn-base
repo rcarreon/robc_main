@@ -1,0 +1,92 @@
+<?php
+
+namespace CI\Validator\Excel;
+
+class Settings extends \CI\Validator\Rule
+{
+    const INVALID_CONFIG = 'invalidConfig';
+    const INVALID_OPTION = 'invalidOption';
+    const INVALID_FORMAT = 'invalidFormat';
+
+    protected $aParentSettings = array();
+
+    protected $aMessageTemplates = array(
+        self::INVALID_CONFIG  => "Invalid config: [%value%]",
+        self::INVALID_OPTION  => "Invalid option on: [%value%]",
+        self::INVALID_FORMAT  => "Invalid format on: [%value%]",
+    );
+
+    public function __construct()
+    {
+        $this->aParentSettings = array(
+            \CI\Excel\Settings::DOCUMENT => \CI\Excel\Settings::DOCUMENT,
+            \CI\Excel\Settings::SHEETS => \CI\Excel\Settings::SHEETS
+        );
+    }
+
+    public function isValid($mValue)
+    {
+        $bReturn = true;
+        $this->setValue($mValue);
+
+        foreach ($mValue as $sNameConfig => $aConfig) {
+            if (!$this->validConfig($sNameConfig)) {
+                $bReturn = false;
+                $this->error(self::INVALID_CONFIG);
+            }
+
+            switch ($sNameConfig) {
+                case \CI\Excel\Settings::DOCUMENT:
+                    if (!$this->validOptionsAndFormats($aConfig)) {
+                        $bReturn = false;
+                    }
+                    break;
+                case \CI\Excel\Settings::SHEETS:
+                    foreach ($aConfig as $SheetsOrColums) {
+                        if (!$this->validOptionsAndFormats($SheetsOrColums)) {
+                            $bReturn = false;
+                        }
+                    }
+                    break;
+            }
+        }
+
+        return $bReturn;
+    }
+
+    protected function validOptionsAndFormats($aConfig)
+    {
+        $bReturn  = true;
+        $oFormats = new \CI\Validator\Excel\Formats();
+        $oOptions = new \CI\Validator\Excel\Options();
+
+        foreach ($aConfig as $sOption => $mValue) {
+            if ($sOption == \CI\Excel\Settings::OPTION_COLUMNS) {
+                foreach ($mValue as $aColumConf) {
+                    if (!$this->validOptionsAndFormats($aColumConf)) {
+                        $bReturn = false;
+                    }
+                }
+            } else {
+                if (!$oOptions->isValid($sOption)) {
+                    $bReturn = false;
+                    $this->error(self::INVALID_OPTION);
+                }
+
+                if (\CI\Excel\Settings::OPTION_FORMAT == $sOption && !$oFormats->isValid($mValue)) {
+                    $bReturn = false;
+                    $this->error(self::INVALID_FORMAT);
+
+                }
+            }
+        }
+
+        return $bReturn;
+    }
+
+    protected function validConfig($sName)
+    {
+        return isset($this->aParentSettings[$sName]);
+
+    }
+}

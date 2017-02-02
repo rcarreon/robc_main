@@ -1,0 +1,82 @@
+<?php
+
+namespace Test\Validator\LandingPage;
+use CI\Validator\LandingPage\Intersect;
+
+class IntersectTest extends \PHPUnit_Framework_TestCase
+{
+    protected $oValidator;
+
+    public function setUp()
+    {
+        $this->oValidator = new Intersect();
+    }
+
+    public function testIsValidWithOuthCategory()
+    {
+        $bExpected  = false;
+        $aExpected  = array('emptyCategory' => 'The intersect don\'t have category');
+        $aIntersect = array(
+            'categories'      => null,
+            'demographic_sex' => 2,
+            'content_rating'  => 1
+        );
+        $bResult = $this->oValidator->isValid($aIntersect);
+        $aResult = $this->oValidator->getMessages();
+
+        $this->assertEquals($bExpected, $bResult);
+        $this->assertEquals($aExpected, $aResult);
+    }
+
+    public function testIsValidWithOuthDemographicSex()
+    {
+        $bExpected  = false;
+        $aExpected  = array('emptyDemographicSex' => 'The intersect don\'t have demographic sex');
+        $aIntersect = array(
+            'categories'      => 2,
+            'demographic_sex' => null,
+            'content_rating'  => 1
+        );
+        $bResult = $this->oValidator->isValid($aIntersect);
+        $aResult = $this->oValidator->getMessages();
+
+        $this->assertEquals($bExpected, $bResult);
+        $this->assertEquals($aExpected, $aResult);
+    }
+
+    public function testIsValidWithOuthContentRaiting()
+    {
+        $bExpected  = false;
+        $aExpected  = array('emptyContentRating' => 'The intersect don\'t have comtent rating');
+        $aIntersect = array(
+            'categories'      => 2,
+            'demographic_sex' => 0,
+            'content_rating'  => null
+        );
+        $bResult = $this->oValidator->isValid($aIntersect);
+        $aResult = $this->oValidator->getMessages();
+
+        $this->assertEquals($bExpected, $bResult);
+        $this->assertEquals($aExpected, $aResult);
+    }
+
+    public function testIsValidWithOuthAllOptions()
+    {
+        $bExpected  = false;
+        $aExpected  = array(
+            'emptyContentRating'  => 'The intersect don\'t have comtent rating',
+            'emptyDemographicSex' => 'The intersect don\'t have demographic sex',
+            'emptyCategory'       => 'The intersect don\'t have category'
+        );
+        $aIntersect = array(
+            'categories'      => null,
+            'demographic_sex' => null,
+            'content_rating'  => null
+        );
+        $bResult = $this->oValidator->isValid($aIntersect);
+        $aResult = $this->oValidator->getMessages();
+
+        $this->assertEquals($bExpected, $bResult);
+        $this->assertEquals($aExpected, $aResult);
+    }
+}

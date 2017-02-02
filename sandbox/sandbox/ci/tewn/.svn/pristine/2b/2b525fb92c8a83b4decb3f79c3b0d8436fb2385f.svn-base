@@ -1,0 +1,19 @@
+<?php
+
+namespace Test\Geo\Adapter;
+
+/**
+ * @group Geo
+ * @group Adapter
+ */
+class MaxMindTest extends \PHPUnit_Framework_TestCase
+{
+    public function testGetCountryShouldReturnIso()
+    {
+        $sIp = '13.123.123.123';
+        $sExpected = 'US';
+        $oMaxMind  = new \CI\Geo\Adapter\MaxMind();
+
+        $this->assertEquals($sExpected, $oMaxMind->getCountry($sIp));
+    }
+}

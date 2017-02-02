@@ -1,0 +1,51 @@
+<style>
+/* Grid */
+
+.grid_12, .container_12 > .grid_7, .container_12 > .grid_5 {
+	width: 940px;
+}
+
+.container_12 .grid_12 {
+	width: 960px;
+}
+
+.container_12 .grid_7 {
+	width: 960px;
+}
+.container_12 .grid_5 {
+	width: 940px;
+	margin-left: 10px;
+}
+
+.grid_7 .grid_7, .grid_5 .grid_5 {
+	width: 200px;
+	float: left;
+}
+
+.grid_7 .grid_7, .grid_5 .grid_5 img {
+	width: 200px;
+	margin-left:auto;
+	margin-right:auto;
+}
+
+.image {
+	width: auto;
+	margin-left: auto;
+	margin-right: auto;
+}
+
+#links_content {
+        background:#fff;
+	margin-left: 5px;
+	-moz-border-radius: 6px 6px 0 0;
+	-webkit-border-radius: 6px 6px 0 0;
+	border-radius:6px 6px 0 0;
+	padding-bottom: 10px;
+	padding-top: 10px;
+	margin-top: 5px;
+}
+
+.item {
+	margin-right: 0px;
+ }
+</style>

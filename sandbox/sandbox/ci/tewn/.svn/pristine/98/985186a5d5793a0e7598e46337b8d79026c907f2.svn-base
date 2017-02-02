@@ -1,0 +1,149 @@
+<?php
+/* Management Test cases generated on: 2011-12-05 19:12:43 : 1323135283*/
+
+class ManagementControllerTestCase extends CakeTestCase {
+	var $fixtures = array(
+		'app.user', 'app.log', 'app.account', 'app.website', 'app.widget', 'app.page', 'app.history_timer',
+		'app.analytic', 'app.landing_page_analytic', 'app.widget_analytic', 'app.widget_instance',
+		'app.landing_page_instance', 'app.similar_engine', 'app.compete_store', 'landing_page_rebalance',
+		'widget_rebalance', 'metric_log', 'social_page', 'app.tag', 'app.page_tag', 'app.settings'
+	);
+
+	function startTest() {
+		App::import('Controller', 'Management');
+		$this->Management = new ManagementController();
+		$this->Management->constructClasses();
+		$this->Management->autoRender = false;
+	}
+
+	function endTest() {
+		unset($this->Management);
+		ClassRegistry::flush();
+	}
+
+	function testIndex() {
+
+	}
+
+	function testWidget() {
+
+	}
+
+	function testEngine() {
+
+	}
+
+	function testAccount() {
+
+	}
+
+	function testCredit() {
+
+	}
+
+	function testLoadWidgetsByWebsite() {
+
+	}
+
+	function testWebsite() {
+
+	}
+
+	function testWebsiteLog() {
+
+	}
+
+	function testPageSearch() {
+
+	}
+
+	function testPage() {
+
+	}
+
+	function testPageNeedsAttention() {
+
+	}
+
+	function testLandingPage() {
+
+	}
+
+	function testLandingPageEngine() {
+
+	}
+
+	function testReport() {
+
+	}
+
+	function testWidgetAnalytic() {
+
+	}
+
+	function testLandingPageAnalytic() {
+
+	}
+
+	function testWidgetAnalyticsWebsite() {
+
+	}
+
+	function testBd() {
+
+	}
+
+	function testBdChart() {
+
+	}
+
+	function testCompete() {
+
+	}
+
+	function testInventory() {
+
+	}
+
+	function testHome() {
+
+	}
+
+	function testMemcached() {
+
+	}
+
+	function testHelp() {
+
+	}
+
+	function testCache() {
+
+	}
+
+	function testValidateAdmin() {
+
+	}
+
+	function testIsFullAdmin() {
+
+	}
+
+	function testIsDomainAdmin() {
+
+	}
+
+	function testUser() {
+
+	}
+
+	function testUserEditProfile() {
+
+	}
+
+	function testUserResetPasswd() {
+
+	}
+
+}
+?>

@@ -1,0 +1,22 @@
+<?php
+
+namespace CI\Chart\Cache;
+use CI\Chart\Cache;
+
+class Account extends Cache
+{
+    protected function getKeyAllStatsFromDate($sDate)
+    {
+        return "account_chart_credit::".$sDate;
+    }
+
+    protected function getKeyDomainStatsFromDate($sDate, $nDomainId)
+    {
+        return "account_chart_domain_credit::".$sDate.":".$nDomainId;
+    }
+
+    protected function getKeyStatsFromDate($sDate, $nId)
+    {
+        return "account_stats_credit::".$nId.":".$sDate;
+    }
+}

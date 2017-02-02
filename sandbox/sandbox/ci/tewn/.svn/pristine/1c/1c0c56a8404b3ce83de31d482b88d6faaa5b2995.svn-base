@@ -1,0 +1,22 @@
+<?php
+    $javascript->link('bootstrap/ci/sidebar.js', false);
+ ?>
+<ul class="nav nav-sidebar" id="<?php echo $component_data['options']['id'];?>">
+    <li class="title">
+        <h2>
+        <span class="glyphicon <?php echo $component_data['options']['icon'];?>"></span> <?php echo $component_data['options']['title'];?>
+        </h2>
+    </li>
+    <li <?php if(in_array(\CI\Hub::DOMAIN_ID_ALL, $component_data['options']['hub_ids'])) { echo 'class="active"'; } ?>>
+        <a class="all" href="#all" data-type="hubs" data-id="<?php echo \CI\Hub::DOMAIN_ID_ALL;?>">All</a>
+    </li>
+    <?php
+        foreach ($component_data['list'] as $domain_id =>  $domain) :
+    ?>
+    <li>
+        <a class="<?php echo $domain['slug']; ?>" href="#<?php echo $domain['slug']; ?>" data-type="hubs" data-id="<?php echo $domain_id;?>"><?php echo $domain['name'];?></a>
+    </li>
+    <?php
+        endforeach;
+    ?>
+</ul>

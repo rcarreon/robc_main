@@ -1,0 +1,21 @@
+<?php
+App::import('Component', 'CIHubs');
+
+class CIHubsSidebarComponent extends CIHubsComponent
+{
+    protected function initView()
+    {
+        $this->view = 'components/hubs/sidebar';
+    }
+
+    public function setAllActiveHubs() {
+        parent::setAllActiveHubs();
+
+        foreach ($this->aHubs as $nId => $hub_name) {
+            $this->aHubs[$nId] = array(
+                'name' => $hub_name,
+                'slug' => str_replace(array(' ', 'ñ'), array('-', 'n'), strtolower($hub_name)),
+            );
+        }
+    }
+}

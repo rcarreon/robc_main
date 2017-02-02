@@ -1,0 +1,194 @@
+<?php
+
+namespace CI\Test\Memcached;
+
+use CI\Memcached\KeyGen;
+
+/**
+ * @group memcached
+ */
+class KeyGenTest extends \PHPUnit_Framework_TestCase
+{
+
+    public function testSimpleValueKey()
+    {
+        $sExpected = 'test::1';
+        $nValue    = 1;
+        $oKeyGen   = new KeyGen($nValue, 'test');
+        $sResult   = $oKeyGen->generate();
+
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testLandingPageSeedKey()
+    {
+        $sExpected = 'lp_seed::3:2:1';
+        $aValues = array(
+            0 => 3,
+            1 => 2,
+            2 => 1,
+        );
+        $oKeyGen = new KeyGen($aValues, 'lp_seed');
+        $sResult = $oKeyGen->generate();
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testLandingPageGeneralWithNullKey()
+    {
+        $sExpected = 'lp_general::072932166fa158bfd7382b72250cce1b';
+        $aValues = array(
+            0 => 3,
+            1 => 2,
+            2 => '1',
+            3 => 8519,
+            4 => NULL,
+            5 => '4071-14940-16471',
+            6 => '0044e37d2bb05249106d33842bffaf1d',
+            7 => '397353471',
+        );
+        $oKeyGen = new KeyGen($aValues, 'lp_general');
+        $sResult = $oKeyGen->generate();
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testLandingPageGeneralWithArrayKey()
+    {
+        $sExpected = 'lp_general::072932166fa158bfd7382b72250cce1b';
+        $aValues = array(
+            0 => 3,
+            1 => 2,
+            2 => '1',
+            3 => 8519,
+            4 => NULL,
+            5 => array(4071, 14940, 16471),
+            6 => '0044e37d2bb05249106d33842bffaf1d',
+            7 => '397353471',
+        );
+        $oKeyGen = new KeyGen($aValues, 'lp_general');
+        $sResult = $oKeyGen->generate();
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testLandingPageGeneralWithLongValuesKey()
+    {
+        $sExpected = 'lp_general::342950a4421f709ab10d377202a20bc8';
+        $aValues = array(
+            0 => 536870918,
+            1 => 4,
+            2 => '1',
+            3 => 1934,
+            4 => 37,
+            5 => array(445,539,677,687,1509,1605,1607,1637,1733,1755,1831,1897,2747,2933,3717,3891,4757,5451,6825,7699,8310,9396,10992,11458,11624,12052,15458,15648,16749,16809,17183,17721,19055,19093,20537,20895,26009,32601,32605,33835,34463,35619,35621),
+            6 => NULL,
+            7 => '499719313',
+        );
+        $oKeyGen = new KeyGen($aValues, 'lp_general');
+        $sResult = $oKeyGen->generate();
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testLandingPageGeneralWithLongValuesAndVersionKey()
+    {
+        $sExpected = 'lp_general::342950a4421f709ab10d377202a20bc8:v1';
+        $aValues = array(
+            0 => 536870918,
+            1 => 4,
+            2 => '1',
+            3 => 1934,
+            4 => 37,
+            5 => array(445,539,677,687,1509,1605,1607,1637,1733,1755,1831,1897,2747,2933,3717,3891,4757,5451,6825,7699,8310,9396,10992,11458,11624,12052,15458,15648,16749,16809,17183,17721,19055,19093,20537,20895,26009,32601,32605,33835,34463,35619,35621),
+            6 => NULL,
+            7 => '499719313',
+        );
+        $oKeyGen = new KeyGen($aValues, 'lp_general', 1);
+        $sResult = $oKeyGen->generate();
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testLandingPageNumChunksKey()
+    {
+        $sExpected = 'lp_chunks::3:2:8519:v4';
+        $aValues = array(
+            0 => 3,
+            1 => 2,
+            2 => 8519,
+        );
+        $oKeyGen = new KeyGen($aValues, 'lp_chunks', 4);
+        $sResult = $oKeyGen->generate();
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testLandingPageChunkNumKey()
+    {
+        $sExpected = 'lp_chunk::3:2:8519:0:v4';
+        $aValues = array(
+            0 => 3,
+            1 => 2,
+            2 => 8519,
+            3 => 0,
+        );
+        $oKeyGen = new KeyGen($aValues, 'lp_chunk', 4);
+        $sResult = $oKeyGen->generate();
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testLandingPageFeaturedWithNullKey()
+    {
+        $sExpected = 'lp_featured::072932166fa158bfd7382b72250cce1b';
+        $aValues = array(
+            0 => 3,
+            1 => 2,
+            2 => '1',
+            3 => 8519,
+            4 => NULL,
+            5 => '4071-14940-16471',
+            6 => '0044e37d2bb05249106d33842bffaf1d',
+            7 => '397353471',
+        );
+        $oKeyGen = new KeyGen($aValues, 'lp_featured');
+        $sResult = $oKeyGen->generate();
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetValuesShouldReturnTheSetValues()
+    {
+        $aExpected = array(
+            0 => 3,
+            1 => 2,
+            2 => '1',
+            3 => 8519,
+            4 => NULL,
+            5 => '4071-14940-16471',
+            6 => '0044e37d2bb05249106d33842bffaf1d',
+            7 => '397353471',
+        );
+
+        $oKeyGen = new KeyGen();
+        $oKeyGen->setValues($aExpected);
+        $aResult = $oKeyGen->getValues();
+
+        $this->assertEquals($aExpected, $aResult);
+    }
+
+    public function testGetNameShouldReturnTheSetName()
+    {
+        $sExpected = 'lg_general';
+
+        $oKeyGen = new KeyGen();
+        $oKeyGen->setName($sExpected);
+        $sResult = $oKeyGen->getName();
+
+        $this->assertEquals($sExpected, $sResult);
+    }
+
+    public function testGetVersionShouldReturnTheSetVersion()
+    {
+        $nExpected = 4;
+
+        $oKeyGen = new KeyGen();
+        $oKeyGen->setVersion($nExpected);
+        $nResult = $oKeyGen->getVersion();
+
+        $this->assertEquals($nExpected, $nResult);
+    }
+}

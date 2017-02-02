@@ -1,0 +1,56 @@
+<?php
+namespace Test\Error;
+
+use CI\Error\Formatter\PlainText;
+
+/**
+ * @group error
+ * @group error_formatter
+ */
+class PlainTextTest extends \PHPUnit_Framework_TestCase
+{
+    public function test_backtrace_entry_should_be_present_in_the_output_in_the_expected_format()
+    {
+        $backtrace = array (
+            array (
+                'file' => '/var/www/tewn/public_html/app/global_defines.php',
+                'line' => 1273,
+                'function' => 'plain_error_info',
+                'args' => array (
+                    0 => 0,
+                ),
+            ),
+            array (
+                'file' => '/var/www/tewn/public_html/app/controllers/pages_controller.php',
+                'line' => 890,
+                'function' => 'plat_assert',
+                'args' => array (
+                    0 => 'asdf',
+                ),
+            )
+        );
+        $fixture = array(
+            array(
+                'index' => 0,
+                'occurrences' => 1,
+                'url' => 'www',
+                'referer' => '',
+                'pid' => 1,
+                'server' => 'localhost',
+                'ip' => 'localhost',
+                'backtrace' => $backtrace
+            )
+        );
+        $formatter = new PlainText();
+        $formatter->setErrors($fixture);
+
+        $actual = $formatter->getErrors();
+
+        $this->assertContains($fixture[0]['backtrace'][0]['function'],$actual);
+        $this->assertContains($fixture[0]['backtrace'][0]['file'],$actual);
+        $this->assertContains($fixture[0]['backtrace'][0]['function'],$actual);
+        $this->assertContains($fixture[0]['backtrace'][1]['function'],$actual);
+        $this->assertContains($fixture[0]['backtrace'][1]['file'],$actual);
+        $this->assertContains("(Line: {$fixture[0]['backtrace'][1]['line']})",$actual);
+    }
+}

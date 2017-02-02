@@ -1,0 +1,132 @@
+/* backend2 - report.js*/
+jQuery(document).ready(function() { 						   
+
+	/* table sorter */
+	jQuery.tablesorter.addParser({
+		id: "commaDigit",
+		is: function(s, table) {
+		var c = table.config;
+		return jQuery.tablesorter.isDigit(s.replace(/,/g, ""), c);
+		},
+		format: function(s) {
+			return jQuery.tablesorter.formatFloat(s.replace(/,/g, ""));
+		},
+		type: "numeric"
+	});    
+    $("#website_table").tablesorter();
+
+
+    /* Date pickers */
+	$( "#date_start" ).datepicker({
+		showOn: "both",
+		defaultDate: "-7d",
+		changeMonth: true,
+		numberOfMonths: 1,
+		minDate: "-5M",
+		maxDate: "0",		
+		onClose: function( selectedDate ) {
+			$( "#date_end" ).datepicker( "option", "minDate", selectedDate );
+		}
+	});
+	$( "#date_end" ).datepicker({
+		showOn: "both",
+		defaultDate: "-1d",
+		changeMonth: true,
+		numberOfMonths: 1,
+		minDate: "-5M +3d",
+		maxDate: "0",		
+		onClose: function( selectedDate ) {
+			$( "#date_start" ).datepicker( "option", "maxDate", selectedDate );
+		}
+	});
+
+
+	/* Dropdowns */
+    $(".dropdown dt a").click(function() {
+        $(this).parent().parent().find("dd ul").toggle();
+    });
+                
+    $(".dropdown dd ul li a").click(function() {
+        var text = $(this).html();        
+        $(this).parent().parent().parent().parent().find("dt a span").html(text);
+       	$(this).parent().parent().parent().parent().find("dd ul").hide();        	
+    });
+    
+    function getSelectedValue(id) {
+        return $("#" + id).find("dt a span.value").html();
+    }
+
+    $(document).bind('click', function(e) {
+        var $clicked = $(e.target);
+        if (! $clicked.parents().hasClass("dropdown"))
+        	$(".dropdown dd ul").hide();
+    });
+
+	/* Change websites/hubs to report */
+	var filterType = $("input[name=filter_type]");
+	jQuery("a.report_by_website").click(function() {	    
+		jQuery(".down_bywebsite").show();
+		jQuery("#domain_checkboxes").hide();
+		filterType.attr("value", "byWebsite");
+		jQuery('#website_details').hide();
+		jQuery('#daily_breakdown').show();
+	});
+	jQuery("a.report_by_hub").click(function() {	    
+		jQuery(".down_bywebsite").hide();
+		jQuery("#domain_checkboxes").show();
+		filterType.attr("value", "byHub");
+		jQuery('#website_details').show();
+		jQuery('#daily_breakdown').show();
+	});	
+
+	var Chosen = $(".chzn-select");
+	Chosen.ajaxChosen({
+		method: 'GET',
+		url: '/websites/getaccounts',
+		dataType: 'json'
+	}, function (data) {
+		var terms = {};
+
+		$.each(data, function (i, val) {
+			terms[val['Website']['id']] = val['Website']['name'];
+		});
+
+		return terms;
+	})
+
+	$('.down_bywebsite').hide(); // hide Website chosen
+
+	//detect if filter is already set to hub or website
+	//var filters = new Filters("<?php echo isset($data["filter_type"])?$data["filter_type"]:''; ?>");
+});
+
+function run_report_csv(){
+	jQuery("#export_csv").val(1);
+	$('#report_form').attr("action", "/management/export_report_csv");
+	run_report(1);
+}
+
+function run_report(export_csv) {
+	var domain_list = "";
+	
+	//we check to see if export_csv ==1, if it does then we send the data to the export_report_csv function
+	//if export_csv == 0 then we run the normal report 
+	export_csv = typeof(export_csv) != 'undefined' ? export_csv : 0;
+	
+	if (export_csv == 0) {
+		$('#report_form').attr("action", "/management/report");
+	} else {
+		$('#report_form').attr("action", "/management/export_report_csv");
+	}
+	
+	
+	// Get all the checked checked boxes
+	jQuery("#domain_checkboxes :checked").each(function() {
+		domain_list = domain_list + $(this).val() + ",";
+	});
+
+	// Remove the last commas
+	domain_list = domain_list.substring(0, domain_list.length-1);
+
+	jQuery("#domains").val(domain_list);
+}

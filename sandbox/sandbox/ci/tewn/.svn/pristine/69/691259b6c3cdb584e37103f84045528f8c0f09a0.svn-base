@@ -1,0 +1,102 @@
+<?php
+    $html->css('bootstrap/external/selectize.css', 'stylesheet', null, false);
+    $html->css('bootstrap/external/selectize.bootstrap3.css', 'stylesheet', null, false);
+
+    $javascript->link('bootstrap/external/jquery.tablesorter', false);
+    $javascript->link('bootstrap/external/handlebars-v1.3.0', false);
+    $javascript->link('bootstrap/external/selectize.js', false);
+    $javascript->link('bootstrap/admin/tags', false);
+?>
+<div class="container right-content">
+    <?php echo $breadcrumbs_component;?>
+    <div class="row" id="table-tags">
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <nav>
+                <ul class="pager">
+                    <li class="previous hidden">
+                        <a href="#"><span aria-hidden="true">&larr;</span> Previous</a>
+                    </li>
+                    <li class="next hidden">
+                        <a href="#">Next <span aria-hidden="true">&rarr;</span></a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="modal-edit" tabindex="-1" role="dialog" aria-labelledby="modal-edit-tag" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+            <span class="sr-only">Close</span>
+        </button>
+        <h4 class="modal-title" id="modal-edit-tag">Edit Tag</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <label for="tag-name" class="control-label">Name:</label>
+            <input type="text" class="form-control" name="name">
+            <input type="hidden" name="id" value="43">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-update" data-loading-text="Saving...">Update</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modal-delete" tabindex="-1" role="dialog" aria-labelledby="modal-delete-tag" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+            <span class="sr-only">Close</span>
+        </button>
+        <h4 class="modal-title" id="modal-delete-tag">Delete Tag</h4>
+      </div>
+      <div class="modal-body">
+        Are you sure to delete the tag ?
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary btn-delete" data-loading-text="Deleting...">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="modal-transfer" tabindex="-1" role="dialog" aria-labelledby="modal-transfer-tag" aria-hidden="true">
+  <div class="modal-dialog modal-sm">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">
+            <span aria-hidden="true">&times;</span>
+            <span class="sr-only">Close</span>
+        </button>
+        <h4 class="modal-title" id="modal-transfer-tag">Transfer tag</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+            <label>Move tag to:</label>
+            <select id="select-tag" class="selectized" placeholder="Find a tag..." tabindex="-1" >
+            </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary btn-move-to" disabled="disabled" data-loading-text="Saving...">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<?php echo $this->element('tags/tpl_tags'); ?>
+<?php echo $this->element('tpl_error'); ?>

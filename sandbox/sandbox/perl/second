@@ -1,0 +1,22 @@
+#!/usr/bin/perl
+
+$line = <STDIN>;
+if ($line eq "\n") {
+  print "That was just a blank line!\n";
+  die ("exit due a blank line \n");
+} else {
+  print "That line of input was: $line";
+}
+
+
+$n = 1;
+while ($n < 10) {
+  $sum += $n;
+  $n += 2; # On to the next odd number
+}
+
+print "The total was $sum.\n";
+#concatanation
+print "suma of all" . "$sum\n";
+
+

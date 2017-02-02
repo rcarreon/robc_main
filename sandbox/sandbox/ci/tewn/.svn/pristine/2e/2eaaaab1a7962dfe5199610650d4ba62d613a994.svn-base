@@ -1,0 +1,179 @@
+<?php
+
+namespace CI\Validator;
+
+class Options extends Rule
+{
+    /**
+     * Configuration options with field => options
+     * example ['id' => 'numeric']
+     * @var array
+     */
+    private $_aOptions = array();
+
+    /**
+     * The field that is proccesing
+     * @var string
+     */
+    protected $sField = '';
+
+    /**
+     * The param option that is proccesing
+     * @var string
+     */
+    protected $sParam = '';
+
+    /**
+     * The message variables used when creating errors
+     * @var array
+     */
+    protected $aMessageVariables = array(
+        'field' => 'sField',
+        'param' => 'sParam',
+    );
+
+    /**
+     * constants for message templates
+     */
+    const NUMERIC     = 'numeric';
+    const STRING      = 'string';
+    const OPTION      = 'not_option';
+    const EXISTS      = 'required';
+    const ARRAY_LIST  = 'array';
+    const GREATER     = 'gt';
+    const STRING_DATE = 'string_date';
+
+    /**
+     * @var array
+     */
+    protected $aMessageTemplates = array(
+        self::NUMERIC     => "The field '%field%' (%value%) is not numeric",
+        self::GREATER     => "The field '%field%' (%value%) is not greater than %param%",
+        self::STRING      => "The field '%field%' (%value%) is not string",
+        self::ARRAY_LIST  => "The field '%field%' (%value%) is not an array",
+        self::OPTION      => "The option [%value%] is unknown",
+        self::EXISTS      => "The field '%field%' is required",
+        self::STRING_DATE => "The field '%field%' (%value%)' is not a string date with format %param%",
+    );
+
+    /**
+     * Construct the rule and could set the options to validate
+     * @param array $aOptions Optional setting the options
+     */
+    public function __construct(array $aOptions = array())
+    {
+        $this->setOptions($aOptions);
+    }
+
+    /**
+     * Sets the options to validate
+     * @param array $aOptions The field => option array
+     */
+    public function setOptions(array $aOptions)
+    {
+        $this->_aOptions = $aOptions;
+    }
+
+    /**
+     * Process and validates a value
+     *
+     * @param array $aValue Array of fields to be processed
+     *
+     * @return boolean True if the value passes the validation
+     */
+    public function isValid($aValue)
+    {
+        $this->setValue($aValue);
+        foreach ($this->_aOptions as $sField => $sOptions) {
+            $aOptions = explode('|', $sOptions);
+            foreach ($aOptions as $sOption) {
+                if (!$this->_validateOption($sOption, $sField)) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Validates an option
+     *
+     * @param string $sOption The option to validate
+     * @param mixed  $sField  The field to get the value
+     *
+     * @return boolean True if it validates, False if not
+     */
+    private function _validateOption($sOption, $sField)
+    {
+        $bValid = true;
+        list($sOption, $sParam) = $this->_getOptionParam($sOption);
+
+        $this->sField = $sField;
+        $this->sParam = $sParam;
+
+        switch ($sOption) {
+            case self::EXISTS:
+                if (!array_key_exists($sField, $this->value)) {
+                    $this->error(self::EXISTS);
+                    $bValid = false;
+                }
+                break;
+            case self::NUMERIC:
+                if (isset($this->value[$sField]) && !is_numeric($this->value[$sField])) {
+                    $this->error(self::NUMERIC, $this->value[$sField]);
+                    $bValid = false;
+                }
+                break;
+            case self::STRING:
+                if (isset($this->value[$sField]) && !is_string($this->value[$sField])) {
+                    $this->error(self::STRING, $this->value[$sField]);
+                    $bValid = false;
+                }
+                break;
+            case self::GREATER:
+                if (isset($this->value[$sField]) && !(intval($this->value[$sField]) > $sParam)) {
+                    $this->error(self::GREATER, $this->value[$sField]);
+                    $bValid = false;
+                }
+                break;
+            case self::STRING_DATE:
+                $value = isset($this->value[$sField]) ? $this->value[$sField] : null;
+                if (isset($this->value[$sField]) && date($sParam, strtotime($value)) != $value) {
+                    $this->error(self::STRING_DATE, $value);
+                    $bValid = false;
+                }
+                break;
+            case self::ARRAY_LIST:
+                if (isset($this->value[$sField]) && !is_array($this->value[$sField])) {
+                    $this->error(self::ARRAY_LIST, $this->value[$sField]);
+                    $bValid = false;
+                }
+                break;
+            default:
+                $this->error(self::OPTION, $sOption);
+                $bValid = false;
+                break;
+        }
+
+        return $bValid;
+    }
+
+    /**
+     * Gets an array with option and param separated
+     *
+     * @param string $sOption The option with param (if used)
+     *
+     * @return array \Array with option and param
+     */
+    private function _getOptionParam($sOption)
+    {
+        $aOptionParam = explode('=', $sOption);
+
+        if (1 == count($aOptionParam)) {
+            // set the param as empty
+            $aOptionParam[] = '';
+        }
+
+        return $aOptionParam;
+    }
+}

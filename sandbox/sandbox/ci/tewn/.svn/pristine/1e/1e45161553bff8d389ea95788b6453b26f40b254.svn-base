@@ -1,0 +1,151 @@
+<?php
+
+class CategoryComponentTestController extends Controller{
+	var $components = array('Category');
+}
+
+class CategoryComponentTest extends CakeTestCase{
+	var $Controller;
+
+	function start(){
+		$this->Controller = new CategoryComponentTestController();
+		$this->Controller->constructClasses();
+		$this->Controller->Component->initialize($this->Controller);
+		$this->Controller->beforeFilter();
+		$this->Controller->Component->startup($this->Controller);
+	}
+
+	function testTranslate() {
+		// Test the same
+		$result = $this->Controller->Category->translate(CATEGORY_GAMING, DOMAIN_ID_GAME_REVOLUTION);
+		$expected = CATEGORY_GAMING;
+		$this->assertEqual($result, $expected);
+
+		// Test single category
+		$result = $this->Controller->Category->translate(CATEGORY_NEWS, DOMAIN_ID_NEWS);
+		$expected = CATEGORY_NEWS;
+		$this->assertEqual($result, $expected);
+
+		// Test miss on a domain
+		$result = $this->Controller->Category->translate(CATEGORY_SPORTS, DOMAIN_ID_MOMTASTIC);
+		$expected = CATEGORY_MEDIA;
+		$this->assertEqual($result, $expected);
+
+		// Test miss with similar category on a domain
+		$result = $this->Controller->Category->translate(CATEGORY_SPORTS, DOMAIN_ID_MOMTASTIC);
+		$expected = CATEGORY_MEDIA;
+		$this->assertEqual($result, $expected);
+
+		// Test total miss on a domain
+		$result = $this->Controller->Category->translate(CATEGORY_URBAN, DOMAIN_ID_THEFASHIONSPOT);
+		$expected = CATEGORY_CELEBRITIES;
+		$this->assertEqual($result, $expected);
+
+		// Test total miss on a domain
+		$result = $this->Controller->Category->translate(CATEGORY_DEALS, DOMAIN_ID_THEFASHIONSPOT);
+		$expected = CATEGORY_ALL;
+		$this->assertEqual($result, $expected);
+	}
+
+	function testMultiDomains() {
+		// Test no array
+		$result = $this->Controller->Category->domains(DOMAIN_ID_GAME_REVOLUTION);
+		$expected = print_r(array(
+			CATEGORY_ALL,
+			CATEGORY_GAMING,
+			CATEGORY_CASUAL_GAMES,
+						), 1);
+		$result = print_r($result, 1);
+		$this->assertEqual($expected, $result);
+
+		// Test single in an array
+		$result = $this->Controller->Category->domains(array(DOMAIN_ID_GAME_REVOLUTION));
+		$expected = print_r(array(
+			CATEGORY_ALL,
+			CATEGORY_GAMING,
+			CATEGORY_CASUAL_GAMES,
+						), 1);
+		$result = print_r($result, 1);
+		$this->assertEqual($expected, $result);
+
+		// Test no overlap on categories
+		$domains = array(
+			DOMAIN_ID_GAME_REVOLUTION,
+			DOMAIN_ID_THEFASHIONSPOT
+			);
+		$result = $this->Controller->Category->domains($domains);
+		$expected = print_r(array(
+			CATEGORY_ALL,
+			CATEGORY_GAMING,
+			CATEGORY_LIFESTYLE,
+			CATEGORY_MEDIA,
+			CATEGORY_CELEBRITIES,
+			CATEGORY_BEAUTY,
+			CATEGORY_CASUAL_GAMES
+			), 1);
+		$result = print_r($result, 1);
+		$this->assertEqual($expected, $result);
+
+		// Test merging w/ partial overlap
+		$domains = array(
+			DOMAIN_ID_TOTALLYHER,
+			DOMAIN_ID_CRAVE_ONLINE
+			);
+		$result = $this->Controller->Category->domains($domains);
+		$expected = print_r(array(
+			CATEGORY_ALL,
+			CATEGORY_OFFBEAT,
+			CATEGORY_SPORTS,
+			CATEGORY_GAMING,
+			CATEGORY_LIFESTYLE,
+			CATEGORY_MEDIA,
+			CATEGORY_CELEBRITIES,
+			CATEGORY_TECHNOLOGY,
+			CATEGORY_MENS_ENTERTAINMENT,
+			CATEGORY_BEAUTY,
+			CATEGORY_FOOD,
+			CATEGORY_PARENTING,
+			CATEGORY_DEALS,
+			CATEGORY_MUSIC,
+			CATEGORY_TRAVEL,
+			CATEGORY_CASUAL_GAMES,
+			CATEGORY_PETS,
+			CATEGORY_HOME,
+			CATEGORY_HEALTH,
+			CATEGORY_DIY,
+			CATEGORY_ANIME,
+			CATEGORY_AUTOMOTIVE,
+			CATEGORY_URBAN), 1);
+		$result = print_r($result, 1);
+		$this->assertEqual($expected, $result);
+
+		// Test merging w/ total overlap
+		$domains = array(
+			DOMAIN_ID_MOMTASTIC,
+			DOMAIN_ID_THEFASHIONSPOT
+			);
+		$result = $this->Controller->Category->domains($domains);
+		$expected = print_r(array(
+			CATEGORY_ALL,
+			CATEGORY_LIFESTYLE,
+			CATEGORY_MEDIA,
+			CATEGORY_CELEBRITIES,
+			CATEGORY_TECHNOLOGY,
+			CATEGORY_BEAUTY,
+			CATEGORY_FOOD,
+			CATEGORY_PARENTING,
+			CATEGORY_DEALS,
+			CATEGORY_MUSIC,
+			CATEGORY_TRAVEL,
+			CATEGORY_PETS,
+			CATEGORY_HOME,
+			CATEGORY_HEALTH,
+			CATEGORY_DIY,
+			CATEGORY_URBAN,
+			), 1);
+		$result = print_r($result, 1);
+		$this->assertEqual($expected, $result);
+
+	}
+
+}

@@ -1,0 +1,66 @@
+<!--<form accept-charset="UNKNOWN" enctype="application/x-www-form-urlencoded" method="get">-->
+<script>
+
+     function check_length() {
+	     var str = jQuery("#query").val();
+	     if (str.length > 3) {
+		     return true;
+	     } else {
+		     return false;
+	     }
+     }
+     
+     function check_length_ws() {
+	     var str = jQuery("#webPageQuery").val();
+	     if (str.length > 3) {
+		     return true;
+	     } else {
+		     return false;
+	     }
+     }
+
+</script>
+
+<?php
+
+$options = array(
+    'update' => 'auto_complete',
+    'url'    => '/pages/search',
+    'frequency' => 1,
+    'loading' => "jQuery('#auto_complete').hide();jQuery('#auto_complete_loading').show();",
+    'complete' => "jQuery('#auto_complete_loading').hide();jQuery('#auto_complete').show();"
+);
+
+echo $ajax->form(array(), 'get', $options);
+
+$options['before'] = "if (!check_length()) { return false; }";
+$options['frequency'] = 1;
+
+$options_ws = array(
+    'update' => 'auto_complete',
+    'url'    => '/websites/search',
+    'frequency' => 1,
+    'loading' => "jQuery('#auto_complete').hide();jQuery('#auto_complete_loading').show();",
+    'complete' => "jQuery('#auto_complete_loading').hide();jQuery('#auto_complete').show();"
+);
+
+echo $ajax->form(array(), 'get', $options_ws);
+
+$options_ws['before'] = "if (!check_length_ws()) { return false; }";
+$options_ws['frequency'] = 1;
+?>
+
+<input id="query" maxlength="2147483647" name="query" size="20" type="text" />
+Website Search: <input id="webPageQuery" maxlength="2147483647" name="webPageQuery" size="20" type="text" />
+<div id="auto_complete_loading" style="display: none; "><? echo $html->image("/img/wait.gif") ?></div>
+</form>
+
+<?
+	print $ajax->observeField('query', $options);
+	print $ajax->observeField('webPageQuery', $options_ws);
+	
+?>
+
+<div id="auto_complete" class="auto_complete">
+    <!-- Results will load here -->
+</div>

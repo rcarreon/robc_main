@@ -1,0 +1,183 @@
+<?php
+// Setup sizes for the pages
+$count = count($pages);
+for ($i = 0; $i < $count; $i++) {
+	if ($i < ($count * .5)) {
+		$pages[$i]['Page']['size'] = "medium_item";
+	} else {
+		$pages[$i]['Page']['size'] = "";
+	}
+}
+
+// Randomize the pages
+shuffle($pages);
+
+$merged_pages = array_merge($pages);
+$all_pages[0] = $merged_pages;
+
+$group_grid[0] = "grid_5";
+
+$group_image_width[0] = 360;
+$group_image_height[0] = 310;
+$link_append = "";
+
+?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 1.0 Transitional//EN">
+<html lang="en">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+
+    <title>Your online source for Videos, Movie News &amp; Trailers, Video Games, Sports and More - Crave Online</title>
+
+    <meta name="description" content="CraveOnline: All That You Crave Online. Film, TV, Music, Gaming, Comics, Sports, Cars, Gear, Funny &amp; Sexy Videos. Original interviews, reviews, &amp; features.">
+    <meta name="keywords" content="funny,sexy,videos,movies,games,sports">
+    <meta name="verify-v1" content="D4mE/mOm8oGYCIZtQgdNW0nsFo2BJCYVZpPQI5P/ucI=">
+    <link rel="shortcut icon" href="http://crowdignite.com/favicon.ico" type="image/x-icon">
+    
+    <link rel="stylesheet" type="text/css" href="/css/reset.css" />
+    <link rel="stylesheet" type="text/css" href="/css/text.css" />
+    <link rel="stylesheet" type="text/css" href="/css/default.css" />
+    <link rel="stylesheet" type="text/css" href="/css/crowdignite.css" />
+    <link rel="stylesheet" type="text/css" href="/css/craveonline/style.css" />
+    <link rel="stylesheet" type="text/css" href="/css/craveonline/ranker_lp.css" />
+
+    <script type="text/javascript" src="/js/jquery-1.5.2.js"></script>
+    <script type="text/javascript" src="/js/jquery-ui-1.8.custom.min.js"></script>
+    <script type="text/javascript" src="/js/jquery.blockUI.min.js"></script>
+    <script type="text/javascript" src="/js/highcharts.src.js"></script>
+    <script type="text/javascript" src="/js/chartify.js"></script>
+    <script type="text/javascript" src="/js/jquery.masonry.min.js"></script>
+    <script type="text/javascript" src="/js/ranker_lp_crave.js"></script>
+    <script src="http://partner.googleadservices.com/gampad/google_ads.js"></script> <!-- must remove this once we change ad unit codes -->
+</head>
+
+<body>
+<div id="header">
+    <a href="http://crowdignite.com/" style="height: 130px; width: 1024px; display: block; outline: medium none; text-decoration: none;"></a>
+    <div id="nav_top">
+        <div class="module mod__menu type_mainmenu">
+            <ul class="menu">
+                <li class="parent item1547"><a href="http://crowdignite.com/"><span>Home</span></a></li>
+                <li class="parent item1549"><a href="http://crowdignite.com/popular/"><span>Popular</span></a></li>
+                <li class="parent item1551"><a href="http://crowdignite.com/newest/"><span>Newest</span></a></li>
+                <li class="parent item1553"><a href="http://crowdignite.com/account/"><span>Sign up</span></a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<div id="upperPub">
+    <div id="roadblock">
+        <div id="leaderboard">
+            <? // ad unit 1 code ?>
+            <script language="JavaScript" type="text/javascript">
+                    if (typeof gn_ads == 'undefined' || gn_ads.is_triggered('728x90,970x90', 'home')) {
+                            if (typeof(gnm_ord)=='undefined') gnm_ord=Math.random()*10000000000000000; if (typeof(gnm_tile) == 'undefined') gnm_tile=1; document.write('<scr'+'ipt language="JavaScript" src="http://n4403ad.doubleclick.net/adj/gn.cr.comingsoon.net/home;sect=home;sz=728x90,970x90;dcopt=ist;type=pop;type=int;type=boom;ct=;ci=;tile='+(gnm_tile++)+';ord=' + gnm_ord + '?" type="text/javascript"></scr' + 'ipt>');
+                    }
+            </script>
+        </div>
+        <div id="small_leaderboard">
+            <? // ad unit 2 code ?>
+            <div id="google_ads_div_comingsoon_home_230x90"><ins style="position:relative;width:230px;height:90px;border:none;display:inline-table;"><ins style="position:relative;width:230px;height:90px;border:none;display:block;"><iframe width="230" height="90" frameborder="0" scrolling="no" src="http://pubads.g.doubleclick.net/gampad/ads?correlator=1329223055484&amp;output=html&amp;impl=ifr&amp;client=ca-pub-1304704158939332&amp;slotname=comingsoon_home_230x90&amp;page_slots=comingsoon_home_230x90&amp;cookie=ID%3D588ad0ec86914fad%3AT%3D1329153268%3AS%3DALNI_MZstiI7SEkiuOpOt3oQML_kEc9sZg&amp;url=http%3A%2F%2Fwww.comingsoon.net%2F&amp;lmt=1329222962&amp;dt=1329223059968&amp;cc=100&amp;biw=1920&amp;bih=1051&amp;adk=1337362703&amp;adx=475&amp;ady=173&amp;ifi=1&amp;oid=3&amp;u_tz=-420&amp;u_his=1&amp;u_h=1200&amp;u_w=1920&amp;u_ah=1160&amp;u_aw=1920&amp;u_cd=24&amp;u_nplug=20&amp;u_nmime=71&amp;flash=11.1.102&amp;gads=v2&amp;ga_vid=193217969.1329223060&amp;ga_sid=1329223060&amp;ga_hid=1084803743" style="border:0px;left:0;position:absolute;top:0;" marginheight="0" marginwidth="0" allowtransparency="true" hspace="0" vspace="0" name="google_ads_iframe_comingsoon_home_230x90" id="google_ads_iframe_comingsoon_home_230x90"></iframe></ins></ins></div>
+        </div>
+    </div>
+    <div class="clear_float"></div>
+</div>
+
+<div class="main">
+<div id="page_body" class="container_12">
+	<div class="grid_12 top_content_spacer"></div>
+
+	<div id="content" class="grid_12">
+	<div id="interior_content">
+	<div id="links_content" class="grid_12">
+
+<?
+	$count = 0;
+	$group_count = 0;
+	foreach ($all_pages as $group_pages) {
+
+		$grid = $group_grid[$group_count];
+		$image_width = $group_image_width[$group_count];
+		$image_height = $group_image_height[$group_count];
+		$group_count++;
+
+		echo "<div class='".$grid."'>";
+
+	        foreach ($group_pages as $page) {
+				$link = "/link/".$page['Page']['title_url']."/0".$link_append;
+				$image_html = $image->zoom_crop($page['Page']['image'], $image_width, $image_height, true, array(), true, false, $page['Page']['image_server'], false, true);
+				$page_tracker = $convert->outbound_tracker($link);
+
+				if ($count++ % 2) {
+					$alt = "";
+				} else {
+					$alt = "alt";
+				}
+
+				/* The item size can be changed using these two classes: medium_item and large_item, but need to be passed on to the element */
+				echo $this->element("item", array("grid" => $grid,
+												  "alt" => $alt,
+												  "link" => $link,
+												  "item_size" => $page['Page']['size'],
+												  "image_html" => $image_html,
+												  "page_tracker" => $page_tracker,
+                                                                                                  "page_id" => $page['Page']['id'],
+												  "title" => $page['Page']['title']));
+			}
+		echo "</div>";
+	}
+
+	echo "</div> <!-- /links_content -->";
+	echo "</div> <!--  /interior_content -->";
+?>
+		<div class="bottom_content_spacer grid_12">
+			<div id=paginate>
+<?
+echo $this->element('paginate', array("type" => "landing_page/ranker"));
+?>
+			</div>
+		</div>
+
+</div> <!--  /page_body -->
+
+</div> <!--  /main -->
+
+<br/><br/><br/>
+<center>
+    <div id="footer">
+        <div class="info">
+        <center>
+            <br/>
+            <a href="http://crowdignite.com/">Want More Traffic?<br> Sign Up for Crowd Ignite</a><br>
+            <a href="http://crowdignite.com/"><img src="craveonline_files/logo_small.jpg" height="35"></a><br>
+
+            <table cellpadding="25" cellspacing="15">
+                <tbody><tr>
+                        <td><a href="http://craveonline.com/videos/">Videos</a></td>
+                        <td><a rel="nofollow" href="http://craveonline.com/contact/">Contact / Advertiser Info</a></td>
+                        <td><a rel="nofollow" href="http://craveonline.com/privacy/">Privacy Policy</a></td>
+                        <td><a rel="nofollow" href="http://craveonline.com/termsofuse/">Terms &amp; Conditions</a></td>
+                        <td><a rel="nofollow" href="http://craveonline.com/staff/">Staff</a></td>
+                        <td><a href="http://craveonline.com/articles.php">View all Articles</a></td>
+                </tr>
+                </tbody>
+            </table>
+        </center>
+        <div style="text-align:left; margin-left: 50px;">© 2012 All Rights Reserved. CraveOnline.com is a property of <a href="http://www.craveonline.com/">CraveOnline Media</a>, LLC.<br/>
+        <a href="http://www.craveonline.com/">CraveOnline Media</a>, LLC is a division of <a href="http://www.atomiconline.com/">AtomicOnline</a>, LLC, an <a href="http://www.evolvemediacorp.com/">Evolve Media</a> Corp. company.<br/>
+        Not in any way Associated With Crave Entertainment, Inc. or Crave Magazine ®</div>
+        </div>
+    </div>
+</center>
+</div>
+        
+<div id="waitingDiv2" style="cursor: default; display: none;">
+    <p><img src="/img/ranker_lp/ajax-loader.gif" width="24" height="24" alt=""/></p>
+</div>
+<?
+	echo $this->element("craveonline/comscore");
+	echo $this->element("craveonline/analytics");
+	echo $this->element("chartbeat_end");
+?>
+</html>

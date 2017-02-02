@@ -1,0 +1,9 @@
+#preview-container {
+    overflow: hidden;
+    height: 199px;
+    width: 349px;
+}
+
+#preview-container img {
+    max-width: none;
+}

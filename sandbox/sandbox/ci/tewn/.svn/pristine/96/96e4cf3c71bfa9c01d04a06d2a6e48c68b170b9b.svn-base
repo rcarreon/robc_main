@@ -1,0 +1,61 @@
+<?php
+
+class ReportSetting extends AppModel
+{
+	var $name = 'ReportSetting';
+	var $useTable = 'report_settings';
+
+    public function get_list_with_user($user_id) {
+        $reports_list = array();
+
+        $query = 'SELECT report_settings.id, report_settings.name, report_settings.user_id, users.username
+                  FROM report_settings
+                  INNER JOIN users
+                  ON report_settings.user_id = users.id';
+
+        if ($reports = $this->query_read($query)) {
+            foreach ($reports as $report) {
+                $reports_list['load'][$report['users']['username']][] = array_merge(
+                    $report['report_settings'],
+                    $report['users'],
+                    array('delete' => ($user_id == $report['report_settings']['user_id']))
+                );
+
+                if ($user_id == $report['report_settings']['user_id']) {
+                    $reports_list['save'][$report['users']['username']][] = array_merge(
+                        $report['report_settings'],
+                        $report['users'],
+                        array('delete' => true)
+                    );
+                }
+            }
+        }
+
+        return $reports_list;
+    }
+
+    public function delete_by_id_user($id, $user_id) {
+        if (! is_numeric($id)) {
+            $this->invalidate('id', 'Report id should be numeric');
+            return false;
+        }
+
+        $conditions = array(
+            'id' => $id,
+            'user_id' => $user_id
+        );
+
+        $this->id = $id;
+        if (! $this->exists(true)) {
+            $this->invalidate('id', 'Report id does not exists');
+            return false;
+        }
+
+        if (!$this->find('all', array('conditions' => $conditions))) {
+            $this->invalidate('user_id', 'The report doesn\'t belongs to the user');
+            return false;
+        }
+
+        return $this->delete($id);
+    }
+}

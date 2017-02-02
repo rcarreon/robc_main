@@ -1,0 +1,89 @@
+<?php
+/**
+ * Crowdignite MySQLi layer for DBO
+ *
+ * Long description for file (same as DboMysqli)
+ *
+ * PHP versions 5
+ *
+ * Licensed under The MIT License
+ * Redistributions of files must retain the above copyright notice.
+ *
+ * @link          http://www.cakefoundation.org/projects/info/cakephp CakePHP(tm) Project
+ * @package       cake
+ * @subpackage    cake.cake.libs.model.datasources.dbo
+ * @author        Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @modifiedby    Ulises Acosta <ulises.acosta@evolvemediallc.com>
+ * @lastmodified  2013-08-22 09:38:09
+ * @license       http://www.opensource.org/licenses/mit-license.php The MIT License
+ */
+App::import('Core', 'DboMysqli');
+/**
+ * Crowdignite MySQLi DBO driver object
+ *
+ * Provides connection and SQL generation for MySQL RDMS using PHP's MySQLi Interface
+ * and provides a mechanism for recconnecting based on time when executing a query
+ *
+ * @package       cake
+ * @subpackage    cake.cake.libs.model.datasources.dbo
+ */
+class DboCidb extends DboMysqli
+{
+    /**
+     * Description of this driver
+     * @var string
+     */
+    public $description = "CI Mysqli DBO Driver";
+
+    /**
+     * Timeout for a reconnection (seconds)
+     * @var integer
+     */
+    public $reconnection_time = 300; /*Seconds*/
+
+    /**
+     * The time when this driver got a connection
+     * @var integer
+     */
+    public $connection_time = 0;
+
+    /**
+     * Connect to the database and set the time of connection
+     *
+     * @see  DboMysqli::connect
+     *
+     * @return boolean True if the database could be connected, else false
+     */
+    public function connect()
+    {
+        $this->connection_time = time();
+        return parent::connect();
+    }
+
+    /**
+     * Indicates if it's time to make a recconection
+     *
+     * @return boolean True if it's time to reconnect, else false
+     */
+    protected function is_time_to_reconnect()
+    {
+        $time_since_connection = time() - $this->connection_time;
+        return $time_since_connection > $this->reconnection_time;
+    }
+
+    /**
+     * Executes given SQL statement and reconnect if needed.
+     *
+     * @param  string $sql SQL statement
+     * @return resource Result resource identifier
+     */
+    public function _execute($sql)
+    {
+        if ($this->is_time_to_reconnect()) {
+            // sending empty array to not change
+            // the config settings, only reconnect
+            $this->reconnect(array());
+        }
+        return parent::_execute($sql);
+    }
+}

@@ -1,0 +1,114 @@
+<?php
+
+namespace CI\Cron;
+use CI\IO\StdOutput;
+use CI\IO\Facade\Output;
+use CI\Config\Facade\Config;
+use CI\Database\Facade\Database;
+
+class Collapse extends \CI\Cron
+{
+    const ALL_CATEGORIES = -1;
+    const CHUNK_SIZE     = 100000;
+    const LIMIT_CONCAT   = 4194304;
+    const LIMIT_BUFFER   = 67108864;
+
+    public function landingPageCommand($nDomainBitfield, $nPasses = 6500, $nSleep = 1, $nVisibles = 0, $nCategory = -1)
+    {
+        $oCache = new \CI\Memcached(Config::get('memcache'));
+        $oKey = new \CI\Memcached\KeyGen(array($nDomainBitfield, $nCategory, $nPasses), __METHOD__);
+        $sKey = $oKey->generate();
+
+        $nInitialPass = (int) $oCache->get($sKey);
+        if ($nInitialPass === 0) {
+            $nInitialPass = 1;
+        }
+
+        Output::info('Starting the collapse...');
+        $this->setDatabaseLimits();
+        for ($nPass = $nInitialPass; $nPass <= $nPasses; $nPass++) {
+            $oCache->set($sKey, $nPass);
+            while (true) {
+                Output::info("Getting data from pass {$nPass} of {$nPasses}...");
+                $aDuplicates = $this->getLPData($nDomainBitfield, $nCategory, $nPass, $nVisibles);
+                if (empty($aDuplicates)) {
+                    break;
+                }
+                Output::info('Collapsing '.count($aDuplicates).' Rows from Pass '.$nPass.'...');
+                foreach ($aDuplicates as $aDuplicate) {
+                    $this->processLPDuplicate($aDuplicate);
+                }
+                Output::info("Sleeping {$nSleep} seconds...");
+                sleep($nSleep);
+            }
+        }
+        $oCache->delete($sKey);
+        Output::success('Done');
+    }
+
+    public function landingPageRebalancesCommand()
+    {
+        $aDuplicates = Database::query(
+            "SELECT domain_bitfield, category, demographic_sex, sum(num_display) as display,
+                MAX(IF(content_rating = 0, id, 0)) as id,  GROUP_CONCAT(id) as ids_2_delete
+            FROM landing_page_rebalances
+            GROUP BY domain_bitfield, category, demographic_sex
+            HAVING Count(*) > 1"
+        );
+        foreach ($aDuplicates as $aDuplicate) {
+            Output::info("Collapsing ID {$aDuplicate['id']}");
+            $aIdsToDelete = explode(',', $aDuplicate['ids_2_delete']);
+            $sIdsToDelete = implode(',', array_diff($aIdsToDelete, array($aDuplicate['id'])));
+            Database::execute(
+                "UPDATE landing_page_rebalances
+                SET num_display = {$aDuplicate['display']}
+                WHERE id = {$aDuplicate['id']}"
+            );
+            Database::execute("DELETE FROM landing_page_rebalances WHERE id IN ({$sIdsToDelete})");
+        }
+        Output::success('Done');
+    }
+
+    protected function processLPDuplicate($aDuplicate)
+    {
+        $aIdsToDie = explode(',', $aDuplicate['lpa_2_die']);
+        unset($aIdsToDie[0]);
+        $sIdsToDie = implode(',', $aIdsToDie);
+        Database::execute(
+            "UPDATE landing_page_analytics
+            SET num_display = {$aDuplicate['num_display']}, num_ctr = {$aDuplicate['num_ctr']}
+            WHERE id = {$aDuplicate['id']}"
+        );
+        Database::execute("DELETE FROM landing_page_analytics WHERE id IN ({$sIdsToDie})");
+    }
+
+    protected function setDatabaseLimits()
+    {
+        Database::read()->execute('SET group_concat_max_len = '.self::LIMIT_CONCAT);
+        Database::read()->execute('SET sort_buffer_size = '.self::LIMIT_BUFFER);
+    }
+
+    protected function getLPData($nDomainBitfield, $nCategory, $nChunk = 1, $nVisibles = 0, $nLimit = 150)
+    {
+        $nVisibles = $nVisibles == 1 ? 1 : 0;
+        $nChunkStart = (($nChunk - 1) * self::CHUNK_SIZE) + 1;
+        $nChunkEnd = ($nChunkStart - 1) + self::CHUNK_SIZE;
+        $sCategoryCondition = $nCategory == self::ALL_CATEGORIES ? '' : "AND category = {$nCategory}";
+        return Database::query(
+            "SELECT domain_bitfield, page_id, category, demographic_sex,
+                content_rating, `type`, `key`, Min(id) AS id, Count(*) AS Total, Sum(num_ctr) AS original_ctr,
+                Sum(num_ctr) - (Count(*) - 1) AS num_ctr, Sum(num_display) AS original_display,
+                Sum(num_display) - (Count(*) - 1) AS num_display , Max(visible) AS visible,
+                Group_concat(id ORDER BY id) AS lpa_2_die
+            FROM landing_page_analytics
+            WHERE domain_bitfield = {$nDomainBitfield}
+                AND visible = {$nVisibles}
+                {$sCategoryCondition}
+                AND page_id BETWEEN {$nChunkStart} AND {$nChunkEnd}
+            GROUP BY domain_bitfield, page_id, category, demographic_sex, content_rating,
+                `type`, `key`
+            HAVING Count(*) > 1
+            LIMIT {$nLimit}"
+        );
+    }
+}

@@ -1,0 +1,16 @@
+$TTL 3600 ; 1 day
+@      IN      SOA     gnmedia.net. root@gnmedia.net. (
+			2012082900	; Serial
+			36262		; Refresh
+			300		; Retry
+			3600000		; Expire
+			3600 )		; Minimum
+
+	IN	NS	app1v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app2v-dns.tp.prd.lax.gnmedia.net.
+	IN      NS      app3v-dns.tp.prd.lax.gnmedia.net.
+	IN      NS      app4v-dns.tp.prd.lax.gnmedia.net.
+
+16	IN	PTR	sw1-lo0.lax1.gnmedia.net
+17	IN	PTR	sw1-lo0.lax2.gnmedia.net
+18	IN	PTR	sw1-lo0.lax3.gnmedia.net

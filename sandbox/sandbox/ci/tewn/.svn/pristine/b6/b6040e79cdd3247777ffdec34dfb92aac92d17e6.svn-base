@@ -1,0 +1,65 @@
+ html, body {
+ margin: 0px;
+ padding: 0px;
+ border: 0px;
+ }
+ #container {
+ width: 1000px;
+ margin: 0 0 0 20px;
+ padding: 0;
+ }
+ #containertext {
+ width: 450px;
+ margin: 200px 0 0 20px;
+ }
+ #containertext .ci_text {
+ margin: 20px 5px 0 10px;
+ font-size: 85%
+}
+#containertext h4 {
+ margin-top: 50px;
+}
+ #container #col1 {
+ width: 450px;
+ float: left;
+ }
+ #container #col2outer {
+ width: 500px;
+ margin: 0 50px 50px 100px;
+ float: right;
+ margin: 0;
+ padding: 0;
+ }
+#container #col2outer li {
+  width: 300px;
+  margin: 10px 10px 10px 10px; /* top right bottom left */
+  float: left;
+}
+#container #col2outer .ci_text {
+  width: 140px;
+  margin: 10px 10px 0 10px; /* top right bottom left */
+  float: right;
+  font-size: 90%;
+  word-wrap: break-word;
+}
+.widget-header {
+    display: inline-block;
+    background: #CCC;
+    padding: 10px 29px;
+    border-radius: 5px 5px 0 0;
+    font-size: 14px;
+    font-weight: normal;
+    margin-bottom: 0px;
+}
+.widget-container {
+    width: 450px;
+    padding: 5px;
+    background: #FFF;
+    position: relative;
+    border: solid 1px #CCC;
+    margin-bottom: 18px;
+}
+.widget-container.text-only {
+    top: -257px;
+    padding: 16px;
+}

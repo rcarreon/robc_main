@@ -1,0 +1,55 @@
+$TTL 86400
+myanimelist.net.    IN    SOA    myanimelist.net.    root.myanimelist.net. (
+                                          2014062500     ; serial
+                                          28800          ; refresh
+                                          14400          ; retry
+                                          3600000        ; expire
+                                          86400 )        ; minimum
+
+myanimelist.net.                          IN    NS       app3v-dns.tp.prd.lax.craveonline.com.
+myanimelist.net.                          IN    NS       app4v-dns.tp.prd.lax.craveonline.com.
+myanimelist.net.                          IN    NS       app1v-dns.tp.prd.lax.craveonline.com.
+myanimelist.net.                          IN    NS       app2v-dns.tp.prd.lax.craveonline.com.
+
+myanimelist.net.                          IN    MX 10    cluster9.us.messagelabs.com.
+myanimelist.net.                          IN    MX 20    cluster9a.us.messagelabs.com.
+
+local                                     IN    A        127.0.0.1
+localhost                                 IN    A        127.0.0.1
+loghost                                   IN    A        127.0.0.1
+
+localhost.myanimelist.net.                IN    A        127.0.0.1
+
+
+; these 4 are Incapsula
+myanimelist.net.                          IN    A        199.83.129.233
+myanimelist.net.                          IN    A        199.83.131.62
+www.myanimelist.net.                      IN    CNAME    9pt4p.x.incapdns.net.   
+origin.myanimelist.net.                   IN    CNAME    28szb.x.incapdns.net.
+cdn.myanimelist.net.                      IN    CNAME    cdn.myanimelist.net.edgesuite.net.
+
+dev.myanimelist.net.                      IN    CNAME    app1v-mal.ao.dev.lax.gnmedia.net.
+dev.cdn.myanimelist.net.                  IN    CNAME    dev.myanimelist.net.
+cdn-dev.myanimelist.net.                  IN    CNAME    dev.myanimelist.net.
+
+stg.myanimelist.net.                      IN    A        72.172.76.175
+stg.cdn.myanimelist.net.                  IN    A        72.172.76.175
+cdn-stg.myanimelist.net.                  IN    CNAME    stg.myanimelist.net.
+
+
+; new FE infrastructure -aib
+campaigns.myanimelist.net.                IN    A        72.172.76.121
+cdn.campaigns.myanimelist.net.            IN    CNAME    cdn.myanimelist.net.edgesuite.net.
+staging.campaigns.myanimelist.net.        IN    A        72.172.76.122
+
+assets.myanimelist.net.                   IN    A        72.172.76.110
+cdn.assets.myanimelist.net.               IN    CNAME    cdn.assets.myanimelist.net.edgesuite.net.
+origin.assets.myanimelist.net.            IN    CNAME    assets
+staging.assets.myanimelist.net.           IN    CNAME    staging.assets.myanimelist.net.edgesuite.net.
+demo.assets.myanimelist.net.              IN    CNAME    demo.assets.myanimelist.net.edgesuite.net.
+origin.staging.assets.myanimelist.net.    IN    A        72.172.76.111
+
+terrortrip.myanimelist.net.               IN    CNAME    cdn.campaigns.myanimelist.net.
+staging.terrortrip.myanimelist.net.       IN    CNAME    staging.campaigns.myanimelist.net.
+demo.terrortrip.myanimelist.net.          IN    CNAME    demo.si.evolvemediallc.com.
+

@@ -1,0 +1,46 @@
+<?php
+/**
+ * Test timer.
+ *
+ * PHP Version 5.3
+ *
+ * @category Test
+ * @package  Test_Test
+ * @author   Jorge Cortes <jorge.cortes@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+namespace Test\Engine;
+
+use CI\Engine\Timer;
+use CI\Hub;
+
+/**
+ * Test timer.
+ *
+ * PHP Version 5.3
+ *
+ * @category Test
+ * @package  Test_Test
+ * @author   Jorge Cortes <jorge.cortes@evolvemediallc.com>
+ * @license  Evolve Media LLC
+ * @link     http://crowdignite.com
+ */
+
+class TimerTest extends \PHPUnit_Framework_TestCase
+{
+    private $oTimer;
+
+    public function setUp()
+    {
+        $this->oTimer = new Timer();
+    }
+
+    function testIdToSimilarTimer()
+    {
+        $sExpected = 50;
+        $sResult = $this->oTimer->idToSimilarTimer(Hub::DOMAIN_ID_CRAVE_ONLINE);
+        $this->assertEquals($sExpected, $sResult);
+    }
+}

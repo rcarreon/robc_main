@@ -1,0 +1,9 @@
+<?php
+    $memcache_session_config = array(
+        'prd' => array(
+            array('mem1v-ses', 11211),
+            array('mem2v-ses', 11211)
+        )
+    );
+
+return $memcache_session_config[ENVIRONMENT];

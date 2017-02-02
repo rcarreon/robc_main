@@ -1,0 +1,109 @@
+    WebFontConfig = {
+	custom: { families: ['LeagueGothicRegular'],
+		  urls: [ '/css/craveonline/ranker_lp.css' ]
+		}
+    };
+    (function loadFonts() {
+	var wf = document.createElement('script');
+	wf.src = ('https:' == document.location.protocol ? 'https' : 'http') + '://ajax.googleapis.com/ajax/libs/webfont/1/webfont.js';
+	wf.type = 'text/javascript';
+	wf.async = 'true';
+	var s = document.getElementsByTagName('script')[0];
+	s.parentNode.insertBefore(wf, s);
+    })();
+
+$(document).ready(function() {
+    var page_id = "";
+
+    $('#links_content').masonry({
+	itemSelector: '.item',
+	columnWidth: 1,
+	isFitWidth: true,
+	isAnimated: true,
+	animationOptions: {
+	    duration: 300,
+	    easing: 'linear',
+	    queue: false
+	}
+    });
+
+    //$('#links_content div:first-child .item:first-child').addClass('large_item');
+
+	$boxes = $('#links_content > div').children('.grid_5');
+	for(i=0;i<=10;i++) {
+		var pos = 1 + Math.floor(Math.random() * ($boxes.length-1) )
+		$boxes.eq(pos).before("<div class='item empty'></div>");
+	}
+
+    $('.large_item').prepend('<div id="site_info"><h3>DAILY CRAVING FOR THIS</h3><div id="site_chart"></div><ul><li>You may also like</li><li><a href="#">Exclusive Captain America Photos</a></li><li><a href="#">Meet Bobby Kotick</a></li><li><a href="#">E3: NBA 2K12 Preview</a></li><li><a href="#">Another Star Says Good Bye From TNA</a></li></ul></div>');
+    
+    // truncate long titles
+    $('.item').each( function() {
+	var title = $(this).find('div.text p a');
+	if( title.text().length >= 40 ) {
+	    var short_title = jQuery.trim( title.text() ).substring(0, 40).split(" ").slice(0, -1).join(" ") + "..."
+	    title.text( short_title );
+	}
+    });
+
+    page_id = $('.large_item').data("page");
+
+    $('#links_content').masonry( 'reload' );
+    $('#site_info').fadeIn(2000);
+
+    if(page_id != "") {
+        getGraphData(page_id);
+    }
+
+
+    $('#links_content .item').click(function() {
+        if( !$(this).hasClass('large_item') && !$(this).hasClass('empty') ) {
+
+            $('#site_chart').remove();
+            $('#site_info').remove();
+            $('#links_content .item').removeClass('large_item');
+
+            $(this).addClass('large_item');
+
+            $('.large_item').prepend('<div id="site_info"><h3>DAILY CRAVINGS</h3><div id="site_chart"></div><ul><li>You may also like</li><li><a href="#">Exclusive Captain America Photos</a></li><li><a href="#">Meet Bobby Kotick</a></li><li><a href="#">E3: NBA 2K12 Preview</a></li><li><a href="#">Another Star Says Good Bye From TNA</a></li></ul></div>');
+            $('#links_content').masonry( 'reload' );
+            $('#site_info').fadeIn(1000);
+
+            var page_id = $('.large_item').data("page");
+            if(page_id != "") {
+                getGraphData(page_id);
+            }
+            return(false);
+        }
+
+    });
+
+    $(".item a").hover(function() {
+        if( !$(this).parent().parent().hasClass('large_item') ) {
+            $(this).parent().find("img").stop().animate({ opacity: 0.4}, 150).animate({ opacity: 1 }, 100);
+        }
+    },function() {
+
+    });
+
+
+});
+
+
+var site_chart;
+function getGraphData( page_id ) {
+    var websitesSelected = new Array();
+
+    jQuery("#site_chart").block({ message:jQuery("#waitingDiv2"), css: {width:'210px', height:'50px'}  });
+
+    var now = new Date();
+    now.setHours(0);
+    now.setMinutes(0);
+
+    var begin = new Date();
+    begin = begin.setDate(now.getDate()-7);
+    var beginTime = Math.ceil(begin/1000);
+    var endTime = Math.ceil(now.getTime()/1000);
+
+    chartify('site_chart', beginTime, endTime, '/history_credits/chart', "Incoming/Outgoing", "I/O", "landingpage", page_id, 0, "outgoing", false, function(){ jQuery("#site_chart").unblock(); });
+}

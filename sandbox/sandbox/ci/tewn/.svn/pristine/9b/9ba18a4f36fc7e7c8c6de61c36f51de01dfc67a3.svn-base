@@ -1,0 +1,40 @@
+<?php 
+class AccountsControllerTest extends CakeTestCase {
+	var $Accounts = null;
+	var $fixtures = array('app.account', 'app.user', 'app.website', 'app.history_credit', 'app.metric_log');
+	
+	function setUp(){
+		parent::setUp('Account');
+	}
+
+	function startTest() {
+		App::import('Controller', 'Accounts');
+		$this->Accounts = new AccountsController();
+		$this->Accounts->constructClasses();
+		$this->Accounts->Component->initialize($this->Accounts);
+		$this->Accounts->autoRender = false;
+	}
+
+	function testAccountsControllerInstance() {
+		$this->assertTrue(is_a($this->Accounts, 'AccountsController'));
+	}
+	
+	function testAccountsCategoryGet(){
+		$domain_primary = DOMAIN_ID_CRAVE_ONLINE;
+		 
+		$this->Accounts->params = Router::parse('/accounts/category_get/'.$domain_primary);
+    	$this->Accounts->beforeFilter();
+    	$this->Accounts->Component->startup($this->Accounts);
+    	$results = $this->Accounts->category_get($domain_primary);
+	
+		$expected = '5';
+	
+		$this->assertTrue($results, $expected);
+	}
+
+	function endTest() {
+		unset($this->Accounts);
+    	ClassRegistry::flush();
+	}
+}
+?>

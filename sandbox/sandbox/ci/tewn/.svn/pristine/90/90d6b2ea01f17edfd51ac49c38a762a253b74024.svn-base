@@ -1,0 +1,45 @@
+<?php
+namespace CI;
+
+class Website
+{
+    const WEBSITE_STATUS_ACTIVE    = 0;
+    const WEBSITE_STATUS_NEW       = 1;
+    const WEBSITE_STATUS_DENIED    = 2;
+    const WEBSITE_STATUS_SUSPENDED = 3;
+    const WEBSITE_STATUS_PAUSED    = 4;
+    const WEBSITE_STATUS_INACTIVE  = 5;
+    const WEBSITE_STATUS_DOWN      = 6;
+    const WEBSITE_STATUS_TRANSFER  = 7;
+
+    private $_oDataSource;
+
+    public function getStatusName($nId)
+    {
+        $oStatusData = $this->getStatusDataSource();
+        $aStatus     = $oStatusData->getById($nId);
+
+        return $aStatus['name'];
+    }
+
+    public function getAllStatus()
+    {
+        $aReturn     = array();
+        $oDataSource = $this->getStatusDataSource();
+
+        foreach ($oDataSource as $aStatus) {
+            $aReturn[] = $aStatus;
+        }
+
+        return $aReturn;
+    }
+
+    protected function getStatusDataSource()
+    {
+        if (empty($this->_oDataSource)) {
+            $this->_oDataSource = new Website\Status\DataSource\MyArray();
+        }
+
+        return $this->_oDataSource;
+    }
+}

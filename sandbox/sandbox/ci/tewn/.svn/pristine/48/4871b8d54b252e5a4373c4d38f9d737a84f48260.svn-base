@@ -1,0 +1,99 @@
+<style>
+body { background:#eee; }
+#interior_content { margin:0!important;}
+#header {
+    background: #fff;
+    height:60px;
+}
+#header a.logo {
+    background:url(/img/totallyhers/logo_small.jpg) no-repeat;
+    display:block;
+    height:40px!important;
+    margin:14px 0 0 0;
+    width:270px!important;
+    position:absolute;
+    top:0;
+    left:15px;
+}
+.ad_leaderboard {
+    display: none;
+}
+
+#header .header_wrapper {
+    height: inherit;
+    margin: 0 auto;
+    position: relative;
+    width: 1290px;
+}
+
+.wf-active #header .poweredby {
+    color:#888;
+    display:inline-block!important;
+    font-family:"Open Sans", Arial, sans-serif;
+    font-size:12px;
+    position:absolute;
+    left:240px;
+    letter-spacing: -0.01em;
+    top:27px;
+}
+.wf-active #header .poweredby span {
+    line-height: 25px;
+    float:left;
+}
+.wf-active #header .poweredby a {
+    background:url(/img/craveonline/ci_small_logo_pinterest.png) 0 bottom no-repeat;
+    color:transparent;
+    display: inline-block;    
+    height:21px;
+    margin:0 0 0 5px;
+    text-decoration: none;
+    width:60px;
+}
+.wf-active #header .poweredby a:hover {
+    background-position: 0 top;
+    text-decoration: underline;
+}
+#navbar ul li { border:none; display:none; }
+#navbar ul li a { color:#666;}
+#navbar ul li a:hover { color:#444; background: none;}
+#navbar ul li:last-child { border-right:none;}
+#header #navbar { 
+    background:none;
+    left:auto; right:0;
+    top:10px;
+    height:40px;
+    margin:0;
+    position: absolute;
+    width:auto;
+}
+#navbar ul li.join { display:block;}
+#paginate { display:block; margin: 0; padding-top: 10px; width:100%;}
+#footer {
+    color: #000;
+    display:none;
+    padding:20px 0;
+    width: 100%;
+}
+#footer a { color:#333; text-decoration:none;}
+#footer a:hover { color:#111!important; text-decoration:underline;}
+#footer div.info div { color:#333; font-size:11px;  margin:10px 0 0!important; text-align:center!important; width: 100%;}
+#footer center { display: block; color:#bbb; margin:0 auto; width:50%;}
+.grid_12 .large_item a.button { background: #db3c7d; border-bottom: 1px solid #b6225f; }
+.grid_12 .large_item a.button span { text-shadow: 0 1px 1px #b6225f; }
+
+#infscr-loading {
+    background:url(/img/crowdignite/pinterest_ajax_loader.gif) center center no-repeat;
+    bottom: -80px;
+    display:inline-block;
+    height:70px;
+    left:50%;
+    margin:20px 0;
+    position: absolute;
+    text-align: center;
+    width:32px;
+}
+#infscr-loading div,
+#infscr-loading img {
+    display: none;
+}
+</style>

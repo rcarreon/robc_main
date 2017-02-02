@@ -1,0 +1,814 @@
+<?
+        if (isset($json_out)) {
+            print_r($json_out);
+            exit();
+        }
+
+        if ($filter_reason) {
+            echo "<!-- F: ".$filter_reason." -->";
+        }
+
+        $sidebar_floating = false;
+        $extra_pages = $featured_pages;
+        $num_clicked_pages = $paginate_current == 1 ? 1 : 0;
+        if (!$num_clicked_pages) {
+            $clicked_pages = array();
+        } else {
+            $clicked_pages = array($clicked_page);
+        }
+
+        $infinite_scroll = 0;
+        $infinite_scroll_active = 0;
+        $ad = 0;
+
+        if ($branded) {
+            $style = "branded";
+            if($website_id == "4948") {
+                $preview_style = 11;
+            } else if ($website_id == "4") {
+                $preview_style = 13;
+            }
+        } else {
+            $style = DOMAIN;
+        }
+
+//$preview_style = 20;
+
+        /*
+         * Each size grouping is put at a spot in the array. Then depending on what grouping we're in we show a grid_* and resize the images appropriately
+         */
+        switch ($preview_style) {
+        case 24:
+        case 23:
+        case 22:
+        case 21:
+        case 29:
+            // 21 Grid Full with Small Header, 300x250 ad, and inf scroll
+            // 22 Gridu Full with Small Header, 300 x250, 728x90 and inf scroll
+            $infinite_scroll = 1;
+            if ($infinite_scroll && $paginate_current > 1) {
+                $infinite_scroll_active = 1;
+            }
+            $infinite_scroll_group_count = 0;
+            $infinite_scroll_grid = ".grid_5";
+
+            if (!$infinite_scroll_active) {
+                if($preview_style == 21) {
+                    echo $this->element("layouts/grid_full_small_header");
+                    echo $this->element("layouts/".DOMAIN."/grid_full_small_header");
+                } else {
+                    echo $this->element("layouts/grid_full_ad_top");
+                    echo $this->element("layouts/".DOMAIN."/grid_full_ad_top");
+                    if ($preview_style == 23 && !$branded) {
+                        echo $this->element("layouts/grid_full_item_effect");
+                    } else if ($preview_style == 24 && !$branded) {
+                        echo $this->element("layouts/grid_full_item_effect-2");
+                    }
+                }
+            }
+
+
+            $ads[] = array('ad' => 1, 'element' => DOMAIN."/ads/300x250");
+            $ad = $paginate_current == 1 ? 1 : 0;
+
+            $merged_pages = array_merge($clicked_pages, $featured_pages, $general_pages);
+            if ($ad) {
+                $tmp_pages = array_splice($merged_pages, 0, 7);
+                $merged_pages = array_merge($tmp_pages, $ads, $merged_pages);
+            }
+            $all_pages[0] = $merged_pages;
+            $group_grid[0] = "grid_5";
+
+            $group_image_width[0] = 300;
+            $group_image_height[0] = 250;
+            break;
+
+        case 20:
+            // Pinterest
+            $infinite_scroll = 1;
+            if ($infinite_scroll && $paginate_current > 1) {
+                $infinite_scroll_active = 1;
+            }
+            $infinite_scroll_group_count = 0;
+            $infinite_scroll_grid = ".grid_5";
+
+            if (!$infinite_scroll_active) {
+                echo $this->element("layouts/pinterest");
+                echo $this->element("layouts/".DOMAIN."/pinterest");
+            }
+            $ads[] = array('ad' => 1, 'element' => DOMAIN."/ads/300x250");
+            $ad = $paginate_current == 1 ? 1 : 0;
+
+            $merged_pages = array_merge($clicked_pages, $featured_pages, $general_pages);
+            if ($ad) {
+                $tmp_pages = array_splice($merged_pages, 0, 2);
+                $merged_pages = array_merge($tmp_pages, $ads, $merged_pages);
+            }
+            $all_pages[0] = $merged_pages;
+
+            $group_grid[0] = "grid_5";
+
+            $group_image_width[0] = 300;
+            $group_image_height[0] = 250;
+            break;
+
+        case 19:
+            // gridwall
+            echo $this->element("layouts/gridwall");
+            echo $this->element("layouts/".DOMAIN."/gridwall");
+
+            $merged_pages = array_merge($clicked_pages, $featured_pages, $general_pages);
+            $all_pages[0] = $merged_pages;
+
+            $group_grid[0] = "grid_5";
+
+            $group_image_width[0] = 180;
+            $group_image_height[0] = 120;
+
+            break;
+        case 18:
+            // Masonry
+            echo $this->element("layouts/masonry2");
+            echo $this->element("layouts/".$style."/masonry2");
+
+            $merged_pages = array_merge($clicked_pages, $featured_pages, $general_pages);
+            $all_pages[0] = $merged_pages;
+
+            $group_grid[0] = "grid_5";
+
+            $group_image_width[0] = 190;
+            $group_image_height[0] = 105;
+
+            break;
+        case 17:
+            // Masonry
+            echo $this->element("layouts/masonry");
+            echo $this->element("layouts/".$style."/masonry");
+
+            $merged_pages = array_merge($clicked_pages, $featured_pages, $general_pages);
+            $all_pages[0] = $merged_pages;
+
+            $group_grid[0] = "grid_5";
+
+            $group_image_width[0] = 300;
+            $group_image_height[0] = 250;
+
+            break;
+        case 16:
+            // Small Grid Infinite Scroll
+            $infinite_scroll = 1;
+            $infinite_scroll_group_count = 0;
+            $infinite_scroll_grid = ".grid_5";
+            if ($infinite_scroll && $paginate_current > 1) {
+                $infinite_scroll_active = 1;
+            }
+        case 15:
+            // Small Grid
+            $merged_pages = array_merge($clicked_pages, $featured_pages, $general_pages);
+            $all_pages[0] = $clicked_pages;
+            $all_pages[1] = $merged_pages;
+
+            if ($infinite_scroll_active) {
+                $group_grid[0] = "grid_5";
+                $group_grid[1] = "grid_5";
+
+                $group_image_width[0] = 210;
+                $group_image_height[0] = 105;
+                $group_image_width[1] = 210;
+                $group_image_height[1] = 105;
+            } else {
+                echo $this->element("layouts/small_grid");
+                echo $this->element("layouts/".$style."/small_grid");
+
+                $group_grid[0] = "grid_7";
+                $group_grid[1] = "grid_5";
+
+                $group_image_width[0] = 450;
+                $group_image_height[0] = 250;
+                $group_image_width[1] = 210;
+                $group_image_height[1] = 105;
+            }
+
+            break;
+        case 7:
+            // Grid infinite scroll
+            $infinite_scroll = 1;
+            $infinite_scroll_group_count = 0;
+            $infinite_scroll_grid = ".grid_5";
+            if ($infinite_scroll && $paginate_current > 1) {
+                $infinite_scroll_active = 1;
+            }
+        case 4:
+            // Grid
+            if (!$infinite_scroll_active) {
+                echo $this->element("layouts/template1");
+                echo $this->element("layouts/".$style."/template1");
+            }
+
+            $merged_pages = array_merge($clicked_pages, $featured_pages, $general_pages);
+            $all_pages[0] = $merged_pages;
+
+            $group_grid[0] = "grid_5";
+
+            $group_image_width[0] = 190;
+            $group_image_height[0] = 108;
+
+            break;
+        case 14:
+            // List with Ads
+            $ads[] = array('ad' => 1, 'element' => DOMAIN."/ads/300x250");
+            $ad = $paginate_current == 1 ? 1 : 0;
+        case 8:
+            // List infinite scroll
+            $infinite_scroll = 1;
+            $infinite_scroll_group_count = 1;
+            $infinite_scroll_grid = ".grid_5";
+            if ($infinite_scroll && $paginate_current > 1) {
+                $infinite_scroll_active = 1;
+            }
+        default:
+        case 0:
+        case 1:
+        case 2:
+        case 3:
+        case 5:
+            // List
+            $sidebar_floating = 'group_0';
+            $merged_pages = array_merge($clicked_pages, $general_pages);
+            if ($ad) {
+                $featured_pages = array_merge($ads, $featured_pages);
+            }
+
+            $all_pages[0] = $featured_pages;
+            $all_pages[1] = $merged_pages;
+
+            if (!$infinite_scroll_active) {
+                $group_grid[0] = "grid_5";
+                $group_grid[1] = "grid_5";
+
+                $group_image_width[0] = 140;
+                $group_image_height[0] = 80;
+                $group_image_width[1] = 140;
+                $group_image_height[1] = 80;
+            } else {
+                echo $this->element("layouts/template2");
+                echo $this->element("layouts/".$style."/template2");
+
+                $group_grid[0] = "grid_3";
+                $group_grid[1] = "grid_5";
+
+                $group_image_width[0] = 300;
+                $group_image_height[0] = 170;
+                $group_image_width[1] = 140;
+                $group_image_height[1] = 80;
+            }
+
+            break;
+        case 13:
+            // Hybrid with Ads
+            if (DOMAIN == "crowdignite" ) {
+                // On CI, Replace ad with Totally Her ad tag
+                $ads[] = array('ad' => 1, 'element' => "totallyhers"."/ads/300x250");
+                // On CI, change the look, color and logos to resemble Totally Her
+                echo $this->element("layouts/crowdignite/girlversion");
+            } else {
+                $ads[] = array('ad' => 1, 'element' => DOMAIN."/ads/300x250");
+            }
+            $ad = $paginate_current == 1 ? 1 : 0;
+        case 9:
+            // Hybrid infinite scroll
+            $infinite_scroll = 1;
+            $infinite_scroll_group_count = 1;
+            $infinite_scroll_grid = ".grid_7";
+            if ($infinite_scroll && $paginate_current > 1) {
+                $infinite_scroll_active = 1;
+            }
+        case 6:
+            // Hybrid
+            $sidebar_floating = 'group_2';
+            $merged_pages = array_merge($clicked_pages, $general_pages);
+            $header_pages = array_splice($merged_pages, 0, 4);
+            if ($ad) {
+                $featured_pages = array_merge($ads, $featured_pages);
+            }
+            $all_pages[0] = $header_pages;
+            $all_pages[1] = $merged_pages;
+            $all_pages[2] = $featured_pages;
+
+            if ($infinite_scroll && $paginate_current > 1) {
+                $group_grid[0] = "grid_7";
+                $group_grid[1] = "grid_7";
+                $group_grid[2] = "grid_7";
+
+                $group_image_width[0] = 220;
+                $group_image_height[0] = 125;
+                $group_image_width[1] = 220;
+                $group_image_height[1] = 125;
+                $group_image_width[2] = 220;
+                $group_image_height[2] = 125;
+
+            } else {
+                echo $this->element("layouts/template3");
+                echo $this->element("layouts/".$style."/template3");
+
+                $group_grid[0] = "grid_3";
+                $group_grid[1] = "grid_7";
+                $group_grid[2] = "grid_5";
+
+                $group_image_width[0] = 220;
+                $group_image_height[0] = 125;
+                $group_image_width[1] = 220;
+                $group_image_height[1] = 125;
+                $group_image_width[2] = 300;
+                $group_image_height[2] = 170;
+            }
+
+            break;
+        case 12:
+            // Grid Full with Ads
+            if (DOMAIN == "crowdignite" ) {
+                // On CI, change the look, color and logos to resemble Totally Her
+                echo $this->element("layouts/crowdignite/girlversion");
+                echo $this->element("layouts/crowdignite/girlversion_grid_full");
+            } else {
+            }
+            $ads[] = array('ad' => 1, 'element' => DOMAIN."/ads/300x250");
+            $ad = $paginate_current == 1 ? 1 : 0;
+        case 11:
+            // Grid Full infinite scroll
+            $infinite_scroll = 1;
+            $infinite_scroll_group_count = 0;
+            $infinite_scroll_grid = ".grid_5";
+            if ($infinite_scroll && $paginate_current > 1) {
+                $infinite_scroll_active = 1;
+            }
+
+        case 10:
+            // Grid Full
+            if (!$infinite_scroll_active) {
+                echo $this->element("layouts/grid_full");
+                echo $this->element("layouts/".$style."/grid_full");
+            }
+
+            $merged_pages = array_merge($clicked_pages, $featured_pages, $general_pages);
+            if ($ad) {
+                $tmp_pages = array_splice($merged_pages, 0, 2);
+                $merged_pages = array_merge($tmp_pages, $ads, $merged_pages);
+            }
+            $all_pages[0] = $merged_pages;
+
+            $group_grid[0] = "grid_5";
+
+            $group_image_width[0] = 300;
+            $group_image_height[0] = 250;
+
+            break;
+        }
+
+/* Branded landing page */
+if ($branded && $infinite_scroll_active == 0) {
+?>
+    <style>
+      body {
+<?
+        if ($branded['LandingPageStyle']['background_image']) {
+                echo 'background-image: url("'.$branded['LandingPageStyle']['background_image'].'");';
+        } else {
+            echo 'background: none;';
+        }
+
+    if ($branded['LandingPageStyle']['background_image']) {
+        echo 'background-color: '.$branded['LandingPageStyle']['background_color'].';';
+    }
+
+?>
+    }
+
+    .text a {
+<?
+    if ($branded['LandingPageStyle']['text_color']) {
+        echo 'color: '.$branded['LandingPageStyle']['text_color'].';';
+    }
+
+    if ($branded['LandingPageStyle']['font']) {
+        echo 'font: '.$branded['LandingPageStyle']['font'].';';
+    }
+
+    if ($branded['LandingPageStyle']['font_size']) {
+        echo 'font-size: '.$branded['LandingPageStyle']['font_size'].'px;';
+    }
+
+?>
+    }
+    #paginate a {
+<?
+    if ($branded['LandingPageStyle']['text_color']) {
+        echo 'color: '.$branded['LandingPageStyle']['text_color'].';';
+    }
+
+    if ($branded['LandingPageStyle']['font']) {
+        echo 'font: '.$branded['LandingPageStyle']['font'].';';
+    }
+
+    if ($branded['LandingPageStyle']['font_size']) {
+        echo 'font-size: '.$branded['LandingPageStyle']['font_size'].'px;';
+    }
+
+?>
+    }
+
+<?
+    if ($branded['LandingPageStyle']['element_background_color']) {
+?>
+    #paginate {
+        background-color: <?=$branded['LandingPageStyle']['element_background_color']?>;
+    }
+
+    .item {
+        background-color: <?=$branded['LandingPageStyle']['element_background_color']?>;
+    }
+    .item:hover {
+        background-color: <?=$branded['LandingPageStyle']['element_background_color']?>;
+    }
+<?
+    }
+?>
+<?
+    if ($branded['LandingPageStyle']['element_border_color']) {
+?>
+    .item {
+        border-color: <?=$branded['LandingPageStyle']['element_border_color']?>;
+    }
+<?
+    }
+?>
+
+
+    #header {
+        width: 973px;
+        margin-left: auto;
+        margin-right: auto;
+        position: relative;
+    }
+
+    #header a.logo {
+        background: url("<?=$branded['LandingPageStyle']['logo']?>") no-repeat top left !important;
+        display: block;
+        width: 277px;
+        height: 146px;
+    }
+
+    #links_content {
+        background-color:transparent;
+    }
+
+<?
+    if ($branded['LandingPageStyle']['customcss']) {
+        echo $branded['LandingPageStyle']['customcss'];
+    }
+?>
+
+    </style>
+<?
+}
+
+if ($infinite_scroll && $infinite_scroll_active == 0) {
+
+if (0) {
+?>
+<style>
+#infscr-loading {
+    text-align: center;
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    background: #000;
+    color: #fff;
+    font-family: "QuicksandBook";
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    width: 300px;
+    height: 50px;
+    margin: 0;
+    margin-left: -150px;
+    padding: 10px;
+    opacity: 0.8;
+    z-index: 9998;
+    border-radius: 10px;
+    -moz-border-radius:10px 10px 10px 10px;
+
+}
+
+#infscr-loading img {
+    margin: 0 0 0 0;
+}
+<?
+} else {
+?>
+<style>
+#infscr-loading {
+    text-align: center;
+}
+
+<?
+}
+?>
+.grid_5 .grid_5 img {
+    height: auto !important;
+}
+</style>
+<a href="/pages/hp/<?=$widget_id?>/<?=$clicked_page['Page']['id']?>" rel=nofollow style="display:none">HP</a>
+<script src="http://<?=CDN_URL?>/js/jquery.infinitescroll.2.0b2.modified.js"></script>
+<?
+} // Infinite scroll
+?>
+<div class="main">
+<div id="page_body" class="container_12">
+    <div class="grid_12 top_content_spacer"></div>
+
+    <div id="content" class="grid_12">
+    <div id="interior_content">
+    <div id="links_content" class="grid_12">
+    <?
+        if ($paginate_current == 1) {
+    ?>
+      <div style="display:none"><a rel=nofollow href="<?=$clicked_page['Page']['url']?>"><?=$clicked_page['Page']['title']?></a></div>
+<?
+    }
+
+    $link_append = "?refer=".$refer_link;
+    if ($branded) {
+        $link_append .= "&branded=1";
+    }
+    if ($infinite_scroll) {
+        $link_append .= "&infinite=1";
+    }
+
+    $count = 0;
+    $slot_page = -1;
+    if ($paginate_current > 1) {
+        $slot_page = 20 * ($paginate_current-1) + 9;
+    }
+
+    $group_count = 0;
+    foreach ($all_pages as $group_pages) {
+
+        $grid = $group_grid[$group_count];
+        $image_width = $group_image_width[$group_count];
+        $image_height = $group_image_height[$group_count];
+
+        echo "<div id='group_".$group_count."' class='".$grid."'>";
+
+        $group_count++;
+        $image_assets = new \CI\Asset\Image();
+
+        foreach ($group_pages as $page) {
+            if (isset($page['ad'])) {
+                echo '<div class="'.$grid.' advert item" style="height:250px;">';
+                echo '<div class="image"><div id="div-gpt-ad-1"></div></div><span class="advert_tab" style="display:none;">Advertisement</span>';
+                echo '</div>';
+            } elseif (isset($page['Page']['third_party_link'])) {
+                echo $this->element(
+                    "item",
+                    array(
+                        "grid"           => $grid,
+                        "alt"            => $count++ % 2 ? '' : 'alt',
+                        "link"           => $page['Page']['link'],
+                        "image_html"     => $page['Page']['image'],
+                        "page_tracker"   => $convert->outbound_tracker($page['Page']['link']),
+                        "link_pretty"    => $page['Page']['link'],
+                        "title"          => $page['Page']['title'],
+                        "description"    => $page['Page']['description'],
+                        "preview_style"  => $preview_style,
+                        "is_third_party" => true
+                    )
+                );
+                echo '<div style="display: none;">', $page['Page']['extra'], '</div>';
+            } else {
+                $link_slot = '';
+                if (ENABLE_LOGGER && 1 == $paginate_current) {
+                    $link_slot = "&slot={$count}";
+                }
+
+                $link = $page['Page']['ctr_link'].$link_append.$link_slot;
+
+                $image_html = $image_assets->getUrl(
+                    array(
+                        'page_id' => $page['Page']['id'],
+                        'type' => \CI\Asset\Image::URL_CROP_FULL,
+                        'image' => $page['Page']['image'],
+                        'width' => $image_width,
+                        'height' => $image_height,
+                        'extra_dirs' => array(
+                            DOMAIN_ID,
+                            $page['Page']['intersect_id'],
+                        ),
+                        'extra_parameters' => array(
+                            't' => strtotime($page['Page']['moderator_modified']),
+                        )
+                    )
+                );
+
+                $page_tracker = $convert->outbound_tracker($link);
+
+                $slot_page++;
+                if ($count++ % 2) {
+                    $alt = "";
+                } else {
+                    $alt = "alt";
+                }
+
+                echo $this->element("item",
+                                    array(
+                                          "grid"           => $grid,
+                                          "alt"            => $alt,
+                                          "link"           => $link,
+                                          "image_html"     => $image_html,
+                                          "page_tracker"   => $page_tracker,
+                                          "link_pretty"    => $page['Page']['url'],
+                                          "title"          => $page['Page']['title'],
+                                          "description"    => $page['Page']['description'],
+                                          "preview_style"  => $preview_style,
+                                          "is_third_party" => false,
+                                          "debug_page"     => in_array($page['Page']['id'], $debug_pages),
+                                          "slot"           => $slot_page,
+                                    )
+                );
+            }
+        }
+        echo "</div>";
+    }
+
+    echo "</div> <!-- /links_content -->";
+    echo "</div> <!--  /interior_content -->";
+    if (!$infinite_scroll) {
+?>
+
+        <div class="bottom_content_spacer grid_12">
+            <div id=paginate>
+<?
+                if (DOMAIN == 'globetrotting') {
+                    echo $this->element(DOMAIN.'/paginate');
+                } else {
+
+                    if ($paginate_previous_link) {
+                        echo $html->link("<< Previous Page", $paginate_previous_link.$link_append);
+                    }
+                    echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+                    if ($paginate_next_link) {
+                        echo $html->link("Next Page >>", $paginate_next_link.$link_append);
+                    } else {
+                        echo $html->link("Next Page >>", "/");
+                    }
+                }
+?>
+            </div>
+        </div>
+<?
+      } else {
+        if ($paginate_next_link) {
+            echo '<div class="bottom_content_spacer grid_12">';
+            echo "<div id=paginate>";
+            echo $html->link("Next Page >>", $paginate_next_link.$link_append);
+            echo "</div>";
+            echo "</div>";
+        }
+    }
+?>
+
+
+</div> <!--  /page_body -->
+
+</div> <!--  /main -->
+<?php foreach($send_traffic as $url): ?>
+    <img src="<?php echo $url ?>" style="display:none" />
+<?php endforeach; ?>
+<?php if ($sidebar_floating) { ?>
+
+<script>
+$(function() {
+    var column = '#<?php echo $sidebar_floating; ?>';
+    var offset = $(column).first().offset();
+    var sidebar_height = $(column).first().height();
+    var window_height = $(window).height();
+    var padding = 15;
+    if (sidebar_height > window_height) {
+        $(window).scroll(function() {
+
+            var elem = $(column);
+            // if we're at the bottom
+            if (elem[0].scrollHeight - elem.scrollTop() == elem.outerHeight()) {
+                $(column).first().stop().animate({
+                    marginTop: $(window).scrollTop() - offset.top - (sidebar_height - window_height)
+                });
+            }
+
+            if (($(window).scrollTop() + window_height) < $(document).height() - offset.top) {
+                if (($(window).scrollTop() + window_height) > (offset.top + sidebar_height)) {
+                    $(column).first().stop().animate({
+                        marginTop: $(window).scrollTop() - offset.top - (sidebar_height - window_height)
+                    });
+                } else {
+                    $(column).first().stop().animate({
+                        marginTop: 0
+                    });
+                }
+            }
+        });
+    } else {
+        $(window).scroll(function() {
+            if ($(window).scrollTop() > offset.top) {
+                $(column).first().stop().animate({
+                    marginTop: $(window).scrollTop() - offset.top + padding
+                });
+            } else {
+                $(column).first().stop().animate({
+                    marginTop: 0
+                });
+            };
+        });
+    }
+});
+</script>
+<?php } ?>
+
+<?
+        if ($infinite_scroll && $infinite_scroll_active == 0) {
+?>
+<div style="display:none;"><a id="infinite_scroll_more" href="#">More</a></div>
+<script type="text/javascript">
+var reload_tries = 0;
+var page_error_num = 0;
+jQuery('#group_<?=$infinite_scroll_group_count?>').infinitescroll({
+    navSelector  : "#paginate",
+    // selector for the paged navigation (it will be hidden)
+    nextSelector : "#paginate a",
+    // selector for the NEXT link (to page 2)
+    itemSelector : "<?=$infinite_scroll_grid?> .item",
+    // selector for all items you'll retrieve
+    loadingText: 'Loading the next page',
+    speed: 'fast',
+    bufferPx: 40,
+    donetext: '<br>Want more?  <a style="color:#fff" href="/">Click here</a>',
+    debug: false,
+    animate: false,
+    //loadingImg: 'http://<?=CDN_URL?>/img/ajax-loader2.gif'
+    loadingImg: '/img/ajax-loader2.gif',
+    errorCallback: function (mesg, pageNum) {
+        if (page_error_num == 0) {
+            page_error_num = pageNum - 1;
+        }
+        if( reload_tries < 3 ) {
+            jQuery("#infinite_scroll_more").click();
+        }
+        reload_tries++;
+    }
+}, function(arrayOfNewElems) {
+    var lenght = arrayOfNewElems.length;
+    var limit  = <?php echo DEFAULT_LANDING_PAGE_GENERAL_INFINITE_SCROLL_LINKS; ?>;
+    if (lenght != limit ) {
+        $(window).unbind('.infscr');
+    }
+
+    addMoreAds();
+});
+
+jQuery("#infinite_scroll_more").click(function(e){
+    e.preventDefault();
+    jQuery('#group_<?=$infinite_scroll_group_count?>').infinitescroll({
+        state: {
+            currPage: page_error_num
+        },
+    }).infinitescroll('retrieve');
+    return false;
+});
+
+function addMoreAds() {
+    var nCounter = 1;
+    var $oElement = $('#' + oCiAds.getLastElementId()).parent().parent();
+    do {
+        $oElement = $oElement.next();
+        if(nCounter == 18) {
+            var sDiv = "<div class='grid_5 advert item' style='height:250px;'>"
+            sDiv +=         "<div class='image'>";
+            sDiv +=             "<div id='" + oCiAds.getNextElementId() + "'></div>";
+            sDiv +=             "<span class='advert_tab'>Advertisement</span>";
+            sDiv +=         "</div>";
+            sDiv += "</div>";
+
+            $oElement.after(sDiv);
+            oCiAds.display([300,250]);
+            break;
+        }
+        nCounter++;
+    }while($oElement.length != 0);
+}
+
+$(document).ready(function() {
+    addMoreAds();
+});
+
+</script>
+<? } ?>
+
+<?php echo $this->element('debugbar', array('page_number' => $paginate_current)); ?>

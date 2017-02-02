@@ -1,0 +1,46 @@
+<?php
+
+namespace CI\Stats\Account;
+
+class Snapshot extends Adapter
+{
+    public function getStats($nAccountId, $sStartDate, $sEndDate)
+    {
+        $nAccountId = intval($nAccountId);
+        $sStartDate = date('Y-m-d H:i:s', strtotime($sStartDate));
+        $sEndDate   = date('Y-m-d H:i:s', strtotime($sEndDate));
+
+        $aParams = array(
+                'fields' => array(
+                        'incoming', 'outgoing', 'credits',
+                ),
+                'conditions' => array(
+                        'account_id' => $nAccountId,
+                        'created >=' => $sStartDate,
+                        'created <=' => $sEndDate,
+                ),
+                'order' => 'created ASC'
+        );
+
+        $aFirst = $this->oModel->find('first', $aParams);
+        $aFirst = is_array($aFirst) ? array_shift($aFirst) : array();
+        $aFirst = $this->statsSet($aFirst);
+
+        $aParams['order'] = 'created DESC';
+        $aLast = $this->oModel->find('first', $aParams);
+        $aLast = is_array($aLast) ? array_shift($aLast) : array();
+        $aLast = $this->statsSet($aLast);
+
+        return array(
+            'incoming' => (int) ($aLast['incoming'] - $aFirst['incoming']),
+            'outgoing' => (int) ($aLast['outgoing'] - $aFirst['outgoing']),
+            'credits'  => (int) $aLast['credits'],
+        );
+    }
+
+    protected function statsSet(array $aNew, array $aOld = array())
+    {
+        $aEmpty = $this->getEmptyStats();
+        return array_merge($aEmpty, $aOld, $aNew);
+    }
+}

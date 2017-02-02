@@ -1,0 +1,26 @@
+#!/usr/bin/perl -w 
+
+use DBI;
+use strict;
+my ($driver,$database,$dsn,$user,$passwd,$host,$query, $db_conn);
+$driver="mysql";
+$database="rt3";
+$host="sql1v-rt.tp.dev.lax.gnmedia.net";
+$dsn="DBI:$driver:database=$database:host=$host";
+$user="noctools_r";
+$passwd="pd0Id6vq";
+$query="SELECT cfv.Name  FROM CustomFields AS cf INNER JOIN CustomFieldValues AS cfv ON cf.id = cfv.CustomField WHERE cf.Name =  'Vertical'";
+
+#connection to db 
+$db_conn = DBI->connect( $dsn, $user, $passwd ) or die DBI::errstr;
+## prepare mysql 
+my $prep_query=$db_conn->prepare($query);
+chomp $prep_query;
+## execute
+my $exe_query= $prep_query->execute or die $DBI::errstr;
+
+#print results
+while ( my @result = $prep_query->fetchrow()){
+	print "@result\n";
+	
+}
