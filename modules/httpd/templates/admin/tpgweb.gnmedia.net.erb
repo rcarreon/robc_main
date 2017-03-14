@@ -1,0 +1,19 @@
+# Managed by Puppet
+
+# <% virtual %>
+
+<VirtualHost *:80>
+
+    ServerName tpgweb.gnmedia.net
+    ServerAlias dev.tpgweb.gnmedia.net
+    ServerAlias stg.tpgweb.gnmedia.net
+    ServerAlias prd.tpgweb.gnmedia.net
+    ServerAlias www.tpgweb.gnmedia.net
+    <%=logging ? '' : '#'%>CustomLog /app/log/gweb.gnmedia.net-access.log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/gweb.gnmedia.net-error.log
+
+    DocumentRoot /var/www/html/ganglia
+
+
+</VirtualHost>
+

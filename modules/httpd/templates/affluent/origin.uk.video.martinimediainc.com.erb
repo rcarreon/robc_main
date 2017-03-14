@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+    ServerName origin.uk.video.martinimediainc.com
+    DocumentRoot "/app/shared/uk.video.martinimediainc.com"
+    ErrorLog /app/log/uk.video.martinimediainc.com-error.log
+    CustomLog /app/log/uk.video.martinimediainc.com-access.log combined
+
+     <Directory "/app/shared/uk.video.martinimediainc.com">
+        Options Indexes FollowSymlinks
+#        AllowOverride FileInfo Indexes 
+        Order   allow,deny
+        Allow from all 
+    </Directory>
+</VirtualHost>

@@ -1,0 +1,74 @@
+# Managed by Puppet
+
+# $Id$
+
+<VirtualHost *:80>
+
+    ServerName svn.gnmedia.net
+    ServerAlias scm.gnmedia.net
+
+    RedirectPermanent / https://svn.gnmedia.net/
+
+</VirtualHost>
+
+
+
+
+<VirtualHost *:443>
+
+    ServerName svn.gnmedia.net
+    ServerAlias scm.gnmedia.net
+
+    <%=logging ? '' : '#'%>CustomLog /app/log/svn.gnmedia.net_access.log Combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/svn.gnmedia.net_error.log
+
+
+    SSLEngine on
+    SSLProtocol all -SSLv2
+
+
+    SSLCertificateFile /etc/httpd/conf.d/svn.gnmedia.net.crt
+    SSLCertificateKeyFile /etc/httpd/conf.d/svn.gnmedia.net.key
+
+    # Let nagios check the server's health
+    Alias /check_health /var/www/html
+    <Location /var/www/html>
+      Allow from all
+      Satisfy any
+    </Location>
+
+    <Location "/">
+    # SVN Part
+      DAV svn
+      SVNParentPath  /ops/repo/svn
+      SVNListParentPath On
+
+      # http://www.sharp-tools.net/archives/000928.html
+      # http://svnbook.red-bean.com/en/1.1/ch06s04.html
+      SVNPathAuthz On
+
+    # Authorization file
+      AuthzSVNAccessFile   /etc/httpd/conf.d/svn.gnmedia.net.acl
+
+
+    # SSL Part 
+        SSLRequireSSL
+
+    # Ldap Part - Authentication
+        AuthName "SVN Access - ldap"
+        AuthType Basic
+        AuthzLDAPAuthoritative    On
+        AuthzLDAPMethod           ldap
+        AuthzLDAPProtocolversion  3
+        AuthzLDAPServer           ldap.gnmedia.net
+        AuthzLDAPUserBase         ou=People,dc=gnmedia,dc=net
+        AuthzLDAPUserKey          uid
+        AuthzLDAPGroupBase        ou=Groups,dc=gnmedia,dc=net
+        AuthzLDAPGroupkey         cn
+        AuthzLDAPMemberKey        uniquemember
+        AuthzLDAPSetGroupAuth     ldapdn
+        #AuthzLDAPLogLevel        debug
+        Require                   valid-user 
+    </Location>
+
+</VirtualHost>

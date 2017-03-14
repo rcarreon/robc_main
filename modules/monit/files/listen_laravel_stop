@@ -1,0 +1,4 @@
+#!/bin/bash
+#This will stop queue_listen_laravel
+
+sudo /bin/kill -9 $(/usr/bin/pgrep -P $(/bin/cat /tmp/queue_listen_laravel.pid))

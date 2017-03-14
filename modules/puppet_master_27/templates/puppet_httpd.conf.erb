@@ -1,0 +1,35 @@
+Listen 8140
+<VirtualHost *:8140>
+
+    SSLEngine on
+    SSLCipherSuite SSLv2:-LOW:-EXPORT:RC4+RSA
+    <% if fqdn =~ /^app[0-9]v-puppet\.tp\.dev/ %>
+    SSLCertificateFile      /app/shared/ssl/certs/<%= fqdn %>.pem
+    SSLCertificateKeyFile   /app/shared/ssl/private_keys/<%= fqdn %>.pem
+    <% else %>
+    SSLCertificateFile      /app/shared/ssl/certs/puppet.gnmedia.net.pem
+    SSLCertificateKeyFile   /app/shared/ssl/private_keys/puppet.gnmedia.net.pem
+    <% end %>
+    SSLCertificateChainFile /app/shared/ssl/ca/ca_crt.pem
+    SSLCACertificateFile    /app/shared/ssl/ca/ca_crt.pem
+    # CRL checking should be enabled; if you have problems with Apache complaining about the CRL, disable the next line
+    SSLCARevocationFile     /app/shared/ssl/ca/ca_crl.pem
+    SSLVerifyClient optional
+    SSLVerifyDepth  1
+    SSLOptions +StdEnvVars
+
+    # The following client headers allow the same configuration to work with Pound.
+    RequestHeader set X-SSL-Subject %{SSL_CLIENT_S_DN}e
+    RequestHeader set X-Client-DN %{SSL_CLIENT_S_DN}e
+    RequestHeader set X-Client-Verify %{SSL_CLIENT_VERIFY}e
+
+    RackAutoDetect On
+    DocumentRoot /usr/share/puppet/rack/puppetmasterd/public/
+	TimeOut 600
+    <Directory /usr/share/puppet/rack/puppetmasterd/>
+        Options FollowSymLinks 
+        AllowOverride None
+        Order allow,deny
+        allow from all
+    </Directory>
+</VirtualHost>

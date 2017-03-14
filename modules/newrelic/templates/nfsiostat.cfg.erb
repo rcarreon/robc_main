@@ -1,0 +1,22 @@
+# NewRelic NFSIOSTAT Config
+# vim: set ft=ini
+[proxy]
+enable_proxy = False
+; proxy_host = my.proxy.url
+; proxy_port = 3128
+
+[nfs]
+; If specified, only the devices in the device_list will
+; be reported. Otherwise, all mounted NFS filesystems will
+; report statistics.
+device_list = []
+
+[plugin]
+key = <%= newrelic_lic %>
+interval = 60
+loglevel = INFO
+logfile  = <%= newrelic_log_dir %>/newrelic-nfsiostat.log
+pidfile  = /var/run/newrelic-nfsiostat.pid ; hard-coded in init script :(
+
+enable_nfs_aggregate     = True
+enable_nfs_reportvolumes = True

@@ -1,0 +1,7 @@
+#we can have an active-passive relationship based on memcache key locks and stagger the start times
+5,37 * * * * root sudo -u apache /usr/local/bin/crowdignite_engine/conrun_vwWidget.sh >> /app/log/cronjobs/conrun_vwWidget.log 2>&1
+5,37 * * * * root sudo -u apache /usr/local/bin/crowdignite_engine/conrun_vwWidget_viewbility.sh >> /app/log/cronjobs/conrun_vwWidget_viewbility.log 2>&1
+7,35 * * * * root sudo -u apache /usr/local/bin/crowdignite_engine/conrun_vwLanding.sh >> /app/log/cronjobs/conrun_vwLanding.log 2>&1
+0 0 * * * root /usr/local/bin/crowdignite_engine/clean_data_share.sh >> /app/log/cronjobs/cleaner.log 2>&1
+0-58/2 * * * * root /usr/local/bin/crowdignite_engine/reload_vw.sh >> /app/log/cronjobs/reload_vw.log 2>&1
+0 5 * * * root /usr/local/bin/crowdignite_engine/email_fatal_errors.sh &> /dev/null

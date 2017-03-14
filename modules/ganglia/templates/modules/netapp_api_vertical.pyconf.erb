@@ -1,0 +1,23 @@
+modules {
+    module {
+        name = "netapp_api_vertical"
+        language = "python"
+    }
+}
+
+collection_group {
+    collect_every = 15
+    time_threshold = 70
+    metric {
+        name_match = "(.+)ops"
+    }
+    metric {
+        name_match = "(.+)latency"
+    }
+    metric {
+        name_match = "(.+)data"
+    }
+    metric {
+        name_match = "disk(.+)"
+    }
+}

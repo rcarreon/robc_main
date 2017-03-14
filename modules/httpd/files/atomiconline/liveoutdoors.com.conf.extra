@@ -1,0 +1,9 @@
+# $Id$
+
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^liveoutdoors\.com$ [NC]
+    RewriteRule ^/(.*) http://www.liveoutdoors.com/$1 [R=301,L]
+
+
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

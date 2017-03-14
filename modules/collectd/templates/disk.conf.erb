@@ -1,0 +1,18 @@
+# $Id$
+# $URL$
+
+LoadPlugin "disk"
+<Plugin "disk">
+  Disk "xvda2"
+  IgnoreSelected false
+</Plugin>
+
+<% if has_variable?("blockdevices") then %>
+  <% blockdevices.split(",").each do |device| %>
+    <Plugin disk>
+      Disk "<%= device %>"
+      IgnoreSelected false
+    </Plugin>
+  <% end %>
+<% end %>
+

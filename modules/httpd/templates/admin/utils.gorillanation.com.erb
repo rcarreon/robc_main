@@ -1,0 +1,31 @@
+#This file is managed by Puppet do not modify it from <%=fqdn %>
+
+<VirtualHost *:80>
+    ServerName utils.gorillanation.com
+    ServerAlias *.utils.gorillanation.com utils.atomiconline.com
+
+    DocumentRoot /app/shared/docroots/utils.gorillanation.com/htdocs/docroot
+    php_value include_path ".:/app/shared/docroots/utils.gorillanation.com/htdocs:/usr/share/pear"
+
+    <Directory "/app/shared/docroots/utils.gorillanation.com/htdocs/docroot">
+    Options Includes FollowSymLinks MultiViews
+    AllowOverride All
+    </Directory>
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/utils-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/utils-access.log combined
+    <Location  /utilities>
+        AuthType Basic
+        AuthName "Admin Only"
+        AuthUserFile /etc/httpd/conf.d/utils.logins
+        Require valid-user
+    </Location>
+
+    AddHandler cgi-script .cgi
+    <Directory /app/shared/docroots/utils.gorillanation.com/htdocs/docroot/utilities>
+        Options ExecCGI
+        DirectoryIndex index.cgi
+    </Directory>
+
+</VirtualHost>
+

@@ -1,0 +1,22 @@
+
+    RewriteEngine On
+
+    # dvdfile --> www.dvdfile
+    RewriteCond %{HTTP_HOST} ^dvdfile\.com$ [NC]
+    RewriteRule ^/(.*) http://www.dvdfile.com/$1 [R=301,L]
+
+
+    # Legacy pagination rules
+    RewriteRule ^/(news|reviews|views|tech)/([0-9]+)$ /$1 [R=301]
+
+    # Legacy urls, from sitebuilder
+    RewriteRule ^/review/([-a-z0-9]+)$ /reviews/review/$1 [R=301]
+
+    RewriteCond %{QUERY_STRING} ^q=(.*)
+    RewriteRule ^/result.php$ /component/search/%1? [R=301]
+    
+    RewriteCond %{QUERY_STRING} ^q=(.*)
+    RewriteRule ^/search.php$ /component/search/%1? [R=301]
+
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

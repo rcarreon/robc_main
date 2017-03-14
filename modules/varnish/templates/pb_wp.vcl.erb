@@ -1,0 +1,386 @@
+# This is a basic VCL configuration file for varnish.  See the vcl(7)
+# man page for details on VCL syntax and semantics.
+# 
+# Default backend definition.  Set this to point to your content
+# server.
+# 
+#
+include "/etc/varnish/plugin.vcl";
+
+<%
+# Need to tweak so we get the ip listed not the short name
+require 'socket'
+
+host,vertical,env,location,domain,tlda = fqdn.split('.')
+wp_ip = IPSocket.getaddress("vip-app-wp.ao." + env + ".lax.gnmedia.net")
+
+%>
+
+backend wp {
+        .host= "<%= wp_ip %>";
+        .port = "80";
+        .probe = {
+            .url = "/";
+            .interval = 5s;
+            .timeout = 1 s;
+            .window = 5;
+            .threshold = 3;
+        }
+        # increasing timeouts to mitigate admin 503 guru meditation errors
+        .connect_timeout = 120s;
+        .first_byte_timeout = 120s;
+        .between_bytes_timeout = 120s;
+}
+
+acl purge {
+<% if env == "prd" %>
+    "10.11.34.19";
+    "10.11.34.22";
+    "10.11.34.28";
+<% end %>
+<% if env == "stg" %>
+    "10.11.134.19";
+<% end %>
+<% if env == "dev" %>
+    "10.11.234.19";
+<% end %>
+
+}
+
+# Called after receiving a request. Decides how to serve the request
+# Possible keywords: error, pass, pipe
+
+sub vcl_recv {
+
+    # Do a geo-ip lookup if country_code is not received from the client
+    # Exlcude CDN
+    if (req.http.host ~ "^(wp|stg.wp|dev.wp|sbx|dev|stg|www).(craveonline|thefashionspot|momtastic|mumtastic|momtasticau)" && !req.http.Cookie ~ "country_code") {
+        C{
+        int maxHeaderSize = 100;
+        char *ipArray[maxHeaderSize];
+        char *cookie;
+        char *country_code = NULL;
+        char *unknown = "Unknown";
+
+        int i;
+
+        // Initialize the ipArray to be null pointers
+        for (i = 0; i < maxHeaderSize; i += 1) {
+            ipArray[i] = NULL;
+        }
+
+        // Populates the ipArray with the values from the X-Forwarded-For
+        getAllHeaders(sp, "X-Forwarded-For", ipArray, maxHeaderSize);
+
+        for (i = 0; ipArray[i] && i < maxHeaderSize; i++) {
+            country_code = getLocationFromIpStr(ipArray[i]);
+            if (0 != strcmp(unknown, country_code)) {
+                break;
+            }
+        }
+
+        if (NULL == country_code) {
+            country_code = unknown;
+        }
+
+        // Set the cookie in the browser
+        cookie = VRT_GetHdr(sp, HDR_REQ, "\07Cookie:");
+
+        if (NULL == cookie) {
+            VRT_SetHdr(sp, HDR_REQ, "\07Cookie:", " country_code=",
+                country_code, "; set_country_code=1",
+                vrt_magic_string_end);
+        }
+        else {
+            VRT_SetHdr(sp, HDR_REQ, "\07Cookie:", cookie,
+                "; country_code=", country_code, "; set_country_code=2",
+                vrt_magic_string_end);
+        }
+        }C
+    }
+
+    # By default, we use unified wordpress platform
+    set req.backend = wp;
+
+    # We allow varnish to server stale content longer if all app servers are down
+    # (6h due to recent change in the OnCall procedure)
+    # http://varnish-cache.org/trac/wiki/VCLExampleGrace
+    # otherwise
+    if (req.backend.healthy) {
+        set req.grace = 30s;
+    } else {
+        set req.grace = 24h;
+    }
+
+    if (req.request == "PURGE") {
+        # If client is from the NAT of ACE (Internet User)
+        if(client.ip ~ purge) {
+            error 405 "Not allowed.";
+        }
+        return(lookup);
+    }
+
+    if (req.request != "GET" &&
+      req.request != "HEAD" &&
+      req.request != "PUT" &&
+      req.request != "POST" &&
+      req.request != "TRACE" &&
+      req.request != "OPTIONS" &&
+      req.request != "DELETE") {
+        /* Non-RFC2616 or CONNECT which is weird. */
+        return (error);
+    }
+
+    if (req.http.Accept-Encoding) {
+    # Handle compression correctly. Varnish treats headers literally, not
+    # semantically. So it is very well possible that there are cache misses
+    # because the headers sent by different browsers aren't the same.
+    # @see: http://varnish.projects.linpro.no/wiki/FAQ/Compression
+    #
+    # if the browser supports it, we'll use gzip
+    if (req.http.Accept-Encoding ~ "gzip") {
+          set req.http.Accept-Encoding = "gzip";
+    } elsif (req.http.Accept-Encoding ~ "deflate") {
+    # next, try deflate if it is supported
+       set req.http.Accept-Encoding = "deflate";
+    } else {
+    # unknown algorithm. Probably junk, remove it
+       unset req.http.Accept-Encoding;
+        }
+    }
+
+    if (req.request != "GET" && req.request != "HEAD") {
+        /* We only deal with GET and HEAD by default */
+        return (pass);
+    }
+
+    if (req.url ~ "^/(pblogin|wp-admin)/" && req.url !~ "admin-ajax\.php") {
+        return (pass);
+    }
+
+    if (req.http.referer ~ "^/(pblogin|wp-admin)/" && req.url !~ "admin-ajax\.php") {
+        return (pass);
+    }
+
+    # If utm_, utc_, or utq_ are detected in the query string, strip out the entire query string.
+    # These parameters are only used by traffic providers to identify a specific buy, so there's
+    # no point in sending them to Apache and generating an uncached request.
+    # Disabled this as requested by the titans team due the honeypot project
+    #if (req.url ~ "(\?.*)(utm_|utc_|utq_)") {
+    #    set req.url = regsub(req.url, "\?.*$", "");
+    #}
+
+    if (req.http.Cookie) {
+        # Add Backend Login Detection
+        if (req.http.cookie ~ "wordpress_") {
+            return (pass);
+        }
+    }
+
+    if (req.http.Authorization) {
+        /* Not cacheable by default */
+        return (pass);
+    }
+
+    # We don't strip http.cookie since we lookup for every request.
+    # By Default varnish doesn't do lookup when cookie is present
+
+    return (lookup);
+}
+
+# sub vcl_pipe {
+#     # Note that only the first request to the backend will have
+#     # X-Forwarded-For set.  If you use X-Forwarded-For and want to
+#     # have it set for all requests, make sure to have:
+#     # set bereq.http.connection = "close";
+#     # here.  It is not set by default as it might break some broken web
+#     # applications, like IIS with NTLM authentication.
+#     return (pipe);
+# }
+# 
+# sub vcl_pass {
+#     return (pass);
+# }
+# 
+
+sub vcl_hash {
+    set req.hash += req.url;
+    if (req.http.host) {
+        set req.hash += req.http.host;
+    } else {
+        set req.hash += server.ip;
+    }
+    if (req.http.Cookie ~ "country_code=(GB|CA|AU)") {
+       set req.hash += regsub(req.http.Cookie, ".*country_code=(.{2});.*", "\1");
+    }
+    if ((req.http.host ~ "(local.wp|dev.wp|stg.wp|sbx.wp|wp|dev|stg|sbx|www).(craveonline|thefashionspot)") &&
+        req.http.user-agent ~ "(Android|BlackBerry|Googlebot-Mobile|^HTC|IEMobile|iPhone|iPod|Kindle|^MOT|Nokia|^SonyEricsson|SymbianOS|webOS|Zune)" &&
+        !req.http.Cookie ~ "pm=n")
+    {
+        set req.hash += "mobile";
+    }
+    return (hash);
+}
+
+sub vcl_hit {
+    if (req.request == "PURGE") {
+        purge(req.url ~ req.url);
+        error 200 "Purged.";
+    }
+    if (!obj.cacheable) {
+        return (pass);
+    }
+    return (deliver);
+}
+# 
+sub vcl_miss {
+    if (req.request == "PURGE") {
+        error 404 "Not in Cache.";
+    }
+    return (fetch);
+}
+# 
+sub vcl_fetch {
+    <% if env == "dev" %>
+        set beresp.http.X-Cookie-Debug = "Request cookie: " req.http.Cookie;
+    <% end %>
+    #We only deal with GET and HEAD by default
+    # The app server can post back in our sorry faces
+    if (req.request != "GET" && req.request != "HEAD") {
+        return (pass);
+    }
+
+    # if backend is down, serve stale content for that period
+    set beresp.grace = 6h;
+
+    if (req.url ~ "^/(pblogin|wp-admin)/" && req.url !~ "admin-ajax\.php") {
+        set beresp.http.X-Cacheable = "NO:Authenticated-Url";
+        return (pass);
+    }
+
+    if (req.http.referer ~ "^/(pblogin|wp-admin)/" && req.url !~ "admin-ajax\.php") {
+        set beresp.http.X-Cacheable = "NO:Authenticated-Referrer";
+        return (pass);
+    }
+
+    if (!beresp.cacheable) {
+        set beresp.http.X-Cacheable = "NO:Not-Cacheable";
+        return (pass);
+    }
+
+    if ((req.http.Cache-Control ~ "no-cache") || (req.http.Pragma ~ "no-cache")) {
+        set beresp.http.X-Cacheable = "NO:User ForcedRefresh";
+        return (pass);
+    }
+    # By default, we cache all static content in varnish for 30 days
+#   if (req.url ~ "\.(js|css|gif|ico|jpg|js|png|swf|txt)") {
+#       set beresp.ttl = 7d;
+#       unset beresp.http.set-cookie;
+#   
+#       # See http://varnish.projects.linpro.no/wiki/VCLExampleLongerCaching
+#       /* Remove Expires from backend, it's not long enough */
+#       #unset beresp.http.expires;
+#   
+#       /* Set the client's TTL on this beresp.ct */
+#       #set beresp.http.cache-control = "max-age = 600";
+#   
+#       /* Don't use Pragma */
+#       unset beresp.http.pragma;
+#   }
+
+    ## if the object is saying how long to cache it, you
+    ## can rely on the fact that it is cachable.
+    if (beresp.http.Cache-Control ~ "max-age" && !beresp.http.Cache-Control == "max-age=0" ) {
+    # We flag that traffic
+        set beresp.http.magicmarker = "1";
+        set beresp.ttl = 30m;
+        set beresp.grace = 30m;
+        unset beresp.http.Set-Cookie;
+
+    # See http://varnish.projects.linpro.no/wiki/VCLExampleLongerCaching
+    # Remove Expires from backend, it's not long enough
+        unset beresp.http.expires;
+
+    # Set the client's TTL on this object
+        set beresp.http.cache-control = "max-age=600";
+
+    # Don't use Pragma
+        unset beresp.http.pragma;
+    }
+
+    #If it's served via Akamai let's use a longer ttl
+    if (req.http.host ~ "cdn|origin") {
+        set beresp.http.edge-control = "cache-maxage=604800";
+    }
+
+    if (!beresp.http.Set-Cookie ~ "pm=n") {
+    # Remove set cookies from backend since it's not being used
+    unset beresp.http.Set-Cookie;
+    }
+    # Ok no matches found, let's deliver
+    return (deliver);
+}
+# 
+sub vcl_deliver {
+    # Remove X-Powered-By: PHP Version
+    remove resp.http.X-Powered-By;
+    # At this point, we don't know if the country_code cookie was set
+    # by varnish, so we check set_country_code. If that is set, it means
+    # varnish set the cookie, so we will send that to the browser so we
+    # can limit the number of geoip lookup.
+
+    # Might not need it since our CDN doesn't cache set-Cookie
+    if (!resp.http.Set-Cookie && !req.http.host ~ "cdn|origin" && req.http.Cookie ~ "set_country_code") {
+        if (req.http.Cookie ~ "country_code=(GB|CA|AU)") {
+            set resp.http.Set-Cookie = regsub(req.http.Cookie, ".*country_code=(.{2});.*","country_code=\1; expires: Session; path=/; ");
+        }
+        else {
+            set resp.http.Set-Cookie = "country_code=Unknown";
+        }
+    }
+    <% if env == "dev" %>
+        set resp.http.X-Set-Cookie-Debug = "SET cookie: " resp.http.Set-Cookie;
+    <% end %>
+
+    if (obj.hits > 0) {
+        set resp.http.X-Cache = "HIT from <%= fqdn.gsub(".gnmedia.net","") %>";
+        set resp.http.X-Cache-Hits =  obj.hits;
+    } else {
+        set resp.http.X-Cache = "MISS from <%= fqdn.gsub(".gnmedia.net","") %>";
+    }
+
+    #Our magicmarker is to flag cacheable content no matter what (ie static)
+    if (resp.http.magicmarker) {
+    # Remove the magic marker
+        unset resp.http.magicmarker;
+    }
+    else {
+    #Set the clients TTL on other objects no matter what (prevent client caching : WE decide) */
+        set resp.http.Expires = "Wed, 29 Dec 1976 00:00:00 GMT";
+        set resp.http.Cache-Control = "no-store, no-cache, must-revalidate";
+    }
+
+}
+# 
+# sub vcl_error {
+#     set obj.http.Content-Type = "text/html; charset=utf-8";
+#     synthetic {"
+# <?xml version="1.0" encoding="utf-8"?>
+# <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+#  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+# <html>
+#   <head>
+#     <title>"} obj.status " " obj.response {"</title>
+#   </head>
+#   <body>
+#     <h1>Error "} obj.status " " obj.response {"</h1>
+#     <p>"} obj.response {"</p>
+#     <h3>Guru Meditation:</h3>
+#     <p>XID: "} req.xid {"</p>
+#     <hr>
+#     <p>Varnish cache server</p>
+#   </body>
+# </html>
+# "};
+#     return (deliver);
+# }

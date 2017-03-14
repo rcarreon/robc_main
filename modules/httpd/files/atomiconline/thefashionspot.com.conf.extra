@@ -1,0 +1,43 @@
+# $Id$
+
+    # Non WWW Rewrite when lax.tfs won't be needed anymore
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^thefashionspot\.com$ [NC]
+    RewriteRule ^/(.*) http://www.thefashionspot.com/$1 [R=301,L]
+
+    # tfs/profiles--> tfs/
+    RewriteRule ^/profiles$ /$1 [R=301,L]
+
+    # tfs/beauty/news--> tfs/beauty
+    RewriteRule ^/beauty/news$ /beauty$1 [R=301,L]
+
+    # tfs/style-trends/news--> tfs/style-trends
+    RewriteRule ^/style-trends/news$ /style-trends$1 [R=301,L]
+
+    # tfs/runway-news/news--> tfs/runway-news
+    RewriteRule ^/runway-news/news$ /runway-news$1 [R=301,L]
+
+    # tfs/celebrity-fashion/news--> tfs/celebrity-fashion
+    RewriteRule ^/celebrity-fashion/news$ /celebrity-fashion$1 [R=301,L]
+
+    # tfs/style-trends/beauty--> tfs/style-trends
+    RewriteRule ^/style-trends/beauty$ /style-trends$1 [R=301,L]
+
+    # tfs/new-york-fashion-week/news--> tfs/new-york-fashion-week
+    RewriteRule ^/new-york-fashion-week/news$ /new-york-fashion-week$1 [R=301,L]
+
+    # tfs/heartbeats--> tfs/runway-news/news/178473-my-heart-beats-for-the-ultimate-heart-pumping-celebrity-playlist
+    RewriteRule ^/heartbeats /runway-news/news/178473-my-heart-beats-for-the-ultimate-heart-pumping-celebrity-playlist [R=301,L]
+    RewriteRule ^/heartbeat /runway-news/news/178473-my-heart-beats-for-the-ultimate-heart-pumping-celebrity-playlist [R=301,L]
+    
+    # www.tfs/forums --> forums.tfs/
+    RewriteRule ^/forums/?(.*) http://forums.thefashionspot.com/$1 [R=301,L]
+    # same for /links/
+    RewriteRule ^/links/?(.*) http://forums.thefashionspot.com/links/$1 [R=301,L]
+    # same for ugala
+    RewriteRule ^/ugala/(.*) http://forums.thefashionspot.com/ugala/$1 [R=301,L]
+    # same for /members/
+    RewriteRule ^/members/(.*) http://forums.thefashionspot.com/members/$1 [R=301,L]
+    #Rewrite rules to redirect xmlrpc.php
+    RewriteRule ^/xmlrpc\.php$ /$1  [R=301,L]
+

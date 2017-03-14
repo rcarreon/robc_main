@@ -1,0 +1,9 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@actiontrip.com
+    DocumentRoot /app/shared/actiontrip.com/htdocs/ 
+    ServerName www.origin.actiontrip.com
+    ServerAlias www.cdn.actiontrip.com
+    <%=logging ? '' : '#'%>ErrorLog /app/log/origin.actiontrip.com-error_log
+    <%=logging ? '' : '#'%>CustomLog /app/log/origin.actiontrip.com-access_log combined
+</VirtualHost>
+

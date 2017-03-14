@@ -1,0 +1,78 @@
+# This file is managed by Puppet do not modify it from <%= fqdn %>
+# $Id$
+
+source dbsettings {
+        type                    = mysql
+        sql_host                = vip-sqlro-mal.ao.stg.lax.gnmedia.net
+        sql_user                = sphinx_r
+        sql_pass                = eHltXsg5
+        sql_db                  = myanimel_db
+}
+
+source myAnimeListForums : dbsettings
+{
+        sql_query	= SELECT topic_id as id, topic_id, topic_title, m.msg_id, topic_board_id, topic_mem_id_started \
+			  FROM forum_topics as t \
+			  JOIN forum_messages m ON msg_id = topic_last_msg_id \
+			  LEFT JOIN animelist_members m1 ON t.topic_mem_id_started = m1.mem_id \
+			  LEFT JOIN forum_messages lm ON t.topic_last_msg_id = lm.msg_id \
+			  LEFT JOIN animelist_members m2 ON m2.mem_id = lm.msg_topic_mem_id \
+			  WHERE topic_club_id = 0 
+	sql_attr_uint 	= msg_id
+	sql_attr_uint	= topic_id
+	sql_attr_uint	= topic_board_id
+	sql_attr_uint   = topic_mem_id_started
+}
+
+source myAnimeListForumsUser : dbsettings
+{
+        sql_query       = SELECT msg_id AS id, topic_title, msg_topic_mem_id, topic_id, topic_board_id \
+                          FROM myanimel_db.forum_sphinx_topic_member
+        sql_attr_uint   = topic_id
+        sql_attr_uint   = msg_topic_mem_id
+        sql_attr_uint   = topic_board_id
+}
+
+##INDICES
+
+index myanimelist_forums
+{
+        source                  = myAnimeListForums
+        path                    = /app/sphinx/myanimelist_forums
+        morphology              = none
+        charset_type            = utf-8
+        min_infix_len           = 1
+}
+
+index myanimelist_forums_user
+{
+        source                  = myAnimeListForumsUser
+        path                    = /app/sphinx/myanimelist_forums_user
+        morphology              = none
+        charset_type            = utf-8
+        min_infix_len           = 1
+}
+
+#############################################################################
+## indexer settings
+#############################################################################
+
+indexer
+{
+        mem_limit               = 64M
+}
+
+#############################################################################
+## searchd settings
+#############################################################################
+
+searchd
+{
+        port                    = 3312
+        log                     = /app/log/sphinx/searchd.log
+        query_log               = /app/log/sphinx/squery.log
+        read_timeout            = 5
+        max_matches             = 10000
+        max_children            = 30
+        pid_file                = /var/sphinx/searchd.pid
+}

@@ -1,0 +1,19 @@
+<VirtualHost *:80>
+  ServerName <%= fqdn %>
+  ServerAlias foreman.gnmedia.net
+  DocumentRoot /usr/share/foreman/public
+       
+  RailsAutoDetect On
+  AddDefaultCharset UTF-8
+            
+  RailsEnv production
+  ErrorLog /app/log/foreman.gnmedia.net_error.log 
+  CustomLog /app/log/foreman.gnmedia.net_access.log combined
+               
+  <Directory /usr/share/foreman/>
+    Options FollowSymLinks
+    AllowOverride None
+    Order allow,deny
+    Allow from      all
+  </Directory>
+</VirtualHost>

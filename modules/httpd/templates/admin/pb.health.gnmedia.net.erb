@@ -1,0 +1,10 @@
+NameVirtualHost *:80
+<VirtualHost *:80>
+        ServerAdmin webmaster@localhost
+        ServerName health.gnmedia.net
+        ServerAlias *.health.gnmedia.net
+        DocumentRoot /app/shared/docroots/titans/pb.health.gnmedia.net
+
+        <%=logging ? '' : '#'%>CustomLog /app/log/pb.health-access.log combined
+        <%=logging ? '' : '#'%>ErrorLog /app/log/pb.health-error.log
+</VirtualHost>

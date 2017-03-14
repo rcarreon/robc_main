@@ -1,0 +1,17 @@
+# This file is managed by Puppet do not modify it from <%=fqdn %>
+#
+<VirtualHost *:80>
+    DocumentRoot /app/shared/docroots/campaigns.<%= name %>
+    ServerName campaigns.<%= name %>
+    ServerAlias *.campaigns.<%= name %>
+    <%=logging ? '' : '#'%>ErrorLog /app/log/campaigns.<%= name %>-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/campaigns.<%= name %>-access.log combined
+
+    <Directory /app/shared/docroots/campaigns.<%= name %>/>
+        AllowOverride FileInfo Indexes Options
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ index.php?url= [QSA,L]
+    </Directory>
+</VirtualHost>

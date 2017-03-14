@@ -1,0 +1,15 @@
+<VirtualHost *:80>
+    # Testing cowboy commits
+
+    ServerName dev.phabricator.gnmedia.net
+    <%=logging ? '' : '#'%>CustomLog /app/log/dev.phabricator.gnmedia.net-access.log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/dev.phabricator.gnmedia.net-error.log
+
+    DocumentRoot /app/shared/docroots/dev.phabricator.gnmedia.net/phabricator/webroot/
+
+    RewriteEngine on
+    RewriteRule ^/rsrc/(.*)     -                       [L,QSA]
+    RewriteRule ^/favicon.ico   -                       [L,QSA]
+    RewriteRule ^(.*)$          /index.php?__path__=$1  [B,L,QSA]
+
+</VirtualHost>

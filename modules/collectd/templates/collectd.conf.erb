@@ -1,0 +1,38 @@
+# $Id$
+# $URL$
+
+#
+# Config file for collectd(1).
+# Please read collectd.conf(5) for a list of options.
+# http://collectd.org/
+#
+
+Hostname    <%= fqdn %>
+FQDNLookup  false
+BaseDir     "/var/lib/collectd"
+PIDFile     "/var/run/collectd.pid"
+PluginDir   "/usr/lib64/collectd"
+TypesDB     "/usr/share/collectd/types.db"
+
+Interval     30
+#ReadThreads  5
+
+
+# http://collectd.org/documentation/manpages/collectd.conf.5.shtml#plugin_logfile
+#
+#LoadPlugin "logfile"
+#<Plugin logfile>
+# 	File "/var/log/collectd.log"
+#	LogLevel info
+#	Timestamp true
+#</Plugin>
+
+# http://collectd.org/documentation/manpages/collectd.conf.5.shtml#plugin_syslog
+LoadPlugin "syslog"
+<Plugin "syslog">
+	LogLevel err
+</Plugin>
+
+Include "/etc/collectd.d/*.conf"
+
+

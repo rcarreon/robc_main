@@ -1,0 +1,66 @@
+#
+# This file is managed by Puppet. DO NOT MODIFY it on <%= fqdn %>
+#
+
+# WARNING - The UUID defined below must be unique for each agent.
+#
+# To use this INI file as a template for configuring additional
+# agents, do not simply copy and start a new agent without first
+# modifying the UUID and adjusting other parameters as necessary.
+#
+# WARNING - If you are upgrading from a previous 1.x release, please
+# note that we have changed the contents of the agent INI file and
+# split the contents across two files:
+#
+#   <installdir>/etc/mysql-monitor-agent.ini              - this file
+#   <installdir>/etc/instances/mysql/agent-instance.ini   - new file
+#
+# Refer to the documentation for more detailed information and
+# instructions.
+# 
+# NOTE - This Enterprise Service Agent is not configured to enable
+# Query Analyzer for the MySQL servers it is monitoring.  To enable
+# Query Analyzer:
+#
+#   1) Change plugins=agent to plugins=proxy,agent
+#   2) Remove the # character from the beginning of all the proxy-xxx lines
+#   3) Add the following to the end of agent-item-files:
+#        ,share/mysql-monitor-agent/items/quan.lua
+# 
+# Version: <%= mysql_monitor_agent_version %>
+
+[mysql-proxy]
+
+# Common Parameters
+plugins=proxy,agent
+keepalive = true
+
+log-file = mysql-monitor-agent.log
+pid-file=<%= mysql_agent_base_folder %>/mysql-monitor-agent.pid
+
+
+# Agent Parameters
+#
+#
+
+<% 
+case at_status
+  when 'production' 
+    agent_hostname='em.gnmedia.net'
+  #when 'development' 
+  #  agent_hostname='dev.em.gnmedia.net'
+  else 
+    agent_hostname = 'stg.em.gnmedia.net'
+end      
+%> 
+agent-mgmt-hostname = http://<%= agent_hostname %>:80/heartbeat
+agent-mgmt-username = rep_agent
+agent-mgmt-password = <%= mysqld_agent_password %>
+mysqld-instance-dir= etc/instances
+agent-item-files = share/mysql-monitor-agent/items/quan.lua,share/mysql-monitor-agent/items/items-mysql-monitor.xml,share/mysql-monitor-agent/items/custom.xml
+agent-uuid = <%= mysql_monitor_agent_uuid %>
+
+# Proxy Parameters
+proxy-address=:6446
+proxy-backend-addresses = /var/lib/mysql/mysql.sock
+proxy-lua-script = lib/mysql-monitor-agent/lua/quan.lua

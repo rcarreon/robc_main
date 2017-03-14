@@ -1,0 +1,57 @@
+# This file is managed by Puppet. Do not modify it from <%=fqdn %>
+# $Id$
+
+<%
+require 'socket'
+ssl_ip           = IPSocket.getaddress("rt." + guessed_silo + ".gnmedia.net")
+%>
+
+
+
+<VirtualHost *:80>
+    ServerName rt.gorillanation.com
+    ServerAlias rt rt.gnmedia.net rt.<%= guessed_silo[0,3] %>.gnmedia.net rt.<%= guessed_silo %>.gnmedia.net
+    DocumentRoot /app/shared/docroots/rt3/share/html
+
+   RedirectPermanent / https://rt.gorillanation.com
+
+	
+
+</VirtualHost>
+
+
+<VirtualHost <%= ssl_ip %>:443>
+	SSLEngine on
+	SSLCipherSuite ALL:!ADH:!EXPORT:!SSLv2:RC4+RSA:+HIGH:+MEDIUM:+LOW
+	SSLCertificateFile /etc/httpd/conf.d/rt.crt
+	SSLCertificateKeyFile /etc/httpd/conf.d/rt.key
+
+   ServerName  rt.gorillanation.com
+   ServerAlias rt rt.gnmedia.net rt.<%= guessed_silo[0,3] %>.gnmedia.net rt.<%= guessed_silo %>.gnmedia.net
+   ServerAdmin webmaster@rt.gorillanation.com
+
+   #DocumentRoot /opt/rt3/share/html/
+   DocumentRoot /app/shared/docroots/rt3/share/html
+
+   <%=logging ? '' : '#'%>ErrorLog /app/log/rt.gorillanation.com-error_log
+   <%=logging ? '' : '#'%>CustomLog /app/log/rt.gorillanation.com-access_log common
+   RewriteEngine on
+
+   AddDefaultCharset UTF-8
+   PerlRequire /app/shared/docroots/rt3/bin/webmux.pl
+
+
+
+   <Location />
+        Allow from all
+   </Location>
+
+   <Directory />
+       Order allow,deny
+       Allow from all
+       SetHandler perl-script
+       PerlResponseHandler RT::Mason
+   </Directory>
+
+</VirtualHost>
+

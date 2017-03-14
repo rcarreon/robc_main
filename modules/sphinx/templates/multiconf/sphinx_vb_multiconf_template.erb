@@ -1,0 +1,185 @@
+# $Id$
+
+## SHH Sphinx Configuration File
+
+source src
+{
+        type                                    = mysql
+        
+	##************************************************************************
+
+	## Account Logins for SHH MySQL (preferably slave) box
+
+	## Table vbulletin.sphinx_counter must be created first
+
+	sql_host                                = <%= sql_host %>
+        sql_user                                = <%= sql_user %>
+        sql_pass                                = <%= sql_pass %>
+        sql_db                                  = <%= sql_db %>
+
+	##************************************************************************
+
+        sql_range_step                  	= 5000
+        sql_query_pre                   	= SET SESSION query_cache_type=OFF
+}
+
+source postsrc : src
+{
+        sql_query_pre                   = REPLACE INTO sphinx_counter SELECT 1, MAX(postid) FROM <%= sql_prefix %>post
+        sql_query_range                 = SELECT MIN(postid), MAX(postid) FROM <%= sql_prefix %>post
+        sql_query = \
+                SELECT postid, forumid, <%= sql_prefix %>post.threadid as threadid, IF(<%= sql_prefix %>post.userid=0,99999999,<%= sql_prefix %>post.userid) AS userid, \
+                        IF(postuserid=0,99999999,postuserid) AS postuserid, <%= sql_prefix %>post.title, pagetext, <%= sql_prefix %>post.dateline \
+                FROM <%= sql_prefix %>post \
+                INNER JOIN <%= sql_prefix %>thread AS thread ON(thread.threadid = <%= sql_prefix %>post.threadid) \
+                WHERE <%= sql_prefix %>post.visible in (1,2) AND postid >= $start AND postid <= $end \
+                        AND postid <= ( SELECT max_doc_id FROM sphinx_counter WHERE counter_id = 1 );
+        sql_attr_uint = forumid
+        sql_attr_uint = threadid
+        sql_attr_uint = userid
+        sql_attr_uint = postuserid
+        sql_attr_uint = dateline
+        sql_query_post =
+
+}
+
+source postdeltasrc : postsrc
+{
+        sql_query_pre =
+        sql_query_range = SELECT ( SELECT max_doc_id FROM sphinx_counter WHERE counter_id = 1 ), MAX(postid) FROM <%= sql_prefix %>post
+        sql_query = \
+                SELECT postid, forumid, <%= sql_prefix %>post.threadid as threadid, \
+                        IF(<%= sql_prefix %>post.userid=0,99999999,<%= sql_prefix %>post.userid) AS userid, \
+                        IF(postuserid=0,99999999,postuserid) AS postuserid, <%= sql_prefix %>post.title, pagetext, <%= sql_prefix %>post.dateline \
+                FROM <%= sql_prefix %>post \
+                INNER JOIN <%= sql_prefix %>thread AS thread ON(thread.threadid = <%= sql_prefix %>post.threadid) \
+                WHERE <%= sql_prefix %>post.visible in (1,2) AND postid >= $start AND postid <= $end \
+                        AND postid > ( SELECT max_doc_id FROM sphinx_counter WHERE counter_id = 1 );
+}
+
+source threadsrc : src
+{
+        sql_query_pre   = REPLACE INTO sphinx_counter SELECT 2, MAX(threadid) FROM <%= sql_prefix %>thread;
+        sql_query_range = SELECT MIN(threadid), MAX(threadid) FROM <%= sql_prefix %>thread
+        sql_query = \
+                SELECT threadid, forumid, title, dateline, replycount, \
+                        IF(postuserid=0,99999999,postuserid) AS postuserid, \
+                        IF(firstpostid=0,99999999,firstpostid) as firstpostid, lastpost \
+                FROM <%= sql_prefix %>thread \
+                WHERE visible in (1,2) AND threadid >= $start AND threadid <= $end \
+                        AND threadid <= ( SELECT max_doc_id FROM sphinx_counter WHERE counter_id = 2 );
+        sql_attr_uint = forumid
+        sql_attr_uint = postuserid
+        sql_attr_uint = firstpostid
+        sql_attr_uint = lastpost
+        sql_attr_uint = dateline
+        sql_attr_uint = replycount
+        # PREFIX/TAG ql_attr_str2ordinal
+}
+
+source threaddeltasrc : threadsrc
+{
+        sql_query_pre =
+        sql_query_range = SELECT ( SELECT max_doc_id FROM sphinx_counter WHERE counter_id = 2 ), MAX(threadid) FROM <%= sql_prefix %>thread
+        sql_query = \
+                SELECT threadid, forumid, title, dateline, replycount, \
+                        IF(postuserid=0,99999999,postuserid) AS postuserid, \
+                        IF(firstpostid=0,99999999,firstpostid) as firstpostid, lastpost \
+                FROM <%= sql_prefix %>thread \
+                WHERE visible in (1,2) AND threadid >= $start AND threadid <= $end \
+                        AND threadid > ( SELECT max_doc_id FROM sphinx_counter WHERE counter_id = 2 );
+}
+
+
+index post
+{
+        morphology              = none
+	min_word_len    	= 3
+        charset_type    	= sbcs
+        source                  = postsrc
+
+	##************************************************************************
+
+	## Any stop word we want to use, we can put it in that file. A blank file must exist.
+
+        stopwords               = /sphinx/<%= name %>/sphinx.stopwords
+
+	## Path for the Post Index
+
+	path                    = /sphinx/<%= name %>/post
+
+	##************************************************************************
+	
+
+}
+
+index postdelta : post
+{
+        source                  = postdeltasrc
+
+	##************************************************************************
+
+        path                    = /sphinx/<%= name %>/postdelta
+
+	##************************************************************************
+}
+
+index thread : post
+{
+        source                  = threadsrc
+
+	##************************************************************************
+
+        path                    = /sphinx/<%= name %>/thread
+
+	##************************************************************************
+
+}
+
+index threaddelta : post
+{
+        source                  = threaddeltasrc
+        
+	##************************************************************************
+
+	path                    = /sphinx/<%= name %>/threaddelta
+
+	##************************************************************************
+
+}
+
+indexer
+{
+	## Don't try to exceed 256M unless you know what you are doing!
+
+        mem_limit                       = 128M
+}
+
+searchd
+{
+
+	##************************************************************************
+	
+	## Port needs to be changed for each vertical/site.
+	## e.g. If SHH is set to port 3312, then HFB should be port 3313, Sherdog would be 3314 ... and so on.
+
+        port                            = <%= port %>
+
+
+        pid_file                        = /var/run/sphinx/searchd-<%= name %>.pid
+	log                             = /var/log/sphinx/searchd-<%= name %>.log
+        query_log                       = /var/log/sphinx/query-<%= name %>.log
+
+	##************************************************************************
+
+        read_timeout            	= 5
+        max_children            	= 20
+        max_matches                     = 1000
+        seamless_rotate         	= 1
+        preopen_indexes         	= 1
+        unlink_old                      = 1
+}
+
+# --eof--
+
+

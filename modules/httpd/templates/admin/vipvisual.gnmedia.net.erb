@@ -1,0 +1,27 @@
+# File managed by puppet
+# Do not edit it on <%= fqdn %>
+
+WSGISocketPrefix /etc/httpd/wsgi/
+WSGIPythonPath '/app/shared/vipvisual:/app/shared/vip-visual_dev'
+WSGIDaemonProcess apache processes=5 threads=5 display-name='%{GROUP}' inactivity-timeout=120
+
+<VirtualHost *:80>
+    ServerName  vipvisual.gnmedia.net
+    ServerAlias *.vipvisual.gnmedia.net
+    DocumentRoot /app/shared/vipvisual
+    <%=logging ? '' : '#'%>ErrorLog /app/log/vipvisual.gnmedia.net_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/vipvisual.gnmedia.net_access.log combined
+
+    WSGIScriptAlias / /app/shared/vipvisual/ui_query.py
+
+    Alias /content/ /app/shared/vipvisual/content/
+    <Location "/content/">
+        SetHandler None
+    </Location>
+
+    <Directory /app/shared/vipvisual/>
+        WSGIApplicationGroup %{GLOBAL}
+    </Directory>
+
+</VirtualHost>
+

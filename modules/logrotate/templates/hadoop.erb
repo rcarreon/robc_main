@@ -1,0 +1,22 @@
+# $Id$
+# $URL$
+
+/app/log/hadoop/*.log {
+  daily
+  dateext
+  rotate 7
+  copytruncate
+  compress
+  delaycompress
+  missingok
+}
+
+/app/log/hadoop/*.out {
+  daily
+  dateext
+  rotate 7
+  copytruncate
+  compress
+  delaycompress
+  missingok
+}

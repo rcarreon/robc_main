@@ -1,0 +1,128 @@
+# This file is managed by Puppet do not modify it from <%=fqdn %>
+
+<VirtualHost *:80>
+           ServerName streaming.springboardvideo.com
+           ServerAlias *.streaming.springboardvideo.com
+
+           RedirectMatch ^(.*)$ http://www.springboardplatform.com/$1
+
+           ErrorLog /app/log/redir.media.springboard_error.log
+           CustomLog /app/log/redir.media.springboard_access.log combined
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName media.springboardplatform.com
+     ServerAlias media.springboard.gorillanation.com
+     ServerAlias cdn.springboardplatform.com
+     ServerAlias origin.media.springboard.gorillanation.com
+     ServerAlias cdn.springboardvideo.com
+     ServerAlias cdn.springboard.gorillanation.com
+     ServerAlias springboard.gorillanation.com
+     ServerAlias springboardplatform.com
+     ServerAlias cpv.media.springboardvideo.com
+     ServerAlias sbplatform-a.akamaihd.net
+     ServerAlias sbplatform-a.*
+     ServerAlias social.springboardplatform.com
+     ServerAlias *.springboardplatform.com
+
+     #enabling CORS
+     Header set Access-Control-Allow-Origin "*"
+
+     RewriteEngine On
+
+     # Wordpress rewrite
+     RewriteRule ^/$ http://home.springboardplatform.com [R,L]
+
+     RewriteRule ^/superconfig/(.*)/$ /superconfig/$1.xml
+     #set Env variable cms
+     RewriteRule ^(.*)$ - [E=cms:http://cms.springboardplatform.com/xml_feeds_advanced/index]
+
+     # Set env var for cpv
+     RewriteCond %{HTTP_HOST} ^cpv.media.springboardvideo.com
+     RewriteRule ^(.*)$ - [E=cms:http://cpv.springboardvideo.com/xml_feeds_advanced/index]
+
+     #PLAYLIST MODE
+
+     RewriteRule ^/mediaplayer/springboard/site/(.*)$ - [E=play:0]           # LATEST PLAYLIST BY PARTNER
+     RewriteRule ^/mediaplayer/springboard/playlist/(.*)$ - [E=play:1]       # By PLAYLIST ID
+     RewriteRule ^/mediaplayer/springboard/video/(.*)$ - [E=play:3]          # SINGLE VIDEO
+     RewriteRule ^/mediaplayer/springboard/latest/(.*)$ - [E=play:0]         # LATEST VIDEO
+     RewriteRule ^/mediaplayer/springboard/tag/(.*)$ - [E=play:4]            # LATEST VIDEO BY TAG
+     RewriteRule ^/mediaplayer/springboard/channel/(.*)$ - [E=play:2]        # LATEST VIDEO BY CHANNEL
+     RewriteRule ^/mediaplayer/springboard/search/(.*)$ - [E=play:6]         # SEARCH
+     RewriteRule ^/mediaplayer/springboard/campaign/(.*)$ - [E=play:8]       # CAMPAIGN
+
+
+     # Dynamic and static playlists
+     # 1. mode,
+     # 2. config id
+     # 3. site id
+     # 4. everything else to config dynamic playlist
+
+     # 6. Search
+
+     # CPV
+     RewriteCond %{HTTP_HOST} ^cpv.media.springboardvideo.com
+     RewriteCond %{REQUEST_URI} ^/mediaplayer/springboard/(video|playlist|video|playlist|latest|tag|channel|site)/(.*)
+     RewriteRule ^/mediaplayer/springboard/(video|playlist|video|playlist|latest|tag|channel|site)/([a-z0-9]+)/([0-9]+)/([0-9]+)/([0-9]+)/([0-9]+)/([a-zA-Z]+)/$ http://cpv.media.springboardvideo.com/mediaplayer/springboard/mediaplayer.swf?config={"externalConfiguration":"http://cpv.media.springboardvideo.com/superconfig/$2.js","playlist":"%{ENV:cms}/$3/rss%{ENV:play}/$4","cpv":{"analytics":{"cpvt":1,"cpvid":$5,"cpvaid":$6,"sbcsa":"$7_SHARE"}}} [R,L]
+
+     # CAMPAIGN
+     RewriteCond %{REQUEST_URI} ^/mediaplayer/springboard/campaign/(.*)
+     RewriteRule ^/mediaplayer/springboard/campaign/([a-z0-9]+)/([0-9]+)/([^/]+)/(.*)$  http://cdn.springboardplatform.com/mediaplayer/springboard/mediaplayer.swf?config={"externalConfiguration":"http://www.springboardplatform.com/superconfig/$1.js","playlist":"%{ENV:cms}/$2/rss%{ENV:play}/$3/$4"} [R,L]
+
+     # Check for the connection from the akamai hosts and
+     # redirecting to the https, and non SSL if host does
+     # not match ( default )
+
+     RewriteCond %{HTTP_HOST} ^social.springboardplatform.com
+     RewriteCond %{REQUEST_URI} ^/mediaplayer/springboard/(video|playlist|latest|tag|channel|site)/(.*)
+     RewriteRule ^/mediaplayer/springboard/(video|playlist|latest|tag|channel|site)/([a-z0-9]+)/([0-9]+)(.*)$ https://%{HTTP_HOST}/mediaplayer/springboard/mediaplayer.swf?config={"externalConfiguration":"http://www.springboardplatform.com/superconfig/$2.js","playlist":"%{ENV:cms}/$3/rss%{ENV:play}$4"} [R,L]
+
+    RewriteCond %{HTTPS} !=on
+    RewriteCond %{REQUEST_URI} ^/mediaplayer/springboard/(video|playlist|latest|tag|channel|site)/(.*)
+    RewriteRule ^/mediaplayer/springboard/(video|playlist|latest|tag|channel|site)/([a-z0-9]+)/([0-9]+)(.*)$ https://%{HTTP_HOST}/mediaplayer/springboard/mediaplayer.swf?config={"externalConfiguration":"https://www.springboardplatform.com/superconfig/$2.js","playlist":"%{ENV:cms}/$3/rss%{ENV:play}$4"} [R,L]
+
+     # SEARCH
+     RewriteCond %{REQUEST_URI} ^/mediaplayer/springboard/search/(.*)
+     RewriteRule ^/mediaplayer/springboard/search/([a-z0-9]+)/([0-9]+)/([^/]+)/(.*)$  http://cdn.springboardplatform.com/mediaplayer/springboard/mediaplayer.swf?config={"externalConfiguration":"http://www.springboardplatform.com/superconfig/$1.js","playlist":"%{ENV:cms}/$2/rss%{ENV:play}/*$3*/$4"} [R,L]
+
+     #EXTERNAL MODES (Youtube)
+     RewriteCond %{REQUEST_URI} ^/mediaplayer/springboard/youtube/(.*)
+     RewriteRule ^/mediaplayer/springboard/youtube/([a-z0-9]+)/([a-zA-Z0-9_-]+)(/)?$ http://cdn.springboardplatform.com/mediaplayer/springboard/mediaplayer.swf?config={"externalConfiguration":"http://www.springboardplatform.com/superconfig/$1.js","youtubeId":"$2"} [R,L]
+    
+
+     # SITEMAPS
+     RewriteRule ^/(.*)/sitemaps/([0-9]+).xml$ http://cdn.springboardplatform.com/storage/$1/sitemaps/$2.xml.gz [R,L]
+
+     # JS Redirect rules
+     RewriteRule ^/jsapi/embed(/)?$ /storage/js/embed/sb.loader.js [PT]
+     RewriteRule ^/jsapi/embed/(.*.js)$ /storage/js/embed/lib/$1 [PT]
+     RewriteRule ^/jsapi/embed/(.*.css)$ /storage/js/embed/css/$1 [PT]
+     RewriteRule ^/jsapi/embed/(.*.png)$ /storage/js/embed/buttons/$1 [PT]
+     RewriteRule ^/js/overlay(/)?$ /storage/js/overlay/overlay.min.js [PT]
+     RewriteRule ^/jsapi/embedhtml5(/)?$ /storage/js/embedhtml5/sb.loader.js [PT]
+     RewriteRule ^/jsapi/embedhtml5/(.*.js)$ /storage/js/embedhtml5/lib/$1 [PT]
+     RewriteRule ^/jsapi/embedhtml5/(.*.css)$ /storage/js/embedhtml5/css/$1 [PT]
+     RewriteRule ^/jsapi/embedhtml5/(.*.png)$ /storage/js/embedhtml5/buttons/$1 [PT]
+
+     Alias /mediaplayer /app/shared/docroots/sbv-mediaplayer/current/ 
+     Alias /js_static /app/shared/docroots/cms.springboard.gorillanation.com/htdocs/webroot/js_static
+    Alias /storage/js /app/shared/docroots/sbv-js/current
+
+    DocumentRoot /app/ugc/ 
+    <Directory /app/ugc>
+        AllowOverride None
+        Order allow,deny
+        allow from all
+    <filesMatch ".(ogg|mp4)$">
+        Header set Access-Control-Allow-Origin "*"
+        Header set Access-Control-Allow-Headers "Range"
+        Header set Access-Control-Expose-Headers "Accept-Ranges, Content-Range, Content-Encoding, Age, Date"
+        Header set Accept-Ranges "bytes"
+    </filesMatch>
+
+    </Directory>
+    <%=logging ? '' : '#'%>ErrorLog /app/log/media.springboard_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/media.springboard_access.log combined
+
+</VirtualHost>

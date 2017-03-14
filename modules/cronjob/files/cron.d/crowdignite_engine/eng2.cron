@@ -1,0 +1,21 @@
+# jobs in .sh scripts need to be run in serial
+
+0 */1 * * * root sudo -u apache /usr/bin/php -q /app/shared/public_html/app/cron_dispatcher.php /websites/active_manage >> /app/log/cronjobs/websites_active_manage.log 2>&1
+0 22 * * * root sudo -u apache /usr/bin/php -q /app/shared/public_html/app/cron_dispatcher.php /widgets/process_status >> /app/log/cronjobs/widgets_process_status.log 2>&1
+0 6,13,20 * * * root sudo -u apache /usr/local/bin/crowdignite_engine/eng2_rebalance.sh >> /app/log/cronjobs/eng2_rebalance.log 2>&1
+#0 6,14 * * * root sudo -u apache /usr/bin/php -q /app/shared/public_html/app/cron_dispatcher.php /contextual_engine/rebalance_website_chunks/3 >> /app/log/cronjobs/context_rebal_webchunks3.log 2>&1
+#0 6,14 * * * root sudo -u apache /usr/bin/php -q /app/shared/public_html/app/cron_dispatcher.php /contextual_engine/rebalance_website_chunks/4 >> /app/log/cronjobs/context_rebal_webchunks4.log 2>&1
+#0 6,14 * * * root sudo -u apache /usr/bin/php -q /app/shared/public_html/app/cron_dispatcher.php /contextual_engine/rebalance_website_chunks/5 >> /app/log/cronjobs/context_rebal_webchunks5.log 2>&1
+10 0 * * * root sudo -u apache /usr/bin/php -q /app/shared/public_html/app/cron_dispatcher.php /history_landing_page_analytics/precache >> /app/log/cronjobs/hist_lp_analytics_precache.log 2>&1
+10 0 * * * root sudo -u apache /usr/bin/php -q /app/shared/public_html/app/cron_dispatcher.php /history_widget_analytics/precache >> /app/log/cronjobs/hist_widget_analytics_precache.log 2>&1
+0 2 * * * root sudo -u apache /usr/local/bin/crowdignite_engine/eng2_daily.sh >> /app/log/cronjobs/eng2_daily.log 2>&1
+0 9 * * * root sudo -u apache /usr/local/bin/crowdignite_engine/eng2_ranker.sh >> /app/log/cronjobs/eng2_ranker.log 2>&1
+*/6 * * * * root sudo -u apache /usr/bin/php -q /app/shared/public_html/app/cron_dispatcher.php /landing_page_engine/daemon/rebalance_top_impressions >> /app/log/cronjobs/lp_rebal_top_imp.log 2>&1
+*/5 * * * * root sudo -u apache /usr/bin/php -q /app/shared/public_html/app/cron_dispatcher.php /page_new_engine/daemon/process_new_pages/1 >> /app/log/cronjobs/page_process_new_pages_1.log 2>&1
+5 11,23 * * * root sudo -u apache /usr/local/bin/crowdignite_engine/eng2_social_2xperday.sh >> /app/log/cronjobs/social_2xperday.log 2>&1
+5 5,17 * * * root sudo -u apache /usr/local/bin/crowdignite_engine/eng2_social_4xperday.sh >> /app/log/cronjobs/social_4xperday.log 2>&1
+#
+# These jobs run as root.
+*/15 * * * * root /usr/local/bin/crowdignite_engine/kill_runaway_cronjobs.pl >> /app/log/cronjobs/kill_runaway_cronjobs.log 2>&1
+1,16,31,46 * * * * root /usr/local/bin/crowdignite_engine/find_overlapping_cronjobs.sh > /dev/null 2>&1
+0 5 * * * root /usr/local/bin/crowdignite_engine/email_fatal_errors.sh > /dev/null 2>&1

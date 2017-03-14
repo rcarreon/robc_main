@@ -1,0 +1,5 @@
+# Configuration file for carbon
+CONFIG=/etc/carbon/carbon.conf
+CONF_DIR=/etc/carbon
+GRAPHITE_DIR=/app/data
+LOG_DIR=/app/log

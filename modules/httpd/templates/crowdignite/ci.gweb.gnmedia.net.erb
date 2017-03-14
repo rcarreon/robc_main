@@ -1,0 +1,12 @@
+# Managed by Puppet
+
+<VirtualHost *:80>
+
+    ServerName ci.gweb.gnmedia.net
+    <%=logging ? '' : '#'%>CustomLog /app/log/gweb.gnmedia.net-access.log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/gweb.gnmedia.net-error.log
+
+    DocumentRoot /var/www/html/ganglia
+
+</VirtualHost>
+

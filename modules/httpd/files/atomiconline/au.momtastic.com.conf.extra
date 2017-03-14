@@ -1,0 +1,7 @@
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^au\.momtastic\.com$ [NC]
+    RewriteRule ^/(.*) http://www.mumtastic.com.au/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.au\.momtastic\.com$ [NC]
+    RewriteRule ^/(.*) http://www.mumtastic.com.au/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

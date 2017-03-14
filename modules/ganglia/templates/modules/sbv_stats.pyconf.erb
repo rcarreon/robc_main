@@ -1,0 +1,19 @@
+modules {
+    module {
+        name = "sbv_stats"
+        language = "python"
+    }
+}
+
+collection_group {
+    collect_every = 10
+    time_threshold = 50
+    metric {
+        name = "lax1"
+        title = "Stats redis queue"
+    }
+    metric {
+        name = "cpv_lax1"
+        title = "CPV redis queue"
+    }
+}

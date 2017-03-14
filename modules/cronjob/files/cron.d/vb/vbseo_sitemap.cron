@@ -1,0 +1,5 @@
+# $Id$
+# $URL$
+
+5 0 * * * root php /app/shared/babyandbump.com/vbseo_sitemap/vbseo_sitemap.php 2>&1
+30 2 * * * root php /app/shared/sherdog.net/forums/vbseo_sitemap/vbseo_sitemap.php 2>&1

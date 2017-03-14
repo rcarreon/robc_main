@@ -1,0 +1,785 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app xmlns="http://java.sun.com/xml/ns/j2ee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd" version="2.4">
+	<display-name>Enterprise Dashboard</display-name>
+	
+    <!-- Put BEFORE Spring loader so that merlin.home is initialized. -->
+    <listener>
+        <listener-class>com.mysql.merlin.server.MonitorContextListener</listener-class>
+    </listener>
+	
+    <!-- Context Configuration locations for Spring XML files -->
+    <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>/WEB-INF/applicationContext.xml,appContext-*.xml</param-value>
+    </context-param>
+
+    <!-- Spring web-app context loader -->
+    <listener>
+        <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+
+<filter>
+           <filter-name>UrlRewriteFilter</filter-name>
+           <filter-class>org.tuckey.web.filters.urlrewrite.UrlRewriteFilter</filter-class>
+           <init-param>
+               <param-name>logLevel</param-name>
+               <param-value>WARN</param-value>
+           </init-param>
+           <init-param>
+               <param-name>confReloadCheckInterval</param-name>
+               <param-value>-1</param-value>
+          </init-param>
+</filter>
+       <filter-mapping>
+           <filter-name>UrlRewriteFilter</filter-name>
+           <url-pattern>/*</url-pattern>
+	   <dispatcher>REQUEST</dispatcher>
+	   <dispatcher>FORWARD</dispatcher>
+       </filter-mapping>
+
+    <filter>
+        <filter-name>actionAccessLog</filter-name>
+        <filter-class>com.mysql.merlin.ui.filters.AccessLogFilter</filter-class>
+        <init-param>
+            <param-name>logSuffix</param-name>
+            <param-value>action</param-value>
+        </init-param>
+    </filter>
+
+    <filter>
+        <filter-name>resourceAccessLog</filter-name>
+        <filter-class>com.mysql.merlin.ui.filters.AccessLogFilter</filter-class>
+        <init-param>
+            <param-name>logSuffix</param-name>
+            <param-value>resource</param-value>
+        </init-param>
+    </filter>
+
+	<filter>
+		<filter-name>requestCounter</filter-name>
+		<filter-class>com.mysql.merlin.server.RequestCounterFilter</filter-class>
+	</filter>
+	
+	<filter>
+		<filter-name>struts2</filter-name>
+		<filter-class>org.apache.struts2.dispatcher.FilterDispatcher</filter-class>
+		<init-param>
+			<param-name>actionPackages</param-name>
+			<param-value>com.mysql.merlin.ui.actions</param-value>
+		</init-param>
+	</filter>
+
+	<filter>
+		<filter-name>contextCleanup</filter-name>
+		<filter-class>org.apache.struts2.dispatcher.ActionContextCleanUp</filter-class>
+	</filter>
+
+	<filter>
+		<filter-name>ResourceHeaderFilter</filter-name>
+		<filter-class>com.mysql.merlin.ui.filters.ResponseHeaderFilter</filter-class>
+		<init-param>
+			<param-name>Cache-Control</param-name>
+			<param-value>max-age=86400</param-value>
+		</init-param>
+		<init-param>
+			<param-name>Accept-Ranges</param-name>
+			<param-value>bytes</param-value>
+		</init-param>
+		<init-param>
+			<param-name>Expires</param-name>
+            <!-- this value is in minutes, for some reason.  37500 min = 26.042 days. -->
+			<param-value>37500</param-value>
+		</init-param>
+	</filter>
+
+	<filter>
+		<filter-name>GraphHeaderFilter</filter-name>
+		<filter-class>com.mysql.merlin.ui.filters.ResponseHeaderFilter</filter-class>
+		<init-param>
+			<param-name>Cache-Control</param-name>
+			<param-value>max-age=60, must-revalidate</param-value>
+		</init-param>
+		<!-- init-param>
+			<param-name>Accept-Ranges</param-name>
+			<param-value>bytes</param-value>
+		</init-param>
+		<init-param>
+			<param-name>Pragma</param-name>
+			<param-value>no-cache</param-value>
+		</init-param>
+		<init-param>
+			<param-name>Expires</param-name>
+			<param-value>-100</param-value>
+		</init-param>
+		<init-param>
+			<param-name>Last-Modified</param-name>
+			<param-value>100</param-value>
+		</init-param -->
+	</filter>
+	
+	<filter>
+        <filter-name>gzip</filter-name>
+        <filter-class>net.sf.ehcache.constructs.web.filter.GzipFilter</filter-class>
+    </filter>
+    
+    <filter>
+      <filter-name>restAuthFilter</filter-name>
+      <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+    </filter>
+    
+	<filter-mapping>
+        <filter-name>restAuthFilter</filter-name>
+		<url-pattern>/v2/rest/*</url-pattern>
+	</filter-mapping>
+	
+	<filter-mapping>
+        <filter-name>restAuthFilter</filter-name>
+		<url-pattern>/main</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+        <filter-name>restAuthFilter</filter-name>
+		<url-pattern>/heartbeat</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+        <filter-name>restAuthFilter</filter-name>
+		<url-pattern>/rest</url-pattern>
+	</filter-mapping>
+
+	<filter-mapping>
+        <filter-name>restAuthFilter</filter-name>
+		<url-pattern>/inventory</url-pattern>
+	</filter-mapping>
+
+    <filter-mapping>
+        <filter-name>actionAccessLog</filter-name>
+        <url-pattern>*.action</url-pattern>
+    </filter-mapping>
+
+    <filter-mapping>
+        <filter-name>resourceAccessLog</filter-name>
+        <url-pattern>/web/*</url-pattern>
+    </filter-mapping>
+
+	<filter-mapping>
+		<filter-name>requestCounter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
+	
+    <filter-mapping>
+        <filter-name>ResourceHeaderFilter</filter-name>
+        <url-pattern>/Constants.js</url-pattern>
+    </filter-mapping>
+
+    <!-- TODO: this re-compresses the PNGs too, since filters don't
+         get advance notice of content-type, we should
+         add a new mapping for struts when actions don't
+         emit text -->
+         
+	<filter-mapping>
+        <filter-name>gzip</filter-name>
+        <url-pattern>*.action</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>gzip</filter-name>
+        <url-pattern>*.js</url-pattern>
+    </filter-mapping>
+    
+    <filter-mapping>
+        <filter-name>gzip</filter-name>
+        <url-pattern>*.css</url-pattern>
+    </filter-mapping>
+
+	<filter-mapping>
+		<filter-name>struts2</filter-name>
+		<url-pattern>*.action</url-pattern>
+	</filter-mapping>
+	
+	<filter-mapping>
+		<filter-name>struts2</filter-name>
+		<url-pattern>/Constants.js</url-pattern>
+	</filter-mapping>	
+
+	<filter-mapping>
+        <filter-name>GraphHeaderFilter</filter-name>
+        <url-pattern>/web/graphs/*</url-pattern>
+    </filter-mapping>
+   
+    <filter-mapping>
+        <filter-name>ResourceHeaderFilter</filter-name>
+        <url-pattern>/web/resources/*</url-pattern>
+    </filter-mapping>
+
+	<listener>
+		<listener-class>org.apache.struts2.tiles.StrutsTilesListener</listener-class>
+	</listener>
+
+	<servlet>
+		<servlet-name>defaultServlet</servlet-name>
+		<servlet-class>org.apache.catalina.servlets.DefaultServlet</servlet-class>
+		<init-param>
+			<param-name>debug</param-name>
+			<param-value>0</param-value>
+		</init-param>
+		<init-param>
+			<param-name>listings</param-name>
+			<param-value>false</param-value>
+		</init-param>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- This is the default servlet that is responsible for schema modifications, starting worker threads etc. -->
+	<servlet>
+		<servlet-name>main</servlet-name>
+		<servlet-class>com.mysql.merlin.server.MainServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
+	</servlet>
+
+	<!-- This is the heartbeat servlet that is responsible for all agent communications. -->
+	<servlet>
+		<servlet-name>heartbeat</servlet-name>
+		<servlet-class>com.mysql.merlin.server.agent.HeartbeatServlet</servlet-class>
+	</servlet>
+
+	<!-- This is the public servlet that is responsible for all REST/RPC 
+         based public API communications. -->
+	<servlet>
+		<servlet-name>rest</servlet-name>
+		<servlet-class>com.mysql.merlin.server.PublicAPIServlet</servlet-class>
+	</servlet>
+
+	<!-- Hack for legacy "blackout" REST based operation. -->
+	<!-- JSPC servlet mappings start -->
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.auth_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.auth_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.noAuth_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.noAuth_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.notFound_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.notFound_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.about_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.about_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.javascriptConstants_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.javascriptConstants_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.setup_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.setup_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.json_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.json_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.error_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.error_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.logs.logs_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.logs.logs_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.logs.showLog_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.logs.showLog_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.users.manageUsersDisallowed_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.users.manageUsersDisallowed_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.users.manageUsers_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.users.manageUsers_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.notification.notification_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.notification.notification_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.global.mosCreds_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.global.mosCreds_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.global.global_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.global.global_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.importExport.importExport_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.importExport.importExport_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.servers.supportReport_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.servers.supportReport_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.servers.manageServers_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.servers.manageServers_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.userpreferences.userPreferences_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.userpreferences.userPreferences_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.productInfo.productInfo_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.productInfo.productInfo_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.supportIssues_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.supportIssues_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.firstRun_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.firstRun_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.home.index_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.home.index_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.help.whatsNew_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.help.whatsNew_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.advisors.addToSchedule_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.advisors.addToSchedule_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.advisors.manageRule_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.advisors.manageRule_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.advisors.currentSchedule_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.advisors.currentSchedule_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.advisors.manageRules_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.advisors.manageRules_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.graphs.graphs_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.graphs.graphs_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.events.historyInfoPopup_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.events.historyInfoPopup_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.events.index_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.events.index_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.dashboard.dashboard_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.dashboard.dashboard_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.dashboard.heatChartFragment_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.dashboard.heatChartFragment_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.dashboard.heatChart_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.dashboard.heatChart_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.queryAnalysis.quanConfig_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.queryAnalysis.quanConfig_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.queryAnalysis.test_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.queryAnalysis.test_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.queryAnalysis.test_002dcg_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.queryAnalysis.test_002dcg_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.queryAnalysis.browseQueries_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.queryAnalysis.browseQueries_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.queryAnalysis.notEnabled_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.queryAnalysis.notEnabled_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.replication.replicationMonitoring_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.replication.replicationMonitoring_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.tiles.layouts.minimal_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.tiles.layouts.minimal_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.tiles.layouts.default_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.tiles.layouts.default_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.tiles.layouts.help_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.tiles.layouts.help_jsp</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.tiles.layouts.heatChart_jsp</servlet-name>
+        <servlet-class>com.mysql.merlin.jsp.WEB_002dINF.tiles.layouts.heatChart_jsp</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.auth_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/auth.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.noAuth_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/noAuth.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.notFound_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/notFound.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.about_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/about.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.javascriptConstants_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/javascriptConstants.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.setup_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/setup.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.json_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/json.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.error_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/error.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.logs.logs_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/settings/logs/logs.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.logs.showLog_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/settings/logs/showLog.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.users.manageUsersDisallowed_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/settings/users/manageUsersDisallowed.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.users.manageUsers_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/settings/users/manageUsers.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.notification.notification_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/settings/notification/notification.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.global.mosCreds_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/settings/global/mosCreds.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.global.global_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/settings/global/global.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.importExport.importExport_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/settings/importExport/importExport.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.servers.supportReport_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/settings/servers/supportReport.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.servers.manageServers_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/settings/servers/manageServers.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.userpreferences.userPreferences_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/settings/userpreferences/userPreferences.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.settings.productInfo.productInfo_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/settings/productInfo/productInfo.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.supportIssues_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/supportIssues.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.firstRun_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/firstRun.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.home.index_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/home/index.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.help.whatsNew_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/help/whatsNew.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.advisors.addToSchedule_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/advisors/addToSchedule.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.advisors.manageRule_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/advisors/manageRule.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.advisors.currentSchedule_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/advisors/currentSchedule.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.advisors.manageRules_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/advisors/manageRules.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.graphs.graphs_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/graphs/graphs.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.events.historyInfoPopup_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/events/historyInfoPopup.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.events.index_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/events/index.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.dashboard.dashboard_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/dashboard/dashboard.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.dashboard.heatChartFragment_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/dashboard/heatChartFragment.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.dashboard.heatChart_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/dashboard/heatChart.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.queryAnalysis.quanConfig_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/queryAnalysis/quanConfig.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.queryAnalysis.test_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/queryAnalysis/test.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.queryAnalysis.test_002dcg_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/queryAnalysis/test-cg.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.queryAnalysis.browseQueries_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/queryAnalysis/browseQueries.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.queryAnalysis.notEnabled_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/queryAnalysis/notEnabled.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.pages.monitor.replication.replicationMonitoring_jsp</servlet-name>
+        <url-pattern>/WEB-INF/pages/monitor/replication/replicationMonitoring.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.tiles.layouts.minimal_jsp</servlet-name>
+        <url-pattern>/WEB-INF/tiles/layouts/minimal.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.tiles.layouts.default_jsp</servlet-name>
+        <url-pattern>/WEB-INF/tiles/layouts/default.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.tiles.layouts.help_jsp</servlet-name>
+        <url-pattern>/WEB-INF/tiles/layouts/help.jsp</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>com.mysql.merlin.jsp.WEB_002dINF.tiles.layouts.heatChart_jsp</servlet-name>
+        <url-pattern>/WEB-INF/tiles/layouts/heatChart.jsp</url-pattern>
+    </servlet-mapping>
+
+<!-- JSPC servlet mappings end -->
+
+ <servlet-mapping>
+		<servlet-name>rest</servlet-name>
+		<url-pattern>/inventory</url-pattern>
+	</servlet-mapping>
+
+	<!-- The 2.x+ JAX-RS/JSR-311/Jersey REST servlet -->
+    <servlet>
+        <servlet-name>JaxRsServlet</servlet-name>
+        <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+        <load-on-startup>1</load-on-startup> 
+        <init-param>
+            <param-name>com.sun.jersey.config.property.packages</param-name>
+            <param-value>com.mysql.etools.monitor.rest</param-value>
+        </init-param>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>JaxRsServlet</servlet-name>
+        <url-pattern>/v2/rest/*</url-pattern>
+    </servlet-mapping>
+    
+    <servlet>
+        <servlet-name>merlinRedirect</servlet-name>
+        <servlet-class>com.mysql.merlin.server.MerlinRedirectServlet</servlet-class>
+    </servlet>
+
+	<servlet-mapping>
+		<servlet-name>defaultServlet</servlet-name>
+		<url-pattern>/</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>main</servlet-name>
+		<url-pattern>/main</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>heartbeat</servlet-name>
+		<url-pattern>/heartbeat</url-pattern>
+	</servlet-mapping>
+
+	<servlet-mapping>
+		<servlet-name>rest</servlet-name>
+		<url-pattern>/rest</url-pattern>
+	</servlet-mapping>
+
+    <!-- this redirects everything /merlin/* to /*, but
+         handles /merlin/inventory in a backwards-compatible manner -->
+    <servlet-mapping>
+        <servlet-name>merlinRedirect</servlet-name>
+        <url-pattern>/merlin/*</url-pattern>
+    </servlet-mapping>
+
+	<session-config>
+		<session-timeout>1440</session-timeout>
+    </session-config>
+
+	<welcome-file-list>
+		<welcome-file>/Auth.action</welcome-file>
+	</welcome-file-list>
+
+	<jsp-config>
+		<taglib>
+			<taglib-uri>/widget-tags</taglib-uri>
+			<taglib-location>/WEB-INF/widget.tld</taglib-location>
+		</taglib>
+		<jsp-property-group>
+			<url-pattern>*.jsp</url-pattern>
+			<page-encoding>UTF-8</page-encoding>
+			<include-prelude>/WEB-INF/pages/suppressWarnings.jspf</include-prelude>
+		</jsp-property-group>
+	</jsp-config>
+
+	<!--Define environment entries for this Application-->
+	<env-entry>
+		<env-entry-name>org.apache.commons.logging.Log</env-entry-name>
+		<env-entry-type>java.lang.String</env-entry-type>
+		<env-entry-value>org.apache.commons.logging.impl.SimpleLog</env-entry-value>
+	</env-entry>
+
+	<env-entry>
+		<env-entry-name>org.apache.commons.logging.simplelog.showdatetime</env-entry-name>
+		<env-entry-type>java.lang.Boolean</env-entry-type>
+		<env-entry-value>true</env-entry-value>
+	</env-entry>
+</web-app>

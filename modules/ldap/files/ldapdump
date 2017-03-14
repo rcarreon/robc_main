@@ -1,0 +1,8 @@
+#!/bin/bash
+
+filename=/ldap_backup/ldapdump.$(date +%A-%Hh).ldif
+rm -f $filename
+touch $filename
+chmod 600 $filename
+ldapsearch -x -b "dc=gnmedia,dc=net" -h 127.0.0.1 -D "cn=Directory Manager" -y /root/.ldapauth "(objectclass=*)" "*" nsAccountLock aci > $filename
+

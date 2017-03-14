@@ -1,0 +1,82 @@
+<%
+         host,project,environment,location,domain,tld = fqdn.split('.')
+%>
+
+<%
+case environment
+  when "prd"
+    env_hostname = name
+    env_prefix = ""
+    env_rewrite = ""
+    env_docroot = "/app/shared/forums.thefashionspot.com"
+  when "stg"
+    env_hostname = "stg." + name
+    env_prefix = "stg."
+    env_rewrite = "stg\\."
+    env_docroot = "/app/shared/vb_tfs/current"
+  when "dev"
+    env_hostname = "dev." + name
+    env_prefix = "dev."
+    env_rewrite = "dev\\."
+    env_docroot = "/app/shared/vb_tfs/current"
+        case host
+          when /uid/
+            env_hostname = "sbx." + name
+            env_prefix = "sbx."
+            env_rewrite = "sbx\\."
+            env_docroot = "/app/shared/vb_tfs/current"
+        end
+end
+%>
+
+<VirtualHost *:80>
+    ServerName forums.thefashionspot.com
+    ServerAlias <%= env_hostname %>
+
+    DocumentRoot <%= env_docroot %>
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/<%= env_hostname %>-error_log
+    <%=logging ? '' : '#'%>CustomLog /app/log/<%= env_hostname %>-access_log combined-xff
+
+    # Non forums Rewrite
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} !^<%= env_rewrite %>forums\.thefashionspot\.com$ [NC]
+    RewriteRule ^/(.*) http://<%= env_prefix %>forums.thefashionspot.com/$1 [R=301,L]
+
+
+    <Directory <%= env_docroot %>>
+
+     RewriteEngine On
+
+     RewriteRule ^((urllist|sitemap).*\.(xml|txt)(\.gz)?)$ vbseo_sitemap/vbseo_getsitemap.php?sitemap=$1 [L]
+
+     RewriteCond %{QUERY_STRING} !vbseourl=
+     RewriteCond %{REQUEST_FILENAME} !(admincp/|modcp/|chat|cron)
+     RewriteRule ^(.*\.php)$ vbseo.php?vbseourl=$1&%{QUERY_STRING} [L]
+
+     RewriteCond %{REQUEST_FILENAME} !\.(jpg|gif)$
+     RewriteRule ^(archive/.*)$ vbseo.php?vbseourl=$1&%{QUERY_STRING} [L]
+
+     RewriteCond %{REQUEST_FILENAME} !-f
+     RewriteCond %{REQUEST_FILENAME} !-d
+     RewriteCond %{REQUEST_FILENAME} !(admincp|modcp|clientscript|cpstyles|images)/
+     RewriteRule ^(.+)$ vbseo.php?vbseourl=$1&%{QUERY_STRING} [L]
+
+
+    </Directory>
+
+    <Location  /administer>
+        AuthType Basic
+        AuthName "Admin Only"
+        AuthUserFile /etc/httpd/conf.d/forums.tfs.logins
+        Require valid-user
+    </Location>
+</VirtualHost>
+
+ <VirtualHost *:80>
+     ServerAlias forums.fashionspot.net
+     ServerAlias <%= env_prefix %>forums.fashionspot.net
+     ServerAlias forums.fashionspot.com
+     ServerAlias <%= env_prefix %>forums.fashionspot.com
+     RedirectPermanent / http://forums.thefashionspot.com/
+ </VirtualHost>

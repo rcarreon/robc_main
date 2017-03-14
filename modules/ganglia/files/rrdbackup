@@ -1,0 +1,14 @@
+#!/bin/bash
+
+cd /app/data/ganglia/rrds || exit 1
+
+backupdir=../../backup/rrds/$(date +%a)
+rm -rf $backupdir
+
+find . -name \*.rrd | \
+while read rrd;do
+   xml=$backupdir/${rrd%.rrd}.xml
+   mkdir -p $(dirname $xml)
+   rrdtool dump $rrd | gzip -9 > $xml.gz
+done
+

@@ -1,0 +1,122 @@
+#!/usr/bin/env python
+
+# -*- coding: utf-8 -*-
+import sys,string,codecs,os,getopt
+from twill.commands import *
+from twill import get_browser
+import smtplib
+from email.MIMEText import MIMEText
+b = get_browser()
+
+basepath = "/home/deploy/on-call/"
+
+phonelist_file = open(basepath + 'phonelist.txt','r')
+dba_current = open(basepath + 'dba_current.txt','r')
+dbaphonelist_file = open(basepath + 'dbaphonelist.txt','r')
+
+phonelist = []
+dbaphonelist = []
+
+current_dba = ""
+
+for line in phonelist_file.readlines():
+    name, phone = line.rstrip().split(' ')
+#    phonelist.append([name, phone])
+    target_phone = phone
+    target_name = name
+
+# print phonelist
+
+for line in dbaphonelist_file.readlines():
+    name, phone = line.rstrip().split(' ')
+    dbaphonelist.append([name, phone])
+
+print dbaphonelist
+
+for line in dba_current.readlines():
+    name, phone = line.rstrip().split(' ')
+    current_dba = name
+
+print current_dba
+dba_current.close()
+
+# def login():
+#     go('http://myphone.epikip.net/webportal/CustomClientServlet?NAV_FUNCTION=FORWARDING_BASIC&PAGE_FUNCTION=OPEN')
+#     fv('loginForm', 'LOGIN_PHONE_NUMBER', '2134158398')
+#     fv('loginForm', 'LOGIN_PHONE_PASSWORD', '06725')
+#     submit()
+#     code(200)
+
+def main():
+    for idx, name in enumerate(dbaphonelist):
+        if name[0] == current_dba: 
+            print "found"
+            print idx, name
+            target_idx = 0
+            # if idx is not the last entry, add 1 to it for target_idx
+            if len(dbaphonelist) != idx+1:
+                target_idx = idx+1
+            dbatarget_name = dbaphonelist[target_idx][0]
+            dbatarget_phone = dbaphonelist[target_idx][1]
+            next_idx = 0
+            if len(dbaphonelist) != target_idx+1:
+                next_idx = target_idx+1
+            nextdbatarget_name = dbaphonelist[next_idx][0]
+            nextdbatarget_phone = dbaphonelist[next_idx][1]
+    print "target dba %s %s" % (dbatarget_name, dbatarget_phone)
+    dba_current = open(basepath + 'dba_current.txt','w')
+    dba_current.write("%s %s" % (dbatarget_name, dbatarget_phone))
+    dba_current.close()
+#     login()
+#     go('http://myphone.epikip.net/webportal/CustomClientServlet?NAV_FUNCTION=FORWARDING_BASIC&PAGE_FUNCTION=OPEN')
+#     code(200)
+#     form = b.get_form('screeningForm')
+#     for fldvalue in b.get_form_field(form,'DEFAULT_FORWARD_NUMBER_01').pairs():
+#         current_phone = fldvalue[1]
+#     for idx, phone in enumerate(phonelist):
+#         if phone[1] == current_phone: 
+#             print "found"
+#             print idx, phone
+#             target_idx = 0
+#             if len(phonelist) != idx+1:
+#                 target_idx = idx+1
+#             target_phone = phonelist[target_idx][1]
+#             target_name = phonelist[target_idx][0]
+#             next_idx = 0
+#             if len(phonelist) != target_idx+1:
+#                 next_idx = target_idx+1
+#             nexttarget_phone = phonelist[next_idx][1]
+#             nexttarget_name = phonelist[next_idx][0]
+#     print "target phone %s" % target_phone
+#     fv('screeningForm','DEFAULT_FORWARD_NUMBER_01',target_phone)
+#     submit()
+#     code(200)
+    content = "A Friendly Reminder: \r\nCongrats!! SA/DBA On-Call Number have been switched to the following:\r\n\r\n \
+               SA: %s : %s \r\n \
+              DBA: %s : %s\r\n \
+            \r\n\r\n\r\n\r\n\r\n \
+Our next winner is:\r\n \
+          %s : %s\r\n" % (target_name, target_phone, dbatarget_name, dbatarget_phone, nextdbatarget_name, nextdbatarget_phone)
+# Our next winners are:\r\n \
+#           %s : %s\r\n \
+#           %s : %s\r\n" % (target_name, target_phone, dbatarget_name, dbatarget_phone, nexttarget_name, nexttarget_phone, nextdbatarget_name, nextdbatarget_phone)
+    print content
+    subject = "SA/DBA On-Call Schedule Updates"
+    send_to = "sysadmins@evolvemediallc.com,dba@evolvemediallc.com,noc@evolvemediallc.com"
+    send_mail(content,subject,send_to)
+    
+
+def send_mail(content,subject,send_to):
+    print "executing send_mail function"
+    msg = MIMEText(content)
+    msg['Subject'] = subject
+    msg['From'] = 'OnCall Scheduler\
+        <TechnologyPlatform@gorillanation.com>'
+    msg['To'] = send_to
+    send = smtplib.SMTP('localhost')
+    send.sendmail(msg['From'], msg['To'].split(","), msg.as_string())
+    send.quit()
+
+
+if __name__ == "__main__":
+    main()

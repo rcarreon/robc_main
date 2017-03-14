@@ -1,0 +1,10 @@
+    RewriteEngine On
+
+    # dvdfile.com --> www.dvdfile.com
+    RewriteCond %{HTTP_HOST} ^dvdfile\.com$ [NC]
+    RewriteRule ^/(.*) http://www.dvdfile.com/$1 [R=301,L]
+
+    # dvdfile.com to comingsoon.net
+    RedirectMatch permanent ^(.*)$ http://www.comingsoon.net/dvd/news.php
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

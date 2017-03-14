@@ -1,0 +1,15 @@
+# $Id$
+# $URL$
+
+/pxy/log/varnish/*.log.1 /pxy/log/varnish/*.log {
+    missingok
+    compress
+    rotate 100
+    size 250M
+    notifempty
+    sharedscripts
+    postrotate
+        /etc/init.d/varnishncsa restart 2> /dev/null || true
+    endscript
+}
+

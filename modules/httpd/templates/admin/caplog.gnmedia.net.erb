@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+    <Directory /app/shared/caplog/>
+      Options FollowSymLinks Indexes
+    </Directory>
+
+    ServerName caplog.gnmedia.net
+    ServerAlias *.caplog.gnmedia.net
+    DocumentRoot /app/shared/caplog/
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/caplog.gnmedia.net_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/caplog.gnmedia.net_access.log combined
+
+</VirtualHost>

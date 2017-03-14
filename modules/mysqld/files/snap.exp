@@ -1,0 +1,20 @@
+#!/usr/bin/expect -f
+
+
+spawn mysql -u backup --password=backup345  --socket=/var/lib/mysql/mysql.sock
+
+expect -re "mysql> "
+send -- "flush tables with read lock;\r"
+
+expect -re "mysql> "
+send -- "flush local logs;\r"
+
+expect -re "mysql> "
+send -- "system /usr/local/bin/snap.sh;\r"
+
+expect -re "mysql> "
+send -- "unlock tables;\r"
+
+expect -re "mysql> "
+send -- "quit\r"
+expect eof

@@ -1,0 +1,15 @@
+    RewriteEngine On
+
+
+    RedirectPermanent / http://brucebuffer.com
+
+#    RewriteRule ^/articles/news$ /news$1 [R=301,L]
+#
+#    RewriteCond %{QUERY_STRING} ^slide=([0-9]+)$ [NC]
+#    RewriteRule ^(.*)$ $0#/slide/%1? [R=301,NE,L]
+#
+## Drop the www
+#    RewriteCond %{HTTP_HOST} ^www\.bufferzone\.craveonline\.com$
+#    RewriteRule ^/(.*)$ http://bufferzone.craveonline.com/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

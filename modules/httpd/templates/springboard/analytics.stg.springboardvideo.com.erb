@@ -1,0 +1,15 @@
+<VirtualHost *:80>
+        ServerName analytics.springboardvideo.com 
+        ServerAlias analytics.stg.springboardvideo.com
+
+        php_value include_path ".:/app/shared/docroots/analytics.springboardvideo.com/current:/usr/share/pear"
+
+        DocumentRoot /app/shared/docroots/analytics.springboardvideo.com/current
+        <Directory /app/shared/docroots/analytics.springboardvideo.com/current >
+                AllowOverride All
+                Order allow,deny
+                allow from all
+        </Directory>
+        <%=logging ? '' : '#'%>ErrorLog /app/log/stg.analytics.springboardvideo.com-error.log
+        <%=logging ? '' : '#'%>CustomLog /app/log/stg.analytics.springboardvideo.com-access.log combined
+</VirtualHost>

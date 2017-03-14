@@ -1,0 +1,73 @@
+<%
+         host,project,environment,location,domain,tld = fqdn.split('.')
+%>
+
+<%
+case environment
+  when "prd"
+    env_prefix = "www"
+  when "stg"
+    env_prefix = "stg"
+  when "dev"
+    env_prefix = "dev"
+        case host
+          when /uid/
+            env_prefix = "sbx"
+        end
+end
+%>
+
+<VirtualHost *:80>
+    ServerName evolveplatform.net
+    ServerAlias <%= env_prefix %>.evolveplatform.net
+
+    DocumentRoot /app/shared/ep/dashboard/current/
+
+        <Directory /app/shared/ep/dashboard/current/>
+                Options Indexes FollowSymLinks
+                Order allow,deny
+                Allow from all
+        </Directory>
+
+    RewriteEngine On
+
+    <%=logging ? '' : '#'%>ErrorLog  /app/log/<%= env_prefix %>.evolveplatform.net-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/<%= env_prefix %>.evolveplatform.net-access.log combined
+</VirtualHost>
+ #changing paths
+<VirtualHost *:80>
+    ServerName dashboard.evolveplatform.net
+    ServerAlias <%= env_prefix %>.dashboard.evolveplatform.net
+
+    DocumentRoot /app/shared/ep/dashboard/current/
+
+        <Directory /app/shared/ep/dashboard/current/>
+                Options Indexes FollowSymLinks
+                Order allow,deny
+                Allow from all
+        </Directory>
+
+    RewriteEngine On
+
+    <%=logging ? '' : '#'%>ErrorLog  /app/log/<%= env_prefix %>.dashboard.evolveplatform.net-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/<%= env_prefix %>.dashboard.evolveplatform.net-access.log combined
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName seo.evolveplatform.net
+    ServerAlias <%= env_prefix %>.seo.evolveplatform.net
+
+    DocumentRoot /app/shared/seo.evolveplatform.net/current/
+
+        <Directory /app/shared/seo.evolveplatform.net/current/>
+                Options Indexes FollowSymLinks
+                Order allow,deny
+                Allow from all
+        </Directory>
+
+    RewriteEngine On
+
+    <%=logging ? '' : '#'%>ErrorLog  /app/log/<%= env_prefix %>.seo.evolveplatform.net-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/<%= env_prefix %>.seo.evolveplatform.net-access.log combined
+</VirtualHost>
+

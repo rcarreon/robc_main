@@ -1,0 +1,19 @@
+# Files managed by Puppet
+# $Id$
+
+# Our httpd logs 
+/app/log/*log {
+    daily
+    dateext
+    rotate 30
+    copytruncate
+    compress
+    notifempty
+    missingok
+    # When done reload apachei, but only once
+    sharedscripts
+    postrotate
+        /sbin/service httpd reload > /dev/null 2>/dev/null || true
+    endscript
+}
+

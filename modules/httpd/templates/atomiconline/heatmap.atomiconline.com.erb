@@ -1,0 +1,17 @@
+<VirtualHost *:80>
+    ServerName heatmap.atomiconline.com
+    DocumentRoot /app/shared/heatmap.atomiconline.com
+    <%=logging ? '' : '#'%>ErrorLog /app/log/heatmap_atomiconline_com_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/heatmap_atomiconline_com_access.log combined
+
+    <Directory "/app/shared/heatmap.atomiconline.com">
+        Options +FollowSymLinks +Includes
+        Order allow,deny
+        Allow from all
+
+        RewriteEngine On
+
+    </Directory>
+
+</VirtualHost>
+

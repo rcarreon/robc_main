@@ -1,0 +1,22 @@
+# This file is managed by Puppet. Do not modify it from <%=fqdn %>
+# $Id: siteanalytics.dev.evolvemediametrics.com.erb
+
+<VirtualHost *:80>
+
+  ServerName siteanalytics.dev.evolvemediametrics.com
+  ServerAlias siteanalytics.dev.*.evolvemediametrics.com *.siteanalytics.dev.*.evolvemediametrics.com
+  DocumentRoot "/app/shared/docroots/siteanalytics.evolvemediametrics.com/htdocs/docroot"
+
+  <%=logging ? '' : '#'%>ErrorLog /app/log/siteanalytics.evolvemediametrics.com.error.log
+  LogLevel warn
+  <%=logging ? '' : '#'%>CustomLog /app/log/siteanalytics.evolvemediametrics.com.access.log combined
+  ServerSignature On
+
+  <Directory "/app/shared/docroots/siteanalytics.evolvemediametrics.com/htdocs/docroot">
+    Options FollowSymLinks
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+
+</VirtualHost>

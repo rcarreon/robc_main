@@ -1,0 +1,10 @@
+# Load Passenger and Ruby
+LoadModule passenger_module /usr/lib/ruby/gems/1.8/gems/passenger-2.2.2/ext/apache2/mod_passenger.so
+PassengerRoot /usr/lib/ruby/gems/1.8/gems/passenger-2.2.2
+PassengerRuby /usr/bin/ruby
+
+# Passenger Tuning
+PassengerUserSwitching off
+PassengerDefaultUser apache 
+PassengerMaxPoolSize <%= processorcount.to_i * 4 %>
+PassengerUseGlobalQueue on

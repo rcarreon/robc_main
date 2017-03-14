@@ -1,0 +1,85 @@
+<%
+         host,project,environment,location,domain,tld = fqdn.split('.')
+%>
+
+<%
+case environment
+  when "prd"
+    cdn_hostname = "cdn1-www." + name
+    origin_hostname = "origin." + name
+    env_hostname = "www." + name
+    site_hostname = name
+  when "stg"
+    cdn_hostname = "cdn1-stg." + name
+    origin_hostname = "origin-stg." + name
+    env_hostname = "stg." + name
+    site_hostname = "stg." + name
+  when "dev"
+    cdn_hostname = "cdn1-dev." + name
+    origin_hostname = "origin-dev." + name
+    env_hostname = "dev." + name
+    site_hostname = "dev." + name
+        case host 
+          when /uid/
+            cdn_hostname = "cdn1-sbx." + name
+            origin_hostname = "origin-sbx." + name
+            env_hostname = "sbx." + name
+            site_hostname = "sbx." + name
+        end
+end
+%>
+
+<VirtualHost *:80>
+    ServerName forums.sherdog.com
+    ServerAlias <%= env_hostname %> 
+
+    DocumentRoot /app/shared/xenforo_sdc/current/
+
+        <Directory /app/shared/xenforo_sdc/current/>
+                Options Indexes FollowSymLinks
+                Order allow,deny
+                Allow from all
+        </Directory>
+	<Directory /app/shared/xenforo_sdc/current/opcache>
+        	AuthType Basic
+	        AuthName "Admin Only"
+        	AuthUserFile /etc/httpd/conf.d/forums.sherdog.com.opcache.logins
+	        Require valid-user
+	        AllowOverride AuthConfig
+        	Order deny,allow
+        </Directory>
+
+
+    #Redirect for UGC
+    AliasMatch ^/data/(.*) /app/ugcfsdc/$1
+
+    RewriteEngine On
+
+    # Drop the www
+    RewriteCond %{HTTP_HOST} ^www\.forums\.sherdog\.com$
+    RewriteRule ^/(.*)$ http://<%= site_hostname %>/$1 [R=301,L]
+
+    <%=logging ? '' : '#'%>ErrorLog  /app/log/<%= site_hostname %>-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/<%= site_hostname %>-access.log combined-xff
+</VirtualHost>
+
+
+<VirtualHost *:80>
+    ServerName <%= origin_hostname %> 
+    ServerAlias <%= cdn_hostname %>
+
+
+    DocumentRoot /app/shared/xenforo_sdc/current/
+
+        <Directory /app/shared/xenforo_sdc/current/>
+                Options Indexes FollowSymLinks
+                Order allow,deny
+                Allow from all
+        </Directory>
+
+    #Redirect for UGC
+    AliasMatch ^/data/(.*) /app/ugcfsdc/$1
+
+    <%=logging ? '' : '#'%>ErrorLog  /app/log/origin-<%= site_hostname %>-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/origin-<%= site_hostname %>-access.log combined-xff
+</VirtualHost>

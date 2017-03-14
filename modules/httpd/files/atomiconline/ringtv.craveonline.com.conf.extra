@@ -1,0 +1,16 @@
+    ServerAlias *.ringtv.com ringtv.com
+    RewriteEngine On
+
+    # www.ringtv.craveonline.com --> ringtv.craveonline.com
+    RewriteCond %{HTTP_HOST} ^www\.ringtv\.craveonline\.com$ [NC]
+    RewriteRule ^/(.*) http://ringtv.craveonline.com/$1 [R=301,L]
+
+    # *.ringtv.com --> ringtv.craveonline.com
+    RewriteCond %{HTTP_HOST} ^(.*\.)?ringtv\.com$ [NC]
+    RewriteRule ^/(.*) http://ringtv.craveonline.com/$1 [R=301,L]
+
+    # m.ringtv.craveonline.com --> ringtv.craveonline.com
+    RewriteCond %{HTTP_HOST} ^m\.ringtv\.craveonline\.com$ [NC]
+    RewriteRule ^/(.*) http://ringtv.craveonline.com/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

@@ -1,0 +1,26 @@
+# This file is managed by puppet
+# $Id$
+
+<VirtualHost *:80>
+    DocumentRoot /app/shared/docroots/sherdog.com/public
+
+    ServerName m.sherdog.com
+    ServerAlias *.m.sherdog.com
+
+   SetEnv APPLICATION_ENV <%= at_status %>
+
+   <Directory "/app/shared/docroots/sherdog.com/public">
+       Options Indexes MultiViews FollowSymLinks
+       AllowOverride All
+       Order allow,deny
+       Allow from all
+   </Directory>
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/m.sherdog.com-error_log
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+    LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" proxy
+    SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" forwarded
+    <%=logging ? '' : '#'%>CustomLog "/app/log/m.sherdog.com-access_log" combined env=!forwarded
+    <%=logging ? '' : '#'%>CustomLog "/app/log/m.sherdog.com-access_log" proxy env=forwarded
+
+</VirtualHost>

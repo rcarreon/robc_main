@@ -1,0 +1,47 @@
+<VirtualHost *:80>
+    ServerName <%= fqdn_type %>.sbx.crowdignite.com
+        ServerAlias <%= fqdn_type %>.sbx.www.crowdignite.com
+        ServerAlias <%= fqdn_type %>.sbx.origin.crowdignite.com
+        ServerAlias <%= fqdn_type %>.sbx.cdn.crowdignite.com
+        ServerAlias <%= fqdn_type %>.sbx.cdn1.crowdignite.com
+        ServerAlias <%= fqdn_type %>.sbx.crowdignite.gamerevolution.com
+        ServerAlias <%= fqdn_type %>.sbx.crowdignite.craveonline.com
+        ServerAlias <%= fqdn_type %>.sbx.es.crowdignite.craveonline.com
+        ServerAlias <%= fqdn_type %>.sbx.news.crowdignite.craveonline.com
+        ServerAlias <%= fqdn_type %>.sbx.crowdignite.momtastic.com
+        ServerAlias <%= fqdn_type %>.sbx.crowdignite.thefashionspot.com
+        ServerAlias <%= fqdn_type %>.sbx.crowdignite.globetrottingonline.com
+        ServerAlias <%= fqdn_type %>.sbx.thecelebritycafe.crowdignite.com
+        ServerAlias <%= fqdn_type %>.sbx.crowdignite.teenspot.com
+        ServerAlias <%= fqdn_type %>.sbx.crowdignite.liveoutdoors.com
+        ServerAlias <%= fqdn_type %>.sbx.crowdignite.totallyher.com
+        ServerAlias <%= fqdn_type %>.sbx.crowd-ignite.totallyher.com
+        ServerAlias <%= fqdn_type %>.sbx.management.crowdignite.com
+        ServerAlias <%= fqdn_type %>.sbx.thebusinesscontentexchange.entrepreneur.com
+        ServerAlias <%= fqdn_type %>.sbx.es.crowdignite.totallyher.com
+
+    DocumentRoot /app/shared/<%= fqdn_type %>/public_html/app/webroot
+    <%=logging ? '' : '#'%>CustomLog /app/log/<%= fqdn_type %>.sbx.crowdignite.com-access_log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/<%= fqdn_type %>.sbx.crowdignite.com-error_log
+
+    # https://bugs.php.net/bug.php?id=59692 imagick and libgomp are incompatiable
+    # so we force imagick to stick to one thread
+    SetEnv MAGICK_THREAD_LIMIT 1
+
+    <Directory "/app/shared/<%= fqdn_type %>/public_html/app/webroot">
+        php_admin_value open_basedir /app/shared:/app/log:/app/log/cakephp:/app/tmp:/var/www/tmp:/app/shared/<%= fqdn_type %>/public_html:/app/shared/<%= fqdn_type %>/public_html/app/webroot/img/upload:/app/shared/<%= fqdn_type %>/public_html/app/tmp:/dev/shm/logs:/var/vw-log-ramdisk:/usr/share/pear
+        Options -Indexes +FollowSymLinks -ExecCGI
+
+        RewriteEngine On
+
+        RewriteBase /
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+        <Files sitemap.xml>
+                RewriteEngine Off
+        </Files>
+    </Directory>
+
+</VirtualHost>

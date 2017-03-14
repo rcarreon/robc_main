@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# Trigger a jenkins build
+
+NOREV=0000000000000000000000000000000000000000
+
+while read oldrev newrev refname
+do
+    if [ "$newrev" == "$NOREV" ]; then
+	continue
+    fi
+
+    branch=$(git rev-parse --symbolic --abbrev-ref $refname)
+    if [ "$branch" == "master" ]; then
+        #`curl -s http://cijoe.gnmedia.net/job/puppet-templates/build?token=templates`
+        curl -s http://cijoe.gnmedia.net/view/Puppet/job/templates/build?token=templates
+        curl -s http://app1v-jenkins.tp.prd.lax.gnmedia.net:8080/job/templates/build
+    fi
+done

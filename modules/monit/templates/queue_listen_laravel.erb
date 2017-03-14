@@ -1,0 +1,17 @@
+# $Id$
+# $URL$
+
+#queue_listen_laravel.conf
+
+#This is to start and stop the laravel queue
+
+  check process queue_listen_laravel with pidfile /tmp/queue_listen_laravel.pid
+  alert liliana.iturribarria@evolvemediallc.com
+  start program = "/etc/monit.d/listen_laravel_start" as uid root
+  stop  program = "/etc/monit.d/listen_laravel_stop" as uid root
+
+#This checks if the version file changes as a result of a code deploy
+#If so it restarts the queue. 
+
+    check file deploy_version with path /app/shared/docroots/flow.evolvemediallc.com/current/version.txt
+	if changed checksum then exec "/etc/monit.d/listen_laravel_restart"

@@ -1,0 +1,22 @@
+
+<VirtualHost *:80>
+    ServerName wholesomebabyfood.com
+    ServerAlias www.wholesomebabyfood.com
+    DocumentRoot /app/shared/docroot/
+
+        <Directory /app/shared/docroot/>
+                Options Indexes FollowSymLinks
+                Order allow,deny
+                Allow from all
+        </Directory>
+
+
+#    RewriteEngine On
+#    # wholesomebabyfood.com --> wholesomebabyfood.momtastic.com
+#    RewriteCond %{HTTP_HOST} ^wholesomebabyfood\.com$ [NC]
+#    RewriteRule ^/(.*) http://wholesomebabyfood.momtastic.com/$1 [R=301,L]
+
+
+    <%=logging ? '' : '#'%>ErrorLog  /app/log/wholesomebabyfood.momtastic.com-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/wholesomebabyfood.momtastic.com-access.log combined
+</VirtualHost>

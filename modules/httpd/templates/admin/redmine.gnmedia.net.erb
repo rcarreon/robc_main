@@ -1,0 +1,17 @@
+# $Id$
+<VirtualHost *:80>
+  ServerName redmine.gnmedia.net
+  ServerAlias *.redmine.gnmedia.net
+  DocumentRoot /app/shared/redmine.gnmedia.net/public/
+
+  <%=logging ? '' : '#'%>ErrorLog /app/log/redmine.gnmedia.net_error.log
+  <%=logging ? '' : '#'%>CustomLog /app/log/redmine.gnmedia.net_access.log combined
+
+  <Directory "/app/shared/redmine.gnmedia.net/public/">
+    Options Indexes ExecCGI FollowSymLinks
+    Order allow,deny
+    Allow from all
+    AllowOverride all
+  </Directory>
+
+</VirtualHost>

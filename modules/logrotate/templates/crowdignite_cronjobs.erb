@@ -1,0 +1,12 @@
+# $Id$
+# $URL$
+
+/app/log/cronjobs/*log {
+  daily
+  dateext
+  rotate 30
+  copytruncate
+  compress
+  delaycompress
+  missingok
+}

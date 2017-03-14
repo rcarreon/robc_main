@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+	ServerName uptime.gnmedia.net
+	DocumentRoot /app/shared/docroots/uptime/
+
+	<%=logging ? '' : '#'%>ErrorLog /app/log/uptime.gnmedia.net_error.log
+	<%=logging ? '' : '#'%>CustomLog /app/log/uptime.gnmedia.net_access.log combined
+
+	<Directory /app/shared/docroots/uptime/>
+		Options FollowSymLinks
+		AllowOverride All
+		Satisfy all
+	</Directory>
+</VirtualHost>

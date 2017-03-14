@@ -1,0 +1,9 @@
+#!/bin/bash
+# The right way:
+# qldap '(&(objectclass=groupofUniqueNames)(memberuid=jkitchen))' cn | grep 'cn:' | awk '{print $2}' | tr '\n' ' ' | sed 's/ $/&/'
+
+#groups $1 | awk '{$1=""; $2=""; print $0}' | sed -e 's/^[ \t]*//'
+id -Gn $1 2>/dev/null || echo ""
+
+# used for debugging auth
+#echo "$1" >> /tmp/git-ldap.log

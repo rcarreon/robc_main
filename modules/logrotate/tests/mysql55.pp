@@ -1,0 +1,1 @@
+include logrotate::mysql55

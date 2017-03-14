@@ -1,0 +1,12 @@
+# $Id$
+# $URL$
+
+/app/log/spark/*.log {
+  daily
+  dateext
+  rotate 7
+  copytruncate
+  compress
+  delaycompress
+  missingok
+}

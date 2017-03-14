@@ -1,0 +1,54 @@
+<VirtualHost *:80>
+    ServerName dev.engine.crowdignite.com
+
+    DocumentRoot /app/shared/public_html/app/webroot
+    <%=logging ? '' : '#'%>CustomLog /app/log/dev.engine.crowdignite.com-access_log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/dev.engine.crowdignite.com-error_log
+
+    <Directory "/app/shared/public_html/app/webroot">
+        php_admin_value open_basedir /app/shared/public_html:/app/tmp:/app/log/cakephp:/var/www/tmp:/app/shared/public_html/app/webroot/img/upload
+      	Options -Indexes +FollowSymLinks -ExecCGI 
+
+      	RewriteEngine On
+
+      	RewriteBase /
+      	RewriteCond %{REQUEST_FILENAME} !-d
+      	RewriteCond %{REQUEST_FILENAME} !-f 
+      	RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+                
+      	<Files sitemap.xml>
+        	RewriteEngine Off
+      	</Files>
+    </Directory>
+
+</VirtualHost>
+
+# Management vhost for long-running reports
+<VirtualHost *:80>
+    ServerName dev.management.crowdignite.com
+
+    DocumentRoot /app/shared/public_html/app/webroot
+    <%=logging ? '' : '#'%>CustomLog /app/log/dev.management.crowdignite.com-access_log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/dev.management.crowdignite.com-error_log
+
+    TimeOut 300
+
+    <Directory "/app/shared/public_html/app/webroot">
+        php_admin_value open_basedir /app/shared/public_html:/app/tmp:/app/log/cakephp:/var/www/tmp:/app/shared/public_html/app/webroot/img/upload:/usr/share/pear:/app/log
+      	Options -Indexes +FollowSymLinks -ExecCGI 
+
+        RewriteEngine On
+
+        RewriteBase /
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f 
+        RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+                
+        <Files sitemap.xml>
+            RewriteEngine Off
+        </Files>
+    </Directory>
+
+</VirtualHost>
+
+

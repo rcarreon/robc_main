@@ -1,0 +1,331 @@
+# This file is managed by Puppet do not modify it from <%= fqdn %> 
+
+include "/etc/varnish/plugin.vcl";
+
+<%
+# Need to tweak so we get the ip listed not the short name
+require 'socket'
+
+host,vertical,env,location,domain,tlda = fqdn.split('.')
+pb_ip = IPSocket.getaddress("app1v-pb.ao." + env + ".lax.gnmedia.net")
+    
+%>
+
+backend wp {
+        .host= "<%= pb_ip %>";
+        .port = "80";
+        .probe = {
+            .url = "/";
+            .interval = 5s;
+            .timeout = 1 s;
+            .window = 5;
+            .threshold = 3;
+        }
+}
+
+# Called after receiving a request. Decides how to serve the request
+# Possible keywords: error, pass, pipe
+sub vcl_recv {
+    # If we get a country_code cookie, we will just use that for the
+    # country code. If we do not have that cookie, do a geoip lookup
+    # and send the request to the backend. We also set a set_country_code
+    # cookie so we can later set the cookie.
+    if (req.http.host ~ "(thefashionspot|momtastic|www.craveonline|^craveonline)" && !req.http.Cookie ~ "country_code") {
+        C{
+        int maxHeaderSize = 100;
+        char *ipArray[maxHeaderSize];
+        char *cookie;
+        char *country_code = NULL;
+        char *unknown = "Unknown";
+
+        int i;
+
+        // Initialize the ipArray to be null pointers
+        for (i = 0; i < maxHeaderSize; i += 1) {
+            ipArray[i] = NULL;
+        }
+
+        // Populates the ipArray with the values from the X-Forwarded-For
+        getAllHeaders(sp, "X-Forwarded-For", ipArray, maxHeaderSize);
+
+        for (i = 0; ipArray[i] && i < maxHeaderSize; i++) {
+            country_code = getLocationFromIpStr(ipArray[i]);
+            if (0 != strcmp(unknown, country_code)) {
+                break;
+            }
+        }
+
+        if (NULL == country_code) {
+            country_code = unknown;
+        }
+
+        // Set the cookie in the browser
+        cookie = VRT_GetHdr(sp, HDR_REQ, "\07Cookie:");
+
+        if (NULL == cookie) {
+            VRT_SetHdr(sp, HDR_REQ, "\07Cookie:", " country_code=",
+                country_code, "; set_country_code=1",
+                vrt_magic_string_end);
+        }
+        else {
+            VRT_SetHdr(sp, HDR_REQ, "\07Cookie:", cookie,
+                "; country_code=", country_code, "; set_country_code=2",
+                vrt_magic_string_end);
+        }
+        }C
+    }
+        
+        # By default, we use unified wordpress platform
+        set req.backend = wp;
+
+        # We allow varnish to server stale content longer if all app servers are down 
+        # (6h due to recent change in the OnCall procedure)
+        # http://varnish-cache.org/trac/wiki/VCLExampleGrace
+        # otherwise
+        if (req.backend.healthy) {
+            set req.grace = 30s;
+        } else {
+            set req.grace = 6h;
+        }
+
+        #Non-RFC2616 or CONNECT which is weird.
+        if (req.request != "GET" &&
+        req.request != "HEAD" &&
+        req.request != "PUT" &&
+        req.request != "POST" &&
+        req.request != "TRACE" &&
+        req.request != "OPTIONS" &&
+        req.request != "DELETE") {
+       
+        return (error);
+        }
+
+        if (req.http.Accept-Encoding) {
+        # Handle compression correctly. Varnish treats headers literally, not
+        # semantically. So it is very well possible that there are cache misses
+        # because the headers sent by different browsers aren't the same.
+        # @see: http://varnish.projects.linpro.no/wiki/FAQ/Compression
+               	# if the browser supports it, we'll use gzip
+                if (req.http.Accept-Encoding ~ "gzip") {
+                    set req.http.Accept-Encoding = "gzip";
+                } elsif (req.http.Accept-Encoding ~ "deflate") {
+                # next, try deflate if it is supported
+                    set req.http.Accept-Encoding = "deflate";
+                } else {
+                # unknown algorithm. Probably junk, remove it
+                    unset req.http.Accept-Encoding;
+                       }    
+                }
+
+        #We only deal with GET and HEAD by default 
+        if (req.request != "GET" && req.request != "HEAD") {
+            return (pass);
+        }
+
+        # in case the user force a refresh (ctrl + alt +r) we purge the object
+        if (req.http.Cache-Control ~ "no-cache" || req.http.Pragma ~ "no-cache") {
+            # We dont want pingdom clearing the cache
+            #purge("req.url == " req.url);
+            return (pass);
+        }
+
+        if (req.url ~ "^/administrator/") {
+            return (pass);
+        }
+
+        if (req.http.referer ~ "/administrator/") {
+            return (pass);
+        }    
+
+        if (req.url ~ "^/login") {
+            return (pass);
+        }
+
+        # If utm_, utc_, or utq_ are detected in the query string, strip out the entire query string.
+        # These parameters are only used by traffic providers to identify a specific buy, so there's
+        # no point in sending them to Apache and generating an uncached request.
+        if (req.url ~ "(\?.*)(utm_|utc_|utq_)") {
+            set req.url = regsub(req.url, "\?.*$", "");
+        }
+
+        if (req.url ~ "\.(css|gif|ico|jpg|js|png|swf)$") {
+            unset req.http.cookie;
+            return (lookup);
+        }
+
+        if (req.http.Authorization) {
+            return (pass);
+        }
+        return (lookup);
+    }
+
+# Called when computing the hash key for an object.
+# Possible keywords : hash
+sub vcl_hash {
+            set req.hash += req.url;
+        if (req.http.host) {
+            set req.hash += req.http.host;
+        } else {
+            set req.hash += server.ip;
+        }
+        if (req.http.Cookie ~ "country_code=(GB|CA|AU)") {
+           set req.hash += regsub(req.http.Cookie, ".*country_code=(.{2});.*", "\1");
+        }
+        if ((req.http.host ~ "(local|dev|stg|sbx|lax|www).craveonline" || req.http.host ~ "(superherohype|wrestlezone)") &&
+            req.http.user-agent ~ "(Android|BlackBerry|Googlebot-Mobile|^HTC|IEMobile|iPhone|iPod|Kindle|^MOT|Nokia|^SonyEricsson|SymbianOS|webOS|Zune)" &&
+            !req.http.Cookie ~ "pm=n")
+        {
+            set req.hash += "mobile";
+        }
+        return (hash);
+    }
+
+# Called after a cache hit.
+# PK : error, pass, deliver
+sub vcl_hit {
+        return (deliver);
+    }   
+
+# Called after a successful retrieval from the backend.
+# An insert will add the retrieved object in the cache and then continue to vcl_deliver
+# PK : error, pass, deliver, esi
+sub vcl_fetch {
+        #We only deal with GET and HEAD by default 
+        # The app server can post back in our sorry faces
+        if (req.request != "GET" && req.request != "HEAD") {
+            return (pass);
+        }
+
+        # if backend is down, serve stale content for that period
+        set beresp.grace = 6h;
+
+        # By default, we cache all static content, and we adjust the headers so the web browser can cache it 
+        #if (req.url ~ "\.(css|gif|ico|jpg|js|png|swf|xml)$") {
+        # White list approach ?
+
+        ## if the object is saying how long to cache it, you
+        ## can rely on the fact that it is cachable. 
+        if (beresp.http.Cache-Control ~ "max-age") {
+        # We flag that traffic 
+            set beresp.http.magicmarker = "1";
+            set beresp.ttl = 10m;
+            set beresp.grace = 10m;
+	    unset beresp.http.Set-Cookie;
+
+    	# See http://varnish.projects.linpro.no/wiki/VCLExampleLongerCaching
+    	# Remove Expires from backend, it's not long enough 
+	    unset beresp.http.expires;
+
+    	# Set the client's TTL on this object 
+	    set beresp.http.cache-control = "max-age=600";
+                
+    	# Don't use Pragma 
+            unset beresp.http.pragma;
+    }
+
+        if (req.url ~ "^/administrator/") {
+            set beresp.http.X-Cacheable = "NO:Authenticated-Url";
+            return (pass);
+        }
+
+        if (req.http.referer ~ "/administrator/") {
+            set beresp.http.X-Cacheable = "NO:Authenticated-Referrer";
+            return (pass);
+        }
+
+        if (!beresp.cacheable) {
+            set beresp.http.X-Cacheable = "NO:Not-Cacheable";
+            return (pass);
+        }
+
+        if ((req.http.Cache-Control ~ "no-cache") || (req.http.Pragma ~ "no-cache")) {
+            set beresp.http.X-Cacheable = "NO:User ForcedRefresh";
+            return (pass);
+        }
+
+        #If it's served via Akamai let's use a longer ttl
+        if (req.http.host ~ "cdn|origin") {
+            set beresp.http.edge-control = "cache-maxage=1d";
+        }
+
+        #Remove Expires from backend, it's not long enough 
+        if (beresp.cacheable) {
+            unset beresp.http.expires;
+
+        #Set how long Varnish will keep it    
+        set beresp.ttl = 300s;
+        set beresp.grace = 300s;
+	}
+    
+        #If it's served via Akamai let's use a longer ttl */
+        if (req.http.host ~ "cdn|origin") {
+            set beresp.http.Edge-Control = "cache-maxage=1d";
+        }
+
+        # Do not harass backend with 404
+        if (beresp.status == 404) {
+            set beresp.http.Cache-Control = "max-age=600";
+            set beresp.ttl = 600s;
+            set beresp.grace = 600s;
+        }
+        
+        # Ok no matches found, let's deliver
+            return (deliver);
+        }
+
+# Called before the cached object is delivered to the client.
+# error, deliver
+sub vcl_deliver {
+    # At this point, we don't know if the country_code cookie was set
+    # by varnish, so we check set_country_code. If that is set, it means
+    # varnish set the cookie, so we will send that to the browser so we
+    # can limit the number of geoip lookup.
+    if (!resp.http.Set-Cookie && req.http.Cookie ~ "set_country_code") {
+        if (req.http.Cookie ~ "country_code=(GB|CA|AU)") {
+            set resp.http.Set-Cookie = regsub(req.http.Cookie, ".*country_code=(.{2});.*", "country_code=\1");
+        }
+        else {
+            set resp.http.Set-Cookie = "country_code=Unknown";
+        }
+    }
+        #See http://varnish.projects.linpro.no/wiki/VCLExampleHitMissHeader
+        if (obj.hits > 0) {
+            set resp.http.X-Cache = "HIT from <%= fqdn.gsub(".gnmedia.net","") %>";
+            set resp.http.X-Cache-Hits =  obj.hits;
+        } else {
+            set resp.http.X-Cache = "MISS from <%= fqdn.gsub(".gnmedia.net","") %>";
+        }
+
+        #Our magicmarker is to flag cacheable content no matter what (ie static) 
+        if (resp.http.magicmarker) {
+        # Remove the magic marker 
+            unset resp.http.magicmarker;
+        }
+        else {
+        #Set the clients TTL on other objects no matter what (prevent client caching : WE decide) */
+            set resp.http.Expires = "Wed, 29 Dec 1976 00:00:00 GMT";
+            set resp.http.Cache-Control = "no-store, no-cache, must-revalidate";
+        }
+}
+
+
+sub vcl_error {
+        set obj.http.Content-Type = "text/html; charset=utf-8";
+        synthetic {"
+            <?xml version="1.0" encoding="utf-8"?>
+            <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+            "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+            <html>
+            <head>
+            <title>"} obj.status " " obj.response {"</title>
+            <head>
+            <body>
+            <h1>Error "} obj.status " " obj.response {"</h1>
+            <p>"} obj.response {"</p>
+            <h3>Guru Meditation:</h3>
+            <p>XID: "} req.xid {"</p>
+            </body>
+            </html>
+        "};
+        return (deliver);
+}

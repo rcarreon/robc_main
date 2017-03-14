@@ -1,0 +1,21 @@
+# $Id$
+
+<VirtualHost *:80>
+    ServerName m.drinksmixer.com
+    ServerAlias *.m.drinksmixer.com
+
+    DocumentRoot /app/shared/docroots/drinksmixer.com/htdocs/m
+
+    php_value auto_prepend_file "/app/shared/docroots/drinksmixer.com/htdocs/inc/config.php"
+
+    RewriteEngine On
+    RewriteRule ^/drink([0-9a-z]*)\.html$ /recipe.php?id=$1 [L]
+    RewriteRule ^/games/([0-9]+)/?$ /games/game.php?id=$1 [L]
+    RewriteRule ^/games/c([0-9]+)/?$ /games/category.php?id=$1 [L]
+    RewriteRule ^/desc([0-9a-z]*)\.html$ /ingredient.php?id=$1 [L]
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/m.drinksmixer.com-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/m.drinksmixer.com-access.log combined
+
+    ErrorDocument 404 /404.php
+</VirtualHost>

@@ -1,0 +1,6 @@
+<desthost sql1v-reports-qa.ap.prd.lax.gnmedia.net>
+  sourcehost=sql1v-56-adops.ap.prd.lax.gnmedia.net
+  masterhost=none
+  savegrants=yes
+  emblackout=yes
+</desthost>

@@ -1,0 +1,272 @@
+#!/usr/bin/perl -W
+
+# Load the config from /etc/my.cnf and from mysqld and make sure they match
+# All errors are reported as warning. No crits.
+# Intented for nagios/nrpe.
+
+use strict;
+use Data::Dumper;
+use Config::General;
+
+# keys that are forced to boolean (paths in my.cnf are reported as boolean by mysqld)
+my @forcebool=qw/log_bin log_slow_queries/;
+
+# running keys that are ignored (I don't think this is ever needed)
+my @runningignore=qw//;
+
+# my.cnf keys that are ignored (they are not reported by mysqld)
+my @startupignore=qw/log_bin_index report_host plugin_load user skip_innodb replicate_ignore_db replicate_wild_do_table skip_character_set_client_handshake core-file ssl replicate_ignore_table/;
+
+# Ignored when server is 5.0
+my @v50ignore=qw/relay_log relay_log_index relay_log_info_file/;
+
+# values that are aligned to 16k
+my @align16k=qw/join_buffer_size/;
+
+# ulongs that get slightly munged by mysql
+my @sloppyulongs=qw/read_buffer_size sort_buffer_size/;
+my $sloppydelta=10*1024;
+
+my $breadcrumbfile="/sql/log/mysqlstartupconf";
+
+
+#-----no user-serviceable parts below this line-----#
+my $stdout=1;
+
+if ($> != 0) {
+   # Not running as root, just use the results from a previous run
+   if (-r "$breadcrumbfile") {
+     exec "$breadcrumbfile";
+   }
+   print "Error reading breadcrumbs file.\n";
+   exit 3;
+}
+
+open(NRPE,">$breadcrumbfile") or die;
+chmod(0755,"$breadcrumbfile");
+if (! -t STDOUT) {
+   $stdout=0;
+}
+
+
+#######
+# Load the Running Config
+my %runningconfig=();
+open(MYSQL,q/echo "show variables like '%'" | mysql 2>&1|/) or die;
+while(<MYSQL>) {
+   chomp;
+   my ($key,$value)=split(/\s+/,$_,2);
+   $runningconfig{$key}=$value;
+}
+close(MYSQL);
+if (!defined $runningconfig{version}) {
+   if (-r "$breadcrumbfile") {
+     exec "$breadcrumbfile";
+   }
+   print "Error getting config from mysql\n";
+   exit 3;
+}
+
+
+#######
+# Load the Startup Config
+open(MYCNF,"/etc/my.cnf") or die;
+$_=<MYCNF>;
+chomp;
+# Read in only the [mysqld] section into $configfiles
+while ($_=<MYCNF>) { chomp; last if ($_ =~ /^\[mysqld\]/); }
+my $configlines;
+while($_=<MYCNF>) {
+   last if /^\[/;
+   if (s/^\s+;/;/) { chomp ($configlines); }
+   $configlines.=$_;
+}
+my $conf = new Config::General("-String" => $configlines);
+my %startupconfig = $conf->getall;
+foreach (@startupignore) {
+   delete $startupconfig{$_} if (exists $startupconfig{$_});
+}
+#print Dumper(\%startupconfig);
+
+
+
+
+# A few helper functions
+sub istrue($) {
+   return grep ($_[0] eq $_,qw/YES ON 1 TRUE yes on true/);
+}
+sub isfalse($) {
+   return grep ($_[0] eq $_,qw/NO OFF 0 FALSE no off false/);
+}
+sub isboolean($) {
+   return (istrue $_[0]) || (isfalse $_[0]);
+}
+sub bcmp($$) {
+   return (istrue $_[0]) == (istrue $_[1]);
+}
+
+
+#######
+# Massage the running config name/values a bit
+foreach my $key (sort keys %runningconfig) {
+   # ignore some keys
+   if (grep ($key eq $_,@runningignore)) {
+      delete $runningconfig{$key};
+      next;
+   }
+   if (grep ($key eq $_,@forcebool)) {
+      if (! isfalse $runningconfig{$key}) {
+         $runningconfig{$key}="ON";
+      } else {
+         $runningconfig{$key}="OFF";
+      }
+   }
+
+   # remove trailing slash
+   $runningconfig{$key} =~ s|/$||;
+
+}
+
+#######
+# Massage the startup config name/values a bit
+foreach my $key (sort keys %startupconfig) {
+
+   # Having a key that exists, is "on"
+   if (!defined $startupconfig{$key}) {
+      $startupconfig{$key}="ON";
+   }
+   if ($startupconfig{$key} eq "") {
+      $startupconfig{$key}="ON";
+   }
+
+   # convert keys with dashes to underscores. mysqld accepts
+   # either, but output is always underscore
+   if ($key =~ /-/) {
+      my $newkey=$key;
+      $newkey =~ tr/-/_/;
+      $startupconfig{$newkey}=$startupconfig{$key};
+      delete $startupconfig{$key};
+      $key=$newkey;
+   }
+   if ($key eq "default_storage_engine") {
+      my $newkey="storage_engine";
+      $startupconfig{$newkey}=$startupconfig{$key};
+      delete $startupconfig{$key};
+      $key=$newkey;
+   }
+
+   # ignore some keys
+   if (grep ($key eq $_,@startupignore)) {
+      delete $startupconfig{$key};
+      next;
+   }
+
+   if (grep ($key eq $_,@forcebool)) {
+      if (! isfalse $startupconfig{$key}) {
+         $startupconfig{$key}="ON";
+      } else {
+         $startupconfig{$key}="OFF";
+      }
+   }
+
+   # remove trailing slash
+   $startupconfig{$key} =~ s|/$||;
+
+   # number conversions
+   if ($startupconfig{$key} =~ /^(\d+)K$/) {
+      # converts megs to ones
+      $startupconfig{$key}=$1*1024;
+   }
+   if ($startupconfig{$key} =~ /^(\d+)M$/) {
+      # converts megs to ones
+      $startupconfig{$key}=$1*1048576; #1024*1024
+   }
+   if ($startupconfig{$key} =~ /^(\d+)G$/) {
+      # converts megs to ones
+      $startupconfig{$key}=$1*1073741824; #1024*1024*1024
+   }
+
+   if ($key eq "binlog_format") {
+      $startupconfig{$key}=~ tr/[a-z]/[A-Z]/;
+   }
+
+   if ($key eq "query_cache_type") {
+      if ($startupconfig{$key} == 2) {
+         $startupconfig{$key}= "DEMAND";
+      }
+   }
+
+}
+if ($runningconfig{"version"} =~ /^5.0/) {
+   map {delete $startupconfig{$_} } @v50ignore;
+}
+
+foreach (@align16k) {
+   if (exists $startupconfig{$_}) {
+      # this algo is incomplete
+      $startupconfig{$_} = (int($startupconfig{$_}/16384)*16384);
+   }
+   if (exists $runningconfig{$_}) {
+      $runningconfig{$_} = (int($runningconfig{$_}/16384)*16384);
+   }
+}
+
+#########
+# Run the comparisons...
+my $exit=0;
+foreach my $key (sort keys %startupconfig) {
+   if (exists $runningconfig{$key}) {
+      my $error=0;
+
+      if (($runningconfig{$key} =~ m/^\d+(\.\d+)?$/) && ($startupconfig{$key} =~ m/^\d+(\.\d+)?$/)) {
+         # numerical compare
+         if ($runningconfig{$key} != $startupconfig{$key}) {
+             if (grep ($key eq $_,@sloppyulongs)) {
+                if ($runningconfig{$key} > $startupconfig{$key}) {
+                   if ($runningconfig{$key}-$startupconfig{$key} > $sloppydelta) {
+                      $error=1;
+                   }
+                } else {
+                   if ($startupconfig{$key}-$runningconfig{$key} > $sloppydelta) {
+                      $error=1;
+                   }
+                }
+             } else {
+                $error=1;
+             }
+         }
+
+      } elsif (isboolean $runningconfig{$key} and isboolean $startupconfig{$key}) {
+         # boolean compare
+         if (!bcmp $runningconfig{$key}, $startupconfig{$key}) { $error=1 }
+
+      } else {
+         # last case, string compare
+         if ($runningconfig{$key} ne $startupconfig{$key}) { $error=1 }
+
+      }
+            
+      if ($error) {
+         print "$key my.cnf: ".$startupconfig{$key}." running: ".$runningconfig{$key}."\n" if $stdout;
+         print NRPE "echo '$key my.cnf: ".$startupconfig{$key}." running: ".$runningconfig{$key}."'\n";
+      }
+      $exit|=$error;
+
+   } else {
+      print "Error: $key missing in running config\n" if $stdout;
+      print NRPE "echo 'Error: $key missing in running config'\n";
+      $exit=1;
+   }
+}
+
+if (!$exit) {
+   print "OK\n" if $stdout;
+   print NRPE "echo OK\n";
+}
+
+print NRPE "exit $exit\n";
+close(NRPE);
+
+exit $exit;
+
+

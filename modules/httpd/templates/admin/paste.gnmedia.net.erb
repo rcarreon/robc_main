@@ -1,0 +1,18 @@
+# $Id$
+<VirtualHost *:80>
+    ServerName paste.gnmedia.net
+    ServerAlias *.paste.gnmedia.net
+    DocumentRoot /app/shared/docroots/paste.gnmedia.net/public_html
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/paste.gnmedia.net_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/paste.gnmedia.net_access.log combined
+
+    php_value include_path .:/app/shared/docroots/paste.gnmedia.net/lib
+    php_value register_globals off
+    DirectoryIndex pastebin.php
+    RewriteEngine on
+    RewriteRule /([0-9]+) /pastebin.php?show=$1
+
+
+</VirtualHost>
+

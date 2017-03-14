@@ -1,0 +1,17 @@
+# description: NRPE (Nagios Remote Plugin Executor)
+service nrpe
+{
+		flags           = REUSE
+		type            = UNLISTED
+		port            = 5666
+		socket_type     = stream
+		wait            = no
+		user            = nrpe
+		group           = nrpe
+		server          = /usr/sbin/nrpe
+		server_args     = -c /etc/nagios/nrpe.cfg -i
+		log_on_success	=
+		log_on_failure  += USERID
+		disable         = no
+		only_from       = 127.0.0.1 10.2.10.246 10.2.10.247 10.2.10.32 
+}

@@ -1,0 +1,82 @@
+# This logname can be set in /etc/my.cnf
+# by setting the variable "err-log"
+# in the [safe_mysqld] section as follows:
+#
+# [safe_mysqld]
+# err-log=/var/lib/mysql/mysqld.log
+#
+# If the root user has a password you have to create a
+# /root/.my.cnf configuration file with the following
+# content:
+#
+# [mysqladmin]
+# password = <secret>
+# user= root
+#
+# where "<secret>" is the password.
+#
+# ATTENTION: This /root/.my.cnf should be readable ONLY
+# for root !
+
+# mysqld rotates error.log to error.log-old when flushed.
+# We need to temporarily put it back in place for logrotate.
+/sql/log/error.log {
+    firstaction
+        cd /sql/log
+        exec >>logrotate.log
+        exec 2>>logrotate.log
+        echo "Starting: $(date) "
+        set -x
+        if [ -s error.log-old ] ;then
+           # save this old file that didn't get rotated
+           mv -f error.log-old error.log-old.$(date +%Y%m%d-%H%M%S)
+        else rm -f error.log-old
+        fi
+        # just if mysqld is really running
+        if test -x /usr/bin/mysqladmin && \
+           /usr/bin/mysqladmin --defaults-extra-file=/root/.my.cnf ping &>/dev/null
+        then
+           #/usr/bin/mysqladmin flush-logs  <-- actually a refresh
+           echo "flush logs;" | mysql --defaults-extra-file=/root/.my.cnf
+        fi
+        if [ -f error.log-old ];then
+            # This is pre-5.1.51 mysql
+            mv -f error.log errorlogsave
+            mv -f error.log-old error.log
+        fi
+        chown mysql: *
+        endscript
+    nocreate
+    notifempty
+    daily
+    rotate 3
+    missingok
+    compress
+    lastaction
+        cd /sql/log
+        exec >>logrotate.log
+        exec 2>>logrotate.log
+        set -x
+        if [ -f errorlogsave ];then
+          # pre-5.1.51 mysql
+          mv -vf errorlogsave error.log
+        else
+          echo "Mysql 5.1.51 or greater, therefore, no lastaction performed"
+        fi
+        echo "End: $(date) "
+        endscript
+} 
+
+# slow-queries.log is not managed like error.log. mysqld does
+# not re-open the file descriptor. 
+# One day, upstream will start renaming slow-queries.log and
+# the scheme below will break.
+/sql/log/slow-queries.log {
+    copytruncate
+    notifempty
+    daily
+    rotate 3
+    missingok
+    compress
+}   
+

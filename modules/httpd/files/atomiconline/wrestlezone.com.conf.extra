@@ -1,0 +1,12 @@
+
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^wrestlezone\.com$ [NC]
+    RewriteRule ^/(.*) http://www.wrestlezone.com/$1 [R=301,L]
+
+    # m.wrestlezone.com -> www.wrestlezone.com
+    RewriteCond %{HTTP_HOST} ^m\.wrestlezone\.com$ [NC]
+    RewriteRule ^/(.*) http://www.wrestlezone.com/$1 [R=301,L]
+
+    RewriteRule ^/images/stories/([1-9]{5,6})/(.*)    /images/stories/archive/$1/$2  [R,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

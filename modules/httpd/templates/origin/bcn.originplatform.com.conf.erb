@@ -1,0 +1,25 @@
+# This file is managed by Puppet. Do not modify it on <%=fqdn %>
+
+<VirtualHost *:80>
+
+    ServerName bcn.originplatform.com 
+    ServerAlias bcn.originplatform.com
+    DocumentRoot "/app/shared/docroots/originplatform.com/current/public"
+    ErrorLog /app/log/bcn.originplatform.com-error.log
+
+    SetEnvIf X-Forwarded-For "(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$" clientip=$1
+    SetEnvIf Incap-Client-IP "^(.*\..*\..*\..*)" clientip=$1
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" balancer
+    LogFormat "%{clientip}e %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" beacon
+
+    CustomLog /app/log/bcn.originplatform.com-access.log balancer env=!clientip
+    CustomLog /app/log/bcn.originplatform.com-access.log beacon env=clientip
+
+    <Directory /app/shared/docroots/originplatform.com/current/public>
+        AllowOverride FileInfo Indexes Options
+        Options -MultiViews
+    </Directory>
+
+    RedirectMatch 204 bcn(.*).png$
+
+</VirtualHost>

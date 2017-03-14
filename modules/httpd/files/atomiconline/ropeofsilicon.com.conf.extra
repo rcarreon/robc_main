@@ -1,0 +1,17 @@
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^ropeofsilicon\.com$ [NC]
+    RewriteRule ^/(.*) http://www.ropeofsilicon.com/$1 [R=301,L]
+
+    ServerAlias ropesofsilicon.com *.ropesofsilicon.com
+    RewriteCond %{HTTP_HOST} ^ropesofsilicon\.com$ [NC]
+    RewriteRule ^/(.*) http://www.ropeofsilicon.com/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.ropesofsilicon\.com$ [NC]
+    RewriteRule ^/(.*) http://www.ropeofsilicon.com/$1 [R=301,L]
+
+    ServerAlias ropeofsilicone.com *.ropeofsilicone.com
+    RewriteCond %{HTTP_HOST} ^ropeofsilicone\.com$ [NC]
+    RewriteRule ^/(.*) http://www.ropeofsilicon.com/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.ropeofsilicone\.com$ [NC]
+    RewriteRule ^/(.*) http://www.ropeofsilicon.com/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

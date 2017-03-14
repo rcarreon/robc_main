@@ -1,0 +1,17 @@
+check system <%= fqdn %>
+  if loadavg (1min) > 30 then alert
+  if loadavg (5min) > 50 then alert
+
+    <% if has_variable?("at_manufacturer") then %>
+      <% if at_manufacturer == "Xen" then %>
+	if memory usage > 92% for 5 cycles then alert
+      <% else %>
+        if memory usage > 99% then alert
+      <% end %>
+    <% else %>
+	if memory usage > 92% for 5 cycles then alert
+    <% end %>
+
+  if cpu usage (user) > 80% then alert
+  if cpu usage (system) > 90% then alert
+  if cpu usage (wait) > 60% then alert

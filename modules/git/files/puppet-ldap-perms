@@ -1,0 +1,68 @@
+#!/bin/bash
+
+#set -x
+
+NOREV=0000000000000000000000000000000000000000
+
+#look at user of commit and reject if it's not a valid ldap user 
+
+while read oldrev newrev ref; do
+    if [ "$GL_REPO" == "puppet-modules" ]; then
+        if [ "$ref" == "refs/heads/master" ]; then
+
+            # ignore new branch creations
+            if [[ $oldrev = $NOREV ]]; then
+                exit 0
+            else 
+
+            # Check the list of incoming commits
+            all_revs=`git rev-list $oldrev..$newrev`
+            for rev in $all_revs; do
+               commit_name=$(git log -1 --pretty="%an" $rev)
+
+                if [[ $commit_name != $GL_USER ]]; then
+                    echo
+                    echo "COMMIT FAILED: Please configure your git name as $GL_USER." 
+                    echo "Right now it is configured as $(git log -1 $rev |awk '{print $2,$3}'|sed -n '2p')!"
+                    echo 'To change the author: git commit --amend --author="'$GL_USER'"'
+                    echo 'To fix permanently going forward: git config user.name "'$GL_USER'"'
+                    exit 1 
+                fi
+            done
+            fi
+        fi
+    fi
+
+    # GIT pre-commit hook to check Puppet syntax for .pp files
+    TMPFILE=$(mktemp /tmp/tmp.XXXXXXXXXX)
+
+    if [[ $oldrev = $NOREV ]]; then
+            # ignore new branches
+            exit 0;
+    fi
+
+    if [[ $newrev = $NOREV ]]; then
+            # ignore branch deletes
+            exit 0;
+    fi
+
+    changed_pp_files=`git diff-tree --no-commit-id --name-only --diff-filter=ACM $oldrev $newrev | grep "\\.pp"`
+    for file in $changed_pp_files; do
+        # Don't check empty files
+        if [[ $(git cat-file -s ${newrev}:"${file}") -eq 0 ]]; then
+            continue
+        fi
+
+        echo "syntax checking ${file}"
+        git cat-file blob ${newrev}:"${file}" > $TMPFILE
+        #git show ${newrev}:${rev} > $TMPFILE
+        puppet parser validate --color=false --confdir=/tmp --vardir=/tmp --ignoreimport $TMPFILE
+        if [ $? -ne 0 ]; then
+            echo "Push failed!  Puppet syntax error in ${file}." >&2
+            rm $TMPFILE
+            exit 1
+        fi
+    done
+done
+rm $TMPFILE
+

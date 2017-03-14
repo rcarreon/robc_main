@@ -1,0 +1,21 @@
+# This file contains the auditctl rules that are loaded
+# whenever the audit daemon is started via the initscripts.
+# The rules are simply the parameters that would be passed
+# to auditctl.
+
+# First rule - delete all
+-D
+
+# Increase the buffers to survive stress events.
+# Make this bigger for busy systems
+-b 1024
+
+# Feel free to add below this line. See auditctl man page
+-a always,exit -F arch=b64 -S open -S access -S unlink -S unlinkat
+-a always,exit -F arch=b32 -S open -S access -S unlink -S unlinkat -S stime
+-w /app/shared -p wx
+-w /etc/group -p wa
+-w /etc/passwd -p wa
+-w /etc/shadow -p wa
+-w /etc/sudoers -p wa
+

@@ -1,0 +1,16 @@
+<VirtualHost *:80>
+
+    ServerName yumoter.gnmedia.net
+
+    DocumentRoot /mnt/yum_repos/yumoter/repos 
+
+    <Directory /mnt/yum_repos/yumoter/repos> 
+        Options Indexes FollowSymLinks
+        AllowOverride None
+    </Directory>
+
+    <%=logging ? '' : '#'%>CustomLog /app/log/yumoter.gnmedia.net-access.log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/yumoter.gnmedia.net-error.log
+
+
+</VirtualHost>

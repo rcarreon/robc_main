@@ -1,0 +1,32 @@
+# dev env
+
+<VirtualHost *:80>
+    ServerName dev.crowdignite.com
+    ServerAlias dev.origin.crowdignite.com dev.cdn.crowdignite.com dev.cdn1.crowdignite.com dev.crowdignite.gamerevolution.com dev.es.crowdignite.craveonline.com dev.news.crowdignite.craveonline.com dev.crowdignite.craveonline.com dev.crowdignite.momtastic.com dev.crowdignite.thefashionspot.com dev.crowdignite.globetrottingonline.com dev.thecelebritycafe.crowdignite.com dev.crowdignite.teenspot.com dev.crowdignite.liveoutdoors.com dev.crowdignite.totallyher.com dev.crowd-ignite.totallyher.com dev.thebusinesscontentexchange.entrepreneur.com dev.es.crowdignite.totallyher.com
+
+    # https://bugs.php.net/bug.php?id=59692 imagick and libgomp are incompatiable
+    # so we force imagick to stick to one thread
+    SetEnv MAGICK_THREAD_LIMIT 1
+
+    DocumentRoot /app/shared/public_html/app/webroot
+    <%=logging ? '' : '#'%>CustomLog /app/log/dev.crowdignite.com-access_log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/dev.crowdignite.com-error_log
+
+    <Directory "/app/shared/public_html/app/webroot">
+        php_admin_value open_basedir /app/shared:/app/log/cakephp:/app/tmp:/var/www/tmp:/app/shared/public_html/app/webroot/img/upload:/dev/shm/logs:/var/vw-log-ramdisk
+        Options -Indexes +FollowSymLinks -ExecCGI
+
+        RewriteEngine On
+
+        RewriteBase /
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+        <Files sitemap.xml>
+                RewriteEngine Off
+        </Files>
+    </Directory>
+
+</VirtualHost>
+

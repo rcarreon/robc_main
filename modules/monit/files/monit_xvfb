@@ -1,0 +1,6 @@
+check process Xvfb with pidfile /tmp/xvfb.pid
+ every 5 cycles
+ start program = "/etc/init.d/xvfb start"
+    as uid deploy and gid deploy
+ stop  program = "/etc/init.d/xvfb stop"
+    as uid deploy and gid deploy

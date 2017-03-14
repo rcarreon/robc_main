@@ -1,0 +1,23 @@
+# $Id$
+# $URL$
+
+check file openfireLog with path /opt/openfire/logs/error.log
+    start program = "/bin/sh /etc/monit.d/openfire_restart"
+    stop  program = "/sbin/service openfire stop"
+
+        if match "java.lang.OutOfMemoryError: Java heap space" then restart
+
+    check host jabber with address localhost
+    alert sysadmins@gorillanation.com
+        if failed url
+            http://jabber.evolvemediacorp.com:9090/
+            timeout 15 seconds
+        then restart
+
+        if failed url
+            http://jabber.evolvemediacorp.com:9090/index.jsp
+            timeout 5 seconds for 2 cycles
+        then alert
+
+        if failed port 5222 then alert
+

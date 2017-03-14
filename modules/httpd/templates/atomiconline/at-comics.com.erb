@@ -1,0 +1,11 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@at-comics.com
+    ServerName www.at-comics.com
+    ServerAlias at-comics.com
+    <%=logging ? '' : '#'%>ErrorLog /app/log/at-comics.com-error_log
+    <%=logging ? '' : '#'%>CustomLog /app/log/at-comics.com-access_log combined
+
+    Redirect Permanent / http://www.actiontrip.com/index/comics.phtml
+
+</VirtualHost>
+

@@ -1,0 +1,24 @@
+###################################
+##  sqlcopy sample mapfile
+###################################
+
+## master-master replication on staging environment
+<desthost sql2v-ci.ci.stg.lax.gnmedia.net>
+  sourcehost=sql1v-ci.ci.prd.lax.gnmedia.net
+  masterhost=sql1v-ci.ci.stg.lax.gnmedia.net
+  savegrants=yes
+</desthost>
+<desthost sql1v-ci.ci.stg.lax.gnmedia.net>
+  sourcehost=sql1v-ci.ci.prd.lax.gnmedia.net
+  masterhost=sql2v-ci.ci.stg.lax.gnmedia.net
+  savegrants=yes
+  emblackout=yes
+</desthost>
+
+## stand alone sql server for dev
+<desthost sql1v-ci.ci.dev.lax.gnmedia.net>
+  sourcehost=sql1v-ci.ci.prd.lax.gnmedia.net
+  masterhost=none
+  savegrants=yes
+  emblackout=yes
+</desthost>

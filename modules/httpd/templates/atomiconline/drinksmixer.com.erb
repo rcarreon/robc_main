@@ -1,0 +1,39 @@
+# $Id$
+# for both prod and stg env
+
+<VirtualHost *:80>
+    ServerAdmin webmaster@drinksmixer.com
+    DocumentRoot /app/shared/docroots/drinksmixer.com/htdocs/
+    ServerName drinksmixer.com 
+    ServerAlias www.drinksmixer.com stg.drinksmixer.com 
+
+    <Directory /app/shared/docroots/drinksmixer.com/htdocs>
+        Allow from all
+        AllowOverride All
+        Order allow,deny
+    </Directory>
+
+    SetEnv SITE_ROOT /app/shared/docroots/drinksmixer.com/htdocs
+    SetEnv SITE_HTMLROOT /app/shared/docroots/drinksmixer.com/htdocs
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/drinksmixer.com-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/drinksmixer.com-access.log combined
+
+
+    <Directory /app/shared/docroots/drinksmixer.com/htdocs/m>
+        Deny From all
+    </Directory>
+
+
+    Alias /interpreters/ /app/shared/docroots/drinksmixer.com/htdocs/interpreters/
+    <Directory /app/shared/docroots/drinksmixer.com/htdocs/interpreters>
+        Options ExecCGI
+        SetHandler cgi-script
+    </Directory>
+
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^drinksmixer\.com$ [NC]
+    RewriteRule ^/(.*) http://www.drinksmixer.com/$1 [R=301,L]
+
+    ErrorDocument 404 /404.php
+</VirtualHost>

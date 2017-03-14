@@ -1,0 +1,54 @@
+#!/bin/sh
+#
+# ciwidget- deploy docroot for the Crowd Ignite widget 
+#
+# chkconfig:   - 80 20
+# description:  ciwidget deploys the docroot files for the Crowd Ignite widget
+#               from /app/shared to /dev/shm for better performance.
+# processname: ciwidget
+
+# Source function library.
+. /etc/rc.d/init.d/functions
+prog="ciwidget"
+
+start() {
+    [ -d /app/shared/public_html_widget ] || exit 5
+    sudo -u deploy /usr/local/bin/deploy_ci_widget.sh
+    retval=$?
+    return $retval
+}
+
+stop() {
+    echo -n ""
+}
+
+restart() {
+    start
+    /etc/init.d/php-fpm restart
+    /etc/init.d/nginx restart
+}
+
+reload() {
+    start
+    /etc/init.d/php-fpm reload
+    /etc/init.d/nginx reload
+}
+
+case "$1" in
+    start)
+        $1
+        ;;
+    stop)
+        $1
+        ;;
+    restart)
+        $1
+        ;;
+    reload)
+        $1
+        ;;
+    *)
+        echo $"Usage: $0 {start|stop|restart|reload}"
+        exit 2
+esac
+

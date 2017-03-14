@@ -1,0 +1,96 @@
+# File managed by puppet
+# Do not edit it on <%= fqdn %>
+# $Id$
+
+WSGISocketPrefix /etc/httpd/wsgi/
+# I've found that an equal number of processes & threads tends
+# to show the best performance for Graphite (ymmv).
+WSGIDaemonProcess graphite processes=5 threads=5 display-name='%{GROUP}' inactivity-timeout=120
+
+<VirtualHost *:80>
+    ServerName  graphite.gnmedia.net
+    ServerAlias *.graphite.gnmedia.net
+    DocumentRoot /app/shared/graphite/webapp/graphite
+    <%=logging ? '' : '#'%>ErrorLog /app/log/graphite.gnmedia.net_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/graphite.gnmedia.net_access.log combined
+
+    Header set Access-Control-Allow-Headers X-Requested-With
+    Header set Access-Control-Allow-Origin *
+
+    # XXX You need to set this up!
+    # Read http://code.google.com/p/modwsgi/wiki/ConfigurationDirectives#WSGISocketPrefix
+
+    # XXX You will need to create this file! There is a graphite.wsgi.example
+    # file in this directory that you can safely use, just copy it to graphite.wgsi
+    WSGIScriptAlias / /app/shared/graphite/conf/graphite.wsgi
+
+    Alias /content/ /app/shared/graphite/webapp/content/
+    <Location "/content/">
+        SetHandler None
+    </Location>
+
+    # XXX In order for the django admin site media to work you
+    # must change @DJANGO_ROOT@ to be the path to your django
+    # installation, which is probably something like:
+    # /usr/lib/python2.6/site-packages/django
+    Alias /media/ "@DJANGO_ROOT@/contrib/admin/media/"
+    <Location "/media/">
+            SetHandler None
+    </Location>
+
+    # The graphite.wsgi file has to be accessible by apache. It won't
+    # be visible to clients because of the DocumentRoot though.
+    <Directory /app/shared/graphite/conf/>
+            Order deny,allow
+            Allow from all
+    </Directory>
+
+    RedirectPermanent /account/ https://graphite.gnmedia.net/account/
+
+
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName  graphite.gnmedia.net
+    ServerAlias *.graphite.gnmedia.net
+    DocumentRoot /app/shared/graphite/webapp/graphite
+    <%=logging ? '' : '#'%>ErrorLog /app/log/graphite.gnmedia.net_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/graphite.gnmedia.net_access.log combined
+    
+    SSLEngine on
+    SSLProtocol all -SSLv2
+    SSLCertificateFile /etc/pki/tls/certs/graphite.gnmedia.net.cert
+    SSLCertificateKeyFile /etc/pki/tls/private/graphite.gnmedia.net.key
+
+
+    # XXX You need to set this up!
+    # Read http://code.google.com/p/modwsgi/wiki/ConfigurationDirectives#WSGISocketPrefix
+
+    # XXX You will need to create this file! There is a graphite.wsgi.example
+    # file in this directory that you can safely use, just copy it to graphite.wgsi
+    WSGIScriptAlias / /app/shared/graphite/conf/graphite.wsgi
+
+    Alias /content/ /app/shared/graphite/webapp/content/
+    <Location "/content/">
+            SetHandler None
+    </Location>
+
+    # XXX In order for the django admin site media to work you
+    # must change @DJANGO_ROOT@ to be the path to your django
+    # installation, which is probably something like:
+    # /usr/lib/python2.6/site-packages/django
+    Alias /media/ "@DJANGO_ROOT@/contrib/admin/media/"
+    
+    <Location "/media/">
+            SetHandler None
+    </Location>
+
+    # The graphite.wsgi file has to be accessible by apache. It won't
+    # be visible to clients because of the DocumentRoot though.
+    <Directory /app/shared/graphite/conf/>
+            Order deny,allow
+            Allow from all
+    </Directory>
+</VirtualHost>
+
+

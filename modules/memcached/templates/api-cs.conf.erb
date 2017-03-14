@@ -1,0 +1,29 @@
+# This file is managed by puppet 
+#
+# $Id:
+
+<%
+
+# memorysize => 1024.00 MB  --> 819.2M                                         
+# memorysize => 3.38 GB     --> 2.704G
+mem,unit = memorysize.split(" ")
+if unit == "MB"
+    malloc = 256
+else
+    if mem.to_f > 1.96
+        malloc = (mem.to_f - 1.6) * 1024
+    else
+        malloc = (mem.to_f - 0.96) * 1024
+    end
+end
+malloc = malloc.to_int
+
+%>
+
+PORT="11211"
+USER="memcached"
+MAXCONN="4096"
+CACHESIZE="<%= malloc %>"
+OPTIONS="-o slab_reassign,slab_automove"
+
+ulimit -n 4096

@@ -1,0 +1,3 @@
+JAVA_HOME="/usr/lib/jvm/jre"
+HEAP_OPTS="-Xmx2560m -Xms2560m -XX:NewSize=384m"
+STAGE=crowdignite

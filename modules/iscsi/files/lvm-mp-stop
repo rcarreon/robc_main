@@ -1,0 +1,40 @@
+#!/bin/bash
+#
+# lvm-mp-stop        This stops lvm and flushes multipath maps
+#
+# chkconfig: - 13 76
+# description: This stops lvm and flushes multipath maps
+#
+
+PATH=/sbin:/bin:/usr/bin:/usr/sbin
+
+# Source function library.
+. /etc/init.d/functions
+
+
+# See how we were called.
+case "$1" in
+    start)
+        touch /var/lock/subsys/lvm-mp-stop
+	;;
+    stop)
+        for vg in $(/sbin/lvm vgs --noheadings | awk '{print $1}');do
+            action $"Stopping $vg" /sbin/lvm vgchange -a n $vg
+        done
+        if [ -x /sbin/multipath ];then
+            action $"Flushing multipath maps" multipath -F
+        fi
+        rm -f /var/lock/subsys/lvm-mp-stop
+	;;
+    restart)
+	;;
+    reload|force-reload)
+	;;
+    condrestart|try-restart)
+	;;
+    *)
+	echo $"Usage: $0 {start|stop|status|restart|condrestart|try-restart|reload|force-reload}"
+	RETVAL=3
+esac
+
+

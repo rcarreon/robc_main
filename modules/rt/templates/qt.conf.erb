@@ -1,0 +1,24 @@
+# $Id$
+# $URL$
+
+<VirtualHost *:80>
+	ServerName <%= name %>
+
+	DocumentRoot	/app/shared/RTFront/QuickTicket
+	ErrorLog /app/log/<%= name %>-error_log
+	CustomLog /app/log/<%= name %>-access_log common
+
+        PerlSetEnv PERL5LIB /app/shared/RTFront
+
+	<Location />
+		SetHandler perl-script
+		PerlHandler RTFront::QuickTicket
+		PerlSendHeader On
+		Allow from all
+	</Location>
+
+	<Location /NoAuth>
+		SetHandler send-as-is
+		Allow from all
+	</Location>
+</VirtualHost>

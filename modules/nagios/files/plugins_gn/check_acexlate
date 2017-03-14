@@ -1,0 +1,152 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+# Globals
+my $PROGNAME = "check_acexlate";
+use Getopt::Long;
+use vars qw($opt_V $opt_v $opt_h $opt_H $PROGNAME);
+
+# aceman -c admin@core1 show xlate | grep "^TCP PAT" | awk '{print $6}' | sed 's/\/.*//' | sort | uniq -c
+
+my $DEBUG           = 0;
+my $REVISION        = "0.1";
+my $hostname        = undef;
+my $exitok=0;
+my $exitwarn=1;
+my $exitcrit=2;
+my $exitunk=3;
+
+
+# nagios specific
+my $status      = $exitok;
+my $problem_on_name = undef;
+my $problem_value   = undef;
+
+
+sub in ($$);
+$ENV{'BASH_ENV'}='';
+$ENV{'ENV'}='';
+$ENV{'PATH'}='/usr/local/bin:/usr/bin:/bin';
+$ENV{'LC_ALL'}='C';
+
+
+
+Getopt::Long::Configure('bundling');
+GetOptions
+       ("V"   => \$opt_V, "version"     => \$opt_V,
+        "h"   => \$opt_h, "help"        => \$opt_h,
+        "v"   => \$opt_v, "verbose"     => \$opt_v,
+        "H=s" => \$opt_H, "hostname=s"  => \$opt_H);
+
+
+# check if everything is ok
+check_parameters();
+
+
+use Data::Dumper;
+
+   #3804 vlan130:10.10.30.23
+   #2024 vlan1034:10.11.34.17
+   #2014 vlan131:10.10.31.246
+   #1664 vlan131:10.10.31.247
+   #1617 vlan131:10.10.31.244
+
+my %acestates=();
+print "Executing 'aceman -c $hostname show xlate'\n" if $DEBUG;
+open(ACEMAN,"aceman -c $hostname show xlate 2>&1|grep '^TCP PAT' | awk '{print \$6}' | sed 's/\\/.*//' | sort | uniq -c|") or die;
+while ($_=<ACEMAN>) {
+   my ($xlates,$int)=split;
+   $acestates{$int}=$xlates;
+}
+close(ACEMAN);
+if ($? != 0) {
+   print "aceman error\n";
+   exit $exitunk;
+}
+
+my $response_text       = '';
+my $highestxlates=0;
+my $highestint;
+
+foreach my $int (keys %acestates) {
+   print "Looking at interface $int, xlates: ".$acestates{$int}."\n" if $DEBUG;
+
+   if ($acestates{$int} > $highestxlates) {
+     $highestxlates=$acestates{$int};
+     $highestint=$int;
+   }
+   if ($acestates{$int} > 40000) {
+      $response_text.="$int xlates: ".$acestates{$int}."\n";
+   }
+}
+
+if ($response_text) {
+   print "$response_text  \n";
+   exit $exitcrit;
+} else {
+   print "OK (highest is $highestint: $highestxlates)\n";
+   exit $exitok;
+}
+
+
+
+##
+###
+### Functions
+###
+##
+
+
+
+# That one check parameters
+sub check_parameters {
+    # Basic checks
+    if ($opt_V) {
+             print "$PROGNAME $REVISION\n";
+             exit 1;
+    }
+
+    if ($opt_h) {
+             print_help ();
+             print "$PROGNAME $REVISION\n";
+             exit 1;
+    }
+
+    if ($opt_v) {
+        $DEBUG = 1;
+    }
+
+    if (!defined($opt_H))   {
+            print "Hostname requested !\n";
+            print_usage();
+            exit 1;
+    } else {
+            $hostname = $opt_H;
+    }
+
+
+} # end check_options
+
+
+sub print_usage () {
+   print "Usage: $0  -H <host>\n";
+}
+
+
+sub print_help () {
+  print "Monitor serverfarm states in ACE loadbalancers\n";
+  print_usage();
+  print <<EOT;
+-h, --help
+       print this help message
+-H, --hostname=HOST
+       name or IP address of host to check
+-v  --verbose
+       Be verbose
+-V, --version
+       prints version number
+EOT
+}
+
+

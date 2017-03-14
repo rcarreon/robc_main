@@ -1,0 +1,25 @@
+# These values can be overridden by editing ~/.spamassassin/user_prefs.cf
+# (see spamassassin(1) for details)
+
+# These should be safe assumptions and allow for simple visual sifting
+# without risking lost emails.
+
+add_header all Report _REPORT_
+required_hits 5
+report_safe 0
+rewrite_header Subject [SPAM]
+
+
+# custom rules
+
+header  WORK_AT_HOME_SUBJ_1 Subject =~ /Internet Workers Needed/i
+score   WORK_AT_HOME_SUBJ_1 10
+
+header  DISCOVER_HOW_SUBJ_1 Subject =~ /Discover how this guy make/i
+score   DISCOVER_HOW_SUBJ_1 10
+
+describe 	META_URI_WORK_HOME work+home hit
+uri 		__URI_WORK /work/i
+uri 		__URI_HOME /home/i
+meta 		META_URI_WORK_HOME (__URI_WORK && __URI_HOME)
+score 		META_URI_WORK_HOME 10.0

@@ -1,0 +1,20 @@
+<VirtualHost *:80> 
+   ServerName www.origin.idontlikeyouinthatway.com
+   ServerAlias media.idontlikeyouinthatway.com cdn.idontlikeyouinthatway.com
+   ServerAdmin sysadmins@gorillanation.com
+   DocumentRoot "/app/shared/docroot/idlyitw.com"
+   <%=logging ? '' : '#'%>CustomLog /app/log/cdn.idontlikeyouinthatway.com-access.log combined
+   <%=logging ? '' : '#'%>ErrorLog "/app/log/cdn.idontlikeyouinthatway.com-error.log"
+   #<%=logging ? '' : '#'%>CustomLog logs/cdn.idontlikeyouinthatway.com-access.log combined
+   #<%=logging ? '' : '#'%>ErrorLog logs/cdn.idontlikeyouinthatway.com-error.log
+   <Directory "/app/shared/docroot/idlyitw.com">
+       Options -Indexes Includes FollowSymLinks MultiViews
+       AllowOverride All
+       Order allow,deny
+       Allow from all
+  </Directory>
+
+
+  LimitInternalRecursion 20
+</VirtualHost> 
+

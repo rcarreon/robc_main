@@ -1,0 +1,11 @@
+
+# filename=<%= file %> 
+
+[client]
+       user = logrotate
+<% if fqdn  =~ /^uid/ %>
+       password = <%= uidlogrotpass %>
+<% else %>
+       password = <%= logrotpass %>
+<% end %>
+

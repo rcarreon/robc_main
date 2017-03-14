@@ -1,0 +1,53 @@
+#
+# Minimal Sphinx configuration sample (clean, simple, functional)
+#
+
+source src1
+{
+	type					= mysql
+
+	sql_host				= vip-sqlrw-mc.ao.prd.lax.gnmedia.net
+	sql_user				= pb_spx_mc_w
+	sql_pass				= 9243QYFr64uN
+	sql_db					= pb_mostcraved
+	sql_port				= 3306										# optional, default is 3306
+
+	sql_query				= \
+		SELECT id, site, title, link, description, pubdate, social_score \
+		FROM movie_feeds
+
+	sql_attr_uint			= social_score
+	sql_attr_timestamp		= pubdate
+
+	sql_query_info			= SELECT * FROM movie_feeds WHERE id=$id
+}
+
+
+index test1
+{
+	source					= src1
+	path					= /var/lib/sphinx/test1
+	docinfo					= extern
+	charset_type			= sbcs
+}
+
+
+indexer
+{
+	mem_limit				= 32M
+}
+
+
+searchd
+{
+	port					= 3312
+	log					= /app/log/sphinx/searchd.log
+	query_log				= /app/log/sphinx/query.log
+	read_timeout			= 5
+	max_children			= 30
+	pid_file				= /var/run/sphinx/searchd.pid
+	max_matches				= 1000
+	seamless_rotate			= 1
+	preopen_indexes			= 0
+	unlink_old				= 1
+}

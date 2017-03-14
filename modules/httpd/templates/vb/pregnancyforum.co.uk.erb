@@ -1,0 +1,85 @@
+<VirtualHost *:80>
+    ServerName pregnancyforum.co.uk
+    ServerAlias *.pregnancyforum.co.uk
+    ServerAlias prd.pregnancyforum.co.uk
+    DocumentRoot /app/shared/pregnancyforum.co.uk
+#    ServerAdmin webmaster@pregnancyforum.co.uk
+    UseCanonicalName Off
+    Options -ExecCGI -Includes
+    RemoveHandler cgi-script .cgi .pl .plx .ppl .perl
+    CustomLog /app/log/pregnancyforum.co.uk-access_log combined
+    ErrorLog /app/log/pregnancyforum.co.uk-error_log
+	
+    ## User pregnanc # Needed for Cpanel::ApacheConf
+#    UserDir enabled pregnanc
+#    <IfModule !mod_disable_suexec.c>
+#        <IfModule !mod_ruid2.c>
+#            SuexecUserGroup pregnanc pregnanc
+#        </IfModule>
+#    </IfModule>
+#    <IfModule mod_ruid2.c>
+#        RMode config
+#        RUidGid pregnanc pregnanc
+#    </IfModule>
+ #   <IfModule itk.c>
+        # For more information on MPM ITK, please read:
+        #   http://mpm-itk.sesse.net/
+ #       AssignUserID pregnanc pregnanc
+ #   </IfModule>
+
+
+    # To customize this VirtualHost use an include file at the following location
+    # Include "/usr/local/apache/conf/userdata/std/2/pregnanc/pregnancyforum.co.uk/*.conf"
+<Directory /app/shared/pregnancyforum.co.uk>
+	Options +FollowSymlinks
+	RewriteEngine On
+# charset
+	AddDefaultCharset Off
+# correct urls by making sure there is a trailing /
+	RewriteCond %{REQUEST_URI} !\..+$
+	RewriteCond %{REQUEST_URI} !/$
+	RewriteRule (.*) %{REQUEST_URI}/ [R=301,L]
+# makes sure everything is 301'd to the same domain
+	RewriteCond %{HTTP_HOST} ^pregnancyforum.co.uk$
+	RewriteRule ^(.*)$ http://www.pregnancyforum.co.uk/$1 [R=301,L]
+	RewriteCond %{HTTP_HOST} ^(www.)?pregnancyforums.co.uk$
+	RewriteRule ^(.*)$ http://www.pregnancyforum.co.uk/$1 [R=301,L]
+	redirect 301 /forum/ http://www.pregnancyforum.co.uk/
+# turn off mod_sec
+<IfModule mod_security.c>
+	SecFilterEngine Off
+	SecFilterScanPOST Off
+</IfModule>
+# expires
+<IfModule mod_expires.c>
+	ExpiresActive On
+	<FilesMatch "\.(css|js|gif|jpg|jpeg|png|swf)$">
+		ExpiresDefault A2592000
+	</FilesMatch>
+</IfModule>
+<IfModule mod_deflate.c>
+	AddOutputFilterByType DEFLATE text/html text/plain text/xml
+	AddOutputFilterByType DEFLATE text/css
+	AddOutputFilterByType DEFLATE application/xml
+	AddOutputFilterByType DEFLATE image/svg+xml
+	AddOutputFilterByType DEFLATE application/rss+xml
+	AddOutputFilterByType DEFLATE application/atom_xml
+	AddOutputFilterByType DEFLATE application/x-javascript
+	AddOutputFilterByType DEFLATE application/x-httpd-php
+	AddOutputFilterByType DEFLATE application/x-httpd-fastphp
+	AddOutputFilterByType DEFLATE application/x-httpd-eruby
+</IfModule>
+# vbseo start
+	RewriteCond %{HTTP_HOST} !^www\.
+	RewriteCond %{HTTP_HOST} ^(.+)\.pregnancyforum\.co.uk
+	RewriteRule ^$ vbseo.php?vbseourl=http://%1.pregnancyforum.co.uk/&%{QUERY_STRING} [L]
+	RewriteRule ^((urllist|sitemap_).*\.(xml|txt)(\.gz)?)$ vbseo_sitemap/vbseo_getsitemap.php?sitemap=$1 [L]
+	RewriteCond %{REQUEST_URI} !(admincp/|modcp/|cron|vbseo_sitemap)
+	RewriteRule ^((archive/)?(.*\.php(/.*)?))$ vbseo.php [L,QSA]
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{REQUEST_FILENAME} !^(admincp|modcp|clientscript|cpstyles|images)/
+	RewriteRule ^(.+)$ vbseo.php [L,QSA]
+# vbseo end
+	</Directory>
+</VirtualHost>

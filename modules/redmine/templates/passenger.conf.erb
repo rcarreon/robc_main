@@ -1,0 +1,6 @@
+# This file is handled by puppet, do not modify it
+# from <%= fqdn %> as it will be overwritten.        
+#
+LoadModule passenger_module /usr/lib/ruby/gems/1.8/gems/passenger-<%= passenger_version %>/libout/apache2/mod_passenger.so
+PassengerRoot /usr/lib/ruby/gems/1.8/gems/passenger-<%= passenger_version %>
+PassengerDefaultRuby /usr/bin/ruby

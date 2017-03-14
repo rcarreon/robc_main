@@ -1,0 +1,23 @@
+# This file is managed by Puppet. Do not modify it from <%=fqdn %>
+
+<VirtualHost *:80>
+
+  ServerName pubops.gorillanation.com
+  ServerAlias pubops.*.gorillanation.com *.pubops.*.gorillanation.com *.pubops.gorillanation.com
+  DocumentRoot "/app/shared/docroots/pubops.gorillanation.com/htdocs/docroot"
+
+  <%=logging ? '' : '#'%>ErrorLog /app/log/pubops.gorillanation.com-error.log
+  LogLevel warn
+  <%=logging ? '' : '#'%>CustomLog /app/log/pubops.gorillanation.com-access.log combined
+  ServerSignature On
+
+  ErrorDocument 404 /index.html
+
+  <Directory "/app/shared/docroots/pubops.gorillanation.com/htdocs/docroot">
+    Options none
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+
+</VirtualHost>

@@ -1,0 +1,292 @@
+# Managed by puppet
+
+# $Id$
+# $URL$
+
+
+# 'check-fast-alive' command definition
+define command{
+        command_name    check-fast-alive
+        command_line    $USER1$/check_ping -H $HOSTADDRESS$ -w 2000,1% -c 5000,10% -p 5
+        }
+
+
+# 'check_url' check vhost on port 80 for a string $ARG3$
+define command{
+        command_name    check_url
+        command_line    $USER1$/check_http --onredirect=sticky -H $ARG1$ -I $HOSTADDRESS$ -u $ARG2$ -s $ARG3$
+}
+
+# 'check_form' check vhost on port 80 for a string $ARG3$
+define command{
+        command_name    check_form
+        command_line    $USER1$/check_form.pl -u $ARG1$ -f "$ARG2$" -e "$ARG3$" -c 10 -w 3 -v
+}
+
+# 'check_url_s' check vhost via https (on port 443) for a string $ARG3$
+define command{
+        command_name    check_url_s
+        command_line    $USER1$/check_http -S -H $ARG1$ -I $HOSTADDRESS$ -u $ARG2$ -s $ARG3$
+}
+
+# 'check_url_p' check vhost on port $ARG4$ for a string $ARG3$
+define command{
+        command_name    check_url_p
+        command_line    $USER1$/check_http --onredirect=sticky -H $ARG1$ -I $HOSTADDRESS$ -u $ARG2$ -s $ARG3$ -p $ARG4$
+}
+
+# 'check_url_invert' check vhost on port 80 for NO string $ARG3$
+define command{
+        command_name    check_url_invert
+        command_line    $USER1$/check_http --onredirect=sticky -H $ARG1$ -I $HOSTADDRESS$ -u $ARG2$ -R $ARG3$ --invert-regex
+}
+#
+# 'check_url_redirect' check vhost on port 80 and follow redirects
+define command{
+        command_name    check_url_redirect
+        command_line    $USER1$/check_http --onredirect=follow -H $ARG1$ -I $HOSTADDRESS$ -u $ARG2$ -s $ARG3$
+}
+
+# 'check_url_xml' check vhost on port 80 and look for regex
+define command{
+        command_name    check_url_xml
+        command_line    $USER1$/check_url_xml.sh -d $ARG1$ -u $ARG2$ -r $ARG3$ $ARG4$
+}
+
+# check rdp #### /usr/lib64/nagios/plugins/check_tcp -H webposition.atomiconline.com  -p 3389
+# RDP is the ssh for windows users
+define command{
+	command_name    check_rdp
+	command_line    $USER1$/check_tcp  -H $HOSTADDRESS$ -p 3389
+}
+
+# check kestrel #### /usr/lib64/nagios/plugins/check_tcp -H kes1v-ci.ci.prd.lax.gnmedia.net -p 22133
+define command{                                                                                                   
+        command_name    check_kestrel
+        command_line    $USER1$/check_tcp -H $HOSTADDRESS$ -p 22133
+        } 
+
+# check kestrel_stats  
+define command{
+        command_name    check_kestrel_stats
+        command_line    $USER1$/check_http -I $HOSTADDRESS$ -p 2223 -u /stats.txt -s counters
+        }
+
+# check sphinxrt mysql41 #### /usr/lib64/nagios/plugins/check_tcp -H spx1v-ci.ci.prd.lax.gnmedia.net -p 
+define command{
+        command_name    check_sphinxrt_mysql41
+        command_line    $USER1$/check_tcp -H $HOSTADDRESS$ -p 9306
+        }
+
+# check sphinxrt #### /usr/lib64/nagios/plugins/check_tcp -H spx1v-ci.ci.prd.lax.gnmedia.net -p 
+define command{
+        command_name    check_sphinxrt
+        command_line    $USER1$/check_tcp -H $HOSTADDRESS$ -p 9312
+        }
+
+# check memcache #### /usr/lib64/nagios/plugins/check_tcp -H www-lax-005.sherdog.net -p 11211
+define command{                                                                                                   
+        command_name    check_memcache                                                                            
+        command_line    $USER1$/check_tcp  -H $HOSTADDRESS$ -p 11211                                              
+        } 
+
+# check memcached_connection #### /usr/lib64/nagios/plugins/check_memcached.pl -H $i -P 11211 -C connections -w 900 -c 1000
+define command{
+        command_name    check_memcached_connection
+        command_line    $USER1$/check_memcached.pl -H $HOSTADDRESS$ -P 11211 -C connections -w 900 -c 1000
+        }
+
+# check memcached_connection #### /usr/lib64/nagios/plugins/check_memcached.pl -H $i -P 11211 -C memory -w 90 -c 95
+define command{
+        command_name    check_memcached_memory
+        command_line    $USER1$/check_memcached.pl -H $HOSTADDRESS$ -P 11211 -C memory -w 90 -c 95
+        }
+
+# check memcached_connection #### /usr/lib64/nagios/plugins/check_memcached.pl -H $i -P 11211 -C evictions -w 100 -c 1000
+define command{
+        command_name    check_memcached_eviction
+        command_line    $USER1$/check_memcached.pl -H $HOSTADDRESS$ -P 11211 -C evictions -w 100 -c 1000
+        }
+
+# check kestrel_queue #### /usr/lib64/nagios/plugins/check_kestrel_queue -H $i -P 2223 -A items -W 500 -C 1000
+define command{
+        command_name    check_kestrel_queue
+        command_line    $USER1$/check_kestrel_queue.py -H $HOSTADDRESS$ -P 2223 -A items -W 200000 -C 400000
+        }
+
+# check netapp /usr/lib64/nagios/plugins/check_netapp -H 10.2.10.53 -v DISKUSED -o /vol/lax3_springboard_shared/ -w 25 -c 75
+define command{                                                                                                   
+        command_name    check_netapp_volume
+        command_line    $USER1$/check_netapp -H $HOSTADDRESS$ -v DISKUSED -o $ARG1$ -w 80 -c 90
+        } 
+
+define command{
+        command_name    check_netapp_cpuload
+        command_line    $USER1$/check_netapp -H $HOSTADDRESS$ -C apetime1 -v CPULOAD -w 70 -c 85
+        } 
+define command{
+        command_name    check_netapp_fan
+        command_line    $USER1$/check_netapp -H $HOSTADDRESS$ -C apetime1 -v FAN
+        } 
+define command{
+        command_name    check_netapp_ps
+        command_line    $USER1$/check_netapp -H $HOSTADDRESS$ -C apetime1 -v PS
+        } 
+define command{
+        command_name    check_netapp_nvram
+        command_line    $USER1$/check_netapp -H $HOSTADDRESS$ -C apetime1 -v NVRAM
+        } 
+define command{
+        command_name    check_netapp_temp
+        command_line    $USER1$/check_netapp -H $HOSTADDRESS$ -C apetime1 -v TEMP
+        } 
+define command{
+        command_name    check_netapp_uptime
+        command_line    $USER1$/check_netapp -H $HOSTADDRESS$ -C apetime1 -v UPTIME
+        } 
+# netapp-specific snmp checks, the first part of the OID is filled in for your sanitation
+define command{
+        command_name    check_netapp_snmp
+        command_line    $USER1$/check_snmp -H $HOSTADDRESS$ -C apetime1 -m NETWORK-APPLIANCE-MIB -o 1.3.6.1.4.1.789.1.$ARG1$ $ARG2$
+}
+
+
+# check sphinx 
+define command{
+        command_name    check_sphinx
+        command_line    $USER1$/check_tcp  -H $HOSTNAME$ -p 3312
+        }
+
+# 'check_mysql' command definition
+define command{
+        command_name    check_mysql
+        command_line    $USER1$/check_mysql -H $HOSTADDRESS$ -u monitor -p w0jXNFum
+        }
+
+# 'check_ldap' command definition
+define command{
+        command_name    check_ldap
+#       command_line    $USER1$/check_ldap -H $HOSTADDRESS$ -b $ARG1$ -p $ARG2$ -D $ARG3$ -P $ARG4$ -t $ARG5$ -c $ARG6$
+        command_line    $USER1$/check_ldap -H $HOSTADDRESS$ -b $ARG1$ 
+        }
+
+# 'check_ssh' command definition
+define command{
+        command_name    check_ssh
+        command_line    $USER1$/check_ssh -H $HOSTADDRESS$
+        }
+
+# check_dns_authoritative command definition
+# /usr/lib64/nagios/plugins/check_dns -s ns5.gnmedia.net -H craveonline.com -a 72.172.76.30 -w 1 -c 2 -A
+# check_dns_authoritative
+define command{
+	command_name    check_dns_authoritative
+	command_line    $USER1$/check_dns -s $HOSTADDRESS$ -H craveonline.com -a 72.172.76.30 -w 1 -c 2 -A
+}
+
+# 'check_puppet_lastrun' command definition
+define command{
+        command_name    check_puppet_lastrun
+        command_line    $USER1$/check_dummy 0
+        }
+
+
+
+# 'check_mysql_slave' command definition
+define command{
+        command_name    check_mysql_slave
+        command_line    $USER1$/check_mysql -H $HOSTADDRESS$ -u monitor -p w0jXNFum -S
+        }
+
+define command{
+	command_name	check_nrpe
+	command_line	$USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$
+}
+
+define command{
+	command_name	check_nrpe_args
+	command_line	$USER1$/check_nrpe -H $HOSTADDRESS$ -c $ARG1$ -a $ARG2$ $ARG3$ $ARG4$ $ARG5$ $ARG6$ $ARG7$
+}
+
+
+define command{
+    command_name    check_search_agent
+    command_line    $USER1$/check_search_agent.sh 
+    }
+
+
+# 'check_mysql_query' command definition
+define command{
+        command_name    check_mysql_query
+        command_line    $USER1$/check_mysql_query -H $HOSTADDRESS$ -q $ARG1$ -w $ARG2$ -c $ARG3$ -u $ARG4$ -p $ARG5$ -d $ARG6$
+        }
+
+
+# check mongodb
+# it needs in config :
+#    rest = true
+define command{
+        command_name    check_mongodb
+        command_line    $USER1$/check_http -I $HOSTADDRESS$ -p 28017 -u /serverStatus -s uptime
+        }
+
+
+# check redis
+define command{
+        command_name    check_redis
+        command_line    $USER1$/check_tcp -H $HOSTNAME$ -p 6379 -w 1 -c 3 -t 5 -s "info" -q "quit"
+        }
+
+# check snmp
+# Example usage: check_snmp!1.3.6.1.4.1.9.9.109.1.1.1.1.3.1!-w 50 -c 80
+# CPU % – 5 Sec: 1.3.6.1.4.1.9.9.109.1.1.1.1.3.1
+# CPU % – 1 Min: 1.3.6.1.4.1.9.9.109.1.1.1.1.4.1
+# CPU % – 5 Min: 1.3.6.1.4.1.9.9.109.1.1.1.1.5.1
+# Memory Free: 1.3.6.1.4.1.9.9.48.1.1.1.5.1
+# Total Connections: 1.3.6.1.4.1.9.9.147.1.2.2.2.1.5.40.6
+# Interface 1 Oct In/sec: 1.3.6.1.2.1.2.2.1.10.1 <-- 10 or 16 for in or out
+# Interface 1 Oct Out/sec: 1.3.6.1.2.1.2.2.1.16.1
+# Interface 2 Oct In/sec: 1.3.6.1.2.1.2.2.1.10.2 <-- last octet for iface number
+# Interface 2 Oct Out/sec: 1.3.6.1.2.1.2.2.1.16.2 
+define command{
+        command_name    check_snmp
+        command_line    $USER1$/check_snmp -H $HOSTADDRESS$ -C apetime1 -o $ARG1$ $ARG2$
+}
+
+# check http json
+## https://github.com/phrawzty/check_http_json - used for elasticsearch but can be used for any json
+## $ARG1$ = port
+## $ARG2$ = path
+## $ARG3$ = json element
+## $ARG4$ = OK result
+define command {
+        command_name    check_http_json-string
+        command_line    $USER1$/check_http_json.rb -u 'http://$HOSTNAME$:$ARG1$/$ARG2$' -e '$ARG3$' -r '$ARG4$'
+}
+
+## more generic check, see README.markdown for usage
+define command {
+        command_name    check_http_json
+        command_line    $USER1$/check_http_json.rb -u 'http://$HOSTNAME$:$ARG1$/$ARG2$' $ARG3$
+}
+
+define command {
+        command_name    check_snapmirror
+        command_line    $USER1$/check_snapmirror
+}
+
+define command {
+        command_name    check_vw
+        command_line    $USER1$/check_vw.sh -H $HOSTADDRESS$ -p $ARG1$
+}
+
+# Just a quick check to see if we have valid JSON
+define command {
+        command_name    check_json.pl
+        command_line    $USER1$/check_json.pl -U $ARG1$
+}
+define command{
+        command_name    check_squid
+        command_line    $USER1$/check_tcp  -H $HOSTADDRESS$ -p 8080
+}
+

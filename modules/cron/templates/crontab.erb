@@ -1,0 +1,14 @@
+# This file is managed by puppet
+
+SHELL=/bin/bash
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+MAILTO=root
+HOME=/
+
+
+# run-parts
+<%= minute_hourly %> * * * * root run-parts /etc/cron.hourly
+<%= minute_daily %> 4 * * * root run-parts /etc/cron.daily
+<%= minute_weekly %> 4 * * 0 root run-parts /etc/cron.weekly
+<%= minute_monthly %> 4 1 * * root run-parts /etc/cron.monthly
+

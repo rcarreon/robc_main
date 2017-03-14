@@ -1,0 +1,110 @@
+#!/bin/bash
+# This file is not used anymore
+PID=/var/run/db-checksum/pt-table-checksum.pid
+ENVIRONMENT=
+
+CHECKSUM_DB=pt_data
+CHECKSUM_TBL=checksums
+PROGRESS="time,30"
+
+# db host opts
+db_list="tewn"
+ignore_tbl_list="landing_page_rebalances_old,log_partition_history_landing_page_analytics,widget_rebalances_old"
+
+# throttle opts
+chunk_size_limit=1
+chunk_time=0.05
+max_load="Threads_running=40"
+
+TMPFILEMAIL=$(/bin/mktemp);
+MAILTO="dba@evolvemediallc.com,crowdignite@evolvemediallc.com"
+
+
+usage() {
+cat << _eof
+Usage: ${0} -e <environment>
+
+OPTIONS:
+  -h    Display usage.
+  -e    {prd,stg}
+_eof
+exit 1;
+}
+
+while getopts "e:h" PARAMS
+  do case ${PARAMS} in
+    h ) usage ;;
+    e ) ENVIRONMENT=${OPTARG} ;;
+  esac
+done
+
+if [ $# -lt 1 ]; then
+  usage;
+fi
+
+if [[ ! ${ENVIRONMENT} =~ (^prd$|^stg$) ]]; then
+    echo "${ENVIRONMENT}: Unknown environment.";
+    exit 1;
+fi
+
+echo "
+SQL1:" >> ${TMPFILEMAIL}
+
+    /usr/bin/pt-table-checksum \
+    --host=sql1v-ci.ci.prd.lax.gnmedia.net \
+    --user=pt_checksum \
+    --password=EEK3bzMU \
+    --nocheck-binlog-format \
+    --check-interval=1  \
+    --check-plan \
+    --check-replication-filters \
+    --check-slave-tables \
+    --chunk-size-limit=${chunk_size_limit} \
+    --chunk-time="${chunk_time}" \
+    --create-replicate-table \
+    --databases="${db_list}" \
+    --ignore-tables="${ignore_tbl_list}" \
+    --empty-replicate-table \
+    --max-lag="1s" \
+    --max-load="${max_load}" \
+    --pid="${PID}" \
+    --progress="${PROGRESS}" \
+    --replicate="${CHECKSUM_DB}.${CHECKSUM_TBL}1" >> ${TMPFILEMAIL}
+
+echo "
+
+DIFF SQL1 vs SQL2:" >> ${TMPFILEMAIL}
+mysql -u pt_checksum -h sql2v-ci.ci.prd.lax.gnmedia.net -pEEK3bzMU pt_data -e "SELECT db, tbl, SUM(this_cnt) AS total_rows, COUNT(*) AS chunks FROM pt_data.checksums1 WHERE (master_cnt <> this_cnt OR master_crc <> this_crc OR ISNULL(master_crc) <> ISNULL(this_crc)) GROUP BY db, tbl" >> ${TMPFILEMAIL}
+
+echo "
+
+DIFF SQL1 vs SQL3:" >> ${TMPFILEMAIL}
+mysql -u pt_checksum -h sql3v-ci.ci.prd.lax.gnmedia.net -pEEK3bzMU pt_data -e "SELECT db, tbl, SUM(this_cnt) AS total_rows, COUNT(*) AS chunks FROM pt_data.checksums1 WHERE (master_cnt <> this_cnt OR master_crc <> this_crc OR ISNULL(master_crc) <> ISNULL(this_crc)) GROUP BY db, tbl" >> ${TMPFILEMAIL}
+
+echo "
+
+DIFF SQL2 vs SQL4:" >> ${TMPFILEMAIL}
+mysql -u pt_checksum -h sql4v-ci.ci.prd.lax.gnmedia.net -pEEK3bzMU pt_data -e "SELECT db, tbl, SUM(this_cnt) AS total_rows, COUNT(*) AS chunks FROM pt_data.checksums1 WHERE (master_cnt <> this_cnt OR master_crc <> this_crc OR ISNULL(master_crc) <> ISNULL(this_crc)) GROUP BY db, tbl" >> ${TMPFILEMAIL}
+
+
+cat ${TMPFILEMAIL}
+send_email() {
+    cat ${TMPFILEMAIL} | mail -s "[checksum] CI" ${MAILTO}
+    if [ $? -ne 0 ]; then
+        echo "Failed to send email";
+        exit 1;
+    else
+        echo "Email sent.";
+    fi
+}
+
+send_email;
+
+clean() {
+    rm ${TMPFILEMAIL};
+}
+
+clean;
+
+exit 0;
+

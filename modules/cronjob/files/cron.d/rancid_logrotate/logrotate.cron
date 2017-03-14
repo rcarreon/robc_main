@@ -1,0 +1,4 @@
+# $Id: 
+# $URL:
+
+0 2 * * * root /usr/local/bin/rancid_logrotate/logrotate_daily.sh >/dev/null 2>&1

@@ -1,0 +1,10 @@
+# same as httpd log without restart, originally used for laravel logs
+<%= directory %>/*log {
+    daily
+    dateext
+    rotate 30
+    copytruncate
+    compress
+    notifempty
+    missingok
+}

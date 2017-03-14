@@ -1,0 +1,26 @@
+# This file is managed by Puppet do not modify it from <%= fqdn %>
+# $Id$
+
+LoadModule proxy_ajp_module modules/mod_proxy_ajp.so
+
+<VirtualHost *:80>
+    ServerName cijoe.gnmedia.net
+    ProxyPass           /   ajp://localhost:8009/
+    ProxyPassReverse    /   ajp://localhost:8009/
+   <Proxy *>
+     AddDefaultCharset Off
+     Order deny,allow
+     Allow from all
+   </Proxy>
+
+    <%=logging ? '' : '#'%>ErrorLog  /app/log/cijoe.gnmedia.net.error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/cijoe.gnmedia.net.access.log combined
+</VirtualHost>
+
+ 
+ <VirtualHost *:80>
+    ServerName ic.gnmedia.net
+    ServerAlias *.ic.gnmedia.net ci.gnmedia.net 
+    RedirectPermanent / http://cijoe.gnmedia.net/
+</VirtualHost>
+

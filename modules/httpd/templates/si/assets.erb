@@ -1,0 +1,21 @@
+# This file is managed by Puppet do not modify it from <%=fqdn %>
+#
+<VirtualHost *:80>
+  DocumentRoot /app/shared/docroots/assets.<%= name %>
+  ServerName assets.<%= name %>
+
+  ServerAlias assets.*.<%= name %> *.assets.<%= name %>
+  <%=logging ? '' : '#'%>ErrorLog /app/log/assets.<%= name %>-error.log
+  <%=logging ? '' : '#'%>CustomLog /app/log/assets.<%= name %>-access.log combined-xff
+
+  <Directory /app/shared/docroots/assets.<%= name %>>
+      AllowOverride All
+      Options Indexes MultiViews FollowSymLinks
+  </Directory>
+  <Directory /app/shared/docroots/assets.<%= name %>/websupport>
+        Header set Access-Control-Allow-Origin "*"
+        AllowOverride All
+        Options Indexes MultiViews FollowSymLinks
+  </Directory>
+
+</VirtualHost>

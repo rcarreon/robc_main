@@ -1,0 +1,16 @@
+<VirtualHost *:80>
+    ServerName dbops.gnmedia.net
+    ServerAlias *.dbops.gnmedia.net
+    ServerAlias dbops.gnmedia.net
+    DocumentRoot /app/shared/docroots/dbops.gnmedia.net/
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/dbops.gnmedia.net_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/dbops.gnmedia.net_access.log combined
+
+    <Directory /app/shared/docroots> 
+	Options FollowSymLinks
+	AllowOverride All
+	Satisfy all
+    </Directory>
+
+</VirtualHost>

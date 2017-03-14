@@ -1,0 +1,6 @@
+error /[Ee]rror|^err:/
+warning /[Ww]arning/
+warning /WARNING/
+error /ERROR/
+info /INFO/
+start /BUILD/

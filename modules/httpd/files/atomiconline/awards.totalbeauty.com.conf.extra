@@ -1,0 +1,7 @@
+    RewriteEngine On
+
+    # www.awards.totalbeauty.com --> awards.totalbeauty.com
+    RewriteCond %{HTTP_HOST} ^www\.awards\.totalbeauty\.com$ [NC]
+    RewriteRule ^/(.*) http://awards.totalbeauty.com/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

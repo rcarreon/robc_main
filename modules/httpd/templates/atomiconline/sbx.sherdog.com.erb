@@ -1,0 +1,202 @@
+# This file is managed by puppet
+# SBX configuration for sherdog
+
+  <VirtualHost *:80>
+     DocumentRoot /app/shared/sherdog/docroots/sherdog.com/public
+  
+     ServerName sherdog.com
+     ServerAlias sbx.sherdog.com *.sherdog.com *.sbx.sherdog.com sbx.fightfinder.com fightfinder.com
+  
+    SetEnv APPLICATION_ENV sandbox
+ 
+    <Directory "/app/shared/sherdog/docroots/sherdog.com/public">
+        Options Indexes MultiViews FollowSymLinks
+        AllowOverride All
+        Order allow,deny
+        Allow from all
+    </Directory>
+  
+     RewriteEngine On
+     RewriteCond %{HTTP_HOST} ^(fightweek|training)\.sherdog\.com$ [NC]
+     RewriteRule ^/(.*) http://sbx.sherdog.com/all-access [L,R=301]
+  
+     RewriteCond %{HTTP_HOST} ^(fantasy|pickem)\.sherdog\.com$ [NC]
+     RewriteRule ^/(.*) http://sbx.sherdog.com/ [L,R=301]
+ 
+     RewriteCond %{HTTP_HOST} ^(sbx\.)?fightfinder.com$ [NC]
+     RewriteRule ^/(.*) http://sbx.sherdog.com/events [L,R=301]
+  
+     ErrorLog /app/log/sherdog.com-error_log
+     LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+     LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" proxy
+     SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" forwarded
+     CustomLog "/app/log/sherdog.com-access_log" combined env=!forwarded
+     CustomLog "/app/log/sherdog.com-access_log" proxy env=forwarded
+  
+  </VirtualHost>
+
+  <VirtualHost *:80>
+    DocumentRoot /app/shared/sherdog_admin/docroots/admin.sherdog.com/webroot
+    ServerName admin.sherdog.com
+    ServerAlias *.admin.sherdog.com
+
+    <Directory /app/shared/sherdog_admin/docroots/admin.sherdog.com/webroot>
+        Order Deny,Allow
+        Allow from all
+        Options -Indexes
+        AllowOverride all
+    </Directory>
+
+    ErrorLog /app/log/admin.sherdog.com-error_log
+    CustomLog /app/log/admin.sherdog.com-access_log combined
+
+  </VirtualHost>
+  
+  <VirtualHost *:80>
+      DocumentRoot /app/shared/sherdog/docroots/sherdog.com/public
+  
+      ServerName m.sherdog.com
+      ServerAlias sbx.m.sherdog.com
+  
+     SetEnv APPLICATION_ENV development
+  
+     <Directory "/app/shared/sherdog/docroots/sherdog.com/public">
+         Options Indexes MultiViews FollowSymLinks
+         AllowOverride All
+         Order allow,deny
+         Allow from all
+     </Directory>
+  
+      ErrorLog /app/log/m.sherdog.com-error_log
+      LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+      LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" proxy
+      SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" forwarded
+      CustomLog "/app/log/m.sherdog.com-access_log" combined env=!forwarded
+      CustomLog "/app/log/m.sherdog.com-access_log" proxy env=forwarded
+  
+  </VirtualHost>
+
+<VirtualHost *:80>
+    ServerName media.sherdog.com
+    ServerAlias *.media.sherdog.com sbx.origin.sherdog.com sbx.sherdog.com *.sbx.origin.sherdog.com *.sbx.cdn.sherdog.com *.sbx*.cdn.sherdog.com sbx*.cdn.sherdog.com
+
+    DocumentRoot /app/ugcsdc/docroots/media.sherdog.com
+
+    <Location /thumbnail_crop>
+        RequestHeader unset Expires
+        RequestHeader unset Cache-Control
+        RequestHeader unset X-Cache-Lookup
+        RequestHeader unset X-Cache
+        RequestHeader unset Via
+    </Location>
+
+    <Location /image_crop>
+        RequestHeader unset Expires
+        RequestHeader unset Cache-Control
+        RequestHeader unset X-Cache-Lookup
+        RequestHeader unset X-Cache
+        RequestHeader unset Via
+    </Location>
+
+        ExpiresActive On
+
+        # Default
+        ExpiresDefault "access plus 1 week"
+        Header set Edge-control "max-age=604800"
+        Header set Cache-Control "max-age=604800"
+
+        # 1 day
+        <FilesMatch "\.(?i:xml)$">
+                Header set Cache-Control "max-age=86400"
+                Header set Edge-Control "max-age=86400"
+                ExpiresDefault A86400
+        </FilesMatch>
+
+        # 1 year
+        <FilesMatch "\.(?i:gif|jpg|png|js|css|ttf|otf|eot|ico)$">
+                Header set Cache-Control "max-age=31556926"
+                Header set Edge-Control "max-age=31556926"
+                ExpiresDefault A31556926
+        </FilesMatch>
+
+        # 1 year
+        <LocationMatch "^/image_crop/.*\.(?i:jpg|gif|png)$">
+                Header set Cache-Control "max-age=31556926"
+                Header set Edge-Control "max-age=31556926"
+                ExpiresDefault A31556926
+        </LocationMatch>
+
+        # 1 year
+        <LocationMatch "^/thumbnail_crop/.*\.(?i:jpg|gif|png)$">
+                Header set Cache-Control "max-age=31556926"
+                Header set Edge-Control "max-age=31556926"
+                ExpiresDefault A31556926
+        </LocationMatch>
+
+        # 1 year
+        <LocationMatch "^/image_vs/(\d+)$">
+                Header set Cache-Control "max-age=31556926"
+                Header set Edge-Control "max-age=31556926"
+                ExpiresDefault A31556926
+        </LocationMatch>
+
+        ExpiresByType image/gif "access plus 1 year"
+        ExpiresByType image/jpeg "access plus 1 year"
+        ExpiresByType image/png "access plus 1 year"
+        ExpiresByType text/css "access plus 1 year"
+
+
+        ExpiresByType application/octet-stream "access plus 1 year"
+        ExpiresByType application/javascript "access plus 1 year"
+        ExpiresByType image/x-icon "access plus 1 year"
+
+        ExpiresByType text/xml "access plus 1 day"
+        ExpiresByType application/rss+xml "access plus 1 day"
+
+        FileETag MTime Size
+
+    RewriteEngine On
+        
+    RewriteCond %{HTTP_HOST} !^sbx([1-4])?.cdn.sherdog.com [NC]
+    RewriteCond %{HTTP_HOST} !^sbx.origin.sherdog.com [NC]
+    RewriteRule ^ - [S=3]
+    RewriteRule ^/thumbnail_crop/([0-9]*)/(.*)$         http://sbx.sherdog.com/thumbnail_crop.php?image=http://%{HTTP_HOST}/$2&&width_size=$1   [QSA,L]
+    RewriteRule ^/image_crop/([0-9]*)/([0-9]*)/(.*)$    http://sbx.sherdog.com/image_crop.php?image=http://%{HTTP_HOST}/$3&&width=$1&&height=$2   [QSA,L]
+    RewriteRule ^/image_vs/([0-9]+)$                    http://sbx.sherdog.com/image/match/?m=$1   [QSA,L]
+
+    ## Surviving the play by play : http://sbx.sherdog.com/news/news/UFC-121-Results-amp-Live-Play-by-Play-27640
+    <Location /news/>
+        # Akamai allowed to cache only for 5 min
+        Header set Edge-control "cache-maxage=5d"
+    </Location>
+    RewriteRule ^/news/(news/UFC-121-Results-amp-Live-Play-by-Play-27640)$  http://sbx.sherdog.com/news/$1      [QSA,L]
+
+    # temp stuff
+    <Directory /app/ugcsdc/docroots/media.sherdog.com>
+        DirectoryIndex index.php index.html
+        AllowOverride None
+        Order Deny,Allow
+        Allow from all
+        Options -Indexes FollowSymLinks
+    </Directory>
+
+    RewriteRule ^/(\d+)/css/(.*)$ /css/$2 [L]
+    RewriteRule ^/(\d+)/js/(.*)$ /js/$2 [L]
+    RewriteRule ^/(\d+)/img/(.*)$ /img/$2 [L]
+    RewriteRule ^/(\d+)/favicon.ico$ /favicon.ico [L]
+    RewriteRule ^/(\d+)/apple-touch-icon.png$ /apple-touch-icon.png [L]
+    RewriteRule ^/(\d+)/flash/(.*)$ /flash/$2 [L]
+    RewriteRule ^/(\d+)/fonts/(.*)$ /fonts/$2 [L]
+    # end temp stuff
+    
+    RewriteCond %{REQUEST_URI}  !^/news/(news/UFC-121-Results-amp-Live-Play-by-Play-27640)
+    RewriteCond %{DOCUMENT_ROOT}/$1 !-f
+    RewriteCond %{DOCUMENT_ROOT}/$1 !-d
+    # temp rewrite cond, symlinks
+    RewriteCond %{DOCUMENT_ROOT}/$1 !-l
+    # end rewrite cond
+    RewriteRule /(.*) http://sbx.sherdog.com/$1 [L,R=301]
+
+    ErrorLog /app/log/media.sherdog.com-error_log
+    CustomLog /app/log/media.sherdog.com-access_log combined
+</VirtualHost>

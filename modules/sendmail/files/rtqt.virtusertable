@@ -1,0 +1,41 @@
+postmaster@rt.gnmedia.net postmaster
+root@* root
+
+# Beware Case sensItiVe /!\
+
+Q_DBA@rt.gnmedia.net Q_DBA
+Q_CM@rt.gnmedia.net Q_CM
+Q_LA@rt.gnmedia.net Q_LA
+Q_WA@rt.gnmedia.net Q_WA
+Adops@rt.gnmedia.net Q_AdOps/PubOps
+Q_networkalerts@rt.gnmedia.net Q_networkalerts
+q_administrative@rt.gnmedia.net Q_administrative
+q_bizdev@rt.gnmedia.net Q_BIZDEV
+q_noc@rt.gnmedia.net Q_NOC
+q_websupport@rt.gnmedia.net Q_websupport
+q_atomicforums@rt.gnmedia.net Q_atomicforums
+q_statuschange@rt.gnmedia.net Q_statuschange
+q_strategicmonetization@rt.gnmedia.net Q_strategicmonetization
+q_wachange@rt.gnmedia.net Q_WAChange
+
+Q_DBA@qt.gnmedia.net Q_DBA
+Q_CM@qt.gnmedia.net Q_CM
+Q_LA@qt.gnmedia.net Q_LA
+Q_WA@qt.gnmedia.net Q_WA
+Q_networkalerts@qt.gnmedia.net Q_networkalerts
+q_administrative@qt.gnmedia.net Q_administrative
+q_bizdev@qt.gnmedia.net Q_BIZDEV
+q_noc@qt.gnmedia.net Q_NOC
+Adops@qt.gnmedia.net Q_AdOps/PubOps
+q_websupport@qt.gnmedia.net Q_websupport
+q_atomicforums@qt.gnmedia.net Q_atomicforums
+q_statuschange@qt.gnmedia.net Q_statuschange
+q_strategicmonetization@qt.gnmedia.net Q_strategicmonetization
+q_wachange@qt.gnmedia.net Q_WAChange
+
+finance@rt.gnmedia.net q_finance
+accountmanagement@rt.gnmedia.net q_accountmanagement
+q_corpweb@rt.gnmedia.net	q_corpweb
+q_corpweb@qt.gnmedia.net	q_corpweb
+
+q_thbug@rt.gnmedia.net Q_THBUG 

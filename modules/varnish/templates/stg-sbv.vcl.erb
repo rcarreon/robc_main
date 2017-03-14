@@ -1,0 +1,237 @@
+#-e This is a basic VCL configuration file for varnish.  See the vcl(7)
+#man page for details on VCL syntax and semantics.
+#
+#Default backend definition.  Set this to point to your content
+#server.
+#
+
+
+
+#
+
+
+# This is only used for siteblder, so I will loopback this traffic so if something is broken
+# we know we need FE servers afterall.
+backend fe {
+  .host = "127.0.0.1";
+  .port = "80";
+  .connect_timeout = 600s;
+  .first_byte_timeout = 600s;
+  .between_bytes_timeout = 600s;
+}
+backend publishers {
+  .host = "10.11.128.48";
+  .port = "80";
+  .connect_timeout = 600s;
+  .first_byte_timeout = 600s;
+  .between_bytes_timeout = 600s;
+}
+backend stats_cms {
+  .host = "10.2.8.77";
+  .port = "80";
+  .connect_timeout = 600s;
+  .first_byte_timeout = 600s;
+  .between_bytes_timeout = 600s;
+}
+# Another suspected sitebuilder app - Loopback the traffic so we know if there is an issue
+backend stats_fe {
+  .host = "127.0.0.1";
+  .port = "80";
+  .connect_timeout = 600s;
+  .first_byte_timeout = 600s;
+  .between_bytes_timeout = 600s;
+}
+backend upl {
+  .host = "10.11.128.47";
+  .port = "80";
+  .connect_timeout = 600s;
+  .first_byte_timeout = 600s;
+  .between_bytes_timeout = 600s;
+}
+# Sitebuilder traffic, loopback to detect errors
+backend bld {
+  .host = "127.0.0.1";
+  .port = "80";
+  .connect_timeout = 600s;
+  .first_byte_timeout = 600s;
+  .between_bytes_timeout = 600s;
+}
+backend media {
+  .host = "10.11.128.49";
+  .port = "80";
+  .connect_timeout = 600s;
+  .first_byte_timeout = 600s;
+  .between_bytes_timeout = 600s;
+}
+backend wp {
+  .host = "10.11.128.54";
+  .port = "80";
+  .connect_timeout = 600s;
+  .first_byte_timeout = 600s;
+  .between_bytes_timeout = 600s;
+}
+
+#
+#Below is a commented-out copy of the default VCL logic.  If you
+#redefine any of these subroutines, the built-in logic will be
+#appended to your code.
+#
+sub vcl_recv {
+    if (req.request != "GET" &&
+      req.request != "HEAD" &&
+      req.request != "PUT" &&
+      req.request != "POST" &&
+      req.request != "TRACE" &&
+      req.request != "OPTIONS" &&
+      req.request != "DELETE") {
+        /* Non-RFC2616 or CONNECT which is weird. */
+        error;
+    }
+
+	# By default, use fe unless you match others below
+	set req.backend = media;
+	# Regex for spring board platforms
+	if (req.http.host ~ "(publishers\.|prod\.cms\.atomiconline\.com|cms\.dvdfile\.com)") {
+		set req.backend = publishers;
+		return(pipe);		# Don't cache these
+                    # bug with headers ( 4242kb long)
+	}
+	if (req.http.host ~ "(preview\.|sitebuilder\.)") {
+		set req.backend = bld;
+		return(pass);		# Don't cache these
+	}
+	if (req.http.host ~ "((\w+\.)?upload\.)") {
+		set req.backend = upl;
+		return(pipe);
+	}
+	if (req.http.host ~ "(springboardplatform\.com|springboardvideo\.com|springboard\.gorillanation\.com|media\.cdn\.dvdfile\.com)") {
+		if(req.url ~ "^/home") {
+			set req.backend = wp;
+		} else {
+			set req.backend = media;
+		}
+		return(pipe);
+	}
+	if (req.http.host ~ "(analytics.(\w+\.)?gorillanation.com)") {
+		set req.backend = stats_cms;
+	}
+	if (req.http.host ~ "(analytics.(\w+\.)?atomiconline.com)") {
+		set req.backend = stats_fe;
+	}
+
+   
+    if (req.request != "GET" && req.request != "HEAD") {
+        /* We only deal with GET and HEAD by default */
+        return(pass);
+    }
+        if (req.url ~ "\.(css|gif|ico|jpg|js|png|swf|tiff?)$") {
+		unset req.http.cookie;
+		return(lookup);
+	}
+    if (req.http.Authorization) {
+        /* Not cacheable by default */
+        return (pass);
+    }
+    return(lookup);
+}
+#
+#sub vcl_pipe {
+#    # Note that only the first request to the backend will have
+#    # X-Forwarded-For set.  If you use X-Forwarded-For and want to
+#    # have it set for all requests, make sure to have:
+#    # set req.http.connection = "close";
+#    # here.  It is not set by default as it might break some broken web
+#    # applications, like IIS with NTLM authentication.
+#    return (pipe);
+#}
+#
+#sub vcl_pass {
+#    return (pass);
+#}
+#
+sub vcl_hash {
+    set req.hash += req.url;
+    if (req.http.host) {
+        set req.hash += req.http.host;
+    } else {
+        set req.hash += server.ip;
+    }
+    return (hash);
+}
+
+sub vcl_hit {
+    if (!obj.cacheable) {
+        return (pass);
+    }
+    return(deliver);
+}
+#
+#sub vcl_miss {
+#    return (fetch);
+#}
+#
+sub vcl_fetch {
+	# By default, we cache all static content
+    if (req.url ~ "\.(css|gif|ico|jpg|js|png|swf|tiff?)$") {
+                set beresp.ttl = 10m;
+		unset beresp.http.set-cookie;
+
+		# See http://varnish.projects.linpro.no/wiki/VCLExampleLongerCaching
+		/* Remove Expires from backend, it's not long enough */
+		unset beresp.http.expires;
+
+		/* Set the client's TTL on this object */
+		set beresp.http.cache-control = "max-age = 600";
+
+		/* Don't use Pragma */
+		unset beresp.http.pragma;
+    }
+
+    if (!beresp.cacheable) {
+        return (pass);
+    }
+
+    if (beresp.http.Pragma ~ "no-cache" ||
+         beresp.http.Cache-Control ~ "no-cache") {
+         return(pass);
+    }
+    
+    if (beresp.http.Set-Cookie) {
+        return (pass);
+    }
+#    set obj.prefetch =  -30s;
+	return(deliver);
+}
+
+sub vcl_deliver {
+	# See http://varnish.projects.linpro.no/wiki/VCLExampleHitMissHeader
+        if (obj.hits > 0) {
+                set resp.http.X-Cache = "HIT from pxy1v-dist.sbv.lax";
+        } else {
+                set resp.http.X-Cache = "MISS from pxy1v-dist.sbv.lax";
+        }
+}
+
+#sub vcl_error {
+#    set obj.http.Content-Type = "text/html; charset=utf-8";
+#    synthetic {"
+#<?xml version="1.0" encoding="utf-8"?>
+#<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+# "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+#<html>
+#  <head>
+#    <title>"} obj.status " " obj.response {"</title>
+#  </head>
+#  <body>
+#    <h1>Error "} obj.status " " obj.response {"</h1>
+#    <p>"} obj.response {"</p>
+#    <h3>Guru Meditation:</h3>
+#    <p>XID: "} req.xid {"</p>
+#    <address>
+#       <a href="http://www.varnish-cache.org/">Varnish</a>
+#    </address>
+#  </body>
+#</html>
+#"};
+#    return (deliver);
+#}

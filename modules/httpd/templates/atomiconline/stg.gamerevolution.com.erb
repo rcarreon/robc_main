@@ -1,0 +1,63 @@
+# That vhost is for the puppetized version of the node
+# $Id$
+
+<VirtualHost *:80>
+    ServerName stg.gamerevolution.com
+    ServerAlias m-stg.gamerevolution.com 
+    <%=logging ? '' : '#'%>ErrorLog /app/log/stg.gamerevolution.com-error_log
+    <%=logging ? '' : '#'%>CustomLog /app/log/stg.gamerevolution.com-access_log combined
+
+    DocumentRoot /app/shared/docroots/stg.gamerevolution.com/htdocs
+    ErrorDocument 404 /missing2.php
+    DirectoryIndex index.htm index.php
+    AddType application/x-httpd-php .html
+    AddType application/x-httpd-php .htm
+
+    <Directory /app/shared/docroots/stg.gamerevolution.com/htdocs>
+        AllowOverride All
+    </Directory>
+</VirtualHost>
+
+# Editor only vhost
+<VirtualHost *:80>
+    ServerName admin-stg.gamerevolution.com
+    <%=logging ? '' : '#'%>ErrorLog /app/log/admin-stg.gamerevolution.com-error_log
+    <%=logging ? '' : '#'%>CustomLog /app/log/admin-stg.gamerevolution.com-access_log combined
+
+    DocumentRoot /app/shared/docroots/stg.gamerevolution.com/htdocs
+    ErrorDocument 404 /missing2.php
+    DirectoryIndex index.htm index.php
+    AddType application/x-httpd-php .html
+    AddType application/x-httpd-php .htm
+
+#    <Directory /app/shared/docroots/stg.gamerevolution.com/htdocs>
+#        AllowOverride All
+#        AuthName "Restricted Area Staging
+#        AuthType Basic
+#        AuthUserFile /app/shared/docroots/stg.gamerevolution.com/htdocs/.htpasswd
+#        require valid-user
+#    </Directory>
+</VirtualHost>
+
+# Vhost for redirector urls
+# (all but www.gamerevolution.com to http://stg.gamerevolution.com/)
+<VirtualHost *:80>
+    ServerName gamerevolution.com
+    ServerAlias *.gr.bolt.com *.gamerevolution.net gamerevolution.net gr.bolt.com *.game-revolution.com game-revolution.com
+    <%=logging ? '' : '#'%>CustomLog /app/log/redirect_gamerevolution-access_log combined
+    RewriteEngine on
+    LimitInternalRecursion 5
+    RewriteRule ^/(.*) http://stg.gamerevolution.com/$1 [R=301,L]
+</VirtualHost>
+
+# Vhost for media urls
+<VirtualHost *:80>
+    DocumentRoot /app/shared/docroots/stg.gamerevolution.com/htdocs
+    ServerName media-stg.gamerevolution.com
+    ServerAlias media-stg.origin.gamerevolution.com
+    <%=logging ? '' : '#'%>CustomLog  /app/log/media-stg.gamerevolution.com-access_log combined
+    <Directory /app/shared/docroots/stg.gamerevolution.com/htdocs>
+        AllowOverride All
+    </Directory>
+</VirtualHost>
+

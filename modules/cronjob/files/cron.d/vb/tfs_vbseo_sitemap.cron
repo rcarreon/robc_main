@@ -1,0 +1,4 @@
+# $Id$
+# $URL$
+
+10 2 * * * root php /app/shared/forums.thefashionspot.com/vbseo_sitemap/vbseo_sitemap.php 2>&1

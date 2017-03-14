@@ -1,0 +1,16 @@
+# $Id$
+
+<VirtualHost *:80>
+    ServerName mostcraved.craveonline.com
+    ServerAlias prd.mostcraved.craveonline.com www.mostcraved.craveonline.com
+    DocumentRoot /app/shared/mostcraved/current/
+
+        <Directory /app/shared/mostcraved/current/>
+                Options Indexes FollowSymLinks
+                Order allow,deny
+                Allow from all
+        </Directory>
+
+    <%=logging ? '' : '#'%>ErrorLog  /app/log/mostcraved.craveonline.com-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/mostcraved.craveonline.com-access.log combined
+</VirtualHost>

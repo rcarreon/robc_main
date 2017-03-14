@@ -1,0 +1,23 @@
+<VirtualHost *:80> 
+   ServerName qa.idontlikeyouinthatway.com
+   ServerAdmin sysadmins@gorillanation.com
+   #DocumentRoot "/app/local/docroot/idlyitw.com"
+   #<%=logging ? '' : '#'%>CustomLog /app/local/logs/qa.idontlikeyouinthatway.com-access_log combined
+   #<%=logging ? '' : '#'%>ErrorLog "/app/local/logs/qa.idontlikeyouinthatway.com-error.log"
+   DocumentRoot "/app/shared/docroot/idlyitw.com"
+   <%=logging ? '' : '#'%>CustomLog /app/log/qa.idontlikeyouinthatway.com-access_log combined
+   <%=logging ? '' : '#'%>ErrorLog "/app/log/qa.idontlikeyouinthatway.com-error.log"
+   #<%=logging ? '' : '#'%>CustomLog logs/qa.idontlikeyouinthatway.com-access_log combined
+   #<%=logging ? '' : '#'%>ErrorLog "logs/qa.idontlikeyouinthatway.com-error.log
+   <Directory "/app/shared/docroot/idlyitw.com">
+       Options -Indexes Includes FollowSymLinks 
+       Order allow,deny
+       Allow from all
+        RewriteEngine On
+        RewriteCond %{HTTP_REFERER} !^http://www\.origin\.idontlikeyouinthatway\.com/ [NC]
+        RewriteCond %{REQUEST_URI} !^/img/* [NC]
+        RewriteRule (.*)\.(png|gif|jpe?g)$ http://cdn.idontlikeyouinthatway.com/$1.$2 [R=301]
+  </Directory>
+  LimitInternalRecursion 20
+</VirtualHost> 
+

@@ -1,0 +1,15 @@
+# $Id$
+# $URL$
+
+/app/log/php-fpm/*log {
+    daily
+    rotate 30
+    missingok
+    notifempty
+    compress
+    sharedscripts
+    postrotate
+    /bin/kill -SIGUSR1 `cat /var/run/php-fpm/php-fpm.pid 2>/dev/null` 2>/dev/null || true
+    endscript
+}
+

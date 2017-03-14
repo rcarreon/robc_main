@@ -1,0 +1,16 @@
+# Managed by Puppet
+
+<VirtualHost *:80>
+    ServerName      nocfiles.gnmedia.net
+    ServerAlias     *.nocfiles.gnmedia.net
+    ServerAlias     app1v-noc.tp.prd.lax.gnmedia.net nocfiles.tp.prd.lax.gnmedia.net
+    DocumentRoot    /app/shared/http
+    <%=logging ? '' : '#'%>ErrorLog        /app/log/files_error.log
+    <%=logging ? '' : '#'%>CustomLog       /app/log/files_access.log   combined
+    <Directory "/app/shared/http">
+        Options Indexes FollowSymlinks
+        AllowOverride None
+        Order   allow,deny
+        Allow from all
+    </Directory>
+</VirtualHost>

@@ -1,0 +1,31 @@
+<%- uidname = scope.lookupvar("fqdn_type") -%>
+
+<VirtualHost *:80>
+    ServerName publishers.springboardplatform.com
+    ServerAlias publishers.springboard.gorillanation.com
+    ServerAlias <%= uidname %>.publishers.springboardplatform.com
+
+    DocumentRoot /app/shared/docroots/publishers.springboardplatform.com/current/webroot/ 
+    <Directory /app/shared/docroots/publishers.springboardplatform.com/current/webroot/>
+        AllowOverride all
+        Order allow,deny
+        allow from all
+    </Directory>
+
+    Redirect permanent /xml_feeds_advanced      http://<%= uidname %>.cms.springboardplatform.com/xml_feeds_advanced
+    Redirect permanent /xml_feeds_customlists   http://<%= uidname %>.cms.springboardplatform.com/xml_feeds_customlists
+    Redirect permanent /teaser                  http://<%= uidname %>.cms.springboardplatform.com/teaser
+    Redirect permanent /embed_code_lightbox     http://<%= uidname %>.cms.springboardplatform.com/embed_code_lightbox
+    Redirect permanent /previews		http://<%= uidname %>.cms.springboardplatform.com/previews
+    Redirect permanent /docs/pdf_doc            http://<%= uidname %>.cms.springboardplatform.com/docs/pdf_doc
+
+    # SBV Name change
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^<%= uidname %>.publishers.springboard.gorillanation.com
+    RewriteRule ^(.*)$ http://publishers.springboardplatform.com/$1 [R=301,NC]
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/publishers.springboard.gorillanation.com_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/publishers.springboard.gorillanation.com_access.log combined
+
+</VirtualHost>
+

@@ -1,0 +1,19 @@
+; $Id$
+; $URL$
+
+; date/time
+date.timezone = America/Los_Angeles
+ 
+extension = apc.so
+ 
+apc.enabled=1
+ 
+; set apc size to 64mb
+apc.shm_size=64M
+
+; set ttl to 2 hours
+apc.ttl=7200
+apc.user_ttl=7200
+apc.enable_cli=1
+
+apc.stat=1

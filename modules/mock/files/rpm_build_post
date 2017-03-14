@@ -1,0 +1,38 @@
+#!/bin/bash
+
+
+srpmdestdir=/mnt/yum_repos/srpms/gnrepo
+buildlogsdestdir=/mnt/yum_repos/buildlogs/gnrepo
+
+if [[ $OSMAJOR == 5 ]]; then
+    rpmdestdir=/mnt/yum_repos/beta/gnrepo
+else
+    rpmdestdir=/mnt/yum_repos/yumoter/repos/gnrepo/6/wildwest
+fi
+
+
+set -x
+shopt -s nullglob
+id
+cd $1
+nvr=$(rpm -qp --qf '%{NAME}-%{VERSION}-%{RELEASE}\n' *.src.rpm)
+
+
+
+if [[ $OSMAJOR == 5 ]]; then
+    mkdir -p $rpmdestdir/$OSMAJOR
+    mv *.$ARCH.rpm *.noarch.rpm $rpmdestdir/$OSMAJOR
+    createrepo -q --checksum=sha $rpmdestdir/$OSMAJOR
+else
+    mkdir -p $rpmdestdir
+    mv *.$ARCH.rpm *.noarch.rpm $rpmdestdir
+    createrepo -q $rpmdestdir
+fi
+
+
+mkdir -p $srpmdestdir
+mv *.src.rpm $srpmdestdir
+
+
+mkdir -p $buildlogsdestdir/$nvr/$OSMAJOR
+mv *.log $buildlogsdestdir/$nvr/$OSMAJOR

@@ -1,0 +1,12 @@
+<VirtualHost *:80>
+    ServerName stg.metrics.originplatform.com
+    DocumentRoot "/app/shared/docroots/metrics.originplatform.com/"
+    ErrorLog /app/log/stg.metrics.originplatform.com-error.log
+    CustomLog /app/log/stg.metrics.originplatform.com-access.log combined
+
+    <Directory /app/shared/docroots/metrics.originplatform.com/>
+        AllowOverride FileInfo Indexes Options
+        Options -MultiViews
+    </Directory>
+
+</VirtualHost>

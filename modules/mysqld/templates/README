@@ -1,0 +1,6 @@
+
+
+Be cautious the my.cnf files have been moved to https://svn.gnmedia.net/puppet/templates/mysqld/
+
+(out of the modules folder so we don't have to cherrypick them, let the DBA manage them directly though puppet)
+

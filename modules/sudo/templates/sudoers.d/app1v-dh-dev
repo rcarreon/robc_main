@@ -1,0 +1,2 @@
+# give branislav sudo access on dev
+bvladisavljev   ALL=(ALL)       NOPASSWD: ALL

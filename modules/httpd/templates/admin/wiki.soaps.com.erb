@@ -1,0 +1,14 @@
+# $Id$
+<VirtualHost *:80>
+    ServerName wiki.soaps.com
+    DocumentRoot /app/shared/docroots/wiki.soaps.com/
+    <%=logging ? '' : '#'%>CustomLog /app/log/wiki.soaps.com-access_log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/wiki.soaps.com_error.log
+
+    Alias /wiki/index.php /app/shared/docroots/wiki.soaps.com/w/index.php
+    Alias /wiki /app/shared/docroots/wiki.soaps.com/w/index.php
+
+
+
+</VirtualHost>
+

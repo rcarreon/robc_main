@@ -1,0 +1,6 @@
+# $Id$
+# $URL$
+
+# make sure full index is not overlab
+*/30 * * * * root /usr/local/bin/sphinx_vb/sphinx-delta.sh 
+0 15 * * * root /usr/local/bin/sphinx_vb/sphinx-full-index.sh 

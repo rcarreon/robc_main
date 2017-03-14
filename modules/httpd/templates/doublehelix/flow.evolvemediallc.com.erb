@@ -1,0 +1,28 @@
+<VirtualHost *:80>
+    DocumentRoot /app/shared/docroots/flow.evolvemediallc.com/current
+    ServerName flow.evolvemediallc.com
+    ServerAlias *.flow.evolvemediallc.com
+    ErrorLog /app/log/flow.evolvemediallc.com-error.log
+    CustomLog /app/log/flow.evolvemediallc.com-access.log combined
+
+# Rewrite conditions based on what was found in .htaccess
+    <Directory /app/shared/docroots/flow.evolvemediallc.com/current/>
+        AllowOverride FileInfo Indexes Options=All,MultiViews
+        RewriteEngine On
+    </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+    DocumentRoot /app/shared/docroots/flow-upgrade.evolvemediallc.com/current
+    ServerName flow-upgrade.evolvemediallc.com
+    ServerAlias *.flow-upgrade.evolvemediallc.com
+    ErrorLog /app/log/flow-upgrade.evolvemediallc.com-error.log
+    CustomLog /app/log/flow-upgrade.evolvemediallc.com-access.log combined
+
+# Rewrite conditions based on what was found in .htaccess
+    <Directory /app/shared/docroots/flow-upgrade.evolvemediallc.com/current/>
+        AllowOverride FileInfo Indexes Options=All,MultiViews
+        RewriteEngine On
+    </Directory>
+</VirtualHost>
+

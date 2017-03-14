@@ -1,0 +1,15 @@
+# This file is managed by Puppet do not modify it from <%=fqdn %>
+# $Id: cms.atomiconline.com.erb 1878 2009-09-29 21:10:15Z jrottenberg $
+
+
+<VirtualHost *:80>
+    ServerName dev.cms.atomiconline.com
+    ServerAlias cms.atomiconline.com cms.<%= silo %>.atomiconline.com cms.lax.atomiconline.com
+
+    Redirect permanent / http://dev.publishers.springboard.gorillanation.com/
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/dev.cms.atomiconline.com_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/dev.cms.atomiconline.com_access.log combined
+
+</VirtualHost>
+

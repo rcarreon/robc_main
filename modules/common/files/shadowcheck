@@ -1,0 +1,91 @@
+#!/usr/bin/perl -W -T
+
+# Check user-supplied username and password
+# 
+# Note: This script is intended to be run setuid root but would work equally well under sudo
+# The perl-suidperl package must be installed
+#
+# Running a setuid perl script automatically invokes taint mode
+
+use strict;
+
+if (!scalar @ARGV) {
+   die "Usage: $0 username\n";
+}
+
+my $username=(grep(!/^-/,shift @ARGV))[0] or die "Usage: $0 username\n";
+my $clearpass='';
+
+# username must be untained before calling getpwnam
+if ($username =~ m/^([a-z]+)$/) {
+   $username=$1; # untainted
+} else {
+   print "Bad username\n";
+   exit 1;
+}
+
+
+my ($usercheck,$shadowpass,$usergid)=getpwnam($username);
+if (!$usercheck) {
+   print "Unknown user\n";
+   exit 1;
+}
+if (!$shadowpass) {
+   print "No password entry\n";
+   exit 1;
+}
+if ($shadowpass eq "x") {
+   print "Insufficient privilege\n";
+   exit 1;
+}
+
+# Get the user-supplied cleartext password
+if (-t STDIN) {
+   use Term::ReadKey;
+   print "Password: ";
+   ReadMode('noecho');
+   $clearpass = ReadLine(0);
+   chomp($clearpass);
+   ReadMode(0);
+   print "\n";
+} else {
+   $clearpass =<>;
+   chomp($clearpass);
+}
+
+
+# Figure out the salt from the password
+my $salt='';
+if ((length $shadowpass) == 13) { 
+   #standard Unix crypt
+   $salt=substr($shadowpass,0,2);
+} elsif ($shadowpass =~ /^\$1\$/) {
+   $shadowpass=~/^(\$1\$........\$)/;
+   # newer md5 hash
+   $salt=$1;
+} else {
+   # unknown, just try the whole shadow pass
+   $salt=$shadowpass;
+}
+
+
+# We have the salt, now check the user-supplied password
+my $cryptpass=crypt($clearpass,$salt);
+if ($cryptpass ne $shadowpass) {
+   print "Bad Password\n";
+   exit 1;
+}
+# past this point, the password checks out
+   
+
+# Return the user's groups
+my @rgnames; # fill in with user's secondary groups
+my $primarygroup='';
+while ( my($name,$pw,$gid,$members) = getgrent ) {
+  $primarygroup=$name if ( $gid == $usergid);
+  push(@rgnames,$name) if ( grep($_ eq $username,split(/\s+/,$members)) );
+}
+   
+print $primarygroup." ". join(" ",@rgnames);
+if (-t STDOUT) { print "\n" };
+exit 0;

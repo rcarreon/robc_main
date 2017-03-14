@@ -1,0 +1,14 @@
+# $Id: videos.evolvemediacorp.com.erb 8272 2011-03-31 17:42:42Z aibarra $
+# videos.evolvemediacorp.com - generated on 20110412 by aibarra 
+# /etc/httpd/conf.d/videos.evolvemediacorp.com.conf
+<VirtualHost *:80>
+    DocumentRoot /app/shared/docroots/videos.evolvemediacorp.com
+    ServerName  videos.evolvemediacorp.com 
+    ServerAlias *.videos.evolvemediacorp.com
+    
+    <%=logging ? '' : '#'%>ErrorLog /app/log/videos.evolvemediacorp.com-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/videos.evolvemediacorp.com-access.log combined
+
+</VirtualHost>
+
+

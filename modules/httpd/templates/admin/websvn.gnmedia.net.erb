@@ -1,0 +1,61 @@
+# Managed by Puppet
+
+# $Id$
+
+<VirtualHost *:80>
+
+    ServerName websvn.gnmedia.net
+
+    RedirectPermanent / https://websvn.gnmedia.net/
+
+</VirtualHost>
+
+
+<VirtualHost *:443>
+
+    ServerName websvn.gnmedia.net
+
+
+    <%=logging ? '' : '#'%>CustomLog /app/log/websvn.gnmedia.net_access.log Combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/websvn.gnmedia.net_error.log
+
+
+    DocumentRoot /usr/share/websvn/
+    Alias /websvn /usr/share/websvn/
+
+    <Directory /usr/share/websvn/>
+       Options MultiViews
+       DirectoryIndex wsvn.php
+    </Directory>
+
+
+    SSLEngine on
+    SSLProtocol all -SSLv2
+    SSLCertificateFile /etc/httpd/conf.d/svn.gnmedia.net.crt
+    SSLCertificateKeyFile /etc/httpd/conf.d/svn.gnmedia.net.key
+
+
+    <Location "/">
+    # SSL Part
+        SSLRequireSSL
+
+    # Ldap Part
+        AuthName "SVN Access - ldap"
+        AuthType Basic
+        AuthzLDAPAuthoritative    On
+        AuthzLDAPMethod           ldap
+        AuthzLDAPProtocolversion  3
+        AuthzLDAPServer           ldap.gnmedia.net
+        AuthzLDAPUserBase         ou=People,dc=gnmedia,dc=net
+        AuthzLDAPUserKey          uid
+        AuthzLDAPGroupBase        ou=Groups,dc=gnmedia,dc=net
+        AuthzLDAPGroupkey         cn
+        AuthzLDAPMemberKey        uniquemember
+        AuthzLDAPSetGroupAuth     ldapdn
+        #AuthzLDAPLogLevel        debug
+        Require                   valid-user
+    </Location>
+
+</VirtualHost>
+
+

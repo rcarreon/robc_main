@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+    <Directory /app/shared/docroots/gem.gnmedia.net/>
+      Options FollowSymLinks Indexes
+    </Directory>
+
+    ServerName gem.gnmedia.net
+    ServerAlias *.gem.gnmedia.net
+    DocumentRoot /app/shared/docroots/gem.gnmedia.net/
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/gem.gnmedia.net_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/gem.gnmedia.net_access.log combined
+
+</VirtualHost>

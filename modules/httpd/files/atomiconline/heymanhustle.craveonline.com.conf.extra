@@ -1,0 +1,6 @@
+    Options +FollowSymLinks
+    RewriteEngine on
+
+    RedirectPermanent / http://www.heymanhustle.com
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

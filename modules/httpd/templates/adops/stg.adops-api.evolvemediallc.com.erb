@@ -1,0 +1,24 @@
+# This file is managed by Puppet. Do not modify it from <%=fqdn %>
+# vim: set ft=apache :
+
+<VirtualHost *:80>
+    ServerName adops-api.evolvemediallc.com
+    ServerAlias stg.adops-api.evolvemediallc.com
+    DocumentRoot "/app/shared/docroots/adops-api.evolvemediallc.com/current/public"
+    Timeout 600
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/adops-api.evolvemediallc.com.error.log
+    LogLevel warn
+    <%=logging ? '' : '#'%>CustomLog /app/log/adops-api.evolvemediallc.com.access.log combined
+
+    PassengerAppEnv staging
+
+    <Directory /app/shared/docroots/adops-api.evolvemediallc.com/current/public>
+        PassengerRuby /app/software/ruby/rbenv/versions/2.2.2/bin/ruby
+
+        Options FollowSymLinks
+        AllowOverride None
+        Order allow,deny
+        Allow from all
+    </Directory>
+</VirtualHost>

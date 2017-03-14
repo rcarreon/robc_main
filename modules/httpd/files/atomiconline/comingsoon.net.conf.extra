@@ -1,0 +1,13 @@
+
+    RewriteEngine On
+
+    RewriteCond %{HTTP_HOST} ^comingsoon\.net$ [NC]
+    RewriteRule ^/(.*) http://www.comingsoon.net/$1 [R=301,L]
+
+    RewriteCond %{HTTP_HOST} ^m\.comingsoon\.net$ [NC]
+    RewriteRule ^/(.*) http://www.comingsoon.net/$1 [R=301,L]
+
+    AliasMatch ^/nextraimages/(.*) /app/ugc/comingsoon.net/assets/nextraimages/$1
+
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

@@ -1,0 +1,20 @@
+# This file is managed by Puppet do not modify it from <%=fqdn %>
+# $Id: analytics.gorillanation.com.erb 1878 2009-09-29 21:10:15Z jrottenberg $
+
+<VirtualHost *:80>
+        ServerName dev.analytics.gorillanation.com 
+        ServerAlias dev.analytics.<%= silo %>.gorillanation.com stg.analytics.lax.gorillanation.com dev.analytics.springboardvideo.com
+
+        php_value include_path ".:/app/shared/docroots/analytics.springboardvideo.com/current:/usr/share/pear"
+
+        DocumentRoot /app/shared/docroots/analytics.springboardvideo.com/current
+        <Directory /app/shared/docroots/analytics.springboardvideo.com/current >
+                AllowOverride All
+                Order allow,deny
+                allow from all
+        </Directory>
+        <%=logging ? '' : '#'%>ErrorLog /app/log/dev.analytics.gorillanation.com-error.log
+        <%=logging ? '' : '#'%>CustomLog /app/log/dev.analytics.gorillanation.com-access.log combined
+</VirtualHost>
+
+

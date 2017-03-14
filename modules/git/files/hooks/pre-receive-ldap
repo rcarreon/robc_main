@@ -1,0 +1,5 @@
+#!/bin/bash
+# Check for ldap user on commit
+
+. /usr/share/git-core/contrib/hooks/ldap-perms
+

@@ -1,0 +1,14 @@
+<VirtualHost *:80>
+    ServerName flume.gnmedia.net
+    ServerAlias *.flume.gnmedia.net
+    DocumentRoot /app/shared/docroots/flume.gnmedia.net/
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/flume.gnmedia.net_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/flume.gnmedia.net_access.log combined
+
+    <Directory /app/shared/docroots> 
+	    Options FollowSymLinks
+	    AllowOverride All
+	    Satisfy all
+    </Directory>
+</VirtualHost>

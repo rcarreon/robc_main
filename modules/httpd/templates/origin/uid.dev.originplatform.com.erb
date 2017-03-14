@@ -1,0 +1,15 @@
+<VirtualHost *:80>
+    ServerName <%= fqdn_type %>.uid.dev.originplatform.com
+    DocumentRoot "/app/shared/docroots/originplatform.com/current/public"
+    ErrorLog /app/log/dev.originplatform.com-error.log
+    CustomLog /app/log/dev.originplatform.com-access.log combined
+
+    LogLevel debug
+
+     <Directory /app/shared/docroots/originplatform.com/current/public/>
+        AllowOverride FileInfo Indexes Options
+        Options -MultiViews
+    </Directory>
+
+</VirtualHost>
+

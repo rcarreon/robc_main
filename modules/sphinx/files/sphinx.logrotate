@@ -1,0 +1,12 @@
+/var/log/sphinx/*.log {
+    daily
+    dateext
+    missingok
+    olddir /var/log/sphinx/parser/unprocessed
+    rotate 30
+    postrotate
+        /etc/init.d/searchd restart
+    endscript
+
+}
+

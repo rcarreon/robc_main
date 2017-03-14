@@ -1,0 +1,30 @@
+# This file is managed by Puppet. Do not modify it on <%=fqdn %>
+
+<VirtualHost *:80>
+
+    ServerName bcn.originplatform.com 
+    ServerAlias bcn.originplatform.com
+    DocumentRoot "/var/www/html"
+    ErrorLog /app/log/bcn.originplatform.com-error.log
+
+    SetEnvIf X-Forwarded-For "(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$" clientip=$1
+    SetEnvIf Incap-Client-IP "^(.*\..*\..*\..*)" clientip=$1
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" balancer
+    LogFormat "%{clientip}e %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" beacon
+
+    CustomLog /app/log/bcn.originplatform.com-access.log balancer env=!clientip
+    CustomLog /app/log/bcn.originplatform.com-access.log beacon env=clientip
+
+    Header always set Cache-Control "no-cache, no-store, must-revalidate"
+    Header always set Pragma "no-cache"
+    Header always set Expires "Mon, 01 Jan 1990 00:00:00 GMT"
+    Header always set X-Content-Type-Options "nosniff"
+    Header always set Content-Type "image/png"
+    Header always set Age 109110
+
+    <Directory /var/www/html>
+        AllowOverride FileInfo Indexes Options
+        Options -MultiViews
+    </Directory>
+
+</VirtualHost>

@@ -1,0 +1,60 @@
+<%
+         host,project,environment,location,domain,tld = fqdn.split('.')
+%>
+
+<%
+case environment
+  when "prd"
+    env_hostname = name
+    env_docroot = "/app/shared/docroots/forums.superherohype.com/"
+  when "stg"
+    env_hostname = "stg." + name
+    env_docroot = "/app/shared/vb_shh/current"
+  when "dev"
+    env_hostname = "dev." + name
+    env_docroot = "/app/shared/vb_shh/current"
+        case host
+          when /uid/
+            env_hostname = "sbx." + name
+            env_docroot = "/app/shared/vb_shh/current"
+        end
+end
+%>
+
+<VirtualHost *:80>
+  ServerName forums.superherohype.com
+  ServerAlias <%= env_hostname %> 
+  ServerAlias lax.forums.superherohype.com 
+  ServerAlias www.forums.superherohype.com 
+  ServerAlias ftp.forums.superherohype.com 
+  ServerAlias mail.forums.superherohype.com
+  ServerAdmin webmaster@forums.superherohype.com
+
+  DocumentRoot <%= env_docroot %>
+
+  # subdomain logic
+  RewriteEngine On
+  RewriteOptions inherit
+  RewriteCond %{HTTP_HOST} !^www\.forums\.superherohype\.com [NC]
+  RewriteCond %{HTTP_HOST} !^forums\.superherohype\.com [NC]
+  RewriteCond %{HTTP_HOST} ^([A-Z0-9a-z-]+)\.forums\.superherohype\.com [NC]
+  RewriteCond %{DOCUMENT_ROOT}/%1 -d
+  RewriteRule ^(.+) %{HTTP_HOST}/$1 [C]
+  RewriteRule ^([0-9A-Za-z-]+)\.forums\.superherohype\.com/?(.*)$ %{DOCUMENT_ROOT}/$1/$2 [L]
+
+  RewriteCond %{HTTP_HOST} ^www\.([A-Z0-9a-z-]+)\.forums\.superherohype\.com [NC]
+  RewriteCond %{DOCUMENT_ROOT}/%1 -d
+  RewriteRule ^(.+) %{HTTP_HOST}/$1 [C]
+  RewriteRule ^www\.([0-9A-Za-z-]+)\.forums\.superherohype\.com/?(.*)$ %{DOCUMENT_ROOT}/$1/$2 [L]
+  # end subdomain logic
+
+  <%=logging ? '' : '#'%>ErrorLog /app/log/<%= env_hostname %>-error.log
+  <%=logging ? '' : '#'%>CustomLog /app/log/<%= env_hostname %>-access.log combined
+
+  <Directory <%= env_docroot %>>
+    AllowOverride  All
+  </Directory>
+
+</VirtualHost>
+
+

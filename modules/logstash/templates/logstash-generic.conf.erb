@@ -1,0 +1,67 @@
+input {
+  <% redis_servers.each do | redis | %>
+  redis {
+    host => "<%= redis %>"
+    data_type => "list"
+    key => "logstash"
+  }
+    
+  redis{
+    host => "<%= redis %>"
+    data_type => "list"
+    key => "crowdignite_platasserts"
+  }
+  <% end %>
+
+  tcp {
+    port => 2233
+    type => "syslog"
+  }
+}
+
+filter {
+if [@type] =~ /.+_access$/
+{
+  grok {
+    match => ["@message", "%{COMBINEDAPACHELOG}"]
+  }
+
+  date {
+    match => ["timestamp", "dd/MMM/YYYY:HH:mm:ss Z"]
+    locale => "en"
+  }
+  mutate {
+    remove_field => ["@message"]
+  }
+}
+if [@type] =~ /.+_error$/
+{
+  grok {
+    patterns_dir => [ "/etc/logstash/patterns/"]
+    match => ["@message", "%{APACHE_ERROR_LOG}"]
+  }
+  mutate {
+    remove_field => ["@message"]
+  }
+}
+
+if [@type] =~ /.+_plat$/
+{
+  date{
+    match => ["plat_time", "EEE MMM dd HH:mm:ss yyyy"]
+    locale => "en"
+    timezone => "America/Los_Angeles"
+  }
+}
+                
+
+}
+
+output {
+
+  elasticsearch_http {
+    host => "localhost"
+    flush_size => <%= ls_flush_size %>
+    index => "%{@type}-%{+YYYY.MM.dd}"
+  }
+}

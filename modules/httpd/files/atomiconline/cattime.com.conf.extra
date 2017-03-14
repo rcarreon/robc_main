@@ -1,0 +1,7 @@
+    RewriteEngine On
+
+    # www.cattime.com --> cattime.com
+    RewriteCond %{HTTP_HOST} ^www\.cattime\.com$ [NC]
+    RewriteRule ^/(.*) http://cattime.com/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

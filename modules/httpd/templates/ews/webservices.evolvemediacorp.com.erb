@@ -1,0 +1,17 @@
+# /etc/httpd/conf.d/webservices.evolvemediacorp.com.conf
+<VirtualHost *:80>
+    DocumentRoot /app/shared/docroots/webservices.evolvemediacorp.com
+    ServerName webservices.evolvemediacorp.com
+    ServerAlias *.webservices.evolvemediacorp.com
+    <%=logging ? '' : '#'%>ErrorLog /app/log/webservices.evolvemediacorp.com-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/webservices.evolvemediacorp.com-access.log combined
+
+    <Directory /app/shared/docroots/webservices.evolvemediacorp.com/>
+        AllowOverride FileInfo Indexes Options
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ index.php?url= [QSA,L]
+    </Directory>
+</VirtualHost>
+

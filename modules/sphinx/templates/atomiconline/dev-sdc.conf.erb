@@ -1,0 +1,357 @@
+# This file is managed by Puppet do not modify it from <%= fqdn %>
+# $Id$
+
+source dbsettings {
+        type                    = mysql
+        sql_host                = sql1v-56-sdc.ao.dev.lax.gnmedia.net
+        sql_user                = sphinx
+        sql_pass                = SklcfvRo
+        sql_db                  = sherdog
+        sql_attr_timestamp	= date
+}
+
+source sherdogArticles : dbsettings
+{
+        sql_query               = select a.id as id, concat(a.title,' ',a.body), ac.article_id as article_id, ac.channel_id as channel_id, unix_timestamp(a.created) as date from articles_channels ac, articles a where a.id = ac.article_id and a.matchup != 1 and ac.channel_id <> 7 and a.flag_active = 1 and a.article_url = '' and ( a.date_active IS NULL OR a.date_active <= CURRENT_TIMESTAMP() )
+        sql_attr_uint		= article_id
+        sql_attr_uint		= channel_id
+}
+
+source sherdogArticlesNLP : dbsettings
+{
+        sql_query               = select id, title, body, unix_timestamp(created) as date from articles where matchup != 1
+}
+
+source sherdogVideos : dbsettings
+{
+        sql_query               = select id, id as video_id, concat(title," ",blurb) as indexed_text, unix_timestamp(created) as date from videos
+        sql_attr_uint           = video_id
+}
+
+source sherdogAudio : dbsettings
+{
+        sql_query               = select id, id as audio_id, concat(title," ",title," ",body) as indexed_text, unix_timestamp(created) as date from audio
+        sql_attr_uint           = audio_id
+}
+
+source sherdogEvents : dbsettings
+{
+        sql_db                  = sherdog_fighter
+        sql_query               = select id, concat(title," ",name," ",location) as indexed_text, unix_timestamp(date) as date from events
+}
+
+source sherdogIArticles : dbsettings
+{
+        sql_db                  = sherdog_fighter
+        sql_query               = select a.id, a.title, a.body, unix_timestamp(a.created) as date from sherdog.articles a, insider i where i.id = a.id and i.type = 'article' and a.matchup != 1
+}
+
+source sherdogIVideos : dbsettings
+{
+        sql_db                  = sherdog_fighter
+        sql_query               = select a.id, a.title, a.body, unix_timestamp(created) as date from sherdog.videos a, insider i where i.id = a.id and i.type = 'video'
+}
+
+source sherdogIAudio : dbsettings
+{
+        sql_db                  = sherdog_fighter
+        sql_query               = select a.id, a.title, a.body, unix_timestamp(created) as date from sherdog.audio a, insider i where i.id = a.id and i.type = 'audio'
+}
+
+source sherdogFighters : dbsettings
+{
+        sql_db        = sherdog_fighter
+        sql_query     = SELECT F.id, F.first_name, F.last_name, F.nick_name, IFNULL((SELECT MIN(id) FROM sherdog_fighter.weight_class WHERE F.weight BETWEEN min_weight AND max_weight AND id != 8),0) AS weight_class_id, \
+                        CRC32(LOWER(F.association)) AS association_name, 1 AS source_id, IFNULL(FR.win,0) AS win, IFNULL(FR.lose,0) AS lose, IFNULL(FR.draw,0) AS draw, IFNULL(FR.no_contest,0) AS no_contest \
+                        FROM sherdog_fighter.fighters AS F LEFT JOIN sherdog_fighter.fighter_record FR ON FR.id = F.id
+        sql_attr_uint = weight_class_id
+        sql_attr_uint = source_id
+        sql_attr_uint = win
+    	sql_attr_uint = association_name
+    	sql_attr_string	= first_name 
+}
+
+source sherdogReferees : dbsettings
+{
+        sql_db        = sherdog_fighter
+        sql_query     = select id, first_name, last_name, nick_name, 2 as source_id from referee
+        sql_attr_uint = source_id
+}
+
+source sherdogEventsNew : dbsettings
+{
+        sql_db        = sherdog_fighter
+        sql_query     = select id, title, name, unix_timestamp(date) as date, 3 as source_id from events
+        sql_attr_uint = source_id
+}
+
+source sherdogFighterGallery : dbsettings
+{
+        sql_query = \
+                SELECT P.id, F.first_name, F.last_name, F.nick_name, P.blurb \
+                FROM sherdog_fighter.fighters AS F \
+                INNER JOIN sherdog_fighter.fighters_pictures AS FP ON F.id = FP.fighter_id \
+                INNER JOIN sherdog.pictures AS P ON FP.pic_id = P.id \
+                WHERE P.flag_active = 'T'
+}
+
+source sherdogFighterGallery2 : dbsettings
+{
+        sql_query = \
+                SELECT P.id, NULL AS first_name, NULL AS last_name, NULL AS nick_name, P.blurb  \
+                FROM sherdog.pictures AS P \
+                WHERE P.flag_active = 'T'
+}
+
+source sherdogOrganizations : dbsettings
+{
+	sql_db        = sherdog_fighter
+	sql_query     = select id, name, 4 as source_id from organizations
+	sql_attr_uint = source_id
+}
+
+source sherdogAssociations : dbsettings
+{
+        sql_db        = sherdog_fighter
+        sql_query     = select MIN(id) AS id, association, 5 as source_id from fighters where association <> '' group by association
+        sql_attr_uint = source_id
+}
+
+source sherdogBlogs : dbsettings
+{
+        sql_query               = select a.id as id, concat(a.title,' ',a.body), ac.article_id as article_id, ac.channel_id as channel_id, unix_timestamp(a.created) as date from articles_channels ac, articles a where a.id = ac.article_id and a.matchup != 1 and ac.channel_id = 9 and a.flag_active = 1 and a.article_url = '' and ( a.date_active IS NULL OR a.date_active <= CURRENT_TIMESTAMP() )
+        sql_attr_uint           = article_id
+        sql_attr_uint           = channel_id
+}
+
+source sherdogCountries : dbsettings
+{
+        sql_db        = sherdog
+        sql_query     = select id, name, code from country
+}
+
+source sherdogFighterArticles : dbsettings
+{
+        sql_query        = \
+                    SELECT A.id, AF.fighter_id as fighter_id, title, blurb, body, article_url AS url, created AS created_date, created AS date, image_115x115 AS image_small, image_420x150 AS image_large, main_channel_id, AC.channel_id, A.modified, A.flag_comments AS allow_comments, A.status \
+                    FROM sherdog.articles A INNER JOIN sherdog_fighter.articles_fighters AF ON A.id = AF.article_id INNER JOIN sherdog.articles_channels AC ON A.id = AC.article_id \
+                    WHERE A.flag_active = 1 AND A.main_channel_id <> 0 AND AC.channel_id <> 7 AND AC.channel_id <> 9 AND A.main_channel_id <> 7 AND A.main_channel_id <> 9 AND ( A.date_active IS NULL OR A.date_active <= CURRENT_TIMESTAMP() )
+        sql_attr_uint    = fighter_id
+}
+
+source sherdogFighterArticlesBlogs : dbsettings
+{
+        sql_query = \
+            SELECT DISTINCT A.id*2 AS id, title, 0 as source_id, blurb, body, article_url AS url, UNIX_TIMESTAMP(created) AS date \
+            FROM sherdog.articles A \
+            INNER JOIN sherdog_fighter.articles_fighters AF ON A.id = AF.article_id \
+            INNER JOIN sherdog.articles_channels AC ON A.id = AC.article_id \
+            WHERE A.flag_active = 1 AND A.main_channel_id <> 0 AND AC.channel_id <> 7 AND A.main_channel_id <> 7 AND ( A.date_active IS NULL OR A.date_active <= CURRENT_TIMESTAMP() ) 
+        sql_attr_uint    = source_id
+}
+
+source sherdogFighterRadio : dbsettings
+{
+        sql_query = \
+            SELECT DISTINCT (A.id*2)+1 AS id, A.title, 1 as source_id, A.blurb, A.body, A.url, UNIX_TIMESTAMP(A.created) AS date \
+            FROM sherdog_fighter.audio_fighter AF \
+            INNER JOIN sherdog.audio A ON AF.audio_id = A.id AND A.flag_active = 1 \
+            LEFT JOIN sherdog.radioshow_audio RA ON RA.audio_id = A.id \
+            LEFT JOIN sherdog.radioshow R ON RA.radioshow_id = R.id AND R.is_active = 1;
+        sql_attr_uint    = source_id
+}
+
+##INDICES
+
+index sherdog_articles
+{
+        source                  = sherdogArticles
+        path                    = /var/lib/sphinx/sherdog_articles
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+index sherdogarticles
+{
+        source                  = sherdogArticlesNLP
+        path                    = /var/lib/sphinx/sherdog_articles_nlp
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+index sherdog_videos
+{
+        source                  = sherdogVideos
+        path                    = /var/lib/sphinx/sherdog_videos
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+index sherdog_audio
+{
+        source                  = sherdogAudio
+        path                    = /var/lib/sphinx/sherdog_audio
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+index sherdog_events
+{
+        source                  = sherdogEvents
+        path                    = /var/lib/sphinx/sherdog_events
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+index insider_articles
+{
+        source                  = sherdogIArticles
+        path                    = /var/lib/sphinx/sherdog_iarticles
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+index insider_video
+{
+        source                  = sherdogIVideos
+        path                    = /var/lib/sphinx/sherdog_ivideo
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+index insider_audio
+{
+        source                  = sherdogIAudio
+        path                    = /var/lib/sphinx/sherdog_iaudio
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+index sherdog_fighters
+{
+        source                  = sherdogFighters
+        path                    = /var/lib/sphinx/sherdog_fighters
+        morphology              = none
+        charset_type            = utf-8
+        enable_star             = 1
+        min_infix_len           = 1
+}
+
+index sherdog_referees
+{
+        source                  = sherdogReferees
+        path                    = /var/lib/sphinx/sherdog_referees
+        morphology              = none
+        charset_type            = utf-8
+        enable_star             = 1
+        min_infix_len           = 1
+}
+
+index sherdog_events_new
+{
+        source                  = sherdogEventsNew
+        path                    = /var/lib/sphinx/sherdog_events_new
+        morphology              = none
+        charset_type            = utf-8
+        enable_star             = 1
+        min_infix_len           = 1
+}
+
+index sherdog_fighters_gallery
+{
+        source                  = sherdogFighterGallery
+        source                  = sherdogFighterGallery2
+        path                    = /var/lib/sphinx/sherdog_fighters_gallery
+        morphology              = none
+        charset_type            = utf-8
+}
+
+index sherdog_organizations
+{
+	source                  = sherdogOrganizations
+        path                    = /var/lib/sphinx/sherdog_organizations
+        morphology              = none
+        charset_type            = utf-8
+        enable_star             = 1
+        min_infix_len           = 1
+}
+
+index sherdog_associations
+{
+        source                  = sherdogAssociations
+        path                    = /var/lib/sphinx/sherdog_associations
+        morphology              = none
+        charset_type            = utf-8
+        enable_star             = 1
+        min_infix_len           = 1
+}
+
+index sherdog_blogs
+{
+        source                  = sherdogBlogs
+        path                    = /var/lib/sphinx/sherdog_blogs
+        morphology              = none
+        charset_type            = utf-8
+        html_strip              = 0
+} 
+
+index sherdog_countries
+{
+        source                  = sherdogCountries
+        path                    = /var/lib/sphinx/sherdog_countries
+        morphology              = none
+        charset_type            = utf-8
+        html_strip              = 0
+        min_infix_len           = 1
+}
+
+index sherdog_fighter_articles
+{
+        source                  = sherdogFighterArticles
+        path                    = /var/lib/sphinx/sherdog_fighter_articles
+        morphology              = none
+        charset_type            = utf-8
+        html_strip              = 0
+}
+
+index sherdog_fighter_articles_radio_blog
+{
+        source                  = sherdogFighterRadio
+        source                  = sherdogFighterArticlesBlogs
+        path                    = /var/lib/sphinx/sherdog_fighter_articles_radio_blog
+        morphology              = none
+        charset_type            = utf-8
+        html_strip              = 0
+}
+
+#############################################################################
+## indexer settings
+#############################################################################
+
+indexer
+{
+        mem_limit               = 64M
+}
+
+#############################################################################
+## searchd settings
+#############################################################################
+
+searchd
+{
+        port                    = 3312
+        log                     = /app/log/sphinx/searchd.log
+        query_log               = /app/log/sphinx/squery.log
+        read_timeout            = 5
+        max_matches             = 10000
+        max_children            = 30
+        pid_file                = /var/sphinx/searchd.pid
+}

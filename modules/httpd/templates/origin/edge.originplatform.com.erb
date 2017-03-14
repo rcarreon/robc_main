@@ -1,0 +1,21 @@
+# This file is managed by Puppet. Do not modify it on <%=fqdn %>
+
+<VirtualHost *:80>
+    ServerName edge.originplatform.com
+    DocumentRoot "/app/shared/docroots/edge.originplatform.com/current/public"
+    ErrorLog /app/log/edge.originplatform.com-error.log
+    CustomLog /app/log/edge.originplatform.com-access.log combined
+
+    <Directory /app/shared/docroots/edge.originplatform.com/current/public/>
+        AllowOverride FileInfo Indexes Options
+        Options -MultiViews
+    </Directory>
+
+    # ELK stuff
+    SetEnvIf X-Forwarded-For "(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$" clientip=$1
+    SetEnvIf Incap-Client-IP "^(.*\..*\..*\..*)" clientip=$1
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+    LogFormat "%{clientip}e %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" proxy
+    CustomLog "|pipestash -t edge_originplatform_com_og_access -R logstash -r redis://vip-rds-logstashdev.tp.prd.lax.gnmedia.net:6379/0" combined env=!clientip
+    CustomLog "|pipestash -t edge_originplatform_com_og_access -R logstash -r redis://vip-rds-logstashdev.tp.prd.lax.gnmedia.net:6379/0" proxy env=clientip
+</VirtualHost>

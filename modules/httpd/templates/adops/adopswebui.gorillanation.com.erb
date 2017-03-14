@@ -1,0 +1,14 @@
+# This file is managed by Puppet. Do not modify it from <%= @fqdn %>
+<%
+         host,project,environment,location,domain,tld = @fqdn.split('.')
+%>
+
+<VirtualHost *:80>
+    ServerName adopswebui.gorillanation.com
+    ServerAlias <%= environment %>.adopswebui.gorillanation.com
+    DocumentRoot "/app/shared/docroots/adopswebui.gorillanation.com/dist"
+
+    <%= @logging ? '' : '#'%>ErrorLog /app/log/adopswebui.gorillanation.com.error.log
+    <%= @logging ? '' : '#'%>CustomLog /app/log/adopswebui.gorillanation.com.access.log combined
+
+</VirtualHost>

@@ -1,0 +1,351 @@
+modules {
+  module {
+    name     = "kestrel"
+    language = "python"
+
+    param host {
+      value = "localhost"
+    }
+    param port {
+      value = 22133
+    }
+    param type {
+      value = "kestrel"
+    }
+
+    param refresh_rate {
+      value = 15
+    }
+
+    param metrix_prefix {
+       value = "ks"
+    }
+    param queues {
+       value = "contextual_match,landing_page_stats_views,landing_page_views,new_page,outgoing_click,widget_stats_views,widget_views"
+    }
+
+  }
+}
+
+collection_group {
+  collect_every  = 20
+  time_threshold = 90
+
+  metric {
+    name  = "ks_curr_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_cmd_get"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_cmd_set"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_bytes_read"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_bytes_written"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_bytes"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_curr_connections"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_get_hits"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_get_misses"
+    value_threshold = 0
+  }
+
+metric {
+    name  = "ks_queue_contextual_match_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_contextual_match_bytes"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_contextual_match_total_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_contextual_match_logsize"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_contextual_match_expired_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_contextual_match_mem_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_contextual_match_mem_bytes"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_contextual_match_age"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_contextual_match_discarded"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_contextual_match_waiters"
+    value_threshold = 0
+  }
+metric {
+    name  = "ks_queue_landing_page_stats_views_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_stats_views_bytes"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_stats_views_total_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_stats_views_logsize"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_stats_views_expired_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_stats_views_mem_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_stats_views_mem_bytes"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_stats_views_age"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_stats_views_discarded"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_stats_views_waiters"
+    value_threshold = 0
+  }
+metric {
+    name  = "ks_queue_landing_page_views_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_views_bytes"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_views_total_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_views_logsize"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_views_expired_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_views_mem_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_views_mem_bytes"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_views_age"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_views_discarded"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_landing_page_views_waiters"
+    value_threshold = 0
+  }
+metric {
+    name  = "ks_queue_new_page_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_new_page_bytes"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_new_page_total_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_new_page_logsize"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_new_page_expired_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_new_page_mem_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_new_page_mem_bytes"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_new_page_age"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_new_page_discarded"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_new_page_waiters"
+    value_threshold = 0
+  }
+metric {
+    name  = "ks_queue_outgoing_click_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_outgoing_click_bytes"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_outgoing_click_total_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_outgoing_click_logsize"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_outgoing_click_expired_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_outgoing_click_mem_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_outgoing_click_mem_bytes"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_outgoing_click_age"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_outgoing_click_discarded"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_outgoing_click_waiters"
+    value_threshold = 0
+  }
+metric {
+    name  = "ks_queue_widget_stats_views_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_stats_views_bytes"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_stats_views_total_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_stats_views_logsize"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_stats_views_expired_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_stats_views_mem_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_stats_views_mem_bytes"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_stats_views_age"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_stats_views_discarded"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_stats_views_waiters"
+    value_threshold = 0
+  }
+metric {
+    name  = "ks_queue_widget_views_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_views_bytes"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_views_total_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_views_logsize"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_views_expired_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_views_mem_items"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_views_mem_bytes"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_views_age"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_views_discarded"
+    value_threshold = 0
+  }
+  metric {
+    name  = "ks_queue_widget_views_waiters"
+    value_threshold = 0
+  }
+}

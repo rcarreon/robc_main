@@ -1,0 +1,27 @@
+# This file is managed by Puppet do not modify it from <%=fqdn %>
+
+
+<VirtualHost *:80>
+    ServerName stg.cms.springboardplatform.com
+    ServerAlias stg.cms.springboard.gorillanation.com
+    ServerAlias cms.springboardplatform.com
+    ServerAlias cms.springboard.gorillanation.com
+    ServerAlias cms.<%= silo %>.springboard.gorillanation.com
+    ServerAlias cms.lax.springboard.gorillanation.com
+    ServerAlias stg.cpv.springboardvideo.com
+
+    Redirect permanent /users http://stg.publishers.springboardplatform.com/users
+
+    # Cake sends cookie but they are not needed here (only on publishers.SB.GN)
+    Header unset Set-Cookie
+
+    DocumentRoot /app/shared/docroots/cms.springboardplatform.com/current/webroot/
+    <Directory /app/shared/docroots/cms.springboardplatform.com/current/webroot/ >
+        AllowOverride All
+        Order allow,deny
+        allow from all
+    </Directory>
+    <%=logging ? '' : '#'%>ErrorLog /app/log/stg.cms.springboard_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/stg.cms.springboard_access.log combined
+
+</VirtualHost>

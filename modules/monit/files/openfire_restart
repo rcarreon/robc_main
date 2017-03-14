@@ -1,0 +1,8 @@
+#!/bin/sh
+
+# $Id$
+# $URL$
+
+/bin/ps -elf | /bin/grep java | /bin/grep -v grep && /usr/bin/pkill -9 java;
+/usr/bin/test -f/var/run/openfire.pid && /bin/rm -f /var/run/openfire.pid;
+/sbin/service openfire start;

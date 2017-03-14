@@ -1,0 +1,16 @@
+# This file is managed by Puppet do not modify it from <%=fqdn %>
+#
+<VirtualHost *:80>
+  DocumentRoot /app/shared/docroots/<%= name %>
+  ServerName <%= name %>
+
+  ServerAlias *.<%= name %>
+  <%=logging ? '' : '#'%>ErrorLog /app/log/<%= name %>-error.log
+  <%=logging ? '' : '#'%>CustomLog /app/log/<%= name %>-access.log combined-xff
+
+  <Directory /app/shared/docroots/<%= name %>>
+      AllowOverride All
+      Options Indexes MultiViews FollowSymLinks
+  </Directory>
+
+</VirtualHost>

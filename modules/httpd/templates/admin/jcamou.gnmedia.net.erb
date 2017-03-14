@@ -1,0 +1,22 @@
+# $Id$
+<VirtualHost *:80>
+    ServerName      jcamou.gnmedia.net
+    ServerAlias     *.jcamou.gnmedia.net
+    DocumentRoot    /app/shared/htdocs/jcamou.gnmedia.net
+    <%=logging ? '' : '#'%>ErrorLog        /app/log/jcamou.gnmedia.net_error.log
+    <%=logging ? '' : '#'%>CustomLog       /app/log/jcamou.gnmedia.net_access.log   combined
+
+    <Directory "/app/shared/htdocs/jcamou.gnmedia.net">
+        Options Indexes FollowSymlinks
+        AllowOverride None
+        Order   allow,deny
+        Allow from all
+    </Directory>
+
+    Alias /cgi-bin /app/shared/htdocs/jcamou.gnmedia.net/cgi-bin
+    <Directory "/app/shared/htdocs/jcamou.gnmedia.net/cgi-bin">
+        Options +ExecCGI
+        AddHandler cgi-script .cgi .pl
+    </Directory>
+
+</VirtualHost>

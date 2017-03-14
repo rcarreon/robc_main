@@ -1,0 +1,42 @@
+#This file is managed by Puppet do not modify it from <%=fqdn %>
+
+<VirtualHost *:80>
+        #ServerAdmin engineering@martini-corp.com
+
+	ServerName	martinitools.evolvemediallc.com
+	ServerAlias	mstr.evolvemediallc.com
+	ServerAlias     martini-test.gnmedia.net
+	ServerAlias     *.martini-test.gnmedia.net
+        DocumentRoot /app/shared/docroot
+        RewriteEngine On
+#        RewriteCond %{HTTP:X-Forwarded-Proto} !https
+#        RewriteRule ^ https://%{SERVER_NAME}%{REQUEST_URI} [L,R]
+
+        <Directory />
+                Options FollowSymLinks
+                AllowOverride All
+        </Directory>
+#        <Directory /app/www/>
+#                Options FollowSymLinks MultiViews ExecCGI
+#                AllowOverride All
+#                AddHandler cgi-script .cgi .py
+#                Order allow,deny
+#                #Order deny,allow
+#                #allow from 127.0.0.1
+#                allow from all
+#        </Directory>
+
+        <Directory /app/shared/docroot/>
+                Options FollowSymLinks MultiViews ExecCGI
+                AllowOverride All
+                AddHandler cgi-script .cgi .py
+                Order allow,deny
+                #Order deny,allow
+                #allow from 127.0.0.1
+                allow from all
+        </Directory>
+
+        <%=logging ? '' : '#'%>ErrorLog /app/log/martinitools.evolvemediallc.com-error.log
+        <%=logging ? '' : '#'%>CustomLog /app/log/martinitools.evolvemediallc.com-access.log combined
+
+</VirtualHost>

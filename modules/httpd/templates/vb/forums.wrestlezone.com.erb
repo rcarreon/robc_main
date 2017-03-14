@@ -1,0 +1,34 @@
+  <%
+           host,project,environment,location,domain,tld = fqdn.split('.')
+  %>
+
+<%
+case environment
+  when "prd"
+    env_hostname = name
+    env_docroot = "/app/shared/forums.wrestlezone.com"
+  when "stg"
+    env_hostname = "stg." + name
+    env_docroot = "/app/shared/vb_wz/current"
+  when "dev"
+    env_hostname = "dev." + name
+    env_docroot = "/app/shared/vb_wz/current"
+        case host
+          when /uid/
+            env_hostname = "sbx." + name
+            env_docroot = "/app/shared/vb_wz/current"
+        end
+end
+%>
+
+<VirtualHost *:80>
+    DocumentRoot <%= env_docroot %>
+    ServerName forums.wrestlezone.com
+    ServerAlias *.forums.wrestlezone.com
+    ServerAlias <%= env_hostname %>
+
+    <%=logging ? '' : '#'%>CustomLog /app/log/<%= env_hostname %>-access_log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/<%= env_hostname %>-error_log
+
+</VirtualHost>
+

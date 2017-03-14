@@ -1,0 +1,20 @@
+# This file is managed by Puppet do not modify it from <%=fqdn %>
+#
+<VirtualHost *:80>
+  DocumentRoot /app/shared/docroots/securecms.springboardplatform.com
+  ServerName securecms.springboardplatform.com
+
+  ServerAlias *.securecms.springboardplatform.com
+  <%=logging ? '' : '#'%>ErrorLog /app/log/securecms.springboardplatform.com-error.log
+  <%=logging ? '' : '#'%>CustomLog /app/log/securecms.springboardplatform.com-access.log combined-xff
+
+  <Directory /app/shared/docroots/securecms.springboardplatform.com>
+      AllowOverride All
+      Options Indexes MultiViews FollowSymLinks
+      RewriteEngine On
+      RewriteRule "^embed_api/json/sidh106/sidh106_1556925_api/video/1556925/515/3/$" "/sidh106_1556925_api.json"
+      RewriteRule "^embed_api/json/sidh106/sidh106_1556923_api/video/1556923/515/3/$" "/sidh106_1556923_api.json"
+      RewriteRule "^embed_api/json/sidh101/sidh101_api/video/1550429/515/10/$" "/sidh101.json"
+  </Directory>
+
+</VirtualHost>

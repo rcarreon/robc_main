@@ -1,0 +1,85 @@
+# Managed by puppet
+
+# $Id$
+#
+##
+##  http://inventory.gnmedia.net/Admin/CustomFields/Modify.html?id=61
+##
+##
+define hostgroup{
+    hostgroup_name      network
+}
+
+# Generate with
+# grep hostgroup_name templates/hostgroups.cfg.erb | egrep -v 'network|serversi|xen' | awk '{ print $2 }' | xargs -n 50 -I {}  echo -n ",{}" && echo
+#
+define hostgroup{
+    hostgroup_name      VMs
+    hostgroup_members   no-vertical-defined,AdPlatform,Springboard_Video,Atomic_Online,Atomic_Sites,Sales_Integration,Sheknows,TechPlatform,Crowd_Ignite,Origin
+}
+
+define hostgroup{
+    hostgroup_name      All-servers
+    alias               All Servers (Just VMs)
+    hostgroup_members   VMs
+}
+
+    
+##  
+define hostgroup{
+    hostgroup_name      METAL
+}
+##  
+define hostgroup{
+    hostgroup_name      no-vertical-defined
+}
+
+##  
+define hostgroup{
+    hostgroup_name      check_url
+}
+
+#
+#
+#
+#
+## http://inventory.gnmedia.net/Admin/CustomFields/Modify.html?id=61
+##
+define hostgroup{
+    hostgroup_name      AdPlatform
+}
+##  
+define hostgroup{
+    hostgroup_name      Springboard_Video
+}
+##  
+define hostgroup{
+    hostgroup_name      Atomic_Online
+}
+##  
+define hostgroup{
+    hostgroup_name      Atomic_Sites
+}
+##  
+define hostgroup{
+    hostgroup_name      Sales_Integration
+}
+##  
+define hostgroup{
+    hostgroup_name     Sheknows
+}
+
+##  
+define hostgroup{
+    hostgroup_name      TechPlatform
+}
+##  
+define hostgroup{
+    hostgroup_name      Crowd_Ignite
+}
+##  
+define hostgroup{
+    hostgroup_name      Origin
+}
+
+

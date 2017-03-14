@@ -1,0 +1,47 @@
+modules {
+    module{
+        name = "rrdcached"
+        language = "python"
+    }
+}
+
+collection_group {
+    collect_every = 10
+    time_threshold = 50
+    metric {
+        name = "QueueLength"
+        title = "Queue Length"
+    }
+    metric {
+        name = "UpdatesReceived"
+        title = "Updates Received"
+    }
+    metric {
+        name = "FlushesReceived"
+        title = "Flushes Received"
+    }
+    metric {
+        name = "UpdatesWritten"
+        title = "Updates Written"
+    }
+    metric {
+        name = "DataSetsWritten"
+        title = "DataSets Written"
+    }
+    metric {
+        name = "TreeNodesNumber"
+        title = "Tree Nodes Number"
+    }
+    metric {
+        name = "TreeDepth"
+        title = "Tree Depth"
+    }
+    metric {
+        name = "JournalBytes"
+        title = "Journal Bytes"
+    }
+    metric {
+        name = "JournalRotate"
+        title = "Journal Rotate"
+    }
+}

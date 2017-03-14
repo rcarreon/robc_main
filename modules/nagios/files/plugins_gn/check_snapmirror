@@ -1,0 +1,63 @@
+#!/usr/bin/perl
+
+use strict;
+
+my %ERRORS = (
+  OK => 0,
+  WARNING => 1,
+  CRITICAL => 2,
+  UNKNOWN => 3,
+  );
+
+my %snaps=();
+my $source;
+my $dest;
+my $lag;
+if (! open(RNETAPP,"rnetapp netapp2 snapmirror list -x|")) {
+    print "SNAPMIRROR UNKNOWN: failed to run rnetapp\n";
+    exit $ERRORS{UNKNOWN};
+}
+
+my $lines=0;
+while (my $line=<RNETAPP>) {
+    $lines++;
+    my @parts=split(/\s+/, $line);
+    if (scalar @parts == 2) {
+        $source=$parts[0];
+        $dest=$parts[1];
+    } elsif (scalar @parts == 6) {
+        $lag=$parts[5];
+        $snaps{$source}{$dest}=$lag;
+    }
+}
+close (RNETAPP);
+
+if ($lines < 5) {
+    print "SNAPMIRROR UNKNOWN: rnetapp didn't have enough output\n";
+    exit $ERRORS{UNKNOWN};
+}
+
+foreach my $source (sort keys %snaps) {
+    my $good=0;
+    foreach my $dest (sort keys %{$snaps{$source}}) {
+        my @parts=split(/:/, $snaps{$source}{$dest});
+        if ($parts[0] < 30) {
+            $good=1;
+        }
+    }
+    if (! $good) {
+        # See if the source has a snapshot policy
+        my ($vserver,$vol) = split(/:/,$source);
+        open(NETAPP,"rnetapp $vserver vol sspolicy $vol|");
+        my ($sspolicy)=<NETAPP>;
+        close(NETAPP);
+        chomp($sspolicy);
+        if ($sspolicy ne "none") {
+            print "SNAPMIRROR CRITICAL: $source is stuck (others may be broken too)\n";
+            exit $ERRORS{CRITICAL};
+        }
+    }
+}
+
+print "SNAPMIRROR OK: All volumes have a good destination\n";
+exit $ERRORS{OK}

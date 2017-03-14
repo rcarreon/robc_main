@@ -1,0 +1,45 @@
+# $Id$
+
+# QA vhost
+<VirtualHost *:80>
+    ServerName dev.gamerevolution.com
+    ServerAlias m-dev.gamerevolution.com
+    <%=logging ? '' : '#'%>ErrorLog /app/log/dev.gamerevolution.com-error_log
+    <%=logging ? '' : '#'%>CustomLog /app/log/dev.gamerevolution.com-access_log combined
+
+    DocumentRoot /app/shared/docroots/dev.gamerevolution.com/htdocs
+    ErrorDocument 404 /missing2.php
+    DirectoryIndex index.htm index.php
+    AddType application/x-httpd-php .html
+    AddType application/x-httpd-php .htm
+
+    <Directory /app/shared/docroots/dev.gamerevolution.com/htdocs>
+        AllowOverride All
+    </Directory>
+</VirtualHost>
+
+# QA - Editor only vhost
+<VirtualHost *:80>
+    ServerName admin-dev.gamerevolution.com
+    <%=logging ? '' : '#'%>ErrorLog /app/log/admin-dev.gamerevolution.com-error_log
+    <%=logging ? '' : '#'%>CustomLog /app/log/admin-dev.gamerevolution.com-access_log combined
+
+    DocumentRoot /app/shared/docroots/dev.gamerevolution.com/htdocs
+    ErrorDocument 404 /missing2.php
+    DirectoryIndex index.htm index.php
+    AddType application/x-httpd-php .html
+    AddType application/x-httpd-php .htm
+
+#    <Directory /app/shared/docroots/dev.gamerevolution.com/htdocs>
+#        AllowOverride All
+#        AuthName "Restricted Area Dev"
+#        AuthType Basic
+#        AuthUserFile /app/shared/docroots/dev.gamerevolution.com/htdocs/.htpasswd
+#        require valid-user
+#    </Directory>
+
+    <Directory /app/shared/docroots/dev.gamerevolution.com/htdocs>
+        AllowOverride All
+    </Directory>
+</VirtualHost>
+

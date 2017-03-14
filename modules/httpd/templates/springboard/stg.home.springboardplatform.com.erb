@@ -1,0 +1,67 @@
+# This file is managed by Puppet do not modify it from <%=fqdn %>
+# $Id
+# $Revision
+
+<VirtualHost *:80>
+	ServerName stg.home.springboardplatform.com
+	ServerAlias home.springboardplatform.com
+
+	DocumentRoot /app/shared/docroots/stg.home.springboardplatform.com/current/webroot
+	<Directory /app/shared/docroots/stg.home.springboardplatform.com/current/webroot>
+		RewriteEngine On
+		RewriteBase /
+
+                #-----------------------------------------
+                # Rules to hide default login file
+                #-----------------------------------------
+                RewriteRule ^logout wp-login.php?action=logout&_wpnonce=db5d6787fc&hide_out_key=fkYQSe [L]
+                RewriteRule ^sbvlogin wp-login.php?hide_in_key=OOJ0aAa&redirect_to=wp-admin [R,L]
+                RewriteRule ^admin wp-admin/?hide_admin_key=ftZdA [R,L]
+
+                RewriteCond %{HTTP_REFERER} !/wp-admin
+                RewriteCond %{HTTP_REFERER} !/wp-login\.php
+                RewriteCond %{HTTP_REFERER} !/sbvlogin
+                RewriteCond %{HTTP_REFERER} !/admin
+
+                RewriteCond %{QUERY_STRING} !^hide_in_key=OOJ0aAa
+                RewriteCond %{QUERY_STRING} !^hide_out_key=fkYQSe
+                RewriteCond %{QUERY_STRING} !^hide_reg_key=AYYDp0u0
+                RewriteCond %{QUERY_STRING} !^hide_admin_key=ftZdA
+
+                RewriteRule ^wp-login\.php /index.php [L]
+                RewriteCond %{QUERY_STRING} ^loggedout=true
+                RewriteRule ^wp-login\.php /index.php [L]
+
+		#                                         #
+		# Standard WP Rewrite rules for SEO links #
+		#                                         #
+		RewriteCond %{REQUEST_FILENAME} !-f
+		RewriteCond %{REQUEST_FILENAME} !-d
+		RewriteRule . /index.php [L]
+		RewriteRule ^index\.php$ - [L]
+	</Directory>
+
+        <Directory /app/shared/docroots/stg.home.springboardplatform.com/current/webroot/wp-content/backups>
+                RewriteEngine On
+                RewriteBase /
+                RewriteCond %{QUERY_STRING} !key=04e87e6a2ca930110703e11c5e8abd80
+                RewriteRule (.*) - [F]
+        </Directory>
+
+        <Directory /app/shared/docroots/stg.home.springboardplatform.com/current/webroot/wp-content/plugins/si-contact-form/captcha/list>
+                deny from all
+        </Directory>
+
+        <Directory /app/shared/docroots/stg.home.springboardplatform.com/current/webroot/wp-content/plugins/si-contact-form/captcha/temp>
+                deny from all
+        </Directory>
+
+	AliasMatch ^/uploads/(.*) /app/ugc/wp/uploads/$1
+	RedirectMatch 404 ^/(assets|images)/.*\.php(/|$)
+
+	# Using svn up to deploy code, but we don't want people to see .svn folders
+	RedirectMatch 404 /\\.svn(/|$)
+
+	<%=logging ? '' : '#'%>ErrorLog /app/log/stg.home.springboardplatform.com-error_log
+	<%=logging ? '' : '#'%>CustomLog /app/log/stg.home.springboardplatform.com-access_log combined
+</VirtualHost>

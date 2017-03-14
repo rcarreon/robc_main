@@ -1,0 +1,15 @@
+
+<VirtualHost *:80>
+    ServerName wholesomebabyfood.momtastic.com
+    ServerAlias origin.wholesomebabyfood.momtastic.com prd.wholesomebabyfood.momtastic.com www.wholesomebabyfood.momtastic.com
+    DocumentRoot /app/shared/docroot/
+
+        <Directory /app/shared/docroot/>
+                Options Indexes FollowSymLinks
+                Order allow,deny
+                Allow from all
+        </Directory>
+
+    <%=logging ? '' : '#'%>ErrorLog  /app/log/wholesomebabyfood.momtastic.com-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/wholesomebabyfood.momtastic.com-access.log combined
+</VirtualHost>

@@ -1,0 +1,59 @@
+<VirtualHost *:80>
+    ServerName www.crowdignite.com
+    ServerAlias *.raaze.com 
+    DocumentRoot /app/shared/public_html/app/webroot
+
+    RewriteEngine ON
+    RewriteRule ^(.*)$ http://crowdignite.com/$1 [R=301,L]
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName crowd-ignite.totallyher.com
+    ServerAlias thecelebritycafe.crowdignite.com
+    DocumentRoot /app/shared/public_html/app/webroot
+
+    RewriteEngine ON
+    RewriteRule ^(.*)$ http://crowdignite.totallyher.com/$1 [R=301,L]
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName crowdignite.liveoutdoors.com
+    ServerAlias crowdignite.globetrottingonline.com
+    DocumentRoot /app/shared/public_html/app/webroot
+
+    RewriteEngine ON
+    RewriteRule ^(.*)$ http://crowdignite.craveonline.com/$1 [R=301,L]
+</VirtualHost>
+
+
+
+<VirtualHost *:80>
+    ServerName crowdignite.com
+    ServerAlias origin.crowdignite.com cdn.crowdignite.com cdn1.crowdignite.com cdn2.crowdignite.com cdn3.crowdignite.com cdn4.crowdignite.com crowdignite.gamerevolution.com es.crowdignite.craveonline.com news.crowdignite.craveonline.com crowdignite.craveonline.com crowdignite.momtastic.com crowdignite.thefashionspot.com test-ci-apache.gnmedia.net crowdignite.gnmedia.net crowdignite.teenspot.com crowdignite.totallyher.com thebusinessexchange.entrepreneur.com es.crowdignite.totallyher.com thebusinesscontentexchange.entrepreneur.com
+
+    # https://bugs.php.net/bug.php?id=59692 imagick and libgomp are incompatiable
+    # so we force imagick to stick to one thread
+    SetEnv MAGICK_THREAD_LIMIT 1
+
+    DocumentRoot /app/shared/public_html/app/webroot
+    <%=logging ? '' : '#'%>CustomLog /app/log/crowdignite.com-access_log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/crowdignite.com-error_log
+
+    <Directory "/app/shared/public_html/app/webroot">
+         php_admin_value open_basedir /app/shared:/app/tmp:/app/log/cakephp:/var/www/tmp:/app/shared/public_html/app/webroot/img/upload:/app/shared/public_html/app/tmp:/dev/shm/logs:/var/vw-log-ramdisk
+        Options -Indexes +FollowSymLinks -ExecCGI 
+
+        RewriteEngine On
+
+        RewriteBase /
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f 
+        RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+                
+        <Files sitemap.xml>
+            RewriteEngine Off
+        </Files>
+    </Directory>
+
+</VirtualHost>
+

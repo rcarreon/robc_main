@@ -1,0 +1,19 @@
+#!/bin/bash
+
+# make everyone's homedirs from /etc/skel
+
+if ! mount | grep -q /home ;then
+   # /home must be mounted
+   exit 0
+fi
+
+ldapsearch -LLL -x -b 'ou=People,dc=gnmedia,dc=net' '(&(uidNumber=*)(gidNumber=*)(homeDirectory=/home/*))' uidNumber gidNumber homeDirectory | \
+   egrep '^uidNumber|^gidNumber|^homeDirectory' | \
+   xargs -n 6 echo | \
+   while read foo uid foo gid foo homedir;do
+      test -d $homedir && continue;
+      echo "Creating $homedir"
+      cp -rvp /etc/skel $homedir
+      chown -v -R $uid:$gid $homedir
+   done
+

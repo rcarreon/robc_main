@@ -1,0 +1,23 @@
+# This file is managed by Puppet do not modify it from <%=fqdn %>
+#
+<VirtualHost *:80>
+  DocumentRoot /app/shared/docroots/<%= name %>
+  ServerName <%= name %>
+
+  ServerAlias *.<%= name %>
+  <%=logging ? '' : '#'%>ErrorLog /app/log/<%= name %>-error.log
+  <%=logging ? '' : '#'%>CustomLog /app/log/<%= name %>-access.log combined-xff
+
+  <Directory /app/shared/docroots/<%= name %>>
+      AllowOverride All
+      Options Indexes MultiViews FollowSymLinks
+      <filesMatch "\.(cur|gif|ico|jpe?g|png)$">
+        Header set Access-Control-Allow-Origin "*"
+        Header set Access-Control-Allow-Headers "Range"
+        Header set Access-Control-Expose-Headers "Accept-Ranges, Content-Range, Content-Encoding, Age, Date"
+        Header set Accept-Ranges "bytes"
+      </FilesMatch>
+
+  </Directory>
+
+</VirtualHost>

@@ -1,0 +1,13 @@
+    RewriteEngine On
+    # playstationlifestyle.net --> www.playstationlifestyle.net
+    RewriteCond %{HTTP_HOST} ^playstationlifestyle\.net$ [NC]
+    RewriteRule ^/(.*) http://www.playstationlifestyle.net/$1 [R=301,L]
+
+    # playstationlifestyle.com --> www.playstationlifestyle.net
+    RewriteCond %{HTTP_HOST} ^playstationlifestyle\.com$ [NC]
+    RewriteRule ^/(.*) http://www.playstationlifestyle.net/$1 [R=301,L]
+
+    # point ugc calls to proper location
+    RewriteRule ^/wp-content/uploads/(.*)$ /assets/uploads/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

@@ -1,0 +1,550 @@
+# ACL for svn.gnmedia.net
+
+[actiontrip.com:/]
+@internal = rw
+@pc-springboard = rw
+mgeraldez = r
+
+[actiontrip.com:/trunk/Capfile]
+@internal = r
+@configuration_management = rw
+
+[actiontrip.com:/trunk/config]
+@internal = r
+@configuration_management = rw
+
+[admin.iconator.com:/]
+@internal = rw
+@pc-springboard = rw
+
+
+
+
+[admin.sherdog.com:/]
+@internal = rw
+@pc-springboard = rw
+@hmo = rw
+
+[sherdog.com:/]
+@internal = rw
+@hmo = rw
+
+[admin.thefashionspot.com:/]
+@internal = rw
+
+
+[analytics.atomiconline.com:/]
+@internal = rw
+
+
+[analytics.gorillanation.com:/]
+@internal = rw
+
+
+
+[Atomic:/]
+@internal = rw
+
+
+[AtomicCMS:/]
+@internal = rw
+
+[AtomicCMS:/js]
+@internal = r
+
+[AtomicCMS:/trunk]
+@internal = r
+
+[AtomicCMS:/branches/analytics_script]
+@internal = r
+
+[AtomicCMS:/branches/yourls]
+@internal = r
+
+[atomiconline.com:/]
+@internal = rw
+
+
+[Atomic-Search:/]
+@internal = rw
+
+
+
+[changelog_manager:/]
+@internal = rw
+
+
+[puppet:/]
+#@system_administrators = r
+#@configuration_management = r
+#@database_administrators = r
+#@internal = r
+#@noc = r
+#@product_champions = r
+# One off for Justin till SK is migrated out of our DC
+#jrainbow = r
+
+[puppet:/templates/auth/access.conf.erb]
+#@noc = r
+
+[puppet:/modules/trunk/nagios/files/external/.htpasswd]
+#@noc = r
+
+#temp puppet module for testing move to git
+[temp:/]
+@configuration_management = rw
+
+
+[configmgmt:/]
+@system_administrators = r
+@configuration_management = r
+
+
+[crave:/]
+@internal = rw
+@pc-springboard = rw
+
+
+[craveonline.com:/]
+@internal = rw
+@pc-springboard = rw
+
+
+[dj_mediaproofs:/]
+@internal = rw
+
+
+[_docs:/]
+@internal = rw
+
+
+[dollwizard.com:/]
+@internal = rw
+@pc-springboard = rw
+
+
+[dvdfile.com:/]
+@internal = rw
+
+
+[evolvemediacorp.com:/]
+@sales_integration = rw
+@configuration_management = rw
+@system_administrators = rw
+
+
+
+[fantasymma.sherdog.com:/]
+@internal = rw
+
+
+[flash:/]
+@internal = rw
+
+[Front-End-scripts:/]
+@internal = rw
+@hmo = rw
+
+[forums.wrestlezone.com:/]
+@internal = rw
+
+[gamerevolution.com:/]
+@internal = rw
+@pc-springboard = rw
+mgeraldez = r
+
+[gnm_django:/]
+@internal = rw
+
+[hfboards.com:/]
+@internal = rw
+
+[hockeysfuture.com:/]
+@internal = rw
+@pc-springboard = rw
+@hmo = rw
+
+
+[hoopsvibe.com:/]
+@internal = r
+
+
+[iconator.com:/]
+@internal = rw
+@pc-springboard = rw
+
+
+[idontlikeyouinthatway.com:/]
+jcortes = rw
+@internal = rw
+@pc-springboard = rw
+
+
+[joomlaplatform:/]
+@internal = rw
+
+[joomlaplatform:/trunk/config]
+@configuration_management = rw
+@developers = r
+ 
+[joomlaplatform:/trunk/Capfile]
+@configuration_management = rw
+@developers = r
+
+[wordpress_pb:/]
+@internal = rw
+
+[mostcraved:/]
+@internal = rw
+
+[wordpress_pb_beta:/]
+@internal = rw
+
+[phpbb_pb:/]
+@internal = rw
+
+[vb5_pb:/]
+@internal = rw
+
+[plugins:/]
+@internal = rw
+
+[tech.gorillanation.com:/]
+@sales_integration = rw
+@configuration_management = rw
+@system_administrators = rw
+
+[tech.gorillanation.com:/trunk/config]
+@configuration_management = rw
+@developers = r
+
+[tech.gorillanation.com:/trunk/Capfile]
+@configuration_management = rw
+@developers = r
+
+### BEGIN Crowd Ignite Repositories ###
+
+[tewn:/]
+@tewn = rw
+@configuration_management = rw
+@internal = r
+
+[crowdignite-marcom:/]
+@tewn = r
+@configuration_management = r
+@internal = r
+
+[crowdignite-widget:/]
+@tewn = rw
+@configuration_management = rw
+@internal = r
+
+### END Crowd Ignite ###
+
+[sites-springboard:/]
+@internal = rw
+
+[mp3masher.com:/]
+@internal = rw
+
+[myanimelist.net:/]
+@internal = rw
+@pc-springboard = rw
+@hmo = rw
+@mal = rw
+mgeraldez = r
+ssekiguchi = r
+jsharps = r
+gsato = r
+yhata = r
+ytakahashi = r
+
+
+[myanimelist.net:/trunk/db]
+@database_administrators = rw
+ssekiguchi = r
+jsharps = r
+gsato = r
+yhata = r
+ytakahashi = r
+
+
+### BEGIN Ad Platform Repositories ###
+[dartapi:/]
+@ad_platform = r
+@configuration_management = r
+@system_administrators = r
+
+[gpsoap:/]
+@ad_platform = r
+@configuration_management = r
+@system_administrators = r
+
+[adops3:/]
+@ad_platform = r
+@configuration_management = r
+@system_administrators = r
+@database_administrators = r
+sdejean = r
+ookafor = r
+
+[adops3:/trunk/app_dfp_scheduler/Lib]
+@adops3_ro_svn = r
+
+[newadops:/]
+@ad_platform = r
+@configuration_management = r
+@system_administrators = r
+sdejean = r
+
+[reports:/]
+@ad_platform = r
+@configuration_management = r
+@system_administrators = r
+
+[siteanalytics:/]
+@ad_platform = r
+@configuration_management = r
+@system_administrators = r
+
+[ap_adops_gem_demo:/]
+@ad_platform = r
+@configuration_management = r
+@system_administrators = r
+
+[ap_adops_api:/]
+@ad_platform = r
+@configuration_management = r
+@system_administrators = r
+
+[ap_dfp_coordinator:/]
+@ad_platform = r
+@configuration_management = r
+@system_administrators = r
+
+[triggertag:/]
+@ad_platform = r
+@configuration_management = r
+
+### END Ad Platform ###
+
+
+
+[originalicons_cake:/]
+@internal = rw
+
+
+[originalicons.com:/]
+@internal = rw
+
+
+[pitnb_contest:/]
+@internal = rw
+
+
+[QA:/]
+@internal = rw
+
+
+[quickticket:/]
+@internal = rw
+
+
+[related_content_engine:/]
+@internal = rw
+
+
+[sales_integration:/]
+@configuration_management = rw
+@system_administrators = rw
+@internal = rw
+
+[sales_integration:/trunk/origin.evolvemediallc.com]
+@internal = r
+
+[sandbox:/]
+@internal = rw 
+
+
+[satanspace.com:/]
+@internal = rw
+@pc-springboard = rw
+
+
+[sherdog.net:/]
+@internal = rw
+@hmo = rw
+
+
+[si.ao:/]
+@sales_integration = r
+@configuration_management = rw
+@system_administrators = rw
+
+
+[si.gn:/]
+@sales_integration = r
+@configuration_management = rw
+@system_administrators = rw
+
+
+
+[si.gni:/]
+@sales_integration = r
+@configuration_management = rw
+@system_administrators = rw
+
+
+[si.lib:/]
+@sales_integration = r
+@configuration_management = rw
+@system_administrators = rw
+
+
+
+[si.assetmanager:/]
+@configuration_management = rw
+@system_administrators = rw
+
+
+[SiteBuilder:/]
+@internal = rw
+
+
+[sphinx_vbulletin:/]
+@internal = rw
+
+
+[springboard:/]
+@internal = rw
+@pc-springboard = r
+
+
+[streetballtalk.com:/]
+@internal = rw
+
+
+[surveys:/]
+@internal = rw
+
+
+### BEGIN System Administrator Repositories ###
+[deploytools:/]
+@system_administrators = rw
+@configuration_management = rw
+@database_administrators = rw
+@developers = r
+@product_champions = r
+@noc = rw
+
+[domains_mngt:/]
+@system_administrators = rw
+@configuration_management = rw
+@developers = r
+@product_champions = r
+
+[dbas:/]
+@system_administrators = r
+@configuration_management = r
+@product_champions = r
+@database_administrators = r
+
+[vaquita-backup:/]
+@system_administrators = rw
+@configuration_management = rw
+@database_administrators = rw
+
+[vaquita-partman:/]
+@system_administrators = rw
+@configuration_management = rw
+@database_administrators = rw
+
+[uptime:/]
+@system_administrators = rw
+@configuration_management = rw
+@database_administrators = rw
+
+[sysadmins:/]
+@system_administrators = rw
+@configuration_management = rw
+@developers = r
+@product_champions = r
+@database_administrators = r
+@noc = r
+
+[sysadmins:/trunk/network/configs]
+@corpnet = rw
+
+### END System Administrator ###
+
+[thefashionspot.com:/]
+@internal = rw
+
+[themeps3.com:/]
+@internal = rw
+@pc-springboard = rw
+
+[themepsp.com:/]
+@internal = rw
+@pc-springboard = rw
+
+[themewii.com:/]
+@internal = rw
+@pc-springboard = rw
+
+[themexbox360.com:/]
+@internal = rw
+@pc-springboard = rw
+
+[ugc:/]
+@internal = rw
+
+[www.spikedhumor.com:/]
+@internal = rw
+
+[www.wrestlezone.com:/]
+@internal = rw
+
+[sitehealth:/]
+@internal = rw
+
+[sitehealth:/trunk/pebblebed/Capfile]
+@internal = r
+@configuration_management = rw
+
+[sitehealth:/trunk/pebblebed/config]
+@internal = r
+@configuration_management = rw
+
+[lovingyou.com:/]
+@internal = rw
+
+[noc:/]
+@internal = rw
+@noc = rw
+
+[xcat:/]
+@system_administrators = rw
+@configuration_management = rw
+
+[clickheat.gnmedia.net:/]
+@internal = rw
+
+[vb-sites:/]
+@system_administrators = rw
+@configuration_management = rw
+
+### For testing svn with phabricator
+[phabtest:/]
+@internal = r
+@system_administrators = rw
+@configuration_management = rw
+
+[wholesomebabyfood.momtastic.com:/]
+@internal = rw
+
+[forums.playstationlifestyle.net:/]
+@internal = rw
+
+[ttg:/]
+@ttg = rw

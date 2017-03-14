@@ -1,0 +1,13 @@
+    RewriteEngine On
+
+	ServerAlias adopt.dogtime.com
+
+    # www.dogtime.com --> dogtime.com
+    RewriteCond %{HTTP_HOST} ^www\.dogtime\.com$ [NC]
+    RewriteRule ^/(.*) http://dogtime.com/$1 [R=301,L]
+	#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]
+
+    # adopt.dogtime.com --> dogtime.com/adopt
+    RewriteCond %{HTTP_HOST} ^adopt\.dogtime\.com$ [NC]
+    RewriteRule ^/(.*) http://dogtime.com/adopt [R=301,L]

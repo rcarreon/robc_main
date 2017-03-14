@@ -1,0 +1,1058 @@
+#!/usr/bin/perl
+
+my $DEFACEHOST="GN1.ace1.core1.gnmedia.net";
+my $REMOVEDOMAIN='.gnmedia.net';
+
+my @ADMINACES=qw/admin.ace1.core1.gnmedia.net admin.ace1.core2.gnmedia.net admin.ace1.lax1.gnmedia.net admin.ace1.lax2.gnmedia.net/;
+use strict;
+
+use XML::Simple;
+use IO::File;
+use Data::Dumper;
+use Socket;
+use File::Basename;
+use POSIX;
+use Config::General;
+use Sys::Syslog;
+
+my $myname=basename $0;
+
+openlog( "aceman", "ndelay,pid", "local0" );
+syslog "notice",
+   "@ARGV by user " . ( exists $ENV{SUDO_USER} ? $ENV{SUDO_USER} . " (sudo)" :
+                                 exists $ENV{USER} ? $ENV{USER} : $< );
+closelog;
+
+sub usage() {
+   print <<"__EOF__";
+Usage: $myname [-c context] (default: $DEFACEHOST) COMMAND OPTIONS...
+Commands: rserver [<rsname> [showrun|add|remove|in|out|search]]
+          sfarm   [<sfname>] [showrun|add|remove|clear]
+          sfarm   [<sfname>] [no] desc|pred|probe|modify <config>
+          sfarm   [<sfname>] <rsname[:port]>|all add|remove|in|out
+          sfarm   [<sfname>] <rsname[:port]>|all [no connlimit|connlimit <max> <min>]
+          show    <acecommands> (run|rserver|serverfarm|service-policy|etc.)
+          showftsync
+          showsfarmstate
+          showconninfo [<sfname>|alert <percent alert>]
+          conf    <acecommands>
+          raw [xml] <acecommands>
+
+The first arg can be '-c' to change the context.  The default
+context is $DEFACEHOST.  Try "-c list" to list contexts.
+
+The run config of any policy can be viewed with 'aceman show run policy CLASSNAME'
+
+__EOF__
+   exit(EXIT_FAILURE);
+}
+
+my %Uconfig;
+my %config;
+
+if (-r "/etc/acemanrc") {
+   my $conf = new Config::General("/etc/acemanrc");
+   %config = $conf->getall;
+}
+if(-r "$ENV{HOME}/.acemanrc") {
+   my $conf = new Config::General("$ENV{HOME}/.acemanrc");
+   %Uconfig = $conf->getall;
+}
+foreach my $key (keys %Uconfig) {
+   $config{$key}=$Uconfig{$key};
+}
+
+
+
+my $ACEHOST;
+if ($ARGV[0] eq "-c") {
+   shift;
+   $ACEHOST=shift;
+   $ACEHOST=~s/@/.ace1./;
+} else {
+   $ACEHOST=$DEFACEHOST;
+}
+
+
+my $USERNAME=$ENV{"ACEMAN_USERNAME"} ? $ENV{"ACEMAN_USERNAME"} :
+      $config{$ACEHOST}{"username"} ? $config{$ACEHOST}{"username"} :
+      $config{"username"} ? $config{"username"} : $ENV{"USER"};
+my $PASSWORD=$ENV{"ACEMAN_PASSWORD"} ? $ENV{"ACEMAN_PASSWORD"} :
+      $config{$ACEHOST}{"password"} ? $config{$ACEHOST}{"password"} :
+      $config{"password"} ? $config{"password"} : "";
+
+if ($ACEHOST eq "list") {
+
+   my %aces=();
+   my $ncontexts=0;
+   foreach my $adminace (@ADMINACES) {
+      $ncontexts=0;
+      $ACEHOST=$adminace;
+      my $ref=rubsoap("show context");
+      $adminace=~s/^admin.ace1.//;
+      $adminace=~s/$REMOVEDOMAIN//;
+      foreach my $execcmd ( @{$ref->{exec_command}} ) {
+         if ($execcmd->{status}->{code} == 100) {
+            if (exists $execcmd->{xml_show_result}->{xml_show_context}->{ctx_contexts}->{ctx_context}) {
+                my $foo=$execcmd->{xml_show_result}->{xml_show_context}->{ctx_contexts}->{ctx_context};
+                foreach my $context (keys %{$foo}) {
+                   $ncontexts++;
+                   $context=~s/_//;
+                   if (inet_aton("$context.ace1.$adminace.gnmedia.net")) {
+                      push(@{$aces{$adminace}},$context);
+                   }
+                }
+             }
+          }
+       }
+   }
+
+   foreach my $b (0..$ncontexts) {
+      foreach my $a (sort keys %aces) {
+         printf"%18s ",$aces{$a}->[$b] ? $aces{$a}->[$b]."\@$a" : "";
+      }
+      print "\n";
+   }
+   exit 1;
+}
+  #my $columns=`eval \$(resize | grep COLUMNS); echo \$COLUMNS`;
+  #chomp $columns;
+  #my $maxlength=0;
+  #map { ($maxlength < length $_) && ($maxlength=2 + length $_ ) } @aces;
+  #my $ncols=int ($columns/$maxlength);
+  #my $colsize=int ($columns/$ncols);
+  #my $nrows=int (scalar @aces/$ncols)+1;
+  #my $output;
+  #my $row=0;
+  #my $col=0;
+  #for (my $ace=0; $ace<=scalar @aces;) {
+      #foreach my $col (0..($ncols-1)) {
+         #printf "%-${maxlength}s", $aces[$col*$nrows + $row];
+         #$ace++;
+      #}
+      #print "\n";
+      #$row++;
+  #}
+   #exit 1;
+#}
+
+
+
+my $command;
+if ($myname eq "aceman") {
+    $command=shift @ARGV;
+} else {
+    $command=$myname;
+}
+
+#rserver support is quite limited. They all look alike. No exceptions!
+if ($command eq "rserver") {
+   my $rserver=host2rserver(shift);
+   my $subcommand=shift;
+   if (!$rserver or !$subcommand) {
+      rserverlist($rserver) or exit (EXIT_FAILURE);
+   } else {
+       if ($subcommand eq "showrun") {
+          rservershowrun($rserver) or exit(EXIT_FAILURE);
+       } elsif ($subcommand eq "add") {
+          rserveradd($rserver) or exit(EXIT_FAILURE);
+       } elsif ($subcommand eq "remove") {
+          rserverremove($rserver) or exit(EXIT_FAILURE);
+       } elsif ($subcommand eq "in") {
+          rserverinservice($rserver) or exit(EXIT_FAILURE);
+       } elsif ($subcommand eq "out") {
+          rserveroutservice($rserver) or exit(EXIT_FAILURE);
+       } elsif ($subcommand eq "search") {
+          rserversearch($rserver) or exit(EXIT_FAILURE);
+       } else {
+          usage();
+       }
+   }
+} elsif ($command eq "serverfarm" or $command eq "sfarm" or $command eq "farm") {
+#serverfarm support is more extensive. They all look *mostly* alike. Exceptions allowed!
+   my $sfarm=host2rserver(shift);
+   my $subcommand=shift;
+   if (!$sfarm or !$subcommand) {
+      sfarmlist($sfarm) or exit (EXIT_FAILURE);
+   } else {
+       if ($subcommand eq "showrun") {
+          sfarmshowrun($sfarm) or exit(EXIT_FAILURE);
+       } elsif ($subcommand eq "add") {
+          sfarmadd($sfarm,@ARGV) or exit(EXIT_FAILURE);
+       } elsif ($subcommand eq "remove") {
+          sfarmremove($sfarm) or exit(EXIT_FAILURE);
+       } elsif ($subcommand eq "clear") {
+          sfarmclear($sfarm) or exit(EXIT_FAILURE);
+       } elsif ($subcommand =~ m/^pred/) {
+          sfarmmodify($sfarm,"predictor",@ARGV) or exit(EXIT_FAILURE);
+       } elsif ($subcommand =~ m/^desc/) {
+          sfarmmodify($sfarm,"description",@ARGV) or exit(EXIT_FAILURE);
+       } elsif ($subcommand eq "modify") {
+          sfarmmodify($sfarm,@ARGV) or exit(EXIT_FAILURE);
+       } elsif ($subcommand eq "no") {
+          $ARGV[0] =~ s/^pred.*/predictor/;
+          $ARGV[0] =~ s/^desc.*/description/;
+          sfarmmodify($sfarm,"no",@ARGV) or exit(EXIT_FAILURE);
+       } elsif ($subcommand eq "probe") {
+          sfarmmodify($sfarm,"probe",@ARGV) or exit(EXIT_FAILURE);
+       } else { 
+          # assume this unknown arg is an rserver
+          my $rserver=$subcommand;
+          $subcommand=shift;
+          if ($subcommand eq "add") {
+             sfarmaddrserver($sfarm,$rserver) or exit(EXIT_FAILURE);
+          } else {
+             my @rservers=($rserver);
+             if ($rserver eq "all") {
+                @rservers=sfarmrserverslist($sfarm);
+                #print join ("\n",@rservers);
+             }
+             foreach my $rserver (@rservers) {
+                if ($subcommand eq "remove") {
+                   sfarmremoverserver($sfarm,$rserver) or exit(EXIT_FAILURE);
+                } elsif ($subcommand eq "in") {
+                   sfarminservice($sfarm,$rserver) or exit(EXIT_FAILURE);
+                } elsif ($subcommand eq "out") {
+                   sfarmoutservice($sfarm,$rserver) or exit(EXIT_FAILURE);
+                } elsif ($subcommand =~ m/^conn/) {
+                   sfarmrserverconnlimit($sfarm,$rserver,@ARGV) or exit(EXIT_FAILURE);
+                } elsif ($subcommand eq "no") {
+                   sfarmrserverconnlimit($sfarm,$rserver,"no") or exit(EXIT_FAILURE);
+                } else {
+                   usage();
+                }
+             }
+          }
+       }
+   }
+} elsif ($command eq "show" or $command eq "raw" or $command eq "conf") {
+   my $ref;
+   if ($command eq "show") {
+       	$ref=rubsoap_noxml("show",@ARGV) or exit(EXIT_FAILURE);
+   } elsif ($command eq "raw") {
+       if ($ARGV[0] eq "xml") {
+          shift;
+          $ref=rubsoap(@ARGV) or exit(EXIT_FAILURE);
+       } else {
+          $ref=rubsoap_noxml(@ARGV) or exit(EXIT_FAILURE);
+       }
+   } elsif ($command eq "conf") {
+       my $cmd;
+       if (! scalar @ARGV) {
+          print "Enter config lines, ctrl-d when done.\n";
+          while (<STDIN>) {
+            next if (/^conf t$/);
+            last if (/^end$/);
+            $cmd.=$_;
+          }
+       } else {
+          $cmd=join("\n",@ARGV);
+       }
+
+       $ref=rubsoap_conf($cmd) or exit(EXIT_FAILURE);
+   }
+   if (ref( $ref->{exec_command}) eq "ARRAY") {
+      # likely success
+      foreach my $execcmd ( @{$ref->{exec_command}} ) {
+         if ($execcmd->{status}->{code} == 100) {
+            if (exists $execcmd->{xml_show_result}->{xml_show_running_config}) {
+               print Dumper($execcmd->{xml_show_result}->{xml_show_running_config});
+            } elsif (exists $execcmd->{xml_show_result}) {
+               print Dumper($execcmd->{xml_show_result});
+            } else {
+               print Dumper($execcmd);
+            }
+         } else {
+            print "sumtin broke\n";
+         print Dumper($execcmd);
+         }
+      }
+   } else {
+      $ref= exists $ref->{exec_command} ? $ref->{exec_command} : $ref->{config_command};
+      if ($ref->{status}->{code} == 100) {
+         if (! ref($ref->{xml_show_result}) ) {
+            print $ref->{xml_show_result},"\n";
+         } else {
+            print Dumper($ref);
+         }
+      } else {
+         print $ref->{status}->{error_message},"\n";
+      }
+   }
+      
+} elsif ($command eq "showftsync") {
+   showftsync();
+} elsif ($command eq "showsfarmstate") {
+   showsfarmstate();
+} elsif ($command eq "showconninfo") {
+   my $vip_name=host2rserver(shift);
+   my $percent_alert=shift;
+   showconninfo($vip_name,$percent_alert);
+} else {
+   usage();
+}
+
+exit(EXIT_SUCCESS);
+# END OF LINE
+
+
+
+sub host2rserver {
+   my $rserver=shift or return;
+
+   if (my $tmp=inet_aton($rserver)) {
+   $rserver =~ s/$REMOVEDOMAIN//;
+   $rserver =~ tr/[a-z]/[A-Z]/;
+   }
+   return $rserver;
+}
+   
+sub rubsoap_noxml {
+
+   my $Q="xml_cmd=<request_raw>@_</request_raw>";
+
+   my $cmd="/usr/bin/curl -s -k -u '${USERNAME}:${PASSWORD}'  https://${ACEHOST}:443/bin/xml_agent -d \"$Q\"";
+   my $cmdcensored="/usr/bin/curl -s -k  -u '${USERNAME}:xxxxxxxx' https://${ACEHOST}:443/bin/xml_agent -d \"$Q\"";
+   my $fh = new IO::File("$cmd |");
+   
+   my $ref;
+   eval { $ref = XMLin($fh); };
+   if (!$ref) {
+       print "Error from $ACEHOST: $!.\n";
+       print "Command; $cmdcensored\n";
+       exit -1;
+   }
+   return $ref;
+}
+sub rubsoap {
+   return rubsoap_noxml("xml-show on\n@_\n");
+}
+sub rubsoap_conf {
+   return rubsoap "conf t\n@_\nend\nwr mem";
+}
+sub sfarmrserverslist {
+   my $serverfarm=shift or return 0;
+   my @rservers=();
+
+   my $ref=rubsoap "show run serverfarm $serverfarm";
+   if (ref( $ref->{exec_command}) eq "ARRAY") {
+      # likely success
+      if ($ref->{exec_command}->[1]->{status}->{code} == 100) {
+         if (exists $ref->{exec_command}->[1]->{xml_show_result}->{xml_show_running_config}->{serverfarm}) {
+            $ref=$ref->{exec_command}->[1]->{xml_show_result}->{xml_show_running_config}->{serverfarm};
+            if (exists $ref->{rserver_sfarm}) {
+                #print Dumper($ref->{rserver_sfarm});
+               if (exists $ref->{rserver_sfarm}->{name}) { # only 1 rserver
+                  @rservers=($ref->{rserver_sfarm}->{name} . $ref->{rserver_sfarm}->{name}->{port} 
+                                                               ? (":".$ref->{rserver_sfarm}->{name}->{port})
+                                                               : "");
+               } else {
+                  @rservers=( map {
+                           $_ . ($ref->{rserver_sfarm}->{$_}->{port}
+                                    && (":".$ref->{rserver_sfarm}->{$_}->{port}))
+                                     } keys %{ $ref->{rserver_sfarm} });
+               }
+            }
+         }
+      }
+   }
+   return (@rservers);
+}
+
+#print "Command 0 status: ",  $ref->{exec_command}->[0]->{status}->{code} ,"\n";
+#print "Command 1 status: ",  $ref->{exec_command}->[1]->{status}->{code} ,"\n";
+
+sub sfarmclear {
+   my $serverfarm=host2rserver(shift) or die;
+   my $cmd="clear serverfarm $serverfarm";
+
+   my $ref=rubsoap "$cmd";
+}
+
+sub rserverlist {
+   my $rserver=host2rserver(shift);
+   my $ref=rubsoap_noxml "show rserver $rserver";
+   if ($ref->{exec_command}->{status}->{code} == 100) {
+      print $ref->{exec_command}->{xml_show_result},"\n";
+      return 1;
+   }
+   return 0;
+}
+
+sub rservershowrun {
+   my $rserver=host2rserver(shift) or die;
+
+   my $ref=rubsoap "show run rserver $rserver";
+   #APP1V-ATP.AO.PRD.LAX
+   if (ref( $ref->{exec_command}) eq "ARRAY") {
+      # likely success
+      if ($ref->{exec_command}->[1]->{status}->{code} == 100) {
+         if (exists $ref->{exec_command}->[1]->{xml_show_result}->{xml_show_running_config}->{rserver}) {
+            $ref=$ref->{exec_command}->[1]->{xml_show_result}->{xml_show_running_config}->{rserver};
+            printf "rserver %s %s\n",$ref->{type}, $ref->{name};
+            if ($ref->{"description"}) {
+               print "  description ",$ref->{"description"}->{"descr-string"},"\n";
+               delete $ref->{"description"}->{"descr-string"};
+               delete $ref->{"description"} if (! %{ $ref->{"description"} });
+            }
+            print "  ip address ",$ref->{ip_address}->{address},"\n" if (exists $ref->{ip_address}->{address});
+            print "  probe ",$ref->{probe_rserver}->{"probe-name"},"\n" if (exists $ref->{probe_rserver});
+            if ($ref->{"webhost-redirection"}) {
+               print "  webhost-redirection ",$ref->{"webhost-redirection"}->{"relocation-string"}," ",$ref->{"webhost-redirection"}->{"redirection-code"},"\n";
+               delete $ref->{"webhost-redirection"}->{"relocation-string"};
+               delete $ref->{"webhost-redirection"}->{"redirection-code"};
+               delete $ref->{"webhost-redirection"} if (! %{ $ref->{"webhost-redirection"} });
+            }
+            print "  inservice\n" if (exists $ref->{inservice});
+            delete $ref->{type};
+            delete $ref->{name};
+            delete $ref->{ip_address}->{address};
+            delete $ref->{probe_rserver}->{"probe-name"};
+            delete $ref->{inservice};
+            delete $ref->{ip_address} if (! %{ $ref->{ip_address} } );
+            delete $ref->{probe_rserver} if (! %{ $ref->{probe_rserver} } );
+            if (%{$ref}) {
+               print "Warning: rserver object has unsupported attributes, tell Garrick.\n";
+               print Dumper($ref);
+            }
+            return 1;
+         }
+      }
+   }
+   print "$rserver does not exist.\n";
+   return 0;
+}
+
+sub rserveradd {
+   my $rserver=host2rserver(shift);
+   my $ip;
+   if (my $tmp=inet_aton($rserver)) {
+      $ip=inet_ntoa($tmp);
+   }
+
+  if (!$ip) {
+     print STDERR "Unable to resolve $rserver.\n";
+     return 0;
+  }
+my $ref=rubsoap_conf "rserver host $rserver
+ip address $ip
+probe icmp_probe
+inservice";
+  if (exists $ref->{config_command}->{status}->{code}) {
+     if ($ref->{config_command}->{status}->{code} == 100) {
+         print "$rserver created.\n";
+         return 1;
+     }
+  }
+  print "$rserver ($ip) NOT created.\n";
+  print "Command: ",$ref->{config_command}->{status}->{error_command},"\n";
+  print $ref->{config_command}->{status}->{error_message},"\n";
+  return 0;
+
+}
+
+sub rserverremove {
+   my $rserver=host2rserver(shift);
+   my $ref=rubsoap_conf "no rserver host $rserver";
+   if (exists $ref->{config_command}->{status}->{code}) {
+      if ($ref->{config_command}->{status}->{code} == 100) {
+         print "$rserver removed.\n";
+         return 1;
+      } else {
+         print "rserverremove returned: ",$ref->{config_command}->{status}->{error_message},"\n";
+      }
+     
+   }
+  return 0;
+}
+
+sub rserverinservice {
+   my $rserver=host2rserver(shift) or die;
+
+   my $cmd="rserver host $rserver\ninservice";
+
+   my $ref=rubsoap_conf "$cmd";
+   if (exists $ref->{config_command}->{status}->{code}) {
+      if ($ref->{config_command}->{status}->{code} == 100) {
+         print "$rserver in service.\n";
+         return 1;
+      } else {
+         print "rserverinservice returned: ",$ref->{config_command}->{status}->{error_message},"\n";
+      }
+   
+   }
+  return 0;
+}
+sub rserveroutservice {
+   my $rserver=host2rserver(shift) or die;
+
+   my $cmd="rserver host $rserver\nno inservice";
+
+   my $ref=rubsoap_conf "$cmd";
+   if (exists $ref->{config_command}->{status}->{code}) {
+      if ($ref->{config_command}->{status}->{code} == 100) {
+         print "$rserver not in service.\n";
+         return 1;
+      } else {
+         print "rserveroutservice returned: ",$ref->{config_command}->{status}->{error_message},"\n";
+      }
+   
+   }
+  return 0;
+}
+
+sub rserversearch {
+   my $rserver=host2rserver(shift) or die;
+   my $ref=rubsoap_noxml "show rserver $rserver";
+   if ($ref->{exec_command}->{status}->{code} == 100) {
+       my @lines=split("\n",$ref->{exec_command}->{xml_show_result});
+       my @serverfarmlines=(grep /serverfarm/, @lines);
+       my @serverfarms=map {m/.*serverfarm: (.*)/; $1} @serverfarmlines;
+       print map { "$_\n"} @serverfarms;
+       return 1;
+   }
+  return 0;
+}
+
+
+
+sub sfarmlist {
+   my $sfarm=host2rserver(shift);
+   my $ref=rubsoap_noxml "show serverfarm $sfarm";
+   if ($ref->{exec_command}->{status}->{code} == 100) {
+      print $ref->{exec_command}->{xml_show_result},"\n";
+      return 1;
+   } else {
+      print $ref->{exec_command}->{status}->{error_message},"\n";
+   }
+   return 0;
+}
+
+sub showconninfo {
+   my $myvip=shift;
+   my $percent_alert=shift;
+   if ($percent_alert<=0) {
+	$percent_alert=90;
+   }
+
+   my $ref=rubsoap "show run serverfarm";
+   my %vip_hash;;
+
+   if (ref( $ref->{exec_command}) eq "ARRAY") {
+      # likely success
+      if ($ref->{exec_command}->[1]->{status}->{code} == 100) {
+         if (exists $ref->{exec_command}->[1]->{xml_show_result}->{xml_show_running_config}->{serverfarm}) {
+            $ref=$ref->{exec_command}->[1]->{xml_show_result}->{xml_show_running_config}->{serverfarm};
+
+
+while ( my ($vip, $value) = each %{$ref} ){
+	if (!$myvip || $vip eq $myvip || $myvip eq 'alert') {
+	   if (exists $value->{rserver_sfarm}->{name}) { # only 1 rserver
+		my $node = $value->{rserver_sfarm}->{name};
+
+	        if (exists $value->{rserver_sfarm}->{'conn-limit'}) {
+			%vip_hash->{$vip}->{$node}->{'maxconn'}=$value->{rserver_sfarm}->{'conn-limit'}->{max};
+		} else {
+			%vip_hash->{$vip}->{$node}->{'maxconn'}=0;
+		}
+
+	   } else {
+
+	  while ( my ($node, $v) = each %{$value->{rserver_sfarm}} )
+	  {
+
+		my $maxconn = $v->{'conn-limit'}->{max};
+
+		
+		if ($maxconn>0) {
+			%vip_hash->{$vip}->{$node}->{'maxconn'}=$maxconn;
+		}else{
+			%vip_hash->{$vip}->{$node}->{'maxconn'}=0;
+		}
+           }
+          }
+        }
+}
+
+	}
+      }
+   }
+#end part 1
+
+#show rserver
+
+   my $ref=rubsoap_noxml "show rserver";
+   if ($ref->{exec_command}->{status}->{code} == 100) {
+
+    my $tmp=$ref->{exec_command}->{xml_show_result};
+    my ($curr_vip,$curr_rserver,$curr_count)='';
+
+
+foreach my $line (split /[\r\n]+/, $tmp) {
+
+	if ($line =~ /serverfarm/) {
+		my @substring = split /\s+/, $line;
+		$curr_vip = $substring[2];
+
+	} elsif ($line =~ /rserver/) {
+		my @substring = split /\s+/, $line;
+		$curr_rserver = $substring[3];
+		$curr_rserver =~ s/,+$//;
+
+	} elsif (($line =~ /(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})/)) {
+		my @substring = split /\s+/, $line;
+		$curr_count = $substring[4];
+		my $total = $substring[5];
+
+#		print $line . "BEFORE--->$curr_vip/$curr_rserver/$curr_count|||$myvip\n";
+
+		if ((!$myvip || $myvip eq $curr_vip || $myvip eq 'alert')) {
+			%vip_hash->{$curr_vip}->{$curr_rserver}->{'current'}=$curr_count;
+			%vip_hash->{$curr_vip}->{$curr_rserver}->{'total'}=$total;
+		}
+
+	} else { next; }
+}
+
+   }
+
+while ( my ($vip, $value) = each %vip_hash )
+{
+if ($myvip ne 'alert') { print "$vip\n"; }
+
+        while ( my ($node, $v) = each %{$value} )
+        {
+		if ($myvip eq 'alert') {
+		     if ($v->{'maxconn'}>0) {
+			my $percent = eval {$v->{'current'} * 100 / $v->{'maxconn'} };
+			if ($percent>=$percent_alert) {
+				my $now_string = localtime;
+				print "[" . $now_string . "] CRITICAL: VIP=" . $vip . " NODE=" . $node . ": " . $v->{'current'} . " connections out of " . $v->{'maxconn'} . " being used\n";
+			}			
+		      }
+	        } else { 
+		       print "\t$node: \t" . $v->{'current'} . "/" . $v->{'maxconn'} . " Total:" . $v->{'total'} . "\n";
+		}
+        }
+}
+
+}
+
+
+sub sfarmshowrun {
+   my $serverfarm=host2rserver(shift) or die;
+   my $ref=rubsoap "show run serverfarm $serverfarm";
+   #APP1V-ATP.AO.PRD.LAX
+   if (ref( $ref->{exec_command}) eq "ARRAY") {
+      # likely success
+      if ($ref->{exec_command}->[1]->{status}->{code} == 100) {
+         if (exists $ref->{exec_command}->[1]->{xml_show_result}->{xml_show_running_config}->{serverfarm}) {
+            $ref=$ref->{exec_command}->[1]->{xml_show_result}->{xml_show_running_config}->{serverfarm};
+
+            printf "serverfarm %s %s\n",$ref->{type}, $ref->{name};
+            delete $ref->{type};
+            delete $ref->{name};
+            if (exists $ref->{description}) {
+                print "  description ",$ref->{description}->{"descr-string"},"\n";
+                delete $ref->{description}->{"descr-string"};
+                delete $ref->{description} if (! %{ $ref->{description} } );
+            }
+            if (exists $ref->{predictor}) {
+                $ref->{predictor}->{"predictor-method"} =~ s/_/ /;
+                print "  predictor ",$ref->{predictor}->{"predictor-method"};
+                delete $ref->{predictor}->{"predictor-method"};
+                if (exists $ref->{predictor}->{"slowstart"}) {
+                   print " slowstart ",$ref->{predictor}->{"slowstart"};
+                   delete $ref->{predictor}->{"slowstart"};
+                }
+                if (exists $ref->{predictor}->{"cookie-name"}) {
+                   print " ".$ref->{predictor}->{"cookie-name"};
+                   delete $ref->{predictor}->{"cookie-name"};
+                }
+                if (exists $ref->{predictor}->{"probe"}) {
+                   print " probe ".$ref->{predictor}->{"probe"};
+                   delete $ref->{predictor}->{"probe"};
+                }
+                print "\n";
+                if (exists $ref->{predictor}->{"weight"}) {
+                   print "    weight ".$ref->{predictor}->{"weight"}->{connection},"\n";
+                   delete $ref->{predictor}->{"weight"};
+                }
+                delete $ref->{predictor} if (! %{ $ref->{predictor} } );
+            }
+            if (exists $ref->{probe_sfarm}) {
+               if (ref( $ref->{probe_sfarm}) eq "ARRAY") {
+                  foreach my $probe (@{ $ref->{probe_sfarm} }) {
+                     print "  probe ",$probe->{"probe-name"},"\n";
+                     delete $probe->{"probe-name"};
+                  }
+                  delete $ref->{probe_sfarm} if (! join( @{ $ref->{probe_sfarm} }) );
+               } else {
+                  print "  probe ",$ref->{probe_sfarm}->{"probe-name"},"\n";
+                  delete $ref->{probe_sfarm}->{"probe-name"};
+                  delete $ref->{probe_sfarm} if (! %{ $ref->{probe_sfarm} } );
+               }
+            }
+            if (exists $ref->{rserver_sfarm}) {
+               if (exists $ref->{rserver_sfarm}->{name}) { # only 1 rserver
+                  print "  rserver ",$ref->{rserver_sfarm}->{name};
+                  print " ",$ref->{rserver_sfarm}->{port} if (exists $ref->{rserver_sfarm}->{port});
+                  print "\n";
+
+                  if (exists $ref->{rserver_sfarm}->{probe_sfarm}) {
+                     if (ref( $ref->{rserver_sfarm}->{probe_sfarm}) eq "ARRAY") {
+                        foreach my $probe (@{ $ref->{rserver_sfarm}->{probe_sfarm} }) {
+                           print "  probe ",$probe->{"probe-name"},"\n";
+                           delete $probe->{"probe-name"};
+                        }
+                     } else {
+                        print "  probe ",$ref->{rserver_sfarm}->{probe_sfarm}->{"probe-name"},"\n";
+                        delete $ref->{rserver_sfarm}->{probe_sfarm}->{"probe-name"};
+                     }
+                     delete $ref->{rserver_sfarm}->{probe_sfarm} if (! %{ $ref->{rserver_sfarm}->{probe_sfarm} } );
+                  }
+                  if (exists $ref->{rserver_sfarm}->{description}) {
+                      print "    description ",$ref->{rserver_sfarm}->{description}->{"descr-string"},"\n";
+                      delete $ref->{rserver_sfarm}->{description}->{"descr-string"};
+                      delete $ref->{rserver_sfarm}->{description} if (! %{ $ref->{rserver_sfarm}->{description} } );
+                  }
+                  if (exists $ref->{rserver_sfarm}->{weight}) {
+                      print "    weight ",$ref->{rserver_sfarm}->{weight}->{value},"\n";
+                      delete $ref->{rserver_sfarm}->{weight}->{value};
+                      delete $ref->{rserver_sfarm}->{weight} if (! %{ $ref->{rserver_sfarm}->{weight} } );
+                  }
+
+                  print "    inservice\n" if (exists $ref->{rserver_sfarm}->{inservice});
+                  printf "    conn-limit %s\n",
+                      join(" ",
+                         map {"$_ ".$ref->{rserver_sfarm}->{"conn-limit"}{$_}} sort keys %{ $ref->{rserver_sfarm}->{"conn-limit"}})
+                             if (exists $ref->{rserver_sfarm}->{"conn-limit"});
+                  delete $ref->{rserver_sfarm}->{"conn-limit"};
+                  delete $ref->{rserver_sfarm}->{inservice};
+                  delete $ref->{rserver_sfarm}->{name};
+                  delete $ref->{rserver_sfarm}->{port};
+                  delete $ref->{rserver_sfarm} if (! %{ $ref->{rserver_sfarm} } );
+               } else {
+                  foreach my $rserver (sort keys %{ $ref->{rserver_sfarm} } ) {
+                     my $rso=$ref->{rserver_sfarm}->{$rserver};
+                     print "  rserver $rserver";
+                     print " ",$rso->{port} if (exists $rso->{port});
+                     print "\n";
+                     if (exists $rso->{probe_sfarm}) {
+                        if (ref( $rso->{probe_sfarm}) eq "ARRAY") {
+                           foreach my $probes (@{ $rso->{probe_sfarm} }) {
+                              print "    probe ",$probes->{"probe-name"},"\n";
+                              delete $probes->{"probe-name"};
+                           }
+                        } else {
+                           print "    probe ",$rso->{probe_sfarm}->{"probe-name"},"\n";
+                           delete $rso->{probe_sfarm}->{"probe-name"};
+                        }
+                        delete $rso->{probe_sfarm} if (! %{ $rso->{probe_sfarm} } );
+                     }
+                     if (exists $rso->{description}) {
+                         print "    description ",$rso->{description}->{"descr-string"},"\n";
+                         delete $rso->{description}->{"descr-string"};
+                         delete $rso->{description} if (! %{ $rso->{description} } );
+                     }
+                     if (exists $rso->{weight}) {
+                         print "    weight ",$rso->{weight}->{value},"\n";
+                         delete $rso->{weight}->{value};
+                         delete $rso->{weight} if (! %{ $rso->{weight} } );
+                     }
+                     print "    inservice\n" if (exists $rso->{inservice});
+                     delete $ref->{rserver_sfarm}->{$rserver}->{inservice};
+                     printf "    conn-limit %s\n",
+                         join(" ",
+                             map {"$_ ".$rso->{"conn-limit"}{$_}} sort keys %{ $rso->{"conn-limit"}})
+                                if (exists $rso->{"conn-limit"});
+
+                     delete $rso->{port};
+                     delete $rso->{"conn-limit"};
+                     delete $ref->{rserver_sfarm}->{$rserver} if (! %{ $ref->{rserver_sfarm}->{$rserver} } );
+                  }
+                  delete $ref->{rserver_sfarm} if (! %{ $ref->{rserver_sfarm} } );
+               }
+            }
+            if (%{$ref}) {
+               print "Warning: serverfarm object has unsupported attributes, tell Garrick.\n";
+               print Dumper($ref);
+            }
+            return 1;
+         }
+      }
+   }
+   return 0;
+}
+
+sub sfarmadd {
+   my $serverfarm=host2rserver(shift) or die;
+   my $probe;
+   my $predictor;
+   my $type="host";
+   while (@_) {
+      my $cmd=shift;
+      $probe=shift if ($_[0] eq "probe");
+      $predictor=shift if ($_[0] eq "predictor");
+      $type=shift if ($_[0] eq "type");
+   }
+  
+   my $cmd="serverfarm $type $serverfarm";
+   $cmd.="\npredictor $predictor" if (defined $predictor);
+   $cmd.="\nprobe $probe" if (defined $probe);
+
+   my $ref=rubsoap_conf "$cmd";
+   if (exists $ref->{config_command}->{status}->{code}) {  
+      if ($ref->{config_command}->{status}->{code} == 100) {
+         print "$serverfarm created.\n";
+         return 1;
+      }
+   }
+   print "sfarmadd returned: ",$ref->{config_command}->{status}->{error_message},"\n";
+   return 0;
+
+}
+
+sub sfarmmodify {
+   my $serverfarm=host2rserver(shift) or die;
+
+   my $cmd="serverfarm host $serverfarm\n".join(" ",@_);
+
+   my $ref=rubsoap_conf "$cmd";
+   if (exists $ref->{config_command}->{status}->{code}) {
+      if ($ref->{config_command}->{status}->{code} == 100) {
+         print "$serverfarm modified.\n";
+         return 1;
+      }
+   }
+   print "Command: $cmd\n";
+   print "sfarmmodify returned: ",$ref->{config_command}->{status}->{error_message},"\n";
+
+   return 0;
+}
+
+sub sfarmremove {
+   my $serverfarm=host2rserver(shift) or die;
+   my $ref=rubsoap_conf "no serverfarm host $serverfarm";
+   if (exists $ref->{config_command}->{status}->{code}) {
+      if ($ref->{config_command}->{status}->{code} == 100) {
+         print "$serverfarm removed.\n";
+         return 1;
+      } else {
+         print "sfarmremove returned: ",$ref->{config_command}->{status}->{error_message},"\n";
+      }
+
+   }
+  return 0;
+}
+
+sub sfarminservice {
+   my $serverfarm=host2rserver(shift) or die;
+   my $rserver=host2rserver(shift) or die;
+
+   my $port="";
+   if ($rserver =~ s/(.*):(.*)/$1/) {
+       $port=$2;
+   }
+
+   my $cmd="serverfarm host $serverfarm\nrserver $rserver $port\ninservice";
+
+   my $ref=rubsoap_conf "$cmd";
+   if (exists $ref->{config_command}->{status}->{code}) {
+      if ($ref->{config_command}->{status}->{code} == 100) {
+         print "$rserver in service in $serverfarm.\n";
+         return 1;
+      } else {
+         print "serverfarminservice returned: ",$ref->{config_command}->{status}->{error_message},"\n";
+      }
+   
+   }
+  return 0;
+}
+
+sub sfarmoutservice {
+   my $serverfarm=host2rserver(shift) or die;
+   my $rserver=host2rserver(shift) or die;
+
+   my $port="";
+   if ($rserver =~ s/(.*):(.*)/$1/) {
+       $port=$2;
+   }
+
+
+   my $cmd="serverfarm host $serverfarm\nrserver $rserver $port\nno inservice";
+
+   my $ref=rubsoap_conf "$cmd";
+   if (exists $ref->{config_command}->{status}->{code}) {
+      if ($ref->{config_command}->{status}->{code} == 100) {
+         print "$rserver out of service in $serverfarm.\n";
+         return 1;
+      } else {
+         print "serverfarmoutservice returned: ",$ref->{config_command}->{status}->{error_message},"\n";
+      }
+   
+   }
+  return 0;
+}
+
+sub sfarmrserverconnlimit {
+   my $serverfarm=host2rserver(shift) or die;
+   my $rserver=host2rserver(shift) or die;
+   my $max=shift;
+   my $min=shift;
+
+   my $port="";
+   if ($rserver =~ s/(.*):(.*)/$1/) {
+       $port=$2;
+   }
+
+
+   my $cmd="serverfarm host $serverfarm\nrserver $rserver $port\n";;
+   if ($max eq "no") {
+      $cmd.="no conn-limit ";
+   } elsif (defined $min) {
+      $cmd.="conn-limit max $max min $min ";
+   } else {
+      print "Missing args. Probably want 'showrun'.\n";
+      return 1;
+   }
+
+   my $ref=rubsoap_conf "$cmd";
+   if (exists $ref->{config_command}->{status}->{code}) {
+      if ($ref->{config_command}->{status}->{code} == 100) {
+         if ($max eq "no") {
+            print "$rserver in $serverfarm conn limit unset\n"
+         } else {
+            print "$rserver in $serverfarm conn limit set to $max/$min.\n";
+         }
+         return 1;
+      } else {
+         print "serverfarmconnlimit returned: ",$ref->{config_command}->{status}->{error_message},"\n";
+      }
+
+   }
+   return 0;
+}
+
+sub sfarmaddrserver {
+   my $serverfarm=host2rserver(shift) or die;
+   my $rserver=host2rserver(shift) or die;
+
+   my $port="";
+   if ($rserver =~ s/(.*):(.*)/$1/) {
+       $port=$2;
+   }
+
+   my $cmd="serverfarm host $serverfarm\nrserver $rserver $port";
+   $cmd.="\ninservice" if ($_[0] eq "inservice");
+
+   my $ref=rubsoap_conf "$cmd";
+   if (exists $ref->{config_command}->{status}->{code}) {
+      if ($ref->{config_command}->{status}->{code} == 100) {
+         print "$rserver added to $serverfarm.\n";
+         return 1;
+      } else {
+         print "serverfarmaddrserver returned: ",$ref->{config_command}->{status}->{error_message},"\n";
+      }
+
+   }
+  return 0;
+}
+
+sub sfarmremoverserver {
+   my $serverfarm=host2rserver(shift) or die;
+   my $rserver=host2rserver(shift) or die;
+
+   my $port="";
+   if ($rserver =~ s/(.*):(.*)/$1/) {
+       $port=$2;
+   }
+
+   my $ref=rubsoap_conf "serverfarm host $serverfarm\nno rserver $rserver $port";
+   if (exists $ref->{config_command}->{status}->{code}) {
+      if ($ref->{config_command}->{status}->{code} == 100) {
+         print "$rserver removed from $serverfarm.\n";
+         return 1;
+      } else {
+         print "serverfarmremoveserver returned: ",$ref->{config_command}->{status}->{error_message},"\n";
+      }
+
+   }
+  return 0;
+}
+
+
+sub showftsync() {
+   my $ref=rubsoap_noxml "show context" or die (EXIT_FAILURE);
+   if ($ref->{exec_command}->{status}->{code} == 100) {
+#Name: SB , Id: 5 
+#Config count: 617 
+#Description:  
+#Resource-class: sticky 
+#Vlans:  Vlan10-12, Vlan50
+#FT Auto-sync running-cfg configured state: enabled
+#FT Auto-sync running-cfg actual state: enabled
+#FT Auto-sync startup-cfg configured state: enabled
+#FT Auto-sync startup-cfg actual state: enabled
+
+      my @lines=split("\n",$ref->{exec_command}->{xml_show_result});
+      my $context="";
+      my %states=();
+      foreach (@lines) {
+         if (/^Name: (.*) ?,/) { $context=$1; }
+         if (/^Name: (.*) ,/) { $context=$1; }
+         if (/^FT Auto-sync (.*) (.*) state: (.*)/) { $states{$context}{$1}{$2}=$3; }
+      }
+      foreach my $context (sort keys %states) {
+         foreach my $cfg (sort keys %{ $states{$context} }) {
+            foreach my $which (sort keys %{ $states{$context}{$cfg} }) {
+              print "$context: $cfg $which ".$states{$context}{$cfg}{$which},"\n";
+            }
+         }
+      }
+ 
+      return 1;
+   }
+   return 0;
+}
+
+sub showsfarmstate() {
+   my $ref=rubsoap_noxml "show serverfarm detail" or die (EXIT_FAILURE);
+   if ($ref->{exec_command}->{status}->{code} == 100) {
+ #serverfarm     : VIP-APP-SORRY.TP.PRD.LAX, type: HOST
+ #state          : ACTIVE
+   #rserver: APP1V-SORRY.TP.PRD.LAX
+       #10.11.20.39:0         8      OPERATIONAL  0          141906     1662
+   #rserver: APP2V-SORRY.TP.PRD.LAX
+       #10.11.20.32:0         8      OPERATIONAL  0          142710     803
+
+
+      my @lines=split("\n",$ref->{exec_command}->{xml_show_result});
+      my $serverfarm="";
+      my $rserver="";
+      my %states=();
+      my $x=0;
+      while ($x < scalar @lines) {
+         $_=$lines[$x];
+         if (/^ serverfarm\s+: (.*),/) { $serverfarm=$1; }
+         if (/^   rserver: (.*)/) {
+            $rserver=$1;
+            $x++;
+            $_=$lines[$x];
+            my ($real,$weight,$state,$current,$total,$failures)=split;
+            $states{$serverfarm}{$rserver}=$state;
+         }
+         $x++;
+      }
+      foreach my $serverfarm (sort keys %states) {
+         foreach my $rserver (sort keys %{ $states{$serverfarm} }) {
+              print "$serverfarm $rserver ".$states{$serverfarm}{$rserver},"\n";
+         }
+      }
+
+      return 1;
+   }
+   return 0;
+}
+
+

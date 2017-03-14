@@ -1,0 +1,18 @@
+host=$1
+# Generate key and remove the passphrase
+if [ ! -f $host.key ];then
+openssl genrsa -des3 -out $host.key 1024
+mv $host.key $host.key.org
+openssl rsa -in $host.key.org -out $host.key
+rm $host.key.org
+fi
+
+# Generate csr
+if [ ! -f $host.csr ];then
+openssl req -new -key $host.key -out $host.csr
+fi
+
+# Generate Cert
+if [ ! -f $host.crt ];then
+openssl x509 -req -days 1000 -in $host.csr -signkey $host.key -out $host.crt
+fi

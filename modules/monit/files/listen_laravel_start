@@ -1,0 +1,5 @@
+#!/bin/bash
+#This will start queue_listen_laravel
+
+/usr/bin/sudo -u apache /usr/bin/php $(/bin/readlink -f /app/shared/docroots/flow.evolvemediallc.com/current/ | /usr/bin/xargs /usr/bin/dirname)/artisan queue:listen --timeout=180 & echo $! > /tmp/queue_listen_laravel.pid
+

@@ -1,0 +1,7 @@
+# This file is managed by Puppet do not modify it from <%= fqdn %>
+# $Id$ 
+
+
+# We need to know what app server got the request
+Header add X-Served-By "<%= fqdn.gsub(".gnmedia.net","") %>"
+

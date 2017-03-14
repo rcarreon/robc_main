@@ -1,0 +1,16 @@
+#!/bin/bash
+
+random=$RANDOM$$
+
+for mount in $(df -l -x tmpfs | awk '$1 ~ /^\// {print $6}');do
+    tempdir=$(mktemp $mount.writetest.XXXXX 2>&1)
+    if [ $? != 0 ];then
+        echo "Local disk failed: $tempdir"
+        exit 1
+    fi
+    rm -f "$tempdir"
+done
+
+echo "Local filesystems OK"
+exit 0
+

@@ -1,0 +1,13 @@
+/app/log/amavisd/amavisd.log {
+  	missingok
+  	notifempty
+  	daily
+  	rotate 7
+  	compress
+  	sharedscripts
+  	postrotate
+		/bin/kill -HUP `cat /var/run/syslogd.pid 2> /dev/null` 2> /dev/null || true
+		/etc/init.d/amavisd reload 2> /dev/null || true
+  	endscript
+}
+

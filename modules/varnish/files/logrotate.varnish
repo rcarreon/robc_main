@@ -1,0 +1,12 @@
+/pxy/log/varnish/*.log.1 /pxy/log/varnish/*.log {
+    missingok
+    compress
+    rotate 31
+    daily
+    dateext
+    notifempty
+    sharedscripts
+    postrotate
+        /etc/init.d/varnishncsa restart 2> /dev/null || true
+    endscript
+}

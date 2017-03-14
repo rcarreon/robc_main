@@ -1,0 +1,20 @@
+# File managed by puppet
+# Do not edit it on app2v-trend.lax1.gnmedia.net
+# $Id$
+
+<Virtualhost *:80>
+    ServerName trends.gnmedia.net
+    DocumentRoot /app/shared/docroots
+
+    <Directory /app/shared/docroots>
+        Options Indexes FollowSymLinks
+    </Directory>
+
+    <Directory /app/shared/docroots/collection3/bin/>
+        AddHandler cgi-script .cgi
+        DirectoryIndex index.cgi
+        Options +ExecCGI
+    </Directory>
+
+
+</Virtualhost>

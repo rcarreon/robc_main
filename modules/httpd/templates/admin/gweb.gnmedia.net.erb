@@ -1,0 +1,16 @@
+<VirtualHost *:80>
+	ServerName gweb.gnmedia.net
+	DocumentRoot /app/shared/docroots/gweb/
+
+	<%=logging ? '' : '#'%>ErrorLog /app/log/gweb.gnmedia.net_error.log
+	<%=logging ? '' : '#'%>CustomLog /app/log/gweb.gnmedia.net_access.log combined
+
+	<Directory /app/shared/docroots/gweb/>
+           Options ExecCGI
+           AllowOverride None
+           AddHandler cgi-script .cgi
+           DirectoryIndex index.cgi
+           Order allow,deny
+           Allow from all
+	</Directory>
+</VirtualHost>

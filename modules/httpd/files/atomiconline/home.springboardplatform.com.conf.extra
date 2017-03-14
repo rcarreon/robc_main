@@ -1,0 +1,7 @@
+    RewriteEngine On
+
+    # www.home.springboardplatform.com --> home.springboardplatform.com
+    RewriteCond %{HTTP_HOST} ^www\.home\.springboardplatform\.com$ [NC]
+    RewriteRule ^/(.*) http://home.springboardplatform.com/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

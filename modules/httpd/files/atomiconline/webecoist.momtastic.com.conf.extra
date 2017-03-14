@@ -1,0 +1,7 @@
+    RewriteEngine On
+
+    # www.webecoist.momtastic.com --> webecoist.momtastic.com
+    RewriteCond %{HTTP_HOST} ^www\.webecoist\.momtastic\.com$ [NC]
+    RewriteRule ^/(.*) http://webecoist.momtastic.com/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

@@ -1,0 +1,142 @@
+# note this file doesn't need to be changed or shouldn't be edit.  use conf.d/virtual.conf instead
+
+#######################################################################
+#
+# This is the main Nginx configuration file.  
+#
+# More information about the configuration options is available on 
+#   * the English wiki - http://wiki.nginx.org/Main
+#   * the Russian documentation - http://sysoev.ru/nginx/
+#
+#######################################################################
+
+#----------------------------------------------------------------------
+# Main Module - directives that cover basic functionality
+#
+#   http://wiki.nginx.org/NginxHttpMainModule
+#
+#----------------------------------------------------------------------
+
+# normally or default, it sets to nginx user
+# but sometimes we have share folder that we share with apache, so in GN env, we default it to apache user.
+
+user              apache;
+
+# don't setup nginx box with more than 4 cpu, perf doesn't incr much. set up multiple boxes if need more
+worker_processes     <%= processorcount %>;
+
+# default will 'try' to dist to all cpu, but not as good as force bind it.
+
+<% if processorcount == "4" %>
+worker_cpu_affinity 0001 0010 0100 1000;
+<% elsif processorcount == "3" %>
+worker_cpu_affinity 0001 0010 0100;
+<% elsif processorcount == "2" %>
+worker_cpu_affinity 0001 0010;
+<% end %>
+
+
+# ulimit -- don't remove!!
+worker_rlimit_nofile 131072;
+
+error_log  /app/log/nginx/error_log error;
+#error_log  /app/log/error.log  notice;
+#error_log  /app/log/error.log  info;
+
+pid        /var/run/nginx.pid;
+
+
+#----------------------------------------------------------------------
+# Events Module 
+#
+#   http://wiki.nginx.org/NginxHttpEventsModule
+#
+#----------------------------------------------------------------------
+
+events {
+    # don't set it higher than 4096, perf would actually goes down.
+    worker_connections  4096;
+}
+
+
+#----------------------------------------------------------------------
+# HTTP Core Module
+#
+#   http://wiki.nginx.org/NginxHttpCoreModule 
+#
+#----------------------------------------------------------------------
+
+http {
+
+    server_names_hash_bucket_size 64;
+
+    include       /etc/nginx/mime.types;
+    default_type  application/octet-stream;
+
+    log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+                      '$status $body_bytes_sent "$http_referer" '
+                      '"$http_user_agent" "$http_x_forwarded_for"';
+
+    access_log  off;
+    #access_log  /app/log/nginx/access_log  main;
+
+    sendfile        on;
+    tcp_nopush      on;
+    tcp_nodelay     on;
+
+
+    # def is 65.  too long...
+    keepalive_timeout  2;
+
+    # below settings are not for rev proxy
+    client_body_temp_path  /dev/shm/client_temp 1 2;
+
+    # dir/file caching of inode info
+    open_file_cache max=100000 inactive=60s;
+    open_file_cache_valid 60s;
+    open_file_cache_min_uses 2;
+    open_file_cache_errors on;
+
+    # only work with 200, 204, 301, 302 and 304, sorry return 503.
+    # 0.11 version doesn't use add_header which might work with 503
+
+    add_header X-Served-By <%= fqdn.gsub(".gnmedia.net","") %>;
+
+    # redirect server error pages to the static page /50x.html
+    #
+    error_page   500 502 503 504  /50x.html;
+
+    #
+    # The default server
+    #
+    server {
+        listen       80;
+        expires      365d;
+
+        # deny all access to hidden file like .htaccess .svn and no loggin
+	location ~ /\. {
+    		access_log off;
+    		log_not_found off; 
+    		deny all;
+	}
+
+        location / {
+            root   /usr/share/nginx/html;
+            index  index.html;
+
+            if (-f $request_filename) {
+                break;
+            }
+        }
+
+        location = /nginx_status {
+            stub_status on;
+            access_log off;
+            allow 127.0.0.1;
+            deny all;
+        }
+
+    }
+
+include /etc/nginx/conf.d/*.conf;
+}

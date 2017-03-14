@@ -1,0 +1,12 @@
+<VirtualHost *:80>
+	ServerName beer30.gnmedia.net
+	DocumentRoot /app/shared/docroots/beer30/
+
+	<%=logging ? '' : '#'%>ErrorLog /app/log/beer30.gnmedia.net_error.log
+	<%=logging ? '' : '#'%>CustomLog /app/log/beer30.gnmedia.net_access.log combined
+
+	<Directory /app/shared/docroots/beer30/>
+		AllowOverride All
+		Satisfy all
+	</Directory>
+</VirtualHost>

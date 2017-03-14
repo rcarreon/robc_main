@@ -1,0 +1,16 @@
+#!/usr/bin/perl
+# script to pipe apache logs to rsyslog
+ use Sys::Syslog qw (:DEFAULT setlogsock);
+
+ setlogsock('unix');
+
+ # open our log socket
+ openlog('httpd', 'pid', 'local6');
+
+ # log all our input
+ while (<STDIN>) {
+        syslog('info', $_);
+ }
+
+ # close the log socket
+ closelog;

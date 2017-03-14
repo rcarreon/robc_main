@@ -1,0 +1,7 @@
+{
+    "project_id" : "puppet-modules",
+    "conduit_uri" : "http://phabricator.gnmedia.net",
+    "events.listeners" : ["gnReviewerTemplate","JenkinsDiffEventListener"],
+    "jenkins.uri" : "http://cijoe.gnmedia.net",
+    "jenkins.job" : "modules-phab"
+}

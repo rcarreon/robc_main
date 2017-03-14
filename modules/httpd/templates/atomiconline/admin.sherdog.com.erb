@@ -1,0 +1,21 @@
+# This file is managed by puppet
+# $Id$
+
+<VirtualHost *:80>
+    DocumentRoot /app/shared/docroots/admin.sherdog.com/webroot
+    ServerName admin.sherdog.com
+    ServerAlias *.admin.sherdog.com
+
+    <Directory /app/shared/docroots/admin.sherdog.com/webroot>
+	Order Deny,Allow
+	Allow from all
+	Options -Indexes
+	AllowOverride all
+    </Directory>
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/admin.sherdog.com-error_log
+    <%=logging ? '' : '#'%>CustomLog /app/log/admin.sherdog.com-access_log combined
+
+</VirtualHost>
+
+

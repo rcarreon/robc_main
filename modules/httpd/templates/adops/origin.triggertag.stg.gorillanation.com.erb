@@ -1,0 +1,21 @@
+# This file is managed by Puppet. Do not modify it from <%=fqdn %>
+# $Id: pubops.stg.gorillanation.com.erb
+
+<VirtualHost *:80>
+
+  ServerName origin.triggertag.stg.gorillanation.com
+  DocumentRoot "/app/shared/docroot"
+
+  <%=logging ? '' : '#'%>ErrorLog /app/log/origin.triggertag.stg.gorillanation.com.error.log
+  LogLevel warn
+  <%=logging ? '' : '#'%>CustomLog /app/log/origin.triggertag.stg.gorillanation.com.access.log combined
+  ServerSignature On
+
+  <Directory "/app/shared/docroot">
+    Options FollowSymLinks
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+
+</VirtualHost>

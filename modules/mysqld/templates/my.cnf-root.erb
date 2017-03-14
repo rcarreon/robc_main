@@ -1,0 +1,12 @@
+
+# filename=<%= file %> 
+
+[client]
+       user= root
+<% if fqdn  =~ /^uid/ %>
+       password = L0tcgP8m
+<% else %>
+       password = <%= require 'base64'
+                       Base64.decode64('c3RyM0BtbTM=') %>
+<% end %>
+

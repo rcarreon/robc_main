@@ -1,0 +1,46 @@
+# This file is managed by Puppet. Do not modify it from <%=fqdn %>
+# $Id$
+
+
+<%
+require 'socket'
+ssl_ip           = IPSocket.getaddress("qt." + guessed_silo + ".gnmedia.net")
+%>
+
+<VirtualHost *:80>
+    ServerName qt.gorillanation.com
+    ServerAlias qt  qt.gnmedia.net qt.<%= guessed_silo[0,3] %>.gnmedia.net
+    RedirectPermanent / https://qt.gorillanation.com 
+
+</VirtualHost>
+
+<VirtualHost <%= ssl_ip %>:443>
+   ServerName qt.gorillanation.com
+   ServerAlias qt qt.gnmedia.net qt.<%= guessed_silo[0,3] %>.gnmedia.net qt.<%= guessed_silo %>.gnmedia.net
+
+   DocumentRoot /app/shared/docroots/QuickTicket
+
+   <%=logging ? '' : '#'%>ErrorLog /app/log/qt.gorillanation.com-error_log
+   <%=logging ? '' : '#'%>CustomLog /app/log/qt.gorillanation.com-access_log Combined
+   LogLevel notice 
+
+   RewriteEngine on
+   SSLEngine on
+   SSLCertificateFile /etc/httpd/conf.d/qt.crt
+   SSLCertificateKeyFile /etc/httpd/conf.d/qt.key
+
+   AddDefaultCharset UTF-8
+
+   <Location />
+        SetHandler perl-script
+        PerlHandler RTFront::QuickTicket
+        PerlSendHeader On
+        Allow from all
+   </Location>
+
+   <Location /NoAuth>
+       SetHandler send-as-is
+       Allow from all
+   </Location>
+
+</VirtualHost>

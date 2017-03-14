@@ -1,0 +1,99 @@
+<%
+         host,project,environment,location,domain,tld = fqdn.split('.')
+%>
+
+
+<VirtualHost *:80>
+    ServerName origin.sbx.<%= name %> 
+    ServerAlias cdn-sbx.<%= name %> cdn1-sbx.<%= name %> cdn2-sbx.<%= name %> cdn3-sbx.<%=name %>
+    DocumentRoot /app/shared/wordpress/current/docroot
+
+    <Directory /app/shared/wordpress/current/docroot>
+	RewriteEngine On
+	RewriteBase /
+	
+	#-----------------------------------------
+	# Rules to kill direct wp-include access
+	#-----------------------------------------
+	RewriteRule ^wp-admin/includes/ /index.php [L]
+	RewriteRule !^wp-includes/ - [S=3]
+	RewriteRule ^wp-includes/[^/]+\.php$ /index.php [L]
+	RewriteRule ^wp-includes/js/tinymce/langs/.+\.php /index.php [L]
+	RewriteRule ^wp-includes/theme-compat/ /index.php [L]
+	
+	#-----------------------------------------
+	# Rules to hide default login file
+	#-----------------------------------------
+	RewriteRule ^logout wp-login.php?action=logout&_wpnonce=db5d6787fc&hide_out_key=fkYQSe [L]
+	RewriteRule ^pblogin wp-login.php?hide_in_key=OOJ0aAa&redirect_to=wp-admin [R,L]
+	RewriteRule ^admin wp-admin/?hide_admin_key=ftZdA [R,L]
+	
+	RewriteCond %{HTTP_REFERER} !/wp-admin
+	RewriteCond %{HTTP_REFERER} !/wp-login\.php
+	RewriteCond %{HTTP_REFERER} !/pblogin
+	RewriteCond %{HTTP_REFERER} !/admin
+	
+	RewriteCond %{QUERY_STRING} !^hide_in_key=OOJ0aAa
+	RewriteCond %{QUERY_STRING} !^hide_out_key=fkYQSe
+	RewriteCond %{QUERY_STRING} !^hide_reg_key=AYYDp0u0
+	RewriteCond %{QUERY_STRING} !^hide_admin_key=ftZdA
+	
+	RewriteRule ^wp-login\.php /index.php [L]
+	RewriteCond %{QUERY_STRING} ^loggedout=true 
+	RewriteRule ^wp-login\.php /index.php [L]
+
+	#-----------------------------------------
+	# Environment specific robots.txt
+	#-----------------------------------------
+        RewriteRule ^robots.txt$                    robots.php [NC]	
+
+	#-----------------------------------------
+	# iframe-busters rewrite rules
+	#-----------------------------------------
+        RewriteRule adcentric/ifr_b.html            wp-content/plugins/pb-ads/iframe-busters/adcentric/ifr_b.html [NC]
+        RewriteRule adx-iframe-v2.html              wp-content/plugins/pb-ads/iframe-busters/adinterax/adx-iframe-v2.html [NC]
+        RewriteRule adx-iframe-v2.html              wp-content/plugins/pb-ads/iframe-busters/adinterax/adx-iframe-v3.html [NC]
+        RewriteRule atlas/atlas_rm.htm              wp-content/plugins/pb-ads/iframe-busters/atlas/atlas_rm.htm [NC]
+        RewriteRule doubleclick/DARTIframe.html     wp-content/plugins/pb-ads/iframe-busters/doubleclick/DARTIframe.html [NC]
+        RewriteRule eyeblaster/addineyeV2.html      wp-content/plugins/pb-ads/iframe-busters/eyeblaster/addineyeV2.html [NC]
+        RewriteRule eyereturn/eyereturn.html        wp-content/plugins/pb-ads/iframe-busters/eyereturn/eyereturn.html [NC]
+        RewriteRule eyewonder/interim.html          wp-content/plugins/pb-ads/iframe-busters/eyewonder/interim.html [NC]
+        RewriteRule flashtalking/ftlocal.html       wp-content/plugins/pb-ads/iframe-busters/flashtalking/ftlocal.html [NC]
+        RewriteRule interpolls/pub_interpolls.html  wp-content/plugins/pb-ads/iframe-busters/interpolls/pub_interpolls.html [NC]
+        RewriteRule klipmart/km_ss.html             wp-content/plugins/pb-ads/iframe-busters/klipmart/km_ss.html [NC]
+        RewriteRule oggifinogi/oggiPlayerLoader.htm wp-content/plugins/pb-ads/iframe-busters/oggifinogi/oggiPlayerLoader.htm [NC]
+        RewriteRule pictela/pictela_buster.html     wp-content/plugins/pb-ads/iframe-busters/pictela/pictela_buster.html [NC]
+        RewriteRule pointroll/PointRollAds.htm      wp-content/plugins/pb-ads/iframe-busters/pointroll/PointRollAds.htm [NC]
+        RewriteRule smartadserver/iframeout.html    wp-content/plugins/pb-ads/iframe-busters/smartadserver/iframeout.html [NC]
+        RewriteRule unicast/unicastIFD.html         wp-content/plugins/pb-ads/iframe-busters/unicast/unicastIFD.html [NC]
+        RewriteRule unicast/UnicastIframe.html      wp-content/plugins/pb-ads/iframe-busters/unicast/UnicastIframe.html [NC]
+        RewriteRule viewpoint/vwpt.html             wp-content/plugins/pb-ads/iframe-busters/viewpoint/vwpt.html [NC]
+
+	#-----------------------------------------
+	# Rules to rewrite minify links
+	#-----------------------------------------
+	RewriteRule wp-content/plugins/bwp-minify/min/f/(.*)/v/(.*) wp-content/plugins/bwp-minify/min/?f=$1&ver=$2 [L]
+	RewriteRule wp-content/plugins/bwp-minify/min/f/(.*)        wp-content/plugins/bwp-minify/min/?f=$1 [L]
+
+	#-----------------------------------------
+	# Standard WP Rewrite rules for SEO links
+	#-----------------------------------------
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_URI} !\.(ico|jpe?g|js|gif|png|css|js|swf|txt)$ [NC]
+	RewriteRule . /index.php [L]
+        RewriteRule ^index\.php$ - [L]
+    </Directory>
+
+    AliasMatch ^/assets/(.*) /app/ugc/<%= name %>/assets/$1
+    AliasMatch ^/images/(.*) /app/ugc/<%= name %>/images/$1
+    RedirectMatch 404 ^/(assets|images)/.*\.php(/|$)
+
+    # we are using svn up to deploy code, but we don't want people to see .svn folders
+    RedirectMatch 404 /\\.svn(/|$)
+    
+    SetEnv WP_SITE <%= name %>
+        
+    <%=logging ? '' : '#'%>ErrorLog /app/log/cdn-sbx.<%= name %>-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/cdn-sbx.<%= name %>-access.log combined
+</VirtualHost>

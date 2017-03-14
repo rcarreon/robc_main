@@ -1,0 +1,12 @@
+# $Id$
+# $URL$
+
+define service {
+        host_name                      <%= dom %>
+        service_description            <%= name %>
+        check_command                  check_url_redirect!<%= dom %>!<%= uri_path %>!<%= str %>
+        notification_options           w,u,c,r,f,s
+        use                            generic-service
+        notes_url                       http://docs.gnmedia.net/wiki/Nagios-check_url
+}
+

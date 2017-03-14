@@ -1,0 +1,12 @@
+    ServerAlias *.wholesomebabyfood.com wholesomebabyfood.com
+    RewriteEngine On
+
+    # www.wholesomebabyfood.momtastic.com --> wholesomebabyfood.momtastic.com
+    RewriteCond %{HTTP_HOST} ^www\.wholesomebabyfood\.momtastic\.com$ [NC]
+    RewriteRule ^/(.*) http://wholesomebabyfood.momtastic.com/$1 [R=301,L]
+
+    # *.wholesomebabyfood.com --> wholesomebabyfood.momtastic.com
+    RewriteCond %{HTTP_HOST} ^(.*\.)?wholesomebabyfood\.com$ [NC]
+    RewriteRule ^/(.*) http://wholesomebabyfood.momtastic.com/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

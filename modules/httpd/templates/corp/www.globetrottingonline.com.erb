@@ -1,0 +1,21 @@
+<VirtualHost *:80>
+    DocumentRoot /app/shared/docroots/www.globetrottingonline.com
+    ServerName www.globetrottingonline.com
+    ServerAlias *.globetrottingonline.com
+    ErrorLog /app/log/www.globetrottingonline.com-error.log
+    CustomLog /app/log/www.globetrottingonline.com-access.log combined
+
+    <Directory /app/shared/docroots/www.globetrottingonline.com/>
+        AllowOverride FileInfo Indexes Options
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ index.php?url= [QSA,L]
+    </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+        ServerName globetrottingonline.com
+        Redirect 301 / http://www.globetrottingonline.com/
+</VirtualHost>
+

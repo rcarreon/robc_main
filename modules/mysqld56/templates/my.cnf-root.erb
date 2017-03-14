@@ -1,0 +1,11 @@
+
+# filename=<%= file %> 
+
+[client]
+       user= root
+<% if fqdn  =~ /^uid/ %>
+       password = <%= uidrootpass %>
+<% else %>
+       password = <%= rootpass %>
+<% end %>
+

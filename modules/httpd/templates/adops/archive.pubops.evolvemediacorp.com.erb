@@ -1,0 +1,28 @@
+# This file is managed by Puppet. Do not modify it from <%=fqdn %>
+# $Id: pubops.evolvemediacorp.com.erb
+
+<VirtualHost *:80>
+    ServerName archive.pubops.evolvemediacorp.com
+    # temporary for during the migration
+    ServerAlias pubops.gorillanation.com
+    ServerAlias pubops.evolvemediacorp.com
+    Timeout 600
+
+    DocumentRoot "/app/shared/docroots/adopsV3/htdocs/app_pubops/webroot"
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/pubops.evolvemediacorp.com.com.error.log
+    LogLevel warn
+    <%=logging ? '' : '#'%>CustomLog /app/log/pubops.evolvemediacorp.com.com.access.log combined
+    ServerSignature On
+
+    SetEnv ADOPS3_MEMCACHE "localhost:11211"
+    <Directory "/app/shared/docroots/adopsV3/htdocs/app_pubops/webroot">
+        RewriteEngine On
+
+        Options FollowSymlinks
+        AllowOverride all
+
+        Order allow,deny
+        Allow from all
+    </Directory>
+</VirtualHost>

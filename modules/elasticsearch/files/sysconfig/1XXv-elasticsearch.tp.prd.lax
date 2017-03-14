@@ -1,0 +1,10 @@
+ES_HOME=/usr/share/elasticsearch
+ES_HEAP_SIZE=5g
+MAX_OPEN_FILES=128000
+MAX_MAP_COUNT=262144
+LOG_DIR=/var/log/elasticsearch
+DATA_DIR=/app/shared/elasticsearch
+WORK_DIR=/tmp/elasticsearch
+CONF_DIR=/etc/elasticsearch
+CONF_FILE=/etc/elasticsearch/elasticsearch.yml
+ES_USER=elasticsearch

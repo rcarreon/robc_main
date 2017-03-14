@@ -1,0 +1,33 @@
+# $Id: headers.acl.erb 3054 2010-02-16 21:31:48Z jjohnson $
+# keep it sorted
+# 
+
+[groups]
+configuration_management = <%=`/usr/bin/getent group confmgmt | cut -d: -f 4 | xargs echo -n`%>
+database_administrators  = <%=`/usr/bin/getent group dba | cut -d: -f 4 | xargs echo -n`%>
+system_administrators    = <%=`/usr/bin/getent group sysadmins | cut -d: -f 4 | xargs echo -n`%>
+hmo                      = <%=`/usr/bin/getent group hmosvn | cut -d: -f 4 | xargs echo -n`%>
+noc                      = <%=`/usr/bin/getent group noc | cut -d: -f 4 | xargs echo -n`%>
+
+ad_platform              = <%=`/usr/bin/getent group adplatformsvn | cut -d: -f 4 | xargs echo -n` %>
+mal                      = <%=`/usr/bin/getent group malsvn | cut -d: -f 4 | xargs echo -n`%>
+tewn                     = <%=`/usr/bin/getent group tewn | cut -d: -f 4 | xargs echo -n`%>
+sales_integration        = <%=`/usr/bin/getent group sisvn | cut -d: -f 4 | xargs echo -n`%>
+springboard              = <%=`/usr/bin/getent group springboardsvn | cut -d: -f 4 | xargs echo -n`%>
+pebblebed                = <%=`/usr/bin/getent group pebblebedsvn | cut -d: -f 4 | xargs echo -n`%>
+adops3_ro_svn            = <%=`/usr/bin/getent group adops3_ro_svn | cut -d: -f 4 | xargs echo -n`%>
+corpnet                  = <%=`/usr/bin/getent group corpnet | cut -d: -f 4 | xargs echo -n`%>
+ttg                      = jcrawford,rvicchiullo,fdavis,aargyle,agodelman,dgrbavcic
+
+
+developers = @ad_platform, @sales_integration, @springboard, @pebblebed
+internal   = @ad_platform, @configuration_management, @database_administrators, @sales_integration, @springboard, @system_administrators, @pebblebed
+
+
+# Product Champions have limited acces (r) on their products, and rw on some legacy repositories
+# (so they can adjust business rule w/o distracting the team), do not agregate in "internal" see SOX
+pc-springboard = ddenton 
+
+product_champions = @pc-springboard
+
+

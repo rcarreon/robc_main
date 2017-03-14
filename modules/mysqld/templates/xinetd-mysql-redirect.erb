@@ -1,0 +1,15 @@
+# This is used by DoubleHelix so that microsites can just connect to localhost and
+# not worry about it.
+# filename=<%= file %> 
+service mysql-redirect
+{
+        type                    = UNLISTED
+        user                    = mysql
+        port                    = 3306
+        socket_type             = stream
+        wait                    = no
+        log_on_success          += DURATION USERID
+        log_on_failure          += USERID
+        redirect                = <%= mysql_host %> 3306
+}
+

@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+    ServerName tech.gorillanation.com
+    DocumentRoot /app/shared/docroots/tech.gorillanation.com/public_html
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/tech.gorillanation.com_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/tech.gorillanation.com_access.log combined
+
+    <Directory /app/shared/docroots>
+        AllowOverride All
+    </Directory>
+
+</VirtualHost>
+

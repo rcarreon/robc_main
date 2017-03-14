@@ -1,0 +1,654 @@
+#!/usr/bin/perl
+use strict;
+use Config::General;
+use Getopt::Long;
+Getopt::Long::Configure ("bundling");
+
+use Data::Dumper;
+
+my $throttle=15360;
+my $needhelp=0;
+my $mapdata = ();
+
+my $user="sqlcopy";
+my $pass="RPsQYznx";
+
+# two arg formats: '$0 [options] <mapfile>' or '$0 [options] <srchost> <desthost>'
+# If the *last* arg is a file, then we assume the former.
+
+
+if (defined $ARGV[$#ARGV] and -f $ARGV[$#ARGV]) {
+    # we are in "mapfile" mode
+    my $mapfile = pop;
+    $throttle = shift;
+    if (defined $throttle) {
+        if ("$throttle" eq "--nothrottle") {
+            $throttle = 0;
+        } else {
+            $needhelp=1;
+        }
+    }
+
+    my $conf   = new Config::General($mapfile);
+    my %config = $conf->getall;
+    foreach my $dest ( keys %{ $config{desthost} } ) {
+        my $sourcehost = $config{desthost}{$dest}{sourcehost};
+        my $masterhost = $config{desthost}{$dest}{masterhost};
+        my $savegrants = $config{desthost}{$dest}{savegrants};
+        my $asyncstart = $config{desthost}{$dest}{asyncstart};
+        my $emblackout = $config{desthost}{$dest}{emblackout};
+        my $sslrepl    = $config{desthost}{$dest}{sslrepl};
+        $mapdata->{$sourcehost}{dests}{$dest};
+        $mapdata->{$sourcehost}{dests}{$dest}{master}     = $masterhost;
+        $mapdata->{$sourcehost}{dests}{$dest}{savegrants} = $savegrants || "yes";
+        $mapdata->{$sourcehost}{dests}{$dest}{asyncstart} = $asyncstart || "no";
+        $mapdata->{$sourcehost}{dests}{$dest}{emblackout} = $emblackout || "no";
+        $mapdata->{$sourcehost}{dests}{$dest}{sslrepl}    = $sslrepl    || "no";
+
+        if ( !exists $mapdata->{$sourcehost}{priority} ) {
+            $mapdata->{$sourcehost}{priority} = 0;
+        }
+        if ( $asyncstart eq "yes" ) {
+            $mapdata->{$sourcehost}{priority} = 1;
+        }
+    }
+} else {
+    # we are in "srchost desthost" mode
+    my ($enslave,$sslrepl,$savegrants,$asyncstart,$emblackout,$sourcehost,$masterhost,$desthosts)=();
+    GetOptions('enslave|slave!' => \$enslave,
+             'sslrepl!' => \$sslrepl,
+             'throttle!' => \$throttle,
+             'savegrants|g!' => \$savegrants,
+             'asyncstart|a!' => \$asyncstart,
+             'emblackout|e!' => \$emblackout,
+             'sourcehost=s' => \$sourcehost,
+             'desthosts|desthost=s' => \$desthosts,
+             'help|?' => \$needhelp,
+             );
+     if (!$sourcehost) {
+         $sourcehost=shift;
+     }
+     if ($sslrepl) {
+         $enslave=1;
+     }
+     if ($enslave) {
+         $masterhost=$sourcehost;
+     }
+     if ($desthosts and $#ARGV > 1) {
+         print STDERR "Error: can't specify --desthost and multiple host args.\n";
+         $needhelp=1;
+     }
+     if (!$sourcehost) {
+         print STDERR "Error: Need a source host.\n";
+         $needhelp=1;
+     }
+     if (!$savegrants) {
+         $savegrants="yes";
+     }
+     my @desthosts=split(/,/, $desthosts);
+     foreach my $arg (@ARGV) {
+         push(@desthosts, split(/,/, $arg));
+     }
+     if (!$desthosts[0]) {
+         print STDERR "Error: Need at least one destination host.\n";
+         $needhelp=1;
+     }
+
+     foreach my $dest (@desthosts) {
+         if ($dest eq $sourcehost) {
+             print STDERR "Error: Destination host can't be the sourcehost.\n";
+             $needhelp=1;
+         }
+         $mapdata->{$sourcehost}{dests}{$dest};
+         $mapdata->{$sourcehost}{dests}{$dest}{master}     = $masterhost || "none";
+         $mapdata->{$sourcehost}{dests}{$dest}{savegrants} = $savegrants && "yes";
+         $mapdata->{$sourcehost}{dests}{$dest}{asyncstart} = $asyncstart && "yes" || "no";
+         $mapdata->{$sourcehost}{dests}{$dest}{emblackout} = $emblackout && "yes" || "no";
+         $mapdata->{$sourcehost}{dests}{$dest}{sslrepl}    = $sslrepl    && "yes" || "no";
+     }
+     if ($enslave eq "") {
+         print STDERR "Error: You must specify --[no]slave.\n";
+         $needhelp=1;
+     }
+}
+
+#print Dumper($mapdata);
+
+if ( $needhelp  ) {
+    print STDERR "Usage: $0 [--nothrottle] mapfile\n";
+    print STDERR "Usage: $0 [options] [srchost] [desthost,...]\n";
+    print STDERR "\nMapfile Example:
+   <desthost sql2v-test.tp.dev.lax.gnmedia.net>
+     sourcehost=sql1v-test.tp.dev.lax.gnmedia.net
+     masterhost=sql1v-test.tp.dev.lax.gnmedia.net|none
+     savegrants=no|yes
+     asyncstart=no|yes
+     emblackout=no|yes
+     sslrepl=no|yes
+   </desthost>\n";
+   print STDERR "Options: --[no]slave       Enable slaving (mandatory option)
+         --[no]sslrepl     Enable SSL replication
+         --[no]throttle    Control BW throttling (throttled by default)
+         --[no]savegrants  Save grants on your destination(s) (enabled by default)
+         --[no]emblackout  Blackout notifications in EM
+         --sourcehost <hostname> Designated source host
+         --desthosts <hostnames,...> One or more destination hosts\n";
+
+    exit(1);
+}
+
+if ( $> != 0 ) {
+    print STDERR "Must be run as root\n";
+    exit(1);
+}
+
+# Two steps for confg information, read the conf file into %config, and then
+# sort it out into $mapdata. $mapdata is the actual config that we use.
+
+
+# hide debug stuff
+#use Data::Dumper;
+#print Dumper($mapdata);
+#foreach my $sourcehost (sort { $mapdata->{$b}{priority} <=> $mapdata->{$a}{priority} } keys %{$mapdata}) {
+#foreach my $desthost (sort { $mapdata->{$sourcehost}{dests}{$b}{asyncstart} cmp $mapdata->{$sourcehost}{dests}{$a}{asyncstart}} keys %{ $mapdata->{$sourcehost}{dests} }) {
+#print "$sourcehost -> $desthost\n";
+#}
+#}
+#exit;
+
+# ssh into each host to test
+foreach my $sourcehost ( keys %{$mapdata} ) {
+    print "-> $sourcehost\n";
+    system("ssh -o 'StrictHostKeyChecking no' $sourcehost true") && die;
+
+    foreach my $desthost ( keys %{ $mapdata->{$sourcehost}{dests} } ) {
+
+        #print "  -> $desthost\n";
+        system("ssh -o 'StrictHostKeyChecking no' $desthost true") && die;
+
+        my $masterhost = $mapdata->{$sourcehost}{dests}{$desthost}{master};
+
+        #print "    -> $masterhost\n";
+        if ( $masterhost ne "none" ) {
+            system("ssh -o 'StrictHostKeyChecking no' $masterhost true") && die;
+        }
+    }
+}
+
+# Actual work below here...
+
+my $snapname = "dbslavenewtmp.$$";
+
+sub lockalltables() {
+    foreach my $sourcehost ( keys %{$mapdata} ) {
+        system(
+"ssh $sourcehost mkfifo /var/tmp/mysqlcopyin /var/tmp/mysqlcopyout 2>/dev/null"
+        );
+    }
+    foreach my $sourcehost ( keys %{$mapdata} ) {
+        print "Locking tables on $sourcehost.\n";
+        open( $mapdata->{$sourcehost}{mysqlfd}, "|ssh $sourcehost mysql -u $user -p$pass " )
+          or return 0;
+        print { $mapdata->{$sourcehost}{mysqlfd} }
+"FLUSH TABLES WITH READ LOCK;SYSTEM echo LOCKED > /var/tmp/mysqlcopyout;SYSTEM cat /var/tmp/mysqlcopyin;UNLOCK TABLES;\n";
+        system(
+"ssh $sourcehost 'while ! grep -q LOCKED /var/tmp/mysqlcopyout;do echo not yet locked;sleep 1;done'"
+        );
+
+    }
+    print "** All tables locked.\n";
+    return 1;
+}
+
+sub unlockalltables() {
+    foreach my $sourcehost ( keys %{$mapdata} ) {
+        print "Unlocking tables on $sourcehost.\n";
+        system("ssh $sourcehost 'echo Unlock > /var/tmp/mysqlcopyin'");
+        close( $mapdata->{$sourcehost}{mysqlfd} );
+    }
+    print "** All tables unlocked.\n";
+    return 1;
+}
+
+sub deleteallsnaps() {
+    foreach my $sourcehost ( keys %{$mapdata} ) {
+        print "Deleting snapshot on $sourcehost.\n";
+        my $filer  = $mapdata->{$sourcehost}{filer};
+        #my $volume  = $mapdata->{$sourcehost}{volume};
+        my $volume = (split("/",$mapdata->{$sourcehost}{volume}))[0];
+        system("rnetapp $filer snapshot delete $volume $snapname");
+    }
+    return 1;
+}
+
+# Function added to remove blackout event when something fail
+sub removeblackout() {
+    foreach my $sourcehost ( keys %{$mapdata} ) {
+        foreach my $desthost ( keys %{ $mapdata->{$sourcehost}{dests} } ) {
+            if ( $mapdata->{$sourcehost}{dests}{$desthost}{emblackout} eq 'yes' ) {
+                if ( -e '/usr/local/bin/emblackout' ) {
+                    print scalar localtime, ": ";
+                    print "$desthost: EM blackout disabled on EM.\n";
+                    system("/usr/local/bin/emblackout $desthost false");
+                }
+                else {
+                    print "Could not find emblackout executable, skipping EM blackout...\n";
+                }
+            }
+        }
+    }
+    return 1;
+}
+
+print scalar localtime, "\n\nStage 1 of 5: Gather configuration data.\n";
+foreach my $sourcehost ( keys %{$mapdata} ) {
+    my $datadir = `echo SHOW VARIABLES | ssh $sourcehost mysql -u $user -p$pass | grep ^datadir`;
+    split( /\s+/, $datadir );
+    $datadir = $_[1];
+    if ( "$datadir" eq "" ) {
+        print STDERR "Unable to fetch datadir from sourcehost $sourcehost.\n";
+        die;
+    }
+    my $nfssource =
+      `ssh $sourcehost df -P $datadir | awk '{print \$1}' | tail -1`;
+    if ( "$nfssource" eq "" ) {
+        print STDERR
+          "Unable to find NFS filesystem from sourcehost $sourcehost.\n";
+        die;
+    }
+    $nfssource =~ m|(.*):/vol/(.*)|;
+    $mapdata->{$sourcehost}{filer}   = $1;
+    $mapdata->{$sourcehost}{volume}  = $2;
+    $mapdata->{$sourcehost}{datadir} = $datadir;
+
+    print "Source SQL: $sourcehost\n";
+    print "NFS Filer: ",   $mapdata->{$sourcehost}{filer},   "\n";
+    print "NFS Volume: ",  $mapdata->{$sourcehost}{volume},  "\n";
+    print "SQL datadir: ", $mapdata->{$sourcehost}{datadir}, "\n";
+
+    foreach my $desthost ( keys %{ $mapdata->{$sourcehost}{dests} } ) {
+        if ( $mapdata->{$sourcehost}{dests}{$desthost}{emblackout} eq 'yes' ) {
+            if ( -e '/usr/local/bin/emblackout' ) {
+                print scalar localtime, ": ";
+                print "$desthost: EM blackout enabled on EM.\n";
+                system("/usr/local/bin/emblackout $desthost true");
+            }
+            else {
+                print
+"Could not find emblackout executable, skipping EM blackout...\n";
+            }
+        }
+
+        print scalar localtime, ": ";
+        my $ret =
+          system("ssh $desthost /sbin/service mysql-monitor-agent status");
+        if ( $ret == 0 ) {
+            $mapdata->{$sourcehost}{dests}{$desthost}{agent} = 1;
+        }
+        else {
+            print
+"$desthost: not running mysql agent, will not start at the end.\n";
+            $mapdata->{$sourcehost}{dests}{$desthost}{agent} = 0;
+        }
+    }
+}
+
+my $startdate = `date +%s`;
+
+print scalar localtime, ": ";
+print "\n\nStage 2 of 5: Get snapshots of source hosts.\n";
+if ( !lockalltables() ) {
+    print "Erroring locking tables, bailing out...\n";
+    unlockalltables();
+    removeblackout();
+    exit(1);
+}
+foreach my $sourcehost ( keys %{$mapdata} ) {
+
+    my $filer   = $mapdata->{$sourcehost}{filer};
+    #my $volume  = $mapdata->{$sourcehost}{volume};
+    my $volume = (split("/",$mapdata->{$sourcehost}{volume}))[0];
+    my $datadir = $mapdata->{$sourcehost}{datadir};
+
+    print scalar localtime, ": ";
+    print "$sourcehost: Creating snapshot of $volume.\n";
+    system("rnetapp $filer snapshot create $volume $snapname");
+    if ( $? != 0 ) {
+        print
+          "$sourcehost: Snapshot failed, unlocking tables and bailing out...\n";
+        unlockalltables();
+        deleteallsnaps();
+        removeblackout();
+        die;
+    }
+    $_ = `echo SHOW MASTER STATUS | ssh $sourcehost mysql -u $user -p$pass | tail -1`;
+    chomp;
+    m/(\S+)\s+(\S+)\s/;
+    $mapdata->{$sourcehost}{logfile} = $1;
+    $mapdata->{$sourcehost}{logpos}  = $2;
+    if ( $mapdata->{$sourcehost}{logfile} eq "" ) {
+        print "$sourcehost: Master logfile not set\n";
+        unlockalltables();
+        deleteallsnaps();
+        removeblackout();
+        die;
+    }
+    if ( $mapdata->{$sourcehost}{logpos} eq "" ) {
+        print "$sourcehost: Master logpos not set\n";
+        unlockalltables();
+        deleteallsnaps();
+        removeblackout();
+        die;
+    }
+    print "Masterlog: ", $mapdata->{$sourcehost}{logfile}, " ",
+      "Masterpos: ", $mapdata->{$sourcehost}{logpos}, "\n";
+
+}
+print scalar localtime, ": ";
+print "Unlocking tables...\n";
+unlockalltables() or die;
+
+print scalar localtime, ": ";
+print "\n\nStage 3 of 5: Save grants, inventory, and copy data.\n";
+foreach my $sourcehost (
+    sort { $mapdata->{$b}{priority} <=> $mapdata->{$a}{priority} }
+    keys %{$mapdata} )
+{
+    foreach my $desthost (
+        sort {
+            $mapdata->{$sourcehost}{dests}{$b}{asyncstart}
+              cmp $mapdata->{$sourcehost}{dests}{$a}{asyncstart}
+        } keys %{ $mapdata->{$sourcehost}{dests} }
+      )
+    {
+
+        my $filer   = $mapdata->{$sourcehost}{filer};
+        my $volume  = $mapdata->{$sourcehost}{volume};
+        my $datadir = $mapdata->{$sourcehost}{datadir};
+        print scalar localtime, ": ";
+        print "\n** Starting on $desthost...\n";
+        $_ =
+`rnetapp $filer snapshot mount $volume $snapname $desthost | grep "^Mounted at"`;
+        if ( $? != 0 ) {
+            print "$desthost: Failed to mount snapshot\n";
+            print "$desthost: Removing snapshot and bailing out\n";
+            deleteallsnaps();
+            removeblackout();
+            die;
+        }
+        chomp;
+        m/Mounted at (.*)/;
+        my $tmpmount = $1;
+        if ( $tmpmount eq "" ) {
+            print STDERR "tmpmount not set\n";
+            deleteallsnaps();
+            removeblackout();
+            die;
+        }
+        print scalar localtime, ": ";
+        print "$desthost: Stopping agent, saving inventory and grants...\n";
+        system("ssh $desthost /sbin/service mysql-monitor-agent stop");
+
+        # EM inventory dump
+        system(
+            "ssh $desthost 'mysqldump -u $user -p$pass mysql inventory > /tmp/inventory.dump'"
+        );
+
+        # This ugly monster gets all of the non-system grants
+        system(q{echo "SELECT CONCAT('SET SQL_LOG_BIN=0; CREATE USER ''',user,'''@''', host, ''' IDENTIFIED WITH ', plugin,' AS ''', authentication_string, ''';') FROM mysql.user WHERE plugin <> '' AND plugin <> 'mysql_native_password' ORDER BY user;" | ssh }
+              . $desthost
+              . qq{ mysql --batch --skip-column-names -u $user -p$pass mysql | ssh }
+              . $desthost
+              . q{ cat \\> /tmp/tmp-grants.txt} );
+
+        system(q{echo "SELECT CONCAT('SHOW GRANTS FOR ''', user, '''@''', host, ''';') FROM mysql.user ORDER BY user;" | ssh }
+              . $desthost
+              . qq{ mysql --batch --skip-column-names -u $user -p$pass -D mysql | ssh }
+              . $desthost
+              . qq{ mysql --batch --skip-column-names -u $user -p$pass } . q{ | sed 's/$/;/' | sed 's/GRANT/SET SQL_LOG_BIN=0; GRANT/' | ssh }
+              . $desthost
+              . q{ cat \\>\\> /tmp/tmp-grants.txt} );    # phew!
+            # This 'mv' helps us to recover from previous copy faults.
+            # If we just got a fresh copy of the grants, then we will use it.
+            # If not, then maybe we have the previously saved grants to use.
+        system(
+"ssh $desthost 'test -s /tmp/tmp-grants.txt && mv -vf /tmp/tmp-grants.txt /tmp/saved-grants.txt'"
+        );
+
+        # Stopping MySQL Service
+        print scalar localtime, ": ";
+        system("ssh $desthost '/sbin/service mysql stop'");
+
+        system("ssh -t $desthost 'rm -rvf $datadir/*'");
+        print scalar localtime, ": ";
+        my $ret = system(
+"ssh -t $desthost 'rsync -av --bwlimit=$throttle --delete-before --progress --exclude=*.pid $tmpmount/mysql/* $datadir/'"
+        );
+        if ( -t STDIN ) {
+            while ( $ret != 0 ) {
+                print "rsync failed: retry? [Y/n]\n";
+                my $resp = <STDIN>;
+                if ( $resp =~ /^n|N/ ) {
+                    $ret = 0;
+                }
+                else {
+                    print scalar localtime, ": ";
+                    system("ssh -t $desthost 'rm -vrf $datadir/*'");
+                    print scalar localtime, ": ";
+                    $ret = system(
+"ssh -t $desthost 'rsync -av --bwlimit=$throttle --delete-before --progress --exclude=*.pid $tmpmount/mysql/* $datadir/'"
+                    );
+                }
+            }
+        }
+        print scalar localtime, ": ";
+        print "$desthost: Removing master.info on slave\n";
+        system("ssh $desthost 'rm -vf $datadir/master.info $datadir/auto.cnf'");
+        system("rnetapp $filer snapshot umount $volume $snapname $desthost");
+        print "$desthost: Data copy completed\n";
+        if ( $mapdata->{$sourcehost}{dests}{$desthost}{asyncstart} eq "yes" ) {
+            print
+              "$desthost: Asyncstart specified, launching mysql early...\n";
+            stage4(
+                $desthost,
+                $mapdata->{$sourcehost}{dests}{$desthost}{savegrants},
+                $mapdata->{$sourcehost}{dests}{$desthost}{agent}
+            );
+        }
+    }
+}
+deleteallsnaps();
+
+sub stage4 {
+    my $desthost   = shift;
+    my $savegrants = shift;
+    my $agent      = shift;
+
+    print scalar localtime, ": ";
+    print "\n$desthost: Starting mysql\n";
+    system(
+        "ssh $desthost /sbin/service mysql-monitor-agent stop >/dev/null 2>&1");
+    system(
+        "ssh $desthost '/sbin/service mysql start'");
+    system("false");
+
+    while ( $? != 0 ) {
+        print "$desthost: Trying again in 10 seconds...\n";
+        sleep(10);
+        system("echo select version'()' | ssh $desthost mysql -u $user -p$pass");
+    }
+    print scalar localtime, ": ";
+    print
+"$desthost: Running mysql_upgrade, redirecting to mysql_upgrade.log-$desthost\n";
+    unlink("mysql_upgrade.log-$desthost");
+    system("ssh $desthost mysql_upgrade --skip-write-binlog  > mysql_upgrade.log-$desthost");
+    if (exists $ENV{SUDO_USER} ) {
+        print "Changing to ",$ENV{SUDO_USER},"\n";
+        my (undef,undef,$uid,$gid) = getpwnam($ENV{SUDO_USER})
+                               or die $ENV{SUDO_USER} ." not in passwd file";
+
+        chown($uid, $gid, "mysql_upgrade.log-$desthost") or die;
+    }
+
+    print "*** FIXME: not checking for required table upgrades yet.\n";
+
+    #grep -B 1 "Table upgrade required." mysql_upgrade.log-$slave | \
+    #while read line;do
+    #if [[ "$line" =~ "Table upgrade required" ]];then
+    #cmd=$(print "$line" | sed 's/.*\"\(REPAIR TABLE .*\)\".*/\1/');
+    #print "$cmd"
+    #print "use $db; $cmd" | ssh $slave mysql
+    #fi
+    #db="${line%\.*}"
+    #done
+    system( "ssh $desthost /sbin/service mysql-monitor-agent stop >/dev/null 2>&1");
+
+# truncate *and* load in old inventory. The truncate is incase the mysqldump failed
+    system( "echo set sql_log_bin=0\\; truncate inventory\\; | ssh $desthost mysql -u $user -p$pass mysql");
+    system(
+"ssh $desthost 'echo \"set sql_log_bin=0; \$(cat /tmp/inventory.dump)\" | tee /tmp/invcmd | mysql -u $user -p$pass mysql' | sed 's/^/$desthost: /'"
+    );
+
+    print scalar localtime, ": ";
+    if ( $savegrants eq "yes" ) {
+        print "$desthost: Restoring grants (if I have any)...\n";
+        system(
+q{echo "SELECT CONCAT('SET SQL_LOG_BIN=0; DROP USER ''', user,'''@''', host, ''';') FROM mysql.user WHERE user not in ('root', 'sqlcopy') ORDER BY user;" | ssh }
+              . $desthost
+              . " mysql -u $user -p$pass --batch --skip-column-names -D mysql | tee -a /tmp/". $desthost ."_drop_grants | ssh "
+              . $desthost
+              . " mysql -u $user -p$pass " );    # phew!
+        system("ssh $desthost 'test -s  /tmp/saved-grants.txt && mysql -u $user -p$pass < /tmp/saved-grants.txt'");
+    }
+    else {
+        print "$desthost: Not restoring grants.\n";
+    }
+
+}
+
+print scalar localtime, ": ";
+print
+  "\n\nStage 4 of 5: Start mysql, load inventory, grants, and start agent.\n";
+foreach my $sourcehost ( keys %{$mapdata} ) {
+    print "-> $sourcehost\n";
+
+    foreach my $desthost (
+        sort {
+            $mapdata->{$sourcehost}{dests}{$b}{asyncstart}
+              cmp $mapdata->{$sourcehost}{dests}{$a}{asyncstart}
+        } keys %{ $mapdata->{$sourcehost}{dests} }
+      )
+    {
+        if ( $mapdata->{$sourcehost}{dests}{$desthost}{asyncstart} ne "yes" ) {
+            stage4(
+                $desthost,
+                $mapdata->{$sourcehost}{dests}{$desthost}{savegrants},
+                $mapdata->{$sourcehost}{dests}{$desthost}{agent}
+            );
+        }
+    }
+}
+
+print scalar localtime, ": ";
+print "\n\nStage 5 of 5: Set up replication!\n";
+my %desthosts = ();
+foreach my $sourcehost ( keys %{$mapdata} ) {
+    foreach my $desthost ( keys %{ $mapdata->{$sourcehost}{dests} } ) {
+
+        # pick out the destination hosts for binlog resetting.
+        $desthosts{$desthost} = 1;
+    }
+}
+foreach my $sourcehost ( keys %{$mapdata} ) {
+    foreach my $desthost ( keys %{ $mapdata->{$sourcehost}{dests} } ) {
+        my $masterhost = $mapdata->{$sourcehost}{dests}{$desthost}{master};
+
+        if ( $masterhost ne "none" ) {
+            if ( exists $desthosts{$masterhost} ) {
+                print
+"$masterhost: Both master and destination, reset master binlog...\n";
+                system(
+"echo 'set sql_log_bin=0; reset master;' | ssh $masterhost mysql -u $user -p$pass | sed 's/^/$masterhost: /'"
+                );
+                $mapdata->{$masterhost}{logfile} =
+                  "bin.000001";    # Rizwan said these defaults are safe
+                $mapdata->{$masterhost}{logpos} = "4";
+            }
+            else {
+                print
+"$masterhost: not a destination host, using existing binlog info.\n";
+            }
+        }
+    }
+}
+print "\n";
+foreach my $sourcehost ( keys %{$mapdata} ) {
+    foreach my $desthost ( keys %{ $mapdata->{$sourcehost}{dests} } ) {
+        my $masterhost = $mapdata->{$sourcehost}{dests}{$desthost}{master};
+        my $ssl = $mapdata->{$sourcehost}{dests}{$desthost}{sslrepl};
+
+        if ( $masterhost ne "none" ) {
+            print scalar localtime, ": ";
+            print "$masterhost: Granting replication to repl\@$desthost.\n";
+            my $grantstmt="set sql_log_bin=0; grant replication slave on *.* to \"repl\"\@\"$desthost\" identified by \"mr.repl\"";
+            if ( "$ssl" eq "yes" ) {
+                $grantstmt.=" REQUIRE SSL";
+            }
+
+            print "Grantstmt: $grantstmt;\n";
+            system( "echo '$grantstmt;' | ssh $masterhost mysql -u $user -p$pass | sed 's/^/$masterhost: /'");
+
+            print "$desthost: Changing master to $masterhost: ",
+              $mapdata->{$masterhost}{logfile}, " ",
+              $mapdata->{$masterhost}{logpos},  "\n";
+
+              my $changestmt="CHANGE MASTER TO MASTER_HOST=\"$masterhost\", MASTER_USER=\"repl\", MASTER_PASSWORD=\"mr.repl\", MASTER_LOG_FILE=\"". $mapdata->{$masterhost}{logfile}. "\", MASTER_LOG_POS=". $mapdata->{$masterhost}{logpos};
+              if ($ssl eq "yes") {
+                  $changestmt.=", MASTER_SSL=1, MASTER_SSL_CA=\"/etc/mysql/ca-cert.pem\", MASTER_SSL_CERT=\"/etc/mysql/client-cert.pem\", MASTER_SSL_KEY=\"/etc/mysql/client-key.pem\"";
+              }
+            print "Changestmt: $changestmt;\n";
+            system( "echo '$changestmt;START SLAVE;' | ssh $desthost mysql -u $user -p$pass | sed 's/^/$desthost: /'" );
+        }
+    }
+}
+print "\n";
+foreach my $sourcehost ( keys %{$mapdata} ) {
+    foreach my $desthost ( keys %{ $mapdata->{$sourcehost}{dests} } ) {
+        my $masterhost = $mapdata->{$sourcehost}{dests}{$desthost}{master};
+
+        if ( $masterhost ne "none" ) {
+            print scalar localtime, ": ";
+            print "$desthost: Starting slave thread.\n";
+            system(
+"echo 'START SLAVE;' | ssh $desthost mysql -u $user -p$pass | sed 's/^/$desthost: /'"
+            );
+        }
+
+        if ($mapdata->{$sourcehost}{dests}{$desthost}{agent}) {
+            print scalar localtime, ": ";
+            system("ssh $desthost /sbin/service mysql-monitor-agent start");
+        }
+
+        if ( $mapdata->{$sourcehost}{dests}{$desthost}{emblackout} eq 'yes' ) {
+            print scalar localtime, ": ";
+            print "$desthost: Disable blackout on EM.\n";
+            system("/usr/local/bin/emblackout $desthost false");
+        }
+
+    }
+}
+
+
+print print "\nDone!\nIf there are problems, double check /etc/my.cnf\n";
+
+# mail dba with sqlcopy job info
+my $stopdate = `date +%s`;
+
+open(MAIL, "| mail -s '[sqlcopy] job completed' dba\@evolvemediallc.com");
+print MAIL "sqlcopy completed with the following config:\n";
+foreach my $sourcehost ( keys %{$mapdata} ) {
+   print MAIL "\nSource host: $sourcehost\n";
+   print MAIL Dumper($mapdata->{$sourcehost});
+}
+print MAIL "\n\nTime: ",($stopdate-$startdate) / 60, " minutes, ",($stopdate-$startdate) % 60, " seconds.\n";
+close(MAIL);

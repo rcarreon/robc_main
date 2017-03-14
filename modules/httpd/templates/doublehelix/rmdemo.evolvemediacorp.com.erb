@@ -1,0 +1,19 @@
+# $Id: $
+# rmdemo.evolvemediacorp.com - generated on 20110310 by aibarra 
+# /etc/httpd/conf.d/rmdemo.evolvemediacorp.com.conf
+<VirtualHost *:80>
+    DocumentRoot /app/shared/docroots/rmdemo.evolvemediacorp.com
+    ServerName  rmdemo.evolvemediacorp.com
+    ServerAlias rmdemo.*.com *.rmdemo.*.com rmdemo.*.net rmdemo.*.com.au
+    
+    <%=logging ? '' : '#'%>ErrorLog /app/log/rmdemo.evolvemediacorp.com-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/rmdemo.evolvemediacorp.com-access.log combined
+
+    <Directory /app/shared/docroots/rmdemo.evolvemediacorp.com/>
+        # AllowOverride FileInfo Indexes Options
+        AllowOverride All
+        RewriteEngine On
+    </Directory>
+</VirtualHost>
+
+

@@ -1,0 +1,36 @@
+# $Id$
+# $URL$
+
+# /modules/sysctl/README 
+#
+# In order to use the sysctl module to update or set 
+# sysctl settings
+#
+# To apply the settings defined in prd.pp for example
+# in your manifest, include 'sysctl::prd'
+
+# To create a custom set of your own settings make a copy
+# of prd.pp like so
+
+# in the sysctl/manifests dir 
+
+# cp {prd,mine}.pp 
+#  -- or --
+# cat prd.pp | sed -e 's/prd/new_name/g' > mine.pp
+
+# or if you only need a few one offs and not a whole new class
+
+# sysctl::conf {
+#    'sysctl.key': value => 'sysctl.key.val';
+#    ... 
+#    'sysctl.key2': value => 'sysctl.key2.val';
+# }
+
+# You can use the puppet-sysctl-admin tool to search for key / values.
+
+$ ./puppet-sysctl-admin crypto
+  sysctl::conf {
+    { 'crypto.fips_enabled': value => '0' };
+  }
+$
+

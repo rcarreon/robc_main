@@ -1,0 +1,29 @@
+<VirtualHost *:80>
+    ServerName stg.crowdignite.com
+    ServerAlias stg.origin.crowdignite.com stg.cdn.crowdignite.com stg.cdn1.crowdignite.com stg.cdn2.crowdignite.com stg.cdn3.crowdignite.com stg.cdn4.crowdignite.com stg.crowdignite.gamerevolution.com stg.es.crowdignite.craveonline.com stg.news.crowdignite.craveonline.com stg.crowdignite.craveonline.com stg.crowdignite.momtastic.com stg.crowdignite.thefashionspot.com stg.crowdignite.globetrottingonline.com stg.thecelebritycafe.crowdignite.com stg.crowdignite.teenspot.com stg.crowdignite.liveoutdoors.com stg.crowdignite.totallyher.com stg.crowd-ignite.totallyher.com stg.thebusinessexchange.entrepreneur.com stg.es.crowdignite.totallyher.com stg.thebusinesscontentexchange.entrepreneur.com
+
+    # https://bugs.php.net/bug.php?id=59692 imagick and libgomp are incompatiable
+    # so we force imagick to stick to one thread
+    SetEnv MAGICK_THREAD_LIMIT 1
+
+    DocumentRoot /app/shared/public_html/app/webroot
+    <%=logging ? '' : '#'%>CustomLog /app/log/stg.crowdignite.com-access_log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/stg.crowdignite.com-error_log
+
+    <Directory "/app/shared/public_html/app/webroot">
+        php_admin_value open_basedir /app/shared:/var/www/tmp:/app/tmp:/app/log/cakephp:/app/shared/public_html/app/webroot/img/upload:/app/shared/public_html/app/tmp:/dev/shm/logs:/var/vw-log-ramdisk
+        Options -Indexes +FollowSymLinks -ExecCGI
+
+        RewriteEngine On
+
+        RewriteBase /
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
+
+        <Files sitemap.xml>
+            RewriteEngine Off
+        </Files>
+    </Directory>
+
+</VirtualHost>

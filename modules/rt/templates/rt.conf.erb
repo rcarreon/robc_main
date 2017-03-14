@@ -1,0 +1,23 @@
+# $Id$
+# $URL$
+
+<VirtualHost *:80>
+	ServerName <%= name %>
+	<%= "ServerAlias #{server_alias}" if server_alias %>
+	DocumentRoot /usr/share/rt3/html
+	ErrorLog /app/log/<%= name %>-error_log
+	CustomLog /app/log/<%= name %>-access_log common
+
+	PerlRequire /usr/sbin/webmux.pl
+
+	<Directory "/usr/share/rt3/html">
+		AllowOverride All
+		Options ExecCGI FollowSymLinks
+		RewriteEngine On
+		RedirectMatch permanent (.*)/$ $1/index.html
+		AddDefaultCharset UTF-8
+		SetHandler perl-script
+		PerlHandler RT::Mason
+	</Directory>
+
+</VirtualHost>

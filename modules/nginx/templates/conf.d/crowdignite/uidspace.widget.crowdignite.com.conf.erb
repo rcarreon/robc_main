@@ -1,0 +1,44 @@
+# set port to 81 for CI UID systems
+
+server {
+        server_name <%= vhost %>;
+        listen       81;
+        #expires      365d;
+
+        #charset koi8-r;
+
+        #access_log  /app/log/nginx/<%= name %>.access.log  main;
+
+        # deny all access to hidden file like .htaccess .svn and no loggin
+	location ~ /\. {
+    		access_log off;
+    		log_not_found off; 
+    		deny all;
+	}
+
+        location / {
+            root   /app/shared/<%= dev %>/public_html_widget;
+            index  index.php index.html index.htm;
+
+
+            if (-f $request_filename) {
+                break;
+            }
+            if (!-f $request_filename) {
+                rewrite ^/widgets/pixel/(.+)/(.*)$ /widgets/pixel.php?url=$1&links=$2 last;
+                rewrite ^/widgets/(.+)$ /widgets/index.php?url=$1 last;
+                rewrite ^/dev/(.+)$ /dev/index.php?url=$1 last;
+                break;
+            }
+        }
+
+        # tell nginx to proxy req to fastcgi (php-fpm)
+        location ~ \.php$ {
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_index  index.php;
+            fastcgi_param  SCRIPT_FILENAME  /app/shared/<%= dev %>/public_html_widget$fastcgi_script_name;
+            include /etc/nginx/fastcgi_params;
+        }
+}
+
+

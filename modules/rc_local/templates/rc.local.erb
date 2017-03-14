@@ -1,0 +1,21 @@
+#!/bin/sh
+
+#
+# This file is managed by Puppet. DO NOT MODIFY it on <%= fqdn %>
+#
+
+# This script will be executed *after* all the other init scripts.
+# You can put your own initialization stuff in here if you don't
+# want to do the full Sys V style init stuff.
+
+touch /var/lock/subsys/local
+
+<% if @fqdn == "app1v-dashboards.tp.prd.lax.gnmedia.net" %>
+pushd /app/shared/docroots/monitor-graphs
+./run-puppet-foreman.sh
+./run-servers-graph.sh
+popd
+<% end %>
+<% if at_status == "production" %>
+uptime | mailx -s "System $(hostname) Rebooted" red@gorillanation.com
+<% end %>

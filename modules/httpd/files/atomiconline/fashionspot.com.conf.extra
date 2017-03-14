@@ -1,0 +1,7 @@
+# $Id$
+
+    RewriteEngine On
+        
+    RedirectPermanent / http://www.thefashionspot.com
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

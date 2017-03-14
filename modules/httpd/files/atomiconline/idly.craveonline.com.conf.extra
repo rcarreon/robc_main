@@ -1,0 +1,19 @@
+    Options +FollowSymLinks
+    RewriteEngine on
+
+# Drop the www
+    RewriteCond %{HTTP_HOST} ^www\.idly\.craveonline\.com$
+    RewriteRule ^/(.*)$ http://idly.craveonline.com/$1 [R=301,L]
+
+# /yyyy/mm/slug.html -> /yyyy/mm/slug
+    RewriteCond %{REQUEST_URI} !^/[0-9]{4}/[0-9]{2}/comment_.+\.html$
+    RewriteRule ^(/[0-9i]{4}/[0-9]{2}/.+).html$ $1 [R=301,L]
+
+# /yyyy/mm/comment_page-alias.html -> /yyyy/mm/page-alias/#disqus_thread
+    RewriteRule ^(/[0-9]{4}/[0-9]{2}/)comment_(.+).html$ $1$2/#disqus_thread [NE,R=301,L]
+
+
+    RewriteCond %{QUERY_STRING} ^slide=([0-9]+)$ [NC]
+    RewriteRule ^(.*)$ $0#/slide/%1? [R=301,NE,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

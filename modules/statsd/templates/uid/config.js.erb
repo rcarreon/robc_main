@@ -1,0 +1,17 @@
+{
+  graphitePort: 2003
+, graphiteHost: "relay-graphite.gnmedia.net"
+, port: 8125
+, statPrefixes: {
+<%
+stats = ['average','counters','timers','gauges']
+if (fqdn =~ /^(uid[1-8]v)-(\w*)\.(\w*)\.(\w*)\.lax\.gnmedia\.net$/ )
+  stats.each do |counter|
+%>
+    <%= counter %>: "statsd.<%= $3 %>.<%= $2 %>.<%= $4 %>.<%= $1 %>.<%= counter %>.",
+<%
+  end
+end
+%>
+  }
+}

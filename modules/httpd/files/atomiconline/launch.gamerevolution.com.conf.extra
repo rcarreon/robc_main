@@ -1,0 +1,7 @@
+# $Id$
+
+    RewriteEngine On
+        
+    RedirectPermanent / http://www.gamerevolution.com
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

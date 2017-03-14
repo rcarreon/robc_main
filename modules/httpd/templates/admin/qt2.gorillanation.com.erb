@@ -1,0 +1,15 @@
+<VirtualHost *:80>
+    ServerName qt2.gorillanation.com
+    ServerAlias *.qt2.gorillanation.com
+    DocumentRoot /app/shared/docroots/qt.gorillanation.com/
+    AddHandler cgi-script .cgi
+    <%=logging ? '' : '#'%>ErrorLog /app/log/qt2.gorillanation.com-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/qt2.gorillanation.com-access.log combined
+
+   <Directory /app/shared/docroots/qt.gorillanation.com>
+     Options ExecCGI
+     DirectoryIndex index.cgi
+   </Directory>
+
+</VirtualHost>
+

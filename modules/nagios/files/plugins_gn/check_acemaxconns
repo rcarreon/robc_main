@@ -1,0 +1,4 @@
+#!/bin/bash
+
+/usr/local/bin/aceman -c $1 showconninfo alert > /tmp/$1_acemaxconns.log
+/usr/lib64/nagios/plugins/check_logfiles -f /etc/nagios/$1_acemaxconns.conf

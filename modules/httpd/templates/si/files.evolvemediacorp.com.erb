@@ -1,0 +1,14 @@
+# $Id$
+# files.evolvemediacorp.com - generated on 20110310 by aibarra 
+# /etc/httpd/conf.d/files.evolvemediacorp.com.conf
+<VirtualHost *:80>
+    DocumentRoot /app/shared/docroots/files.evolvemediacorp.com
+    ServerName  files.evolvemediacorp.com 
+    ServerAlias files.*.com *.files.*.com files.*.net
+    
+    <%=logging ? '' : '#'%>ErrorLog /app/log/files.evolvemediacorp.com-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/files.evolvemediacorp.com-access.log combined
+
+</VirtualHost>
+
+

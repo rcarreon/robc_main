@@ -1,0 +1,389 @@
+#!/usr/bin/perl
+use SOAP::Lite;
+use MIME::Base64;
+# use Data::Dump  qw(dump);
+use strict;
+use warnings;
+use Crypt::Blowfish;
+
+my $cipher = Crypt::Blowfish->new("Vaquita is not a little Cow");
+my $sHost = 'f5evo.platform1701.com';
+my $sProtocol = "https";
+my $sPort = 443;
+my $sUID = 'evolve';
+my $sPWD = $cipher->decrypt(pack "H16","e0a9f97aac3dc646");
+my $sPool = "";
+my $sNode = "";
+my $sEnable = "";
+my $sCommand = lc($ARGV[0]);
+
+#----------------------------------------------------------------------------
+# Validate Arguments
+#----------------------------------------------------------------------------
+if ( !(defined $ARGV[0]) or (($sCommand ne "pools") and ($sCommand ne "nodes") and ($sCommand ne "set"))) {
+    &Help();
+}
+if ($sCommand eq "set") {
+    if ( (defined $ARGV[1]) and (defined $ARGV[2]) and (defined $ARGV[3] and (($ARGV[3] eq "enable") or ($ARGV[3] eq "disable") )) ) {
+        $sPool = uc($ARGV[1]);
+        $sNode = uc($ARGV[2]);
+        $sEnable = lc($ARGV[3]);
+    } else {
+        &Help();
+    }
+} else {
+    if ( ($sCommand eq "pools") and (defined  $ARGV[1]) ) {
+        $sNode = uc($ARGV[1]);
+    }
+    if ( ($sCommand eq "nodes") and (defined  $ARGV[1]) ) {
+        $sPool = uc($ARGV[1]);
+    }
+}
+
+
+#----------------------------------------------------------------------------
+# Usage:
+#----------------------------------------------------------------------------
+sub Help() {
+    die ("Usage:\n\thi5 pools\n\thi5 nodes\n\thi5 pools <node_name>\n\thi5 nodes <pool_name>\n\thi5 set   <pool_name> <node_name> <enable|disable>\n");
+}
+
+#----------------------------------------------------------------------------
+# support for custom enum types
+#----------------------------------------------------------------------------
+BEGIN {
+    no warnings;
+    sub SOAP::Deserializer::typecast {
+        my ($self, $value, $name, $attrs, $children, $type) = @_;
+        my $retval = undef;
+    
+        if ( (defined $type) and (("{urn:iControl}LocalLB.AvailabilityStatus" == $type) or ("{urn:iControl}Common.EnabledState" == $type) or ("{urn:iControl}Common.EnabledStatus" == $type))) {
+            $retval = $value;
+        }
+        return $retval;
+    }
+}
+
+#----------------------------------------------------------------------------
+# Transport Information
+#----------------------------------------------------------------------------
+sub SOAP::Transport::HTTP::Client::get_basic_credentials {
+    return "$sUID" => "$sPWD";
+}
+
+my $Pool = SOAP::Lite-> uri('urn:iControl:LocalLB/Pool')-> proxy("$sProtocol://$sHost:$sPort/iControl/iControlPortal.cgi");
+eval {
+    $Pool->transport->http_request->header('Authorization' => 'Basic ' . MIME::Base64::encode("$sUID:$sPWD", '') ); 
+};
+
+my $PoolMember = SOAP::Lite-> uri('urn:iControl:LocalLB/PoolMember')-> proxy("$sProtocol://$sHost:$sPort/iControl/iControlPortal.cgi");
+eval {
+    $PoolMember->transport->http_request->header('Authorization' =>'Basic ' . MIME::Base64::encode("$sUID:$sPWD", '')); 
+};
+
+my $NodeAddress = SOAP::Lite-> uri('urn:iControl:LocalLB/NodeAddress')-> proxy("$sProtocol://$sHost:$sPort/iControl/iControlPortal.cgi");
+eval {
+    $NodeAddress->transport->http_request->header('Authorization' =>'Basic ' . MIME::Base64::encode("$sUID:$sPWD", '')); 
+};
+
+#----------------------------------------------------------------------------
+# sub ListNodes
+#----------------------------------------------------------------------------
+sub ListNodes() {
+    my $pool_addr = shift;
+    my @node_list = &getNodeList();
+    my @screen_name_lists = &getScreenNameLists(@node_list);
+
+    if ( $pool_addr eq "") {
+        # Loop over nodes
+        for my $i (0 .. $#node_list) {
+            my $node = $screen_name_lists[$i];
+            $node =~ s/\/EvolveMedia\///g;
+            print "$node\n";
+        }
+    } else {
+        my @poolslist = &getPoolList();
+        my @objectStatusLists = &getObjectStatusLists(@poolslist);
+
+        # Loop over pools
+        for my $i (0 .. $#poolslist) {
+            my $bFound = 0;
+            my $pool = $poolslist[$i];
+
+            $pool =~ s/\/EvolveMedia\///g;
+            if ( !$bFound ) {
+                if ( ($pool_addr eq $pool) ) {
+                    # print "$pool\n";
+                    print "\n";
+                    print "\taddress:port\t\tstatus\t\tcurr\tmax\ttotal\tpackets(in/out)\n";
+                    print "\t-----\t\t\t-----\t\t-----\t-----\t-----\t-----\n";
+                    $bFound = 1;
+
+                    my @MemberStatistics = &getMemberStatistics($poolslist[$i]);
+                    my $addr = "";
+                    my $port = "";
+                    foreach my $status (@{$objectStatusLists[$i]}) {
+                        my $member = $status->{"member"};
+                        my $object = $status->{"object_status"};
+                        my $addr = $member->{"address"};
+                        my $port = $member->{"port"};
+                        my $availability = $object->{"availability_status"};
+                        my $enabled = $object->{"enabled_status"};
+                        my $name = "";
+                        my $pack_in = "";
+                        my $pack_out = "";
+                        my $conn_cur = "";
+                        my $conn_max = "";
+                        my $conn_tot = "";
+                        $availability =~ s/AVAILABILITY_STATUS_//g;
+                        $enabled =~ s/ENABLED_STATUS_//g;
+
+                        for my $x (0 .. $#node_list) {
+                            if ($addr eq $node_list[$x]) {
+                                $name = $screen_name_lists[$x];
+                                $name =~ s/\/EvolveMedia\///g;
+                            }
+                        }
+
+                        foreach my $node (@{$MemberStatistics[0]->{"statistics"}}) {
+                            my $stats_member = $node->{"member"};
+                            my $stats_addr = $stats_member->{"address"};
+                            my $stats_port = $stats_member->{"port"};
+                            if (($stats_addr eq $addr) and ($stats_port eq $port)){
+                                
+                                foreach my $statistic (@{$node->{"statistics"}}) {
+                                    my $type = $statistic->{"type"};
+                                    my $value = $statistic->{"value"};
+                                    my $low = $value->{"low"};
+                                    my $high = $value->{"high"};
+                                    my $value64 = ($high<<32)|$low;
+
+                                    # Total number of packets in from the server-side of the object.
+                                    if ($type eq 'STATISTIC_SERVER_SIDE_PACKETS_IN') { $pack_in = $value64; }
+                                    # Total number of packets out from the server-side of the object.
+                                    if ($type eq 'STATISTIC_SERVER_SIDE_PACKETS_OUT') { $pack_out = $value64; }
+                                    # Current number of connections from the server-side of the object.
+                                    if ($type eq 'STATISTIC_SERVER_SIDE_CURRENT_CONNECTIONS') { $conn_cur = $value64; }
+                                    # Maximum number of connections from the server-side of the object.
+                                    if ($type eq 'STATISTIC_SERVER_SIDE_MAXIMUM_CONNECTIONS') { $conn_max = $value64; }
+                                    # Total number of connections from the server-side of the object.
+                                    if ($type eq 'STATISTIC_SERVER_SIDE_TOTAL_CONNECTIONS') { $conn_tot = $value64; }
+                                }
+                            }
+                        }
+                        print "\n$name\n\t$addr:$port\t$availability-$enabled\t$conn_cur\t$conn_max\t$conn_tot\t$pack_in/$pack_out\n";
+                    }
+                }
+            }
+        }
+        print "\n";
+    }
+}
+
+#----------------------------------------------------------------------------
+# sub ListPools
+#----------------------------------------------------------------------------
+sub ListPools() {
+    my $node_addr = "";
+    if ( $sNode ne "" ) {
+        $node_addr = &getNodeAddress($sNode);
+    }
+    my @pools_list = &getPoolList();
+    my @objectStatusLists = &getObjectStatusLists(@pools_list);
+
+    # Loop over pools
+    for my $i (0 .. $#pools_list) {
+        my $bFound = 0;
+        my $pool = $pools_list[$i];
+        if ( $node_addr eq "" ) {
+            $pool =~ s/\/EvolveMedia\///g;
+            print "$pool\n";
+        } else {
+            # else, only print out where matches are found.
+            my $addr = "";
+            my $port = "";
+            my $ostat = "";
+            my $astat = "";
+            my $estat = "";
+            foreach my $status (@{$objectStatusLists[$i]}) {
+                if ( !$bFound ) {
+                    my $member = $status->{"member"};
+                    $addr = $member->{"address"};
+                    $port = $member->{"port"};
+                    $ostat = $status->{"object_status"};
+                    $astat = $ostat->{"availability_status"};
+                    $estat = $ostat->{"enabled_status"};
+                    if ( ($node_addr eq $addr) ) {
+                        $bFound = 1;
+                    }
+                }
+            }
+            if ( $bFound ) {
+                $pool =~ s/\/EvolveMedia\///g;
+                $astat =~ s/AVAILABILITY_STATUS_//g;
+                $estat =~ s/ENABLED_STATUS_//g;
+                print "$pool\n";
+                print "\t$addr:$port\t$astat-$estat\n";
+            }
+        }
+    }
+}
+
+#----------------------------------------------------------------------------
+# sub SetNodeStatus
+#----------------------------------------------------------------------------
+sub SetNodeStatus() {
+    my @ports;
+    my $stridx = index($sNode,":");
+    my $node_addr = "";
+
+    # node include port
+    if ($stridx >= 0){
+        my $port = substr($sNode, $stridx + 1);
+        push @ports, $port;
+        $sNode =~ s/:$port//g;
+        $node_addr = &getNodeAddress($sNode);
+    } else {
+        my @objectStatusLists = &getObjectStatusLists($sPool);
+        $node_addr = &getNodeAddress($sNode);
+        foreach my $status (@{$objectStatusLists[0]}) {
+            my $member = $status->{"member"};
+            my $addr =  $member->{"address"};
+            my $port =  $member->{"port"};
+            if ($addr eq $node_addr) {
+                push @ports, $port;
+            }
+        }
+    }
+
+    foreach my $node_port (@ports) {
+        my $member = { address => $node_addr, port => $node_port };
+        my $ENABLED_STATE = "STATE_ENABLED";
+        if ( $sEnable eq "disable" ) {
+            $ENABLED_STATE = "STATE_DISABLED";
+        }
+        my $MemberMonitorState = { member => $member, monitor_state => $ENABLED_STATE };
+        my @MemberMonitorStateList;
+        push @MemberMonitorStateList, $MemberMonitorState;
+        my @MemberMonitorStateLists;
+        push @MemberMonitorStateLists, [@MemberMonitorStateList];
+            
+        my $MemberSessionState = { member => $member, session_state => $ENABLED_STATE };
+        my @MemberSessionStateList;
+        push @MemberSessionStateList, $MemberSessionState;
+        my @MemberSessionStateLists;
+        push @MemberSessionStateLists, [@MemberSessionStateList];
+
+        if ($sEnable eq "enable") {
+            my $soapResponse = $PoolMember->set_monitor_state(SOAP::Data->name(pool_names => [$sPool]), SOAP::Data->name(monitor_states => [@MemberMonitorStateLists]) );
+            &checkResponse($soapResponse);
+        }
+        my $soapResponseSession = $PoolMember->set_session_enabled_state(SOAP::Data->name(pool_names => [$sPool]), SOAP::Data->name(session_states => [@MemberSessionStateLists]));
+        &checkResponse($soapResponseSession);
+        print "Node Server $sNode:$node_port set to $ENABLED_STATE in pools: $sPool\n";
+    }
+}
+
+#----------------------------------------------------------------------------
+# sub getPoolList
+#----------------------------------------------------------------------------
+sub getPoolList() {
+    # Get the list of pools
+    my $soapResponse = $Pool->get_list();
+    &checkResponse($soapResponse);
+    my @poolslist = @{$soapResponse->result};
+    return @poolslist;
+}
+
+#----------------------------------------------------------------------------
+# sub getNodeList
+#----------------------------------------------------------------------------
+sub getNodeList() {
+    # Get the list of nodes
+    my $soapResponse = $NodeAddress->get_list();
+    &checkResponse($soapResponse);
+    my @node_list = @{$soapResponse->result};
+    return @node_list;
+}
+
+#----------------------------------------------------------------------------
+# sub getScreenNameLists
+#----------------------------------------------------------------------------
+sub getScreenNameLists() {
+    my (@node_list) = (@_);
+    # Get the list of members for all the pools
+    my $soapResponse = $NodeAddress->get_screen_name (SOAP::Data->name(node_addresses => [@node_list]));
+    &checkResponse($soapResponse);
+    my @screen_name_lists = @{$soapResponse->result};
+    return @screen_name_lists;
+}
+
+#----------------------------------------------------------------------------
+# sub getObjectStatus
+#----------------------------------------------------------------------------
+sub getObjectStatusLists() {
+    my (@poolslist) = (@_);
+    # Get the list of pool members for all the pools
+    my $soapResponse = $PoolMember->get_object_status(SOAP::Data->name(pool_names => [@poolslist]));
+    &checkResponse($soapResponse);
+    my @objectStatusLists = @{$soapResponse->result};
+    return @objectStatusLists;
+}
+
+#----------------------------------------------------------------------------
+# sub getMemberStatistics
+#----------------------------------------------------------------------------
+sub getMemberStatistics() {
+    my @poolslist = shift;
+    my $soapResponse = $PoolMember->get_all_statistics (SOAP::Data->name(pool_names => [@poolslist]));
+    &checkResponse($soapResponse);
+    push my @member_stats, @{$soapResponse->result};
+    return @member_stats;
+}
+
+#----------------------------------------------------------------------------
+# sub getNodeAddress
+#----------------------------------------------------------------------------
+sub getNodeAddress() {
+    my $node_name = shift;
+    my @node_list = &getNodeList();
+    my @screen_name_lists = &getScreenNameLists(@node_list);
+
+    my $nodeAddress = "";
+    # Loop over nodes
+    for my $i (0 .. $#node_list) {
+        my $some = "";
+        if ( $nodeAddress eq "" ) {
+            my $some = $screen_name_lists[$i];
+            $some =~ s/\/EvolveMedia\///g;
+            if ( ($some eq $node_name) ) {
+                $nodeAddress = $node_list[$i];
+            }
+        }
+    }
+    return $nodeAddress;
+}
+
+#----------------------------------------------------------------------------
+# checkResponse
+#----------------------------------------------------------------------------
+sub checkResponse() {
+    my ($soapResponse) = (@_);
+    if ( $soapResponse->fault ) {
+        print $soapResponse->faultcode, " ", $soapResponse->faultstring, "\n";
+        exit();
+    }
+}
+
+#----------------------------------------------------------------------------
+# main app logic
+#----------------------------------------------------------------------------
+if ($sCommand eq "pools") {
+    &ListPools($sNode);
+}
+if ($sCommand eq "nodes") {
+    &ListNodes($sPool);
+}
+if ($sCommand eq "set") {
+    &SetNodeStatus();
+}

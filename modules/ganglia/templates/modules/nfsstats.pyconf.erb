@@ -1,0 +1,32 @@
+modules {
+  module {
+    name = "nfsstats"
+    language = "python"
+  }
+}
+
+collection_group {
+  collect_every = 60
+  time_threshold = 120
+  metric {
+    name = "nfs_v3_getattr"
+    title = "NFS v3 getattr"
+  }
+  metric {
+    name = "nfs_v3_lookup"
+    title = "NFS v3 lookup"
+  }
+  metric {
+    name = "nfs_v3_access"
+    title = "NFS v3 access"
+  }
+  metric {
+    name = "nfs_v3_read"
+    title = "NFS v3 read"
+  }
+  metric {
+    name = "nfs_v3_write"
+    title = "NFS v3 write"
+  }
+}
+

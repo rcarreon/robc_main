@@ -1,0 +1,638 @@
+#!/usr/bin/python
+#Name: netapp_api_vertical.py
+#Based on Evan Frasfer's netapp_api.py
+#Desc: Uses Netapp Data Ontap API to get per volume latency & iops metrics.  Download the managemability SDK from now.netapp.com
+#Author: Evan Fraser <evan.fraser@trademe.co.nz>
+#Date: 13/08/2012
+
+import sys
+import time
+import pprint
+import unicodedata
+import os
+
+#FIXME: we need an rpm for the python netapp lib
+sys.path.append("/home/gstaples/lib/python/NetApp")
+from NaServer import *
+
+# The keys of validverts are strings found in volume names
+# The values are how metrics should be grouped and displayed in gweb
+validverts= {
+    'ao' : "Atomic Online",
+    'ap' : "Ad Platform",
+    'ci' : "Crowd Ignite",
+    'sbv': "Springboard Platform",
+    'si' : "Sales Integration",
+    'tp' : "TechPlatform",
+    'metal' : "KVM Metal Hosts",
+    'unknown' : "Unknown"
+    }
+
+validvlans= {
+'20':"tp",
+'22':"tp",
+'24':"metal",
+'26':"si",
+'28':"sbv",
+'30':"ap",
+'34':"ao",
+}
+
+descriptors = list()
+params = {}
+filerdict = {}
+
+FASMETRICS = {
+    'time' : 0,
+    'data' : {}
+}
+LAST_FASMETRICS = dict(FASMETRICS)
+#This is the minimum interval between querying the RPA for metrics
+FASMETRICS_CACHE_MAX = 10
+COUNTER_UNITS = {
+    "total_ops" : "per_sec",
+    "avg_latency" : "microsec",
+    "read_ops" : "per_sec",
+    "read_latency" : "microsec",
+    "write_ops" : "per_sec",
+    "write_latency" : "microsec",
+    "recv_data" : "b_per_sec",
+    "sent_data" : "b_per_sec",
+    "disk_alloc" : "bytes",
+    "disk_used" : "bytes",
+}
+
+# Very simple volume parsing to find a vertical
+def parse_volumename(volname):
+    vertical="unknown"
+    parts = volname.split('_')
+    for part in parts:
+        if part in validverts:
+            vertical=part
+            break
+        elif part == "vm":
+            vertical="metal"
+            break
+        elif part == "home":
+            vertical="tp"
+            break
+    return vertical
+
+def init_netapp(filer):
+    s = NaServer(filerdict[filer]['name'], 1, 20)
+    out = s.set_transport_type('HTTP')
+    if (out and out.results_errno() != 0) :
+        r = out.results_reason()
+        print ("Connection to filer failed: " + r + "\n")
+        sys.exit(2)
+
+    out = s.set_style('LOGIN')
+    if (out and out.results_errno() != 0) :
+        r = out.results_reason()
+        print ("Connection to filer failed: " + r + "\n")
+        sys.exit(2)
+    s.set_admin_user(filerdict[filer]['user'], filerdict[filer]['password'])
+    return s
+
+
+def make_volqueries(volumes):
+
+    perf_in = NaElement("perf-object-get-instances")
+
+    obj_name = "volume"
+    perf_in.child_add_string("objectname", obj_name)
+
+    instances = NaElement("instances")
+    for i in range(10):
+       if volumes:
+          instances.child_add_string("instance", volumes.pop())
+    perf_in.child_add(instances)
+
+    #Create object of type counters
+    counters = NaElement("counters")
+
+    #Add counter names to the object
+    counters.child_add_string("counter", "total_ops")
+    counters.child_add_string("counter", "avg_latency")
+    counters.child_add_string("counter", "read_ops")
+    counters.child_add_string("counter", "read_latency")
+    counters.child_add_string("counter", "write_ops")
+    counters.child_add_string("counter", "write_latency")
+    perf_in.child_add(counters)
+
+    return perf_in
+
+def make_lifqueries(lifs):
+
+    perf_in = NaElement("perf-object-get-instances")
+
+    obj_name = "lif"
+    perf_in.child_add_string("objectname", obj_name)
+
+    instances = NaElement("instances")
+    for i in range(10):
+       if lifs:
+          instances.child_add_string("instance", lifs.pop())
+    perf_in.child_add(instances)
+
+    #Create object of type counters
+    counters = NaElement("counters")
+
+    #Add counter names to the object
+    counters.child_add_string("counter", "sent_data")
+    counters.child_add_string("counter", "recv_data")
+    perf_in.child_add(counters)
+
+    return perf_in
+
+
+def get_metrics(name):
+    global FASMETRICS, LAST_FASMETRICS, FASMETRICS_CACHE_MAX, params
+    newmetrics = {}
+    if (time.time() - FASMETRICS['time']) > FASMETRICS_CACHE_MAX:
+        
+        print "Starting iteration..."
+        for filer in filerdict.keys():
+            print "looking at",filer,"in get_metrics"
+
+            s = init_netapp(filer)
+
+            # Get all volume size and usage
+            volumes = fetch_vol_usage(s, filerdict[filer]['name'], newmetrics)
+
+            while volumes:
+                perf_in = make_volqueries(volumes)
+                fetch_counters(s, filerdict[filer]['name'], perf_in, newmetrics)
+
+
+            lifs = fetch_lifs(s)
+
+            while lifs:
+                perf_in = make_lifqueries(lifs)
+                fetch_counters(s, filerdict[filer]['name'], perf_in, newmetrics)
+
+        #pprint.pprint(newmetrics)
+        #sys.exit(0)
+
+        # aggregate the data by vertical
+        metrics = {}
+        for vertical in newmetrics:
+            for counter_name in newmetrics[vertical]:
+                count=newmetrics[vertical][counter_name]["count"]
+                del newmetrics[vertical][counter_name]["count"]
+
+                if 'per_sec' in COUNTER_UNITS[counter_name]:
+
+                    # get big total
+                    grandtotal=0
+                    for k, value in newmetrics[vertical][counter_name].iteritems():
+                        grandtotal += value
+                    metrics[vertical+'-'+counter_name]=grandtotal
+
+                elif 'microsec' in COUNTER_UNITS[counter_name]:
+                    # compute average
+                    total=0
+                    for k, value in newmetrics[vertical][counter_name].iteritems():
+                        total += value
+                    average = total / count
+                    metrics[vertical+'-'+counter_name]=average
+                elif 'bytes' in COUNTER_UNITS[counter_name]:
+                    grandtotal=0
+                    for k, value in newmetrics[vertical][counter_name].iteritems():
+                        grandtotal += value
+                    metrics[vertical+'-'+counter_name]=grandtotal
+
+
+
+        # update cache
+        LAST_FASMETRICS = dict(FASMETRICS)
+        FASMETRICS = {
+            'time': time.time(),
+            'data': metrics
+            }
+
+
+    else: 
+        metrics = FASMETRICS['data']
+
+    #calculate change in values and return
+    if 'total_ops' in name:
+        try:
+            delta = float(FASMETRICS['data'][name] - LAST_FASMETRICS['data'][name])/(FASMETRICS['time'] - LAST_FASMETRICS['time'])
+            if delta < 0:
+                print "Less than 0"
+                delta = 0
+        except StandardError:
+            delta = 0
+        #This is the Operations per second
+        return delta
+
+    elif 'avg_latency' in name:
+        try: 
+            #T1 and T2
+            #(T2_lat - T1_lat) / (T2_ops - T1_ops)
+            #Find the metric name of the base counter
+            total_ops_name = name.replace('avg_latency', 'total_ops')
+            #Calculate latency in time (div 100 to change to ms)
+            return float((FASMETRICS['data'][name] - LAST_FASMETRICS['data'][name]) / (FASMETRICS['data'][total_ops_name] -LAST_FASMETRICS['data'][total_ops_name])) / 100
+        except StandardError:
+            return 0
+    elif 'read_ops' in name:
+
+        try:
+            delta = float(FASMETRICS['data'][name] - LAST_FASMETRICS['data'][name])/(FASMETRICS['time'] - LAST_FASMETRICS['time'])
+            if delta < 0:
+                print "Less than 0"
+                delta = 0
+        except StandardError:
+            delta = 0
+        return delta
+
+    elif 'read_latency' in name:
+        try: 
+            read_ops_name = name.replace('read_latency', 'read_ops')
+            return float((FASMETRICS['data'][name] - LAST_FASMETRICS['data'][name]) / (FASMETRICS['data'][read_ops_name] -LAST_FASMETRICS['data'][read_ops_name])) / 100
+        except StandardError:
+            return 0
+    elif 'write_ops' in name:
+        try:
+            delta = float(FASMETRICS['data'][name] - LAST_FASMETRICS['data'][name])/(FASMETRICS['time'] - LAST_FASMETRICS['time'])
+            if delta < 0:
+                print "Less than 0"
+                delta = 0
+        except StandardError:
+            delta = 0
+        return delta
+
+    elif 'write_latency' in name:
+        try: 
+            write_ops_name = name.replace('write_latency', 'write_ops')
+            return float((FASMETRICS['data'][name] - LAST_FASMETRICS['data'][name]) / (FASMETRICS['data'][write_ops_name] -LAST_FASMETRICS['data'][write_ops_name])) / 100
+        except StandardError:
+            return 0
+            
+    elif 'sent_data' in name:
+        try:
+            delta = float(FASMETRICS['data'][name] - LAST_FASMETRICS['data'][name])/(FASMETRICS['time'] - LAST_FASMETRICS['time'])
+            if delta < 0:
+                print "Less than 0"
+                delta = 0
+        except StandardError:
+            delta = 0
+        return delta
+
+    elif 'recv_data' in name:
+        try:
+            delta = float(FASMETRICS['data'][name] - LAST_FASMETRICS['data'][name])/(FASMETRICS['time'] - LAST_FASMETRICS['time'])
+            if delta < 0:
+                print "Less than 0"
+                delta = 0
+        except StandardError:
+            delta = 0
+        return delta
+    elif 'disk_alloc' in name:
+        total=float(FASMETRICS['data'][name])
+        return total
+    elif 'disk_used' in name:
+        used=float(FASMETRICS['data'][name])
+        return used
+
+    return 0    
+        
+
+def fetch_counters(s,filername,perf_in,newmetrics):
+    #Invoke API
+    out = s.invoke_elem(perf_in)
+
+    if(out.results_status() == "failed"):
+        print(out.results_reason() + "\n")
+        sys.exit(2)
+    
+    instances_list = out.child_get("instances")            
+    instances = instances_list.children_get()
+
+    for inst in instances:
+        inst_name = unicodedata.normalize('NFKD',inst.child_get_string("name")).encode('ascii','ignore')
+        counters_list = inst.child_get("counters")
+        counters = counters_list.children_get()
+
+        if 'nfs:nfs-' in inst_name:
+            try:
+                vertical = inst_name.split('-')[1]
+                #print "Instance: " + inst_name + " is from " + vertical
+            except:
+                continue
+            
+        else:
+            # parse out the vertcal
+                    vertical=parse_volumename(inst_name)
+
+        try:
+            newmetrics[vertical]
+        except KeyError:
+            newmetrics[vertical]={}
+
+        for counter in counters:
+            counter_name = unicodedata.normalize('NFKD',counter.child_get_string("name")).encode('ascii','ignore')         
+            counter_value = counter.child_get_string("value")
+            counter_unit = counter.child_get_string("unit")           
+            try:
+                newmetrics[vertical][counter_name]
+            except KeyError:
+                newmetrics[vertical][counter_name]={}
+
+            newmetrics[vertical][counter_name][filername + ':' + inst_name]=float(counter_value)
+
+            try:
+                newmetrics[vertical][counter_name]["count"]=newmetrics[vertical][counter_name]["count"] + 1
+            except KeyError:
+                newmetrics[vertical][counter_name]["count"]=0
+
+    return newmetrics
+
+def fetch_lifs(s):
+    iter_tag = ""
+    num_records = 1
+    max_records = 10
+    lifs = list()
+
+    while(iter_tag != None):
+        perf_in = NaElement("perf-object-instance-list-info-iter")
+        perf_in.child_add_string("objectname","lif")
+        #perf_in.child_add_string(da)
+        if (iter_tag != ""):
+            # This is a bug. The brackets should be html entities
+            iter_tag=iter_tag.replace('<', '&lt;');
+            iter_tag=iter_tag.replace('>', '&gt;');
+            perf_in.child_add_string("tag", iter_tag)
+        perf_in.child_add_string("max-records", max_records)
+        out = s.invoke_elem(perf_in)
+
+        if(out.results_status() == "failed"):
+            print(out.results_reason() + "\n")
+            sys.exit(2)
+
+        num_records = out.child_get_int("num-records")
+        iter_tag = out.child_get_string("next-tag")
+
+        if(num_records > 0) :
+            attributes_list = out.child_get("attributes-list")
+            result = attributes_list.children_get()
+
+            for lif in result:
+                lif_name = lif.child_get_string("name")
+                lifs.append(lif_name)
+    return lifs
+
+
+def fetch_vol_usage(s,filername,newmetrics):
+    max_records = 100
+    volumes = list()
+
+    #Set up desired-attributes filter. Use 'da' in subsequent queries
+    da = NaElement("desired-attributes")
+    va = NaElement("volume-attributes")
+    via = NaElement("volume-id-attributes")
+    vsa = NaElement("volume-space-attributes")
+    vSa = NaElement("volume-state-attributes")
+    da.child_add(va)
+    va.child_add(via)
+    va.child_add(vsa)
+    va.child_add(vSa)
+    via.child_add_string("name",1);
+    vsa.child_add_string("size-total",1);
+    vsa.child_add_string("size-used",1);
+    vSa.child_add_string("state",1);
+
+    iter_tag = ""
+    num_records = 1
+
+    while(iter_tag != None):
+        perf_in = NaElement("volume-get-iter")
+        perf_in.child_add(da)
+        if (iter_tag != ""):
+            # This is a bug. The brackets should be html entities
+            iter_tag=iter_tag.replace('<', '&lt;');
+            iter_tag=iter_tag.replace('>', '&gt;');
+            perf_in.child_add_string("tag", iter_tag)
+        perf_in.child_add_string("max-records", max_records)
+        out = s.invoke_elem(perf_in)
+
+        if(out.results_status() == "failed"):
+            print(out.results_reason() + "\n")
+            sys.exit(2)
+
+        num_records = out.child_get_int("num-records")
+        iter_tag = out.child_get_string("next-tag")
+
+        if(num_records > 0) :
+            attributes_list = out.child_get("attributes-list")            
+            result = attributes_list.children_get()
+
+            for vol in result:
+                vSa = vol.child_get("volume-state-attributes")
+                via = vol.child_get("volume-id-attributes")
+                vsa = vol.child_get("volume-space-attributes")
+
+                vol_state = vSa.child_get_string("state")
+                if (vol_state != "online"):
+                    continue
+
+                vol_name = via.child_get_string("name")
+                volumes.append(vol_name)
+                disk_alloc = vsa.child_get_int("size-total")
+                disk_used = vsa.child_get_int("size-used")
+
+                vertical=parse_volumename(vol_name)
+
+                if vertical not in newmetrics.keys():
+                    newmetrics[vertical]={}
+
+                if 'disk_alloc' not in newmetrics[vertical].keys():
+                    newmetrics[vertical]['disk_alloc']={}
+                    newmetrics[vertical]['disk_used']={}
+
+                newmetrics[vertical]['disk_alloc'][filername + ':' + vol_name]=float(disk_alloc)
+                newmetrics[vertical]['disk_used'][filername + ':' + vol_name]=float(disk_used)
+                try:
+                    newmetrics[vertical]['disk_alloc']["count"]=newmetrics[vertical]['disk_alloc']["count"] + 1
+                    newmetrics[vertical]['disk_used']["count"]=newmetrics[vertical]['disk_used']["count"] + 1
+                except KeyError:
+                    newmetrics[vertical]['disk_alloc']["count"]=0
+                    newmetrics[vertical]['disk_used']["count"]=0
+
+    return volumes
+
+
+
+
+def create_desc(skel, prop):
+    d = skel.copy()
+    for k,v in prop.iteritems():
+        d[k] = v
+    return d
+    
+def define_metrics(Desc_Skel,params):
+    max_records = 10
+    definedmetrics = {}
+    volumes = list()
+    newmetrics = {}
+    for filer in params.keys():
+        print "looking at",filer,"in define_metrics"
+
+        s = init_netapp(filer)
+
+        volumes = fetch_vol_usage(s, filerdict[filer]['name'], newmetrics)
+
+        while volumes:
+            perf_in = make_volqueries(volumes)
+            out = s.invoke_elem(perf_in)
+
+            if(out.results_status() == "failed"):
+                print(out.results_reason() + "\n")
+                sys.exit(2)
+    
+            filername = params[filer]['name']
+
+            instances_list = out.child_get("instances")            
+            instances = instances_list.children_get()
+
+            for inst in instances:
+                inst_name = unicodedata.normalize('NFKD',inst.child_get_string("name")).encode('ascii','ignore')
+                counters_list = inst.child_get("counters")
+                counters = counters_list.children_get()
+
+                vertical=parse_volumename(inst_name)
+
+                if "unknown" in vertical:
+                    print "Unknown volume:",inst_name
+
+                for counter in counters:
+                    counter_name = unicodedata.normalize('NFKD',counter.child_get_string("name")).encode('ascii','ignore')
+                    counter_value = counter.child_get_string("value")
+                    #counter_unit = counter.child_get_string("unit")
+
+                    if vertical not in definedmetrics:
+                        definedmetrics[vertical] = {}
+                    if counter_name not in definedmetrics[vertical]:
+                        definedmetrics[vertical][counter_name] = 0
+
+                    definedmetrics[vertical][counter_name] += 1
+
+
+    for vertical in definedmetrics:
+        descriptors.append(create_desc(Desc_Skel, {
+                                        "name"        : vertical + '-sent_data',
+                                        "units"       : 'bps',
+                                        "description" : "vertical bps",
+                                        "groups"      : validverts[vertical] + ' netapp'
+                                        }))
+        descriptors.append(create_desc(Desc_Skel, {
+                                        "name"        : vertical + '-recv_data',
+                                        "units"       : 'bps',
+                                        "description" : "vertical bps",
+                                        "groups"      : validverts[vertical] + ' netapp'
+                                        }))
+        descriptors.append(create_desc(Desc_Skel, {
+                                        "name"        : vertical + '-disk_used',
+                                        "units"       : 'bytes',
+                                        "description" : "vertical bytes used",
+                                        "groups"      : validverts[vertical] + ' netapp'
+                                        }))
+        descriptors.append(create_desc(Desc_Skel, {
+                                        "name"        : vertical + '-disk_alloc',
+                                        "units"       : 'bytes',
+                                        "description" : "vertical bytes total",
+                                        "groups"      : validverts[vertical] + ' netapp'
+                                        }))
+        for counter_name in definedmetrics[vertical]:
+            if 'total_ops' in counter_name:
+                descriptors.append(create_desc(Desc_Skel, {
+                                        "name"        : vertical + '-' + counter_name,
+                                        "units"       : 'iops',
+                                        "description" : "vertical iops",
+                                        "groups"      : validverts[vertical] + ' netapp'
+                                        }))
+            elif 'avg_latency' in counter_name:
+                            descriptors.append(create_desc(Desc_Skel, {
+                                        "name"        : vertical + '-' + counter_name,
+                                        "units"       : 'ms',
+                                        "description" : "vertical avg latency",
+                                        "groups"      : validverts[vertical] + ' netapp'
+                                        }))
+            elif 'read_ops' in counter_name:
+                            descriptors.append(create_desc(Desc_Skel, {
+                                        "name"        : vertical + '-' + counter_name,
+                                        "units"       : 'iops',
+                                        "description" : "vertical read iops",
+                                        "groups"      : validverts[vertical] + ' netapp'
+                                        }))
+            elif 'read_latency' in counter_name:
+                            descriptors.append(create_desc(Desc_Skel, {
+                                        "name"        : vertical + '-' + counter_name,
+                                        "units"       : 'ms',
+                                        "description" : "vertical read latency",
+                                        "groups"      : validverts[vertical] + ' netapp'
+                                        }))
+            elif 'write_ops' in counter_name:
+                            descriptors.append(create_desc(Desc_Skel, {
+                                        "name"        : vertical + '-' + counter_name,
+                                        "units"       : 'iops',
+                                        "description" : "vertical write iops",
+                                        "groups"      : validverts[vertical] + ' netapp'
+                                        }))
+            elif 'write_latency' in counter_name:
+                            descriptors.append(create_desc(Desc_Skel, {
+                                        "name"        : vertical + '-' + counter_name,
+                                        "units"       : 'ms',
+                                        "description" : "vertical write latency",
+                                        "groups"      : validverts[vertical] + ' netapp'
+                                        }))
+                        
+    return descriptors
+
+def metric_init(params):
+    global descriptors,filerdict
+    print 'netapp_stats] Received the following parameters'
+    pprint.pprint(params)
+
+    params = {
+        'netapp1_nfs' : {
+                    'name' : 'netapp1_nfs.gnmedia.net',
+                    'user' : 'vsadmin',
+                    'password' : '<%= netapppasswd %>',
+                   },
+    }
+    filerdict=params
+
+    Desc_Skel = {
+        'name'        : 'XXX',
+        'call_back'   : get_metrics,
+        'time_max'    : 60,
+        'value_type'  : 'double',
+        'format'      : '%0f',
+        'units'       : 'XXX',
+        'slope'       : 'both',
+        'description' : 'XXX',
+        'groups'      : 'XXX',
+        }  
+
+    # Run define_metrics
+    descriptors = define_metrics(Desc_Skel,params)
+
+    return descriptors
+
+# For CLI Debugging:
+if __name__ == '__main__':
+    #global params
+    params = {}
+    descriptors = metric_init(params)
+    pprint.pprint(descriptors)
+    print len(descriptors)
+    while True:
+        for d in descriptors:
+            v = d['call_back'](d['name'])
+            #print v
+            print 'value for %s is %.2f' % (d['name'],  v)        
+        print 'Sleeping 15 seconds'
+        time.sleep(15)

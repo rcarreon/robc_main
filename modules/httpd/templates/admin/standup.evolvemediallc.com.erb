@@ -1,0 +1,14 @@
+<VirtualHost *:80>
+    ServerName standup.evolvemediallc.com
+    ServerAlias *.standup.evolvemediallc.com
+    DocumentRoot /app/shared/docroots/standup.evolvemediallc.com/
+    AddHandler cgi-script .cgi
+    <%=logging ? '' : '#'%>ErrorLog /app/log/standup.evolvemediallc.com-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/standup-access.evolvemediallc.com.log combined
+
+   <Directory /app/shared/docroots/standup.evolvemediallc.com>
+     Options ExecCGI
+     DirectoryIndex index.cgi
+   </Directory>
+
+</VirtualHost>

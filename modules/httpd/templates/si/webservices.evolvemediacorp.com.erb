@@ -1,0 +1,32 @@
+# /etc/httpd/conf.d/webservices.evolvemediacorp.com.conf
+<VirtualHost *:80>
+    DocumentRoot /app/shared/docroots/webservices.evolvemediacorp.com
+    ServerName webservices.evolvemediacorp.com
+    ServerAlias *.webservices.evolvemediacorp.com
+    <%=logging ? '' : '#'%>ErrorLog /app/log/webservices.evolvemediacorp.com-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/webservices.evolvemediacorp.com-access.log combined
+
+    <Directory /app/shared/docroots/webservices.evolvemediacorp.com/>
+        AllowOverride FileInfo Indexes Options
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ index.php?url= [QSA,L]
+    </Directory>
+
+
+    <Directory /app/shared/docroots/webservices.evolvemediacorp.com/administrator/>
+        RewriteEngine On
+
+        # Block all access to users/login from external hosts.  NAT addreses from LA, DC, HMO, and PH are allowed.
+        RewriteCond %{REMOTE_ADDR} ^(10\.11\.1?26\.1(3|4|5))$
+        RewriteCond %{HTTP:X-FORWARDED-FOR} !(10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|192\.168\.[0-9]{1,3}\.[0-9]{1,3}|63.139.86.3|72.172.76.235|187.216.89.242|180.190.61.202|119\.92\.62\.[0-9]{1,3})
+        RewriteRule ^.* - [F]
+
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ index.php?url= [QSA,L]
+    </Directory>
+
+</VirtualHost>
+

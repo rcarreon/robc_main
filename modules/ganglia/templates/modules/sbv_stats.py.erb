@@ -1,0 +1,45 @@
+import socket
+
+def redisList_handler(name):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(5)
+    s.connect(("127.0.0.1", 6379))
+    s.send("llen %s\r\n" % name )
+    output = s.recv(1024)
+    s.close
+    cleanOutput = output.replace('\r\n', '')[1:]
+    return int(cleanOutput)
+
+def metric_cleanup():
+    pass
+
+def metric_init(params):
+    global descriptors
+    d1 = {  'name': 'lax1',
+            'call_back': redisList_handler,
+            'time_max': 90,
+            'value_type': 'uint',
+            'units': 'n',
+            'slope': 'both',
+            'format': '%u',
+            'description': 'Stats redis queue length',
+            'groups': 'redis' }
+    d2 = {  'name': 'cpv_lax1',
+            'call_back': redisList_handler,
+            'time_max': 90,
+            'value_type': 'uint',
+            'units': 'n',
+            'slope': 'both',
+            'format': '%u',
+            'description': 'CPV redis queue length',
+            'groups': 'redis' }
+ 
+    descriptors = [ d1, d2 ]
+    return descriptors
+
+#This code is for debugging and unit testing
+if __name__ == '__main__':
+    metric_init({})
+    for d in descriptors:
+        v = d['call_back'](d['name'])
+        print 'value for %s is %u' % (d['name'],  v)

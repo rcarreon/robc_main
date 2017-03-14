@@ -1,0 +1,42 @@
+# This vhost is configured in puppet and should not be edited by hand
+# $Id$
+
+<VirtualHost *:80>
+    ServerAdmin webmaster@actiontrip.com
+    DocumentRoot /app/shared/stg.actiontrip.com/htdocs/
+
+    ServerName stg.actiontrip.com
+    ServerAlias www-stg.actiontrip.com
+    ServerAlias new-stg.actiontrip.com
+    ServerAlias m-stg.actiontrip.com
+    ServerAlias origin-stg.actiontrip.com
+
+    <Location /rei/db>
+        AuthUserFile /app/shared/stg.actiontrip.com/htdocs/rei/db/.htpasswd
+        AuthName "Enter your username and password:"
+        AuthType Basic
+        <Limit GET>
+                require valid-user
+        </Limit>
+
+        php_value post_max_size 128M
+        php_value upload_max_filesize 128M
+   </location>
+
+   <Location /rei/e3>
+        AuthUserFile /app/shared/stg.actiontrip.com/htdocs/rei/e3/.htpasswd
+        AuthName "Enter your username and password:"
+        AuthType Basic
+        <Limit GET>
+                require valid-user
+        </Limit>
+
+        php_value post_max_size 128M
+        php_value upload_max_filesize 128M
+   </location>
+
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/stg.actiontrip.com-error_log
+    <%=logging ? '' : '#'%>CustomLog /app/log/stg.actiontrip.com-access_log combined-xff
+</VirtualHost>
+

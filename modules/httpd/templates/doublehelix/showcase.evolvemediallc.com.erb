@@ -1,0 +1,14 @@
+<VirtualHost *:80>
+    DocumentRoot /app/shared/docroots/showcase.evolvemediallc.com/current
+    ServerName showcase.evolvemediallc.com
+    ServerAlias *.showcase.evolvemediallc.com
+    ErrorLog /app/log/showcase.evolvemediallc.com-error.log
+    CustomLog /app/log/showcase.evolvemediallc.com-access.log combined
+
+# Rewrite conditions based on what was found in .htaccess
+     <Directory /app/shared/docroots/showcase.evolvemediallc.com/current/>
+         AllowOverride FileInfo Indexes Options=All,MultiViews
+         RewriteEngine On
+     </Directory>
+</VirtualHost>
+

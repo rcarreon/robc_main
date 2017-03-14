@@ -1,0 +1,67 @@
+#!/usr/bin/perl
+use strict;
+use LWP 5.64;
+use Config::General;
+#use warnings;
+
+my ($host)=$ARGV[0];
+my ($state)=$ARGV[1];
+my ($prefix);
+my ($user);
+my ($passwd);
+
+if (-r "/etc/emblackout") {
+  my $conf = Config::General->new('/etc/emblackout'); 
+  my %config = $conf->getall;
+  $user=$config{username};
+  $passwd=$config{password};
+} else {
+  die("Cannot retrieve auth tokens.");
+}
+
+sub usage {
+  print "Usage: $0 <host> [true|false]\n";
+  exit(1);
+}
+
+if (@ARGV < 2 || @ARGV > 2 || $state !~ m/(true|false)/i) {
+  usage();
+}
+
+my ($prefix) = `mysql -u emblackout_r -psPvgOqIB -h vip-sqlrw-dashboards.tp.prd.lax.gnmedia.net -e "SELECT TRIM(F.function_name) AS '' FROM toolshed.processlist_servers S INNER JOIN toolshed.processlist_server_functions F ON F.id = S.function_id WHERE server_url = '$host'" | egrep '[A-Z]+'`;
+
+chomp($prefix);
+
+if ($host =~ m/prd/i) {
+  die ("Production systems blackouts disabled.");
+} 
+
+my ($emname)="$prefix: $host:3306";
+my ($server)="stg.em.gnmedia.net:80";
+
+sub switch() {
+  my $browser = LWP::UserAgent->new;
+
+  $browser->credentials($_[0],'',$_[1],$_[2]);
+
+  my $url = URI->new('http://'.$_[0].'/rest');
+
+    $url->query_form(
+      'command'        => 'blackout',
+      'server_name'    => $_[3],
+      'blackout_state' => $_[4]
+    );
+
+  my $response = $browser->post($url);
+
+  if (!$response->is_success) {
+    die $response->status_line . "\n";
+  }
+
+  if ($response->content =~ /UserUnauthorizedException/ ||
+    $response->content =~ /ServerDoesNotExistException/) { 
+      die $response->content;
+  }
+}
+
+&switch($server,$user,$passwd,$emname,$state);

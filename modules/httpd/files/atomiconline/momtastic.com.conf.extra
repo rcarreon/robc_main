@@ -1,0 +1,44 @@
+# $Id$
+
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^momtastic\.com$ [NC]
+    RewriteRule ^/(.*) http://www.momtastic.com/$1 [R=301,L]
+
+    # UK
+    ServerAlias mumtasticuk.co.uk *.mumtasticuk.co.uk
+    RewriteCond %{HTTP_HOST} ^mumtasticuk\.co\.uk$ [NC]
+    RewriteRule ^/(.*) http://www.momtastic.com/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www.mumtasticuk\.co\.uk$ [NC]
+    RewriteRule ^/(.*) http://www.momtastic.com/$1 [R=301,L]
+
+    # Australian 
+    ServerAlias mumtastic.com.au *.mumtastic.com.au
+    RewriteCond %{HTTP_HOST} ^mumtastic\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.mumtastic.com.au/$1 [R=301,L]
+
+    ServerAlias mumtastic.com *.mumtastic.com
+    RewriteCond %{HTTP_HOST} ^mumtastic\.com$ [NC]
+    RewriteRule ^/(.*) http://www.mumtastic.com.au/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.mumtastic\.com$ [NC]
+    RewriteRule ^/(.*) http://www.mumtastic.com.au/$1 [R=301,L]
+
+    ServerAlias momtastic.com.au *.momtastic.com.au
+    RewriteCond %{HTTP_HOST} ^momtastic\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.mumtastic.com.au/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.momtastic\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.mumtastic.com.au/$1 [R=301,L]
+
+    # Holiday Redirects
+    RewriteRule ^/topics/thanksgiving-recipes$ /thanksgiving-recipes [R=301,L]
+    RewriteRule ^/topics/thanksgiving-decor$ /thanksgiving-decor  [R=301,L]
+    RewriteRule ^/topics/thanksgiving-crafts$ /thanksgiving-crafts [R=301,L]
+    RewriteRule ^/topics/thanksgiving$ /thanksgiving [R=301,L]
+    RewriteRule ^/topics/holiday-shopping$ /holiday-shopping  [R=301,L]
+    RewriteRule ^/topics/christmas-recipes$ /christmas-recipes [R=301,L]
+    RewriteRule ^/topics/christmas-crafts$ /christmas-crafts [R=301,L]
+    RewriteRule ^/topics/christmas-gifts$ /christmas-gifts [R=301,L]
+    RewriteRule ^/topics/christmas$ /christmas [R=301,L]
+    RewriteRule ^/topics/new-years-resolutions$ /new-years-resolutions [R=301,L]
+    RewriteRule ^/topics/new-years$ /new-years [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

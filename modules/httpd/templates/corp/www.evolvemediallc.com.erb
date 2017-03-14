@@ -1,0 +1,90 @@
+# $Id$
+# www.evolvemediallc.com - generated on 20100713 by jjohnson 
+# /etc/httpd/conf.d/www.evolvemediallc.com.conf
+# All the corporate websites (brabd) are managed by that one joomla install, hence the server aliases
+<%
+          host,vertical,environment,location,domain,tld = fqdn.split('.')
+          case environment
+                      when 'dev'
+                          target = "dev"
+                      when 'stg'
+                          target = "staging"
+                      when 'prd'
+                          target = "www"
+                      end
+%>
+
+<VirtualHost *:80>
+    DocumentRoot /app/shared/docroots/www.evolvemediallc.com/current
+    ServerName  evolvemediallc.com
+    ServerAlias staging.evolvemediallc.com staging.www.evolvemediallc.com
+    ServerAlias lax.evolvemediallc.com www.evolvemediallc.com intl.evolvemediallc.com
+    ServerAlias atomiconline.com www.atomiconline.com 
+    ServerAlias gorillanation.com www.gorillanation.com 
+    ServerAlias youthologymedia.com www.youthologymedia.com 
+    ServerAlias totallyher.com www.totallyher.com
+    ServerAlias globetrottingdigitalmedia.com www.globetrottingdigitalmedia.com
+    <%=logging ? '' : '#'%>ErrorLog /app/log/www.evolvemediallc.com-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/www.evolvemediallc.com-access.log combined
+    RedirectPermanent /craveonline http://<%= target %>.craveonlinemedia.com
+
+    RewriteEngine On
+    RewriteCond %{REQUEST_URI} ^/$
+    RewriteRule ^(.*)$ http://%{HTTP_HOST}/home [R=301,L]
+
+    <Directory /app/shared/docroots/www.evolvemediallc.com/current>
+        # AllowOverride FileInfo Indexes Options
+        AllowOverride All
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ index.php?url= [QSA,L]
+    </Directory>
+</VirtualHost>
+
+
+# www.globetrottingdigital.com --> www.globetrottingdigitalmedia.com (++media)
+<VirtualHost *:80>
+    ServerName globetrottingdigital.com
+    ServerAlias www.globetrottingdigital.com
+    RedirectPermanent / http://www.globetrottingdigitalmedia.com/
+    <%=logging ? '' : '#'%>ErrorLog logs/www.evolvemediallc.com-error.log
+    <%=logging ? '' : '#'%>CustomLog logs/www.evolvemediallc.com-access.log combined
+</VirtualHost>
+
+# gorillanation.ca -> http://www.evolvemediallc.com/gorillanationmedia-ca/home
+<VirtualHost *:80>
+    ServerName gorillanation.ca
+    ServerAlias www.gorillanation.ca
+    RedirectPermanent / http://www.evolvemediallc.com/gorillanationmedia-ca/home
+    <%=logging ? '' : '#'%>ErrorLog logs/www.evolvemediallc.com-error.log
+    <%=logging ? '' : '#'%>CustomLog logs/www.evolvemediallc.com-access.log combined
+</VirtualHost>
+
+# gorillanation.co.uk -> http://www.evolvemediallc.com/gorillanationmedia-uk/home
+<VirtualHost *:80>
+    ServerName gorillanation.co.uk
+    ServerAlias www.gorillanation.co.uk
+    RedirectPermanent / http://www.evolvemediallc.com/gorillanationmedia-uk/home
+    <%=logging ? '' : '#'%>ErrorLog logs/www.evolvemediallc.com-error.log
+    <%=logging ? '' : '#'%>CustomLog logs/www.evolvemediallc.com-access.log combined
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName evolvemediacorp.com
+    ServerAlias *.evolvemediacorp.com
+    RewriteEngine On
+    RewriteCond %{http_host} evolvemediacorp.com [NC]
+    RewriteRule ^/(.*)$ http://www.evolvemediallc.com/$1 [L,R=301]
+</VirtualHost>
+
+# www.springboardvideo.com/terms-of-service --> home.springboardplatform.com/about/technology-use-policy
+<VirtualHost *:80>
+    ServerName springboardvideo.com
+    ServerAlias *.springboardvideo.com
+    DocumentRoot /app/shared/docroots/www.evolvemediallc.com/current
+    RedirectPermanent /terms-of-service http://home.springboardplatform.com/about/technology-use-policy
+    <%=logging ? '' : '#'%>ErrorLog logs/www.evolvemediallc.com-error.log
+    <%=logging ? '' : '#'%>CustomLog logs/www.evolvemediallc.com-access.log combined
+</VirtualHost>
+

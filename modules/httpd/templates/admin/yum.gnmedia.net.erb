@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+    <Directory /app/shared/docroots/yum.gnmedia.net/>
+      Options FollowSymLinks Indexes
+    </Directory>
+
+    ServerName yum.gnmedia.net
+    ServerAlias *.yum.gnmedia.net
+    DocumentRoot /app/shared/docroots/yum.gnmedia.net/
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/yum.gnmedia.net_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/yum.gnmedia.net_access.log combined
+
+</VirtualHost>

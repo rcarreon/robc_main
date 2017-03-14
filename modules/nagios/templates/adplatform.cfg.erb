@@ -1,0 +1,38 @@
+define host{
+        host_name       adops.gorillanation.com
+        address         adops.gorillanation.com
+        notifications_enabled           1       ; Host notifications are enabled
+        event_handler_enabled           1       ; Host event handler is enabled
+        flap_detection_enabled          1       ; Flap detection is enabled
+        process_perf_data               1       ; Process performance data
+        retain_status_information       1       ; Retain status information across program restarts
+        retain_nonstatus_information    1       ; Retain non-status information across program restarts
+        max_check_attempts              5
+        notification_interval           0
+        notification_period             24x7
+        notification_options            d,u,r
+        contact_groups                  sys-admins
+        check_command                   check-fast-alive
+
+        }
+
+
+define servicegroup{
+        servicegroup_name   AdPlatform
+        alias       AdPlatform Checks
+}
+
+
+define service {
+        host_name                  adops.gorillanation.com
+        service_description             Site Check
+        check_command                   check_url!adops.gorillanation.com!/!"forgot your password"
+        use                             generic-service
+        notes_url                   http://docs.gnmedia.net/wiki/Nagios-sitecheck
+        normal_check_interval           1440
+        retry_check_interval            1
+        max_check_attempts              2
+        servicegroups                   AdPlatform
+        contacts      adplatform
+}
+

@@ -1,0 +1,29 @@
+# $Id$
+# $URL$
+
+
+<% if  lsbmajdistrelease == "6" %>
+check process httpd with pidfile /var/run/httpd/httpd.pid
+<% else %>
+check process httpd with pidfile /var/run/httpd.pid
+<% end %>
+
+ alert red@evolvemediacorp.com only on { action, exec, resource, timeout }
+
+	start program = "/etc/monit.d/apache_restart"
+	stop  program = "/sbin/service httpd stop"
+
+<% if fqdn[6,5] == "sorry" %>
+	if failed host 127.0.0.1 port 80 type tcp
+		and send "GET / HTTP/1.0\n\n" expect "503 Service Temporarily Unavailable"
+<% else %>
+	if failed host 127.0.0.1 port 80 protocol http
+		and request "/"
+<% end %>
+		and timeout 300 seconds
+		for 5 cycles
+		then restart
+
+	if totalmem > 90%
+		for 5 cycles
+		then restart

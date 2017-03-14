@@ -1,0 +1,153 @@
+import socket
+import time
+import syslog
+
+def rrdcached_handler(name):
+    getStats()
+    try:
+        result = int(metricStats[name])
+    except TypeError:
+        result = metricStats[name]
+    return result 
+
+def metric_init(params):
+    global socketTimeout
+    global descriptors
+    socketTimeout = False
+    d1 = {  'name': 'QueueLength',
+            'call_back': rrdcached_handler,
+            'time_max': 90,
+            'value_type': 'uint',
+            'units': 'N',
+            'slope': 'both',
+            'format': '%u',
+            'description': 'Number of nodes currently enqueued in the update queue.',
+            'groups': 'rrdcached' }
+
+    d2 = {  'name': 'UpdatesReceived',
+            'call_back': rrdcached_handler,
+            'time_max': 90,
+            'value_type': 'uint',
+            'units': 'N',
+            'slope': 'positive',
+            'format': '%u',
+            'description': 'Number of UPDATE commands received.',
+            'groups': 'rrdcached' }
+
+    d3 = {  'name': 'FlushesReceived',
+            'call_back': rrdcached_handler,
+            'time_max': 90,
+            'value_type': 'uint',
+            'units': 'N',
+            'slope': 'positive',
+            'format': '%u',
+            'description': 'Number of FLUSH commands received.',
+            'groups': 'rrdcached' }
+
+    d4 = {  'name': 'UpdatesWritten',
+            'call_back': rrdcached_handler,
+            'time_max': 90,
+            'value_type': 'uint',
+            'units': 'N',
+            'slope': 'positive',
+            'format': '%u',
+            'description': 'Total number of updates, i. e. calls to rrd_update_r, since the daemon was started.', 
+            'groups': 'rrdcached' }
+
+    d5 = {  'name': 'DataSetsWritten',
+            'call_back': rrdcached_handler,
+            'time_max': 90,
+            'value_type': 'uint',
+            'units': 'N',
+            'slope': 'positive',
+            'format': '%u',
+            'description': 'Total number of data sets written to disk since the daemon was started. A data set is one or more values passed to the UPDATE command.',
+            'groups': 'rrdcached' }
+
+    d6 = {  'name': 'TreeNodesNumber',
+            'call_back': rrdcached_handler,
+            'time_max': 90,
+            'value_type': 'uint',
+            'units': 'N',
+            'slope': 'both',
+            'format': '%u',
+            'description': 'Number of nodes in the cache.',
+            'groups': 'rrdcached' }
+
+    d7 = {  'name': 'TreeDepth',
+            'call_back': rrdcached_handler,
+            'time_max': 90,
+            'value_type': 'uint',
+            'units': 'N',
+            'slope': 'both',
+            'format': '%u',
+            'description': 'Depth of the tree used for fast key lookup.',
+            'groups': 'rrdcached' }
+
+    d8 = {  'name': 'JournalBytes',
+            'call_back': rrdcached_handler,
+            'time_max': 90,
+            'value_type': 'uint',
+            'units': 'B',
+            'slope': 'both',
+            'format': '%u',
+            'description': 'Total number of bytes written to the journal since startup.',
+            'groups': 'rrdcached' }
+
+    d9 = {  'name': 'JournalRotate',
+            'call_back': rrdcached_handler,
+            'time_max': 90,
+            'value_type': 'uint',
+            'units': 'N',
+            'slope': 'both',
+            'format': '%u',
+            'description': 'Number of times the journal has been rotated since startup.',
+            'groups': 'rrdcached' }
+    descriptors = [ d1, d2, d3, d4, d5, d6, d7, d8, d9 ]
+    return descriptors
+
+def metric_cleanup():
+    pass
+
+def getStats():
+    global metricCacheTTL, metricStats, metricStatsTime, socketTimeout
+    metricCacheTTL = 10
+    try:
+        metricStatsTime
+    except NameError:
+        metricStatsTime = 0
+    if (time.time() - metricStatsTime) > metricCacheTTL:
+        s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        s.settimeout(5)
+        s.connect("/var/rrdtool/rrdcached/rrdcached.limited.sock")
+        s.send("STATS\r\n")
+        try:
+            dataHeader = s.recv(1024)
+            data = s.recv(1024)
+        except socket.timeout:
+            syslog.syslog("gmond rrdcached module - Socket timeout")
+            socketTimeout = True
+        s.close()
+        if socketTimeout == False:
+            metricStatsTime = time.time()
+        metricStats = parseStats(data)
+
+def parseStats(data):
+    global socketTimeout
+    resultDict = {}
+    i = 0
+    while i < len(data.split()):
+        resultDict[data.split()[i][:-1]] = data.split()[i+1]
+        i = i + 2
+    if socketTimeout == True:
+        syslog.syslog("gmond rrdcached module - Reset stats to None due to socket timeout")
+        resultDict = {'UpdatesWritten': None, 'JournalBytes': None, 'QueueLength': None, 'FlushesReceived': None, 'JournalRotate': None, 'TreeDepth': None, 'UpdatesReceived': None, 'DataSetsWritten': None, 'TreeNodesNumber': None}
+        socketTimeout = False
+    return resultDict
+
+#This code is for debugging and unit testing
+if __name__ == '__main__':
+    metric_init({})
+    for d in descriptors:
+        v = d['call_back'](d['name'])
+        print 'value for %s is %u' % (d['name'],  v)

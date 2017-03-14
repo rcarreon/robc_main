@@ -1,0 +1,14 @@
+# description: VMLoadtoJSON
+service rvmloadtojson
+{
+    disable = no
+    type            = UNLISTED
+    port            = 1455
+    socket_type     = stream
+    wait            = no
+    user            = root
+    group           = root
+    server          = /usr/local/bin/vmloadtojson
+    log_on_success  =
+}
+

@@ -1,0 +1,8 @@
+    RewriteEngine On
+    # totallyher.com --> totallyhermedia.com
+    RewriteCond %{HTTP_HOST} ^totallyher\.com$ [NC,OR]
+    RewriteCond %{HTTP_HOST} ^www\.totallyher\.com$ [NC]
+    RewriteRule ^/(.*) http://www.totallyhermedia.com/$1 [R=301,L]
+
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

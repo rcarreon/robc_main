@@ -1,0 +1,32 @@
+{
+    "sbv-cms": {
+        "deployto": "app@cms@sbv@%s,-stats",
+        "deploysymlink": "/app/shared/docroots/cms.springboardplatform.com/current",
+        "shareddeploy": true
+    },
+    "sbv-media": {
+	"deployto": "app@media@sbv@%s",
+	"deploysymlink": "/app/shared/docroots/cms.springboardplatform.com/current",
+	"shareddeploy": true
+    },
+    "sbv-mediaplayer": {
+        "deployto": "app@media@sbv@%s",
+        "deploysymlink": "/app/shared/docroots/sbv-mediaplayer/current",
+        "shareddeploy": true
+    },
+    "sbv-stats": {
+    	"deployto": "app@stats@sbv@%s",
+    	"deploysymlink": "/app/shared/docroots/analytics.springboardvideo.com/current",
+    	"shareddeploy": true
+    },
+    "sbv-yourls": {
+        "deployto": "app@yourls@sbv@%s",
+        "deploysymlink": "/app/shared/docroots/www.sbvid.us/current",
+        "shareddeploy": true
+    },
+    "sbv-js": {
+    	"deployto": "app@media@sbv@%s",
+    	"deploysymlink": "/app/shared/docroots/sbv-js/current",
+    	"shareddeploy": true
+    }
+}

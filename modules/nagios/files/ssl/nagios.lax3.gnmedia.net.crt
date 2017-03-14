@@ -1,0 +1,38 @@
+Certificate:
+    Data:
+        Version: 1 (0x0)
+        Serial Number:
+            e4:68:0a:28:1b:5d:f5:b9
+        Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=US, ST=California, L=Los Angeles, O=GN, OU=IT, CN=nagios.lax3.gnmedia.net
+        Validity
+            Not Before: Jul 16 17:48:02 2009 GMT
+            Not After : Jul 14 17:48:02 2019 GMT
+        Subject: C=US, ST=California, L=Los Angeles, O=GN, OU=IT, CN=nagios.lax3.gnmedia.net
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+            RSA Public Key: (512 bit)
+                Modulus (512 bit):
+                    00:e5:83:02:98:3b:39:2d:21:e5:cc:e3:38:7f:61:
+                    c8:5f:99:cb:3e:a5:47:1b:22:c8:db:78:1c:ef:35:
+                    d5:12:53:7a:8a:ef:5e:50:61:3c:f2:a5:b1:27:26:
+                    df:d3:87:bf:2f:10:21:05:fc:a6:6b:da:e8:45:07:
+                    13:9e:ce:95:53
+                Exponent: 65537 (0x10001)
+    Signature Algorithm: sha1WithRSAEncryption
+        3f:26:26:94:19:b2:48:83:18:02:97:90:9b:af:f8:c9:d2:4d:
+        26:36:e9:cc:ae:28:7e:5b:a9:d8:f0:c7:b8:88:c2:4d:2b:ca:
+        38:96:c3:21:90:17:08:b5:04:55:76:ea:4a:0a:33:6c:05:93:
+        ea:c1:08:f9:a3:e9:9a:63:1d:2d
+-----BEGIN CERTIFICATE-----
+MIIB2jCCAYQCCQDkaAooG131uTANBgkqhkiG9w0BAQUFADB0MQswCQYDVQQGEwJV
+UzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLTG9zIEFuZ2VsZXMxCzAJ
+BgNVBAoTAkdOMQswCQYDVQQLEwJJVDEgMB4GA1UEAxMXbmFnaW9zLmxheDMuZ25t
+ZWRpYS5uZXQwHhcNMDkwNzE2MTc0ODAyWhcNMTkwNzE0MTc0ODAyWjB0MQswCQYD
+VQQGEwJVUzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLTG9zIEFuZ2Vs
+ZXMxCzAJBgNVBAoTAkdOMQswCQYDVQQLEwJJVDEgMB4GA1UEAxMXbmFnaW9zLmxh
+eDMuZ25tZWRpYS5uZXQwXDANBgkqhkiG9w0BAQEFAANLADBIAkEA5YMCmDs5LSHl
+zOM4f2HIX5nLPqVHGyLI23gc7zXVElN6iu9eUGE88qWxJybf04e/LxAhBfyma9ro
+RQcTns6VUwIDAQABMA0GCSqGSIb3DQEBBQUAA0EAPyYmlBmySIMYApeQm6/4ydJN
+JjbpzK4oflup2PDHuIjCTSvKOJbDIZAXCLUEVXbqSgozbAWT6sEI+aPpmmMdLQ==
+-----END CERTIFICATE-----

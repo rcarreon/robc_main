@@ -1,0 +1,10 @@
+
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^afterellen\.com$ [NC]
+    RewriteRule ^/(.*) http://www.afterellen.com/$1 [R=301,L]
+
+    # m.afterellen.com -> www.afterellen.com
+    RewriteCond %{HTTP_HOST} ^m\.afterellen\.com$ [NC]
+    RewriteRule ^/(.*) http://www.afterellen.com/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

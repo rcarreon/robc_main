@@ -1,0 +1,18 @@
+#
+# This file is managed by Puppet. DO NOT MODIFY it on <%= fqdn %>
+#
+
+# To use this .ini file as a template for configuring additional
+# instances to monitor, do not simply copy and re-start the agent
+# without first modifying the parameters below to match the login
+# credentials for the new instance.
+#
+# Refer to the documentation for more detailed information and
+# instructions.
+# 
+# Version: <%= mysql_monitor_agent_version %>
+
+[mysqld]
+user     = em_agent
+password = <%= mysqld_agent_password %>
+socket   = /var/lib/mysql/mysql.sock

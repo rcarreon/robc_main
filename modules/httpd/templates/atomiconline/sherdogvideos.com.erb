@@ -1,0 +1,18 @@
+# $Id$
+<VirtualHost *:80>
+  ServerName sherdogvideos.com
+  ServerAlias www.sherdogvideos.com www.origin.sherdogvideos.com
+
+  DocumentRoot "/app/shared/docroots/sherdogvideos.com"
+
+  <%=logging ? '' : '#'%>CustomLog /app/log/sherdogvideos.com-access_log combined
+  <%=logging ? '' : '#'%>ErrorLog /app/log/sherdogvideos.com-error_log
+
+   <Directory "/app/shared/docroots/sherdogvideos.com">
+       Options -Indexes Includes FollowSymLinks
+       Order allow,deny
+       Allow from all
+       deny from 124.40.42.35
+  </Directory>
+
+</VirtualHost>

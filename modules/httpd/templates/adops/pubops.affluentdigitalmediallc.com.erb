@@ -1,0 +1,19 @@
+# This file is managed by Puppet. Do not modify it from <%=fqdn %>
+# vim: set ft=apache :
+
+<VirtualHost *:80>
+    ServerName pubops.affluentdigitalmediallc.com
+    ServerAlias *.pubops.affluentdigitalmediallc.com
+    DocumentRoot "/app/shared/docroots/pubops.affluentdigitalmediallc.com/current/public"
+    Timeout 600
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/pubops.affluentdigitalmediallc.com.error.log
+    LogLevel warn
+    <%=logging ? '' : '#'%>CustomLog /app/log/pubops.affluentdigitalmediallc.com.access.log combined
+
+    PassengerAppEnv production
+
+    <Directory /app/shared/docroots/pubops.affluentdigitalmediallc.com/current/public>
+        PassengerRuby /app/software/ruby/rbenv/versions/2.1.1/bin/ruby
+    </Directory>
+</VirtualHost>

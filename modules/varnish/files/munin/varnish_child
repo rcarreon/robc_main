@@ -1,0 +1,26 @@
+#! /bin/sh
+
+# anders@fupp.net, 2007-09-19
+# jrottenberg, 2009-10-02 - Use varnishstat output
+# Shows the number of threads for the varnish child process
+
+# http://anders.fupp.net/plugins/munin/varnish_threads
+
+case $1 in
+autoconf) echo yes;;
+config)
+    echo 'graph_title Varnish threads'
+    echo 'graph_vlabel threads'
+    echo 'graph_category varnish'
+    echo 'graph_info This graph shows the number of threads for the varnish child process'
+
+    echo 'threads.label threads'
+    echo 'threads.type GAUGE'
+    echo 'threads.graph yes'
+    ;;
+*)
+    printf "threads.value "
+    varnishstat -f n_wrk -1| awk '{print $2}'
+    ;;
+esac
+

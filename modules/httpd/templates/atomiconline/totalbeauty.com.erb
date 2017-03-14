@@ -1,0 +1,70 @@
+<VirtualHost *:80>
+        ServerName www.totalbeauty.com
+        ServerAlias totalbeauty.com images.totalbeauty.com zwww.totalbeauty.com zimages.totalbeauty.com *.totalbeauty.com totalbeautymedia.com www.totalbeautymedia.com video.totalbeauty.com justbeauty.com www.justbeauty.com beautygasm.com www.beautygasm.com
+
+        LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+        LogFormat "%{X-Forwarded-for}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" xff
+        SetEnvIf X-Forwarded-For ^[1-9].* HAVE_XFF
+
+
+        FileETag none
+
+        DocumentRoot /app/shared/docroot/www.totalbeauty.com/files/html
+        <Directory /app/shared/docroot/www.totalbeauty.com/files/html>
+                AllowOverride AuthConfig FileInfo Indexes Limit
+                Options Includes FollowSymLinks
+                DirectoryIndex index.php index.html
+
+                ExpiresActive On
+                ExpiresByType text/css "access plus 1 hour"
+                ExpiresByType application/x-javascript "access plus 1 hour"
+                ExpiresByType application/javascript "access plus 1 hour"
+                ExpiresByType application/x-shockwave-flash "access plus 1 hour"
+                ExpiresByType text/javascript "access plus 1 hour"
+                ExpiresByType image/jpg "access plus 30 days"
+                ExpiresByType image/jpeg "access plus 30 days"
+                
+                
+                ExpiresByType image/gif "access plus 30 days"
+                ExpiresByType image/png "access plus 30 days"
+                ExpiresByType video/x-flv "access plus 1 hour"
+
+
+        </Directory>
+        <LocationMatch "p_drugstore_shampoos">
+                ExpiresActive On
+                ExpiresDefault "access plus 5 minutes"
+                ExpiresByType text/html "access plus 5 minutes"
+                Header add Expires "Sat, 31 Oct 2009 12:00:00 -0700"
+        </LocationMatch>
+        <Location "/content/gallery/p_drugstore_shampoos">
+                ExpiresActive On
+                ExpiresDefault "access plus 5 minutes"
+                ExpiresByType text/html "access plus 5 minutes"
+                Header add Expires "Sat, 31 Oct 2009 12:00:00 -0700"
+        </Location>
+        <Location "http://www.totalbeauty.com/content/gallery/p_drugstore_shampoos">
+                ExpiresActive On
+                ExpiresDefault "access plus 5 minutes"
+                ExpiresByType text/html "access plus 5 minutes"
+                Header add Expires "Sat, 31 Oct 2009 12:00:00 -0700"
+        </Location>
+
+        ScriptAlias /cgi-bin /app/shared/docroot/www.totalbeauty.com/files/cgi-bin/
+
+        Alias /stats /app/shared/docroot/www.totalbeauty.com/wusage/
+
+        CustomLog /www/sites/www.totalbeauty.com/logs/access/access_log combined
+        ErrorLog /app/log/totalbeauty.com-error.log
+        CustomLog /app/log/totalbeauty.com_access.log combined env=!HAVE_XFF
+        CustomLog /app/log/totalbeauty.com_access.log xff env=HAVE_XFF
+
+        RewriteEngine On
+
+        RewriteCond %{HTTP_HOST} ^m\.totalbeauty\.com$
+        RewriteRule ^(.*)$ http://www.totalbeauty.com/mobile [R=301,NC]
+
+        RewriteCond %{HTTP_HOST} ^(.*)justbeauty\.com
+        RewriteRule ^(.*)$ http://www.totalbeauty.com/$1 [R=permanent,L]
+
+</VirtualHost>

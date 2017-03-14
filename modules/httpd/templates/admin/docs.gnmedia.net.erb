@@ -1,0 +1,27 @@
+# $Id$
+
+<VirtualHost *:80>
+    ServerName docs.gnmedia.net
+    DocumentRoot /app/shared/docroots/docs.gnmedia.net
+
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/docs.gnmedia.net_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/docs.gnmedia.net_access.log combined
+
+    LogLevel warn
+
+    Alias /wiki /app/shared/docroots/docs.gnmedia.net/w/index.php
+
+    <Location />
+        RewriteEngine On
+        Options +FollowSymLinks
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule ^wiki/(.+)$ /w/index.php?title=$1 [PT,L,QSA]
+        RewriteRule ^wiki/*$ wiki/ [L,QSA]
+        RewriteRule ^/*$ wiki/ [L,QSA]
+        RewriteRule ^/$ wiki/ [L,QSA]
+    </Location>
+
+</VirtualHost>
+

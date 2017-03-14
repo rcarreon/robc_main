@@ -1,0 +1,18 @@
+#!/usr/bin/expect
+
+# simple expect script so that nagios can check rcons
+
+log_user 0
+set timeout 8
+set node [lindex $argv 0]
+
+spawn /opt/xcat/bin/rcons $node
+send "check_rcons\r"
+expect {
+    "read-only" { puts "OK: $node: someone connected" }
+    "assword: " { puts "OK: $node: got password prompt" }
+    "ogin" { puts "OK: $node: got login prompt" }
+    "command not found" { puts "WARNING: got a shell"; send "exit\r"; sleep 1; exit 1 }
+    timeout { puts "CRITICAL: $node: timeout!"; exit 2 }
+}
+exit 0

@@ -1,0 +1,5 @@
+error /^err:|^Failed|failed:|^Duplicate definition:|^Could not find dependency|^Invalid parameter|^Only subclasses can override parameters/
+warning /^warning:/
+info /^notice:/
+info /^\w+ PASSED/
+start /^Starting dry run of \w+/

@@ -1,0 +1,15 @@
+    ServerAlias *shocktilyoudrop.com
+    RewriteEngine On
+
+    RewriteCond %{HTTP_HOST} ^shocktilyoudrop\.com$ [NC,OR]
+    RewriteCond %{HTTP_HOST} ^shocktillyoudrop\.com$ [NC,OR]
+    RewriteCond %{HTTP_HOST} ^prd\.shocktillyoudrop\.com$ [NC,OR]
+    RewriteCond %{HTTP_HOST} ^www\.shocktilyoudrop\.com$ [NC]
+    RewriteRule ^/(.*) http://www.shocktillyoudrop.com/$1 [R=301,L]
+
+    # m.shocktillyoudrop.com -> www.shocktillyoudrop.com
+    RewriteCond %{HTTP_HOST} ^m\.shocktillyoudrop\.com$ [NC]
+    RewriteRule ^/(.*) http://www.shocktillyoudrop.com/$1 [R=301,L]
+
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

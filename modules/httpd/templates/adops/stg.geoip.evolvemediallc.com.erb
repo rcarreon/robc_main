@@ -1,0 +1,29 @@
+# This file is managed by Puppet. Do not modify it from <%=fqdn %>
+# vim: set ft=apache :
+
+<VirtualHost *:80>
+    ServerName geoip.evolvemediallc.com
+    ServerAlias stg.geoip.evolvemediallc.com
+    ServerAlias geo.gorillanation.com *.geo.gorillanation.com
+    ServerAlias geo.*.gorillanation.com *.geo.*.gorillanation.com
+    DocumentRoot "/app/shared/docroots/geoip.evolvemediallc.com/current/public"
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/geoip.evolvemediallc.com.error.log
+    LogLevel warn
+    <%=logging ? '' : '#'%>CustomLog /app/log/geoip.evolvemediallc.com.access.log combined
+
+    PassengerAppEnv staging
+
+    <Directory /app/shared/docroots/geoip.evolvemediallc.com/current/public>
+        PassengerRuby /app/software/ruby/rbenv/versions/2.1.1/bin/ruby
+
+        RewriteEngine On
+        RewriteRule geo.php /geo [L]
+        RewriteRule lookup.php /lookup [L]
+
+        Options FollowSymLinks
+        AllowOverride None
+        Order allow,deny
+        Allow from all
+    </Directory>
+</VirtualHost>

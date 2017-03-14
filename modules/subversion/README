@@ -1,0 +1,13 @@
+$Id: README 1206 2009-08-13 04:50:09Z jrottenberg $
+
+Subversion class 
+
+DONE
+ - Manage notifications on post commit
+ - Provide synax checks on pre-commit (for php scripts, pupppet manifests, ...)
+ - Manage ACL (/etc/httpd/conf.d/svn.gnmedia.net.acl) 
+
+ENHANCE
+- Manage repo
+
+

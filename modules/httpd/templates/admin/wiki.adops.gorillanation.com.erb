@@ -1,0 +1,28 @@
+# $Id: wiki.adops.gorillanation.com.erb 7961 2011-03-08 18:52:08Z jrottenberg $
+
+<VirtualHost *:80>
+    ServerName wiki.adops.gorillanation.com
+    ServerAlias www.wiki.adops.gorillanation.com 
+    DocumentRoot /app/shared/docroots/wiki.adops.gorillanation.com
+
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/wiki.adops.gorillanation.com_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/wiki.adops.gorillanation.com_access.log combined
+
+    LogLevel warn
+
+    #Alias /wiki /app/shared/docroots/wiki.adops.gorillanation.com/wiki/index.php
+
+    <Location />
+        RewriteEngine On
+        Options +FollowSymLinks
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule ^wiki/(.+)$ /wiki/index.php?title=$1 [PT,L,QSA]
+        RewriteRule ^wiki/*$ wiki/ [L,QSA]
+        RewriteRule ^/*$ wiki/ [L,QSA]
+        RewriteRule ^/$ wiki/ [L,QSA]
+    </Location>
+
+</VirtualHost>
+

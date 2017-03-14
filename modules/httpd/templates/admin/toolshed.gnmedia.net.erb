@@ -1,0 +1,18 @@
+#
+#
+<VirtualHost *:80>
+    ServerName toolshed.gnmedia.net
+    ServerAlias *.toolshed.gnmedia.net
+    ServerAlias dba.gnmedia.net
+    DocumentRoot /app/shared/docroots/toolshed.gnmedia.net/
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/toolshed.gnmedia.net_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/toolshed.gnmedia.net_access.log combined
+
+    <Directory /app/shared/docroots> 
+	Options FollowSymLinks
+	AllowOverride All
+	Satisfy all
+    </Directory>
+
+</VirtualHost>

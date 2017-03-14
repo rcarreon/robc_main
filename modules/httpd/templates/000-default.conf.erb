@@ -1,0 +1,26 @@
+# This file is managed by Puppet do not modify it from <%=fqdn %>
+# $Id$
+
+# Sets the default logging behaviour
+<%=logcomm%>ErrorLog /app/log/error_log
+<%=logcomm%>CustomLog /app/log/access_log combined
+
+# See OTG-CONFIG-006
+TraceEnable off
+
+
+<VirtualHost *:80>
+        ServerName <%= ipaddress %>
+        ServerAlias <%= fqdn %>
+    
+        DocumentRoot /var/www/html/
+
+        <Directory /var/www/html/>
+		Options Indexes FollowSymLinks
+                Order allow,deny
+                Allow from all
+        </Directory>
+
+        <%=logcomm%>ErrorLog /app/log/error_log
+        <%=logcomm%>CustomLog /app/log/access_log combined
+</VirtualHost>

@@ -1,0 +1,6 @@
+# $Id$
+
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^mumtastic\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.mumtastic.com.au/$1 [R=301,L]
+    

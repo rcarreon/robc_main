@@ -1,0 +1,7 @@
+    RewriteEngine On
+    # hockeysfuture.com --> www.hockeysfuture.com
+    RewriteCond %{HTTP_HOST} ^hockeysfuture\.com$ [NC]
+    RewriteRule ^/(.*) http://www.hockeysfuture.com/$1 [R=301,L]
+
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

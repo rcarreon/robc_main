@@ -1,0 +1,21 @@
+<VirtualHost *:80>
+    DocumentRoot /app/shared/docroots/www.craveonlinemedia.com/current
+    ServerName www.craveonlinemedia.com
+    ServerAlias *.craveonlinemedia.com
+    ErrorLog /app/log/www.craveonlinemedia.com-error.log
+    CustomLog /app/log/www.craveonlinemedia.com-access.log combined
+
+    <Directory /app/shared/docroots/www.craveonlinemedia.com/current/>
+        AllowOverride FileInfo Indexes Options
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteRule ^(.*)$ index.php?url= [QSA,L]
+    </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+        ServerName craveonlinemedia.com
+        Redirect 301 / http://www.craveonlinemedia.com/
+</VirtualHost>
+

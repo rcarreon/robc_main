@@ -1,0 +1,11 @@
+/app/log/sphinx/*.log {
+       daily
+       dateext
+       rotate 30
+       copytruncate
+       delaycompress
+       compress
+       notifempty
+       missingok
+}
+

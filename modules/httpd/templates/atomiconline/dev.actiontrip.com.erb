@@ -1,0 +1,37 @@
+# $Id$
+
+<VirtualHost *:80>
+    ServerAdmin webmaster@actiontrip.com
+    DocumentRoot /app/shared/dev.actiontrip.com/htdocs/
+
+    ServerName dev.actiontrip.com
+
+    <Location /rei/db>
+        AuthUserFile /app/shared/dev.actiontrip.com/htdocs/rei/db/.htpasswd
+        AuthName "Enter your username and password:"
+        AuthType Basic
+        <Limit GET>
+                require valid-user
+        </Limit>
+
+        php_value post_max_size 128M
+        php_value upload_max_filesize 128M
+   </location>
+
+   <Location /rei/e3>
+        AuthUserFile /app/shared/dev.actiontrip.com/htdocs/rei/e3/.htpasswd
+        AuthName "Enter your username and password:"
+        AuthType Basic
+        <Limit GET>
+                require valid-user
+        </Limit>
+
+        php_value post_max_size 128M
+        php_value upload_max_filesize 128M
+   </location>
+
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/dev.actiontrip.com-error_log
+    <%=logging ? '' : '#'%>CustomLog /app/log/dev.actiontrip.com-access_log combined
+</VirtualHost>
+

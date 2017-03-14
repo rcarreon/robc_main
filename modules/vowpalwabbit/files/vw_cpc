@@ -1,0 +1,73 @@
+#!/bin/bash
+#
+# Init file for Vowpal Wabbit system monitor
+# Written by monkies
+#
+# chkconfig: - 98 02
+# description: cpc machine learning.....math!!
+#
+# processname: vw
+# pidfile: /var/run/vw_cpc.pid
+# Short-Description: VW is a machine learning app
+
+# Source function library.
+. /etc/init.d/functions
+
+### Default variables
+pidfile="/var/run/vw/vw_cpc.pid"
+modelfile="/app/data/vwmodels.live/cpc.model"
+logfile="/app/log/vw_cpc.log"
+prog="vw"
+prog_path="/usr/local/bin/vw"
+options="-i $modelfile --daemon --port 26546 --pid_file $pidfile -t --num_children 20 --no_stdin --quiet"
+user="apache"
+RETVAL=0
+
+start() {
+	echo -n $"Starting $prog: "
+	daemon --user $user --pidfile $pidfile $prog_path $options
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$prog
+	return $RETVAL
+}
+
+stop() {
+	echo -n $"Shutting down $prog: "
+	killproc -p ${pidfile} $prog_path
+	RETVAL=$?
+	echo
+	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$prog
+	return $RETVAL
+}
+
+restart() {
+        $prog_path -ti $modelfile --no_stdin &> /dev/null
+        if [[ $? -ne 0 ]]; then
+            echo "Aborting restart... bad modelfile: $modelfile"
+            exit 1
+        fi
+	stop
+	start
+}
+
+case "$1" in
+  start)
+	start
+	;;
+  stop)
+	stop
+	;;
+  restart|reload)
+	restart
+	;;
+  status)
+	status $prog
+	RETVAL=$?
+	;;
+  *)
+	echo $"Usage: $0 {start|stop|restart|status}"
+	RETVAL=1
+esac
+
+exit $RETVAL

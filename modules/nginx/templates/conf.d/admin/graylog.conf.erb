@@ -1,0 +1,26 @@
+worker_processes 4;
+
+pid /var/run/nginx.pid
+
+events {
+  worker_connections  4096;
+}
+
+http {
+  passenger_root  /usr/local/rvm/gems/ruby-1.9.3-p194/gems/passenger-3.0.10
+  passenger_ruby  /usr/local/rvm/wrappers/ruby-1.9.3-p194/ruby
+
+  access_log  /app/log/nginx/access_log  main;
+
+  sendfile  on;
+
+  keepalive_timeout   5;
+
+  gzip  on;
+}
+
+server {
+  listen  80;
+  server_name graylog2.gnmedia.net;
+  root  /app/shared/graylog2/web/public;
+}

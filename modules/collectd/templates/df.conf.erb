@@ -1,0 +1,15 @@
+# $Id$
+# $URL$
+
+LoadPlugin "df"
+<Plugin "df">
+  MountPoint "/"
+<% if has_variable?("blockdevices") then -%>
+  <% blockdevices.split(",").each do |device| -%>
+  Device "/dev/<%= device %>"
+  <% end -%>
+<% end -%>
+  FSType "ext3"
+  IgnoreSelected false
+</Plugin>
+

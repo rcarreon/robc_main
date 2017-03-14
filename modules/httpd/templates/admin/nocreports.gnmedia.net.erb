@@ -1,0 +1,20 @@
+<VirtualHost *:80>
+    ServerName      nocreports.gnmedia.net
+    ServerAlias     *.nocreports.gnmedia.net
+    DocumentRoot    /app/shared/http/reports
+    <%=logging ? '' : '#'%>ErrorLog        /app/log/nocreports.gnmedia.net_error.log
+    <%=logging ? '' : '#'%>CustomLog       /app/log/nocreports.gnmedia.net_access.log   combined
+    <Directory "/app/shared/http/reports">
+        Options Indexes FollowSymlinks
+        AllowOverride None
+        Order   allow,deny
+        Allow from all
+    </Directory>
+
+    Alias /cgi-bin /app/shared/http/reports/cgi-bin
+    <Directory "/app/shared/http/reports/cgi-bin">
+        Options +ExecCGI
+        AddHandler cgi-script .cgi .pl
+
+    </Directory>
+</VirtualHost>

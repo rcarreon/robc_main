@@ -1,0 +1,175 @@
+#!/bin/bash
+
+exec 1>>/tmp/mysql-postboot-output
+exec 2>>/tmp/mysql-postboot-output
+set -x
+
+export HOME=/root
+
+
+# Some first-time bits to setup mysqld.
+
+# It is assumed that puppet has already run and mounted the volumes.
+
+# Every VM will run this after first boot, but this script exist unless /sql exists.
+
+if ! test -f /root/.puppet-mysqld56-module;then
+    echo "Not a MySQL host."
+    exit 0
+fi
+
+
+# A few sanity checks
+if ! df -t nfs /sql/data;then
+    echo "/sql/data is not on NFS."
+    exit 1
+fi
+if ! getent passwd mysql >/dev/null ;then
+    echo "User mysql does not exist. Something broke."
+    exit 1
+fi
+
+if ! test -d /sql/data/mysql;then
+    # This is a brand-new install, so we will have extra steps to do.
+    freshinstall=1
+
+
+else
+    freshinstall=0
+fi
+
+
+
+#   Ok, start doing stuff
+if [ $freshinstall == 1 ];then
+    mkdir -p /sql/data/mysql
+    chmod 700 /sql/data/mysql
+    chown mysql:mysql /sql/data/mysql
+fi
+
+# This file should be the same name as what puppet will make later
+cat <<__EOF__>/etc/yum.repos.d/mysql5627.repo
+[mysql5627]
+name=CentOS 6 MySQL 5.6.27
+baseurl=http://yum.gnmedia.net/mysql/\$releasever/5627/
+enabled=1
+gpgcheck=0
+__EOF__
+
+
+yum clean all
+cp -f /etc/my.cnf /usr/my.cnf
+rm -f /root/.mysql_secret
+# these rpms start the server and set a random root passwd
+rpm -q MySQL-client.x86_64 || yum -y install MySQL-client.x86_64
+rpm -q MySQL-server.x86_64 || yum -y install MySQL-server.x86_64
+service mysql status || service mysql start
+chmod 755 /var/lib/mysql  # make the socket file accessible
+
+if test -f /root/.my.cnf;then
+   newpass=$(grep password /root/.my.cnf | tail -1 | sed 's/.*=\s*//')
+   echo "Puppet wants the password to be $newpass"
+else
+   newpass=L0tcgP8m
+   echo "No root/.my.cnf, going to use password $newpass"
+fi
+
+# If /root/.mysql_secret exists, then we have a fresh server install
+if test -f /root/.mysql_secret;then
+   echo "/root/.mysql_secret exists, going to run mysql_secure_install"
+   curpass=$(cat /root/.mysql_secret | sed 's/.*(local time): //' | sed '/^$/d' | tail -1)
+   rm -f /usr/my.cnf /usr/my-new.cnf
+
+
+
+  yum -y install expect tcl
+cat <<__EOF__>/tmp/mysqlsi-wrap
+#!/usr/bin/expect --
+
+set curpass [lindex \$argv 0]
+set newpass [lindex \$argv 1]
+
+spawn /usr/bin/mysql_secure_installation
+
+expect "Enter current password for root (enter for none):"
+send "\$curpass\r"
+
+expect "Change the root password? "
+send "y\r"
+
+expect "New password:"
+send "\$newpass\r"
+
+expect "Re-enter new password:"
+send "\$newpass\r"
+
+expect "Remove anonymous users?"
+send "y\r"
+
+expect "Disallow root login remotely?"
+send "y\r"
+
+expect "Remove test database and access to it?"
+send "y\r"
+
+expect "Reload privilege tables now?"
+send "y\r"
+
+expect "All done"
+puts "mysql_secure_installation wrapper completed."
+__EOF__
+    chmod 755 /tmp/mysqlsi-wrap
+    /tmp/mysqlsi-wrap "$curpass"  "$newpass"
+    rpm -e expect tcl
+fi
+rm -f /usr/my.cnf /usr/my-new.cnf
+rm -f /root/.mysql_secret
+
+if test -f /root/.my.logrot.cnf;then
+   logrotpass=$(grep password /root/.my.logrot.cnf | tail -1 | sed 's/.*=\s*//')
+   echo "Puppet wants the logrot password to be $newpass"
+else
+   logrotpass=L0tcgP8m
+   echo "No /root/.my.logrot.cnf, going to use logrot password $newpass"
+fi
+
+
+cat <<__EOF__ | mysql -u root -p$newpass
+
+GRANT ALL PRIVILEGES ON *.* to 'dba'@'192.168.240.%' IDENTIFIED BY 'gorillamaster789'; 
+GRANT ALL PRIVILEGES ON *.* to 'dba'@'192.168.1.%' IDENTIFIED BY 'gorillamaster789';
+GRANT ALL PRIVILEGES ON *.* TO 'dba'@'192.168.12.%' IDENTIFIED BY 'gorillamaster789';
+GRANT ALL PRIVILEGES ON *.* TO 'dba'@'app1v-xcat.tp.prd.lax.gnmedia.net' IDENTIFIED BY 'gorillamaster789';
+GRANT ALL PRIVILEGES ON *.* TO 'dba'@'app1v-percona.tp.prd.lax.gnmedia.net' IDENTIFIED BY PASSWORD '*A315102357FC6395E71AC3173E6332A2DE95216B';
+GRANT SELECT, REPLICATION CLIENT, SHOW DATABASES, SUPER, PROCESS ON *.* TO 'em_agent'@'localhost' IDENTIFIED BY 'qmno98r6';
+GRANT CREATE, INSERT ON mysql.* TO 'em_agent'@'localhost'; 
+GRANT SELECT ON *.* TO 'collectd'@'localhost' IDENTIFIED BY 'xWTj9TVG';
+GRANT SELECT, REPLICATION CLIENT ON *.* TO 'monitor'@'app%v-nagios.tp.%.lax.gnmedia.net' IDENTIFIED BY 'w0jXNFum';
+GRANT SELECT, RELOAD, PROCESS, SHOW DATABASES, SUPER, REPLICATION CLIENT ON *.* TO 'dbtool_ops'@'app1v-dashboards.tp.prd.lax.gnmedia.net' IDENTIFIED BY '1rHhUYVi';
+GRANT ALL ON *.* TO 'sqlcopy'@'localhost' IDENTIFIED BY 'RPsQYznx' WITH GRANT OPTION;
+GRANT PROXY ON ''@'' TO 'sqlcopy'@'localhost' WITH GRANT OPTION;
+GRANT ALL PRIVILEGES ON *.* TO 'dbops'@'app1v-dbops.tp.prd.lax.gnmedia.net' IDENTIFIED BY PASSWORD '*5131183708008333F068CB93C98C0ECC01937C56';
+GRANT SELECT, RELOAD, LOCK TABLES, REPLICATION CLIENT ON *.* TO 'vaquita_backup'@'app1v-vaquita.tp.prd.lax.gnmedia.net' IDENTIFIED BY '34NE1PgAhKXs';
+GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, CREATE TEMPORARY TABLES, DROP, ALTER, EXECUTE, SUPER, EVENT ON *.* TO 'definer_rw'@'localhost' IDENTIFIED BY PASSWORD '*3C37FDEFBD8A6B35C31110CC83C64F8593ACBB4B';
+__EOF__
+echo "GRANT RELOAD ON *.* TO 'logrotate'@'localhost' identified by '$logrotpass'" | mysql -u root -p$newpass
+echo "GRANT PROCESS, REPLICATION CLIENT ON *.* TO 'newrelic'@'$HOSTNAME' IDENTIFIED BY PASSWORD '*95DDC76BAE836550022C2AD4FD2E31A3D6785D4B'" | mysql -u root -p$newpass
+
+case $HOSTNAME in
+  *-em.*)
+     echo "GRANT ALL PRIVILEGES ON *.* TO 'service_manager'@'localhost' IDENTIFIED BY PASSWORD '*A315102357FC6395E71AC3173E6332A2DE95216B'" | mysql -u root -p$newpass
+     ;;
+  *.dev.*)
+     echo "GRANT SELECT, RELOAD, LOCK TABLES, REPLICATION CLIENT ON *.* TO 'vaquita_backup'@'app1v-vaquita.tp.dev.lax.gnmedia.net' IDENTIFIED BY PASSWORD '*B05D1F021C28C75BCEA568A871308C8C3E6AABEA'" | mysql -u root -p$newpass
+     echo "GRANT SELECT, RELOAD, PROCESS, SHOW DATABASES, SUPER, REPLICATION CLIENT ON *.* TO 'dbtool_ops'@'app1v-dashboards.tp.dev.lax.gnmedia.net' IDENTIFIED BY 'qnBmxgAD';" | mysql -u root -p$newpass
+     ;;
+esac
+
+# leave a breadcrumb saying that we have successfully initialized mysql
+echo 'select version()' | mysql -u root -p$newpass > /sql/log/mysql-version
+if ! test -s /sql/log/mysql-version;then
+   rm -f /sql/log/mysql-version
+fi
+
+/usr/sbin/puppetd -tv
+/usr/sbin/puppetd -tv

@@ -1,0 +1,35 @@
+# $Id$
+# $URL$
+
+
+# All nodes are client, the network plugin is loaded there
+LoadPlugin "network"
+<Plugin "network">
+    Listen "<%= fqdn %>" 
+</Plugin>
+
+# use rrdcached instead
+#LoadPlugin "rrdtool"
+#<Plugin "rrdtool">
+#    DataDir "/var/lib/collectd/"
+#    CacheFlush 900
+#    CacheTimeout 300 
+#    WritesPerSecond 3
+#</Plugin>
+
+
+LoadPlugin "rrdcached"
+<Plugin rrdcached>
+       DaemonAddress "unix:/var/run/rrdcached/rrdcached.sock"
+       DataDir "/var/lib/collectd"
+       CreateFiles true
+       #CollectStatistics true
+</Plugin>
+
+
+LoadPlugin unixsock
+<Plugin unixsock>
+   SocketFile "/var/run/collectd-unixsock"
+   SocketGroup "apache"
+   SocketPerms "0770"
+</Plugin>

@@ -1,0 +1,174 @@
+#!/usr/bin/perl -W
+
+# Load the db routines from mysql database and from deploy web service, and make sure they match
+# All errors are reported as warning. No crits.
+# Intented for nagios/nrpe.
+
+use strict;
+use Data::Dumper;
+use Config::General;
+use Sys::Hostname;
+use Digest::MD5 qw(md5_hex);
+use Encode qw(encode_utf8);
+use DBI;
+use WWW::Curl::Easy;
+use MIME::Base64;
+
+my $breadcrumbfile="/sql/log/mysqlroutines";
+
+# Get hostname, system, vertical and the envirorment
+my @hostname = split(/\./, lc(hostname));
+my @system = split(/-/, $hostname[0]);
+my $vertical = $hostname[1];
+my $environment = $hostname[2];
+
+#-----no user-serviceable parts below this line-----#
+my $stdout=1;
+
+if ($> != 0) {
+   # Not running as root, just use the results from a previous run
+   if (-r "$breadcrumbfile") {
+     exec "$breadcrumbfile";
+   }
+   print "Error reading breadcrumbs file.\n";
+   exit 3;
+}
+
+open(NRPE,">$breadcrumbfile") or die;
+chmod(0755,"$breadcrumbfile");
+if (! -t STDOUT) {
+   $stdout=0;
+}
+
+my $exit=0;
+
+# This check is disable for:
+# - Environment DEV
+# - Verticals TP, AP, SI
+if (($environment ne "dev") && ($vertical ne "tp") && ($vertical ne "ap") && ($vertical ne "si")) {
+  # Get hostname info
+  splice @system, 0, 1;
+  my $system = "";
+  while (@system) {
+    my $item = shift(@system);
+    if (! ($item !~ /\D/) && ($item ne "")) {
+      $system = $system . $item . "-";
+    }
+  }
+  $system = substr($system, 0, -1);
+
+  # dbconnection
+  my $dbh = DBI->connect("DBI:mysql:host=localhost",
+                              "definer_rw", decode_base64('WnM5Vk10ckM=') ,
+                                                      {'RaiseError' => 1});
+
+  # Get routine list names from database
+  my $sth;
+  $sth = $dbh->prepare("SELECT CONCAT(LOWER(ROUTINE_SCHEMA),'.',LOWER(ROUTINE_NAME)) AS r_name, LOWER(ROUTINE_TYPE) AS r_type 
+      FROM INFORMATION_SCHEMA.ROUTINES 
+      WHERE 
+      ROUTINE_SCHEMA NOT IN('mysql','sys','information_schema')") 
+      or die "Cannot prepare: " . $dbh->errstr();
+  $sth->execute() or die "Cannot execute: " . $sth->errstr();
+
+  # Read result and put it in @routine_list
+  my @routine_list;
+  my @row;
+  while(@row = $sth->fetchrow_array()) {
+    my @record = @row;
+    push(@routine_list, \@record);
+  }
+  $sth->finish();
+
+  # Now separate each routine from  @routine_list into $proc_name and $proc_type
+  if (@routine_list != 0) {
+    # Variables will be used to save routine version from database (dbroutine) and deployed version (curlroutine)
+    my $curlroutine="";
+    my $dbroutine="";
+    my $i=0;
+    my $line;
+    foreach $line (@routine_list) {
+      my $proc_name = @$line[0]; #print "proc_name: ".$proc_name."\n";
+      my $proc_type = @$line[1]; #print "proc_type: ".$proc_type."\n";
+      $i++;
+
+      # Get routine body from database
+      my $sth = $dbh->prepare("SHOW CREATE $proc_type ".$proc_name) or die "Cannot prepare: " . $dbh->errstr();
+      $sth->execute() or die "Cannot execute: " . $sth->errstr();;
+
+      while (my $ref = $sth->fetchrow_hashref()) {
+        #It will always return 1 row for valid results and will be assigned and will read column "Create Procedure" or "Create Function" from SHOW CREATE
+        if($proc_type eq "procedure") {
+          $dbroutine = $ref->{'Create Procedure'};
+        }
+        if($proc_type eq "function") {
+          $dbroutine = $ref->{'Create Function'};
+        }
+      }
+
+      # Get routine body with curl from dbops.gnmedia.net current deployed version
+      my $curl = WWW::Curl::Easy->new;
+      my $url = "http://dbops.gnmedia.net/$vertical/deploys/$system.$vertical.$environment/current/$proc_type/$proc_name.sql";
+      $curl->setopt(CURLOPT_URL, $url);
+      # A filehandle, reference to a scalar or reference to a typeglob can be used here.
+      my $response_body = '';
+      my $retcode;
+      open(my $fileb, ">", \$response_body);
+      $curl->setopt(CURLOPT_WRITEDATA,$fileb);
+      # Starts the actual request
+      $retcode = $curl->perform;
+
+      # Looking into results
+      if ($retcode == 0) {
+              my $response_code = $curl->getinfo(CURLINFO_HTTP_CODE);
+              #print "response_code: ".$response_code."\n";
+              if($response_code == 200){
+                #Curl excecution went fine so we're going to parse routine body
+                my $urlright=rindex($response_body,'END')+3;
+                my $urlleft=length(substr($response_body, 0, index($response_body,'CREATE DEFINER')));
+                $curlroutine=substr(substr($response_body,0,$urlright),$urlleft);
+              }
+      } else {
+              # Error code, type of error, error message
+              print("CURL ERROR: $retcode ".$curl->strerror($retcode)." ".$curl->errbuf."\n");
+      }
+
+      my $error=0;
+      if (md5_hex(encode_utf8($curlroutine)) eq md5_hex(encode_utf8($dbroutine))) {
+        $error=0;
+      } else {
+        $error=1;
+      }
+
+      # Only for debug puposes will print proc_name, routine body and hash compared
+      my $debug = 0;
+      if($debug){
+        print $proc_name."\n";
+        print "\nDBROUTINE: $proc_name\n";
+        print "<>".$dbroutine."<>\n";
+        print md5_hex(encode_utf8($dbroutine))."\n";        
+        print "\nCURLROUTINE: $proc_name\n";
+        print "<>".$curlroutine."<>\n"; 
+        print md5_hex(encode_utf8($curlroutine))."\n";
+      }
+
+      if ($error) {
+        print "Differences in ".lc(hostname)." $proc_type $proc_name\n" if $stdout;
+        print NRPE "echo 'Differences in ".lc(hostname)." $proc_type $proc_name'\n";
+      }
+
+      $exit|=$error;
+    }
+  }
+}
+
+print $exit."\n"; 
+if (!$exit) {
+   print "OK\n" if $stdout;
+   print NRPE "echo OK\n";
+}
+
+print NRPE "exit $exit\n";
+close(NRPE);
+
+exit $exit;

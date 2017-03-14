@@ -1,0 +1,26 @@
+# This file is managed by puppet
+# $Id$
+
+<VirtualHost *:80>
+    DocumentRoot /app/shared/adopt.dogtime.com/current/public
+    ServerName adopt.dogtime.com
+    ServerAlias *.adopt.dogtime.com
+
+    PassengerHighPerformance off
+    RailsEnv production
+    Timeout 600
+
+    <Directory /app/shared/adopt.dogtime.com/current/public>
+        PassengerRuby /opt/rbenv/shims/ruby
+        RewriteEngine On
+        Order Deny,Allow
+        Allow from all
+        Options -Indexes
+        AllowOverride all
+    </Directory>
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/adopt.dogtime.com-error_log
+    <%=logging ? '' : '#'%>CustomLog /app/log/adopt.dogtime.com-access_log combined
+
+</VirtualHost>
+

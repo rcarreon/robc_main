@@ -1,0 +1,46 @@
+# $Id$
+#
+#
+#  Code on https://svn.gnmedia.net/dbas/trunk/
+<VirtualHost *:80>
+    ServerName rrodriguez.gnmedia.net
+#    DocumentRoot /app/shared/docroots/toolshed.gnmedia.net/
+	DocumentRoot /app/shared/docroots/trunk/
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/toolshed.gnmedia.net_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/toolshed.gnmedia.net_access.log combined
+
+<Directory /app/shared/docroots> 
+	Options FollowSymLinks
+	AllowOverride All
+	Satisfy all
+</Directory>
+
+# Remote MySQL Process List reporter
+    <Location /mysqlproc>
+        RewriteEngine On
+        RewriteCond   %{REQUEST_FILENAME}  !-f
+        RewriteCond   %{REQUEST_FILENAME}  !-l
+        RewriteCond   %{REQUEST_FILENAME}  !-d
+        RewriteRule   ^(.+?)$ /mysqlproc/index.php [L,QSA]
+    </Location>
+
+# The new VIP Visualizer
+    <Location /resourcemap>
+        RewriteEngine On
+        RewriteCond   %{REQUEST_FILENAME}  !-f
+        RewriteCond   %{REQUEST_FILENAME}  !-l
+        RewriteCond   %{REQUEST_FILENAME}  !-d
+        RewriteRule   ^(.+?)$ /resourcemap/index.php [L,QSA]
+    </Location>
+
+# Virtual Machine Viewer
+    <Location /vmv>
+        RewriteEngine On
+        RewriteCond   %{REQUEST_FILENAME}  !-f
+        RewriteCond   %{REQUEST_FILENAME}  !-l
+        RewriteCond   %{REQUEST_FILENAME}  !-d
+        RewriteRule   ^(.+?)$ /vmv/index.php [L,QSA]
+    </Location>
+
+</VirtualHost>

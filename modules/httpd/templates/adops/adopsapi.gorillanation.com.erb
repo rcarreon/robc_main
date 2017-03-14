@@ -1,0 +1,34 @@
+# This file is managed by Puppet. Do not modify it from <%= @fqdn %>
+<%
+         host,project,environment,location,domain,tld = @fqdn.split('.')
+%>
+<% case environment when 'prd' %>
+    <% rbenv_version = '2.1.1' %>
+    <% app_env = 'production' %>
+<% when 'stg' %>
+    <% rbenv_version = '2.1.1' %>
+    <% app_env = 'staging' %>
+<% when 'dev' %>
+    <% rbenv_version = '2.1.1' %>
+    <% app_env = 'development' %>
+<% else %>
+    <% rbenv_version = '2.1.1' %>
+    <% app_env = 'production' %>
+<% end %>
+
+<VirtualHost *:80>
+    ServerName adopsapi.gorillanation.com
+    ServerAlias <%= environment %>.adopsapi.gorillanation.com
+    DocumentRoot "/app/shared/docroots/adopsapi.gorillanation.com/com/current/public"
+    Timeout 600
+
+    <%= @logging ? '' : '#'%>ErrorLog /app/log/adopsapi.gorillanation.com.error.log
+    LogLevel warn
+    <%= @logging ? '' : '#'%>CustomLog /app/log/adopsapi.gorillanation.com.access.log combined
+
+    PassengerAppEnv <%= app_env %>
+
+    <Directory /app/shared/docroots/adopsapi.gorillanation.com/current/public>
+    PassengerRuby /app/software/ruby/rbenv/versions/<%= rbenv_version %>/bin/ruby
+    </Directory>
+</VirtualHost>

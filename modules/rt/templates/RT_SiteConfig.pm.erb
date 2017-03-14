@@ -1,0 +1,76 @@
+# $Id$
+# $URL$
+
+# Any configuration directives you include  here will override 
+# RT's default configuration file, RT_Config.pm
+#
+#
+# Managed by puppet
+# $Id$
+#
+Set($rtname , "gorillanation.com");
+Set($Organization , "gorillanation.com");
+Set( $Timezone , 'US/Pacific');
+Set($WebBaseURL , "http://<%= name %>");
+Set( $WebPath , "");
+Set($WebImagesURL , $WebURL . "/NoAuth/images/");
+Set(@ReferrerWhitelist, qw(inventory.gnmedia.net:80 dev.inventory.gnmedia.net:80 rt.gorillanation.com:80 dev.rt.gorillanation.com:80 inventory.gnmedia.net:443 dev.inventory.gnmedia.net:443 rt.gorillanation.com:443 dev.rt.gorillanation.com:443));
+
+
+Set($LogToSyslog , 'error');
+
+Set($DatabaseType , 'mysql');
+Set($DatabaseHost   , '<%= db_host %>');
+Set($DatabaseRTHost , '<%= db_host %>');
+Set($DatabasePort , '');
+Set($DatabaseUser , '<%= db_user %>');
+Set($DatabasePassword , '<%= db_pass %>');
+Set($DatabaseName , 'rt3');
+
+<% if sso %>
+Set( @Plugins, qw(RT::Authen::ExternalAuth) );
+push @RT::MailPlugins, qw/Auth::MailFrom Filter::TakeAction/;
+Set( $CommandByMailHeader,'Command');
+Set($ExternalAuthPriority,['My_LDAP']);
+Set($ExternalInfoPriority, ['My_LDAP']);
+Set($ExternalServiceUsesSSLorTLS,    0);
+Set($AutoCreateNonExternalUsers,    0);
+Set($ResolveDefaultUpdateType, 'Respond');
+Set($ExternalSettings,      {
+'My_LDAP'       =>  {
+  'type' => 'ldap',
+  'auth' =>  1,
+  'info' =>  1,
+  'server' => 'ldap.gorillanation.local',
+  'user' => 'rtacct@gorillanation.local',
+  'pass' => 'G0ri11a!',
+  'base' => 'dc=gorillanation,dc=local',
+  'filter' => '(objectClass=*)',
+  'd_filter' => '(userAccountControl:1.2.840.113556.1.4.803:=2)',
+  'tls' =>  1,
+  'net_ldap_args' => [    version =>  3   ],
+  'group' => '',
+  'group_attr' => '',
+  'attr_match_list' => [
+    'Name',
+    'EmailAddress',
+  ],
+  'attr_map' => {
+    'Name' => 'sAMAccountName',
+    'EmailAddress' => 'mail',
+    'Organization' => 'physicalDeliveryOfficeName',
+    'RealName' => 'cn',
+    'ExternalAuthId' => 'sAMAccountName',
+    'Gecos' => 'sAMAccountName',
+    'WorkPhone' => 'telephoneNumber',
+    'Address1' => 'streetAddress',
+    'City' => 'l',
+    'State' => 'st',
+    'Zip' => 'postalCode',
+    'Country' => 'co'
+  }
+}
+});
+<% end %>
+
+1;

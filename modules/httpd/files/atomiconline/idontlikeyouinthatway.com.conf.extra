@@ -1,0 +1,6 @@
+    Options +FollowSymLinks
+    RewriteEngine on
+
+    RewriteRule (.*) http://idly.craveonline.com/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

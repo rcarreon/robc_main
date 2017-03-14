@@ -1,0 +1,88 @@
+#!/bin/sh
+#
+#
+# nodejs-<%= nodeappname %>          This shell script takes care of starting and stopping
+#               nodejs-<%= nodeappname %>.
+#
+# chkconfig: - 80 30
+# description: nodejs is server-side javascript.
+# processname: node
+# config: /etc/sysconfig/nodejs
+
+
+# Source function library
+if [ -f /etc/rc.d/init.d/functions ]; then
+. /etc/rc.d/init.d/functions
+elif [ -f /etc/init.d/functions ]; then
+. /etc/init.d/functions
+elif [ -f /etc/rc.d/functions ]; then
+. /etc/rc.d/functions
+fi
+
+# Source networking configuration.
+. /etc/sysconfig/network
+
+if [ -f /etc/sysconfig/nodejs ]; then
+    . /etc/sysconfig/nodejs
+fi
+
+# Check that networking is up.
+[ ${NETWORKING} = "no" ] && exit 0
+
+NodeBin=/usr/bin/node
+NodeService=<%= nodeappname %>
+NodeApp=/app/shared/nodejs/<%= nodeappname %>/<%=nodeappjs %>
+NodePort=<%=nodeport %>
+service=nodejs-$NodeService
+
+if [ ! -f $NodeApp ];then
+   echo "Missing nodejs script: $NodeApp"
+   exit 1
+fi
+
+LockFile=/var/lock/subsys/$service
+RETVAL=0
+
+# See how we were called.
+case "$1" in
+  start)
+	# Start daemons.
+	echo -n "Starting $service: "
+        <% host,vertical,environment,location,domain,tld = fqdn.split('.') %>
+        cd `dirname $NodeApp`
+        exec env NODE_ENV=<%=environment %> PORT=$NodePort $NodeBin $NodeApp </dev/null >/dev/null 2>&1 &
+	echo $! > $LockFile
+
+	RETVAL=$?
+	echo
+	[ $RETVAL = 0 ] && touch $LockFile
+	;;
+  stop)
+	# Stop daemons.
+	echo -n "Shutting down $service: "
+	killproc -p $LockFile $service
+	RETVAL=$?
+	echo
+	[ $RETVAL = 0 ] && rm -f $LockFile
+	;;
+  restart)
+	$0 stop
+	$0 start
+	;;
+  reload)
+	echo -n "Reloading $service"
+	killproc -p $LockFile $service -HUP
+	RETVAL=$?
+	echo
+	;;
+  status)
+	status -p $LockFile $service
+	RETVAL=$?
+	;;
+  *)
+	echo "Usage: $service {start|stop|restart|reload|status}"
+	RETVAL=2
+esac
+
+exit $RETVAL
+

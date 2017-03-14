@@ -1,0 +1,167 @@
+#############################################################################
+# Sample NRPE Config File
+# Written by: Ethan Galstad (nagios@nagios.org)
+#
+# Last Modified: 11-23-2007
+#
+# NOTES:
+# This is a sample configuration file for the NRPE daemon.  It needs to be
+# located on the remote host that is running the NRPE daemon, not the host
+# from which the check_nrpe client is being executed.
+#############################################################################
+
+
+# LOG FACILITY
+log_facility=daemon
+
+
+# PID FILE
+pid_file=/var/run/nrpe.pid
+
+
+# PORT NUMBER
+server_port=5666
+
+
+# SERVER ADDRESS
+#server_address=127.0.0.1
+
+
+# NRPE USER
+nrpe_user=nrpe
+
+
+# NRPE GROUP
+nrpe_group=nrpe
+
+
+# ALLOWED HOST ADDRESSES
+allowed_hosts=10.64.81.163,10.64.81.149,10.64.81.107
+
+
+# COMMAND ARGUMENT PROCESSING
+dont_blame_nrpe=1
+
+
+# COMMAND PREFIX
+# command_prefix=/usr/bin/sudo
+
+
+# DEBUGGING OPTION
+debug=0
+
+
+# COMMAND TIMEOUT
+command_timeout=60
+
+
+# CONNECTION TIMEOUT
+#connection_timeout=300
+
+
+# WEEK RANDOM SEED OPTION
+#allow_weak_random_seed=1
+
+
+# INCLUDE CONFIG FILE
+#include=<somefile.cfg>
+
+
+# INCLUDE CONFIG DIRECTORY
+#include_dir=<somedirectory>
+#include_dir=<someotherdirectory>
+
+
+# COMMAND DEFINITIONS
+<%
+	if (architecture == "x86_64")
+		libdir="/usr/lib64"
+	else
+		libdir="/usr/lib"
+	end
+	if (operatingsystem == "CentOS")
+		ntpcheck = "check_ntp_time"
+		diskoptions = "-A -i boot -i xenstored"
+	else
+		ntpcheck = "check_ntp"
+		diskoptions = "-x /boot"
+	end
+
+%>
+
+# GNMEDIA CHECKS
+command[check_ntp_time]=<%= libdir %>/nagios/plugins/<%= ntpcheck %> -H ntp.peakhosting.com -w 0.9 -c 1 -q
+command[check_disk]=<%= libdir %>/nagios/plugins/check_disk -w 20% -c 10% -l <%= diskoptions %>
+command[check_collectd]=/usr/lib64/nagios/plugins/check_procs -C collectd -w 1 -c 1
+command[check_mysqlstartupconf]=/usr/lib64/nagios/plugins/check_mysqlstartupconf
+command[check_emagent]=/usr/lib64/nagios/plugins/check_emagent
+command[check_acesyslog]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/var/log/messages --tag=$ARG1$ --syslogclient=$ARG2$  --warningpattern='.*' --noperfdata
+command[check_mysqlerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/sql/log/error.log --tag=mysqlerror --criticalpattern='\[(ERROR|Error|error)\]'
+command[check_uptime_gn_com]=/usr/lib64/nagios/plugins/check_uptime_gn_net
+command[check_file_age]=/usr/lib64/nagios/plugins/check_file_age -f $ARG1$ -w $ARG2$ -c $ARG3$
+command[check_localfs]=sudo /usr/lib64/nagios/plugins/check_localfs
+command[check_pingdom_checks_bg]=/usr/lib64/nagios/plugins/check_procs -a /app/shared/http/reports/bin/pingdom_checks_bg -c 1:1
+command[check_nagios_config]=/usr/lib64/nagios/plugins/check_nagios_config
+command[check_mysqlroutines]=/usr/lib64/nagios/plugins/check_mysqlroutines
+command[check_cpu_io]=/usr/lib64/nagios/plugins/check_cpu_io.pl -w 20 -c 25
+
+# crowdignite failing log log watcher
+command[check_failurelog]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=$ARG2$ --tag=$ARG1$ --criticalpattern='.*' --rotation=loglogdate8gz --noperfdata
+command[check_vw_health]=<%= libdir %>/nagios/plugins/check_vw_health.sh
+
+# checks moved to monit
+#command[check_gn_puppet]=<%= libdir %>/nagios/plugins/check_gn_puppet.sh
+#command[check_load]=<%= libdir %>/nagios/plugins/check_load -w 30,200,200 -c 50,200,200
+#command[check_gn_mem]=<%= libdir %>/nagios/plugins/check_gn_mem.py -w 10 -c 5
+
+# The following examples allow user-supplied arguments and can
+# only be used if the NRPE daemon was compiled with support for
+# command arguments *AND* the dont_blame_nrpe directive in this
+# config file is set to '1'.  This poses a potential security risk, so
+# make sure you read the SECURITY file before doing this.
+#command[check_load]=<%= libdir %>/nagios/plugins/check_load -w $ARG1$ -c $ARG2$
+
+command[check_swap_activity]=/usr/lib64/nagios/plugins/check_swap_activity -d 2 -w 100 -c 2000
+command[check_nfsmounts]=/usr/lib64/nagios/plugins/check_nfsmounts -w .05 -c .1
+command[check_mailq]=sudo /usr/lib64/nagios/plugins/check_mailq -w 150 -c 300 -M $ARG1$
+command[check_rcons]=sudo /usr/lib64/nagios/plugins/check_rcons $ARG1$
+command[check_localhost_smtp]=/usr/lib64/nagios/plugins/check_smtp -H localhost
+
+<% if fqdn =~ /^app*.*bcn.*.prd.*/  -%>
+# FLUME CHECK
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/flume/flume.log --tag=flumeerror --criticalpattern='(ERROR|Error|error)'
+<% end -%>
+
+<% if fqdn =~ /^app*.*flume.*.prd.*/  -%>
+# FLUME CHECK
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/flume.log --tag=flumeerror --criticalpattern='(WARN|ERROR|Error|error)'
+<% end -%>
+
+<% if fqdn =~ /^app*.*spark.*.prd.*/  -%>
+# SPARK CHECK
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/spark/pixel.log --tag=sparkerror --criticalpattern='(ERROR|Error|error)'
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/spark/pixel_etl.log --tag=sparkerror --criticalpattern='(ERROR|Error|error|WARN|Warn|warn)'
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/spark/spark-hadoop-org.apache.spark.deploy.master.Master-1-<%= fqdn %>.out --tag=sparkerror --criticalpattern='(ERROR|Error|error)'
+<% end -%>
+
+
+<% if fqdn =~ /^app*.*hadoop.*.prd.*/  -%>
+# HADOOP CHECK
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/hadoop/hadoop-hadoop-namenode-<%= fqdn %>.out --tag=hadooperror --criticalpattern='(ERROR|Error|error)'
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/hadoop/hadoop-hadoop-namenode-<%= fqdn %>.log --tag=hadooperror --criticalpattern='(ERROR|Error|error)'
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/hadoop/hadoop-hadoop-zkfc-<%= fqdn %>.out --tag=hadooperror --criticalpattern='(ERROR|Error|error)'
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/hadoop/hadoop-hadoop-zkfc-<%= fqdn %>.log --tag=hadooperror --criticalpattern='(ERROR|Error|error)'
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/hadoop/yarn-hadoop-resourcemanager-<%= fqdn %>.out --tag=hadooperror --criticalpattern='(ERROR|Error|error)'
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/hadoop/yarn-hadoop-resourcemanager-<%= fqdn %>.log --tag=hadooperror --criticalpattern='(ERROR|Error|error)'
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/hadoop/hadoop-hadoop-datanode-<%= fqdn %>.out --tag=hadooperror --criticalpattern='(ERROR|Error|error)'
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/hadoop/hadoop-hadoop-datanode-<%= fqdn %>.log --tag=hadooperror --criticalpattern='(ERROR|Error|error)'
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/hadoop/hadoop-hadoop-journalnode-<%= fqdn %>.out --tag=hadooperror --criticalpattern='(ERROR|Error|error)'
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/hadoop/hadoop-hadoop-journalnode-<%= fqdn %>.log --tag=hadooperror --criticalpattern='(ERROR|Error|error)'
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/hadoop/yarn-hadoop-nodemanager-<%= fqdn %>.out --tag=hadooperror --criticalpattern='(ERROR|Error|error)'
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/hadoop/yarn-hadoop-nodemanager-<%= fqdn %>.log --tag=hadooperror --criticalpattern='(ERROR|Error|error)'
+<% end -%>
+
+<% if fqdn =~ /^app*.*zookeeper.*.prd.*/  -%>
+# ZOOKEEPER CHECK
+command[check_flumeerror]=sudo <%= libdir %>/nagios/plugins/check_logfiles --logfile=/app/log/zookeeper/zookeeper.log --tag=zookeepererror --criticalpattern='(ERROR|Error|error)'
+<% end -%>

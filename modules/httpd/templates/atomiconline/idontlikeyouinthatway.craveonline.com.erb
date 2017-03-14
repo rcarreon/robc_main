@@ -1,0 +1,27 @@
+<VirtualHost *:80>
+    ServerName idontlikeyouinthatway.craveonline.com 
+    ServerAlias idontlikeyouinthatway.lax1.craveonline.com idontlikeyouinthatway.lax.craveonline.com
+    DocumentRoot /app/shared/docroot/idontlikeyouinthatway/docroot
+    <%=logging ? '' : '#'%>ErrorLog /app/log/idontlikeyouinthatway.craveonline.error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/idontlikeyouinthatway.craveonline.access.log combined
+    php_value include_path ".:/usr/share/pear:/app/shared/docroot/idontlikeyouinthatway"
+
+
+    <Directory "/app/shared/docroot/idontlikeyouinthatway/docroot">
+       Options +FollowSymLinks 
+        Order allow,deny
+        Allow from all
+
+        RewriteEngine On
+        RewriteCond %{REQUEST_FILENAME} !-f
+        RewriteCond %{REQUEST_FILENAME} !-d
+        RewriteRule (.*) /dispatcher.php [L]
+
+
+    </Directory>
+
+
+
+
+</VirtualHost>
+

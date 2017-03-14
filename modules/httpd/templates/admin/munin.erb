@@ -1,0 +1,13 @@
+# File managed by puppet
+# Do not edit it on <%= fqdn %>
+
+# $Id$
+
+<Virtualhost *:80>
+    ServerName munin.<%= silo %>.gnmedia.net
+    DocumentRoot /var/www/html/munin
+    <%=logging ? '' : '#'%>ErrorLog /app/log/munin.error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/munin-access.log Combined
+
+
+</Virtualhost>

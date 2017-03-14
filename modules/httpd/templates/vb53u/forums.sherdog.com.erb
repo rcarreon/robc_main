@@ -1,0 +1,94 @@
+<%
+         host,project,environment,location,domain,tld = fqdn.split('.')
+%>
+
+<%
+case environment
+  when "prd"
+    env_hostname = name
+    env_docroot = "/app/shared/forums.sherdog.com"
+    env_ugc = ":/app/ugc/vb_sdc"
+  when "stg"
+    env_hostname = "stg." + name
+    env_docroot = "/app/shared/vb_sdc/current"
+    env_ugc = ":/app/ugc/vb_sdc"
+  when "dev"
+    env_hostname = "dev." + name
+    env_docroot = "/app/shared/vb_sdc/current"
+    env_ugc = ":/app/ugc/vb_sdc"
+        case host
+          when /uid/
+            env_hostname = "sbx." + name
+            env_docroot = "/app/shared/vb_sdc/current"
+            env_ugc = ""
+        end
+end
+%>
+
+
+
+<VirtualHost *:80>
+
+    DocumentRoot <%= env_docroot %>
+    ServerName forums.sherdog.com
+    ServerAlias *.forums.sherdog.com
+    ServerAlias <%= env_hostname %>
+
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" combined
+    LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" proxy
+    SetEnvIf X-Forwarded-For "^.*\..*\..*\..*" forwarded
+    <%=logging ? '' : '#'%>CustomLog /app/log/<%= env_hostname %>-access_log combined env=!forwarded
+    <%=logging ? '' : '#'%>CustomLog /app/log/<%= env_hostname %>-access_log proxy env=forwarded
+    <%=logging ? '' : '#'%>ErrorLog /app/log/<%= env_hostname %>-error_log
+
+    <Directory <%= env_docroot %>/forums/admincp>
+        AuthType Basic
+        AuthName "Admin Only"
+        AuthUserFile /etc/httpd/conf.d/forums.sherdog.com.logins
+        Require valid-user
+        AllowOverride AuthConfig
+        Order deny,allow
+    </Directory>
+
+    <Directory <%= env_docroot %>>
+      php_admin_value open_basedir <%= env_docroot %>:/var/www/tmp<%= env_ugc %>
+      Options -Indexes -FollowSymLinks -ExecCGI
+    </Directory>
+
+    # Rewrite rules to push database-driven image requests through CDN to reduce traffic (hopefully)
+
+    RewriteEngine on
+
+    # Include conf.d/include/forum-image-cdn.conf
+    # do NOT load from CDN or origin servers
+    # technically, CDN *should* never come here, but if it does, we don't want to loop
+    RewriteCond %{HTTP_HOST}   !^.*cdn\..* [NC]
+    RewriteCond %{HTTP_HOST}   !^.*origin\..* [NC]
+    RewriteCond %{QUERY_STRING} /(avatars/|picture.php|image.php)/ [NC]
+    RewriteRule ^/forums/(.*)$ http://www.cdn.sherdog.net/forums/$1 [R=301,L]
+
+    # vBSEO control panel section
+    RewriteRule ^/forums/((urllist|sitemap).*\.(xml|txt)(\.gz)?)$ /forums/vbseo_sitemap/vbseo_getsitemap.php?sitemap=$1 [L]
+
+    RewriteCond %{QUERY_STRING} !vbseourl=
+    RewriteCond %{REQUEST_URI} !(admincp/|modcp/|chat|cron|picture)
+    RewriteRule ^/forums/(.*\.php(/.*)?)$ /forums/vbseo.php?vbseourl=$1 [L,QSA]
+
+    RewriteCond %{REQUEST_FILENAME} !\.(jpg|gif)$
+    RewriteRule ^(archive/.*)$ vbseo.php?vbseourl=$1 [L,QSA]
+    RewriteRule ^/forums/(archive/.*)$ /forums/vbseo.php?vbseourl=$1 [L,QSA]
+
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !/(admincp|modcp|clientscript|cpstyles|images|sd_images|sd_miscimages)/
+    RewriteRule ^/forums/(.+)$ /forums/vbseo.php?vbseourl=$1 [L,QSA]
+
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName sherdog.net
+    ServerAlias *.sherdog.net
+    ServerAlias sherdognet.craveonline.com
+    ServerAlias *.sherdognet.craveonline.com
+    RedirectPermanent / http://forums.sherdog.com/
+</VirtualHost>

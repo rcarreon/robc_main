@@ -1,0 +1,11 @@
+<VirtualHost  *:80>
+    ServerAdmin webmaster@gorillanation.com
+    DocumentRoot /app/shared/docroots/mediaads
+    ServerName mediaads.gorillanation.com
+    ServerAlias mediaads.craveonline.com *.mediaads.gorillanation.com *.mediaads.craveonline.com
+    DirectoryIndex index.htm index.html 
+    <%=logging ? '' : '#'%>ErrorLog /app/log/mediaads.gorillanation.com-error.log
+    LogLevel warn
+    <%=logging ? '' : '#'%>CustomLog /app/log/mediaads.gorillanation.com-access_log combined
+</VirtualHost>
+

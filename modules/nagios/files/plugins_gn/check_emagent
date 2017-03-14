@@ -1,0 +1,9 @@
+#!/bin/bash
+
+if pidof -s mysql-monitor-agent >/dev/null;then
+    echo "EM Agent is running"
+    exit 0
+else
+    echo "EM Agent is not running"
+    exit 1
+fi

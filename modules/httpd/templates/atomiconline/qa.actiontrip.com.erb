@@ -1,0 +1,35 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@actiontrip.com
+    DocumentRoot /app/shared/qa-actiontrip.com/qa-actiontrip.com/
+
+    ServerName qa.actiontrip.com
+
+    <Location /rei/db>
+        AuthUserFile /app/shared/qa-actiontrip.com/qa-actiontrip.com/rei/db/.htpasswd
+        AuthName "Enter your username and password:"
+        AuthType Basic
+        <Limit GET>
+                require valid-user
+        </Limit>
+
+        php_value post_max_size 128M
+        php_value upload_max_filesize 128M
+   </location>
+
+   <Location /rei/e3>
+        AuthUserFile /app/shared/qa-actiontrip.com/qa-actiontrip.com/rei/e3/.htpasswd
+        AuthName "Enter your username and password:"
+        AuthType Basic
+        <Limit GET>
+                require valid-user
+        </Limit>
+
+        php_value post_max_size 128M
+        php_value upload_max_filesize 128M
+   </location>
+
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/qa-actiontrip.com-error_log
+    <%=logging ? '' : '#'%>CustomLog /app/log/qa-actiontrip.com-access_log combined
+</VirtualHost>
+

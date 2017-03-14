@@ -1,0 +1,17 @@
+# This file is managed by Puppet. Do not modify it from <%=fqdn %>
+
+<VirtualHost *:80>
+    ServerName dev.pubops.evolvemediacorp.com
+    DocumentRoot "/app/shared/docroots/pubops.evolvemediacorp.com/current/public"
+    Timeout 600
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/dev.pubops.evolvemediacorp.com.error.log
+    LogLevel warn
+    <%=logging ? '' : '#'%>CustomLog /app/log/dev.pubops.evolvemediacorp.com.access.log combined
+
+    PassengerAppEnv development
+
+    <Directory /app/shared/docroots/pubops.evolvemediacorp.com/htdocs/public>
+        PassengerRuby /app/software/ruby/rbenv/versions/2.1.4/bin/ruby
+    </Directory>
+</VirtualHost>

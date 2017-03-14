@@ -1,0 +1,23 @@
+    ServerAlias brides.beautyriot.com
+    ServerAlias sac.beautyriot.com
+    ServerAlias www-revert.beautyriot.com
+    ServerAlias xo.beautyriot.com
+
+    RewriteEngine On
+
+    RewriteCond %{HTTP_HOST} ^brides\.beautyriot\.com$ [NC]
+    RewriteRule ^/(.*) http://www.beautyriot.com/$1 [R=301,L]
+
+    RewriteCond %{HTTP_HOST} ^sac\.beautyriot\.com$ [NC]
+    RewriteRule ^/(.*) http://www.beautyriot.com/$1 [R=301,L]
+
+    RewriteCond %{HTTP_HOST} ^www-revert\.beautyriot\.com$ [NC]
+    RewriteRule ^/(.*) http://www.beautyriot.com/$1 [R=301,L]
+
+    RewriteCond %{HTTP_HOST} ^xo\.beautyriot\.com$ [NC]
+    RewriteRule ^/(.*) http://www.beautyriot.com/$1 [R=301,L]
+
+    RewriteCond %{HTTP_HOST} ^beautyriot\.com$ [NC]
+    RewriteRule ^/(.*) http://www.beautyriot.com/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

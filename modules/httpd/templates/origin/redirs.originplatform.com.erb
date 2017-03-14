@@ -1,0 +1,20 @@
+# This file is managed by Puppet. Do not modify it on <%=fqdn %>
+
+<%
+         host,project,environment,location,domain,tld = fqdn.split('.')
+%>
+
+<%
+case environment
+  when "prd"
+    env_prefix = ""
+  when "stg"
+    env_prefix = "stg."
+end
+%>
+
+# just redirecting [stg.]mgmt.originplatform.com to the web app
+<VirtualHost *:80>
+  ServerName <%= env_prefix %>mgmt.originplatform.com
+  Redirect / https://<%= env_prefix %>management.originplatform.com/
+</VirtualHost>

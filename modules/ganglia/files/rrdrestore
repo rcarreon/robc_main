@@ -1,0 +1,20 @@
+#!/bin/bash
+
+cd /app/data/backup/rrds || exit 1
+day=$(ls -rt | tail -1)
+cd $day || exit 
+
+/sbin/service puppet stop
+/sbin/service gmetad stop
+
+find . -name \*.xml.gz | \
+while read xmlgz;do
+   xml=../../../ganglia/rrds/${xmlgz%.gz}
+   rrd=${xml%.xml}.rrd
+   mkdir -p $(dirname $xml)
+   gunzip < $xmlgz > $xml
+   rrdtool restore $xml $rrd -f
+   rm -f $xml
+done
+
+echo "Turn gmetad and puppet back on."

@@ -1,0 +1,7 @@
+#!/bin/bash
+
+# $Id$
+# $URL$
+
+/usr/bin/pkill -9 httpd;
+/sbin/service httpd restart;

@@ -1,0 +1,40 @@
+#
+# http://reductivelabs.com/trac/puppet/wiki/UsingPassenger#ApacheConfigurationforPuppet0.24.x
+#
+
+# Module
+LoadModule passenger_module <%= scope.lookupvar('passenger::params::mod_passenger_location') %>
+PassengerRoot <%= "#{scope.lookupvar('passenger::params::gem_path')}/passenger-#{scope.lookupvar('passenger::params::version')}" %>
+PassengerRuby /usr/bin/ruby
+
+#
+# Tunning
+# [root@puppet ~]# passenger-status
+# [root@puppet ~]# passenger-memory-stats
+
+PassengerHighPerformance on
+
+# how many max applications to have  (#CPU)
+PassengerMaxPoolSize <%= processorcount.to_i * 3 %>
+
+PassengerPoolIdleTime 1500
+
+# after that many requests respawn puppetmaster process, memory leak FTW
+PassengerMaxRequests 1000
+
+# http://blog.phusion.nl/2008/10/29/phusion-passenger-now-with-global-queuing/
+PassengerUseGlobalQueue on 
+
+# How often (seconds) do we check for restart.txt, config.ru change
+PassengerStatThrottleRate 60
+
+RailsFrameworkSpawnerIdleTime 0
+RailsAppSpawnerIdleTime 0
+
+RackAutoDetect On
+RailsAutoDetect On
+
+# Debug
+#PassengerLogLevel 1
+PassengerLogLevel 3
+

@@ -1,0 +1,11 @@
+# Managed by Puppet
+
+# convenience redirect for oncommand
+<VirtualHost *:80>
+
+    ServerName <%= fqdn %>
+    ServerAlias oncommand.gnmedia.net
+
+    Redirect permanent / http://app1v-oncommand.tp.prd.lax.gnmedia.net:8080/
+
+</VirtualHost>

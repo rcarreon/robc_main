@@ -1,0 +1,54 @@
+#!/bin/bash
+#
+
+o=$IFS
+IFS=$(echo -en "\n\b")
+
+ERR_SUCCESS=0
+ERR_COMMAND_NOT_FOUND=2
+SYSCTL="`which sysctl 2> /dev/null`";
+
+if [ ! -f "$SYSCTL" ]; then
+  exit $ERR_COMMAND_NOT_FOUND;
+fi
+
+function search(){
+  ${SYSCTL} -a 2>/dev/null | grep "$1"
+}
+
+function init(){
+
+# find sysctl command to use or generate from local /proc scan
+# if /proc scan take extra precaution to not break system.
+ 
+# @depends: /etc/sysctl.conf
+# @files: manifests/[ <application|role|identifier>/ ]<class>.pp   
+  
+  usage="`$SYSCTL -h`"
+  PRG="$(echo `basename $0 `) "
+  echo "$usage" | sed -e "s/sysctl /$PRG/"
+}
+ 
+function write_conf_out() {
+  declare -a p
+  p=( `sysctl -a 2> /dev/null |grep $1[.]` );
+  
+  # echo a temp manifest
+  #
+  echo "  sysctl::conf {"
+  for s in "${p[@]}"; do 
+     echo -e $s |awk -v q="'" '{ printf "    { %s%s%s: value %s %s%d%s };\n", q, $1, q, "=>", q, $3, q }';
+   
+#    #| sed -e 's/^/{ /g' | sed -e 's/$/ }/g' | sed -e 's/{ /{ "/g' | sed -e 's/}$/" }/g' |sed -e 's/ = /\" = \"/g';
+done
+  echo "  }"
+}
+
+if [ $# -ne 0 ]; then
+  if [[ `echo $1 | wc -l` -gt 0 ]]; then
+      write_conf_out "$@"
+  fi
+else
+  init
+fi
+exit 0;

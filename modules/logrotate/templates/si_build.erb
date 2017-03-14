@@ -1,0 +1,10 @@
+/app/log/*log {
+    daily
+    dateext
+    rotate 30
+    compress
+    notifempty
+    missingok
+    create 0664 deploy deploy
+}
+

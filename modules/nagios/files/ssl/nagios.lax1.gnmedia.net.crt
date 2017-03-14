@@ -1,0 +1,39 @@
+Certificate:
+    Data:
+        Version: 1 (0x0)
+        Serial Number:
+            b8:50:0a:30:69:0d:69:8a
+        Signature Algorithm: sha1WithRSAEncryption
+        Issuer: C=US, ST=California, L=Los Angeles, O=Gorilla Nation Media, LLC, CN=nagios.lax1.gnmedia.net
+        Validity
+            Not Before: Jul 16 23:09:29 2009 GMT
+            Not After : Jul 14 23:09:29 2019 GMT
+        Subject: C=US, ST=California, L=Los Angeles, O=Gorilla Nation Media, LLC, CN=nagios.lax1.gnmedia.net
+        Subject Public Key Info:
+            Public Key Algorithm: rsaEncryption
+            RSA Public Key: (512 bit)
+                Modulus (512 bit):
+                    00:94:9b:d6:82:38:de:a3:e0:2b:a8:df:ad:42:e7:
+                    12:e1:61:88:e2:ca:ee:b7:c9:fe:e6:d9:a3:4a:59:
+                    79:2c:ce:a5:96:53:61:9b:44:89:9c:ff:ba:9d:65:
+                    56:03:57:c2:96:ad:85:bb:7b:e0:25:33:cf:71:1b:
+                    9c:09:1c:56:35
+                Exponent: 65537 (0x10001)
+    Signature Algorithm: sha1WithRSAEncryption
+        61:5b:e8:d9:b6:3a:83:ee:47:c7:a5:00:77:37:68:19:76:db:
+        86:47:f7:ec:9f:d0:b4:02:df:e7:0a:d8:4b:31:81:ea:cc:70:
+        ad:76:74:7f:0c:ec:a5:7d:81:31:33:c3:bd:fc:3a:65:8d:73:
+        16:19:0b:ae:5b:b5:95:31:95:3d
+-----BEGIN CERTIFICATE-----
+MIIB7jCCAZgCCQC4UAowaQ1pijANBgkqhkiG9w0BAQUFADB+MQswCQYDVQQGEwJV
+UzETMBEGA1UECBMKQ2FsaWZvcm5pYTEUMBIGA1UEBxMLTG9zIEFuZ2VsZXMxIjAg
+BgNVBAoTGUdvcmlsbGEgTmF0aW9uIE1lZGlhLCBMTEMxIDAeBgNVBAMTF25hZ2lv
+cy5sYXgxLmdubWVkaWEubmV0MB4XDTA5MDcxNjIzMDkyOVoXDTE5MDcxNDIzMDky
+OVowfjELMAkGA1UEBhMCVVMxEzARBgNVBAgTCkNhbGlmb3JuaWExFDASBgNVBAcT
+C0xvcyBBbmdlbGVzMSIwIAYDVQQKExlHb3JpbGxhIE5hdGlvbiBNZWRpYSwgTExD
+MSAwHgYDVQQDExduYWdpb3MubGF4MS5nbm1lZGlhLm5ldDBcMA0GCSqGSIb3DQEB
+AQUAA0sAMEgCQQCUm9aCON6j4Cuo361C5xLhYYjiyu63yf7m2aNKWXkszqWWU2Gb
+RImc/7qdZVYDV8KWrYW7e+AlM89xG5wJHFY1AgMBAAEwDQYJKoZIhvcNAQEFBQAD
+QQBhW+jZtjqD7kfHpQB3N2gZdtuGR/fsn9C0At/nCthLMYHqzHCtdnR/DOylfYEx
+M8O9/DpljXMWGQuuW7WVMZU9
+-----END CERTIFICATE-----

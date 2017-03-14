@@ -1,0 +1,29 @@
+# This file is managed by Puppet do not modify it from <%=fqdn %>
+
+
+<VirtualHost *:80>
+    ServerName dev.publishers.springboard.gorillanation.com
+    ServerAlias dev.publishers.springboardplatform.com publishers.springboardplatform.com publishers.springboard.gorillanation.com publishers.lax.springboard.gorillanation.com publishers.<%= silo %>.springboard.gorillanation.com
+
+    DocumentRoot /app/shared/docroots/cms.springboardplatform.com/current/webroot 
+    <Directory /app/shared/docroots/cms.springboardplatform.com/current/webroot/>
+        AllowOverride all
+        Order allow,deny
+        allow from all
+    </Directory>
+
+    Redirect permanent /xml_feeds_advanced      http://dev.cms.springboardplatform.com/xml_feeds_advanced
+    Redirect permanent /xml_feeds_customlists   http://dev.cms.springboardplatform.com/xml_feeds_customlists
+    Redirect permanent /teaser                  http://dev.cms.springboardplatform.com/teaser
+    Redirect permanent /embed_code_lightbox     http://dev.cms.springboardplatform.com/embed_code_lightbox
+    Redirect permanent /previews		http://dev.cms.springboardplatform.com/previews
+
+    RewriteEngine On
+    RewriteCond %{http_host} ^dev.publishers.springboard.gorillanation.com
+    RewriteRule ^(.*)$ http://dev.publishers.springboardplatform.com/$1 [R=301,NC]
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/dev.publishers.springboard.gorillanation.com_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/dev.publishers.springboard.gorillanation.com_access.log combined
+
+</VirtualHost>
+

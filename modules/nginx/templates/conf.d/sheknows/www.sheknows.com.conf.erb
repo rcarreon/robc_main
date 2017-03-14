@@ -1,0 +1,44 @@
+# $Id$
+# $URL$
+
+server {
+        server_name <%= vhost %>;
+        listen       80;
+        #expires      365d;
+
+        #charset koi8-r;
+
+        #access_log  /app/log/nginx/<%= name %>_access.log  main;
+
+        # deny all access to hidden file like .htaccess .svn and no loggin
+	location ~ /\. {
+    		access_log off;
+    		log_not_found off; 
+    		deny all;
+	}
+
+	# PHP-FPM status 
+	location = /_fpmstatus {
+		access_log off;
+		allow 127.0.0.1;
+		deny all;
+		fastcgi_pass 127.0.0.1:9000;
+		fastcgi_param  SCRIPT_FILENAME  /dev/shm/public_html_widget$fastcgi_script_name;
+		include /etc/nginx/fastcgi_params;
+	}
+
+        location / {
+            root   /app/shared/docroots/<%= vhost %>/htdocs/app/webroot;
+            index  index.php index.html index.html.var index.htm;
+
+        }
+
+        # tell nginx to proxy req to fastcgi (php-fpm)
+        location ~ \.php$ {
+            fastcgi_pass   127.0.0.1:9000;
+            fastcgi_index  index.php;
+            fastcgi_param  SCRIPT_FILENAME  /dev/shm/public_html_widget$fastcgi_script_name;
+            include /etc/nginx/fastcgi_params;
+        }
+}
+

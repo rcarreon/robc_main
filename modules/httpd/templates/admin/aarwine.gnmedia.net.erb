@@ -1,0 +1,18 @@
+# Managed by Puppet
+
+# $Id$
+
+# <% virtual %>
+
+<VirtualHost *:80>
+
+    ServerName aarwine.gnmedia.net
+    ServerAlias aarwine.*
+    <%=logging ? '' : '#'%>CustomLog /app/log/aarwine.gnmedia.net-access.log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/aarwine.gnmedia.net-error.log
+
+    DocumentRoot /app/shared/docroots/aarwine.gnmedia.net/htdocs/
+
+
+</VirtualHost>
+

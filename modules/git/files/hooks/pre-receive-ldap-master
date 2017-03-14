@@ -1,0 +1,3 @@
+#!/bin/sh
+
+.  /usr/share/git-core/contrib/hooks/puppet-syntax-ldap-perms

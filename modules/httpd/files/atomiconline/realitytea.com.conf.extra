@@ -1,0 +1,10 @@
+    RewriteEngine On
+    # realitytea.com --> www.realitytea.com
+    RewriteCond %{HTTP_HOST} ^realitytea\.com$ [NC]
+    RewriteRule ^/(.*) http://www.realitytea.com/$1 [R=301,L]
+
+    RewriteRule ^/wp-content/uploads/(.*)$ /assets/uploads/$1 [R=301,L]
+    RewriteRule ^/wp-content/new-uploads/(.*)$ /assets/uploads/$1 [R=301,L]
+    #Redirect xmlrpc to home
+    RewriteRule ^/xmlrpc\.php$ /$1  [R=301,L]
+

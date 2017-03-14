@@ -1,0 +1,20 @@
+<VirtualHost *:80>
+    ServerName      noctools.gnmedia.net
+    ServerAlias     *.noctools.gnmedia.net
+    DocumentRoot    /app/shared/http/noctools
+    ErrorLog        /app/log/noctools.gnmedia.net_error.log
+    CustomLog       /app/log/noctools.gnmedia.net_access.log   combined
+    <Directory "/app/shared/http/noctools">
+        Options Indexes FollowSymlinks
+        AllowOverride None
+        Order   allow,deny
+        Allow from all
+    </Directory>
+
+    Alias /cgi-bin /app/shared/http/noctools/cgi-bin
+    <Directory "/app/shared/http/noctools/cgi-bin">
+        Options +ExecCGI
+        AddHandler cgi-script .cgi .pl
+
+    </Directory>
+</VirtualHost>

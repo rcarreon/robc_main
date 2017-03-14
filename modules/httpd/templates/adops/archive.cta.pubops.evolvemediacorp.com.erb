@@ -1,0 +1,35 @@
+# This file is managed by Puppet. Do not modify it from <%=fqdn %>
+# $Id$
+
+<VirtualHost *:80>
+    ServerName archive.cta.pubops.evolvemediacorp.com
+    Timeout 600
+
+    DocumentRoot "/app/shared/docroots/adopsV3/htdocs/app_cta/webroot"
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/cta.pubops.evolvemediacorp.com.error.log
+    LogLevel warn
+    <%=logging ? '' : '#'%>CustomLog /app/log/cta.pubops.evolvemediacorp.com.access.log combined
+    ServerSignature On
+
+    SetEnv ADOPS3_MEMCACHE "localhost:11211"
+    <Directory "/app/shared/docroots/adopsV3/htdocs/app_cta/webroot">
+        RewriteEngine On
+
+        Options FollowSymlinks
+        AllowOverride all
+
+        Order allow,deny
+        Allow from all
+
+	AuthType Basic
+	AuthName "Secure Content"
+	AuthBasicProvider file
+	AuthUserFile /app/shared/docroots/adopsV3/htdocs/app_cta/.htpasswd
+	Require user EvolvePublisher
+    </Directory>
+    <Location /robots.txt>
+        Allow from all
+        Satisfy any
+    </Location>
+</VirtualHost>

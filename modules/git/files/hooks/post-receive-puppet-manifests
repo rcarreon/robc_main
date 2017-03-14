@@ -1,0 +1,20 @@
+#!/bin/sh
+#
+# Trigger a jenkins build on push
+
+NOREV=0000000000000000000000000000000000000000
+
+while read oldrev newrev refname
+do
+
+    if [ "$newrev" == "$NOREV" ]; then
+	continue
+    fi
+
+    branch=$(git rev-parse --symbolic --abbrev-ref $refname)
+    if [ "$branch" == "master" ]; then
+        #`curl -s http://cijoe.gnmedia.net/job/puppet-manifests/build?token=manifests`
+        curl -s http://cijoe.gnmedia.net/view/Puppet/job/manifests/build?token=manifests
+        curl -s http://app1v-jenkins.tp.prd.lax.gnmedia.net:8080/job/puppet-manifests/buildWithParameters?autoDeploy=0
+    fi
+done

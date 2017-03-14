@@ -1,0 +1,18 @@
+# Default for all clients
+[main]
+    vardir        = /var/lib/puppet
+    logdir        = /var/log/puppet
+    rundir        = /var/run/puppet
+    configtimeout = 600
+    pluginsync    = true
+    logdest       = $logdir/puppet.log
+    ssldir         = $vardir/ssl
+
+[agent]
+    classfile    = $vardir/classes.txt
+    localconfig  = $vardir/localconfig
+    report       = true
+    listen       = false 
+    splay        = true
+    server       = puppet.gnmedia.net
+    <%= "environment  = #{fqdn_env_full}" if has_variable?("fqdn_env_full") %>

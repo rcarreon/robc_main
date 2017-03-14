@@ -1,0 +1,5 @@
+check process vaquita-backup with pidfile /var/run/vaquita-backup.pid
+ alert dba@evolvemediallc.com only on { action, exec, resource, timeout }
+
+    start program = "/etc/init.d/vaquita-backup start"
+    stop  program = "/etc/init.d/vaquita-backup stop"

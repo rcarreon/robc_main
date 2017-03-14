@@ -1,0 +1,30 @@
+# This file is managed by Puppet. Do not modify it from <%=fqdn %>
+
+<VirtualHost *:80>
+  ServerName prd.kibana.gnmedia.net
+  ServerAlias www.prd.kibana.gnmedia.net kibana.gnmedia.net
+  DocumentRoot "/app/shared/docroots/prd.kibana.gnmedia.net/current"
+
+  SetEnv KIBANA_CONFIG /app/shared/docroots/prd.kibana.gnmedia.net/config/KibanaConfig.rb
+
+  Timeout 600
+
+  <%=logging ? '' : '#'%>ErrorLog /app/log/prd.kibana.gnmedia.net.error.log
+  LogLevel warn
+  <%=logging ? '' : '#'%>CustomLog /app/log/prd.kibana.gnmedia.net.access.log combined
+  ServerSignature On
+
+  <Directory "/app/shared/docroots/prd.kibana.gnmedia.net/current">
+    RewriteEngine On
+    # Check for maintenance file and redirect all requests
+    RewriteCond %{DOCUMENT_ROOT}/maintenance.html -f
+    RewriteCond %{SCRIPT_FILENAME} !maintenance.html
+    RewriteRule ^.* /maintenance.html [L]  
+    
+    Options FollowSymLinks
+    AllowOverride None
+
+    Order allow,deny
+    Allow from all
+  </Directory>
+</VirtualHost>

@@ -1,0 +1,50 @@
+    ServerAlias www2.craveonline.com
+
+    # Redirect for corwdignite.com
+    ServerAlias crowdignite.com
+    ServerAlias www.crowdignite.com
+
+    RewriteEngine On
+ 
+    # craveonline.com --> www.craveonline.com
+    RewriteCond %{HTTP_HOST} ^craveonline\.com$ [NC]
+    RewriteRule ^/(.*) http://www.craveonline.com/$1 [R=301,L]
+
+    # www2.craveonline.com --> www.craveonline.com
+    RewriteCond %{HTTP_HOST} ^www2\.craveonline\.com$ [NC]
+    RewriteRule ^/(.*) http://www.craveonline.com/$1 [R=301,L]
+
+    # crowdignite.com --> www.craveonline.com
+    RewriteCond %{HTTP_HOST} ^crowdignite\.com$ [NC]
+    RewriteRule ^/(.*) http://www.craveonline.com [R=301,L]
+
+    # www.crowdignite.com --> www.craveonline.com
+    RewriteCond %{HTTP_HOST} ^www\.crowdignite\.com$ [NC]
+    RewriteRule ^/(.*) http://www.craveonline.com [R=301,L]
+
+    RewriteCond %{HTTP_HOST} ^(www|stg|lax|dev).craveonline.com 
+    # craveonline.com/privacy.php --> craveonline.com/privacy
+    RewriteRule ^/privacy.php$   /privacy [R=301,QSA]  
+
+    # craveonline.com/termsofuse.php --> craveonline.com/termsofuse
+    RewriteRule ^/termsofuse.php$   /termsofuse [R=301,QSA] 
+
+    # importing old craveonline rewrite rules
+    RewriteRule ^/terms$ /termsofuse [R=301,L]
+    RewriteRule ^/garage    /lifestyle [R=301,L]
+    RewriteRule ^/babes     /lifestyle [R=301,L]
+    RewriteRule ^/gear      /lifestyle [R=301,L]
+    RewriteRule ^/scifi     /tv [R=301,L]
+    RewriteRule ^/howardtv  / [R=301,L]
+
+    # actofvalor redirect
+    Redirect /actofvalor http://actofvalor.craveonline.com
+
+    RewriteCond %{QUERY_STRING} ^slide=([0-9]+)$ [NC]
+    RewriteRule ^(.*)$ $0#/slide/%1? [R=301,NE,L]
+
+    # m.craveonline.com -> www.craveonline.com
+    RewriteCond %{HTTP_HOST} ^m\.craveonline\.com$ [NC]
+    RewriteRule ^/(.*) http://www.craveonline.com/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

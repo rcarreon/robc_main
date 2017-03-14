@@ -1,0 +1,45 @@
+# This file is managed by Puppet. Do not modify it from <%=fqdn %>
+# $Id: adops.gorillanation.com.erb
+
+<VirtualHost *:80>
+  ServerName adops-qa.gorillanation.com
+  ServerAlias <%=fqdn %>
+  ServerAlias adops-qa.prd.gorillanation.com
+  ServerAlias prd.adops-qa.gorillanation.com
+  DocumentRoot "/app/shared/docroots/adops.gorillanation.com/current/public"
+
+  PassengerHighPerformance off
+  RailsEnv production
+  Timeout 600
+
+  <%=logging ? '' : '#'%>ErrorLog /app/log/adops.gorillanation.com.error.log
+  LogLevel warn
+  <%=logging ? '' : '#'%>CustomLog /app/log/adops.gorillanation.com.access.log combined
+  ServerSignature On
+
+  Alias /uploads /app/ugc/uploads
+  <Directory "/app/ugc/uploads">
+    RemoveHandler .php
+    Options -ExecCGI -Indexes
+    AllowOverride None
+  </Directory>
+
+  <Directory "/app/shared/docroots/adops.gorillanation.com/current/public">
+    PassengerRuby /app/software/ruby/rbenv/versions/1.8.7-p375/bin/ruby
+    RewriteEngine On
+    # Check for maintenance file and redirect all requests
+    RewriteCond %{DOCUMENT_ROOT}/maintenance.html -f
+    RewriteCond %{SCRIPT_FILENAME} !maintenance.html
+    RewriteRule ^.* /maintenance.html [L]  
+    
+    Options FollowSymLinks
+    AllowOverride None
+    #
+    # force browser to download CSV files
+    #
+    AddType application/vnd.ms-excel .csv
+    #
+    Order allow,deny
+    Allow from all
+  </Directory>
+</VirtualHost>

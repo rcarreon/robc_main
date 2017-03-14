@@ -1,0 +1,12 @@
+<VirtualHost *:80>
+    ServerName      dev.kibana3.gnmedia.net
+    DocumentRoot    /app/shared/http/kibana3
+    <%=logging ? '' : '#'%>ErrorLog        /app/log/kibana3_error.log
+    <%=logging ? '' : '#'%>CustomLog       /app/log/kibana3_access.log  combined
+    <Directory "/app/shared/http/kibana3">
+        Options Indexes FollowSymlinks
+        AllowOverride None
+        Order allow,deny
+        Allow from all
+    </Directory>
+</VirtualHost>

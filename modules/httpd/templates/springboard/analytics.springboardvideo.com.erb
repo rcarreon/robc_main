@@ -1,0 +1,20 @@
+# This file is managed by Puppet do not modify it from <%=fqdn %>
+# $Id: $
+
+<VirtualHost *:80>
+        ServerName analytics.springboardvideo.com 
+
+        php_value include_path ".:/app/shared/docroots/analytics.springboardvideo.com/current:/usr/share/pear"
+
+        DocumentRoot /app/shared/docroots/analytics.springboardvideo.com/current
+
+        <Directory /app/shared/docroots/analytics.springboardvideo.com/current >
+                AllowOverride None
+                Order allow,deny
+                allow from all
+        </Directory>
+        <%=logging ? '' : '#'%>ErrorLog /app/log/prd.analytics.gorillanation.com-error.log
+        <%=logging ? '' : '#'%>CustomLog /app/log/prd.analytics.gorillanation.com-access.log combined
+</VirtualHost>
+
+

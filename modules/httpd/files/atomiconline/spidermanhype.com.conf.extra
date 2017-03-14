@@ -1,0 +1,10 @@
+# $Id$
+
+    RewriteEngine On
+    # spidermanhype.com --> www.spidermanhype.com
+    RewriteCond %{HTTP_HOST} ^spidermanhype\.com$ [NC]
+    RewriteRule ^/(.*) http://www.spidermanhype.com/$1 [R=301,L]
+
+    RedirectPermanent / http://www.superherohype.com/heroes/spider-man
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

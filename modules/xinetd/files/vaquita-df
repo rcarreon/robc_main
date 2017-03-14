@@ -1,0 +1,7 @@
+#!/bin/bash
+
+read path
+if test -d "$path";then
+    # Be real care about only returning NFS server and volume
+    df -P "$path" -t nfs | tail -1 | awk '{print $1}' | sed -e 's|\(.*\):/vol/\([^/]*\).*|\1,\2|g'
+fi

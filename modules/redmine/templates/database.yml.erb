@@ -1,0 +1,13 @@
+# This file is managed by puppet, do not edit directly on <%= fqdn %>,
+# changes will be overwritten. 
+#
+# Default setup is given for MySQL with ruby1.8. If you're running Redmine
+# with MySQL and ruby1.9, replace the adapter name with `mysql2`.
+
+production:
+  adapter: mysql
+  database: <%= database %>
+  encoding: utf8
+  host: <%= dbserver %>
+  username: <%= dbuser %>
+  password: "<%= dbpasswd %>"

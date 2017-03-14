@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# $Id$
+if test -f /app/shared/modules/development/version.txt ;then
+
+# Display version.txt for development then staging then production (order matter)
+version=`cat /app/shared/modules/{development,staging,production}/version.txt | tr '\n' '-'`
+
+# From 3 lines get one line with dash as separator
+load=`cut -d ' ' -f 1 /proc/loadavg`
+
+hostname=`hostname | sed s/.gnmedia.net//g`
+echo ${version}${hostname}-${load}
+else
+    echo devel_environment
+fi

@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+    <Directory /app/shared/docroots/pip.gnmedia.net/>
+      Options FollowSymLinks Indexes
+    </Directory>
+
+    ServerName pip.gnmedia.net
+    ServerAlias *.pip.gnmedia.net
+    DocumentRoot /app/shared/docroots/pip.gnmedia.net/
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/pip.gnmedia.net_error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/pip.gnmedia.net_access.log combined
+
+</VirtualHost>

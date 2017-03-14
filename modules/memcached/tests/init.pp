@@ -1,0 +1,2 @@
+$project="default"
+include memcached

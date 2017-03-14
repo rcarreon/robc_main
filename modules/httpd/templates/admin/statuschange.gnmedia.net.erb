@@ -1,0 +1,20 @@
+<VirtualHost *:80>
+    ServerName      statuschange.gnmedia.net
+    ServerAlias     *.statuschange.gnmedia.net
+    DocumentRoot    /app/shared/http/statuschange
+    ErrorLog        /app/log/statuschange.gnmedia.net_error.log
+    CustomLog       /app/log/statuschange.gnmedia.net_access.log   combined
+    <Directory "/app/shared/http/statuschange">
+        Options Indexes FollowSymlinks
+        AllowOverride None
+        Order   allow,deny
+        Allow from all
+    </Directory>
+
+    Alias /cgi-bin /app/shared/http/statuschange/cgi-bin
+    <Directory "/app/shared/http/statuschange/cgi-bin">
+        Options +ExecCGI
+        AddHandler cgi-script .cgi .pl
+
+    </Directory>
+</VirtualHost>

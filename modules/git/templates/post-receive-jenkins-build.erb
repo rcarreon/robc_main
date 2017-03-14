@@ -1,0 +1,18 @@
+#!/bin/sh
+#
+# Trigger a jenkins build on push
+
+NOREV=0000000000000000000000000000000000000000
+
+while read oldrev newrev refname
+do
+
+    if [ "$newrev" == "$NOREV" ]; then
+	continue
+    fi
+
+    branch=$(git rev-parse --symbolic --abbrev-ref $refname)
+    if [ "$branch" == "master" ]; then
+        curl -s http://cijoe.gnmedia.net/view/<%= jenkins_viewname %>/job/<%= jenkins_jobname %>/build?token=<%= jenkins_token %>
+    fi
+done

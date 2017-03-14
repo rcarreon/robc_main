@@ -1,0 +1,9 @@
+%developers       app2v-deploy.tp.prd.lax.gnmedia.net = NOPASSWD: DEV_DEPLOY
+ggyssler          app2v-deploy.tp.prd.lax.gnmedia.net = NOPASSWD: MAL_DEPLOY
+%salesintegration app2v-deploy.tp.prd.lax.gnmedia.net = NOPASSWD: SI_DEPLOY
+%dba              app2v-deploy.tp.prd.lax.gnmedia.net = NOPASSWD: SYNC_DB
+%adplatform       app2v-deploy.tp.prd.lax.gnmedia.net = NOPASSWD: ADOPS_DEPLOY
+%hmosvn           app2v-deploy.tp.prd.lax.gnmedia.net = NOPASSWD: ASH_CMDS
+%tewn             app2v-deploy.tp.prd.lax.gnmedia.net = NOPASSWD: CI_CMDS
+%springboardsvn   app2v-deploy.tp.prd.lax.gnmedia.net = NOPASSWD: SBV_CMDS
+%springboardsvn   app2v-deploy.sbv.prd.lax.gnmedia.net = NOPASSWD: SBV_CMDS

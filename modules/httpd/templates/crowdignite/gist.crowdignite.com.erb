@@ -1,0 +1,30 @@
+<VirtualHost *:80>
+    ServerName gist.crowdignite.com
+
+    DocumentRoot /app/shared/phorkie/www
+    <%=logging ? '' : '#'%>CustomLog /app/log/gist-access_log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/gist-error_log
+
+    <Directory "/app/shared/phorkie/www">
+        Options -Indexes +FollowSymLinks -ExecCGI
+    </Directory>
+
+</VirtualHost>
+<VirtualHost *:443>
+    ServerName gist.crowdignite.com
+
+    DocumentRoot /app/shared/phorkie/www
+    <%=logging ? '' : '#'%>CustomLog /app/log/gist-access_log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/gist-error_log
+
+    SSLEngine on
+    SSLProtocol all -SSLv2
+
+    SSLCertificateFile /etc/httpd/conf.d/gist.crowdignite.com.crt
+    SSLCertificateKeyFile /etc/httpd/conf.d/gist.crowdignite.com.key
+
+    <Directory "/app/shared/phorkie/www">
+        Options -Indexes +FollowSymLinks -ExecCGI
+    </Directory>
+
+</VirtualHost>

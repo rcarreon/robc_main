@@ -1,0 +1,80 @@
+<%
+         host,project,environment,location,domain,tld = fqdn.split('.')
+%>
+
+<%
+case environment
+  when "prd"
+    env_hostname = "www." + name
+    env_prefix = "www"
+    env_docroot = "/app/shared"
+    env_ugc = ":/app/ugc/vb_bab"
+  when "stg"
+    env_hostname = "stg." + name
+    env_prefix = "stg"
+    env_docroot = "/app/shared/vb_bab/current"
+    env_ugc = ":/app/ugc/vb_bab"
+  when "dev"
+    env_hostname = "dev." + name
+    env_prefix = "dev"
+    env_docroot = "/app/shared/vb_bab/current"
+    env_ugc = ":/app/ugc/vb_bab"
+        case host
+          when /uid/
+            env_hostname = "sbx." + name
+            env_prefix = "sbx"
+            env_docroot = "/app/shared/vb_bab/current"
+            env_ugc = ""
+        end
+end
+%>
+
+
+<VirtualHost *:80>
+    ServerName babyandbump.momtastic.com
+    ServerAlias <%= env_hostname %>
+
+    DocumentRoot <%= env_docroot %>
+    <%=logging ? '' : '#'%>CustomLog /app/log/<%= env_hostname %>-access_log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/<%= env_hostname %>-error_log
+
+    <Directory <%= env_docroot %>>
+      php_admin_value open_basedir <%= env_docroot %>:/var/www/tmp<%= env_ugc %>
+      Options -Indexes -FollowSymLinks -ExecCGI 
+    </Directory>
+
+    RewriteEngine on
+
+    #### for bnb only, 301 /rule(s)?/ to /announcement.php?f=18&a=3
+    RewriteRule ^/rule(s)/?$ /announcement.php?f=18&a=3 [R=301,L]
+
+    RewriteRule ^/((urllist|sitemap_).*\.(xml|txt)(\.gz)?)$ /vbseo_sitemap/vbseo_getsitemap.php?sitemap=$1 [L]
+
+    RewriteCond %{REQUEST_URI} !(admincp/|modcp/|cron|vbseo_sitemap|api\.php|images|mycookies\.php)
+    RewriteRule ^/((archive/)?(.*\.php(/.*)?))$ /vbseo.php [L,QSA]
+  
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{REQUEST_FILENAME} !/(admincp|modcp|clientscript|cpstyles|images|userimages)/
+    RewriteCond %{REQUEST_FILENAME} !\.(jpg|gif|js|txt|gz|png)$
+    RewriteRule ^/(.+)$ /vbseo.php [L,QSA]
+</VirtualHost>
+
+#### Redirect variants to bab.mt
+<VirtualHost *:80>
+    ServerName babyandbump.com
+    ServerAlias <%= env_prefix %>.babyandbump.com     
+    ServerAlias baby-and-bump.com 
+    ServerAlias <%= env_prefix %>.baby-and-bump.com     
+    ServerAlias babyandbump.co.uk
+    ServerAlias <%= env_prefix %>.babyandbump.co.uk     
+    ServerAlias babyandbump.net 
+    ServerAlias <%= env_prefix %>.babyandbump.net     
+    ServerAlias babyandbump.org 
+    ServerAlias <%= env_prefix %>.babyandbump.org     
+    ServerAlias babyandbumps.com 
+    ServerAlias <%= env_prefix %>.babyandbumps.com     
+    ServerAlias babyandbumps.co.uk 
+    ServerAlias <%= env_prefix %>.babyandbumps.co.uk 
+    RedirectPermanent / http://babyandbump.momtastic.com/
+</VirtualHost>

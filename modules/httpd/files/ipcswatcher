@@ -1,0 +1,32 @@
+#!/bin/bash
+
+# Keep an eye on the number of semaphores in use. The ticketing system on this
+# machine seems to leak them like my VW leaks oil. -gstaples May 2011.
+
+
+# How many semaphores is too much? Let's ask the system.
+max=$(ipcs -l | grep "max number of arrays" | sed 's/max number of arrays = //')
+if [ -z "$max" ];then
+   # the text labels on ipcs -l changed. *shrug*
+   max=128
+fi
+
+# Integer value of 90% of the system max.
+limit=$(echo "a=$max * 0.9; scale=0; a /= 1; print a" | bc)
+limit=5
+
+
+# Sweep out the detritus
+if [ $(ipcs -s | grep apache | wc -l) -gt $limit ];then
+   logger -t ipcswatcher "too many sem arrays ($(ipcs -s | grep apache | wc -l) > $limit), cleaning up"
+   monit unmonitor httpd
+   /sbin/service httpd stop
+
+   for sem in `ipcs -s | grep apache | egrep "0x[0-9a-f]+ [0-9]+" | cut -f2 -d" "`;do
+        ipcrm -s $sem
+   done
+
+   /sbin/service httpd start
+   monit monitor httpd
+fi
+

@@ -1,0 +1,30 @@
+# This file is managed by Puppet. Do not modify it on <%=fqdn %>
+
+<%
+         host,project,environment,location,domain,tld = fqdn.split('.')
+%>
+
+<%
+case environment
+  when "prd"
+    env_prefix = ""
+  when "dev"
+    env_prefix = "dev."
+  when "stg"
+    env_prefix = "stg."
+end
+%>
+
+<VirtualHost *:80>
+    ServerName <%= env_prefix %>metrics.originplatform.com
+    DocumentRoot "/app/shared/docroots/metrics.originplatform.com/"
+    ErrorLog /app/log/<%= env_prefix %>metrics.originplatform.com-error.log
+    CustomLog /app/log/<%= env_prefix %>metrics.originplatform.com-access.log combined
+
+    <Directory /app/shared/docroots/metrics.originplatform.com/>
+        AllowOverride FileInfo Indexes Options
+        Options -MultiViews
+    </Directory>
+
+</VirtualHost>
+

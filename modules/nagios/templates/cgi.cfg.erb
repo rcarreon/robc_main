@@ -1,0 +1,19 @@
+# This file is provided by puppet.  Do not edit manually.
+# $Id: cgi.cfg 12541 2011-11-07 20:25:04Z jcamou $
+main_config_file=/etc/nagios/nagios.cfg
+physical_html_path=/usr/share/nagios
+url_html_path=/
+show_context_help=0
+use_authentication=1
+authorized_for_system_information=*
+authorized_for_configuration_information=*
+authorized_for_system_commands=*
+authorized_for_all_services=*
+authorized_for_all_hosts=*
+authorized_for_all_service_commands=<%= `/usr/bin/getent group sysadmins dba noc | cut -d: -f 4 | xargs echo | sed 's/ /,/g' | xargs echo -n` %>
+authorized_for_all_host_commands=<%= `/usr/bin/getent group sysadmins dba noc | cut -d: -f 4 | xargs echo | sed 's/ /,/g' | xargs echo -n` %>
+default_statusmap_layout=5
+default_statuswrl_layout=4
+ping_syntax=/bin/ping -n -U -c 5 $HOSTADDRESS$
+refresh_rate=90
+default_user_name=viewer

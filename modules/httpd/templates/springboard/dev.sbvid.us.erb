@@ -1,0 +1,23 @@
+# This file is managed by Puppet do not modify it from <%=fqdn %>
+# $Id
+# $Revision
+
+<VirtualHost *:80>
+	ServerName dev.sbvid.us
+	ServerAlias sbvid.us www.sbvid.us www.dev.sbvid.us
+
+        DocumentRoot /app/shared/docroots/www.sbvid.us/current
+        <Directory /app/shared/docroots/www.sbvid.us/current>
+		RewriteEngine On
+		RewriteBase /
+		RewriteCond %{REQUEST_FILENAME} !-f
+		RewriteCond %{REQUEST_FILENAME} !-d
+		RewriteRule ^(.*)$ /yourls-loader.php [L]
+
+		#RewriteCond %{HTTP_HOST} ^www\.yourls\.org$ [NC]
+		#RewriteRule ^(.*)$ http://yourls.org/$1 [R=301,L]
+	</Directory>
+
+	<%=logging ? '' : '#'%>ErrorLog /app/log/dev.sbvid.us-error_log
+	<%=logging ? '' : '#'%>CustomLog /app/log/dev.sbvid.us-access_log combined
+</VirtualHost>

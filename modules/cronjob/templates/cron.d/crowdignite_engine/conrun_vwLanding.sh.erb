@@ -1,0 +1,89 @@
+#!/bin/sh
+
+DATEFORMAT="+%Y-%m-%d.%H%M.%S"
+# for debugging individual runs
+START=$(date)
+MODEL_UPDATED=0
+
+HOUR=$(date +'%H')
+MIN=$(date +'%M')
+
+
+if [ "$MIN" -gt "29" ]
+then
+  MIN=30
+else
+  MIN=00
+fi
+RUNTIME=$HOUR$MIN
+
+rotate_logs() {
+ max=8
+ local base="$1"
+
+  for i in $(ls -1r "$base".*); do
+    # Calculate the next number for the current file, i.e. 4 for base.3
+    n=$((1 + $(echo $i | sed 's,'"$base"'.,,')))
+    # If the new file number is greater than max, delete it.
+    if [ $n -gt ${max:-999999} ]; then
+      rm -rf "$i"
+    else
+      # otherwise move the file to the new number
+      mv $i "$base".$n
+    fi
+  done
+  # If there is a "base" file with no extension move that now.
+  if [ -e "$base" ]; then
+    cp "$base" "$base".0
+  fi
+}
+
+#let's check if we are already running
+OUTPUT=`/usr/local/bin/crowdignite_engine/set_cache.php -e <%= fqdn_env %> -f get -k conrun_vwLanding_$RUNTIME`
+if [ "$OUTPUT" = "1" ]
+then 
+	echo "[conrun_vwLanding] Script already running for $RUNTIME."
+	exit
+fi
+
+echo "[conrun_vwLanding] Starting run for $RUNTIME at:" $(date -d"$START" $DATEFORMAT)
+
+/usr/local/bin/crowdignite_engine/set_cache.php -e <%= fqdn_env %> -f set -k conrun_vwLanding_$RUNTIME -t 3600
+RETVAL=$?
+[ $RETVAL -ne 0 ] && exit 1
+
+php -q /app/shared/public_html/app/cron_dispatcher.php /vowpal_wabbit/correlator_landing_page_impressions_clicks noverbose
+for f in /app/data/vwinput/*
+do  
+	if [ -e "$f" -a -s "$f" ]
+	then
+                MODEL_UPDATED=1
+                /usr/local/bin/vw --initial_regressor /app/data/vwmodels.live/landing.model --data $f --final_regressor /app/data/vwmodels/landing.model --quadratic xv --loss_function squared
+		if [ $? -ne 0 ]; then
+			mv $f /app/data/vwinput.failed/
+		else
+			mv $f /app/data/vwinput.done/
+		fi
+	fi
+done
+
+if [ $MODEL_UPDATED -ne 0 ]
+then
+    /usr/local/bin/vw --no_stdin -ti /app/data/vwmodels/landing.model
+    if [ "$?" -ne 0 ]
+    then
+        echo "VW Fatal error: bad widget.model file, not propagating changes. From Landing Page consolidation run: $RUNTIME"
+    else
+        cp /app/data/vwmodels/landing.model /app/data/vwmodels/landing.model.$(date -d"$START" "+%Y%m%d.%H%M")
+        cp -f /app/data/vwmodels/landing.model /app/data/vwmodels.live/landing.model
+        chmod 0444 /app/data/vwmodels.live/landing.model
+        cd /app/data/vwmodels.live/
+        rotate_logs landing.model
+    fi
+fi
+
+END=$(date)
+DIFF=$(($(date -d"$END" +"%s")-$(date -d"$START" +"%s")))
+echo
+echo "[conrun_vwLanding] Run for $RUNTIME started at:" $(date -d"$START" $DATEFORMAT) " ended at: " $(date -d"$END" $DATEFORMAT) " took: $(($DIFF / 60)) minutes and $(($DIFF % 60)) seconds."
+

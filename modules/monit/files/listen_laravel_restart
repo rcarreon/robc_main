@@ -1,0 +1,8 @@
+#!/bin/bash
+#This will restart queue_listen_laravel
+#First it kills the pid file 
+#then uses monit to start the process
+
+sudo /bin/kill -9 $(/usr/bin/pgrep -P $(/bin/cat /tmp/queue_listen_laravel.pid))
+
+sudo /usr/bin/monit start queue_listen_laravel

@@ -1,0 +1,156 @@
+# This file is managed by Puppet do not modify it from <%= fqdn %>
+# $Id$
+
+source dbsettings {
+        type                    = mysql
+        sql_host                = sql1v-56-sdc.ao.dev.lax.gnmedia.net
+        sql_user                = sphinx
+        sql_pass                = SklcfvRo
+        sql_db                  = sherdog
+        sql_attr_timestamp	= date
+}
+
+source sherdogArticles : dbsettings
+{
+        sql_query               = select ac.id as id, concat(a.title,' ',a.body), ac.article_id as article_id, ac.channel_id as channel_id, unix_timestamp(a.created) as date from articles_channels ac, articles a where a.id = ac.article_id and a.matchup != 1
+        sql_attr_uint		= article_id
+        sql_attr_uint		= channel_id
+}
+
+source sherdogArticlesNLP : dbsettings
+{
+        sql_query               = select id, title, body, unix_timestamp(created) as date from articles where matchup != 1
+}
+
+
+source sherdogVideos : dbsettings
+{
+        sql_query               = select id, concat(title," ",blurb) as indexed_text, unix_timestamp(created) as date from videos
+}
+
+source sherdogAudio : dbsettings
+{
+        sql_query               = select id, concat(title," ",title," ",body) as indexed_text, unix_timestamp(created) as date from audio
+}
+
+source sherdogEvents : dbsettings
+{
+        sql_db                  = sherdog_fighter
+        sql_query               = select id, concat(title," ",name," ",location) as indexed_text, unix_timestamp(date) as date from events
+}
+
+source sherdogIArticles : dbsettings
+{
+        sql_db                  = sherdog_fighter
+        sql_query               = select a.id, a.title, a.body, unix_timestamp(a.created) as date from sherdog.articles a, insider i where i.id = a.id and i.type = 'article' and a.matchup != 1
+}
+
+source sherdogIVideos : dbsettings
+{
+        sql_db                  = sherdog_fighter
+        sql_query               = select a.id, a.title, a.body, unix_timestamp(created) as date from sherdog.videos a, insider i where i.id = a.id and i.type = 'video'
+}
+
+source sherdogIAudio : dbsettings
+{
+        sql_db                  = sherdog_fighter
+        sql_query               = select a.id, a.title, a.body, unix_timestamp(created) as date from sherdog.audio a, insider i where i.id = a.id and i.type = 'audio'
+}
+
+##INDICES
+
+index sherdog_articles
+{
+        source                  = sherdogArticles
+        path                    = /var/lib/sphinx/sherdog_articles
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+index sherdogarticles
+{
+        source                  = sherdogArticlesNLP
+        path                    = /var/lib/sphinx/sherdog_articles_nlp
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+index sherdog_videos
+{
+        source                  = sherdogVideos
+        path                    = /var/lib/sphinx/sherdog_videos
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+index sherdog_audio
+{
+        source                  = sherdogAudio
+        path                    = /var/lib/sphinx/sherdog_audio
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+index sherdog_events
+{
+        source                  = sherdogEvents
+        path                    = /var/lib/sphinx/sherdog_events
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+index insider_articles
+{
+        source                  = sherdogIArticles
+        path                    = /var/lib/sphinx/sherdog_iarticles
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+index insider_video
+{
+        source                  = sherdogIVideos
+        path                    = /var/lib/sphinx/sherdog_ivideo
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+index insider_audio
+{
+        source                  = sherdogIAudio
+        path                    = /var/lib/sphinx/sherdog_iaudio
+        morphology              = none
+        charset_type            = utf-8
+        html_strip		= 0
+}
+
+#############################################################################
+## indexer settings
+#############################################################################
+
+indexer
+{
+        mem_limit               = 64M
+}
+
+#############################################################################
+## searchd settings
+#############################################################################
+
+searchd
+{
+        port                    = 3312
+        log                     = /app/log/sphinx/searchd.log
+        query_log               = /app/log/sphinx/squery.log
+        read_timeout            = 5
+        max_matches             = 10000
+        max_children            = 30
+        pid_file                = /var/sphinx/searchd.pid
+}

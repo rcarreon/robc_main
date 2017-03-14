@@ -1,0 +1,69 @@
+<%
+         host,project,environment,location,domain,tld = fqdn.split('.')
+%>
+
+<%
+case environment
+  when "prd"
+    env_hostname = name
+    env_docroot = "/app/shared"
+    env_admin_dir = "/app/shared/admincp"
+    env_auth_file = "/app/shared/admincp/.htpasswd"
+    env_ugc = ":/app/ugc/vb_hfb"
+  when "stg"
+    env_hostname = "stg." + name
+    env_docroot = "/app/shared/vb_hfb/current"
+    env_ugc = ":/app/ugc/vb_hfb"
+  when "dev"
+    env_hostname = "dev." + name
+    env_docroot = "/app/shared/vb_hfb/current"
+    env_ugc = ":/app/ugc/vb_hfb"
+        case host
+          when /uid/
+            env_hostname = "sbx." + name
+            env_docroot = "/app/shared/vb_hfb/current"
+            env_ugc = ""
+        end
+end
+%>
+
+<VirtualHost *:80>
+    ServerAdmin webmaster@hockeysfuture.com
+    DocumentRoot <%= env_docroot %>
+    ServerName hfboards.hockeysfuture.com
+    ServerAlias <%= env_hostname %> 
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/<%= env_hostname %>-error_log
+    <%=logging ? '' : '#'%>CustomLog /app/log/<%= env_hostname %>-access_log combined
+
+<% if environment == "prd" %>
+
+ <Directory <%= env_admin_dir %>>
+         Options -Indexes -FollowSymLinks -ExecCGI
+         AuthType Basic
+         AuthName "Password required Hfboards"
+         AuthUserFile <%= env_auth_file %>
+         Require valid-user
+         Order Deny,Allow
+         allow from all
+ </Directory>
+ 
+<% end %>
+
+  <Directory <%= env_docroot %>>
+    php_admin_value open_basedir <%= env_docroot %>:/var/www/tmp<%= env_ugc %>
+    Options -Indexes -FollowSymLinks -ExecCGI 
+  </Directory>
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerAlias hfboards.com
+    ServerAlias *.hfboards.com 
+    ServerAlias wwwhfboards.com 
+    ServerAlias *.wwwhfboards.com 
+    ServerAlias hfboards.ca
+    ServerAlias *.hfboards.ca 
+    ServerAlias hfboards.craveonline.com
+    ServerAlias hfboards.*.craveonline.com
+    RedirectPermanent / http://hfboards.hockeysfuture.com/
+</VirtualHost>

@@ -1,0 +1,6 @@
+m_stage_adops (cron1v-ao.ap.stg1.gnmedia.net,,) (app1v-ao.ap.stg1.gnmedia.net,,) (app2v-ao.ap.stg1.gnmedia.net,,) (app1v-ao.ap.stg2.gnmedia.net,,) (app2v-ao.ap.stg2.gnmedia.net,,)
+m_dev_lax3_sk (dev1v.lax3.gnmedia.net,,)
+m_dev_deploy (app1v-deploy.tp.prd.lax.gnmedia.net,,)
+m_dev m_dev_lax3_sk m_dev_deploy
+m_dev_lax3_search (app1v-spx.sb.dev1.gnmedia.net,,)
+m_prod_emserv (agentile.lax3.gnmedia.net,,) (em1v.lax1.gnmedia.net,,) (vburnett.lax3.gnmedia.net,,)

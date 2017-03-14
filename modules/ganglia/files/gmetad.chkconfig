@@ -1,0 +1,2 @@
+# chkconfig: 2345 98 02
+# description: gmetad startup script

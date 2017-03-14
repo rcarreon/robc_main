@@ -1,0 +1,19 @@
+# this file is managed by Puppet in the resolv module,
+# please don't edit it on <%= fqdn %>
+
+<%
+require 'socket'
+ns1_ip = IPSocket.getaddress("app1v-dns.tp.prd.lax.gnmedia.net")
+ns2_ip = IPSocket.getaddress("app2v-dns.tp.prd.lax.gnmedia.net")
+ns3_ip = IPSocket.getaddress("app3v-dns.tp.prd.lax.gnmedia.net")
+ns4_ip = IPSocket.getaddress("app4v-dns.tp.prd.lax.gnmedia.net")
+%>
+search gnmedia.net
+options rotate
+options timeout:1
+options attempts:5
+nameserver <%= ns1_ip %>
+nameserver <%= ns2_ip %>
+nameserver <%= ns3_ip %>
+nameserver <%= ns4_ip %>
+sortlist <%=network_eth0%>/<%=netmask_eth0%>

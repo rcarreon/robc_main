@@ -1,0 +1,73 @@
+<VirtualHost *:80>
+    ServerName git.gnmedia.net
+    RedirectPermanent / https://git.gnmedia.net/
+</VirtualHost>
+
+<VirtualHost *:443>
+    ServerName git.gnmedia.net
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/git.gnmedia.net-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/git.gnmedia.net-access.log combined
+
+    DocumentRoot /var/www/html/gitweb
+
+    # since all git/gitolite are owned by git, in /app/shared/git
+    SuexecUserGroup git git
+   
+    SSLEngine on
+    SSLProtocol all -SSLv2
+
+    SSLCertificateFile /etc/httpd/conf.d/git.gnmedia.net.crt
+    SSLCertificateKeyFile /etc/httpd/conf.d/git.gnmedia.net.key
+    SSLCertificateChainFile /etc/httpd/conf.d/gd_bundle-g2-g1.crt
+
+    SetEnv GIT_PROJECT_ROOT /app/shared/git
+    SetEnv GIT_HTTP_BACKEND /usr/libexec/git-core/git-http-backend
+    SetEnv GIT_HTTP_EXPORT_ALL
+    SetEnv GITOLITE_HTTP_HOME /app/shared/gitolite
+
+    # To serve gitweb at the same url, use a ScriptAliasMatch to
+    # only those URLs that git http-backend can handle, and
+    # forward the rest to gitweb:
+    ScriptAliasMatch \
+            "(?x)^/(.*/(HEAD | \
+                            info/refs | \
+                            objects/(info/[^/]+ | \
+                                     [0-9a-f]{2}/[0-9a-f]{38} | \
+                                     pack/pack-[0-9a-f]{40}\.(pack|idx)) | \
+                            git-(upload|receive)-pack))$" \
+            /var/www/bin/gitolite-suexec-wrapper.sh/$1
+
+# suexec is compiled with a docroot of /var/www, (see suexec -V)
+# so we did a bind mount of /usr/share/gitweb onto /var/www/html/gitweb
+<Directory "/var/www/html/gitweb">
+    Options ExecCGI
+    AllowOverride None
+    AddHandler cgi-script .cgi
+    DirectoryIndex gitweb.cgi
+    Order allow,deny
+    Allow from all
+</Directory>
+
+<Directory "/var/www/bin">
+    <Files "gitolite-suexec-wrapper.sh">
+        Order allow,deny
+        Allow from all
+    </Files>
+</Directory>
+
+<Location />
+    SSLRequireSSL
+    Order allow,deny
+    Allow from All
+    AuthType Basic
+    AuthName "Git Repo"
+
+    AuthzLDAPAuthoritative   Off
+    AuthBasicProvider ldap
+    AuthLDAPURL "ldap://ldap.gnmedia.net:389/ou=People,dc=gnmedia,dc=net"
+    Require valid-user
+
+</Location>
+
+</VirtualHost>

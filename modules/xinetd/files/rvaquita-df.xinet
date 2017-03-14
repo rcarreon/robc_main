@@ -1,0 +1,13 @@
+# description: Remote Load reporter
+service rvaquita-df
+{
+	disable	= no
+		type            = UNLISTED
+		port            = 1500
+		socket_type     = stream
+		wait            = no
+		user            = root
+		group           = root
+		server          = /usr/libexec/vaquita-df
+		log_on_success	=
+}

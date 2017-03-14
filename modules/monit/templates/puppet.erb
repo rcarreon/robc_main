@@ -1,0 +1,14 @@
+
+<%
+pid_path = "/var/run/puppet/agent.pid"
+%>
+
+#check process puppetd with pidfile <%= pid_path %>
+#
+ #start program = "/bin/sh /etc/monit.d/puppet_restart"
+ #stop  program = "/etc/init.d/puppet stop"
+ #depends on puppet-state
+
+check file puppet-state with path /var/lib/puppet/state/state.yaml
+ if timestamp > 120 minutes
+  then alert

@@ -1,0 +1,88 @@
+#!/usr/bin/python
+
+import time, urllib, optparse, sys
+try:
+    import json
+except ImportError:
+    import simplejson as json
+
+usage = "usage: %prog [options]"
+parser = optparse.OptionParser(usage=usage, version="%prog 0.1")
+parser.add_option("-g", "--gweb", dest="gweb", help="gweb server to send event to; Required.")
+parser.add_option("-a", "--action", dest="action", type="choice", choices=['add', 'delete', 'edit'], help="action; what are you doing")
+parser.add_option("-i", "--id", dest="id", help="Define the id you are editing. Use with edit or delete")
+parser.add_option("-s", "--summary", dest="summary", help="Summary of event. Use with add.")
+parser.add_option("-t", "--starttime", dest="starttime", help="Start time of event in epoch (or the 'now' keyword). Use with add or edit.")
+parser.add_option("-e", "--endtime", dest="endtime", help="End time of event in epoch (or the 'now' keyword). Use with add or edit")
+parser.add_option("-p", "--filtertype", dest="filtertype", type="choice", choices=['grid', 'cluster', 'host_regex'], help="filter type; Use with add")
+parser.add_option("-f", "--filter", dest="filter", help="filter content. Use with filtertype")
+(options, args) = parser.parse_args()
+
+if options.gweb == None:
+    parser.error("gweb server is required")
+
+if options.action == "edit" and options.id == None:
+    parser.error("Cannot edit without defining an id w/ -e")
+
+if options.action == "delete" and options.id == None:
+    parser.error("Cannot delete a record without defining an id")
+
+if options.action == "add" and options.summary == None:
+    parser.error("Must define a summary to add an event")
+if options.action == "add" and options.starttime == None:
+    parser.error("Must define a starttime to add an event")
+
+parameters = {}
+
+gwebserver = options.gweb
+parameters['action'] = options.action
+
+if options.action == "add":
+    parameters['start_time'] = options.starttime
+    parameters['summary'] = options.summary
+    if options.endtime != None:
+        parameters['end_time'] = options.endtime
+    if options.filtertype == "grid":
+        parameters['grid'] = options.filter
+    elif options.filtertype == "host_regex":
+        parameters['host_regex'] = options.filter
+    elif options.filtertype == "cluster":
+        parameters['cluster'] = options.filter
+    else:
+        pass
+elif options.action == "delete":
+    parameters['event_id'] = options.id
+elif options.action == "edit":
+    parameters['event_id'] = options.id
+    if options.summary != None:
+        parameters['summary'] = options.summary
+    if options.filtertype != None:
+        if options.filtertype == "grid":
+            parameters['grid'] = options.filter
+        elif options.filtertype == "host_regex":
+            parameters['host_regex'] = options.filter
+        elif options.filtertype == "cluster":
+            parameters['cluster'] = options.filter
+        else:
+            pass
+    if options.starttime != None:
+        parameters['start_time'] = options.starttime
+    if options.endtime != None:
+        parameters['end_time'] = options.endtime
+
+# action=add&host_regex=app1v-svn.tp.prd.lax.gnmedia.net&start_time=1369285995.0&summary=This+is+a+test
+# urllib.urlencode(parameters)
+
+callUrl = "http://%s/api/events.php?%s" % (gwebserver, urllib.urlencode(parameters))
+output = urllib.urlopen(callUrl)
+outputjson = json.loads(output.readlines()[0])
+
+if outputjson['status'] == 'ok':
+    try:
+        print outputjson['event_id']
+    except KeyError:
+        print outputjson['message']
+    sys.exit(0)
+else:
+    print outputjson
+    sys.exit(1)

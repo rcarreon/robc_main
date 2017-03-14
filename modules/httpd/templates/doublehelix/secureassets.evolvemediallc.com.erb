@@ -1,0 +1,16 @@
+# This file is managed by Puppet do not modify it from <%=fqdn %>
+#
+<VirtualHost *:80>
+  DocumentRoot /app/shared/docroots/secureassets.evolvemediallc.com
+  ServerName secureassets.evolvemediallc.com
+
+  ServerAlias *.secureassets.evolvemediallc.com
+  <%=logging ? '' : '#'%>ErrorLog /app/log/secureassets.evolvemediallc.com-error.log
+  <%=logging ? '' : '#'%>CustomLog /app/log/secureassets.evolvemediallc.com-access.log combined-xff
+
+  <Directory /app/shared/docroots/secureassets.evolvemediallc.com>
+      AllowOverride All
+      Options Indexes MultiViews FollowSymLinks
+  </Directory>
+
+</VirtualHost>

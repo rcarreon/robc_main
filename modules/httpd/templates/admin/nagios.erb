@@ -1,0 +1,116 @@
+# Managed by Puppet
+
+# $Id$
+
+
+<VirtualHost *:80>
+
+    ServerName  <%= httpservername %>
+    ServerAlias nagios
+
+    Redirect permanent / https://<%= httpservername %>
+
+</VirtualHost>
+
+<VirtualHost *:443>
+
+    ServerName  <%= httpservername %>
+    ServerAlias nagios
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/nagios.error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/nagios.access.log Combined
+
+
+    ScriptAlias /cgi-bin "/usr/lib64/nagios/cgi-bin"
+    ScriptAlias /nagios/cgi-bin "/usr/lib64/nagios/cgi-bin"
+
+
+    SSLEngine on
+    SSLProtocol all -SSLv2
+
+
+    SSLCertificateFile /etc/httpd/conf.d/<%= httpservername %>.crt
+    SSLCertificateKeyFile /etc/httpd/conf.d/<%= httpservername %>.key
+
+    <Directory "/usr/lib64/nagios/cgi-bin">
+        SSLRequireSSL
+        Options ExecCGI
+        AllowOverride None
+        Order allow,deny
+        Allow from all
+        AuthName "Nagios Access on <%= httpservername %>"
+        AuthType Basic
+        AuthzLDAPAuthoritative    On
+        AuthzLDAPMethod           ldap
+        AuthzLDAPProtocolversion  3
+        #AuthzLDAPLogLevel         debug
+        AuthzLDAPServer           ldap.gnmedia.net
+        AuthzLDAPUserBase         ou=People,dc=gnmedia,dc=net
+        AuthzLDAPUserKey          uid
+        AuthzLDAPGroupBase        ou=Groups,dc=gnmedia,dc=net
+        AuthzLDAPGroupkey         cn
+        AuthzLDAPMemberKey        uniquemember
+        AuthzLDAPSetGroupAuth     ldapdn
+        Require group             sysadmins developers noc noc-leads dba
+    </Directory>
+
+    Alias /       "/usr/share/nagios/html/"
+
+    <Directory "/usr/share/nagios/html">
+        SSLRequireSSL
+        Options None
+        AllowOverride None
+        Order allow,deny
+        Allow from all
+        AuthName "Nagios Access on <%= httpservername %>"
+        AuthType Basic
+        AuthzLDAPAuthoritative    On    
+        AuthzLDAPMethod           ldap
+        AuthzLDAPProtocolversion  3
+        #AuthzLDAPLogLevel        debug
+        AuthzLDAPServer           ldap.gnmedia.net
+        AuthzLDAPUserBase         ou=People,dc=gnmedia,dc=net
+        AuthzLDAPUserKey          uid
+        AuthzLDAPGroupBase        ou=Groups,dc=gnmedia,dc=net
+        AuthzLDAPGroupkey         cn
+        AuthzLDAPMemberKey        uniquemember
+        AuthzLDAPSetGroupAuth     ldapdn
+        Require group             sysadmins developers noc noc-leads dba
+    </Directory>
+
+</VirtualHost>
+
+<VirtualHost *:80>
+
+    ServerName  ro<%= httpservername %>
+    ServerAlias ronagios
+
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/nagios.error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/nagios.access.log Combined
+
+
+    ScriptAlias /cgi-bin "/usr/lib64/nagios/cgi-bin"
+    ScriptAlias /nagios/cgi-bin "/usr/lib64/nagios/cgi-bin"
+
+
+    <Directory "/usr/lib64/nagios/cgi-bin">
+        Options ExecCGI
+        AllowOverride None
+        Order allow,deny
+        Allow from all
+        Deny from none
+    </Directory>
+
+    Alias /       "/usr/share/nagios/html/"
+
+    <Directory "/usr/share/nagios/html">
+        Options None
+        AllowOverride None
+        Order allow,deny
+        Allow from all
+        Deny from none
+    </Directory>
+
+</VirtualHost>
+

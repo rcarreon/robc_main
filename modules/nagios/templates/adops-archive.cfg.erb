@@ -1,0 +1,143 @@
+# Define checks for Adops Archive environment, to be decomissioned end of 2015
+<%
+
+appservers = {
+"app1v-archive.ap.prd.lax.gnmedia.net"=>"10.64.81.249",
+}
+
+sqlservers = {
+"sql1v-archive.ap.prd.lax.gnmedia.net"=>"10.64.81.250",
+"sql2v-archive.ap.prd.lax.gnmedia.net"=>"10.64.81.251",
+}
+
+archiveservers = appservers.merge(sqlservers).dup
+
+%>
+
+# Define Host checks
+<% archiveservers.each_key  do |archiveserver|
+%>
+
+define host {
+        hostgroups                     AdPlatform
+        notification_interval          60
+        use                            generic-host
+        alias                          <%= archiveserver %>
+        host_name                      <%= archiveserver %>
+        address                        <%= archiveservers[archiveserver] %>
+        notes_url                      http://gweb.gnmedia.net/?h=<%= archiveserver %>
+}
+
+<% end %>
+
+
+# Define Service checks
+<% appservers.each_key  do |appserver|
+%>
+
+# Service checks for <%= appserver %>
+define service {
+        notification_options           w,u,c,r,f,s
+        action_url                     http://gweb.gnmedia.net/?h=<%= appserver %>$&r=hour&metric_group=NOGROUPS&z=small
+        host_name                      <%= appserver %>
+        max_check_attempts             3
+        service_description            httpd
+        normal_check_interval          3
+        check_command                  check_url!<%= appservers[appserver] %>!/!up
+        notifications_enabled          1
+        notes_url                      http://docs.gnmedia.net/wiki/Nagios-check_url
+        use                            generic-service
+        retry_check_interval           2
+}
+
+define service {
+        notification_options           w,u,c,r,f,s
+        action_url                     http://gweb.gnmedia.net/?h=<%= appserver %>$&r=hour&metric_group=NOGROUPS&z=small
+        host_name                      <%= appserver %>
+        max_check_attempts             3
+        service_description            archive.adops.gorillanation.com
+        normal_check_interval          3
+        notes_url                      http://docs.gnmedia.net/wiki/Nagios-check_url
+        check_command                  check_url!archive.adops.gorillanation.com!/sessions/login!forget your password
+        notifications_enabled          1
+        use                            generic-service
+        retry_check_interval           2
+}
+
+define service {
+        notification_options           w,u,c,r,f,s
+        action_url                     http://gweb.gnmedia.net/?h=<%= appserver %>$&r=hour&metric_group=NOGROUPS&z=small
+        host_name                      <%= appserver %>
+        max_check_attempts             3
+        service_description            archive.pubops.evolvemediacorp.com
+        normal_check_interval          3
+        notes_url                      http://docs.gnmedia.net/wiki/Nagios-check_url
+        check_command                  check_url!archive.pubops.evolvemediacorp.com!/robots.txt!User-agent
+        notifications_enabled          1
+        use                            generic-service
+        retry_check_interval           2
+}
+
+<% end %>
+
+
+
+<% sqlservers.each_key  do |sqlserver|
+%>
+
+# Service checks for <%= sqlserver %>
+define service {
+        notification_options           w,u,c,r,f,s
+        host_name                      <%= sqlserver %>
+        max_check_attempts             3
+        service_description            check_emagent
+        normal_check_interval          7
+        notes_url                      http://docs.gnmedia.net/wiki/Nagios-check_emagent
+        check_command                  check_nrpe!check_emagent
+        notifications_enabled          1
+        use                            mysql-services
+        retry_check_interval           2
+}
+
+define service {
+        notification_options           w,u,c,r,f,s
+        host_name                      <%= sqlserver %>
+        max_check_attempts             3
+        service_description            mysql
+        normal_check_interval          7
+        check_command                  check_mysql!read!me
+        notifications_enabled          1
+        notes_url                      http://docs.gnmedia.net/wiki/Nagios-mysql
+        use                            mysql-services
+        retry_check_interval           2
+}
+
+define service {
+        notification_options           w,u,c,s
+        host_name                      <%= sqlserver %>
+        max_check_attempts             1
+        service_description            mysqlerrorlog
+        normal_check_interval          7
+        notes_url                      http://docs.gnmedia.net/wiki/Nagios-mysqlerror
+        check_command                  check_nrpe!check_mysqlerror
+        notifications_enabled          1
+        use                            mysql-services
+        retry_check_interval           2
+}
+
+define service {
+        notification_options           w,u,c,r,f,s
+        host_name                      <%= sqlserver %>
+        max_check_attempts             3
+        service_description            mysqlstartupconf
+        normal_check_interval          7
+        notes_url                      http://docs.gnmedia.net/wiki/Nagios-mysqlstartupconf
+        check_command                  check_nrpe!check_mysqlstartupconf
+        notifications_enabled          1
+        use                            mysql-services
+        retry_check_interval           2
+}
+
+<% end %>
+
+

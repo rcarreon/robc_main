@@ -1,0 +1,8 @@
+mode=unattended
+installdir=/opt/mysql/enterprise/monitor
+tomcatport=80
+tomcatshutdownport=8005
+mysql_installation_type=existing
+dbport=3306
+adminuser=<%= em_database_username %>
+adminpassword=<%= em_database_password %>

@@ -1,0 +1,60 @@
+# $Id$
+
+
+    ServerAlias nbablog.hoopsvibe.com
+
+    # Non WWW Rewrite 
+    RewriteEngine On
+    RewriteCond %{HTTP_HOST} ^hoopsvibe\.com$ [NC]
+    RewriteRule ^/(.*) http://www.hoopsvibe.com/$1 [R=301,L]
+
+    RewriteCond %{HTTP_HOST} ^nbablog\.hoopsvibe\.com$ [NC]
+    RewriteRule ^/(.*) http://www.hoopsvibe.com/nba-blog/$1 [R=301,L]
+
+
+    RewriteRule ^/nba/nba-teams/.* / [R=301,L]
+    RewriteRule ^/nba/nba-players/.* / [R=301,L]
+    RewriteRule ^/nba/nba-draft/.* / [R=301,L]
+    RewriteRule ^/hoops-tours-events/.* / [R=301,L]
+    RewriteRule ^/movies-dvd-s/.* / [R=301,L]
+    RewriteRule ^/basketball-fun/.* / [R=301,L]
+    RewriteRule ^/nba/nba-wallpapers-ar18309/.* / [R=301,L]
+    RewriteRule ^/nba/nba-media-links-ar35068.html$ / [R=301,L]
+    RewriteRule ^/nba/nba-rookie-watch-ar33418.html$ / [R=301,L]
+
+    #hv/site/articles-->  hv/site
+    RewriteRule ^/site/articles$ /site$1 [R=301,L]
+
+    #hv/basketball-training/articles-->  hv/basketball-training
+    RewriteRule ^/basketball-training/articles$ /basketball-training$1 [R=301,L]
+
+    #hv/gossip/articles-->  hv/gossip
+    RewriteRule ^/gossip/articles$ /gossip$1 [R=301,L]
+
+    #hv/features/articles-->  hv/features
+    RewriteRule ^/features/articles$ /features$1 [R=301,L]
+
+    #hv/nba-news-and-rumors/articles-->  hv/nba-news-and-rumors
+    RewriteRule ^/nba-news-and-rumors/articles$ /nba-news-and-rumors$1 [R=301,L]
+
+    #hv/gallery/atricles/basketball-shoes-->  hv/gallery/basketball-shoes
+    RewriteRule ^/gallery/articles/basketball-shoes$ /gallery/basketball-shoes$1 [R=301,L]
+
+    RewriteRule ^/books/.*  /gossip/articles/79750-in-the-paint-tattoos-of-the-nba-and-the-stories-behind-them [R=301,L]
+
+    RewriteRule ^/web_reviews/.* / [R=301,L]
+    RewriteRule ^/apparel-accessories/.* / [R=301,L]
+
+    RewriteRule ^/(.*)(-pa[0-9]+).html(.*) /$1.html$3 [R=301]
+
+    RewriteCond %{QUERY_STRING} ^debut_for=(.*)
+    RewriteRule ^/(.*) /$1? [R=301]
+
+    RewriteCond %{QUERY_STRING} ^debut_page=(.*)
+    RewriteRule ^/(.*) /$1? [R=301]
+
+    RewriteRule ^/(.*)/image([0-9]+)(-[1-9]+).html(.*) /$1/image$2-0.html$4 [R=301,L]
+
+    RewriteRule ^/photos(.*) /gallery$1 [R=301]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

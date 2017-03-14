@@ -1,0 +1,10 @@
+#check uri by regex
+define service {
+        host_name                      <%= dom %>
+        service_description            <%= name %>
+        check_command                  check_url_xml!<%= dom %>!<%= full_url %>!<%= num_retries %>!<%= extra_opts %>
+        notification_options           w,u,c,r,f,s
+        use                            generic-service
+        notes_url                      http://docs.gnmedia.net/wiki/Nagios-check_url
+}
+

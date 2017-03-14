@@ -1,0 +1,40 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@iconator.com
+    DocumentRoot /var/www/html/www.iconator.com/web
+    # DocumentRoot /var/www/html/www.iconator.com.maint
+
+    ServerName iconator.com
+    ServerAlias www.iconator.com
+
+    <%=logging ? '' : '#'%>ErrorLog logs/www.iconator.com-error_log
+    <%=logging ? '' : '#'%>CustomLog logs/www.iconator.com-access_log combined
+
+    <Directory "/var/www/html/www.iconator.com/web">
+        Options Indexes FollowSymLinks
+        AllowOverride All 
+        Order allow,deny
+        Allow from all
+    </Directory>
+
+
+    RewriteEngine On
+      Options +FollowSymlinks
+      RewriteCond %{HTTP_HOST}	^iconator\.com [NC]
+      RewriteRule ^/(.*)		http://www.iconator.com/$1 [L,R]
+
+    <Location /contest>
+      RewriteBase /contest/
+      RewriteCond %{REQUEST_URI}    ^(.*)contest/(.*)$
+      RewriteRule ^(.+)(.html|.htm|.php)    ../$1
+      RewriteRule ^contest/([^/]+)/([^/]+)/send_creations/?$   ./contest_send_creations.php?partner=$1&contest=$2 [L]
+      RewriteRule ^contest/([^/]+)/([^/]+)/send_page/?$   ./contest_send_page.php?partner=$1&contest=$2 [L]
+      RewriteRule ^contest/([^/]+)/([^/]+)/([^/]+)/?$  ./contest_page.php?partner=$1&contest=$2&page=$3 [L]
+      RewriteRule ^contest/([^/]+)/([^/]+)/?$  ./contest_page.php?partner=$1&contest=$2 [L]
+      RewriteRule ^contest/([^/]+)/?$    ../contest_page.php?partner=$1 [L]
+      RewriteRule ^contest/?$    ../index.php
+    </Location>
+</VirtualHost>
+
+
+
+

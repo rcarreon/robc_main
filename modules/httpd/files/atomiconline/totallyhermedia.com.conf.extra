@@ -1,0 +1,22 @@
+    RewriteEngine On
+    # totallyhermedia.com --> www.totallyhermedia.com
+    RewriteCond %{HTTP_HOST} ^totallyhermedia\.com$ [NC]
+    RewriteRule ^/(.*) http://www.totallyhermedia.com/$1 [R=301,L]
+
+    ServerAlias *.totallyhermedia.com.au
+    ServerAlias *.totallyhermedia.co.uk
+    ServerAlias *.totallyhermedia.ca
+
+    # *.totallyhermedia.com.au --> www.totallyhermedia.com
+    RewriteCond %{HTTP_HOST} ^(.*\.)?totallyhermedia\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.totallyhermedia.com/$1 [R=301,L]
+
+    # *.totallyhermedia.co.uk --> www.totallyhermedia.com
+    RewriteCond %{HTTP_HOST} ^(.*\.)?totallyhermedia\.co\.uk$ [NC]
+    RewriteRule ^/(.*) http://www.totallyhermedia.com/$1 [R=301,L]
+
+    # *.totallyhermedia.ca --> www.totallyhermedia.com
+    RewriteCond %{HTTP_HOST} ^(.*\.)?totallyhermedia\.ca$ [NC]
+    RewriteRule ^/(.*) http://www.totallyhermedia.com/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

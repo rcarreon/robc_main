@@ -1,0 +1,111 @@
+## tFS Sphinx Configuration File
+#
+source src {
+        type            = mysql
+	    sql_host        = vip-sqlro-vb-tfs.ao.stg.lax.gnmedia.net
+        sql_user        = sphinx
+        sql_pass        = U1UAE3RAqJ
+        sql_db          = tfs_forums
+        sql_range_step  = 5000
+        sql_query_pre   = SET SESSION query_cache_type=OFF
+}
+
+source postsrc : src {
+        sql_query_pre                   = REPLACE INTO sphinx_counter SELECT 1, MAX(postid) FROM forums_post
+        sql_query_range                 = SELECT MIN(postid), MAX(postid) FROM forums_post
+        sql_query = \
+                SELECT postid, forumid, forums_post.threadid as threadid, IF(forums_post.userid=0,99999999,forums_post.userid) AS userid, \
+                        IF(postuserid=0,99999999,postuserid) AS postuserid, forums_post.title, pagetext, forums_post.dateline \
+                FROM forums_post \
+                INNER JOIN forums_thread AS thread ON(thread.threadid = forums_post.threadid) \
+                WHERE forums_post.visible in (1,2) AND postid >= $start AND postid <= $end \
+                        AND postid <= ( SELECT max_doc_id FROM sphinx_counter WHERE counter_id = 1 );
+        sql_attr_uint = forumid
+        sql_attr_uint = threadid
+        sql_attr_uint = userid
+        sql_attr_uint = postuserid
+        sql_attr_uint = dateline
+        sql_query_post =
+
+}
+
+source postdeltasrc : postsrc {
+        sql_query_pre =
+        sql_query_range = SELECT ( SELECT max_doc_id FROM sphinx_counter WHERE counter_id = 1 ), MAX(postid) FROM forums_post
+        sql_query = \
+                SELECT postid, forumid, forums_post.threadid as threadid, \
+                        IF(forums_post.userid=0,99999999,forums_post.userid) AS userid, \
+                        IF(postuserid=0,99999999,postuserid) AS postuserid, forums_post.title, pagetext, forums_post.dateline \
+                FROM forums_post \
+                INNER JOIN forums_thread AS thread ON(thread.threadid = forums_post.threadid) \
+                WHERE forums_post.visible in (1,2) AND postid >= $start AND postid <= $end \
+                        AND postid > ( SELECT max_doc_id FROM sphinx_counter WHERE counter_id = 1 );
+}
+
+source threadsrc : src {
+        sql_query_pre   = REPLACE INTO sphinx_counter SELECT 2, MAX(threadid) FROM forums_thread;
+        sql_query_range = SELECT MIN(threadid), MAX(threadid) FROM forums_thread
+        sql_query = \
+                SELECT threadid, forumid, title, dateline, replycount, \
+                        IF(postuserid=0,99999999,postuserid) AS postuserid, \
+                        IF(firstpostid=0,99999999,firstpostid) as firstpostid, lastpost \
+                FROM forums_thread \
+                WHERE visible in (1,2) AND threadid >= $start AND threadid <= $end \
+                        AND threadid <= ( SELECT max_doc_id FROM sphinx_counter WHERE counter_id = 2 );
+        sql_attr_uint = forumid
+        sql_attr_uint = postuserid
+        sql_attr_uint = firstpostid
+        sql_attr_uint = lastpost
+        sql_attr_uint = dateline
+        sql_attr_uint = replycount
+}
+
+source threaddeltasrc : threadsrc {
+        sql_query_pre =
+        sql_query_range = SELECT ( SELECT max_doc_id FROM sphinx_counter WHERE counter_id = 2 ), MAX(threadid) FROM forums_thread
+        sql_query = \
+                SELECT threadid, forumid, title, dateline, replycount, \
+                        IF(postuserid=0,99999999,postuserid) AS postuserid, \
+                        IF(firstpostid=0,99999999,firstpostid) as firstpostid, lastpost \
+                FROM forums_thread \
+                WHERE visible in (1,2) AND threadid >= $start AND threadid <= $end \
+                        AND threadid > ( SELECT max_doc_id FROM sphinx_counter WHERE counter_id = 2 );
+}
+
+
+index post {
+        morphology              = none
+        min_word_len    	    = 3
+        charset_type    	    = sbcs
+        source                  = postsrc
+        path                    = /app/sphinx/post
+}
+
+index postdelta : post {
+        source                  = postdeltasrc
+        path                    = /app/sphinx/postdelta
+}
+
+index thread : post {
+        source                  = threadsrc
+        path                    = /app/sphinx/thread
+}
+
+index threaddelta : post {
+        source                  = threaddeltasrc
+	    path                    = /app/sphinx/threaddelta
+}
+
+indexer {
+        mem_limit               = 128M
+}
+
+searchd {
+        port                    = 3312
+        log                     = /app/log/sphinx/searchd.log
+        query_log               = /app/log/sphinx/squery.log
+        read_timeout            = 5
+        max_matches             = 10000
+        max_children            = 30
+        pid_file                = /var/sphinx/searchd.pid
+}

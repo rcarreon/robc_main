@@ -1,0 +1,13 @@
+# /etc/sysconfig/puppet managed by puppet
+# The puppetmaster server
+PUPPET_SERVER=puppet.gnmedia.net
+
+# If you wish to specify the port to connect to do so here
+#PUPPET_PORT=8140
+
+# Where to log to. Specify syslog to send log messages to the system log.
+PUPPET_LOG=/var/log/puppet/puppet.log
+
+# You may specify other parameters to the puppet client here
+# adds --environment if the at_status variable is defined
+<%= "PUPPET_EXTRA_OPTS=\"--pluginsync --environment=#{fqdn_env_full} --waitforcert 10\"" if has_variable?("fqdn_env_full") %>

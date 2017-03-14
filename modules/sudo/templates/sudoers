@@ -1,0 +1,297 @@
+# Sudoers allows particular users to run various commands as
+## the root user, without needing the root password.
+##
+## Examples are provided at the bottom of the file for collections
+## of related commands, which can then be delegated out to particular
+## users or groups.
+##
+## This file must be edited with the 'visudo' command.
+
+## Host Aliases
+## Groups of machines. You may prefer to use hostnames (perhap using
+## wildcards for entire domains) or IP addresses instead.
+# Host_Alias     FILESERVERS = fs1, fs2
+# Host_Alias     MAILSERVERS = smtp, smtp2
+
+## User Aliases
+## These aren't often necessary, as you can use regular groups
+## (ie, from files, LDAP, NIS, etc) in this file - just use %groupname
+## rather than USERALIAS
+# User_Alias ADMINS = jsmith, mikem
+
+
+## Command Aliases
+## These are groups of related commands...
+
+## Networking
+Cmnd_Alias NETWORKING = /sbin/route, /sbin/ifconfig, /bin/ping, /sbin/dhclient, /usr/bin/net, /sbin/iptables, /usr/bin/rfcomm, /usr/bin/wvdial, /sbin/iwconfig, /sbin/mii-tool
+
+## Installation and management of software
+Cmnd_Alias SOFTWARE = /bin/rpm, /usr/bin/up2date, /usr/bin/yum
+
+## Services
+Cmnd_Alias SERVICES = /sbin/service, /sbin/chkconfig
+
+## Updating the locate database
+Cmnd_Alias LOCATE = /usr/sbin/updatedb
+
+## Storage
+Cmnd_Alias STORAGE = /sbin/fdisk, /sbin/sfdisk, /sbin/parted, /sbin/partprobe, /bin/mount, /bin/umount
+
+## Delegating permissions
+Cmnd_Alias DELEGATING = /usr/sbin/visudo, /bin/chown, /bin/chmod, /bin/chgrp
+
+## Processes
+Cmnd_Alias PROCESSES = /bin/nice, /bin/kill, /usr/bin/kill, /usr/bin/killall
+
+## Drivers
+Cmnd_Alias DRIVERS = /sbin/modprobe
+
+# Defaults specification
+
+#
+# Disable "ssh hostname sudo <cmd>", because it will show the password in clear.
+#         You have to run "ssh -t hostname sudo <cmd>".
+#
+#Defaults    requiretty
+
+Defaults    env_reset
+Defaults    env_keep = "COLORS DISPLAY HOSTNAME HISTSIZE INPUTRC KDEDIR \
+                        LS_COLORS MAIL PS1 PS2 QTDIR USERNAME \
+                        LANG LC_ADDRESS LC_CTYPE LC_COLLATE LC_IDENTIFICATION \
+                        LC_MEASUREMENT LC_MESSAGES LC_MONETARY LC_NAME LC_NUMERIC \
+                        LC_PAPER LC_TELEPHONE LC_TIME LC_ALL LANGUAGE LINGUAS \
+                        _XKB_CHARSET XAUTHORITY"
+<% if @fqdn =~ /app[0-9]*v-ci\.tp\.prd\.lax\.gnmedia\.net/ %>Defaults:deploy  env_keep += FACTER_*<% end %>
+
+## Next comes the main part: which users can run what software on
+## which machines (the sudoers file can be shared between multiple
+## systems).
+## Syntax:
+##
+##      user    MACHINE=COMMANDS
+##
+## The COMMANDS section may have other options added to it.
+##
+## Allow root to run any commands anywhere
+root    ALL=(ALL)       ALL
+padmin  ALL=(ALL)       ALL
+
+## Allows members of the 'sys' group to run networking, software,
+## service management apps and more.
+# %sys ALL = NETWORKING, SOFTWARE, SERVICES, STORAGE, DELEGATING, PROCESSES, LOCATE, DRIVERS
+
+## Allows people in group wheel to run all commands
+# %wheel        ALL=(ALL)       ALL
+
+## Same thing without a password
+# %wheel        ALL=(ALL)       NOPASSWD: ALL
+
+## Allows members of the users group to mount and unmount the
+## cdrom as root
+# %users  ALL=/sbin/mount /mnt/cdrom, /sbin/umount /mnt/cdrom
+
+## Allows members of the users group to shutdown this system
+# %users  localhost=/sbin/shutdown -h now
+
+
+# Specific rules for deploy user to run commands as apache or root
+Cmnd_Alias DEPLOY_CMD_AS_APACHE = /usr/bin/rsync, /bin/chmod, /bin/cp, /bin/mv, /bin/rm, /bin/chmod, /bin/touch, /bin/mkdir
+Cmnd_Alias DEPLOY_CMD_AS_ROOT   = /sbin/service httpd graceful, /sbin/service httpd restart, /etc/init.d/memcached , /etc/init.d/httpd, /bin/chmod, /bin/chown, /usr/bin/puppet, /etc/init.d/crond, /usr/bin/cap, /usr/local/bin/deploy_sherdog, /etc/init.d/php-fpm, /etc/init.d/httpd, /etc/init.d/nginx, /etc/init.d/nodejs-*, /usr/local/bin/gitdeploypuppet
+Cmnd_Alias DEPLOY_CMD_AS_ROOT_SQLCOPY   = /usr/local/bin/sqlcopy, /usr/local/bin/sqlmulticopy
+deploy app1v-nsync.tp.prd.lax.gnmedia.net   = (root) NOPASSWD: DEPLOY_CMD_AS_ROOT_SQLCOPY
+deploy,em-deploy,adops-deploy ALL = (root) NOPASSWD: DEPLOY_CMD_AS_ROOT , (apache) NOPASSWD: DEPLOY_CMD_AS_APACHE
+
+# crowdignite nightly db sync stuff
+Cmnd_Alias CI_DEV_DB_UPDATE     = /usr/local/bin/crowdignite_db/dbup.sh
+deploy sql1v-ci.ci.dev.lax.gnmedia.net,sql1v-ci.ci.stg.lax.gnmedia.net  = (root) NOPASSWD: CI_DEV_DB_UPDATE
+
+# Specific rules for developers to deploy code as deploy on deploy.gnmedia.net only
+Cmnd_Alias DEV_DEPLOY  = /usr/local/bin/sync_pebblebedDB.sh, /usr/local/bin/deploy_WZForums.sh, /usr/local/bin/deploy_joomla_script, /usr/local/bin/deploy_sherdog, /usr/local/bin/deploy_admin.sherdog, /usr/local/bin/deploy_m.sherdog, /usr/local/bin/cherrypicker.sh
+Cmnd_Alias SI_DEPLOY  = /usr/local/bin/deploy_si_*, /usr/local/bin/deploy-microsite.sh, /usr/local/bin/new-microsite.sh, /usr/local/bin/deploy-campaign.sh, /usr/local/bin/LEGACY-new-microsite.sh, /usr/local/bin/LEGACY-deploy-microsite.sh, /usr/local/bin/LEGACY-deploy-campaign.sh, /usr/local/bin/cherrypicker.sh, /usr/local/bin/flow_migrate
+Cmnd_Alias MAL_DEPLOY = /usr/local/bin/cherrypicker.sh
+Cmnd_Alias SYNC_DB  =  /usr/local/bin/sync_pebblebedDB.sh
+Cmnd_Alias ADOPS_DEPLOY = /usr/local/bin/cherrypicker.sh
+# AtomicSitesHermosillo
+Cmnd_Alias ASH_CMDS = /usr/local/bin/deploy_sherdog, /usr/local/bin/deploy_admin.sherdog, /usr/local/bin/cherrypicker.sh
+Cmnd_Alias CI_CMDS = /usr/local/bin/deploy_ci.sh, /usr/local/bin/cherrypicker.sh, /usr/local/bin/deploy_test_copters.sh
+Cmnd_Alias SBV_CMDS = /usr/local/bin/deploy.py, /usr/local/bin/deploy_sbv_*.sh *
+
+
+%developers       app2v-deploy.tp.prd.lax.gnmedia.net = NOPASSWD: DEV_DEPLOY
+%salesintegration app2v-deploy.tp.prd.lax.gnmedia.net = NOPASSWD: SI_DEPLOY
+%salesintegration app1v-build.si.dev.lax.gnmedia.net = NOPASSWD: SI_DEPLOY
+%dba              app2v-deploy.tp.prd.lax.gnmedia.net = NOPASSWD: SYNC_DB
+%adplatform       app2v-deploy.tp.prd.lax.gnmedia.net = NOPASSWD: ADOPS_DEPLOY
+%hmosvn           app2v-deploy.tp.prd.lax.gnmedia.net = NOPASSWD: ASH_CMDS
+%tewn             app2v-deploy.tp.prd.lax.gnmedia.net = NOPASSWD: CI_CMDS
+%springboardsvn   app2v-deploy.tp.prd.lax.gnmedia.net = NOPASSWD: SBV_CMDS
+%springboardsvn   app1v-deploy.sbv.prd.lax.gnmedia.net = NOPASSWD: SBV_CMDS
+
+Cmnd_Alias DELEGATED_SYSADM_CMDS = /usr/bin/rnetapp, /usr/local/bin/aceman, /usr/local/bin/sqlcopy, /usr/local/bin/sqlmulticopy, /usr/local/bin/emblackout
+Cmnd_Alias DELEGATED_DEPLOY_CMDS = /home/deploy/AT-RT/extnagiospush.sh
+%dba ALL=(ALL) NOPASSWD: DELEGATED_SYSADM_CMDS
+
+
+<% if fqdn[0,3] == "dev" or fqdn =~ /\.ap\.dev\./ or fqdn =~ /\.sbv\.dev\./ %>
+Cmnd_Alias DEVELOPERS = /bin/cp, /bin/mv, /bin/rm, /bin/chown, /bin/chmod, /sbin/service
+%developers     ALL = DEVELOPERS
+%adplatform     ALL=(ALL)       ALL
+<% end %>
+
+<% if fqdn =~/^uid[0-9]+.-([^.]+)[.].*/
+username=$1 %>
+# General UID rule
+<%= username %>  ALL=(ALL) ALL
+<% end %>
+
+# DEV's have sudo rights on DEV Search
+%developers     +m_dev_lax3_search = /bin/vi
+
+
+Cmnd_Alias NOC_CMD_AS_ROOT   = /usr/bin/less, /usr/sbin/puppetd, /etc/init.d/puppet, /usr/bin/puppet agent *, /home/deploy/clear_puppet_lock.sh, /home/deploy/clean_puppet_ssl.sh, /usr/local/bin/malblock, /usr/local/bin/gitdeploypuppet, /usr/bin/tail, /opt/xcat/bin/nodels, /sbin/service
+
+
+# Sysadmins have sudo rights everywhere
+%sysadmins  ALL=(ALL)  NOPASSWD: ALL
+%noc-leads  ALL=(ALL)  NOPASSWD: ALL
+%noc        ALL=(ALL)  NOPASSWD: ALL
+# Peakers group will have full access as requested by Zmer
+%peakers    ALL=(ALL)  NOPASSWD: ALL
+
+# DBAs have mysql rights everywhere
+Cmnd_Alias DBA_CMD_AS_ROOT = /etc/init.d/mysql, /etc/init.d/mysqld, /etc/init.d/mysql-monitor-agent, /usr/bin/monit monitor mysql*, /sbin/service monit restart, /usr/bin/monit unmonitor mysql*, /usr/bin/monit summary, /usr/bin/monit status, /bin/kill, /usr/sbin/puppetd, /usr/bin/puppet agent *, /usr/local/bin/deploy_storedprocs, /sbin/service mysql*, /usr/local/bin/cherrypicker.sh, /usr/local/bin/git-cherrypicker.sh, /usr/pgsql-9.3/bin/postgres, /etc/init.d/postgresql-9.3, /sbin/service postgresql*, /usr/local/bin/mysqld56-postboot, /sbin/service newrelic*, /usr/sbin/lsof
+
+
+%dba  ALL=(mysql)     NOPASSWD: ALL, (root) DBA_CMD_AS_ROOT
+%dba  ALL=(postgres)  NOPASSWD: ALL
+# DBAs have sudo rights on em1v and their uid servers
+%dba    +m_prod_emserv = (ALL) ALL
+%dba    app1v-em.tp.stg.lax.gnmedia.net = (ALL) ALL
+%dba    app1v-em.tp.prd.lax.gnmedia.net = (ALL) ALL
+%dba    app1v-dbops.tp.prd.lax.gnmedia.net = (ALL) ALL
+%dba    app1v-vaquita.tp.prd.lax.gnmedia.net = (ALL) ALL
+%dba    app1v-vaquita.tp.dev.lax.gnmedia.net = (ALL) ALL
+%dba    app1v-test.tp.dev.lax.gnmedia.net = (ALL) ALL
+%dba    app1v-cap.tp.prd.lax.gnmedia.net = /usr/bin/cap
+%dba    app2v-cap.tp.prd.lax.gnmedia.net = /usr/bin/cap
+#STG
+%dba    sql1v-56-dh.si.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba    sql2v-56-dh.si.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba    sql1v-56-ews.si.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba    sql2v-56-ews.si.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql1v-56-backup.ap.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql1v-origin.og.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql2v-origin.og.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql1v-56-adops.ap.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql2v-56-adops.ap.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql1v-56-tags.ap.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql2v-56-tags.ap.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql1v-56-audit.ci.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql1v-56-ci.ci.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql1v-56-dw.ci.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql2v-56-audit.ci.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql2v-56-ci.ci.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql2v-56-dw.ci.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql1v-56-cms.sbv.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql1v-56-stats-cms.sbv.stg.lax.gnmedia.net = (ALL)  ALL
+%dba	sql1v-56-yourls.sbv.stg.lax.gnmedia.net = (ALL)  ALL
+%dba	sql2v-56-cms.sbv.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql2v-56-stats-cms.sbv.stg.lax.gnmedia.net = (ALL)  ALL
+%dba	sql2v-56-yourls.sbv.stg.lax.gnmedia.net = (ALL)  ALL
+%dba	sql3v-56-cms.sbv.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql3v-56-stats-cms.sbv.stg.lax.gnmedia.net = (ALL)  ALL
+%dba	sql4v-56-cms.sbv.stg.lax.gnmedia.net 	= (ALL)  ALL
+%dba	sql4v-56-stats-cms.sbv.stg.lax.gnmedia.net = (ALL)  ALL
+%dba	sql5v-56-stats-cms.sbv.stg.lax.gnmedia.net = (ALL)  ALL
+%dba	sql6v-56-stats-cms.sbv.stg.lax.gnmedia.net = (ALL)  ALL
+
+# Developer access
+%developers app1v-cap.tp.prd.lax.gnmedia.net = NOPASSWD: /usr/bin/cap
+%developers app2v-cap.tp.prd.lax.gnmedia.net = NOPASSWD: /usr/bin/cap
+bvladisavljev app1v-dh.si.dev.lax.gnmedia.net = /sbin/service
+
+# sudo access to pebblebed beta server
+%pebblebedsvn uid1v-pbwpbeta.ao.dev.lax.gnmedia.net = (ALL) ALL
+
+# dev access for crowdignite app and eng servers
+%tewn app1v-ci.ci.dev.lax.gnmedia.net = (apache) ALL
+%tewn eng1v-ci.ci.dev.lax.gnmedia.net = (apache) ALL
+%tewn eng1v-ci.ci.stg.lax.gnmedia.net = (apache) ALL
+%tewn eng2v-ci.ci.stg.lax.gnmedia.net = (apache) ALL
+%tewn app1v-vw.ci.dev.lax.gnmedia.net = (apache) ALL
+%tewn app1v-vw.ci.stg.lax.gnmedia.net = (apache) ALL
+%tewn app2v-vw.ci.stg.lax.gnmedia.net = (apache) ALL
+
+# Push out DNS as user deploy
+<% if fqdn[6,3] == "dns" %> # this comment intentionally left blank
+Cmnd_Alias DNS_DEPLOY = /etc/init.d/named, /usr/sbin/named-checkzone, /usr/sbin/named-checkconf
+deploy  ALL = NOPASSWD: DNS_DEPLOY
+em-deploy	ALL = NOPASSWD: DNS_DEPLOY
+<% end %> # this comment intentionally left blank
+
+# Let nrpe read mysql error log
+<% if (architecture == "x86_64")
+                libdir="/usr/lib64"
+        else
+                libdir="/usr/lib"
+        end
+%>
+nrpe ALL = NOPASSWD: <%= libdir %>/nagios/plugins/check_logfiles
+nrpe ALL = NOPASSWD: <%= libdir %>/nagios/plugins/check_localfs
+nrpe ALL = NOPASSWD: /sbin/service nagios checkconfig
+nrpe ALL = NOPASSWD: <%= libdir %>/nagios/plugins/check_mailq
+nrpe ALL = NOPASSWD: <%= libdir %>/nagios/plugins/check_rcons
+
+
+#MISC
+
+<% if @fqdn == "app1v-noc.tp.prd.lax.gnmedia.net" %>
+# These couple of commands are used by the Netapp Storage report web app.
+
+apache ALL = NOPASSWD: /usr/bin/rnetapp * volume list -q -s
+apache ALL = NOPASSWD: /usr/bin/rnetapp * aggr list
+<% end %>
+
+<% if @fqdn =~ /^app\d+v-(go|build).ap\.(dev|stg|prd)\.lax\.gnmedia\.net/ %>
+# This is for the user go to have full power on the go build boxes
+go ALL=(ALL)	NOPASSWD: ALL
+<% end %>
+
+<% if @fqdn == "app1v-yum.tp.prd.lax.gnmedia.net" %>
+# This is for the user go to have full power on the yum box
+go ALL=(ALL)	NOPASSWD: ALL
+<% end %>
+
+<% if @fqdn =~ /^app\d+v-(cron|adops).ap\.\w{3}\.lax\.gnmedia\.net/ %>
+# This is for EM deploy to be able to run any ansible task without password on AP boxes
+em-deploy ALL=(ALL) NOPASSWD: ALL
+# Adops developers need to run processing jobs when necessary - 20160303 sdejean
+%adplatform ALL=(root) /usr/bin/crontab -u adops-worker -l, /usr/bin/crontab -u apache -l, /usr/bin/crontab -u nobody -l
+%adplatform ALL=(adops-worker) /opt/adops/*/bin/*
+%adplatform ALL=(apache) /app/software/ruby/rbenv/shims/bundle,/usr/bin/flock,/usr/bin/make
+%adplatform ALL=(nobody) /app/software/ruby/rbenv/shims/bundle,/usr/bin/flock,/usr/local/bin/adops_rake.sh
+<% end %>
+
+<% if @fqdn =~ /^app\d+v-mstr\.tp\.(dev|stg|prd)\.lax\.gnmedia\.net/ %>
+# this is for giving MSTR project consultants sudo rights to the MSTR app boxes
+thuffman ALL=(ALL) ALL
+rjannavarapu ALL=(ALL) ALL
+ahajee ALL=(ALL) ALL
+<% end %>
+
+<% if @fqdn == "app1v-bi-reports.ap.dev.lax.gnmedia.net" %>
+nacuff ALL=(ALL)    NOPASSWD: ALL
+msantiago  ALL=(ALL)    NOPASSWD: ALL
+<% end %>
+
+<% if @fqdn =~ /^.+\.ap\.(dev|stg|prd)\.lax\.gnmedia\.net$/ %>
+%adplatform ALL=(ALL)    NOPASSWD: ALL
+<% end %>
+
+<% if @fqdn == "ngx1v-zergnet.ci.prd.lax.gnmedia.net" %>
+uacosta ALL=(ALL) NOPASSWD: ALL
+<% end %>
+
+# include all of /etc/sudoers.d
+#includedir /etc/sudoers.d

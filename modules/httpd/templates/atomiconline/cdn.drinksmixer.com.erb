@@ -1,0 +1,19 @@
+# $Id$
+
+<VirtualHost *:80>
+    ServerName cdn.drinksmixer.com 
+    ServerAlias origin.drinksmixer.com stg.media.drinksmixer.com
+    DocumentRoot /app/shared/docroots/drinksmixer.com/htdocs
+
+    Alias /media /app/shared/data/drinksmixer.com/htdocs/media
+    <Directory /app/shared/data/drinksmixer.com/htdocs/media>
+        AllowOverride None
+        Order allow,deny
+        Allow from all
+    </Directory>
+
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/cdn.drinksmixer.com-error.log
+    <%=logging ? '' : '#'%>CustomLog /app/log/cdn.drinksmixer.com-access.log combined
+</VirtualHost>
+

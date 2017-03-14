@@ -1,0 +1,15 @@
+    RewriteEngine On
+
+    RewriteCond %{HTTP_HOST} ^superherohype\.com$ [NC]
+    RewriteRule ^/(.*) http://www.superherohype.com/$1 [R=301,L]
+    RewriteRule ^/news/(.+)news.php$ /news/news.php [R=301,QSA]
+    RewriteRule ^/(?!administrator)(.+)/index.php$ /news/news.php [R=301,QSA]
+    RewriteRule ^/(?!news)(.+)/news.php$ /news/news.php [R=301,QSA]
+    RewriteRule ^/forums/(.*)$ http://forums.superherohype.com/$1 [R=301,QSA]
+    RewriteCond %{REQUEST_URI} !(administrator|gnads)
+
+    # m.superherohype.com -> www.superherohype.com
+    RewriteCond %{HTTP_HOST} ^m\.superherohype\.com$ [NC]
+    RewriteRule ^/(.*) http://www.superherohype.com/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

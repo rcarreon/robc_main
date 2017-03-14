@@ -1,0 +1,155 @@
+#!/usr/bin/perl -w
+
+use strict;
+
+# Globals
+my $PROGNAME = "check_acesfarmstate";
+use Getopt::Long;
+use vars qw($opt_V $opt_v $opt_h $opt_H $PROGNAME);
+
+
+
+my $DEBUG           = 0;
+my $REVISION        = "0.1";
+my $hostname        = undef;
+my $exitok=0;
+my $exitwarn=1;
+my $exitcrit=2;
+my $exitunk=3;
+
+#VIP-SQLRW-MAL.AO.PRD.LAX SQL1V-MAL.AO.PRD.LAX OPERATIONAL
+#VIP-SQLRW-MAL.AO.PRD.LAX SQL2V-MAL.AO.PRD.LAX OUTOFSERVICE
+#VIP-SQLRW-PUPPET.TP.PRD.LAX SQL1V-PUPPET.TP.PRD.LAX OPERATIONAL
+#VIP-SQLRW-PUPPET.TP.PRD.LAX SQL2V-PUPPET.TP.PRD.LAX OUTOFSERVICE
+
+
+# nagios specific
+my $status      = $exitok;
+my $problem_on_name = undef;
+my $problem_value   = undef;
+
+
+sub in ($$);
+$ENV{'BASH_ENV'}='';
+$ENV{'ENV'}='';
+$ENV{'PATH'}='/usr/local/bin:/usr/bin:/bin';
+$ENV{'LC_ALL'}='C';
+
+
+
+Getopt::Long::Configure('bundling');
+GetOptions
+       ("V"   => \$opt_V, "version"     => \$opt_V,
+        "h"   => \$opt_h, "help"        => \$opt_h,
+        "v"   => \$opt_v, "verbose"     => \$opt_v,
+        "H=s" => \$opt_H, "hostname=s"  => \$opt_H);
+
+
+# check if everything is ok
+check_parameters();
+
+
+use Data::Dumper;
+
+my %acestates=();
+print "Executing 'aceman -c $hostname showsfarmstate'\n" if $DEBUG;
+open(ACEMAN,"aceman -c $hostname showsfarmstate 2>&1|") or die;
+while (my $line=<ACEMAN>) {
+   if ($line=~/^(.*) (.*) (.*)/) {
+      $acestates{$1}{$2}=$3;
+   } else {
+     print "aceman error: $line\n";
+     exit $exitunk;
+   }
+}
+close(ACEMAN);
+if ($? != 0) {
+   print "aceman error\n";
+   exit $exitunk;
+}
+
+my $response_text       = '';
+
+foreach my $sfarm (keys %acestates) {
+   print "Looking at sfarm $sfarm\n" if $DEBUG;
+
+   foreach my $rserver (keys %{ $acestates{$sfarm} }) {
+
+      print "      Looking at sfarm $sfarm $rserver\n" if $DEBUG;
+      # fix up the below if we ever find that we care about another state
+      unless ($acestates{$sfarm}{$rserver} eq "OPERATIONAL"
+              or $acestates{$sfarm}{$rserver} eq "OUTOFSERVICE") {
+                $response_text.="$sfarm $rserver: ".$acestates{$sfarm}{$rserver}."\n";
+      }
+   }
+}
+
+if ($status) {
+   print "$response_text  \n";
+   exit $status;
+} else {
+   print "OK\n";
+   exit $exitok;
+}
+
+
+
+##
+###
+### Functions
+###
+##
+
+
+
+# That one check parameters
+sub check_parameters {
+    # Basic checks
+    if ($opt_V) {
+             print "$PROGNAME $REVISION\n";
+             exit 1;
+    }
+
+    if ($opt_h) {
+             print_help ();
+             print "$PROGNAME $REVISION\n";
+             exit 1;
+    }
+
+    if ($opt_v) {
+        $DEBUG = 1;
+    }
+
+    if (!defined($opt_H))   {
+            print "Hostname requested !\n";
+            print_usage();
+            exit 1;
+    } else {
+            $hostname = $opt_H;
+    }
+
+
+} # end check_options
+
+
+sub print_usage () {
+   print "Usage: $0  -H <host>\n";
+}
+
+
+sub print_help () {
+  print "Monitor serverfarm states in ACE loadbalancers\n";
+  print_usage();
+  print <<EOT;
+-h, --help
+       print this help message
+-H, --hostname=HOST
+       name or IP address of host to check
+-v  --verbose
+       Be verbose
+-V, --version
+       prints version number
+EOT
+}
+
+

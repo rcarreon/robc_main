@@ -1,0 +1,33 @@
+<VirtualHost *:443>
+        ServerName www.totalbeauty.com
+        ServerAlias secure.totalbeauty.com
+
+        SSLEngine on
+        SSLCipherSuite AES256-SHA:AES128-SHA:DES-CBC3-SHA:DHE-DSS-AES256-SHA:DHE-DSS-AES128-SHA:EDH-DSS-DES-CBC3-SHA:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:EDH-RSA-DES-CBC3-SHA
+
+        SSLCertificateFile    /www/sites/www.totalbeauty.com/ssl/www.totalbeauty.com.crt
+        SSLCertificateKeyFile /www/sites/www.totalbeauty.com/ssl/www.totalbeauty.com.key
+        SSLCACertificateFile  /www/sites/www.totalbeauty.com/ssl/ca-bundle-client.crt
+
+        <Files ~ ".(cgi|shtml|phtml|php3?)$">
+                SSLOptions +StdEnvVars
+        </Files>
+
+        DocumentRoot /app/shared/docroot/www.totalbeauty.com/files/html
+        <Directory "/app/shared/docroot/www.totalbeauty.com/files/html">
+                AllowOverride AuthConfig FileInfo Indexes Limit
+                Options Includes SymLinksIfOwnerMatch
+        </Directory>
+
+        ScriptAlias /cgi-bin/ /www/sites/www.totalbeauty.com/files/cgi-bin/
+        <Directory "/app/shared/docroot/www.totalbeauty.com/files/cgi-bin">
+                SSLOptions +StdEnvVars
+        </Directory>
+
+        SetEnvIf User-Agent ".*MSIE.*" \
+                nokeepalive ssl-unclean-shutdown \
+                downgrade-1.0 force-response-1.0
+
+        CustomLog /app/log/totalbeauty.com-ssl_access.log combined
+        ErrorLog  /app/log/totalbeauty.com-ssl-error.log
+</VirtualHost>

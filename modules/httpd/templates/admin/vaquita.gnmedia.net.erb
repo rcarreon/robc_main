@@ -1,0 +1,19 @@
+WSGIPythonPath /app/shared/docroots/vaquita.gnmedia.net/vaquita-backup/
+<VirtualHost *:80>
+    ServerName vaquita.gnmedia.net
+    ServerAlias www.vaquita.gnmedia.net
+    ServerAdmin dba@evolvemediallc.com
+    <%=logging ? '' : '#'%>CustomLog /app/log/vaquita.gnmedia.net-access.log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/vaquita.gnmedia.net-error.log
+
+    DocumentRoot /usr/lib/python2.6/site-packages/
+
+    <Directory /usr/lib/python2.6/site-packages>
+    Order allow,deny
+    Allow from all
+    </Directory>
+
+    WSGIScriptAlias /toolshed 	/usr/lib/python2.6/site-packages/webservice/toolshed.py
+    WSGIScriptAlias /toolshed_backup_set   /usr/lib/python2.6/site-packages/webservice/toolshed_backup_set.py
+    WSGIScriptAlias /toolshed_manual   /usr/lib/python2.6/site-packages/webservice/toolshed_manual.py
+</VirtualHost>

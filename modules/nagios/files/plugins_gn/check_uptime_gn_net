@@ -1,0 +1,16 @@
+#!/bin/bash
+
+currentTime=$(date +'%s')
+rawFormatTime=$(curl -s http://uptime.gnmedia.net/date | sed 's/@ //')
+previousTime=$(date -d "${rawFormatTime}" +'%s')
+deltaThreshold="90000"
+
+timeDelta=$((${currentTime}-${previousTime}))
+
+if [[ $timeDelta -gt $deltaThreshold ]]; then
+    echo "uptime.gnmedia.net is malfunctioning; currently ${timeDelta} seconds old."
+    exit 1
+else
+    echo "uptime.gnmedia.net last updated at: ${rawFormatTime}"
+    exit 0
+fi

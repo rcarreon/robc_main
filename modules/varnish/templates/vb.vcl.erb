@@ -1,0 +1,250 @@
+<%
+# Need to tweak so we get the ip listed not the short name
+require 'socket'
+
+host,vertical,env,location,domain,tlda = fqdn.split('.')
+vb_bab_ip = IPSocket.getaddress("vip-app-vb-bab.ao." + env + ".lax.gnmedia.net")
+vb_hfb_ip = IPSocket.getaddress("vip-app-vb-hfb.ao." + env + ".lax.gnmedia.net")
+vb_sdc_ip = IPSocket.getaddress("vip-app-vb-sdc.ao." + env + ".lax.gnmedia.net")
+vb_ssh_ip = IPSocket.getaddress("vip-app-vb-shh.ao." + env + ".lax.gnmedia.net")
+vb_tfs_ip = IPSocket.getaddress("vip-app-vb-tfs.ao." + env + ".lax.gnmedia.net")
+vb_wz_ip = IPSocket.getaddress("vip-app-vb-wz.ao." + env + ".lax.gnmedia.net")
+
+%>
+
+# Define the backends
+backend vb_bab {
+    .host = "<%= vb_bab_ip %>";
+    .port = "80";
+    .probe = {
+        .url = "/";
+        .interval = 5s;
+        .timeout = 1 s;
+        .window = 5;
+        .threshold = 3;
+    }
+    .connect_timeout = 120s;
+    .first_byte_timeout = 120s;
+    .between_bytes_timeout = 120s;
+}
+backend vb_hfb {
+    .host = "<%= vb_hfb_ip %>";
+    .port = "80";
+    .probe = {
+        .url = "/";
+        .interval = 5s;
+        .timeout = 1 s;
+        .window = 5;
+        .threshold = 3;
+    }
+    .connect_timeout = 120s;
+    .first_byte_timeout = 120s;
+    .between_bytes_timeout = 120s;
+}
+backend vb_sdc {
+    .host = "<%= vb_sdc_ip %>";
+    .port = "80";
+    .probe = {
+        .url = "/";
+        .interval = 5s;
+        .timeout = 1 s;
+        .window = 5;
+        .threshold = 3;
+    }
+    .connect_timeout = 120s;
+    .first_byte_timeout = 120s;
+    .between_bytes_timeout = 120s;
+}
+backend vb_shh {
+    .host = "<%= vb_ssh_ip %>";
+    .port = "80";
+    .probe = {
+        .url = "/";
+        .interval = 5s;
+        .timeout = 1 s;
+        .window = 5;
+        .threshold = 3;
+    }
+    .connect_timeout = 120s;
+    .first_byte_timeout = 120s;
+    .between_bytes_timeout = 120s;
+}
+backend vb_tfs {
+    .host = "<%= vb_tfs_ip %>";
+    .port = "80";
+    .probe = {
+        .url = "/";
+        .interval = 5s;
+        .timeout = 1 s;
+        .window = 5;
+        .threshold = 3;
+    }
+    .connect_timeout = 120s;
+    .first_byte_timeout = 120s;
+    .between_bytes_timeout = 120s;
+}
+backend vb_wz {
+    .host = "<%= vb_wz_ip %>";
+    .port = "80";
+    .probe = {
+        .url = "/";
+        .interval = 5s;
+        .timeout = 1 s;
+        .window = 5;
+        .threshold = 3;
+    }
+    .connect_timeout = 120s;
+    .first_byte_timeout = 120s;
+    .between_bytes_timeout = 120s;
+}
+
+
+sub vcl_recv {
+
+# Send to backends
+if (req.http.host == "babyandbump.com") {
+    set req.backend = vb_bab;
+}
+if (req.http.host == "hockeysfuture.com") {
+    set req.backend = vb_hfb;
+}
+if (req.http.host == "sherdog.com") {
+    set req.backend = vb_sdc;
+}
+if (req.http.host == "superherohype.com") {
+    set req.backend = vb_shh;
+}
+if (req.http.host == "thefashionspot.com") {
+    set req.backend = vb_tfs;
+}
+if (req.http.host == "wrestlezone.com") {
+    set req.backend = vb_wz;
+}
+
+
+
+    if (req.backend.healthy) {
+      # if stale content get multiple req, 
+      # only 1 will go back to webserver and allow stale to be served for that obj for 30s
+      set req.grace = 30s;
+    } else {
+      # if backend is dead, serve stale
+      set req.grace = 6h;
+      unset req.http.Cookie;
+    }
+
+    if (req.request != "GET" &&
+      req.request != "HEAD" &&
+      req.request != "PUT" &&
+      req.request != "POST" &&
+      req.request != "TRACE" &&
+      req.request != "OPTIONS" &&
+      req.request != "DELETE") {
+        /* Non-RFC2616 or CONNECT which is weird. */
+        error;
+    }
+
+    # prevent caching multiple versions for accept-encoding for diff bs and versions
+    # https://www.varnish-cache.org/trac/wiki/FAQ/Compression
+    if (req.http.Accept-Encoding) {
+      if (req.url ~ "\.(jpg|png|gif|gz|tgz|bz2|tbz|mp3|ogg)$") {
+        # No point in compressing these
+        remove req.http.Accept-Encoding;
+      } elsif (req.http.Accept-Encoding ~ "gzip") {
+        set req.http.Accept-Encoding = "gzip";
+      } elsif (req.http.Accept-Encoding ~ "deflate" && req.http.user-agent !~ "MSIE") {
+        set req.http.Accept-Encoding = "deflate";
+      } else {
+        # unkown algorithm
+        remove req.http.Accept-Encoding;
+      }
+    }
+
+#    if (req.http.Cache-Control ~ "no-cache" || req.http.Pragma ~ "no-cache" ) {
+#        purge_url(req.url);
+#        return(pass);
+#    }
+
+    if (req.request != "GET" && req.request != "HEAD") {
+        /* We only deal with GET and HEAD by default */
+        return(pass);
+    }
+
+    if (req.url ~ "(picture|image|attachment)\.php") {
+        return(lookup);
+    }
+
+    if (req.url ~ "\.(js|css|gif|ico|jpg|js|png|swf|txt)") {
+	unset req.http.cookie;
+	return(lookup);
+    }
+
+    if (req.http.Authorization) {
+        /* Not cacheable by default */
+        return(pass);
+    }
+
+    return(pass);
+}
+
+
+sub vcl_hash {
+    set req.hash += req.url;
+    if (req.http.host) {
+        set req.hash += req.http.host;
+    } else {
+        set req.hash += server.ip;
+    }
+    return(hash);
+}
+
+sub vcl_hit {
+#    if (!beresp.cacheable) {
+#        pass;
+#    }
+    return(deliver);
+}
+
+sub vcl_fetch {
+    # allow items to be stale if needed.
+    set beresp.grace = 6h;
+
+    # By default, we cache all static content in varnish for 30 days
+    if (req.url ~ "\.(js|css|gif|ico|jpg|js|png|swf|txt)") {
+        set beresp.ttl = 7d;
+		unset beresp.http.set-cookie;
+
+		# See http://varnish.projects.linpro.no/wiki/VCLExampleLongerCaching
+		/* Remove Expires from backend, it's not long enough */
+		#unset beresp.http.expires;
+
+		/* Set the client's TTL on this beresp.ct */
+		#set beresp.http.cache-control = "max-age = 600";
+
+		/* Don't use Pragma */
+		unset beresp.http.pragma;
+     }
+
+#    if (beresp.http.Pragma ~ "no-cache" ||
+#        beresp.http.Cache-Control ~ "no-cache") {
+#        return(pass);
+#    }
+
+    if (req.url ~ "(picture|image|attachment)\.php") {
+        set beresp.ttl = 7d;
+        return(deliver);
+    }
+
+     return(deliver);
+}
+
+
+sub vcl_deliver {
+	# See http://varnish.projects.linpro.no/wiki/VCLExampleHitMissHeader
+        if (obj.hits > 0) {
+                set resp.http.X-Cache = "HIT from <%= fqdn.gsub(".gnmedia.net","") %>";
+
+        } else {
+                set resp.http.X-Cache = "MISS from <%= fqdn.gsub(".gnmedia.net","") %>";
+        }
+}

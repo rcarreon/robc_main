@@ -1,0 +1,23 @@
+# This file is managed by Puppet. Do not modify it from <%=fqdn %>
+
+<VirtualHost *:80>
+    ServerName dev.tags.evolvemediallc.com
+    DocumentRoot /app/shared/docroots/tags.evolvemediallc.com/htdocs/app_tags/webroot
+
+    <%=logging ? '' : '#'%>ErrorLog /app/log/dev.tags.evolvemediallc.com.error.log
+    LogLevel warn
+    <%=logging ? '' : '#'%>CustomLog /app/log/dev.tags.evolvemediallc.com.access.log combined
+
+    RewriteEngine On
+
+#Logstash
+    SetEnvIf X-Forwarded-For "(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})$" clientip=$1
+    SetEnvIf Incap-Client-IP "^(.*\..*\..*\..*)" clientip=$1
+    LogFormat "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" logstash
+    LogFormat "%{clientip}e %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\"" logstash-proxy
+                 
+    CustomLog "|pipestash -t dev_tags_evolvemediallc_com_ap_access -R logstash -r redis://vip-rds-logstashdev.tp.prd.lax.gnmedia.net:6379/0" logstash env=!clientip
+    CustomLog "|pipestash -t dev_tags_evolvemediallc_com_ap_access -R logstash -r redis://vip-rds-logstashdev.tp.prd.lax.gnmedia.net:6379/0" logstash-proxy env=clientip
+                          
+#End of Logstash
+</VirtualHost>

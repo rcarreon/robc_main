@@ -1,0 +1,13 @@
+<VirtualHost *:80>
+
+    ServerName deploy.springboardplatform.com
+
+    <%=logging ? '' : '#'%>CustomLog /app/log/deploy.springboardplatform.com-access.log combined
+    <%=logging ? '' : '#'%>ErrorLog /app/log/deploy.springboardplatform.com-error.log
+
+    DocumentRoot /app/shared/docroots/deploy.springboardplatform.com/htdocs/ 
+    <Directory /app/shared/docroots/deploy.springboardplatform.com/htdocs>
+        Options FollowSymLinks
+    </Directory>
+
+</VirtualHost>

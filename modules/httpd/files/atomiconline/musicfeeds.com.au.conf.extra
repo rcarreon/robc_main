@@ -1,0 +1,98 @@
+    RewriteEngine On
+
+# www.musicfeeds.com.au --> musicfeeds.com.au
+    RewriteCond %{HTTP_HOST} ^www\.musicfeeds\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://musicfeeds.com.au/$1 [R=301,L]
+
+# fashionfeeds.com.au (redirects to thefashionspot.com.au)
+    ServerAlias fashionfeeds.com.au *.fashionfeeds.com.au
+    RewriteCond %{HTTP_HOST} ^fashionfeeds\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://thefashionspot.com.au/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.fashionfeeds\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://thefashionspot.com.au/$1 [R=301,L]
+
+# musicfeeds.com (redirects to musicfeeds.com.au)
+    ServerAlias musicfeeds.com *.musicfeeds.com
+    RewriteCond %{HTTP_HOST} ^musicfeeds\.com$ [NC]
+    RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.musicfeeds\.com$ [NC]
+    RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+
+# musicfeeds.tv (redirects to musicfeeds.com.au)
+    ServerAlias musicfeeds.tv *.musicfeeds.tv
+    RewriteCond %{HTTP_HOST} ^musicfeeds\.tv$ [NC]
+    RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.musicfeeds\.tv$ [NC]
+    RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+
+# newsfeeds.com.au (redirects to craveonline.com.au)
+    ServerAlias newsfeeds.com.au *.newsfeeds.com.au
+    RewriteCond %{HTTP_HOST} ^newsfeeds\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.craveonline.com.au/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.newsfeeds\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.craveonline.com.au/$1 [R=301,L]
+
+# screenfeeds.com.au (redirects to craveonline.com.au)
+    ServerAlias screenfeeds.com.au *.screenfeeds.com.au
+    RewriteCond %{HTTP_HOST} ^screenfeeds\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.craveonline.com.au/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.screenfeeds\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.craveonline.com.au/$1 [R=301,L]
+
+# sportsfeeds.com.au (redirects to craveonline.com.au)
+    ServerAlias sportsfeeds.com.au *.sportsfeeds.com.au
+    RewriteCond %{HTTP_HOST} ^sportsfeeds\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.craveonline.com.au/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.sportsfeeds\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.craveonline.com.au/$1 [R=301,L]
+
+# techfeeds.com.au (redirects to craveonline.com.au)
+    ServerAlias techfeeds.com.au *.techfeeds.com.au
+    RewriteCond %{HTTP_HOST} ^techfeeds\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.craveonline.com.au/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.techfeeds\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.craveonline.com.au/$1 [R=301,L]
+
+# gigfeeds.com.au (new redirect to musicfeeds.com.au)
+    ServerAlias gigfeeds.com.au *.gigfeeds.com.au
+    RewriteCond %{HTTP_HOST} ^gigfeeds\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.gigfeeds\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+
+# musicfeedstv.com.au (new redirect to musicfeeds.com.au)
+    ServerAlias musicfeedstv.com.au *.musicfeedstv.com.au
+    RewriteCond %{HTTP_HOST} ^musicfeedstv\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.musicfeedstv\.com\.au$ [NC]
+    RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+
+# musicfeedstv.com (new redirect to musicfeeds.com.au)
+    ServerAlias musicfeedstv.com *.musicfeedstv.com
+    RewriteCond %{HTTP_HOST} ^musicfeedstv\.com$ [NC]
+    RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.musicfeedstv\.com$ [NC]
+    RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+
+# musicfeeds.me (new redirect to musicfeeds.com.au)
+    ServerAlias musicfeeds.me *.musicfeeds.me
+    RewriteCond %{HTTP_HOST} ^musicfeeds\.me$ [NC]
+    RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.musicfeeds\.me$ [NC]
+    RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+
+# thefeedsnetwork.com (new redirect to musicfeeds.com.au)
+    ServerAlias thefeedsnetwork.com *.thefeedsnetwork.com
+    RewriteCond %{HTTP_HOST} ^thefeedsnetwork\.com$ [NC]
+    RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+    RewriteCond %{HTTP_HOST} ^www\.thefeedsnetwork\.com$ [NC]
+    RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+
+# m.musicfeeds.com.au (new redirect to musicfeeds.com.au) 
+     ServerAlias m.musicfeeds.com.au *.m.musicfeeds.com.au
+     RewriteCond %{HTTP_HOST} ^m\.musicfeeds\.com\.au$ [NC]
+     RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+     RewriteCond %{HTTP_HOST} ^www\.m\.musicfeeds\.com\.au$ [NC]
+     RewriteRule ^/(.*) http://www.musicfeeds.com.au/$1 [R=301,L]
+#Redirect xmlrpc.php to home
+	RewriteRule ^/xmlrpc.php$ /$1 [R=301,L]

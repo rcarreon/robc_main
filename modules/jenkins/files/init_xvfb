@@ -1,0 +1,46 @@
+#!/bin/bash
+
+# chkconfig: 2345 55 25
+# description: iX Headless
+#
+# processname: Xvfb
+#set -x
+
+# source function library
+. /etc/rc.d/init.d/functions
+
+RETVAL=0
+
+VDISPLAY='1'
+
+XVFB=/usr/bin/Xvfb
+XVFB_ARGS=":$VDISPLAY -screen 0 800x600x8 -fbdir /tmp -fp /usr/share/X11/fonts/misc"
+XVFB_PIDFILE=/tmp/xvfb.pid
+start() {
+       echo -n $"Starting Xvfb"
+       $XVFB $XVFB_ARGS >/dev/null  &
+       [ $? -eq 0 ] && success || failure
+       pidof Xvfb > $XVFB_PIDFILE
+       echo
+}
+stop() {
+       echo -n $"Stopping Xvfb"
+       killproc Xvfb
+       rm $XVFB_PIDFILE
+       echo
+}
+case "$1" in
+       start)
+               start
+               ;;
+       stop)
+               stop
+               ;;
+       restart)
+               stop
+               start
+               ;;
+       *)
+               echo $"Usage: $0 {start|stop|restart}"
+esac
+

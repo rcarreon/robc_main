@@ -1,0 +1,84 @@
+# Default for all clients
+[main]
+    vardir        = /var/lib/puppet
+    logdir        = /var/log/puppet
+    rundir        = /var/run/puppet
+    configtimeout = 600
+    pluginsync    = true
+    logdest       = $logdir/puppet.log
+    ssldir        = /app/shared/ssl
+
+[agent]
+    classfile    = $vardir/classes.txt
+    localconfig  = $vardir/localconfig
+    report       = true
+    listen       = false 
+    splay        = true
+    server       = puppet.gnmedia.net
+    <%= "environment  = #{fqdn_env_full}" if has_variable?("fqdn_env_full") %>
+
+[master]
+    # Stored config settings
+    storeconfigs       = true
+    thin_storedconfigs = true
+    dbadapter          = mysql
+    dbuser             = puppet_w
+    <% if fqdn =~ /app[0-9]v-puppet\.tp\.dev/ %>
+    reports            = log
+    dbpassword         = f9qPiokN
+    dbserver           = sql1v-56-puppet.tp.dev.lax.gnmedia.net
+    <% else %>
+    reports            = tagmail, log
+    dbpassword         = EFrk9cwO
+    dbserver           = vip-sqlrw-puppet.tp.prd.lax.gnmedia.net
+    <% end %>
+    reportfrom         = peakpuppet@<%= fqdn %>
+    rrdinterval        = $runinterval
+    rrdgraph           = false
+    config_version     = /usr/local/bin/return_version
+
+    # Puppet master serving puppet code settings
+    manifestdir        = /app/shared/manifests
+    modulepath         = /app/shared/modules/production
+    templatedir        = /app/shared/templates
+
+[staging]
+  modulepath = /app/shared/modules/staging 
+
+[preproduction]
+  modulepath = /app/shared/modules/staging
+
+[development]
+  modulepath = /app/shared/modules/development
+
+    # place puppet dev box environments here, make sure they're within the if/end
+    <% if fqdn =~ /app[0-9]v-puppet\.tp\.dev/ %>
+[mdillon]
+    manifestdir     = /home/mdillon/git/puppet-manifests
+    modulepath      = /home/mdillon/git/puppet-modules
+    templatedir     = /home/mdillon/git/puppet-templates
+
+[fdavis]
+    manifestdir     = /home/fdavis/gitrepos/puppet-manifests
+    modulepath      = /home/fdavis/gitrepos/puppet-modules
+    templatedir     = /home/fdavis/gitrepos/puppet-templates
+
+[rscott]
+    manifestdir     = /home/rscott/puppet/manifests
+    modulepath      = /home/rscott/puppet/modules
+    templatedir     = /home/rscott/puppet/templates
+ 
+[sdejean]
+    manifestdir     = /home/sdejean/src/tp_puppet_manifests
+    modulepath      = /home/sdejean/src/tp_puppet_modules
+    templatedir     = /home/sdejean/src/tp_puppet_templates
+   <%- puppet_dev.each do |user| -%>
+
+[<%= user %>]
+    manifestdir     = /home/<%= user %>/repos/git/puppet-manifests
+    modulepath      = /home/<%= user %>/repos/git/puppet-modules
+    templatedir     = /home/<%= user %>/repos/git/puppet-templates
+    <%- end -%>
+
+    # do not place any puppet dev box environments below this line!
+    <% end %>

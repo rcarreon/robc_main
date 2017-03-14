@@ -1,0 +1,7 @@
+# check process is running
+check process collectdmon with pidfile /var/run/collectdmon.pid
+
+        start program = "/etc/init.d/collectd restart"
+        stop  program = "/etc/init.d/collectd stop && killall collectd"
+
+        if 12 restarts within 12 cycles then timeout
