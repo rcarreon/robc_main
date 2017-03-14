@@ -1,0 +1,11 @@
+#!/bin/bash
+# Need to have the juniper ncsvc compiled and installed and
+# also the vpn certificate in order for this to work.
+HOST="vpn.gorillanation.com"
+#HOST="63.139.86.7"
+VPNUSER="roberto.carreon"
+REALM="Users"
+CERT=${HOME}/.juniper_networks/vpn.cert
+NCSVCBIN=${HOME}/.juniper_networks/network_connect/ncsvc
+
+${NCSVCBIN} -h ${HOST} -u ${VPNUSER} -r ${REALM} -f ${CERT} -L 5

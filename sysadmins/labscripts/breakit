@@ -1,0 +1,66 @@
+#!/bin/bash
+
+if [ $(id -u) != 0 ];then
+    echo "Only as root" 1>&2
+    exit 1
+fi  
+
+PATH=/sbin:$PATH
+
+test -f ./fixit || cd $(dirname $0)
+echo "Running fixit first..."
+./fixit
+
+# Shut down apache and mysql
+echo "Shutting down services prior to breakage..."
+service httpd stop
+killall httpd
+service puppet stop
+sleep 2
+
+echo "Building new /var/run/httpd..."
+umount /var/run/httpd
+test -e /dev/hda3 || mknod /dev/hda3 b 7 0
+losetup -d /dev/hda3
+dd if=/dev/zero of=/root/.littlefs.img bs=1k count=1 seek=5000k
+losetup /dev/hda3 /root/.littlefs.img
+mkfs -N 1024 /dev/hda3
+mkdir -p /var/run/httpd
+sed -i /httpd/d /etc/fstab
+echo "/dev/hda3 /var/run/httpd ext2 defaults 0 0" >> /etc/fstab
+mount /var/run/httpd
+
+umount /mnt/apache /mnt/docroots
+mount /mnt/apache
+mount /mnt/docroots
+
+# Revoke db user rights for monthly_earnings app
+mysql -u root -plab01 mysql --execute="revoke all privileges on labMonthly.* from lab@localhost;"
+mysql -u root -plab01 mysql --execute="revoke all privileges on *.* from lab@localhost;"
+service mysqld stop
+
+
+# Fill up inodes on /var/run/httpd (256 max inodes)
+for file in `seq 1 18000`
+do
+  mkdir -p /var/run/httpd/.backups
+  touch /var/run/httpd/.backups/backup.$file > /dev/null 2>&1
+done
+
+# Tear the php end tag out of monthly_earnings.php
+sed -i 's/\?>//' /mnt/docroots/crucialmonthlyreport.gnmedia.net/monthly_earnings.php
+
+# Chown the mysql files to be owned by apache user
+sudo find /mnt/mysql -noleaf -name .snapshot -prune -o -print0 | xargs -0 sudo chown apache:apache
+
+# Remove php addtype
+sed -i /^AddType/d /mnt/apache/conf.d/php.conf
+
+sed -i 's/PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+service sshd restart
+
+rm -f /root/.bash_history; ln -s /dev/null /root/.bash_history
+
+# Munge the mounts
+umount /mnt/docroots /mnt/apache
+mount -r /mnt/apache

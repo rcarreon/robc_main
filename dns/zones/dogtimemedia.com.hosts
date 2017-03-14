@@ -1,0 +1,32 @@
+$TTL    3600 
+dogtimemedia.com.   IN      SOA     dogtimemedia.com. root.dogtimemedia.com. (
+                                              2016041301     ; serial
+                                              28800          ; refresh
+                                              14400          ; retry
+                                              3600000        ; expire
+                                              86400 )        ; minimum
+
+dogtimemedia.com.                             IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+dogtimemedia.com.                             IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+dogtimemedia.com.                             IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+dogtimemedia.com.                             IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+
+wiki.dogtimemedia.com.                   IN    A        38.104.224.114
+webmail.dogtimemedia.com.                IN    A        38.104.224.114
+media01.dogtimemedia.com.                IN    A        174.129.247.185
+mc.staging.dogtimemedia.com.             IN    A        72.46.232.46
+mc.dogtimemedia.com.                     IN    A        72.46.232.49
+mail.dogtimemedia.com.                   IN    A        63.241.14.163
+help.dogtimemedia.com.                   IN    A        74.201.154.141
+www.dogtimemedia.com.                    IN    CNAME    dtm-hachikou.herokuapp.com.
+cdn.partners.dogtimemedia.com.           IN    CNAME    d1ogbdow4a08e8.cloudfront.net.
+;dogtimemedia.com.                        IN    CNAME    dtm-hachikou.herokuapp.com.
+auth.dogtimemedia.com.                   IN    CNAME    dtm-casper.herokuapp.com.
+jira.dogtimemedia.com.                   IN    CNAME    wiki.dogtimemedia.com.
+social.dogtimemedia.com.                 IN    CNAME    social.dogtimemedia.com.srm.vitrue.com.
+streaming.mc.dogtimemedia.com.           IN    CNAME    s1pmbh61tj7gqn.cloudfront.net.
+presentation.dogtimemedia.com.           IN    CNAME    dtm-hachikou.herokuapp.com.
+ads.dogtimemedia.com.                    IN    CNAME    d39aa37u0b23ac.cloudfront.net.
+dogtimemedia.com.                        IN    TXT      "G0O0R34839"
+;dogtimemedia.com.                        IN    TXT      "ALIAS for dtm-hachikou.herokuapp.com"

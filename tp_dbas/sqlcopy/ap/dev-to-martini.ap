@@ -1,0 +1,28 @@
+<desthost sql1v-pubops-martini.ap.stg.lax.gnmedia.net>
+  sourcehost=sql1v-pubops-martini.ap.dev.lax.gnmedia.net
+  masterhost=sql2v-pubops-martini.ap.stg.lax.gnmedia.net
+  savegrants=yes
+  emblackout=yes
+</desthost>
+
+<desthost sql2v-pubops-martini.ap.stg.lax.gnmedia.net>
+  sourcehost=sql1v-pubops-martini.ap.dev.lax.gnmedia.net
+  masterhost=sql1v-pubops-martini.ap.stg.lax.gnmedia.net
+  savegrants=yes
+  emblackout=yes
+</desthost>
+
+<desthost sql1v-pubops-martini.ap.prd.lax.gnmedia.net>
+  sourcehost=sql1v-pubops-martini.ap.dev.lax.gnmedia.net
+  masterhost=sql2v-pubops-martini.ap.prd.lax.gnmedia.net
+  savegrants=yes
+  emblackout=yes
+</desthost>
+
+<desthost sql2v-pubops-martini.ap.prd.lax.gnmedia.net>
+  sourcehost=sql1v-pubops-martini.ap.dev.lax.gnmedia.net
+  masterhost=sql1v-pubops-martini.ap.prd.lax.gnmedia.net
+  savegrants=yes
+  emblackout=yes
+</desthost>
+

@@ -1,0 +1,29 @@
+$TTL 3600
+fightfinder.com.	IN      SOA     fightfinder.com. root.fightfinder.com. (
+                        2015060201	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+fightfinder.com.     IN      NS              app3v-dns.tp.prd.lax.mmamasterllc.com.
+fightfinder.com.     IN      NS              app4v-dns.tp.prd.lax.mmamasterllc.com.
+fightfinder.com.     IN      NS              app1v-dns.tp.prd.lax.mmamasterllc.com.
+fightfinder.com.     IN      NS              app2v-dns.tp.prd.lax.mmamasterllc.com.
+fightfinder.com.     IN      MX      1       mail.fightfinder.com.
+;
+; local host
+;
+local           IN      A       127.0.0.1
+localhost       IN      A       127.0.0.1
+loghost         IN      A       127.0.0.1
+;
+;
+; hosts
+mail.fightfinder.com.	IN	A	97.64.84.3
+;fightfinder.com.	IN      A	209.151.238.37 
+;*			IN	A	209.151.238.37 
+;
+fightfinder.com.	IN      A	97.64.84.162
+www.fightfinder.com.	IN	CNAME	fightfinder.com.

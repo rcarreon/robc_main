@@ -1,0 +1,75 @@
+$TTL    3600 
+beautyriot.com. IN      SOA     beautyriot.com. root.beautyriot.com. (
+                                           2016061600     ; serial
+                                           28800          ; refresh
+                                           14400          ; retry
+                                           3600000        ; expire
+                                           86400 )        ; minimum
+
+beautyriot.com.                            IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+beautyriot.com.                            IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+beautyriot.com.                            IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+beautyriot.com.                            IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+mail.beautyriot.com.                       IN    NS       ns1.responsys.net.
+mail.beautyriot.com.                       IN    NS       ns2.responsys.net.
+
+
+beautyriot.com.     IN  MX 1 aspmx.l.google.com. 
+beautyriot.com.     IN MX 5 alt1.aspmx.l.google.com. 
+beautyriot.com.     IN MX 5 alt2.aspmx.l.google.com. 
+beautyriot.com.     IN MX 10 alt3.aspmx.l.google.com. 
+beautyriot.com.     IN MX 10 alt4.aspmx.l.google.com.
+beautyriot.com.                            IN    MX 10    mx.mse23.exchange.ms.
+
+;##### Start TitanWP #####
+;beautyriot.com.                           IN    A        67.201.59.218
+beautyriot.com.                            IN    A        97.64.84.172
+
+bta.beautyriot.com.                        IN    A        10.64.64.75
+dev.beautyriot.com.                        IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.beautyriot.com.                        IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.beautyriot.com.                        IN    A        97.64.84.172
+;www.beautyriot.com.                       IN    A        67.201.59.218
+www.beautyriot.com.                        IN    A        97.64.84.172
+
+origin.bta.beautyriot.com.                 IN    CNAME    bta.beautyriot.com.
+cdn1-bta.beautyriot.com.                   IN    CNAME    bta.beautyriot.com.
+cdn2-bta.beautyriot.com.                   IN    CNAME    bta.beautyriot.com.
+cdn3-bta.beautyriot.com.                   IN    CNAME    bta.beautyriot.com.
+
+origin-dev.beautyriot.com.                 IN    CNAME    dev.beautyriot.com.
+cdn1-dev.beautyriot.com.                   IN    CNAME    dev.beautyriot.com.
+cdn2-dev.beautyriot.com.                   IN    CNAME    dev.beautyriot.com.
+cdn3-dev.beautyriot.com.                   IN    CNAME    dev.beautyriot.com.
+
+origin-stg.beautyriot.com.                 IN    CNAME    stg.beautyriot.com.
+cdn1-stg.beautyriot.com.                   IN    CNAME    wac.ee35.edgecastcdn.net.
+cdn2-stg.beautyriot.com.                   IN    CNAME    wac.ee35.edgecastcdn.net.
+cdn3-stg.beautyriot.com.                   IN    CNAME    wac.ee35.edgecastcdn.net.
+
+origin.beautyriot.com.                     IN    CNAME    prd.beautyriot.com.
+cdn1-www.beautyriot.com.                   IN    CNAME    wac.ee35.edgecastcdn.net.
+cdn2-www.beautyriot.com.                   IN    CNAME    wac.ee35.edgecastcdn.net.
+cdn3-www.beautyriot.com.                   IN    CNAME    wac.ee35.edgecastcdn.net.
+;##### End TitanWP #####
+
+brides.beautyriot.com.                     IN    A        97.64.84.172
+sac.beautyriot.com.                        IN    A        97.64.84.172
+www-revert                                 IN    A        97.64.84.172
+xo.beautyriot.com.                         IN    A        97.64.84.172
+james.beautyriot.com.                      IN    A        67.201.59.215
+jonathan.beautyriot.com.                   IN    A        67.201.59.215
+staging.beautyriot.com.                    IN    A        67.201.59.215
+tung.beautyriot.com.                       IN    A        67.201.59.215
+west.beautyriot.com.                       IN    A        67.201.59.215
+zdev.beautyriot.com.                       IN    A        67.201.59.215
+zstaging.beautyriot.com.                   IN    A        67.201.59.215
+ftp.beautyriot.com.                        IN    A        206.111.151.143
+community.beautyriot.com.                  IN    CNAME    affiliate.kickapps.com.
+images.beautyriot.com.                     IN    CNAME    wac.14d0.edgecastcdn.net.
+metrics.beautyriot.com.                    IN    CNAME    totalbeauty.com.112.2o7.net.
+oascentral.beautyriot.com.                 IN    CNAME    oasc18056.247realmedia.com.
+static1.beautyriot.com.                    IN    CNAME    wac.14d0.edgecastcdn.net.
+videos.beautyriot.com.                     IN    CNAME    wac.14d0.edgecastcdn.net.
+beautyriot.com.                            IN    TXT      "google-site-verification: 5VHN6tdNMh6ph03GSTICzlspIz-A8M37ZxG2cyFfaAk"
+beautyriot.com. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

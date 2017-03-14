@@ -1,0 +1,544 @@
+#### This file is managed by Puppet, do not modify it directly.
+hockeysfuture_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_hockeysfuture
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: hockeysfuture.com
+hockeysfuture_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_hockeysfuture
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: hockeysfuture.com
+pbwpgnmedia_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_gnmedia
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: pbwp.gnmedia.net
+pbwpgnmedia_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_gnmedia
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: pbwp.gnmedia.net
+realitytea_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_realitytea
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: realitytea.com
+realitytea_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_realitytea
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: realitytea.com
+playstationlifestyle_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_playstationls
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: playstationlifestyle.net
+playstationlifestyle_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_playstationls
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: playstationlifestyle.net
+mostcraved_ro:
+  dbhost: sql1v-56-mc.ao.dev.lax.gnmedia.net
+  database: pb_mostcraved
+  dbuser: dbsync_r
+  dbpassword: <%= pbmcdevropw %>
+  siteurl: mostcraved.craveonline.com
+mostcraved_rw:
+  dbhost: sql1v-56-mc.ao.dev.lax.gnmedia.net
+  database: pb_mostcraved
+  dbuser: dbsync_w
+  dbpassword: <%= pbmcdevrwpw %>
+  siteurl: mostcraved.craveonline.com
+craveonline_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_craveonline
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: craveonline.com
+craveonline_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_craveonline
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: craveonline.com
+idlyitw_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_idlyitw
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: idly.craveonline.com
+idlyitw_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_idlyitw
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: idly.craveonline.com
+thefashionspot_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_thefashionspot
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: thefashionspot.com
+thefashionspot_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_thefashionspot
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: thefashionspot.com
+bufferzone_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_bufferzone
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: bufferzone.craveonline.com
+bufferzone_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_bufferzone
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: bufferzone.craveonline.com
+totallyher_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_totallyher
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: totallyher.com
+totallyher_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_totallyher
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: totallyher.com
+wholesomebabyfood_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_wholesomebabyfood
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: wholesomebabyfood.momtastic.com
+wholesomebabyfood_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_wholesomebabyfood
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: wholesomebabyfood.momtastic.com
+hoopsvibe_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_hoopsvibe
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: hoopsvibe.com
+hoopsvibe_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_hoopsvibe
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: hoopsvibe.com
+liveoutdoors_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_liveoutdoors
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: liveoutdoors.com
+liveoutdoors_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_liveoutdoors
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: liveoutdoors.com
+wrestlezone_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_wrestlezone
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: wrestlezone.com
+wrestlezone_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_wrestlezone
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: wrestlezone.com
+momtasticau_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_momtasticau
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: momtastic.com.au
+momtasticau_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_momtasticau
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: momtastic.com.au
+mumtasticuk_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_mumtasticuk
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: mumtasticuk.co.uk
+mumtasticuk_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_mumtasticuk
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: mumtasticuk.co.uk
+momtastic_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_momtastic
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: momtastic.com
+momtastic_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_momtastic
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: momtastic.com
+shocktillyoudrop_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_shocktillyoudrop
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: shocktillyoudrop.com
+shocktillyoudrop_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_shocktillyoudrop
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: shocktillyoudrop.com
+superherohype_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_superherohype
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: superherohype.com
+superherohype_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_superherohype
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: superherohype.com
+ringtv_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_ringtv
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: ringtv.craveonline.com
+ringtv_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_ringtv
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: ringtv.craveonline.com
+comingsoon_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_comingsoon
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: comingsoon.net
+comingsoon_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_comingsoon
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: comingsoon.net
+forums_psl_ro:
+  dbhost: vip-sqlro-xf-psl.ao.dev.lax.gnmedia.net
+  database: forums_psl
+  dbuser: dbsync_r
+  dbpassword: <%= pbxfpsldevropw %>
+  siteurl: forums.playstationlifestyle.net
+forums_psl_rw:
+  dbhost: vip-sqlrw-xf-psl.ao.dev.lax.gnmedia.net
+  database: forums_psl
+  dbuser: dbsync_w
+  dbpassword: <%= pbxfpsldevrwpw %>
+  siteurl: forums.playstationlifestyle.net
+forums_hfb_ro:
+  dbhost: vip-sqlro-xf-hfb.ao.dev.lax.gnmedia.net
+  database: forums_hfb
+  dbuser: dbsync_r
+  dbpassword: <%= pbxfhfbdevropw %>
+  siteurl: hfboards.hockeysfuture.com
+forums_hfb_rw:
+  dbhost: vip-sqlrw-xf-hfb.ao.dev.lax.gnmedia.net
+  database: forums_hfb
+  dbuser: dbsync_w
+  dbpassword: <%= pbxfhfbdevrwpw %>
+  siteurl: hfboards.hockeysfuture.com
+forums_wz_ro:
+  dbhost: vip-sqlro-xf-wz.ao.dev.lax.gnmedia.net
+  database: forums_wz
+  dbuser: dbsync_r
+  dbpassword: <%= pbxfwzdevropw %>
+  siteurl: forums.wrestlezone.com
+forums_wz_rw:
+  dbhost: vip-sqlrw-xf-wz.ao.dev.lax.gnmedia.net
+  database: forums_wz
+  dbuser: dbsync_w
+  dbpassword: <%= pbxfwzdevrwpw %>
+  siteurl: forums.wrestlezone.com
+webecoist_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_webecoist
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: webecoist.momtastic.com
+webecoist_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_webecoist
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: webecoist.momtastic.com
+craveonlinemedia_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_craveonlinemedia
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: craveonlinemedia.com
+craveonlinemedia_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_craveonlinemedia
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: craveonlinemedia.com
+totallyhermedia_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_totallyhermedia
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: totallyhermedia.com
+totallyhermedia_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_totallyhermedia
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: totallyhermedia.com
+springboard_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_springboard
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: home.springboardplatform.com
+springboard_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_springboard
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: home.springboardplatform.com
+api_cs_ro:
+  dbhost: vip-sqlro-api-cs.ao.dev.lax.gnmedia.net
+  database: csmovies
+  dbuser: dbsync_r
+  dbpassword: <%= apicsdevropw %>
+  siteurl: api.comingsoon.net
+api_cs_rw:
+  dbhost: vip-sqlrw-api-cs.ao.dev.lax.gnmedia.net
+  database: csmovies
+  dbuser: dbsync_w
+  dbpassword: <%= apicsdevrwpw %>
+  siteurl: api.comingsoon.net
+forums_sdc_ro:
+  dbhost: vip-sqlro-xf-sdc.ao.dev.lax.gnmedia.net
+  database: forums_sdc
+  dbuser: dbsync_r
+  dbpassword: <%= pbxfsdcdevropw %>
+  siteurl: forums.sherdog.com
+forums_sdc_rw:
+  dbhost: vip-sqlrw-xf-sdc.ao.dev.lax.gnmedia.net
+  database: forums_sdc
+  dbuser: dbsync_w
+  dbpassword: <%= pbxfsdcdevrwpw %>
+  siteurl: forums.sherdog.com
+sherdog_ro:
+  dbhost: sql1v-sdc.ao.dev.lax.gnmedia.net
+  database: sherdog
+  dbuser: dbsync_r
+  dbpassword: <%= pbsdcdevropw %>
+  siteurl: sherdog.com
+sherdog_rw:
+  dbhost: sql1v-sdc.ao.dev.lax.gnmedia.net
+  database: sherdog
+  dbuser: dbsync_w
+  dbpassword: <%= pbsdcdevrwpw %>
+  siteurl: sherdog.com
+afterellen_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_afterellen
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: afterellen.com
+afterellen_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_afterellen
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: afterellen.com
+forums_ae_ro:
+  dbhost: vip-sqlro-xf-ae.ao.dev.lax.gnmedia.net
+  database: forums_ae
+  dbuser: dbsync_r
+  dbpassword: <%= pbxfaedevropw %>
+  siteurl: forums.afterellen.com
+forums_ae_rw:
+  dbhost: vip-sqlrw-xf-ae.ao.dev.lax.gnmedia.net
+  database: forums_ae
+  dbuser: dbsync_w
+  dbpassword: <%= pbxfaedevrwpw %>
+  siteurl: forums.afterellen.com
+totallykidz_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_totallykidz
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: totallykidz.com
+totallykidz_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_totallykidz
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: totallykidz.com
+beautyriot_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_beautyriot
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: beautyriot.com
+beautyriot_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_beautyriot
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: beautyriot.com
+evolvemediallc_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_evolvemediallc
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: evolvemediallc.com
+evolvemediallc_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_evolvemediallc
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: evolvemediallc.com
+cattime_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_cattime
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: cattime.com
+cattime_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_cattime
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: cattime.com
+musicfeeds_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_musicfeeds
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: musicfeeds.com.au
+musicfeeds_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_musicfeeds
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: musicfeeds.com.au
+base_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_base
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: base.evolvemediallc.com
+base_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_base
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: base.evolvemediallc.com
+dogtime_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_dogtime
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: dogtime.com
+dogtime_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_dogtime
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: dogtime.com
+ropeofsilicon_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_ropeofsilicon
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: ropeofsilicon.com
+ropeofsilicon_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_ropeofsilicon
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: ropeofsilicon.com
+studio_musicfeeds_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_studio_musicfeeds
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: studio.musicfeeds.com.au
+studio_musicfeeds_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_studio_musicfeeds
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: studio.musicfeeds.com.au
+awards_totalbeauty_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_awards_totalbeauty
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: awards.totalbeauty.com
+awards_totalbeauty_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_awards_totalbeauty
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: awards.totalbeauty.com
+api_dfp_ro:
+  dbhost: sql1v-api-dfp.ao.dev.lax.gnmedia.net
+  database: api_dfp
+  dbuser: dbsync_r
+  dbpassword: <%= apidfpdevropw %>
+  siteurl: api.dfp.gnmedia.net
+api_dfp_rw:
+  dbhost: sql1v-api-dfp.ao.dev.lax.gnmedia.net
+  database: api_dfp
+  dbuser: dbsync_w
+  dbpassword: <%= apidfpdevrwpw %>
+  siteurl: api.dfp.gnmedia.net
+mandatory_ro:
+  dbhost: vip-sqlro-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_mandatory
+  dbuser: dbsync_r
+  dbpassword: <%= pbwpdevropw %>
+  siteurl: mandatory.com
+mandatory_rw:
+  dbhost: vip-sqlrw-wp.ao.dev.lax.gnmedia.net
+  database: wp_pb_mandatory
+  dbuser: dbsync_w
+  dbpassword: <%= pbwpdevrwpw %>
+  siteurl: mandatory.com
+
+
+

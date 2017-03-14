@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+vm_fqdn=$(sed 's/\./\\./g' <<< $1)
+
+for i in {1..50} ; do
+    metal=metal-${i}.lax.gnmedia.net
+
+    if ! ping -c1 $metal > /dev/null 2>&1 ; then
+	continue
+    fi
+
+    ssh $metal 'sudo virsh list --all' < /dev/null |
+    if grep -q $vm_fqdn ; then
+        echo $metal
+    fi
+done

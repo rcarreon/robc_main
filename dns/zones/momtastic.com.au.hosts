@@ -1,0 +1,39 @@
+$TTL 3600
+momtastic.com.au.       IN      SOA     momtastic.com.au. root.momtastic.com.au. (
+                                             2016061600     ; serial
+                                             28800          ; refresh
+                                             14400          ; retry
+                                             3600000        ; expire
+                                             86400 )        ; minimum
+; name servers and mail servers
+;
+momtastic.com.au.                            IN    NS       app3v-dns.tp.prd.lax.evolvemediallc.com.
+momtastic.com.au.                            IN    NS       app4v-dns.tp.prd.lax.evolvemediallc.com.
+momtastic.com.au.                            IN    NS       app1v-dns.tp.prd.lax.evolvemediallc.com.
+momtastic.com.au.                            IN    NS       app2v-dns.tp.prd.lax.evolvemediallc.com.
+
+momtastic.com.au.     IN  MX 1 aspmx.l.google.com. 
+momtastic.com.au.     IN MX 5 alt1.aspmx.l.google.com. 
+momtastic.com.au.     IN MX 5 alt2.aspmx.l.google.com. 
+momtastic.com.au.     IN MX 10 alt3.aspmx.l.google.com. 
+momtastic.com.au.     IN MX 10 alt4.aspmx.l.google.com.
+
+; local host
+;
+local                                        IN    A        127.0.0.1
+localhost                                    IN    A        127.0.0.1
+loghost                                      IN    A        127.0.0.1
+
+; #### PBWP Migration
+momtastic.com.au.                            IN    A        97.64.84.172
+bta.momtastic.com.au.                        IN    A        10.64.64.75
+dev.momtastic.com.au.                        IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.momtastic.com.au.                        IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.momtastic.com.au.                        IN    A        97.64.84.172
+www.momtastic.com.au.                        IN    A        97.64.84.172
+
+origin.campaigns.momtastic.com.au.           IN    A       97.64.84.104
+campaigns.momtastic.com.au.                  IN    CNAME   origin.campaigns.momtastic.com.au.
+cdn.campaigns.momtastic.com.au.              IN    CNAME   wac.1384D.sigmacdn.net.
+staging.campaigns.momtastic.com.au.      IN    A       97.64.84.105
+momtastic.com.au. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

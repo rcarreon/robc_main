@@ -1,0 +1,33 @@
+$TTL 86400
+hfboards.ca.		IN      SOA     hfboards.ca. root.hfboards.ca. (
+                        2014062500	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+hfboards.ca.	IN	NS              app3v-dns.tp.prd.lax.craveonline.com.
+hfboards.ca.	IN	NS              app4v-dns.tp.prd.lax.craveonline.com.
+hfboards.ca.	IN	NS              app1v-dns.tp.prd.lax.craveonline.com.
+hfboards.ca.	IN	NS              app2v-dns.tp.prd.lax.craveonline.com.
+		IN	MX	0	mail.hfboards.ca.
+;
+; local host
+;
+local           IN      A       127.0.0.1
+localhost       IN      A       127.0.0.1
+loghost         IN      A       127.0.0.1
+;
+;
+; wildcard
+; *		IN	A	66.154.35.211
+;*		IN	A	72.172.76.31	
+;
+; old
+;*		IN	A	66.180.202.85
+;
+; new
+hfboards.ca.	IN	A	72.172.76.31
+*		IN	A	72.172.76.31
+www		IN	A	72.172.76.31

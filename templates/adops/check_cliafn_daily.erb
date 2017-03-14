@@ -1,0 +1,66 @@
+#!/bin/bash
+
+#set -x
+
+date_fmt="+%Y-%m-%d"
+date_cur=$(date ${date_fmt})
+date_exclude="2013-04-01"
+
+email=addevelopers@evolvemediallc.com
+
+cronhost=app1v-cron.ap.prd.lax.gnmedia.net
+
+dbhost=vip-sqlro-adops.ap.prd.lax.gnmedia.net
+dbuser=payoutcheck_r
+dbpass=<%= payoutcheck_r %>
+
+db=adops2_0_production
+tbl=campaign_line_item_ad_final_numbers
+
+read -r -d '' msg_success <<EOF
+
+SUCCESS: Daily check of "${tbl}" shows that there are no empty campaign IDs.
+
+EOF
+
+read -r -d '' msg_error <<EOF
+
+
+WARNING: Daily check of "${tbl}" shows that there are empty campaign IDs.
+
+
+To verify and identify the missing campaign IDs, run this query against ${dbhost} using db ${db}: 
+
+    "SELECT id,campaign_id FROM ${tbl} WHERE campaign_id IS NULL and reporting_date != '${date_exclude}';"
+
+EOF
+
+
+sql="SELECT COUNT(*) FROM ${tbl} WHERE campaign_id IS NULL and reporting_date != '${date_exclude}';"
+rows=$(mysql --host=${dbhost} --user=${dbuser} --password=${dbpass} ${db} --batch --skip-column-names --execute="${sql}")
+
+if [[ $? -ne 0 ]]; then
+echo "${0} on host: ${HOSTNAME} has failed running the mysql command" | mail -s "${0} ERROR" ${email}
+    exit 1
+fi
+
+# Check for successful run
+if [[ ${rows} == 0 ]]; then
+    status="SUCCESS"
+    msg_next_steps=${msg_success}
+else
+    status="WARNING"
+    msg_next_steps=${msg_error}
+fi
+
+subject="Check of ${tbl} - ${date_cur} (${status})"
+read -r -d '' msg <<EOF
+Checking ${tbl} for empty campaign IDs
+
+Total number of entries with empty campaign IDs: ${rows}
+
+${msg_next_steps}
+EOF
+
+
+echo "${msg}" | mail -s "${subject}" ${email}

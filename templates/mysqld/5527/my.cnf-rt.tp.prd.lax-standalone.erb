@@ -1,0 +1,48 @@
+# This file is managed by Puppet do not modify it from <%= fqdn %>
+# My.cnf for MySQL 5.5 for Standalone (but based on RT master's template)
+# filename=<%= file %> 
+# Please note any item enclosed by < > brackets needs to be replaced by an actual value during the time of the build
+
+
+                   
+[mysqld]
+datadir=<%= mysqldatadir %>
+server-id = <%= mysqld_serverid %>
+report-host = <%= fqdn %>
+
+# Error log
+log-error=/sql/log/error.log
+
+# Slow query log
+log_output=FILE
+slow_query_log=1
+slow_query_log_file=/sql/log/slow-queries.log
+long_query_time=5
+
+# Connection info
+max_connections=700
+thread_cache_size=100
+connect_timeout=20
+max_connect_errors=100
+
+# MyISAM config
+key_buffer_size = 64M
+
+# InnoDB config
+innodb_file_per_table
+innodb_buffer_pool_size=2G
+innodb_buffer_pool_instances=1
+innodb_log_file_size=256M
+innodb_log_buffer_size=4M
+innodb_flush_method = O_DIRECT
+
+# Query cache
+query_cache_size= 512M
+
+# Table cache
+table_open_cache=512
+
+###############
+
+tmp_table_size = 64M
+max_heap_table_size = 64M

@@ -1,0 +1,23 @@
+$ORIGIN martinimediaeurope.com.
+$TTL    3600 
+martinimediaeurope.com.	IN      SOA     martinimediaeurope.com. root.martinimediaeurope.com. (
+                        2015070600	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+martinimediaeurope.com.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+martinimediaeurope.com.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+martinimediaeurope.com.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+martinimediaeurope.com.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+
+
+                       A     85.133.38.1
+www                    A     85.133.38.1
+
+

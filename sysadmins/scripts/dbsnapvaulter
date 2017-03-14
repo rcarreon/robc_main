@@ -1,0 +1,19 @@
+#!/bin/bash
+
+PATH=/usr/local/bin:$PATH
+
+volumes=$(rnetapp netapp1_nfs snapshot list -q | grep " dbbackup$" | awk -F: '{print $1}' | sort -u)
+
+for vol in $volumes;do
+    if rnetapp netapp2_sv vol list sv_$vol >/dev/null;then
+        continue
+    fi
+    numtr=$(rnetapp netapp2 snapmirror list -x | grep transferring | wc -l)
+    while [ $numtr -ge 5 ];do
+        sleep 150;
+        numtr=$(rnetapp netapp2 snapmirror list -x | grep transferring | wc -l)
+    done
+    #rnetapp netapp2_sv vol list | egrep sv_$vol >/dev/null && continue
+    
+    snapvault-setup nfsA-netapp1.gnmedia.net:$vol none
+done

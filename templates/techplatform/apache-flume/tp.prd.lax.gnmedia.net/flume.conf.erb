@@ -1,0 +1,31 @@
+####################################
+#           ORIGIN-PRD             #
+####################################
+origin-prd.sources = srcPrd
+origin-prd.sinks = snkPrd
+origin-prd.channels = chnPrd
+
+origin-prd.sources.srcPrd.type = http
+origin-prd.sources.srcPrd.port = 11112
+origin-prd.sources.srcPrd.channels = chnPrd
+origin-prd.sources.srcPrd.handler = org.apache.flume.source.http.JSONHandler
+
+origin-prd.sinks.snkPrd.type = hdfs
+origin-prd.sinks.snkPrd.hdfs.path = hdfs://zootpprd/flume/origin/prd/%Y/%m/%d
+origin-prd.sinks.snkPrd.hdfs.rollInterval = 3600
+origin-prd.sinks.snkPrd.hdfs.rollSize = 0
+origin-prd.sinks.snkPrd.hdfs.rollCount = 0
+origin-prd.sinks.snkPrd.hdfs.fileType = DataStream
+origin-prd.sinks.snkPrd.hdfs.filePrefix = <%= fqdn %>
+origin-prd.sinks.snkPrd.hdfs.inUsePrefix = .
+origin-prd.sinks.snkPrd.hdfs.useLocalTimeStamp = true
+
+origin-prd.sinks.snkPrd.hdfs.minBlockReplicas = 1
+origin-prd.sinks.snkPrd.hdfs.batchSize = 10000
+origin-prd.sinks.snkPrd.channel = chnPrd
+
+origin-prd.channels.chnPrd.type = memory
+origin-prd.channels.chnPrd.capacity = 100000
+origin-prd.channels.chnPrd.transactionCapacity = 10000
+
+origin-prd.http.monitoring.port=21112

@@ -1,0 +1,19 @@
+$TTL 3600
+theukfashionspot.co.uk.     IN      SOA     theukfashionspot.co.uk. root.theukfashionspot.co.uk. (
+                                2015051100     ; serial
+                                28800          ; refresh
+                                14400          ; retry
+                                3600000        ; expire
+                                86400 )        ; minimum
+
+theukfashionspot.co.uk.         IN    NS       app1v-dns.tp.prd.lax.thefashionspot.com.
+theukfashionspot.co.uk.         IN    NS       app2v-dns.tp.prd.lax.thefashionspot.com.
+theukfashionspot.co.uk.         IN    NS       app3v-dns.tp.prd.lax.thefashionspot.com.
+theukfashionspot.co.uk.         IN    NS       app4v-dns.tp.prd.lax.thefashionspot.com.
+
+theukfashionspot.co.uk.         IN    A        97.64.84.172       
+bta.theukfashionspot.co.uk.     IN    A        10.64.64.75
+dev.theukfashionspot.co.uk.     IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.theukfashionspot.co.uk.     IN    CNAME    stg.pbwordpress.gnmedia.net.
+www.theukfashionspot.co.uk.     IN    CNAME    theukfashionspot.co.uk.
+forums                          IN    CNAME    forums.thefashionspot.com.

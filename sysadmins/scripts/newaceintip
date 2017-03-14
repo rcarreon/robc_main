@@ -1,0 +1,53 @@
+#!/bin/bash
+
+vlan=$1
+context=$2
+
+usage="Usage: $0 vlan context
+Example: $0 vlan1022 gn1.ace1.core1.gnmedia.net
+Example: $0 vlan1022 gn1@core1"
+
+case "$vlan" in
+  vlan????) : ;;
+  *) echo "$usage"; exit 1;;
+esac
+  
+if [ -z "$context" ];then
+  echo "$usage"; exit 1
+fi
+
+context=$(echo "$context" | sed -e 's/@/./' -e 's/.ace1././' -e 's/.gnmedia.net//')
+
+fqdn=int-$vlan.$context.gnmedia.net
+
+continue() {
+   read -p "${1:-Continue?} [Y/n] " reply
+   if test -z "$reply" -o "${reply:0:1}" = Y -o "${reply:0:1}" = y ; then
+      return 0
+   else
+      return 1
+   fi
+}
+
+
+echo "Running 'ipreserve $vlan $fqdn'"
+newip=$(ipreserve $vlan $fqdn)
+
+       if test -z "$newip" ;then
+          echo "Error: Failed to get an IP in network $vlan"
+          exit 1
+       fi
+       echo "IP: $newip"
+       if ! continue "Create DNS entry?";then
+          iprelease $fqdn
+          exit 0
+       fi
+       dnsnewentry --commit $fqdn $newip
+       echo
+       read -p "Run dnspush? [Y/n] " reply
+       case $reply in
+          n*|N*) echo "Do not forget to run dnspush yourself!";;
+          *) dnspush ;;
+       esac
+       exit
+

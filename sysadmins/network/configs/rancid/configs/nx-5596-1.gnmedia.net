@@ -1,0 +1,1908 @@
+!RANCID-CONTENT-TYPE: cisco-nx
+!
+!Chassis type:  - a NXOS router
+!Hardware: cisco Nexus5596 Chassis ("O2 48X10GE/Modular Supervisor")
+!Hardware: Intel(R) Xeon(R) CPU with 8070 MB of memory.
+!Hardware: Processor Board ID JAF1508AHGT
+!
+!Memory: bootflash: 1960 MB
+!
+!Software: BIOS: version 3.5.0
+!Software: loader: version N/A
+!Software: kickstart: version 5.2(1)N1(3)
+!Software: system: version 5.2(1)N1(3)
+!Software: power-seq: Module 1: version v4.0
+!Software: Module 2: version v1.0
+!Software: Module 3: version v0.0
+!Software: uC: version v1.0.0.2
+!Software: SFP uC: Module 1: v1.0.0.0
+!Software: BIOS compile time: 02/03/2011
+!Software: kickstart image file is: bootflash:///n5000-uk9-kickstart.5.2.1.N1.3.bin
+!Software: kickstart compile time: 12/4/2012 1:00:00 [12/04/2012 01:53:21]
+!Software: system image file is: bootflash:///n5000-uk9.5.2.1.N1.3.bin
+!Software: system compile time: 12/4/2012 1:00:00 [12/04/2012 03:40:13]
+!
+!LIC: MDS20130103140535265.lic:
+!LIC: SERVER this_host ANY
+!LIC: VENDOR cisco
+!LIC: INCREMENT LAN_ENTERPRISE_SERVICES_PKG cisco 1.0 permanent uncounted \
+!LIC:         VENDOR_STRING=<LIC_SOURCE>MDS_SWIFT</LIC_SOURCE><SKU>N55-LAN1K9=</SKU> \
+!LIC:         HOSTID=VDH=FOX1504H65F \
+!LIC:         NOTICE="<LicFileID>20130103140535265</LicFileID><LicLineID>1</LicLineID> \
+!LIC:         <PAK></PAK>" SIGN=EEA89A3072C2
+!LIC: license_FOX1504H65F_10.lic:
+!LIC: SERVER this_host ANY
+!LIC: VENDOR cisco
+!LIC: INCREMENT LAN_BASE_SERVICES_PKG cisco 1.0 permanent uncounted \
+!LIC:         VENDOR_STRING=MDS HOSTID=VDH=FOX1504H65F \
+!LIC:         NOTICE=<LicFileID>20110408083331000</LicFileID><LicLineID>1</LicLineID><PAK>N5K-C5596UPFOX1504H65F</PAK> \
+!LIC:         SIGN=AED2FF60AD5A
+!LIC: enterprise_lic_5596_ent2.lic:
+!LIC: SERVER this_host ANY
+!LIC: VENDOR cisco
+!LIC: INCREMENT LAN_ENTERPRISE_SERVICES_PKG cisco 1.0 4-jan-2012 uncounted \
+!LIC:         VENDOR_STRING=<LIC_SOURCE>MDS_SWIFT</LIC_SOURCE><SKU>N55-LAN1K9=</SKU> \
+!LIC:         HOSTID=VDH=FOX1504H65F \
+!LIC:         NOTICE="<LicFileID>20111006124246062</LicFileID><LicLineID>1</LicLineID> \
+!LIC:         <PAK></PAK>" SIGN=A20F3ED24DE8
+!
+!LIC: Feature                      Ins  Lic   Status Expiry Date Comments
+!LIC:                                  Count
+!LIC: FCOE_NPV_PKG                  No    -   Unused             -
+!LIC: FM_SERVER_PKG                 No    -   Unused             -
+!LIC: ENTERPRISE_PKG                No    -   Unused             -
+!LIC: FC_FEATURES_PKG               No    -   Unused             -
+!LIC: VMFEX_FEATURE_PKG             No    -   Unused             -
+!LIC: ENHANCED_LAYER2_PKG           No    -   Unused             -
+!LIC: LAN_BASE_SERVICES_PKG         Yes   -   In use Never       -
+!LIC: LAN_ENTERPRISE_SERVICES_PKG   Yes   -   Unused Never       -
+!
+!LIC: License hostid: VDH=FOX1504H65F
+!
+!Red: This command is not supported on this platform.
+!
+!Env:                          ^
+!Env: Fan:
+!Env: ------------------------------------------------------
+!Env: Fan             Model                Hw         Status
+!Env: ------------------------------------------------------
+!Env: Chassis-1       N5596UP-FAN          --         ok
+!Env: Chassis-2       N5596UP-FAN          --         ok
+!Env: Chassis-3       N5596UP-FAN          --         ok
+!Env: Chassis-4       N5596UP-FAN          --         ok
+!Env: PS-1            N55-PAC-1100W        --         ok
+!Env: PS-2            N55-PAC-1100W        --         ok
+!
+!Env: Temperature
+!Env: -----------------------------------------------------------------
+!Env: Module   Sensor     MajorThresh   MinorThres   Status
+!Env:                     (Celsius)     (Celsius)
+!Env: -----------------------------------------------------------------
+!Env: 1        Outlet     67            58           ok
+!
+!Env: Power Supply:
+!Env: Voltage: 12 Volts
+!Env: -----------------------------------------------------------
+!Env: PS  Model                Input Power       Power     Status
+!Env:                          Type  (Watts)     (Amp)
+!Env: -----------------------------------------------------------
+!Env: 1   N55-PAC-1100W        AC    1050.00     87.50     ok
+!Env: 2   N55-PAC-1100W        AC    1050.00     87.50     ok
+!Env: Mod Model                   Power     Power       Power     Power       Status
+!Env:                             Requested Requested   Allocated Allocated
+!Env:                             (Watts)   (Amp)       (Watts)   (Amp)
+!Env: --- ----------------------  -------   ----------  --------- ----------  ----------
+!Env: 1    N5K-C5596UP-SUP        648.00    54.00       648.00    54.00       powered-up
+!Env: 2    N55-M160L3-V2          110.40    9.20        110.40    9.20        powered-up
+!Env: 3    N55-M16UP              90.00     7.50        90.00     7.50        powered-up
+!Env: Power Usage Summary:
+!Env: --------------------
+!Env: Power Supply redundancy mode:                 Redundant
+!Env: Power Supply redundancy operational mode:     Redundant
+!Env: Total Power Capacity                             2100.00 W
+!Env: Power reserved for Supervisor(s)                  648.00 W
+!Env: Power currently used by Modules                   200.40 W
+!Env:                                                 -------------
+!Env: Total Power Available                            1251.60 W
+!Env:                                                 -------------
+!
+!Variable: Current Boot Variables:
+!Variable: kickstart = bootflash:/n5000-uk9-kickstart.5.2.1.N1.3.bin
+!Variable: system = bootflash:/n5000-uk9.5.2.1.N1.3.bin
+!Variable: Boot Variables on next reload:
+!Variable: kickstart = bootflash:/n5000-uk9-kickstart.5.2.1.N1.3.bin
+!Variable: system = bootflash:/n5000-uk9.5.2.1.N1.3.bin
+!
+!Flash: bootflash:           0    Dec 07 10:06:49 2012  20121207_180649_poap_3529_init.log
+!Flash: bootflash:           0    Dec 13 08:14:07 2012  20121213_161407_poap_3521_init.log
+!Flash: bootflash:         317    Dec 07 09:56:18 2012  MDS20130103140535265.lic
+!Flash: bootflash:         311    Dec 07 09:55:53 2012  MDS20130103140623032.lic
+!Flash: bootflash:       49152    Jul 07 11:15:58 2011  lost+found/
+!Flash: bootflash:        6929    Dec 13 08:12:42 2012  mts.log
+!Flash: bootflash:    25140224    Sep 27 14:34:18 2011  n5000-uk9-kickstart.5.0.3.N2.1.bin
+!Flash: bootflash:    31646720    Dec 07 09:26:15 2012  n5000-uk9-kickstart.5.2.1.N1.3.bin
+!Flash: bootflash:   147256572    Sep 27 14:31:04 2011  n5000-uk9.5.0.3.N2.1.bin
+!Flash: bootflash:   173248174    Dec 07 09:31:15 2012  n5000-uk9.5.2.1.N1.3.bin
+!Flash: bootflash:        4096    Jan 01 07:29:05 2009  vdc_2/
+!Flash: bootflash:        4096    Jan 01 07:29:05 2009  vdc_3/
+!Flash: bootflash:        4096    Jan 01 07:29:05 2009  vdc_4/
+!Flash: bootflash: Usage for bootflash://sup-local
+!Flash: bootflash:   472 MB used
+!Flash: bootflash:  1102 MB free
+!Flash: bootflash:  1574 MB total
+!
+!Flash: debug: Usage for debug://sup-local
+!Flash: debug:           0 MB used
+!Flash: debug:    20 MB free
+!Flash: debug:    20 MB total
+!
+!Flash: logflash: No such file or directory
+!
+!Flash: slot0: No such file or directory
+!
+!Flash: usb2: No such file or directory
+!
+!Flash: volatile: Usage for volatile://sup-local
+!Flash: volatile:           0 MB used
+!Flash: volatile:   150 MB free
+!Flash: volatile:   150 MB total
+!
+!Mod: Mod Ports Module-Type                       Model                  Status
+!Mod: --- ----- --------------------------------- ---------------------- ------------
+!Mod: 1   48    O2 48X10GE/Modular Supervisor     N5K-C5596UP-SUP        active
+!Mod: 2   0     O2 GEM with L3 ASIC               N55-M160L3-V2          ok
+!Mod: 3   16    O2 16 port flexible GEM           N55-M16UP              ok
+!Mod: 
+!Mod: Mod  Sw              Hw      World-Wide-Name(s) (WWN)
+!Mod: ---  --------------  ------  --------------------------------------------------
+!Mod: 1    5.2(1)N1(3)     1.0     --
+!Mod: 2    5.2(1)N1(3)     1.0     --
+!Mod: 3    5.2(1)N1(3)     1.0     --
+!Mod: 
+!Mod: Mod  MAC-Address(es)                         Serial-Num
+!Mod: ---  --------------------------------------  ----------
+!Mod: 1    0005.73d7.e508 to 0005.73d7.e537         JAF1508AHGT
+!Mod: 2    0000.0000.0000 to 0000.0000.000f         FOC163849PQ
+!Mod: 3    547f.eeb0.abf0 to 547f.eeb0.abff         FOC16231T68
+!
+!NAME: "Chassis",               DESCR: "Nexus5596 Chassis"
+!PID: N5K-C5596UP
+!VID: V01
+!SN: FOX1504H65F
+!NAME: "Module 1",              DESCR: "O2 48X10GE/Modular Supervisor"
+!PID: N5K-C5596UP
+!VID: V01
+!SN: JAF1508AHGT
+!NAME: "Module 2",              DESCR: "O2 GEM with L3 ASIC"
+!PID: N55-M160L3-V2
+!VID: V01
+!SN: FOC163849PQ
+!NAME: "Module 3",              DESCR: "O2 16 port flexible GEM"
+!PID: N55-M16UP
+!VID: V01
+!SN: FOC16231T68
+!NAME: "Fan 4",                 DESCR: "Chassis fan module"
+!PID: N5596UP-FAN
+!VID: N/A
+!SN: N/A
+!NAME: "Fan 3",                 DESCR: "Chassis fan module"
+!PID: N5596UP-FAN
+!VID: N/A
+!SN: N/A
+!NAME: "Fan 2",                 DESCR: "Chassis fan module"
+!PID: N5596UP-FAN
+!VID: N/A
+!SN: N/A
+!NAME: "Fan 1",                 DESCR: "Chassis fan module"
+!PID: N5596UP-FAN
+!VID: N/A
+!SN: N/A
+!NAME: "Power supply 1",        DESCR: "AC power supply"
+!PID: N55-PAC-1100W
+!VID: V01
+!SN: POG151650GD
+!NAME: "Power supply 2",        DESCR: "AC power supply"
+!PID: N55-PAC-1100W
+!VID: V01
+!SN: POG1512505D
+!NAME: "FEX 103 CHASSIS",       DESCR: "N2K-C2232PP-10GE  CHASSIS"
+!PID: N2K-C2232PP-10GE
+!VID: V03
+!SN: SSI16070CLA
+!NAME: "FEX 103 Module 1",      DESCR: "Fabric Extender Module: 32x10GE, 8x10GE Supervisor"
+!PID: N2K-C2232PP-10GE
+!VID: V03
+!SN: FOC16163EG7
+!NAME: "FEX 103 Fan 1",         DESCR: "Fabric Extender Fan module"
+!PID: N2K-C2232-FAN
+!VID: N/A
+!SN: N/A
+!NAME: "FEX 103 Power Supply 1", DESCR: "Fabric Extender AC power supply"
+!PID: N2200-PAC-400W
+!VID: V03
+!SN: DTN1607P0N2
+!NAME: "FEX 103 Power Supply 2", DESCR: "Fabric Extender AC power supply"
+!PID: N2200-PAC-400W
+!VID: V03
+!SN: DTN1607P0MX
+!
+!DEBUG: Debug level is set to Minor(1) 
+!DEBUG:  default for new sessions logging level: 3
+!
+!CORES: Module  Instance  Process-name     PID       Date(Year-Month-Day Time)
+!CORES: ------  --------  ---------------  --------  -------------------------
+!
+!PROC_LOGS: Process          PID     Normal-exit  Stack  Core   Log-create-time
+!PROC_LOGS: ---------------  ------  -----------  -----  -----  ---------------
+!PROC_LOGS: bcm_usd          4525              N      Y      N  Fri Dec  7 09:47:33 2012
+!
+
+
+version 5.2(1)N1(3)
+logging level feature-mgr 0
+hostname 5596-1
+
+no feature telnet
+cfs eth distribute
+feature interface-vlan
+feature lacp
+feature vpc
+feature lldp
+feature fex
+
+username admin password 5 $1$VV6db6QA$laAzarLxbDaLfGU7v8G4o.  role network-admin
+username rancid password 5 $1$7I8j1VIE$gM2tG6cwdMl3AzxleNXin/  role network-admin
+
+banner motd #Nexus 5000 Switch
+#
+
+ip domain-lookup
+ip access-list test
+  statistics per-entry
+  10 permit icmp 10.11.20.34/0 10.11.20.51/0
+  20 permit icmp 10.11.20.51/0 10.11.20.34/0
+  30 permit ip any any
+ip access-list test1
+  statistics per-entry
+  10 permit icmp 10.11.20.34/0 10.11.20.51/0
+  20 permit icmp 10.11.20.51/0 10.11.20.34/0
+  30 permit ip any any
+class-map type qos class-fcoe
+class-map type queuing class-fcoe
+  match qos-group 1
+class-map type queuing class-all-flood
+  match qos-group 2
+class-map type queuing class-ip-multicast
+  match qos-group 2
+class-map type network-qos class-fcoe
+  match qos-group 1
+class-map type network-qos class-all-flood
+  match qos-group 2
+class-map type network-qos class-ip-multicast
+  match qos-group 2
+policy-map type network-qos jumbo
+  class type network-qos class-default
+    mtu 9216
+    multicast-optimize
+system qos
+  service-policy type network-qos jumbo
+fex 101
+  pinning max-links 1
+  description "FEX0101"
+fex 103
+  no hardware N2232P queue-limit
+  pinning max-links 1
+  description "FEX0103"
+slot 101
+  provision model N2K-C2232P
+slot 103
+  provision model N2K-C2232P
+snmp-server user admin network-admin auth md5 0x23b64b986b4e3f4d6a5d978589bf7dae priv 0x23b64b986b4e3f4d6a5d978589bf7dae localizedkey
+snmp-server community apetime1 group network-operator
+ntp distribute
+ntp server 10.2.11.1 use-vrf management
+ntp server 10.2.11.4 use-vrf management
+ntp server 10.2.11.5 use-vrf management
+ntp peer 10.2.11.242 use-vrf management
+ntp server 10.11.20.65 use-vrf management
+ntp source-interface  mgmt0
+ntp commit 
+
+vrf context management
+  ip route 0.0.0.0/0 10.2.11.1
+vlan 1,10-12
+vlan 500
+  name Keep-Alive-for-5ks
+vlan 1020
+  name lax1TechPlatformProd
+vlan 1022
+  name lax1Management
+vlan 1024
+  name lax1XenMaster
+vlan 1026
+  name lax1DoubleHelixProd
+vlan 1028
+  name lax1SpringboardVideoProd
+vlan 1030
+  name lax1AdopsProd
+vlan 1032
+  name lax1SheKnowsProd
+vlan 1034
+  name lax1AtomicOnlineProd
+vlan 1036
+  name lax1OriginProd
+vlan 1120
+  name lax1TechPlatformStage
+vlan 1122
+  name lax1ManagementReserved1
+vlan 1124
+  name lax1XenMasterReserved1
+vlan 1126
+  name lax1DoubleHelixStage
+vlan 1128
+  name lax1SpringboardVideoStage
+vlan 1130
+  name lax1AdopsStage
+vlan 1132
+  name lax1SheKnowsStage
+vlan 1134
+  name lax1AtomicOnlineStage
+vlan 1136
+  name lax1OriginStage
+vlan 1220
+  name lax1TechPlatformDev
+vlan 1222
+  name lax1ManagementReserved2
+vlan 1224
+  name lax1XenMasterReserved2
+vlan 1226
+  name lax1DoubleHelixDev
+vlan 1228
+  name lax1SpringboardVideoDev
+vlan 1230
+  name lax1AdopsDev
+vlan 1232
+  name lax1SheKnowsDev
+vlan 1234
+  name lax1AtomicOnlineDev
+vlan 1236
+  name lax1OriginDev
+vlan 2020
+  name lax2TechPlatformProd
+vlan 2022
+  name lax2Management
+vlan 2024
+  name lax2XenMaster
+vlan 2026
+  name lax2DoubleHelixProd
+vlan 2028
+  name lax2SpringboardVideoProd
+vlan 2030
+  name lax2AdopsProd
+vlan 2032
+  name lax2SheKnowsProd
+vlan 2034
+  name lax2AtomicOnlineProd
+vlan 2036
+  name lax2OriginProd
+vlan 2120
+  name lax2TechPlatformStage
+vlan 2122
+  name lax2ManagementReserved1
+vlan 2124
+  name lax2XenMasterReserved1
+vlan 2126
+  name lax2DoubleHelixStage
+vlan 2128
+  name lax2SpringboardVideoStage
+vlan 2130
+  name lax2AdopsStage
+vlan 2132
+  name lax2SheKnowsStage
+vlan 2134
+  name lax2AtomicOnlineStage
+vlan 2136
+  name lax2OriginStage
+vlan 2220
+  name lax2TechPlatformDev
+vlan 2222
+  name lax2ManagementReserved2
+vlan 2224
+  name lax2XenMasterReserved2
+vlan 2226
+  name lax2DoubleHelixDev
+vlan 2228
+  name lax2SpringboardVideoDev
+vlan 2230
+  name lax2AdopsDev
+vlan 2232
+  name lax2SheKnowsDev
+vlan 2234
+  name lax2AtomicOnlineDev
+vlan 2236
+  name lax2OriginDev
+port-channel load-balance ethernet source-dest-port
+vpc domain 1
+  role priority 32666
+  peer-keepalive destination 10.2.11.242 source 10.2.11.241
+  delay restore 150
+  auto-recovery
+port-profile default max-ports 512
+
+
+interface Vlan1
+
+interface Vlan500
+  no shutdown
+  ip address 172.16.1.105/30
+
+interface port-channel3
+  description swx1.lax1 po3
+  shutdown
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-2234
+  logging event port trunk-status
+  vpc 3
+
+interface port-channel4
+  description swx1.lax2 po4
+  shutdown
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-2234
+  no logging event port link-status
+  no logging event port trunk-status
+  vpc 4
+
+interface port-channel5
+  description swx1.lax1 po5
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-2236
+  logging event port trunk-status
+  vpc 5
+
+interface port-channel6
+  description swx1.lax2 po6
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-2236
+  no logging event port link-status
+  no logging event port trunk-status
+  vpc 6
+
+interface port-channel10
+  description 5k-to-5k-Vpc Link
+  switchport mode trunk
+  switchport trunk allowed vlan 500,1020-2236
+  spanning-tree port type network
+  vpc peer-link
+
+interface port-channel101
+  description vpc-for-Fex101
+  switchport mode fex-fabric
+  fex associate 101
+
+interface port-channel103
+  description vpc-for-Fex103
+  switchport mode fex-fabric
+  fex associate 103
+
+interface port-channel405
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 405
+
+interface port-channel431
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 431
+
+interface port-channel432
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 432
+
+interface port-channel433
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 433
+
+interface port-channel434
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 434
+
+interface port-channel435
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 435
+
+interface port-channel436
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 436
+
+interface port-channel437
+  switchport mode trunk
+  ip port access-group test in
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 437
+
+interface port-channel438
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 438
+
+interface port-channel439
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 439
+
+interface port-channel440
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 440
+
+interface port-channel441
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 441
+
+interface port-channel442
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 442
+
+interface port-channel443
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 443
+
+interface port-channel444
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 444
+
+interface port-channel445
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 445
+
+interface port-channel446
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 446
+
+interface port-channel447
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 447
+
+interface port-channel448
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 448
+
+interface port-channel449
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 449
+
+interface port-channel450
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 450
+
+interface port-channel451
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 451
+
+interface port-channel452
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 452
+
+interface port-channel453
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 453
+
+interface port-channel454
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 454
+
+interface port-channel455
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 455
+
+interface port-channel456
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 456
+
+interface port-channel457
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 457
+
+interface port-channel458
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 458
+
+interface port-channel459
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 459
+
+interface port-channel460
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 460
+
+interface port-channel461
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 461
+
+interface port-channel462
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 462
+
+interface port-channel463
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 463
+
+interface port-channel464
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 464
+
+interface port-channel465
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 465
+
+interface port-channel466
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 466
+
+interface port-channel467
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 467
+
+interface port-channel500
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 500
+
+interface port-channel501
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 501
+
+interface port-channel502
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 502
+
+interface port-channel503
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 503
+
+interface port-channel504
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 504
+
+interface port-channel505
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 505
+
+interface port-channel506
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 506
+
+interface port-channel512
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 512
+
+interface port-channel513
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 513
+
+interface port-channel515
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 515
+
+interface port-channel516
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 516
+
+interface port-channel517
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 517
+
+interface port-channel518
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 518
+
+interface port-channel519
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 519
+
+interface port-channel520
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 520
+
+interface port-channel521
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 521
+
+interface port-channel522
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 522
+
+interface port-channel523
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 523
+
+interface port-channel524
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 524
+
+interface port-channel525
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 525
+
+interface port-channel526
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 526
+
+interface port-channel527
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 527
+
+interface port-channel528
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 528
+
+interface port-channel529
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 529
+
+interface port-channel530
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 530
+
+interface port-channel531
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 531
+
+interface port-channel532
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 532
+
+interface port-channel533
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 533
+
+interface port-channel535
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 535
+
+interface port-channel536
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 536
+
+interface port-channel537
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 537
+
+interface port-channel538
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  vpc 538
+
+interface port-channel539
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 539
+
+interface port-channel540
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 540
+
+interface port-channel541
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 541
+
+interface port-channel542
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 542
+
+interface port-channel654
+  shutdown
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  speed 10000
+  flowcontrol receive on
+
+interface port-channel906
+  description vcp-nfs1.netapp2
+  switchport mode trunk
+  switchport access vlan 1020
+  switchport trunk allowed vlan 1008-3222
+  spanning-tree port type edge trunk
+  vpc 906
+
+interface port-channel907
+  description vpc-nfs2.netapp2
+  switchport mode trunk
+  switchport access vlan 1020
+  switchport trunk allowed vlan 1008-3222
+  spanning-tree port type edge trunk
+  vpc 907
+
+interface port-channel908
+  description vpc-nfs1.netapp3
+  switchport mode trunk
+  switchport access vlan 1020
+  switchport trunk allowed vlan 1008-3222
+  spanning-tree port type edge trunk
+  vpc 908
+
+interface port-channel909
+  description vpc-nfs2.netapp3
+  switchport mode trunk
+  switchport access vlan 1020
+  switchport trunk allowed vlan 1008-3222
+  spanning-tree port type edge trunk
+  vpc 909
+
+interface port-channel910
+  description vpc_netapp-1_node_1
+  switchport mode trunk
+  switchport access vlan 1020
+  switchport trunk allowed vlan 1008-3222
+  spanning-tree port type edge trunk
+  vpc 910
+
+interface port-channel911
+  description vpc_netapp-1_node_2
+  switchport mode trunk
+  switchport access vlan 1020
+  switchport trunk allowed vlan 1008-3222
+  spanning-tree port type edge trunk
+  vpc 911
+
+interface port-channel928
+  description temp.netapp
+  switchport mode trunk
+  switchport trunk allowed vlan 1008-3222
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 928
+
+interface port-channel946
+  description temp.netapp
+  switchport mode trunk
+  switchport trunk allowed vlan 1008-3222
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  vpc 946
+
+interface port-channel947
+  description temp.netapp
+  switchport mode trunk
+  switchport trunk allowed vlan 1008-3222
+  speed 10000
+  flowcontrol receive on
+  vpc 947
+
+interface port-channel948
+  description temp.netapp
+  switchport mode trunk
+  switchport trunk allowed vlan 1008-3222
+  speed 10000
+  flowcontrol receive on
+  vpc 948
+
+interface Ethernet1/1
+  description netapp-1_node_1
+  switchport mode trunk
+  switchport access vlan 1020
+  switchport trunk allowed vlan 1008-3222
+  spanning-tree port type edge trunk
+  channel-group 910 mode active
+
+interface Ethernet1/2
+  description netapp-1_node_2
+  switchport mode trunk
+  switchport access vlan 1020
+  switchport trunk allowed vlan 1008-3222
+  spanning-tree port type edge trunk
+  channel-group 911 mode active
+
+interface Ethernet1/3
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 500 mode active
+
+interface Ethernet1/4
+  description bad port
+  switchport mode fex-fabric
+
+interface Ethernet1/5
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 501 mode active
+
+interface Ethernet1/6
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 502 mode active
+
+interface Ethernet1/7
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 505 mode active
+
+interface Ethernet1/8
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 504 mode active
+
+interface Ethernet1/9
+  description swx1.lax1 t9/3
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-2236
+  channel-group 5 mode active
+
+interface Ethernet1/10
+  description swx1.lax2 t9/4
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-2236
+  channel-group 6 mode active
+
+interface Ethernet1/11
+  description to-Fex 103
+  switchport mode fex-fabric
+  fex associate 103
+  channel-group 103
+
+interface Ethernet1/12
+  description to-Fex 103
+  switchport mode fex-fabric
+  fex associate 103
+  channel-group 103
+
+interface Ethernet1/13
+  description nfs1.netapp2
+  switchport mode trunk
+  switchport access vlan 1020
+  switchport trunk allowed vlan 1008-3222
+  channel-group 906 mode active
+
+interface Ethernet1/14
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 506 mode active
+
+interface Ethernet1/15
+  description nfs2.netapp2
+  switchport mode trunk
+  switchport access vlan 1020
+  switchport trunk allowed vlan 1008-3222
+  channel-group 907 mode active
+
+interface Ethernet1/16
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 512 mode active
+
+interface Ethernet1/17
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 513 mode active
+
+interface Ethernet1/18
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 515 mode active
+
+interface Ethernet1/19
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 516 mode active
+
+interface Ethernet1/20
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 517 mode active
+
+interface Ethernet1/21
+  description nfs1.netapp3
+  switchport mode trunk
+  switchport access vlan 1020
+  switchport trunk allowed vlan 1008-3222
+  channel-group 908 mode active
+
+interface Ethernet1/22
+
+interface Ethernet1/23
+  description nfs2.netapp3
+  switchport mode trunk
+  switchport access vlan 1020
+  switchport trunk allowed vlan 1008-3222
+  channel-group 909 mode active
+
+interface Ethernet1/24
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 405 mode active
+
+interface Ethernet1/25
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 524 mode active
+
+interface Ethernet1/26
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 525 mode active
+
+interface Ethernet1/27
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 526 mode active
+
+interface Ethernet1/28
+  switchport mode trunk
+  switchport trunk allowed vlan 1008-3222
+  flowcontrol receive on
+  channel-group 928 mode active
+
+interface Ethernet1/29
+  description 5k-to-5k-Interconnect
+  switchport mode trunk
+  switchport trunk allowed vlan 500,1020-2236
+  channel-group 10 mode active
+
+interface Ethernet1/30
+  description 5k-to-5k-Interconnect
+  switchport mode trunk
+  switchport trunk allowed vlan 500,1020-2236
+  channel-group 10 mode active
+
+interface Ethernet1/31
+  description 5k-to-5k-Interconnect
+  shutdown
+  switchport mode trunk
+  switchport trunk allowed vlan 500,1020-2236
+  channel-group 10 mode active
+
+interface Ethernet1/32
+  description temp.netapp
+  switchport trunk allowed vlan none
+  speed auto
+
+interface Ethernet1/33
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 431 mode active
+
+interface Ethernet1/34
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 465 mode active
+
+interface Ethernet1/35
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 432 mode active
+
+interface Ethernet1/36
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 434 mode active
+
+interface Ethernet1/37
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 435 mode active
+
+interface Ethernet1/38
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 466 mode active
+
+interface Ethernet1/39
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 467 mode active
+
+interface Ethernet1/40
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 528 mode active
+
+interface Ethernet1/41
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 529 mode active
+
+interface Ethernet1/42
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 518 mode active
+
+interface Ethernet1/43
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 519 mode active
+
+interface Ethernet1/44
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 520 mode active
+
+interface Ethernet1/45
+  switchport monitor
+  speed 1000
+
+interface Ethernet1/46
+  switchport mode trunk
+  switchport trunk allowed vlan 1008-3222
+  speed auto
+  flowcontrol receive on
+  channel-group 946 mode active
+
+interface Ethernet1/47
+  switchport mode trunk
+  switchport trunk allowed vlan 1008-3222
+  flowcontrol receive on
+  channel-group 947 mode active
+
+interface Ethernet1/48
+  switchport mode trunk
+  switchport trunk allowed vlan 1008-3222
+  flowcontrol receive on
+  channel-group 948 mode active
+
+interface Ethernet3/1
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 532 mode active
+
+interface Ethernet3/2
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 533 mode active
+
+interface Ethernet3/3
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 535 mode active
+
+interface Ethernet3/4
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 536 mode active
+
+interface Ethernet3/5
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 537 mode active
+
+interface Ethernet3/6
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 538 mode active
+
+interface Ethernet3/7
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 539 mode active
+
+interface Ethernet3/8
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 542 mode active
+
+interface Ethernet3/9
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 530 mode active
+
+interface Ethernet3/10
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 531 mode active
+
+interface Ethernet3/11
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 540 mode active
+
+interface Ethernet3/12
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 541 mode active
+
+interface Ethernet3/13
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 521 mode active
+
+interface Ethernet3/14
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 522 mode active
+
+interface Ethernet3/15
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 523 mode active
+
+interface Ethernet3/16
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  spanning-tree port type edge trunk
+  flowcontrol receive on
+  channel-group 527 mode active
+
+interface mgmt0
+  ip address 10.2.11.241/24
+
+interface Ethernet101/1/1
+
+interface Ethernet101/1/2
+
+interface Ethernet101/1/3
+
+interface Ethernet101/1/4
+
+interface Ethernet101/1/5
+
+interface Ethernet101/1/6
+
+interface Ethernet101/1/7
+
+interface Ethernet101/1/8
+
+interface Ethernet101/1/9
+
+interface Ethernet101/1/10
+
+interface Ethernet101/1/11
+
+interface Ethernet101/1/12
+
+interface Ethernet101/1/13
+
+interface Ethernet101/1/14
+
+interface Ethernet101/1/15
+
+interface Ethernet101/1/16
+
+interface Ethernet101/1/17
+
+interface Ethernet101/1/18
+
+interface Ethernet101/1/19
+
+interface Ethernet101/1/20
+
+interface Ethernet101/1/21
+
+interface Ethernet101/1/22
+
+interface Ethernet101/1/23
+
+interface Ethernet101/1/24
+
+interface Ethernet101/1/25
+
+interface Ethernet101/1/26
+
+interface Ethernet101/1/27
+
+interface Ethernet101/1/28
+
+interface Ethernet101/1/29
+
+interface Ethernet101/1/30
+
+interface Ethernet101/1/31
+
+interface Ethernet101/1/32
+
+interface Ethernet103/1/1
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+
+interface Ethernet103/1/2
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 455 mode active
+
+interface Ethernet103/1/3
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 433 mode active
+
+interface Ethernet103/1/4
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 457 mode active
+
+interface Ethernet103/1/5
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 456 mode active
+
+interface Ethernet103/1/6
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 451 mode active
+
+interface Ethernet103/1/7
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 437 mode active
+
+interface Ethernet103/1/8
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 438 mode active
+
+interface Ethernet103/1/9
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 439 mode active
+
+interface Ethernet103/1/10
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 440 mode active
+
+interface Ethernet103/1/11
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 441 mode active
+
+interface Ethernet103/1/12
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 442 mode active
+
+interface Ethernet103/1/13
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 443 mode active
+
+interface Ethernet103/1/14
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 444 mode active
+
+interface Ethernet103/1/15
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 452 mode active
+
+interface Ethernet103/1/16
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+
+interface Ethernet103/1/17
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 447 mode active
+
+interface Ethernet103/1/18
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 448 mode active
+
+interface Ethernet103/1/19
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 449 mode active
+
+interface Ethernet103/1/20
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 450 mode active
+
+interface Ethernet103/1/21
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+
+interface Ethernet103/1/22
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 453 mode active
+
+interface Ethernet103/1/23
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 454 mode active
+
+interface Ethernet103/1/24
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 458 mode active
+
+interface Ethernet103/1/25
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 459 mode active
+
+interface Ethernet103/1/26
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 460 mode active
+
+interface Ethernet103/1/27
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 461 mode active
+
+interface Ethernet103/1/28
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 462 mode active
+
+interface Ethernet103/1/29
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 463 mode active
+
+interface Ethernet103/1/30
+  switchport mode trunk
+  switchport trunk native vlan 1024
+  switchport trunk allowed vlan 1020-3967
+  flowcontrol receive on
+  channel-group 464 mode active
+
+interface Ethernet103/1/31
+
+interface Ethernet103/1/32
+clock timezone PST -8 0
+clock summer-time PDT 2 Sun Mar 02:00 1 Sun Nov 02:00 60
+line console
+line vty
+  session-limit 5
+  session-limit 5
+  exec-timeout 240
+boot kickstart bootflash:/n5000-uk9-kickstart.5.2.1.N1.3.bin
+boot system bootflash:/n5000-uk9.5.2.1.N1.3.bin 
+monitor session 1 
+  source interface port-channel524 both
+  destination interface Ethernet1/45
+  no shut
+
+

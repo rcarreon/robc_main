@@ -1,0 +1,53 @@
+#!/bin/bash
+# rsync Ad Platform /app/software from $SOURCE_ENV to $DEST_ENV
+#
+#
+usage() {
+  echo "Usage: $0 SOURCE_ENV DEST_ENV"
+  echo "Valid ENVs are build, dev, stg, and prd"
+  exit 1
+}
+
+if [[ $# -ne 2 ]]; then
+  echo "show usage"
+  usage
+fi
+
+SOURCE_ENV="$1"
+DEST_ENV="$2"
+
+if [[ ${SOURCE_ENV} == "build" ]]; then
+  SOURCE_MOUNT="nfsA-netapp1.gnmedia.net:/vol/nac1a_ap_lax_dev_app_shared/ap-software-${SOURCE_ENV}"
+else
+  SOURCE_MOUNT="nfsA-netapp1.gnmedia.net:/vol/nac1a_ap_lax_${SOURCE_ENV}_app_shared/ap-software-${SOURCE_ENV}"
+fi
+
+DEST_MOUNT="nfsA-netapp1.gnmedia.net:/vol/nac1a_ap_lax_${DEST_ENV}_app_shared/ap-software-${DEST_ENV}"
+
+# check that source mount is in place
+mount | grep ${SOURCE_MOUNT} | grep -w /app/software > /dev/null
+if [[ $? != "0" ]]; then
+  echo "Failure:  ${SOURCE_ENV} environment software mount is missing"
+  exit 1
+fi
+
+# mount DEST_MOUNT
+mount ${DEST_MOUNT} /app/software-${DEST_ENV}
+if [[ $? != "0" ]]; then
+  echo "Failure:  ${DEST_ENV} environment software mount could not be mounted"
+  exit 1
+fi
+
+# check that destination mount is in place
+mount | grep ${DEST_MOUNT} | grep -w /app/software-${DEST_ENV} > /dev/null
+if [[ $? != "0" ]]; then
+  echo "Failure:  ${DEST_ENV} environment software mount is missing"
+  exit 1
+fi
+
+echo "rsync -av --exclude '.snapshot' --delete /app/software/ /app/software-${DEST_ENV}"
+rsync -av --exclude '.snapshot' --delete /app/software/ /app/software-${DEST_ENV}
+umount /app/software-${DEST_ENV}
+if [[ $? != "0" ]]; then
+  echo "Failure:  ${DEST_ENV} environment software mount could not be unmounted"
+fi

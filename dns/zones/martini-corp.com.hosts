@@ -1,0 +1,52 @@
+$ORIGIN martini-corp.com.
+$TTL    3600
+martini-corp.com.	IN      SOA     martini-corp.com. root.martini-corp.com. (
+                        2016061601	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+martini-corp.com.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+martini-corp.com.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+martini-corp.com.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+martini-corp.com.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+
+martini-corp.com.					  IN  MX 1 aspmx.l.google.com.
+martini-corp.com.					  IN MX 5 alt1.aspmx.l.google.com.
+martini-corp.com.					  IN MX 5 alt2.aspmx.l.google.com.
+martini-corp.com. 					  IN MX 10 alt3.aspmx.l.google.com.
+martini-corp.com.  					  IN MX 10 alt4.aspmx.l.google.com.
+
+martini-corp.com.                       IN	 A     216.146.46.10
+martini-corp.com.                       IN	 A     216.146.46.11
+martini-corp.com.                       IN	TXT   "v=spf1 a:cluster9out.us.messagelabs.com include:_spf.google.com ip4:216.82.240.0/20 ~all"
+google85b36dc13fb7c81.martini-corp.com. IN	 CNAME google.com.
+tdp.martini-corp.com.                   IN	 CNAME google85b36dc13fb7c81.google.com.
+wiki.martini-corp.com.                  IN	 CNAME ghs.google.com.
+www.martini-corp.com.                   IN	 CNAME martini-corp.com.
+martini-corp.com. 	 	IN 	TXT	"G0O0R34839"
+;$ORIGIN _domainkey.martini-corp.com.
+google._domainkey.martini-corp.com.                 IN	 TXT   "v=DKIM1\; k=rsa\; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCytzKu/uY2K7F9nxVWPt8poaooXr4BKMok0uFHEyGr7C64v7y0Pd8FrUpYzpB6MFtikftMJQBTs6hHjr5t8ZWyfncwougoc/DNXTzzdyBI7JOnWHZu3JbttsWTqdW9/WcY6JPBauJORhWF9OGLS7Hyd8zKQ12mG5EXjU0T2yWatQIDAQAB"
+ci.engineering.martini-corp.com.                    IN	CNAME ec2-52-0-125-156.compute-1.amazonaws.com.
+drone.engineering.martini-corp.com.                  IN	CNAME ec2-52-0-125-156.compute-1.amazonaws.com.
+$ORIGIN hq.martini-corp.com.
+;@                       IN	 A     67.169.71.154
+hq.martini-corp.com.	IN	A	67.169.71.154
+$ORIGIN cerberus.hq.martini-corp.com.
+;@                      IN	 CNAME cerberusLB-2066091218.us-east-1.elb.amazonaws.com.
+cerberus.hq.martini-corp.com.                      IN	 CNAME cerberusLB-2066091218.us-east-1.elb.amazonaws.com.
+staging.cerberus.hq.martini-corp.com.                IN	 CNAME ec2-52-5-12-54.compute-1.amazonaws.com.
+$ORIGIN tools.hq.martini-corp.com.
+;@                      IN	 CNAME AppServerLB-96807610.us-east-1.elb.amazonaws.com.
+tools.hq.martini-corp.com.                      IN	 CNAME AppServerLB-96807610.us-east-1.elb.amazonaws.com.
+staging.tools.hq.martini-corp.com.                IN	 CNAME ec2-52-5-12-54.compute-1.amazonaws.com.
+
+
+
+
+

@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+export RBENV_ROOT="<%= rbenv_path %>"
+export RBENV_VERSION="<%= rbenv_ruby_version %>"
+exec rbenv exec <%= rbenv_script_name %> "$@"

@@ -1,0 +1,19 @@
+; adops siteanalytics db conf file
+; this file is managed by puppet
+
+[adops]
+user = <%= ap_sitedb_user %>
+password = <%= ap_sitedb_pass %>
+host = <%= ap_sitedb_vip %>
+database = adops2_0_production
+
+[js]
+output = /app/ugc/siteanalytics/data
+
+; Development uses the STAGING CDN.  If we absolutely need a dev CDN , create a story for the SA team to work on.
+[cdn]
+host = http://cdn.siteanalytics.evolvemediametrics.com
+wsdl = https://ccuapi.akamai.com/ccuapi-axis.wsdl
+user =  <%= ap_sitecdn_user %>
+passwd = <%= ap_sitecdn_pass %>
+email = AdPlatform@gorillanation.com

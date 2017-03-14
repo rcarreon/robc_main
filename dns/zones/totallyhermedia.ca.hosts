@@ -1,0 +1,34 @@
+$TTL 3600
+totallyhermedia.ca. IN      SOA     totallyhermedia.ca. root.totallyhermedia.ca. (
+                                               2016061600     ; serial
+                                               28800          ; refresh
+                                               14400          ; retry
+                                               3600000        ; expire
+                                               86400 )        ; minimum
+
+totallyhermedia.ca.                            IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+totallyhermedia.ca.                            IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+totallyhermedia.ca.                            IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+totallyhermedia.ca.                            IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+ns3.totallyhermedia.ca.                        IN    A        67.15.66.42
+ns4.totallyhermedia.ca.                        IN    A        67.15.66.43
+ns5.totallyhermedia.ca.                        IN    A        64.34.172.209
+ns6.totallyhermedia.ca.                        IN    A        72.51.41.238
+
+totallyhermedia.ca.     IN  MX 1 aspmx.l.google.com. 
+totallyhermedia.ca.     IN MX 5 alt1.aspmx.l.google.com. 
+totallyhermedia.ca.     IN MX 5 alt2.aspmx.l.google.com. 
+totallyhermedia.ca.     IN MX 10 alt3.aspmx.l.google.com. 
+totallyhermedia.ca.     IN MX 10 alt4.aspmx.l.google.com.
+
+
+
+; #### TitanWP
+totallyhermedia.ca.                            IN    A        97.64.84.172
+bta.totallyhermedia.ca.                        IN    A        10.64.64.75
+dev.totallyhermedia.ca.                        IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.totallyhermedia.ca.                        IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.totallyhermedia.ca.                        IN    A        97.64.84.172
+www.totallyhermedia.ca.                        IN    A        97.64.84.172
+; #### End TitanWP
+totallyhermedia.ca. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

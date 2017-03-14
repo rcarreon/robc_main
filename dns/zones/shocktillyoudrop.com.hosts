@@ -1,0 +1,100 @@
+$TTL 3600
+shocktillyoudrop.com.   IN      SOA     shocktillyoudrop.com. root.shocktillyoudrop.com. (
+                                                    2016061600     ; serial
+                                                    28800          ; refresh
+                                                    14400          ; retry
+                                                    3600000        ; expire
+                                                    86400 )        ; minimum
+
+
+; name servers and mail servers
+;
+shocktillyoudrop.com.                               IN    NS       app3v-dns.tp.prd.lax.craveonline.com.
+shocktillyoudrop.com.                               IN    NS       app4v-dns.tp.prd.lax.craveonline.com.
+shocktillyoudrop.com.                               IN    NS       app1v-dns.tp.prd.lax.craveonline.com.
+shocktillyoudrop.com.                               IN    NS       app2v-dns.tp.prd.lax.craveonline.com.
+
+
+shocktillyoudrop.com.     IN  MX 1 aspmx.l.google.com. 
+shocktillyoudrop.com.     IN MX 5 alt1.aspmx.l.google.com. 
+shocktillyoudrop.com.     IN MX 5 alt2.aspmx.l.google.com. 
+shocktillyoudrop.com.     IN MX 10 alt3.aspmx.l.google.com. 
+shocktillyoudrop.com.     IN MX 10 alt4.aspmx.l.google.com.
+mail.shocktillyoudrop.com.     IN  MX 1 aspmx.l.google.com. 
+mail.shocktillyoudrop.com.     IN MX 5 alt1.aspmx.l.google.com. 
+mail.shocktillyoudrop.com.     IN MX 5 alt2.aspmx.l.google.com. 
+mail.shocktillyoudrop.com.     IN MX 10 alt3.aspmx.l.google.com. 
+mail.shocktillyoudrop.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+; local host
+local                                               IN    A        127.0.0.1
+localhost                                           IN    A        127.0.0.1
+loghost                                             IN    A        127.0.0.1
+
+
+; #### shocktillyoudrop PBWP
+shocktillyoudrop.com.                               IN    A        97.64.84.172
+
+bta.shocktillyoudrop.com.                           IN    A        10.64.64.75
+dev.shocktillyoudrop.com.                           IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.shocktillyoudrop.com.                           IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.shocktillyoudrop.com.                           IN    A        97.64.84.172
+www.shocktillyoudrop.com.                           IN    A        97.64.84.172
+
+origin.bta.shocktillyoudrop.com.                    IN    CNAME    bta.shocktillyoudrop.com.
+cdn1-bta.shocktillyoudrop.com.                      IN    CNAME    bta.shocktillyoudrop.com.
+cdn2-bta.shocktillyoudrop.com.                      IN    CNAME    bta.shocktillyoudrop.com.
+cdn3-bta.shocktillyoudrop.com.                      IN    CNAME    bta.shocktillyoudrop.com.
+
+origin-dev.shocktillyoudrop.com.                    IN    CNAME    dev.shocktillyoudrop.com.
+cdn1-dev.shocktillyoudrop.com.                      IN    CNAME    dev.shocktillyoudrop.com.
+cdn2-dev.shocktillyoudrop.com.                      IN    CNAME    dev.shocktillyoudrop.com.
+cdn3-dev.shocktillyoudrop.com.                      IN    CNAME    dev.shocktillyoudrop.com.
+
+origin-stg.shocktillyoudrop.com.                    IN    CNAME    stg.shocktillyoudrop.com.
+cdn1-stg.shocktillyoudrop.com.                      IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-stg.shocktillyoudrop.com.                      IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-stg.shocktillyoudrop.com.                      IN    CNAME    wac.EE35.edgecastcdn.net.
+
+origin.shocktillyoudrop.com.                        IN    CNAME    prd.shocktillyoudrop.com.
+cdn1-www.shocktillyoudrop.com.                      IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-www.shocktillyoudrop.com.                      IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-www.shocktillyoudrop.com.                      IN    CNAME    wac.EE35.edgecastcdn.net.
+
+dev.m.shocktillyoudrop.com.                         IN    CNAME    dev.shocktillyoudrop.com.
+stg.m.shocktillyoudrop.com.                         IN    CNAME    stg.shocktillyoudrop.com.
+www.m.shocktillyoudrop.com.                         IN    CNAME    prd.shocktillyoudrop.com.
+m.shocktillyoudrop.com.                             IN    CNAME    prd.shocktillyoudrop.com.
+; #### End PBWP
+
+
+; new FE infrastructure -dru
+origin.campaigns                                    IN    A        97.64.84.104
+campaigns                                           IN    CNAME    origin.campaigns
+cdn.campaigns                                       IN    CNAME    wac.1384D.sigmacdn.net.
+staging.campaigns                                   IN    A        97.64.84.105
+
+assets                                              IN    A        97.64.84.101
+cdn.assets                                          IN    CNAME    wac.1384D.sigmacdn.net.
+origin.assets                                       IN    CNAME    assets
+staging.assets                                      IN    CNAME    wac.1384D.sigmacdn.net.
+demo.assets                                         IN    CNAME    wac.1384D.sigmacdn.net.
+origin.staging.assets                               IN    A        97.64.84.102
+
+; priest.shocktillyoudrop.com entries 
+; Created on 20110324 by wfu
+priest.shocktillyoudrop.com.                        IN    CNAME    cdn.campaigns.shocktillyoudrop.com.
+staging.priest.shocktillyoudrop.com.                IN    CNAME    staging.campaigns.shocktillyoudrop.com.
+;demo.priest.shocktillyoudrop.com.                   IN    CNAME    demo.campaigns.shocktillyoudrop.com.
+
+
+insidiousdvd.shocktillyoudrop.com.                  IN    CNAME    cdn.campaigns.shocktillyoudrop.com.
+staging.insidiousdvd.shocktillyoudrop.com.          IN    CNAME    staging.campaigns.shocktillyoudrop.com.
+demo.insidiousdvd.shocktillyoudrop.com.             IN    CNAME    demo.si.evolvemediallc.com.
+;wrongturn4.shocktillyoudrop.com.                   IN    CNAME    cdn.campaigns.shocktillyoudrop.com.
+;staging.wrongturn4.shocktillyoudrop.com.           IN    CNAME    staging.campaigns.shocktillyoudrop.com.
+demo.wrongturn4.shocktillyoudrop.com.               IN    CNAME    demo.si.evolvemediallc.com.
+terrortrip.shocktillyoudrop.com.                    IN    CNAME    cdn.campaigns.shocktillyoudrop.com.
+staging.terrortrip.shocktillyoudrop.com.            IN    CNAME    staging.campaigns.shocktillyoudrop.com.
+demo.terrortrip.shocktillyoudrop.com.               IN    CNAME    demo.si.evolvemediallc.com.
+shocktillyoudrop.com. 	IN 	TXT 	"v=spf1 a:cluster9out.us.messagelabs.com include:_spf.google.com ip4:216.82.240.0/20 ~all"

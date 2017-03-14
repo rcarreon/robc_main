@@ -1,0 +1,24 @@
+$TTL 86400
+evolvemedia.net.nz.	IN      SOA     evolvemedia.net.nz. root.evolvemedia.net.nz (
+                        2016061600	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+;
+; name servers and mail servers
+;
+evolvemedia.net.nz.		IN	NS		app1v-dns.tp.prd.lax.evolvemediallc.com.
+evolvemedia.net.nz.		IN	NS		app2v-dns.tp.prd.lax.evolvemediallc.com.
+evolvemedia.net.nz.		IN	NS		app3v-dns.tp.prd.lax.evolvemediallc.com.
+evolvemedia.net.nz.		IN	NS		app4v-dns.tp.prd.lax.evolvemediallc.com.
+;
+; Messagelabs powered mx
+evolvemedia.net.nz.         IN      TXT     "G0O0R34839"
+evolvemedia.net.nz.     IN  MX 1 aspmx.l.google.com. 
+evolvemedia.net.nz.     IN MX 5 alt1.aspmx.l.google.com. 
+evolvemedia.net.nz.     IN MX 5 alt2.aspmx.l.google.com. 
+evolvemedia.net.nz.     IN MX 10 alt3.aspmx.l.google.com. 
+evolvemedia.net.nz.     IN MX 10 alt4.aspmx.l.google.com.
+
+evolvemedia.net.nz. 	IN 	TXT 	"v=spf1 a:cluster9out.us.messagelabs.com include:_spf.google.com ip4:216.82.240.0/20 ~all"

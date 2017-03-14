@@ -1,0 +1,37 @@
+#!/bin/bash
+
+date >> /var/log/repo-updates
+
+# OS base repos
+baseDir="/mnt/yum_repos/docroot/centos"
+repoList="os updates contrib"
+
+# EPEL repos
+epelBaseDir="/mnt/yum_repos/epel"
+iusBaseDir="/mnt/yum_repos/ius"
+# dl.iuscommunity.org/ius/
+
+versionList="5.6 6.0"
+
+mkdir -p $baseDir
+for ver in $versionList; do
+	for repo in $repoList; do
+		mkdir -p ${baseDir}/${ver}/stg/${repo}
+	done
+done
+
+for repo in $repoList; do
+	for ver in $versionList; do
+		rsync -av rsync://mirrors.kernel.org/centos/${ver}/${repo}/x86_64/ ${baseDir}/${ver}/stg/${repo}/ >> /var/log/repo-updates
+	done
+done
+
+mkdir -p $epelBaseDir
+for ver in $versionList; do
+	rsync -av "rsync://mirrors.kernel.org/fedora-epel/${ver%.*}/x86_64/" "${epelBaseDir}/${ver%.*}/" >> /var/log/repo-updates
+done
+
+mkdir -p $iusBaseDir
+for ver in $versionList; do
+	rsync -av "rsync://mirror.rackspace.com/ius/stable/Redhat/${ver%.*}/x86_64/" "${iusBaseDir}/${ver%.*}/" >> /var/log/repo-updates
+done

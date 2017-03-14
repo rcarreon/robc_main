@@ -1,0 +1,21 @@
+$TTL 3600
+spikedhumor.com.	IN      SOA     spikedhumor.com. root.spikedhumor.com. (
+                        2016041301	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+spikedhumor.com.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+spikedhumor.com.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+spikedhumor.com.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+spikedhumor.com.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+
+
+
+
+spikedhumor.com.                         IN      A       97.64.84.103
+www.spikedhumor.com.                     IN      A       97.64.84.103

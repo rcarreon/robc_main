@@ -1,0 +1,30 @@
+; $Id$
+$TTL 300
+
+@ IN SOA hmo.gnmedia.net. noc.gorillanation.com. (
+	2011062400		; serial
+	36000			; refresh
+	3600			; retry
+	3600000			; expire
+	36000 )			; default ttl
+
+
+
+@	IN NS	nochmo2.hmo.gnmedia.net
+nochmo2		IN	A	192.168.12.49
+puppet		IN	A	192.168.12.48
+wiki		IN	A	192.168.12.48
+dif		IN	A	192.168.12.48
+mailer		IN	A	192.168.12.46
+;nochmo1	IN A	192.168.12.45
+;ubuntu		IN	A	192.168.12.48
+;puppet IN A	192.168.12.43
+;fedora IN A	192.168.12.242
+;solaris IN A    192.168.12.41
+mipage		IN 	A	192.168.12.48
+rcarreon	IN 	A	192.168.12.103
+rangel		IN 	A	192.168.12.101
+
+deepspace2	IN	A	192.168.12.116
+hotwheels	CNAME	deepspace2
+angrybirds	CNAME	deepspace2

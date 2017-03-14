@@ -1,0 +1,31 @@
+#############################################
+#     Apache webserver logs Pixel Agent     #
+#############################################
+
+beacon-log.sources = weblog
+beacon-log.sinks = snkHDFS
+beacon-log.channels = chnMemory
+
+beacon-log.channels.chnMemory.type = memory
+beacon-log.channels.chnMemory.capacity = 10000000
+beacon-log.channels.chnMemory.transactionCapacity = 1000000
+
+beacon-log.sources.weblog.type = exec
+beacon-log.sources.weblog.command = tail -F /app/log/bcn.originplatform.com-access.log
+beacon-log.sources.weblog.batchSize = 10000
+beacon-log.sources.weblog.channels = chnMemory
+
+beacon-log.sinks.snkHDFS.type = hdfs
+beacon-log.sinks.snkHDFS.channel = chnMemory
+beacon-log.sinks.snkHDFS.hdfs.path = hdfs://zootpprd/flume/origin/weblogs/prd/
+beacon-log.sinks.snkHDFS.hdfs.rollInterval = 1800
+beacon-log.sinks.snkHDFS.hdfs.rollSize = 0
+beacon-log.sinks.snkHDFS.hdfs.rollCount = 0
+beacon-log.sinks.snkHDFS.hdfs.fileType = DataStream
+beacon-log.sinks.snkHDFS.hdfs.filePrefix = <%= hostname%>
+beacon-log.sinks.snkHDFS.hdfs.inUsePrefix = .
+beacon-log.sinks.snkHDFS.hdfs.minBlockReplicas = 1
+beacon-log.sinks.snkHDFS.hdfs.batchSize = 10000
+beacon-log.sinks.snkHDFS.hdfs.useLocalTimeStamp = true
+
+beacon-log.http.monitoring.port=21112

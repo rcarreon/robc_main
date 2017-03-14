@@ -1,0 +1,34 @@
+voice vlan oui-table add 0001e3 Siemens_AG_phone________
+voice vlan oui-table add 00036b Cisco_phone_____________
+voice vlan oui-table add 00096e Avaya___________________
+voice vlan oui-table add 000fe2 H3C_Aolynk______________
+voice vlan oui-table add 0060b9 Philips_and_NEC_AG_phone
+voice vlan oui-table add 00d01e Pingtel_phone___________
+voice vlan oui-table add 00e075 Polycom/Veritel_phone___
+voice vlan oui-table add 00e0bb 3Com_phone______________
+interface vlan 1
+ip address 192.168.2.2 255.255.255.0 
+exit
+ip default-gateway 192.168.2.1
+ip dhcp relay address 192.168.1.11
+ip dhcp relay enable
+ip dhcp information option 
+interface vlan 1
+ip dhcp relay enable 
+exit
+interface vlan 1
+no ip address dhcp 
+exit
+bonjour service enable csco-sb
+bonjour service enable http   
+bonjour service enable https  
+bonjour service enable ssh    
+bonjour service enable telnet 
+hostname switch554adb
+username cisco password 63e9a193209ac309f26eed17f8c1f4699b5c4957 level 15 encrypted 
+ip ssh server
+snmp-server location LAB
+snmp-server contact HELPDESK@GORILLANATION.COM
+snmp-server community gorilla rw 192.168.1.54 view Default 
+snmp-server community gorilla rw 192.168.1.178 view Default 
+ip telnet server

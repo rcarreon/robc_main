@@ -1,0 +1,22 @@
+$ORIGIN martinimediaInc.co.uk.
+$TTL    3600 
+martinimediainc.co.uk.	IN      SOA     martinimediainc.co.uk. root.martinimediainc.co.uk. (
+                        2016061600	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+martinimediainc.co.uk.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+martinimediainc.co.uk.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+martinimediainc.co.uk.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+martinimediainc.co.uk.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+
+
+
+                         A     216.146.46.10
+                         A     216.146.46.11
+www                    1800 CNAME martinimediaInc.co.uk.

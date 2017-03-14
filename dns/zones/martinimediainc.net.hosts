@@ -1,0 +1,27 @@
+$ORIGIN martinimediainc.net.
+$TTL    3600 
+martinimediainc.net.	IN      SOA     martinimediainc.net. root.martinimediainc.net. (
+                        2015070600	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+martinimediainc.net.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+martinimediainc.net.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+martinimediainc.net.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+martinimediainc.net.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+
+                      		 NS    ns1.p15.dynect.net.
+                      		 NS    ns2.p15.dynect.net.
+                      		 NS    ns3.p15.dynect.net.
+                      		 NS    ns4.p15.dynect.net.
+
+                         A     216.146.46.10
+                         A     216.146.46.11
+www                      A     192.124.249.3
+

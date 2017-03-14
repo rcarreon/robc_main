@@ -1,0 +1,67 @@
+# This file is managed by Puppet do not modify it from <%= fqdn %>
+# My.cnf for MySQL 5.5 for Master default config
+# filename=<%= file %>
+
+
+[mysqld]
+datadir=<%= mysqldatadir %>
+server-id = <%= mysqld_serverid %>
+report-host = <%= fqdn %>
+
+# Error log
+log-error=/sql/log/error.log
+
+# Slow query log
+log_output=FILE
+slow_query_log=1
+slow_query_log_file=/sql/log/slow-queries.log
+long_query_time=5
+
+# Master-Master config is frequently used. Set auto-increment-increment=2 to switch the writes between masters without duplicate errors.
+auto-increment-increment=2
+
+# Determines the starting point for the AUTO_INCREMENT
+# IMPORTANT - If this is master 1 set the auto_increment_offset=1, if this is master 2 set the auto_increment_offset=2
+
+auto-increment-offset=<%= mysqld_offset %>
+
+# If slaves are attached to the master forming chained replication leave the following param otherwise comment it out
+log-slave-updates
+
+# Binlog format
+log-bin = /sql/binlog/bin.log
+log-bin-index = /sql/binlog/bin.index
+expire_logs_days = 7
+
+# Relay log format
+relay-log=/sql/binlog/relay.log
+relay-log-index=/sql/binlog/relay.index
+relay_log_info_file=/sql/binlog/relay.info
+
+# Connection params
+max_connections=500
+thread_cache_size=80
+max_connect_errors=100
+connect_timeout=20
+
+# MyISAM Params
+key_buffer_size=64M
+
+# Innodb Params
+innodb_file_per_table
+innodb_buffer_pool_size=4G
+innodb_buffer_pool_instances=4
+innodb_log_file_size=512M
+innodb_log_buffer_size=8M
+innodb_flush_method=O_DIRECT
+
+# Query cache
+query_cache_size = 64M
+
+# Table cache
+table_open_cache=1024
+
+# Extra options
+binlog_format=MIXED
+sql_mode=STRICT_ALL_TABLES
+max_allowed_packet=16M

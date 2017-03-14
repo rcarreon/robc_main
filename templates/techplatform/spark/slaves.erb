@@ -1,0 +1,10 @@
+# A Spark Worker will be started on each of the machines listed below.
+<% if fqdn =~ /^app*.*spark.*.prd.*/  -%>
+app1v-spark-bd.og.prd.lax.gnmedia.net
+app2v-spark-bd.og.prd.lax.gnmedia.net
+app3v-spark-bd.og.prd.lax.gnmedia.net
+<% end -%>
+
+<% if fqdn =~ /^app*.*spark.*.(dev|stg).*/ -%>
+localhost
+<% end -%>

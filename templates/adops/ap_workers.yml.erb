@@ -1,0 +1,23 @@
+workers:
+  <%= ap_worker_name %>:
+  app_id: <%= ap_worker_app_id %>
+  routing_key: <%= ap_worker_routing_key %>
+  exchange: <%= ap_worker_exchange %>
+  exchange_options:
+    durable: <%= ap_worker_exchange_durable %>
+    type: <%= ap_worker_exchange_type %>
+  queue: <%= ap_worker_q %>
+  queue_options:
+    durable: <%= ap_worker_q_durable %>
+    exclusive: <%= ap_worker_q_exclusive %>
+    manual_ack: <%= ap_worker_q_manual_ack %>
+  subscribe_options:
+    block: <%= ap_worker_subscribe_block %>
+    manual_ack: <%= ap_worker_subscribe_manual_ack %>
+  workers: 2
+  min_workers: 1
+  max_workers: 3
+  daemonize: false
+  logfile: STDOUT
+  pidfile: /var/run/dfp-worker.pid
+  log_level: debug

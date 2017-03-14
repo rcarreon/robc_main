@@ -1,0 +1,31 @@
+# This file is managed by Puppet. Do not modify it from <%=fqdn %>
+# <puppet-templates>/adops/httpd/stg.adops-api.evolvemediallc.com.erb
+# vim: set ft=apache :
+<VirtualHost *:80>
+  ServerName adops-api.evolvemediallc.com
+  ServerAlias stg.adops-api.evolvemediallc.com
+  DocumentRoot "/app/shared/docroots/adops-api.evolvemediallc.com/current/public"
+  Timeout 600
+  <%=logging ? '' : '#'%>ErrorLog /app/log/adops-api.evolvemediallc.com.error.log
+  LogLevel warn
+  <%=logging ? '' : '#'%>CustomLog /app/log/adops-api.evolvemediallc.com.access.log combined
+
+  PassengerAppEnv stage
+  Header always set Access-Control-Allow-Origin "*"
+  Header always set Access-Control-Max-Age "1000"
+  Header always set Access-Control-Allow-Headers "X-Requested-With, Content-Type, Origin, Authorization, Accept, Client-Security-Token, Accept-Encoding"
+  Header always set Access-Control-Allow-Methods "POST, GET, OPTIONS, DELETE, PUT"
+
+  # Added a rewrite to respond with a 200 SUCCESS on every OPTIONS request.
+  RewriteEngine On
+  RewriteCond %{REQUEST_METHOD} OPTIONS
+  RewriteRule ^(.*)$ $1 [R=200,L]
+  <Directory /app/shared/docroots/adops-api.evolvemediallc.com/current/public>
+    PassengerRuby /app/software/ruby/rbenv/versions/2.2.2/bin/ruby
+
+    Options FollowSymLinks
+    AllowOverride None
+    Order allow,deny
+    Allow from all
+  </Directory>
+</VirtualHost>

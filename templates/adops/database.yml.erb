@@ -1,0 +1,69 @@
+production:
+  adapter: mysql
+  database: adops2_0_production
+  username: <%= user_adplatform_rw_dev %>
+  password: <%= pw_adplatform_rw_dev %>
+  host: <%= host_adplatform_rw_dev %>
+
+production_adops_reporting:
+  adapter: mysql
+  database: ap_adops_reporting
+  username: <%= user_adplatform_rw_dev %>
+  password: <%= pw_adplatform_rw_dev %>
+  host: <%= host_adplatform_rw_dev %>
+
+production_read:
+  adapter: mysql
+  database: adops2_0_production
+  username: <%= user_adplatform_ro_dev %>
+  password: <%= pw_adplatform_ro_dev %>
+  host: <%= host_adplatform_ro_dev %>
+
+development:
+  adapter: mysql
+  database: adops2_0_production
+  username: <%= user_adplatform_rw_dev %>
+  password: <%= pw_adplatform_rw_dev %>
+  host: <%= host_adplatform_rw_dev %>
+
+development_adops_reporting:
+  adapter: mysql
+  database: ap_adops_reporting
+  username: <%= user_adplatform_rw_dev %>
+  password: <%= pw_adplatform_rw_dev %>
+  host: <%= host_adplatform_rw_dev %>
+
+development_migration:
+  adapter: mysql
+  database: adops2_0_production
+  username: <%= user_ap_migration_rw_dev %>
+  password: <%= pw_ap_migration_rw_dev %>
+  host: <%= host_adplatform_rw_dev %>
+
+development_read:
+  adapter: mysql
+  database: adops2_0_production
+  username: <%= user_adplatform_ro_dev %>
+  password: <%= pw_adplatform_ro_dev %>
+  host: <%= host_adplatform_ro_dev %>
+
+# NOTE: When we first started using SalesForce, we wanted to integrate it with
+# AdOps, however the Sales team was able to rapidly customize reports and data
+# in SalesForce at a rate that deemed attempting to keep up with impractical.
+#
+# However for just in case you ever want to attempt to sync the data between
+# the two, here you go.
+#
+salesforce_development:
+  adapter: mysql
+  host: localhost
+  username: dev
+  password: dev
+  database: salesforce_local
+
+salesforce:
+  adapter: activesalesforce
+  url: https://www.salesforce.com/services/Soap/u/7.0
+  username: <%= user_adplatform_salesforce %>
+  password: <%= pw_adplatform_salesforce %>
+

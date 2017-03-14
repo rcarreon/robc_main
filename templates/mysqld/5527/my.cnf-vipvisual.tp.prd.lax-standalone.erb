@@ -1,0 +1,56 @@
+# This file is managed by Puppet do not modify it from <%= fqdn %>
+# My.cnf for MySQL 5.5 for Standalone VipVisual
+# filename=<%= file %> 
+
+
+[mysqld]
+datadir=<%= mysqldatadir %>
+server-id = <%= mysqld_serverid %>
+report-host = <%= fqdn %>
+
+# Error log
+log-error=/sql/log/error.log
+
+# Slow query log
+log_output=FILE
+slow_query_log=1
+slow_query_log_file=/sql/log/slow-queries.log
+long_query_time=5
+
+# Binlog format
+log-bin = /sql/binlog/bin.log
+log-bin-index = /sql/binlog/bin.index
+expire_logs_days = 7
+
+# Connection params
+max_connections=100
+thread_cache_size=10
+max_connect_errors=100
+connect_timeout=20
+
+# MyISAM Params
+key_buffer_size=64M
+
+# Innodb Params
+innodb_file_per_table
+innodb_buffer_pool_size=512M
+innodb_buffer_pool_instances=1
+innodb_log_file_size=5242880
+innodb_log_buffer_size=8M
+innodb_flush_method=O_DIRECT
+
+# Query cache
+query_cache_size = 64M
+
+# Table cache
+table_open_cache=100 
+
+# Site Setted to UTF8
+character_set_server=utf8
+character_set_client=utf8
+character_set_filesystem=utf8
+collation_server=utf8_general_ci
+skip_character_set_client_handshake
+
+
+

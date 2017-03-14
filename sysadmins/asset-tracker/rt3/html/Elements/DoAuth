@@ -1,0 +1,22 @@
+<%once>
+my $loaded_user = 0;
+</%once>
+<%init>
+
+use RT::Authen::ExternalAuth;
+
+my ($val,$msg);
+unless($session{'CurrentUser'} && $session{'CurrentUser'}->Id) {
+    ($val,$msg) = RT::Authen::ExternalAuth::DoAuth(\%session,$user,$pass);
+    $RT::Logger->debug("Autohandler called ExternalAuth. Response: ($val, $msg)");
+}
+
+return;
+</%init>
+
+<%ARGS>
+$user => undef
+$pass => undef
+$menu => undef
+</%ARGS>
+

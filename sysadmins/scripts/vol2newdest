@@ -1,0 +1,100 @@
+#!/bin/bash
+
+ # regarding netapp3->netapp1 migration
+ # print the new path given the old path
+ 
+oldpath=$1
+if [ -z "$oldpath" ];then
+   echo "Usage: $o [filer:]/path"
+   exit 1
+fi
+
+#/vol/nac1b_ci_lax_prd_app_log/app2v-ci.ci.prd.lax.gnmedia.net
+#/vol/nac1b_ci_lax_prd_app_shared/ci-shared
+#/vol/nac1a_sql2v_ci_prd_lax_binlog
+#/vol/nac1a_sql2v_ci_prd_lax_data
+#/vol/nac1a_ci_lax_prd_sql_log/sql2v-ci.ci.prd.lax.gnmedia.net
+
+filerfromint() {
+   path=$(IFS=:; set -- $1; echo $2)
+   vol=$(echo $path | cut -d / -f 3-)
+   digit=$(echo $vol | sed -e 's/.*_sql\([[:digit:]]\)[vp]_.*/\1/' -e 's/.*_uid\([[:digit:]]\)[vp]_.*/\1/')
+   case $((digit%2)) in
+      0) int=b;;
+      1) int=a;;
+   esac
+   echo $int
+}
+
+case $oldpath in
+    */vol/nac1*) echo "FAIL ALREADY MIGRATED"; exit 1;;
+esac
+
+vertical=unknown
+loc=lax
+env=unknown
+logging=none
+case $oldpath in
+    *_data) filer=$(filerfromint $oldpath);;
+    *_binlog) filer=$(filerfromint $oldpath);;
+    *app_shared*) filer=a;;
+    *uid_shared/*) filer=a;;
+    *app_ugc*) filer=b;;
+    *app_archive*) filer=b;;
+    *app_log/*) filer=a;;
+    *pxy_log/*) filer=b;;
+    *sql_log/*) filer=b;;
+    *uid_log/*) filer=b;;
+    *mem_log/*) filer=a;;
+    *mem_kestrel/*) filer=b;;
+    *spx_shared/*) filer=a;;
+    *spx_log/*) filer=a;;
+    *mem_mongodb/*) filer=a;;
+    *app_tmp*) filer=b;;
+    *dev_lax_data/*) filer=b;;
+    *joomla_ugc) filer=a;;
+    *sql_archive/*) filer=a;;
+    *mem_shared/*) filer=a;;
+    *_backup) filer=a;;
+    *_archive) filer=a;;
+    *_decom) filer=a;;
+    *_uid?v_*) filer=$(filerfromint $oldpath);;
+    *) filer=a;;
+esac
+case $oldpath in
+    *_tp_*) vertical=tp;;
+    *_si_*) vertical=si;;
+    *_sbv_*) vertical=sbv;;
+    *_ap_*) vertical=ap;;
+    *_ao_*) vertical=ao;;
+    *_ci_*) vertical=ci;;
+    *_og_*) vertical=og;;
+    *) echo "FAIL SECOND CASE"; exit 1;;
+esac
+case $oldpath in
+    *_prd_*) env=prd;;
+    *_stg_*) env=stg;;
+    *_dev_*) env=dev;;
+    *) echo "FAIL THIRD CASE"; exit 1;;
+esac
+
+   
+subdir=$(echo $oldpath | cut -d / -f 4-)
+case $subdir in
+  *.*.*.lax.gnmedia.net)
+    digit=$(echo $subdir | tr -c -d '[[:digit:]]')
+    if [ -n "$digit" ];then
+      case $((digit%2)) in
+        0) filer=b;;
+        1) filer=a;;
+      esac
+    fi
+    ;;
+esac
+
+Filer=$(echo $filer| tr 'a-b' 'A-B')
+
+#nfsA-netapp1.ao.dev.lax.gnmedia.net.
+#echo -n nfs$Filer-netapp1.$vertical.$env.$loc.gnmedia.net:
+echo -n nfs$Filer-netapp1.gnmedia.net:
+echo "$oldpath" | sed -e "s/nfs[12]/nac1$filer/g" -e "s/lax[12]/nac1$filer/g" -e "s/.*://"

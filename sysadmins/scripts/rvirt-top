@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# gstaples @ Gorilla Nation
+
+node=$(nodels $1)
+shift
+if [ $(echo "$node" | wc -w) -gt 1 ];then
+  echo "only one node allowed"
+  exit 1
+fi
+virt-top -c qemu+ssh://root@$node/system "$@"

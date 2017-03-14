@@ -1,0 +1,24 @@
+$TTL    3600 
+ropeofsilicon.com.   IN      SOA     ropeofsilicon.com. root.ropeofsilicon.com. (
+                                                        2016061600     ; serial
+                                                        28800          ; refresh
+                                                        14400          ; retry
+                                                        3600000        ; expire
+                                                        86400 )        ; minimum
+
+ropeofsilicon.com.                                      IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+ropeofsilicon.com.                                      IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+ropeofsilicon.com.                                      IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+ropeofsilicon.com.                                      IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+;ns1.ropeofsilicon.com.                                 IN    A        208.69.121.8
+;ns2.ropeofsilicon.com.                                 IN    A        208.69.121.15
+
+;ropeofsilicon.com.                                     IN    A        208.69.121.8
+ropeofsilicon.com.                                      IN    A        97.64.84.172
+bta.ropeofsilicon.com.                                  IN    A        10.64.64.75
+dev.ropeofsilicon.com.                                  IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.ropeofsilicon.com.                                  IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.ropeofsilicon.com.                                  IN    A        97.64.84.172
+;www.ropeofsilicon.com.                                 IN    A        208.69.121.8
+www.ropeofsilicon.com.                                  IN    A        97.64.84.172

@@ -1,0 +1,46 @@
+$TTL    3600 
+martiniadnetwork.com.	IN      SOA     martiniadnetwork.com. root.martiniadnetwork.com. (
+                        2016061600	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+martiniadnetwork.com.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+martiniadnetwork.com.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+martiniadnetwork.com.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+martiniadnetwork.com.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+
+martiniadnetwork.com.     IN  MX 1 aspmx.l.google.com. 
+martiniadnetwork.com.     IN MX 5 alt1.aspmx.l.google.com. 
+martiniadnetwork.com.     IN MX 5 alt2.aspmx.l.google.com. 
+martiniadnetwork.com.     IN MX 10 alt3.aspmx.l.google.com. 
+martiniadnetwork.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+
+martiniadnetwork.com.		IN	A	173.201.0.1
+pixel.martiniadnetwork.com.	IN	NS	ns-1726.awsdns-23.co.uk.
+pixel.martiniadnetwork.com.	IN	NS	ns-1529.awsdns-63.org.
+pixel.martiniadnetwork.com.	IN	NS	ns-838.awsdns-40.net.
+pixel.martiniadnetwork.com.	IN	NS	ns-103.awsdns-12.com.
+pxl.martiniadnetwork.com.	IN	NS	ns-1714.awsdns-22.co.uk.
+pxl.martiniadnetwork.com.	IN	NS	ns-610.awsdns-12.net.
+pxl.martiniadnetwork.com.	IN	NS	ns-1283.awsdns-32.org.
+pxl.martiniadnetwork.com.	IN	NS	ns-489.awsdns-61.com.
+tag.martiniadnetwork.com.	IN	NS	ns-922.awsdns-51.net.
+tag.martiniadnetwork.com.	IN	NS	ns-1872.awsdns-42.co.uk.
+tag.martiniadnetwork.com.	IN	NS	ns-242.awsdns-30.com.
+tag.martiniadnetwork.com.	IN	NS	ns-1105.awsdns-10.org.
+tags.martiniadnetwork.com.	IN	CNAME	tags.pubgears.com.
+tg.martiniadnetwork.com.	IN	NS	ns-193.awsdns-24.com.
+tg.martiniadnetwork.com.	IN	NS	ns-928.awsdns-52.net.
+tg.martiniadnetwork.com.	IN	NS	ns-1856.awsdns-40.co.uk.
+tg.martiniadnetwork.com.	IN	NS	ns-1089.awsdns-08.org.
+www.martiniadnetwork.com.	IN	CNAME	martiniadnetwork.com.
+
+
+martiniadnetwork.com. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

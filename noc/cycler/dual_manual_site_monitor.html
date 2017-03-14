@@ -1,0 +1,95 @@
+ <html>
+      <head>
+      <!-- This file lives at:
+           https://svn.gnmedia.net/deploytools/trunk/sites/cycler-monitorX.html
+          Just commit changes to subversion and the monitor will eventualy be updated -->
+       
+      <script type="text/javascript">
+      var urls    = new Array();
+      var nextpagesecs=20000
+      var url=0
+      var titulo=''
+       
+      // Add new URLs here...
+ 	urls.push("http://www.sherdog.net")
+	urls.push("http://www.sherdog.com")
+	urls.push("http://www.myanimelist.net")
+	urls.push("http://www.momtastic.com")
+	urls.push("http://chefmom.sheknows.com")
+	urls.push("http://cms.springboard.gorillanation.com")
+	urls.push("http://comingsoon.net")
+	urls.push("http://connect.sheknows.com")
+	urls.push("http://crowdignite.com")
+//	urls.push("http://forum.drinksmixer.com")
+	urls.push("http://forums.superherohype.com")
+	urls.push("http://forums.thefashionspot.com")
+	urls.push("http://forums.wrestlezone.com")
+	urls.push("http://geoparent.sheknows.com")
+	urls.push("http://hfboards.com")
+	urls.push("http://pregnancyandbaby.sheknows.com")
+	urls.push("http://pregnancysearch.com")
+	urls.push("http://realmomsguide.sheknows.com")
+	urls.push("http://soaps.sheknows.com")
+	urls.push("http://talk.realitytvmagazine.com")
+	urls.push("http://talk.sheknows.com")
+	urls.push("http://talk.soapoperafan.com")
+	urls.push("http://www.actiontrip.com")
+	urls.push("http://www.comingsoon.net")
+	urls.push("http://www.craveonline.com")
+	urls.push("http://www.dvdfile.com")
+	urls.push("http://www.fabulousfoods.com")
+	urls.push("http://www.fabulousliving.com")
+	urls.push("http://www.fabuloustravel.com")
+	urls.push("http://www.gamerevolution.com")
+	urls.push("http://www.gorillanation.com")
+	urls.push("http://www.harrypotterfans.com")
+	urls.push("http://www.hockeysfuture.com")
+	urls.push("http://www.hoopsvibe.com")
+	urls.push("http://www.iconator.com")
+	urls.push("http://www.idontlikeyouinthatway.com")
+	urls.push("http://www.liveoutdoors.com")
+	urls.push("http://www.sheknows.com")
+	urls.push("http://www.shocktillyoudrop.com")
+	urls.push("http://www.soapoperafan.com")
+	urls.push("http://www.superherohype.com")
+	urls.push("http://www.thefashionspot.com")
+	urls.push("http://www.wrestlezone.com")
+	urls.push("http://netflow.gnmedia.net:8000/report.jsp?templid=0000&output=chart&unit=minute&nunits=60&device=72.172.76.1&recappl=80%2FTCP&reload=90")
+
+      function nextpage() {
+        if (!urls[url]) { window.location.reload(true); }
+         document.getElementById("showframe").src=urls[url]
+         titulo='Cycler: '+url+': '+urls[url]
+         url=url+1
+      }
+
+      function nexterpage() {
+        if (!urls[url]) { window.location.reload(true); }
+         document.getElementById("showframe2").src=urls[url]
+         document.title=' '+titulo+' | Cycler: '+url+': '+urls[url]
+         url=url+1
+      }
+
+       
+      var d=new Date();
+      if (d.getDay() == 5) {
+        urls.push('http://aibarra.lax3.gnmedia.net/')
+      }
+      </script>
+      </head>
+      <body> 
+      <form>
+      <input type="button" value="Next!" onclick="javascript:nextpage(); nexterpage()" />
+      </form>
+      <iframe id="showframe" width="50%" height="99%">
+        <p>Your browser does not support iframes.</p>
+      </iframe>
+   
+	<iframe id="showframe2" width="49%" height="99%">
+        <p>Your browser does not support iframes.</p>
+      </iframe>
+
+      </body>
+
+ </html>     
+

@@ -1,0 +1,30 @@
+$TTL    3600 
+apexmobilemedia.com.   IN      SOA     apexmobilemedia.com. root.apexmobilemedia.com. (
+                        2016070503     ; serial
+                        28800          ; refresh
+                        14400          ; retry
+                        3600000        ; expire
+                        86400 )        ; minimum
+
+apexmobilemedia.com.           IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+apexmobilemedia.com.           IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+apexmobilemedia.com.           IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+apexmobilemedia.com.           IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+
+apexmobilemedia.com.     IN  MX 1 aspmx.l.google.com.
+apexmobilemedia.com.     IN  MX 5 alt1.aspmx.l.google.com.
+apexmobilemedia.com.     IN  MX 5 alt2.aspmx.l.google.com.
+apexmobilemedia.com.     IN  MX 10 alt3.aspmx.l.google.com.
+apexmobilemedia.com.     IN  MX 10 alt4.aspmx.l.google.com.
+
+
+; GoDaddy backup default zone
+
+apexmobilemedia.com.	IN 	A 	    50.63.202.41
+;email 	  	            IN 	CNAME 	email.secureserver.net.
+
+;apexmobilemedia.com.     IN MX 10 	mailstore1.secureserver.net.
+;apexmobilemedia.com.     IN MX 10 	smtp.secureserver.net.
+
+; End of GoDaddy default zone

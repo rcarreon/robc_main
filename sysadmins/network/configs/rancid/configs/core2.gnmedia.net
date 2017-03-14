@@ -1,0 +1,1400 @@
+!RANCID-CONTENT-TYPE: cisco
+!
+!Chassis type: WS-C6509-E - a WS-C6509-E router
+!CPU: R7000, SR71000 CPU at 600Mhz, impl 1284, Rev 1.2, 512KB L2 Cache
+!
+!Memory: main 516096K/8192K
+!Memory: nvram 1917K
+!Memory: bootflash 65536K
+!
+!Catalyst Chassis type: WS-C6509-E, Catalyst 6500 9-slot backplane
+!Catalyst Chassis S/N: SMG1230N1AC
+!Catalyst Chassis assembly: 73-9221-06, rev A0, ver 1.4
+!Processor ID: SMG1230N1AC
+!
+!
+!Image: Software: s72033_rp-IPSERVICESK9_WAN-VM, 12.2(33)SXH4, RELEASE SOFTWARE (fc1)
+!Image: Compiled: Mon 10-Nov-08 14:11 by prod_rel_team
+!Image: sup-bootdisk:s72033-ipservicesk9_wan-vz.122-33.SXH4.bin
+!Image: active is not a valid search root for this operation
+!Image: Search root must be <valid filesystem>:/<sys|newsys|oldsys>[/<directory>]
+!
+!ROM Bootstrap: Version 12.2(17r)SX5, RELEASE SOFTWARE (fc1)
+!
+!BootFlash: BOOT variable = sup-bootdisk:s72033-ipservicesk9_wan-vz.122-33.SXH4.bin,1;sup-bootdisk:s72033-ipservicesk9_wan-vz.122-33.SXH3.bin,1;
+!BootFlash: CONFIG_FILE variable = 
+!BootFlash: BOOTLDR variable = 
+!BootFlash: Configuration register is 0x2102
+!BootFlash: Standby is not present.
+!
+!BootFlash: BOOT variable = sup-bootdisk:s72033-ipservicesk9_wan-vz.122-33.SXH4.bin,1;sup-bootdisk:s72033-ipservicesk9_wan-vz.122-33.SXH3.bin,1;
+!BootFlash: CONFIG_FILE variable = 
+!BootFlash: BOOTLDR variable = 
+!BootFlash: Configuration register is 0x2102
+!BootFlash: Standby is not present.
+!
+!Flash: nvram: Directory of nvram:/
+!Flash: nvram:  1918  -rwx       30188                    <no date>  startup-config
+!Flash: nvram:  1919  ----        1933                    <no date>  private-config
+!Flash: nvram:  1920  -rwx       30188                    <no date>  underlying-config
+!Flash: nvram:     1  ----           4                    <no date>  rf_cold_starts
+!Flash: nvram:     2  ----          48                    <no date>  persistent-data
+!Flash: nvram:     3  -rwx        4702                    <no date>  ifIndex-table
+!Flash: nvram: 1964024 bytes total (1924683 bytes free)
+!
+!Flash: bootflash: Directory of bootflash:/
+!Flash: bootflash: No files in directory
+!Flash: bootflash: 65536000 bytes total (65536000 bytes free)
+!
+!Flash: disk0: Directory of disk0:/
+!Flash: disk0: No files in directory
+!Flash: disk0: 1024196608 bytes total (1024196608 bytes free)
+!
+!Flash: sup-bootflash: Directory of sup-bootdisk:/
+!Flash: sup-bootflash:     1  -rwx   119874212   Sep 3 2008 15:25:06 -07:00  s72033-ipservicesk9_wan-vz.122-33.SXH3.bin
+!Flash: sup-bootflash:     2  -rwx    33554432   Sep 3 2008 20:10:44 -07:00  sea_log.dat
+!Flash: sup-bootflash:     3  -rwx   119971492   Aug 5 2013 13:34:58 -07:00  s72033-ipservicesk9_wan-vz.122-33.SXH4.bin
+!Flash: sup-bootflash: 512106496 bytes total (238698496 bytes free)
+!
+!Flash: sup-microcode: Directory of sup-microcode:/
+!Flash: sup-microcode:     0  drwx   <no size>                    <no date>  
+!Flash: sup-microcode:     1  -rwx     5810410                    <no date>  CWPA2_version_10.10
+!Flash: sup-microcode:     2  -rwx     7597458                    <no date>  SIP1_version_10.10
+!Flash: sup-microcode:     3  -rwx     8169266                    <no date>  SIP2_version_10.10
+!Flash: sup-microcode:     4  -rwx     4513498                    <no date>  SMSC_version_10.10
+!Flash: sup-microcode:     5  -rwx    29937926                    <no date>  DRACO2_MP
+!Flash: sup-microcode:     6  -rwx    14458702                    <no date>  CHEVYS-LC
+!Flash: sup-microcode:     7  -rwx    16707662                    <no date>  C2LC
+!Flash: sup-microcode:     8  -rwx      327932                    <no date>  LCP_LX10100
+!Flash: sup-microcode:     9  -rwx      298256                    <no date>  LCP_LX1000
+!Flash: sup-microcode:    10  -rwx      320626                    <no date>  LCP_AX1000
+!Flash: sup-microcode:    11  -rwx      391146                    <no date>  LCP_AX10100
+!Flash: sup-microcode:    12  -rwx      366686                    <no date>  LCP_CPFAB
+!Flash: sup-microcode:    13  -rwx      724702                    <no date>  LCP_CPGBIT
+!Flash: sup-microcode:    14  -rwx      468350                    <no date>  LCP_CP10G
+!Flash: sup-microcode:    15  -rwx      788926                    <no date>  LCP_CPMBIT2
+!Flash: sup-microcode:    16  -rwx      889470                    <no date>  LCP_CPMBIT
+!Flash: sup-microcode:    17  -rwx     1108030                    <no date>  LCP_CPXBIT
+!Flash: sup-microcode:    18  -rwx       65318                    <no date>  LCP_ABOOT
+!Flash: sup-microcode:    19  -rwx       60490                    <no date>  LCP_BOOT
+!Flash: sup-microcode:    20  -rwx     1225250                    <no date>  CWPA2_FPD_version_10.10
+!Flash: sup-microcode: 94230104 bytes total (0 bytes free)
+!
+!
+!Slot 1: type Application Control Engine Module, 1 ports
+!Slot 1: part ACE20-MOD-K9, serial SAL16095S71
+!Slot 1: hvers 2.6, firmware ace2t_main_d, sw A2(3.4)
+!
+!Slot 2: type CEF720 48 port 10/100/1000mb Ethernet, 48 ports
+!Slot 2: part WS-X6748-GE-TX, serial SAL12351A8P
+!Slot 2: hvers 3.0, firmware 12.2(18r)S1, sw 12.2(33)SXH4
+!
+!Slot 2/0: type  Centralized Forwarding Card
+!Slot 2/0: part WS-F6700-CFC, serial SAL12351EBE
+!Slot 2/0: hvers 4.1
+!
+!Slot 3: type Firewall Module, 6 ports
+!Slot 3: part WS-SVC-FWM-1, serial SAD123500AB
+!Slot 3: hvers 4.3, firmware 7.2(1), sw 4.1(15)
+!
+!Slot 5: type Supervisor Engine 720 (Active), 2 ports
+!Slot 5: part WS-SUP720-3B, serial SAL12351FST
+!Slot 5: hvers 5.7, firmware 8.5(2), sw 12.2(33)SXH4
+!
+!Slot 5/0: type  Policy Feature Card 3      
+!Slot 5/0: part WS-F6K-PFC3B, serial SAL12340VHJ
+!Slot 5/0: hvers 2.4
+!
+!Slot 5/1: type  MSFC3 Daughterboard        
+!Slot 5/1: part WS-SUP720, serial SAL1233039X
+!Slot 5/1: hvers 3.2
+!
+!NAME: "WS-C6509-E",            DESCR: "Cisco Systems Catalyst 6500 9-slotChassis System"
+!PID: WS-C6509-E
+!VID: V04
+!SN: SMG1230N1AC
+!NAME: "Backplane",             DESCR: "Cisco Systems Catalyst 6500 9-slot backplane"
+!NAME: "Container of VTT 1",    DESCR: "Container of VTT"
+!NAME: "WS-C6K-VTT-E 1",        DESCR: "VTT-E FRU 1"
+!PID: WS-C6K-VTT-E
+!SN: SMT1218B874
+!NAME: "VTT 1 OK Sensor",       DESCR: "VTT-E FRU 1 OK Sensor"
+!NAME: "VTT 1 outlet temperature Sensor", DESCR: "VTT-E FRU 1 outlet temperature Sensor"
+!NAME: "Container of VTT 2",    DESCR: "Container of VTT"
+!NAME: "WS-C6K-VTT-E 2",        DESCR: "VTT-E FRU 2"
+!PID: WS-C6K-VTT-E
+!SN: SMT1217N781
+!NAME: "VTT 2 OK Sensor",       DESCR: "VTT-E FRU 2 OK Sensor"
+!NAME: "VTT 2 outlet temperature Sensor", DESCR: "VTT-E FRU 2 outlet temperature Sensor"
+!NAME: "Container of VTT 3",    DESCR: "Container of VTT"
+!NAME: "WS-C6K-VTT-E 3",        DESCR: "VTT-E FRU 3"
+!PID: WS-C6K-VTT-E
+!SN: SMT1218B877
+!NAME: "VTT 3 OK Sensor",       DESCR: "VTT-E FRU 3 OK Sensor"
+!NAME: "VTT 3 outlet temperature Sensor", DESCR: "VTT-E FRU 3 outlet temperature Sensor"
+!NAME: "Container of Clock 1",  DESCR: "Container of Clock"
+!NAME: "CLK-7600 1",            DESCR: "OSR-7600 Clock FRU 1"
+!PID: CLK-7600
+!SN: SMT1222G845
+!NAME: "Clock 1 OK Sensor",     DESCR: "OSR-7600 Clock FRU 1 OK Sensor"
+!NAME: "Clock 1 In Using Sensor", DESCR: "OSR-7600 Clock FRU 1 In Using Sensor"
+!NAME: "Container of Clock 2",  DESCR: "Container of Clock"
+!NAME: "CLK-7600 2",            DESCR: "OSR-7600 Clock FRU 2"
+!PID: CLK-7600
+!SN: SMT1222G845
+!NAME: "Clock 2 OK Sensor",     DESCR: "OSR-7600 Clock FRU 2 OK Sensor"
+!NAME: "Clock 2 In Using Sensor", DESCR: "OSR-7600 Clock FRU 2 In Using Sensor"
+!NAME: "Sensor for counting number of OK VTTs", DESCR: "Sensor for counting number of OK VTTs"
+!NAME: "Sensor for counting number of OK Clocks", DESCR: "Sensor for counting number of OK Clocks"
+!NAME: "fan-tray 1 fan-fail Sensor", DESCR: "fan-tray 1 fan-fail Sensor"
+!NAME: "Physical Slot 1",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "1",                     DESCR: "ACE20-MOD-K9 1 ports Application Control Engine Module Rev. 2.6"
+!PID: ACE20-MOD-K9
+!VID: V05
+!SN: SAL16095S71
+!NAME: "module 1 power-output-fail Sensor", DESCR: "module 1 power-output-fail Sensor"
+!NAME: "module 1 insufficient cooling Sensor", DESCR: "module 1 insufficient cooling Sensor"
+!NAME: "module 1 outlet1 temperature Sensor", DESCR: "module 1 outlet1 temperature Sensor"
+!NAME: "module 1 outlet2 temperature Sensor", DESCR: "module 1 outlet2 temperature Sensor"
+!NAME: "Te1/1",                 DESCR: "MultiService Module Te1/1"
+!NAME: "Physical Slot 2",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "2",                     DESCR: "WS-X6748-GE-TX CEF720 48 port 10/100/1000mb Ethernet Rev. 3.0"
+!PID: WS-X6748-GE-TX
+!VID: V03
+!SN: SAL12351A8P
+!NAME: "Switching Engine Container 2", DESCR: "Switching Engine Container 2"
+!NAME: "WS-F6700-CFC Centralized Forwarding Card sub-module of 2", DESCR: "WS-F6700-CFC Centralized Forwarding Card Rev. 4.1"
+!PID: WS-F6700-CFC
+!VID: V06
+!SN: SAL12351EBE
+!NAME: "module 2 power-output-fail Sensor", DESCR: "module 2 power-output-fail Sensor"
+!NAME: "module 2 insufficient cooling Sensor", DESCR: "module 2 insufficient cooling Sensor"
+!NAME: "module 2 outlet temperature Sensor", DESCR: "module 2 outlet temperature Sensor"
+!NAME: "module 2 inlet temperature Sensor", DESCR: "module 2 inlet temperature Sensor"
+!NAME: "CPU of Module 2",       DESCR: "CPU of Module 2"
+!NAME: "Gi2/1",                 DESCR: "10/100/1000BaseT Gi2/1"
+!NAME: "Gi2/2",                 DESCR: "10/100/1000BaseT Gi2/2"
+!NAME: "Gi2/3",                 DESCR: "10/100/1000BaseT Gi2/3"
+!NAME: "Gi2/4",                 DESCR: "10/100/1000BaseT Gi2/4"
+!NAME: "Gi2/5",                 DESCR: "10/100/1000BaseT Gi2/5"
+!NAME: "Gi2/6",                 DESCR: "10/100/1000BaseT Gi2/6"
+!NAME: "Gi2/7",                 DESCR: "10/100/1000BaseT Gi2/7"
+!NAME: "Gi2/8",                 DESCR: "10/100/1000BaseT Gi2/8"
+!NAME: "Gi2/9",                 DESCR: "10/100/1000BaseT Gi2/9"
+!NAME: "Gi2/10",                DESCR: "10/100/1000BaseT Gi2/10"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/11",                DESCR: "10/100/1000BaseT Gi2/11"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/12",                DESCR: "10/100/1000BaseT Gi2/12"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/13",                DESCR: "10/100/1000BaseT Gi2/13"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/14",                DESCR: "10/100/1000BaseT Gi2/14"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/15",                DESCR: "10/100/1000BaseT Gi2/15"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/16",                DESCR: "10/100/1000BaseT Gi2/16"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/17",                DESCR: "10/100/1000BaseT Gi2/17"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/18",                DESCR: "10/100/1000BaseT Gi2/18"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/19",                DESCR: "10/100/1000BaseT Gi2/19"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/20",                DESCR: "10/100/1000BaseT Gi2/20"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/21",                DESCR: "10/100/1000BaseT Gi2/21"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/22",                DESCR: "10/100/1000BaseT Gi2/22"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/23",                DESCR: "10/100/1000BaseT Gi2/23"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/24",                DESCR: "10/100/1000BaseT Gi2/24"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/25",                DESCR: "10/100/1000BaseT Gi2/25"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/26",                DESCR: "10/100/1000BaseT Gi2/26"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/27",                DESCR: "10/100/1000BaseT Gi2/27"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/28",                DESCR: "10/100/1000BaseT Gi2/28"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/29",                DESCR: "10/100/1000BaseT Gi2/29"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/30",                DESCR: "10/100/1000BaseT Gi2/30"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/31",                DESCR: "10/100/1000BaseT Gi2/31"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/32",                DESCR: "10/100/1000BaseT Gi2/32"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/33",                DESCR: "10/100/1000BaseT Gi2/33"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/34",                DESCR: "10/100/1000BaseT Gi2/34"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/35",                DESCR: "10/100/1000BaseT Gi2/35"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/36",                DESCR: "10/100/1000BaseT Gi2/36"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/37",                DESCR: "10/100/1000BaseT Gi2/37"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/38",                DESCR: "10/100/1000BaseT Gi2/38"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/39",                DESCR: "10/100/1000BaseT Gi2/39"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/40",                DESCR: "10/100/1000BaseT Gi2/40"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/41",                DESCR: "10/100/1000BaseT Gi2/41"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/42",                DESCR: "10/100/1000BaseT Gi2/42"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/43",                DESCR: "10/100/1000BaseT Gi2/43"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/44",                DESCR: "10/100/1000BaseT Gi2/44"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/45",                DESCR: "10/100/1000BaseT Gi2/45"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/46",                DESCR: "10/100/1000BaseT Gi2/46"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/47",                DESCR: "10/100/1000BaseT Gi2/47"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/48",                DESCR: "10/100/1000BaseT Gi2/48"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Physical Slot 3",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "3",                     DESCR: "WS-SVC-FWM-1 6 ports Firewall Module Rev. 4.3"
+!PID: WS-SVC-FWM-1
+!SN: SAD123500AB
+!NAME: "module 3 power-output-fail Sensor", DESCR: "module 3 power-output-fail Sensor"
+!NAME: "module 3 insufficient cooling Sensor", DESCR: "module 3 insufficient cooling Sensor"
+!NAME: "module 3 outlet temperature Sensor", DESCR: "module 3 outlet temperature Sensor"
+!NAME: "module 3 inlet temperature Sensor", DESCR: "module 3 inlet temperature Sensor"
+!NAME: "module 3 device-1 temperature Sensor", DESCR: "module 3 device-1 temperature Sensor"
+!NAME: "module 3 device-2 temperature Sensor", DESCR: "module 3 device-2 temperature Sensor"
+!NAME: "module 3 aux-1 temperature Sensor", DESCR: "module 3 aux-1 temperature Sensor"
+!NAME: "module 3 aux-2 temperature Sensor", DESCR: "module 3 aux-2 temperature Sensor"
+!NAME: "Gi3/1",                 DESCR: "Firewall Gi3/1"
+!NAME: "Gi3/2",                 DESCR: "Firewall Gi3/2"
+!NAME: "Gi3/3",                 DESCR: "Firewall Gi3/3"
+!NAME: "Gi3/4",                 DESCR: "Firewall Gi3/4"
+!NAME: "Gi3/5",                 DESCR: "Firewall Gi3/5"
+!NAME: "Gi3/6",                 DESCR: "Firewall Gi3/6"
+!NAME: "Physical Slot 4",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "Physical Slot 5",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "5",                     DESCR: "WS-SUP720-3B 2 ports Supervisor Engine 720 Rev. 5.7"
+!PID: WS-SUP720-3B
+!VID: V06
+!SN: SAL12351FST
+!NAME: "MSFC Container 5",      DESCR: "MSFC Container 5"
+!NAME: "msfc sub-module of 5",  DESCR: "WS-SUP720 MSFC3 Daughterboard Rev. 3.2"
+!PID: WS-SUP720
+!SN: SAL1233039X
+!NAME: "module 5 RP outlet temperature Sensor", DESCR: "module 5 RP outlet temperature Sensor"
+!NAME: "module 5 RP inlet temperature Sensor", DESCR: "module 5 RP inlet temperature Sensor"
+!NAME: "CPU of Routing Processor 5", DESCR: "CPU of Routing Processor 5"
+!NAME: "Switching Engine Container 5", DESCR: "Switching Engine Container 5"
+!NAME: "WS-F6K-PFC3B Policy Feature Card 3 sub-module of 5", DESCR: "WS-F6K-PFC3B Policy Feature Card 3 Rev. 2.4"
+!PID: WS-F6K-PFC3B
+!VID: V02
+!SN: SAL12340VHJ
+!NAME: "module 5 EARL outlet temperature Sensor", DESCR: "module 5 EARL outlet temperature Sensor"
+!NAME: "module 5 EARL inlet temperature Sensor", DESCR: "module 5 EARL inlet temperature Sensor"
+!NAME: "Gigabit Port Container 5/1", DESCR: "Gigabit Port Container Gi5/1"
+!NAME: "Gi5/1",                 DESCR: "1000BaseSX Gi5/1"
+!SN: FNS12261U4W
+!NAME: "Gigabit Port Container 5/2", DESCR: "Gigabit Port Container Gi5/2"
+!NAME: "module 5 power-output-fail Sensor", DESCR: "module 5 power-output-fail Sensor"
+!NAME: "module 5 insufficient cooling Sensor", DESCR: "module 5 insufficient cooling Sensor"
+!NAME: "module 5 fan-upgrade required Sensor", DESCR: "module 5 fan-upgrade required Sensor"
+!NAME: "module 5 outlet temperature Sensor", DESCR: "module 5 outlet temperature Sensor"
+!NAME: "module 5 inlet temperature Sensor", DESCR: "module 5 inlet temperature Sensor"
+!NAME: "module 5 device-1 temperature Sensor", DESCR: "module 5 device-1 temperature Sensor"
+!NAME: "module 5 device-2 temperature Sensor", DESCR: "module 5 device-2 temperature Sensor"
+!NAME: "module 5 asic-1 temperature Sensor", DESCR: "module 5 asic-1 temperature Sensor"
+!NAME: "module 5 asic-2 temperature Sensor", DESCR: "module 5 asic-2 temperature Sensor"
+!NAME: "module 5 asic-3 temperature Sensor", DESCR: "module 5 asic-3 temperature Sensor"
+!NAME: "module 5 asic-4 temperature Sensor", DESCR: "module 5 asic-4 temperature Sensor"
+!NAME: "module 5 asic-5 temperature Sensor", DESCR: "module 5 asic-5 temperature Sensor"
+!NAME: "module 5 asic-6 temperature Sensor", DESCR: "module 5 asic-6 temperature Sensor"
+!NAME: "CPU of Switching Processor 5", DESCR: "CPU of Switching Processor 5"
+!NAME: "Gi5/2 10/100/1000BaseT", DESCR: "10/100/1000BaseT Gi5/2"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Physical Slot 6",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "Physical Slot 7",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "Physical Slot 8",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "Physical Slot 9",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "Container of Fan FRU 1", DESCR: "Container of Fan FRU"
+!NAME: "WS-C6509-E-FAN 1",      DESCR: "Enhanced 9-slot Fan Tray 1"
+!PID: WS-C6509-E-FAN
+!VID: V03
+!SN: DCH12180035
+!NAME: "Container of Container of Power Supply", DESCR: "Container of Container of Power Supply"
+!NAME: "Container of Power Supply 1", DESCR: "Container of Power Supply 1"
+!NAME: "PS 1 WS-CAC-6000W",     DESCR: "AC power supply, 6000 watt 1"
+!PID: WS-CAC-6000W
+!VID: V03
+!SN: AZS10440JH1
+!NAME: "power-supply 1 fan-fail Sensor", DESCR: "power-supply 1 fan-fail Sensor"
+!NAME: "power-supply 1 power-output-fail Sensor", DESCR: "power-supply 1 power-output-fail Sensor"
+!NAME: "power-supply 1 incompatible with fan Sensor", DESCR: "power-supply 1 incompatible with fan Sensor"
+!NAME: "power-supply 1 power-output-mode Sensor", DESCR: "power-supply 1 power-output-mode Sensor"
+!NAME: "power-supply 1 power-input Sensor", DESCR: "power-supply 1 power-input Sensor"
+!NAME: "Container of Power Supply 2", DESCR: "Container of Power Supply 2"
+!NAME: "PS 2 WS-CAC-6000W",     DESCR: "AC power supply, 6000 watt 2"
+!PID: WS-CAC-6000W
+!VID: V03
+!SN: AZS10510UTE
+!NAME: "power-supply 2 fan-fail Sensor", DESCR: "power-supply 2 fan-fail Sensor"
+!NAME: "power-supply 2 power-output-fail Sensor", DESCR: "power-supply 2 power-output-fail Sensor"
+!NAME: "power-supply 2 incompatible with fan Sensor", DESCR: "power-supply 2 incompatible with fan Sensor"
+!NAME: "power-supply 2 power-input Sensor", DESCR: "power-supply 2 power-input Sensor"
+!NAME: "power-supply 2 power-output-mode Sensor", DESCR: "power-supply 2 power-output-mode Sensor"
+!
+!VTP: VTP Version                     : 2
+!VTP: Configuration Revision          : 0
+!VTP: Maximum VLANs supported locally : 1005
+!VTP: Number of existing VLANs        : 20
+!VTP: VTP Operating Mode              : Transparent
+!VTP: VTP Domain Name                 : 
+!VTP: VTP Pruning Mode                : Disabled
+!VTP: VTP V2 Mode                     : Disabled
+!VTP: VTP Traps Generation            : Disabled
+!VTP: MD5 digest                      : 0xBD 0xC0 0xAB 0xB6 0xCC 0xB6 0xE6 0x57 
+!
+!VLAN: VLAN Name                             Status    Ports
+!VLAN: ---- -------------------------------- --------- -------------------------------
+!VLAN: 1    default                          active    
+!VLAN: 2    VLAN0002                         active    
+!VLAN: 3    VLAN0003                         active    
+!VLAN: 4    VLAN0004                         active    
+!VLAN: 8    VLAN0008                         active    
+!VLAN: 10   VLAN0010                         active    Gi2/2, Gi2/4, Gi2/6, Gi2/8
+!VLAN:                                                 Gi2/10, Gi2/12, Gi2/18, Gi2/22
+!VLAN:                                                 Gi2/24, Gi2/26, Gi2/28, Gi2/30
+!VLAN:                                                 Gi2/32, Gi2/34, Gi2/36, Gi2/38
+!VLAN:                                                 Gi2/40, Gi2/42, Gi2/48
+!VLAN: 11   VLAN0011                         active    Gi2/46
+!VLAN: 12   VLAN0012                         active    
+!VLAN: 14   VLAN0014                         active    
+!VLAN: 15   vpn-internal                     active    Gi2/44
+!VLAN: 40   VLAN0040                         active    
+!VLAN: 50   VLAN0050                         active    
+!VLAN: 100  VLAN0100                         active    Gi2/20
+!VLAN: 101  VLAN0101                         active    Gi5/1
+!VLAN: 200  VLAN0200                         active    Gi2/16
+!VLAN: 400  VLAN0400                         active    Gi2/14
+!VLAN: 1002 fddi-default                     act/unsup 
+!VLAN: 1003 token-ring-default               act/unsup 
+!VLAN: 1004 fddinet-default                  act/unsup 
+!VLAN: 1005 trnet-default                    act/unsup 
+!VLAN: 1020 VLAN1020                         active    
+!VLAN: 1026 VLAN1026                         active    
+!VLAN: 1028 VLAN1028                         active    
+!VLAN: 1030 VLAN1030                         active    
+!VLAN: 1032 VLAN1032                         active    
+!VLAN: 1034 VLAN1034                         active    
+!VLAN: 1036 VLAN1036                         active    
+!VLAN: 1126 VLAN1126                         active    
+!VLAN: 1128 VLAN1128                         active    
+!VLAN: 1130 VLAN1130                         active    
+!VLAN: 1132 VLAN1132                         active    
+!VLAN: 1134 VLAN1134                         active    
+!VLAN: 1136 VLAN1136                         active    
+!VLAN: 1220 VLAN1220                         active    
+!VLAN: 1234 VLAN1234                         active    
+!VLAN: 1236 lax1OriginDev                    active    
+!VLAN: 2020 VLAN2020                         active    
+!VLAN: 2026 VLAN2026                         active    
+!VLAN: 2028 VLAN2028                         active    
+!VLAN: 2030 VLAN2030                         active    
+!VLAN: 2032 VLAN2032                         active    
+!VLAN: 2034 VLAN2034                         active    
+!VLAN: 2036 VLAN2036                         active    
+!VLAN: 2126 VLAN2126                         active    
+!VLAN: 2128 VLAN2128                         active    
+!VLAN: 2130 VLAN2130                         active    
+!VLAN: 2132 VLAN2132                         active    
+!VLAN: 2134 VLAN2134                         active    
+!VLAN: 2136 VLAN2136                         active    
+!VLAN: 2220 VLAN2220                         active    
+!VLAN: 2232 VLAN2232                         active    
+!VLAN: 2234 VLAN2234                         active    
+!VLAN: 2236 lax2OriginDev                    active    
+!VLAN: VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+!VLAN: ---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+!VLAN: 1    enet  100001     1500  -      -      -        -    -        0      0   
+!VLAN: 2    enet  100002     1500  -      -      -        -    -        0      0   
+!VLAN: 3    enet  100003     1500  -      -      -        -    -        0      0   
+!VLAN: 4    enet  100004     1500  -      -      -        -    -        0      0   
+!VLAN: 8    enet  100008     1500  -      -      -        -    -        0      0   
+!VLAN: 10   enet  100010     1500  -      -      -        -    -        0      0   
+!VLAN: 11   enet  100011     1500  -      -      -        -    -        0      0   
+!VLAN: 12   enet  100012     1500  -      -      -        -    -        0      0   
+!VLAN: 14   enet  100014     1500  -      -      -        -    -        0      0   
+!VLAN: 15   enet  100015     1500  -      -      -        -    -        0      0   
+!VLAN: 40   enet  100040     1500  -      -      -        -    -        0      0   
+!VLAN: 50   enet  100050     1500  -      -      -        -    -        0      0   
+!VLAN: 100  enet  100100     1500  -      -      -        -    -        0      0   
+!VLAN: 101  enet  100101     1500  -      -      -        -    -        0      0   
+!VLAN: 200  enet  100200     1500  -      -      -        -    -        0      0   
+!VLAN: 400  enet  100400     1500  -      -      -        -    -        0      0   
+!VLAN: 1002 fddi  101002     1500  -      -      -        -    -        0      0   
+!VLAN: 1003 tr    101003     1500  -      -      -        -    -        0      0   
+!VLAN: 1004 fdnet 101004     1500  -      -      -        ieee -        0      0   
+!VLAN: 1005 trnet 101005     1500  -      -      -        ibm  -        0      0   
+!VLAN: 1020 enet  101020     1500  -      -      -        -    -        0      0   
+!VLAN: 1026 enet  101026     1500  -      -      -        -    -        0      0   
+!VLAN: 1028 enet  101028     1500  -      -      -        -    -        0      0   
+!VLAN: 1030 enet  101030     1500  -      -      -        -    -        0      0   
+!VLAN: 1032 enet  101032     1500  -      -      -        -    -        0      0   
+!VLAN: 1034 enet  101034     1500  -      -      -        -    -        0      0   
+!VLAN: 1036 enet  101036     1500  -      -      -        -    -        0      0   
+!VLAN: 1126 enet  101126     1500  -      -      -        -    -        0      0   
+!VLAN: 1128 enet  101128     1500  -      -      -        -    -        0      0   
+!VLAN: 1130 enet  101130     1500  -      -      -        -    -        0      0   
+!VLAN: 1132 enet  101132     1500  -      -      -        -    -        0      0   
+!VLAN: 1134 enet  101134     1500  -      -      -        -    -        0      0   
+!VLAN: 1136 enet  101136     1500  -      -      -        -    -        0      0   
+!VLAN: 1220 enet  101220     1500  -      -      -        -    -        0      0   
+!VLAN: 1234 enet  101234     1500  -      -      -        -    -        0      0   
+!VLAN: 1236 enet  101236     1500  -      -      -        -    -        0      0   
+!VLAN: 2020 enet  102020     1500  -      -      -        -    -        0      0   
+!VLAN: 2026 enet  102026     1500  -      -      -        -    -        0      0   
+!VLAN: 2028 enet  102028     1500  -      -      -        -    -        0      0   
+!VLAN: 2030 enet  102030     1500  -      -      -        -    -        0      0   
+!VLAN: 2032 enet  102032     1500  -      -      -        -    -        0      0   
+!VLAN: 2034 enet  102034     1500  -      -      -        -    -        0      0   
+!VLAN: 2036 enet  102036     1500  -      -      -        -    -        0      0   
+!VLAN: 2126 enet  102126     1500  -      -      -        -    -        0      0   
+!VLAN: 2128 enet  102128     1500  -      -      -        -    -        0      0   
+!VLAN: 2130 enet  102130     1500  -      -      -        -    -        0      0   
+!VLAN: 2132 enet  102132     1500  -      -      -        -    -        0      0   
+!VLAN: 2134 enet  102134     1500  -      -      -        -    -        0      0   
+!VLAN: 2136 enet  102136     1500  -      -      -        -    -        0      0   
+!VLAN: 2220 enet  102220     1500  -      -      -        -    -        0      0   
+!VLAN: 2232 enet  102232     1500  -      -      -        -    -        0      0   
+!VLAN: 2234 enet  102234     1500  -      -      -        -    -        0      0   
+!VLAN: 2236 enet  102236     1500  -      -      -        -    -        0      0   
+!VLAN: Remote SPAN VLANs
+!VLAN: ------------------------------------------------------------------------------
+!VLAN: Primary Secondary Type              Ports
+!VLAN: ------- --------- ----------------- ------------------------------------------
+!
+!
+config-register 0x2102
+!
+upgrade fpd auto
+version 12.2
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service counters max age 5
+!
+hostname core2
+!
+boot-start-marker
+boot system flash sup-bootdisk:s72033-ipservicesk9_wan-vz.122-33.SXH4.bin
+boot system flash sup-bootdisk:s72033-ipservicesk9_wan-vz.122-33.SXH3.bin
+boot-end-marker
+!
+logging buffered 1048576 debugging
+no logging console
+enable secret 5 $1$f5A9$Go3za6BP1WBZZLr.xbsw8.
+!
+username admin secret 5 $1$eBOB$w9VqtEuVAjBs/xzr/Nxw.0
+username rancid secret 5 $1$h2N5$IGwHQJwXVM7jX4rZBEgZ31
+aaa new-model
+!
+aaa session-id common
+clock timezone PST -8
+clock summer-time PDT recurring
+clock calendar-valid
+firewall multiple-vlan-interfaces
+firewall module 3 vlan-group 1,2,3,4,6,8,
+svclc multiple-vlan-interfaces
+svclc module 1 vlan-group 1,2,4,5,6,7,8,
+svclc vlan-group 1  10
+svclc vlan-group 2  50
+svclc vlan-group 3  100
+svclc vlan-group 4  3,11
+svclc vlan-group 5  4
+svclc vlan-group 6  12,15
+svclc vlan-group 7  1020,1026,1028,1030,1032,1034,1036,1126,1128,1130,1132
+svclc vlan-group 7  1134,1136,1220,1234,1236,2020,2026,2028,2030,2032,2034
+svclc vlan-group 7  2036,2126,2128,2130,2132,2134,2136,2220,2232,2234,2236
+svclc vlan-group 8  8
+ip subnet-zero
+!
+no ip domain-lookup
+ip domain-name gnmedia.net
+!
+ip ssh time-out 60
+ip ssh authentication-retries 2
+ip ssh version 2
+vtp mode transparent
+call-home
+ alert-group configuration
+ alert-group diagnostic
+ alert-group environment
+ alert-group inventory
+ alert-group syslog
+ profile "CiscoTAC-1"
+  no active
+  no destination transport-method http
+  destination transport-method email
+  destination address email callhome@cisco.com
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
+  subscribe-to-alert-group diagnostic severity minor 
+  subscribe-to-alert-group environment severity minor 
+  subscribe-to-alert-group syslog severity major pattern ".*"
+  subscribe-to-alert-group configuration periodic monthly 17 9:43
+  subscribe-to-alert-group inventory periodic monthly 17 9:28
+mls aging long 64
+mls aging normal 64
+mls netflow interface
+mls flow ip interface-full
+mls nde sender version 5
+mls ip slb purge global
+mls cef error action reset
+!
+fabric timer 15
+diagnostic cns publish cisco.cns.device.diag_results
+diagnostic cns subscribe cisco.cns.device.diag_commands
+!
+redundancy
+ keepalive-enable
+ mode sso
+ main-cpu
+  auto-sync running-config
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+spanning-tree vlan 8,10-12,40 priority 16384
+!
+vlan internal allocation policy ascending
+vlan access-log ratelimit 2000
+!
+vlan 2-4,8,10-12,14 
+!
+vlan 15
+ name vpn-internal
+!
+vlan 40,50,100-101,200,400,1020,1026,1028,1030,1032,1034,1036,1126,1128,1130 
+!
+vlan 1132,1134,1136,1220,1234 
+!
+vlan 1236
+ name lax1OriginDev
+!
+vlan 2020,2026,2028,2030,2032,2034,2036,2126,2128,2130,2132,2134,2136,2220 
+!
+vlan 2232,2234 
+!
+vlan 2236
+ name lax2OriginDev
+!
+interface Tunnel1
+ description R2.GORILLANATION.LAX-R2.VIDN-FO.SFO1
+ ip address 203.144.54.78 255.255.255.252
+ tunnel source 72.172.66.34
+ tunnel destination 199.7.54.102
+!
+interface Port-channel10
+ description Uplink to core1
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 2-4,8,10-12,14,15,40,50,100,200,400,1020,1026
+ switchport trunk allowed vlan add 1028,1030,1032,1034,1036,1126,1128,1130,1132
+ switchport trunk allowed vlan add 1134,1136,1220,1234,1236,2020,2026,2028,2030
+ switchport trunk allowed vlan add 2032,2034,2036,2126,2128,2130,2132,2134,2136
+ switchport trunk allowed vlan add 2220,2232,2234,2236
+ switchport mode trunk
+!
+interface Port-channel21
+ description Uplink to sw1
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+!
+interface Port-channel22
+ description Uplink to sw2
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+!
+interface Port-channel23
+ description Uplink to sw3
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,200,400
+ switchport mode trunk
+!
+interface GigabitEthernet2/1
+ description Uplink to sw2 po12
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 22 mode active
+!
+interface GigabitEthernet2/2
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/3
+ description Uplink to sw2 po12
+ no ip address
+!
+interface GigabitEthernet2/4
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/5
+ description Uplink to sw2 po12
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 22 mode active
+!
+interface GigabitEthernet2/6
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/7
+ description Uplink to sw2 po12
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 22 mode active
+!
+interface GigabitEthernet2/8
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/9
+ description Uplink to sw2 po12
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 22 mode active
+!
+interface GigabitEthernet2/10
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/11
+ description Uplink to sw2 po12
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 22 mode active
+!
+interface GigabitEthernet2/12
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/13
+ description Uplink to core1 po10
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 2-4,8,10-12,14,15,40,50,100,200,400,1020,1026
+ switchport trunk allowed vlan add 1028,1030,1032,1034,1036,1126,1128,1130,1132
+ switchport trunk allowed vlan add 1134,1136,1220,1234,1236,2020,2026,2028,2030
+ switchport trunk allowed vlan add 2032,2034,2036,2126,2128,2130,2132,2134,2136
+ switchport trunk allowed vlan add 2220,2232,2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 10 mode active
+!
+interface GigabitEthernet2/14
+ switchport
+ switchport access vlan 400
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet2/15
+ description Uplink to core1 po10
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 2-4,8,10-12,14,15,40,50,100,200,400,1020,1026
+ switchport trunk allowed vlan add 1028,1030,1032,1034,1036,1126,1128,1130,1132
+ switchport trunk allowed vlan add 1134,1136,1220,1234,1236,2020,2026,2028,2030
+ switchport trunk allowed vlan add 2032,2034,2036,2126,2128,2130,2132,2134,2136
+ switchport trunk allowed vlan add 2220,2232,2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 10 mode active
+!
+interface GigabitEthernet2/16
+ switchport
+ switchport access vlan 200
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet2/17
+ description Uplink to core1 po10
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 2-4,8,10-12,14,15,40,50,100,200,400,1020,1026
+ switchport trunk allowed vlan add 1028,1030,1032,1034,1036,1126,1128,1130,1132
+ switchport trunk allowed vlan add 1134,1136,1220,1234,1236,2020,2026,2028,2030
+ switchport trunk allowed vlan add 2032,2034,2036,2126,2128,2130,2132,2134,2136
+ switchport trunk allowed vlan add 2220,2232,2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 10 mode active
+!
+interface GigabitEthernet2/18
+ switchport
+ switchport access vlan 10
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet2/19
+ description Uplink to core1 po10
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 2-4,8,10-12,14,15,40,50,100,200,400,1020,1026
+ switchport trunk allowed vlan add 1028,1030,1032,1034,1036,1126,1128,1130,1132
+ switchport trunk allowed vlan add 1134,1136,1220,1234,1236,2020,2026,2028,2030
+ switchport trunk allowed vlan add 2032,2034,2036,2126,2128,2130,2132,2134,2136
+ switchport trunk allowed vlan add 2220,2232,2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 10 mode active
+!
+interface GigabitEthernet2/20
+ description Uplink to ASA-FW2
+ switchport
+ switchport access vlan 100
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet2/21
+ description Uplink to core1 po10
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 2-4,8,10-12,14,15,40,50,100,200,400,1020,1026
+ switchport trunk allowed vlan add 1028,1030,1032,1034,1036,1126,1128,1130,1132
+ switchport trunk allowed vlan add 1134,1136,1220,1234,1236,2020,2026,2028,2030
+ switchport trunk allowed vlan add 2032,2034,2036,2126,2128,2130,2132,2134,2136
+ switchport trunk allowed vlan add 2220,2232,2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 10 mode active
+!
+interface GigabitEthernet2/22
+ description Link to ASA-FW1
+ switchport
+ switchport access vlan 10
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet2/23
+ description Uplink to core1 po10
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 2-4,8,10-12,14,15,40,50,100,200,400,1020,1026
+ switchport trunk allowed vlan add 1028,1030,1032,1034,1036,1126,1128,1130,1132
+ switchport trunk allowed vlan add 1134,1136,1220,1234,1236,2020,2026,2028,2030
+ switchport trunk allowed vlan add 2032,2034,2036,2126,2128,2130,2132,2134,2136
+ switchport trunk allowed vlan add 2220,2232,2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 10 mode active
+!
+interface GigabitEthernet2/24
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/25
+ description Uplink to sw1 po11
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ no vtp
+ channel-protocol lacp
+ channel-group 21 mode active
+!
+interface GigabitEthernet2/26
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/27
+ description Uplink to sw1 po11
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 21 mode active
+!
+interface GigabitEthernet2/28
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/29
+ description Uplink to sw1 po11
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 21 mode active
+!
+interface GigabitEthernet2/30
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/31
+ description Uplink to sw1 po11
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 21 mode active
+!
+interface GigabitEthernet2/32
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/33
+ description Uplink to sw1 po11
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 21 mode active
+!
+interface GigabitEthernet2/34
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/35
+ description Uplink to sw1 po11
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 21 mode active
+!
+interface GigabitEthernet2/36
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/37
+ description Uplink to sw3 po13
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,200,400
+ switchport mode trunk
+ no vtp
+ channel-protocol lacp
+ channel-group 23 mode active
+!
+interface GigabitEthernet2/38
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/39
+ description Uplink to sw3 po13
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,200,400
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 23 mode active
+!
+interface GigabitEthernet2/40
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/41
+ description Uplink to sw3 po13
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,200,400
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 23 mode active
+!
+interface GigabitEthernet2/42
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet2/43
+ description Uplink to sw3 po13
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,200,400
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 23 mode active
+!
+interface GigabitEthernet2/44
+ description sa2500-2-int
+ switchport
+ switchport access vlan 15
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet2/45
+ description Uplink to sw3 po13
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,200,400
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 23 mode active
+!
+interface GigabitEthernet2/46
+ description sa2500-2-ext
+ switchport
+ switchport access vlan 11
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet2/47
+ description Uplink to sw3 po13
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,200,400
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 23 mode active
+!
+interface GigabitEthernet2/48
+ switchport
+ switchport access vlan 10
+!
+interface GigabitEthernet5/1
+ description Uplink to Net2EZ secondary
+ switchport
+ switchport access vlan 101
+ switchport mode access
+!
+interface GigabitEthernet5/2
+ no ip address
+ shutdown
+ media-type rj45
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan2
+ description Core1 failover
+ ip address 10.2.2.2 255.255.255.0
+!
+interface Vlan100
+ description Net2EZ network block
+ ip address 72.172.76.2 255.255.254.0
+ ip flow ingress
+ standby 1 ip 72.172.76.8
+! standby 1 authentication <removed>
+!
+interface Vlan101
+ description Net2EZ serial uplink
+ ip address 72.172.66.34 255.255.255.252
+ ip access-group 2014 in
+ ip access-group 1918 out
+ ip flow ingress
+!
+router bgp 65005
+ no synchronization
+ bgp log-neighbor-changes
+ network 72.172.76.0 mask 255.255.254.0 route-map External:Route
+ redistribute static route-map Static-to-BGP
+ neighbor 10.2.2.1 remote-as 65005
+ neighbor 10.2.2.1 next-hop-self
+ neighbor 72.172.66.33 remote-as 558
+! neighbor 72.172.66.33 password <removed>
+ neighbor 72.172.66.33 send-community
+ neighbor 72.172.66.33 soft-reconfiguration inbound
+ neighbor 72.172.66.33 prefix-list Net2EZ:Out out
+ neighbor 72.172.66.33 route-map prepend out
+ no auto-summary
+!
+ip classless
+ip route 1.9.2.28 255.255.255.255 Null0
+ip route 10.0.0.0 255.0.0.0 Null0
+ip route 24.23.140.113 255.255.255.255 Null0
+ip route 24.107.106.15 255.255.255.255 Null0
+ip route 65.254.35.70 255.255.255.255 Null0
+ip route 66.249.67.11 255.255.255.255 Null0
+ip route 66.249.67.17 255.255.255.255 Null0
+ip route 67.195.37.82 255.255.255.255 Null0
+ip route 71.81.176.200 255.255.255.255 Null0
+ip route 71.168.64.74 255.255.255.255 Null0
+ip route 76.16.80.44 255.255.255.255 Null0
+ip route 76.16.85.212 255.255.255.255 Null0
+ip route 76.250.192.111 255.255.255.255 Null0
+ip route 78.109.36.6 255.255.255.255 Null0
+ip route 87.250.224.0 255.255.224.0 Null0
+ip route 94.143.63.191 255.255.255.255 Null0
+ip route 112.202.92.22 255.255.255.255 Null0
+ip route 112.202.92.228 255.255.255.255 Null0
+ip route 157.56.93.99 255.255.255.255 Null0
+ip route 160.7.248.58 255.255.255.255 Null0
+ip route 166.70.44.136 255.255.255.255 Null0
+ip route 172.16.0.0 255.240.0.0 Null0
+ip route 172.16.0.1 255.255.255.255 Null0
+ip route 178.79.146.20 255.255.255.255 Null0
+ip route 183.185.82.47 255.255.255.255 Null0
+ip route 192.168.0.0 255.255.0.0 Null0
+ip route 192.228.79.0 255.255.255.0 Null0
+ip route 199.16.173.137 255.255.255.255 Null0
+ip route 208.92.221.98 255.255.255.255 Null0
+ip route 208.103.63.117 255.255.255.255 Null0
+ip route 209.81.88.73 255.255.255.255 Null0
+ip route 209.81.88.74 255.255.255.255 Null0
+ip route 212.92.136.250 255.255.255.255 Null0
+ip route 216.47.136.51 255.255.255.255 Null0
+ip route 217.172.108.18 255.255.255.255 Null0
+!
+ip bgp-community new-format
+ip community-list expanded Global:Drop permit 65005:666
+ip community-list expanded Global:Drop deny internet
+ip community-list expanded Global:Drop deny [0-9]*
+ip community-list expanded Net2EZ:Out permit 65005:101
+ip community-list expanded Net2EZ:Out deny [0-9]*
+ip community-list expanded Net2EZ:Out deny internet
+ip flow-export source Vlan100
+ip flow-export version 5
+ip flow-export destination 72.172.76.244 2055
+!
+no ip http server
+no ip http secure-server
+!
+ip prefix-list Net2EZ:Out permit 72.172.76.0/23 le 32
+access-list 1 permit 10.2.10.21
+access-list 1 permit 10.2.10.33
+access-list 1 permit 63.139.86.0 0.0.0.15
+access-list 1918 remark RFC 1918 internal deny
+access-list 1918 deny   10.0.0.0 0.255.255.255
+access-list 1918 deny   169.254.0.0 0.0.255.255
+access-list 1918 deny   172.16.0.0 0.15.255.255
+access-list 1918 deny   192.168.0.0 0.0.255.255
+access-list 1918 permit any
+access-list 2010 remark Anti-bogon ACL
+access-list 2010 permit tcp 63.139.86.0 0.0.0.15 72.172.76.0 0.0.0.15 eq 22
+access-list 2010 permit udp 63.139.86.0 0.0.0.15 72.172.76.0 0.0.0.15 eq snmp
+access-list 2010 permit tcp 63.139.86.0 0.0.0.15 72.172.66.0 0.0.0.63 eq 22
+access-list 2010 permit udp 63.139.86.0 0.0.0.15 72.172.66.0 0.0.0.63 eq snmp
+access-list 2010 permit udp host 72.13.49.20 host 72.172.66.30 eq snmp
+access-list 2010 permit gre host 199.7.59.98 host 72.172.66.30
+access-list 2010 permit icmp host 203.144.53.113 host 203.144.53.114
+access-list 2010 permit tcp host 203.144.53.113 host 203.144.53.114 eq bgp
+access-list 2010 deny   tcp any 72.172.66.0 0.0.0.63 eq telnet
+access-list 2010 deny   tcp any 72.172.76.0 0.0.0.15 eq telnet
+access-list 2010 deny   tcp any 72.172.66.0 0.0.0.63 eq 22
+access-list 2010 deny   tcp any 72.172.76.0 0.0.0.15 eq 22
+access-list 2010 deny   udp any 72.172.66.0 0.0.0.63 eq snmp
+access-list 2010 deny   udp any 72.172.76.0 0.0.0.15 eq snmp
+access-list 2010 deny   ip 72.172.76.0 0.0.1.255 any
+access-list 2010 deny   ip 0.0.0.0 0.255.255.255 any
+access-list 2010 deny   ip 5.0.0.0 0.255.255.255 any
+access-list 2010 deny   ip 10.0.0.0 0.255.255.255 any
+access-list 2010 deny   ip 104.0.0.0 1.255.255.255 any
+access-list 2010 deny   ip 127.0.0.0 0.255.255.255 any
+access-list 2010 deny   ip 169.254.0.0 0.0.255.255 any
+access-list 2010 deny   ip 172.16.0.0 0.15.255.255 any
+access-list 2010 deny   ip 179.0.0.0 0.255.255.255 any
+access-list 2010 deny   ip 181.0.0.0 0.255.255.255 any
+access-list 2010 deny   ip 185.0.0.0 0.255.255.255 any
+access-list 2010 deny   ip 192.0.2.0 0.0.0.255 any
+access-list 2010 deny   ip 192.168.0.0 0.0.255.255 any
+access-list 2010 deny   ip 198.18.0.0 0.1.255.255 any
+access-list 2010 deny   ip 198.51.100.0 0.0.0.255 any
+access-list 2010 deny   ip 203.0.113.0 0.0.0.255 any
+access-list 2010 deny   ip 224.0.0.0 31.255.255.255 any
+access-list 2010 deny   ip 161.53.131.0 0.0.0.255 any
+access-list 2010 permit ip any any
+access-list 2012 remark Anti-bogon ACL
+access-list 2012 permit tcp 63.139.86.0 0.0.0.15 72.172.76.0 0.0.0.15 eq 22
+access-list 2012 permit udp 63.139.86.0 0.0.0.15 72.172.76.0 0.0.0.15 eq snmp
+access-list 2012 permit tcp 63.139.86.0 0.0.0.15 72.172.66.0 0.0.0.63 eq 22
+access-list 2012 permit udp 63.139.86.0 0.0.0.15 72.172.66.0 0.0.0.63 eq snmp
+access-list 2012 permit udp host 72.13.49.20 host 72.172.66.30 eq snmp
+access-list 2012 permit gre host 199.7.59.98 host 72.172.66.30
+access-list 2012 permit icmp host 203.144.53.113 host 203.144.53.114
+access-list 2012 permit tcp host 203.144.53.113 host 203.144.53.114 eq bgp
+access-list 2012 deny   tcp any 72.172.66.0 0.0.0.63 eq telnet
+access-list 2012 deny   tcp any 72.172.76.0 0.0.0.15 eq telnet
+access-list 2012 deny   tcp any 72.172.66.0 0.0.0.63 eq 22
+access-list 2012 deny   tcp any 72.172.76.0 0.0.0.15 eq 22
+access-list 2012 deny   udp any 72.172.66.0 0.0.0.63 eq snmp
+access-list 2012 deny   udp any 72.172.76.0 0.0.0.15 eq snmp
+access-list 2012 deny   ip 72.172.76.0 0.0.1.255 any
+access-list 2012 deny   ip 0.0.0.0 0.255.255.255 any
+access-list 2012 deny   ip 10.0.0.0 0.255.255.255 any
+access-list 2012 deny   ip 127.0.0.0 0.255.255.255 any
+access-list 2012 deny   ip 169.254.0.0 0.0.255.255 any
+access-list 2012 deny   ip 172.16.0.0 0.15.255.255 any
+access-list 2012 deny   ip 192.0.2.0 0.0.0.255 any
+access-list 2012 deny   ip 192.168.0.0 0.0.255.255 any
+access-list 2012 deny   ip 224.0.0.0 31.255.255.255 any
+access-list 2012 permit ip any any
+access-list 2013 remark Anti-bogon ACL and MAL UDP block
+access-list 2013 permit tcp 63.139.86.0 0.0.0.15 72.172.76.0 0.0.0.15 eq 22
+access-list 2013 permit udp 63.139.86.0 0.0.0.15 72.172.76.0 0.0.0.15 eq snmp
+access-list 2013 permit tcp 63.139.86.0 0.0.0.15 72.172.66.0 0.0.0.63 eq 22
+access-list 2013 permit udp 63.139.86.0 0.0.0.15 72.172.66.0 0.0.0.63 eq snmp
+access-list 2013 permit udp host 72.13.49.20 host 72.172.66.30 eq snmp
+access-list 2013 permit gre host 199.7.59.98 host 72.172.66.30
+access-list 2013 permit icmp host 203.144.53.113 host 203.144.53.114
+access-list 2013 permit tcp host 203.144.53.113 host 203.144.53.114 eq bgp
+access-list 2013 deny   tcp any 72.172.66.0 0.0.0.63 eq telnet
+access-list 2013 deny   tcp any 72.172.76.0 0.0.0.15 eq telnet
+access-list 2013 deny   tcp any 72.172.66.0 0.0.0.63 eq 22
+access-list 2013 deny   tcp any 72.172.76.0 0.0.0.15 eq 22
+access-list 2013 deny   udp any 72.172.66.0 0.0.0.63 eq snmp
+access-list 2013 deny   udp any 72.172.76.0 0.0.0.15 eq snmp
+access-list 2013 deny   ip 72.172.76.0 0.0.1.255 any
+access-list 2013 deny   ip 0.0.0.0 0.255.255.255 any
+access-list 2013 deny   ip 10.0.0.0 0.255.255.255 any
+access-list 2013 deny   ip 127.0.0.0 0.255.255.255 any
+access-list 2013 deny   ip 169.254.0.0 0.0.255.255 any
+access-list 2013 deny   ip 172.16.0.0 0.15.255.255 any
+access-list 2013 deny   ip 192.0.2.0 0.0.0.255 any
+access-list 2013 deny   ip 192.168.0.0 0.0.255.255 any
+access-list 2013 deny   ip 224.0.0.0 31.255.255.255 any
+access-list 2013 deny   udp any host 72.172.76.139 log
+access-list 2013 permit ip any any
+access-list 2014 remark Anti-bogon ACL and Incapsula White List
+access-list 2014 permit tcp 63.139.86.0 0.0.0.15 72.172.76.0 0.0.0.15 eq 22
+access-list 2014 permit udp 63.139.86.0 0.0.0.15 72.172.76.0 0.0.0.15 eq snmp
+access-list 2014 permit tcp 63.139.86.0 0.0.0.15 72.172.66.0 0.0.0.63 eq 22
+access-list 2014 permit udp 63.139.86.0 0.0.0.15 72.172.66.0 0.0.0.63 eq snmp
+access-list 2014 permit udp host 72.13.49.20 host 72.172.66.30 eq snmp
+access-list 2014 permit gre host 199.7.59.98 host 72.172.66.30
+access-list 2014 permit icmp host 203.144.53.113 host 203.144.53.114
+access-list 2014 permit tcp host 203.144.53.113 host 203.144.53.114 eq bgp
+access-list 2014 permit ip 199.83.128.0 0.0.7.255 host 72.172.76.190
+access-list 2014 permit ip 198.143.32.0 0.0.31.255 host 72.172.76.190
+access-list 2014 permit ip 149.126.72.0 0.0.7.255 host 72.172.76.190
+access-list 2014 permit ip 103.28.248.0 0.0.3.255 host 72.172.76.190
+access-list 2014 permit ip 185.11.124.0 0.0.3.255 host 72.172.76.190
+access-list 2014 permit ip host 63.139.86.3 host 72.172.76.190
+access-list 2014 deny   ip any host 72.172.76.190
+access-list 2014 deny   tcp any 72.172.66.0 0.0.0.63 eq telnet
+access-list 2014 deny   tcp any 72.172.76.0 0.0.0.15 eq telnet
+access-list 2014 deny   tcp any 72.172.66.0 0.0.0.63 eq 22
+access-list 2014 deny   tcp any 72.172.76.0 0.0.0.15 eq 22
+access-list 2014 deny   udp any 72.172.66.0 0.0.0.63 eq snmp
+access-list 2014 deny   udp any 72.172.76.0 0.0.0.15 eq snmp
+access-list 2014 deny   ip 72.172.76.0 0.0.1.255 any
+access-list 2014 deny   ip 0.0.0.0 0.255.255.255 any
+access-list 2014 deny   ip 10.0.0.0 0.255.255.255 any
+access-list 2014 deny   ip 127.0.0.0 0.255.255.255 any
+access-list 2014 deny   ip 169.254.0.0 0.0.255.255 any
+access-list 2014 deny   ip 172.16.0.0 0.15.255.255 any
+access-list 2014 deny   ip 192.0.2.0 0.0.0.255 any
+access-list 2014 deny   ip 192.168.0.0 0.0.255.255 any
+access-list 2014 deny   ip 224.0.0.0 31.255.255.255 any
+access-list 2014 permit ip any any
+route-map External:Route permit 10
+ set community 65005:101
+!
+route-map Peer-Net2Ez permit 10
+ match community Global:Drop
+ set community 558:666
+!
+route-map Peer-Net2Ez permit 25
+ match community Net2EZ:Out
+ set community none
+!
+route-map Static-to-BGP permit 10
+ match tag 666
+ set metric 1
+ set local-preference 1
+ set origin igp
+ set community 65005:666
+ set ip next-hop 172.16.0.1
+!
+route-map prepend permit 10
+ set as-path prepend 65005 65005 65005
+!
+!snmp-server community <removed> RO
+snmp-server location Net2EZ
+snmp-server contact sysadmins@gorillanation.com
+snmp ifmib ifindex persist
+!
+radius-server source-ports 1645-1646
+!
+control-plane
+!
+dial-peer cor custom
+!
+line con 0
+line vty 0 4
+ exec-timeout 240 0
+! password <removed>
+ transport input ssh
+line vty 5 15
+ access-class 1 in
+ exec-timeout 240 0
+ transport input ssh
+!
+exception core-file 
+!
+ntp update-calendar
+ntp server 164.67.62.194
+ntp server 192.5.41.40
+no event manager policy Mandatory.go_switchbus.tcl type system
+!
+end

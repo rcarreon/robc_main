@@ -1,0 +1,63 @@
+#!/usr/bin/perl -W
+
+use strict;
+
+$ENV{PATH}=$ENV{PATH}.":/usr/local/bin";
+
+open(RT, qq/rt list -t asset "Type = 'Servers' and Status != 'retired'"|/) or die;
+@_=(<RT>);
+chomp(@_);
+my %assets = map { /(.*): (.*)/; $2 => $1 } @_;
+close(RT);
+
+my %data=();
+# first, count up memory allocations
+open(VMDATA,"/opt/xcat/bin/nodels vm vm.host vm.memory vm.cpus|") or die;
+my $host="";
+my $memory="";
+my $cpus="";
+while (my $line=<VMDATA>) {
+   #tester8.tp.dev.lax.gnmedia.net: vm.memory: 1024
+   #tester8.tp.dev.lax.gnmedia.net: vm.host: metal-1419.lax.gnmedia.net
+   # This weird parsing is because I don't trust the order I get these lines from xcat
+   if ($line =~ /(.*): vm.(.*): (.*)/) {
+      $host=$3 if ($2 eq "host");
+      $memory=$3 if ($2 eq "memory");
+      $cpus=$3 if ($2 eq "cpus");
+      if ($memory && $host && $cpus) {
+         $data{$host}{usedmegs}+=$memory;
+         #print "$host $memory (".$data{$host}{usedmegs}.")\n";
+         my $asset="asset/".$assets{$1};
+         system("rt edit $asset set CF-Memory=$memory CF-CPU=$cpus");
+         
+         $host="";
+         $memory="";
+         $cpus="";
+      }
+   }
+}
+
+open(METALS,"/opt/xcat/bin/nodels per610|") or die;
+while (my $host=<METALS>) {
+   chomp($host);
+   my $asset=`rt list -i -t asset "Name = '$host'"`;
+   chomp $asset;
+
+   my $free=191508 - $data{$host}{usedmegs};
+   print $host,"\n";
+   system("rt edit ${asset} set CF-MetalFreeRam=$free CF-CPU=24 CF-Model=R610");
+}
+open(METALS,"/opt/xcat/bin/nodels per620|") or die;
+while (my $host=<METALS>) {
+   chomp($host);
+   my $asset=`rt list -i -t asset "Name = '$host'"`;
+   chomp $asset;
+
+   my $free=191571 - $data{$host}{usedmegs};
+   print $host,"\n";
+   system("rt edit ${asset} set CF-MetalFreeRam=$free CF-CPU=32 CF-Model=R620");
+}
+
+
+
+

@@ -1,0 +1,9 @@
+---
+- hosts: all
+  sudo: yes
+  gather_facts: no
+  vars:
+  - adhoc_file: puppet is stopped to fix ssh access issues
+  - dest_file: /etc/motd
+  tasks:
+  - template: src=templates/dump_adhoc_file.j2 dest={{ dest_file }}

@@ -1,0 +1,30 @@
+$TTL 3600
+at-comics.com.		IN      SOA     at-comics.com. root.at-comics.com. (
+                        2015051100; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+at-comics.com.     IN      NS              app3v-dns.tp.prd.lax.craveonline.com.
+at-comics.com.     IN      NS              app4v-dns.tp.prd.lax.craveonline.com.
+at-comics.com.     IN      NS              app1v-dns.tp.prd.lax.craveonline.com.
+at-comics.com.     IN      NS              app2v-dns.tp.prd.lax.craveonline.com.
+at-comics.com.     IN      MX      1       mail.gnmedia.net.
+;
+; local host
+;
+local           IN      A       127.0.0.1
+localhost       IN      A       127.0.0.1
+loghost         IN      A       127.0.0.1
+;
+;
+; hosts
+;atforums.at-comics.com.	IN      A	67.18.216.74
+;at-comics.com.			IN      A       67.18.216.78 
+atforums.at-comics.com.        IN      A       97.64.84.137
+at-comics.com.         	IN      A       97.64.84.137
+mail.at-comics.com.	IN	CNAME	at-comics.com.
+www.at-comics.com.	IN      CNAME	at-comics.com.
+ftp.at-comics.com.	IN      CNAME	at-comics.com.

@@ -1,0 +1,56 @@
+#!/usr/bin/perl -w
+        
+# Define a subclass
+package Parser;        
+use Data::Dumper;
+use File::Basename;
+use POSIX qw(strftime);
+use Getopt::Std;
+use BIND::Conf_Parser;
+use vars qw(@ISA);
+@ISA = qw(BIND::Conf_Parser);
+
+my %options=();
+getopts("a", \%options);
+
+my $force_check=0;
+my $tmp_dir = $ARGV[0];
+if (!$tmp_dir) {
+    die "Usage:\n\t$0 <DNSPUSH_CHECKOUT_DIR> (optional -a does a full sync)\n";
+}
+
+my $conf = "$tmp_dir/dns/configs/app1v-dnsext/named-zones-generated.conf";
+my $zone_dir = "$tmp_dir/dns/pub";
+
+if (! -d "$zone_dir") {
+    print "Can not find dns/pub within $tmp_dir!\n";
+    exit 1;
+}
+
+if ($options{a}) {
+    $force_check=1;
+    print "[" . localtime() . "] Looks like we are doing a FULL check. Get some coffee, this may take a while...\n";
+}
+
+sub handle_zone {
+    my($self, $name, $class, $type, $options) = @_;
+    my $TODAY=strftime("%Y%m%d", localtime);
+
+    my $file = $options->{file};
+    if (`grep -linr $TODAY $zone_dir/$file` || $force_check) {
+        print "[" . localtime() . "] Processing $name\n";
+        my ($ext) = $file =~ /(\.[^.]+)$/;
+       	if ($ext eq '.rev') {
+            system("/usr/local/bin/r53sync -v -r $name $zone_dir/$file");
+        } else {
+            system("/usr/local/bin/r53sync -v $zone_dir/$file");
+        }
+    }
+}
+        
+package main;
+Parser->parse_file($conf);
+
+print "[" . localtime() . "] Deleting tmpdir $tmp_dir\n";
+`rm -fr $tmp_dir`;
+print "[" . localtime() . "] All done.\n";

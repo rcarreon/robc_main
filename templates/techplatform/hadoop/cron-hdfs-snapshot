@@ -1,0 +1,7 @@
+#!/bin/sh
+# vim: set ft=sh :
+
+if [ -f /etc/profile.d/hadoop.sh ]; then
+    . /etc/profile.d/hadoop.sh
+fi
+/opt/hadoop/bin/hdfs dfs -createSnapshot / "hdfs_snapshot_cron_$(date +%Y%m%d%H%M%S%z)" 2>&1

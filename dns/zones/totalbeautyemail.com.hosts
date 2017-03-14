@@ -1,0 +1,19 @@
+$TTL    3600 
+totalbeautyemail.com.   IN      SOA     totalbeautyemail.com. root.totalbeautyemail.com. (
+                                     2015061800     ; serial
+                                     28800          ; refresh
+                                     14400          ; retry
+                                     3600000        ; expire
+                                     86400 )        ; minimum
+
+totalbeautyemail.com.                IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+totalbeautyemail.com.                IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+totalbeautyemail.com.                IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+totalbeautyemail.com.                IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+totalbeautyemail.com.                IN    MX 10    cluster9.us.messagelabs.com.
+totalbeautyemail.com.                IN    MX 20    cluster9a.us.messagelabs.com.
+totalbeautyemail.com.                IN    MX 10    mx.mse23.exchange.ms.
+
+totalbeautyemail.com.                IN    A        67.201.37.155
+*.totalbeautyemail.com.              IN    A        67.201.37.155

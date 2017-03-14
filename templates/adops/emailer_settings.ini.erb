@@ -1,0 +1,15 @@
+[environment]
+env = <%= env_adplatform_emailer %>
+
+[adops]
+user = <%= user_adplatform_emailer %>
+password = <%= pw_adplatform_emailer %>
+host = <%= host_adplatform_emailer %>
+database = adops2_0_production
+
+[emailer]
+flagSaveLog = true
+logFilepath = /app/log/adops/nobody/emailer.log
+flagUsePHPMailer = true
+host = localhost
+

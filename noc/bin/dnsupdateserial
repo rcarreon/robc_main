@@ -1,0 +1,48 @@
+#!/usr/bin/env python
+
+import re
+import sys
+import datetime
+
+# Standalone dnsupdateserial util python script for your serial updating needs.
+
+def main():
+    if len(sys.argv) < 2:
+        print("Usage: {0} zonefile1 [zonefile2 [ ... ]]]".format(sys.argv[0]))
+        sys.exit(-1)
+
+    for zonefile in sys.argv[1:]:
+        lines = None
+        with open(zonefile, "r") as fh:
+            lines = fh.read().split("\n")
+
+        i = 0
+        while i < len(lines):
+            m = re.match(r"^(\s+)(?P<serial>\d+)(\s+;\s+serial.*)$",
+                         lines[i],
+                         re.IGNORECASE)
+            if m:
+                old_serial = m.group("serial")
+                new_serial = datetime.datetime.now().strftime("%Y%m%d") + "00"
+                serial = None
+
+                if old_serial[:-2] != new_serial[:-2]:
+                    serial = new_serial
+                else:
+                    trail = 1 + int(old_serial[-2:])
+                    if trail < 10:
+                        trail = '0' + str(trail)
+
+                    serial = old_serial[:-2] + str(trail)
+
+                lines[i] = "".join([m.group(1), serial, m.group(3)])
+
+                print("{0}:\t{1} -> {2}".format(zonefile, old_serial, serial))
+                break
+            i += 1
+
+        with open(zonefile, "w") as fh:
+            fh.write("\n".join(lines))
+
+if __name__ == "__main__":
+    main()

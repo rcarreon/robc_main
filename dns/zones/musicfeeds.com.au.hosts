@@ -1,0 +1,135 @@
+$TTL    3600 
+musicfeeds.com.au.  IN      SOA     musicfeeds.com.au. root.musicfeeds.com.au. (
+                                                     2016061600     ; serial
+                                                     28800          ; refresh
+                                                     14400          ; retry
+                                                     3600000        ; expire
+                                                     86400 )        ; minimum
+
+musicfeeds.com.au.                                   IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+musicfeeds.com.au.                                   IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+musicfeeds.com.au.                                   IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+musicfeeds.com.au.                                   IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+musicfeeds.com.au.     IN  MX 1 aspmx.l.google.com. 
+musicfeeds.com.au.     IN MX 5 alt1.aspmx.l.google.com. 
+musicfeeds.com.au.     IN MX 5 alt2.aspmx.l.google.com. 
+musicfeeds.com.au.     IN MX 10 alt3.aspmx.l.google.com. 
+musicfeeds.com.au.     IN MX 10 alt4.aspmx.l.google.com.
+
+musicfeeds.com.au.                               IN     TXT      "v=spf1 include:spf.mandrillapp.com ?all"
+mandrill._domainkey.musicfeeds.com.au.           IN     TXT      "v=DKIM1\; k=rsa\; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCrLHiExVd55zd/IQ/J/mRwSRMAocV/hMB3jXwaHH36d9NaVynQFYV8NaWi69c1veUtRzGt7yAioXqLj7Z4TeEUoOLgrKsn8YnckGs9i3B3tVFB+Ch/4mPhXWiNfNdynHWBcPcbJ8kjEQ2U8y78dHZj1YeRXXVvWob2OaKynO8/lQIDAQAB\;"
+
+_xmpp-server._tcp.musicfeeds.com.au.             IN     SRV 5    0 5269 xmpp-server.l.google.com.
+_xmpp-server._tcp.musicfeeds.com.au.             IN     SRV 20   0 5269 alt1.xmpp-server.l.google.com.
+_xmpp-server._tcp.musicfeeds.com.au.             IN     SRV 20   0 5269 alt2.xmpp-server.l.google.com.
+_xmpp-server._tcp.musicfeeds.com.au.             IN     SRV 20   0 5269 alt3.xmpp-server.l.google.com.
+_xmpp-server._tcp.musicfeeds.com.au.             IN     SRV 20   0 5269 alt4.xmpp-server.l.google.com.
+
+calendar.musicfeeds.com.au.                      IN     CNAME    ghs.google.com.
+rmdemo.musicfeeds.com.au.                        IN     CNAME    rmdemo.musicfeeds.com.au.gnmedia.net.
+assets.musicfeeds.com.au.                        IN     CNAME    d2qb9qe7mwgq8u.cloudfront.net.
+media.musicfeeds.com.au.                         IN     CNAME    s3.amazonaws.com.
+botr.musicfeeds.com.au.                          IN     CNAME    content.bitsontherun.com.
+streaming.musicfeeds.com.au.                     IN     CNAME    s24el3r49tw2mc.cloudfront.net.
+ads2.musicfeeds.com.au.                          IN     CNAME    s3.amazonaws.com.
+ipv6.musicfeeds.com.au.                          IN     CNAME    musicfeeds.com.au.
+download.musicfeeds.com.au.                      IN     CNAME    d2qb9qe7mwgq8u.cloudfront.net.
+images1.musicfeeds.com.au.                       IN     CNAME    s3.amazonaws.com.
+photos.musicfeeds.com.au.                        IN     CNAME    s3.amazonaws.com.
+webmail.musicfeeds.com.au.                       IN     CNAME    ghs.google.com.
+staging.rmdemo.musicfeeds.com.au.                IN     CNAME    staging.rmdemo.musicfeeds.com.au.gnmedia.net.
+assets2.musicfeeds.com.au.                       IN     CNAME    s3.amazonaws.com.
+stream.musicfeeds.com.au.                        IN     CNAME    s98nxohmlskwj.cloudfront.net.
+images.musicfeeds.com.au.                        IN     CNAME    d2qb9qe7mwgq8u.cloudfront.net.
+www.ipv6.musicfeeds.com.au.                      IN     CNAME    www.musicfeeds.com.au.
+images2.musicfeeds.com.au.                       IN     CNAME    s3.amazonaws.com.
+cdn1.musicfeeds.com.au.                          IN     CNAME    d2qb9qe7mwgq8u.cloudfront.net.
+docs.musicfeeds.com.au.                          IN     CNAME    ghs.google.com.
+media2.musicfeeds.com.au.                        IN     CNAME    s3.amazonaws.com.
+
+player.musicfeeds.com.au.                        IN     A        54.198.91.135
+;www.musicfeeds.com.au.                          IN     A        104.237.157.56
+8rde4g8jt3.musicfeeds.com.au.                    IN     A        104.237.157.56
+v411ogd9j.musicfeeds.com.au.                     IN     A        104.236.159.27
+syn.musicfeeds.com.au.                           IN     A        104.236.163.205
+rb4ifvsu6q.musicfeeds.com.au.                    IN     A        104.236.163.205
+studio.musicfeeds.com.au.                        IN     A        104.236.163.205
+;musicfeeds.com.au.                              IN     A        104.237.157.56
+staging.musicfeeds.com.au.                       IN     A        104.237.157.56
+mail.musicfeeds.com.au.                          IN     A        104.237.157.56
+;*.musicfeeds.com.au.                            IN     A        104.237.157.56
+*.musicfeeds.com.au.                             IN     A        97.64.84.172
+
+; #### liveoutdoors TitanWP
+musicfeeds.com.au.                                   IN    A        97.64.84.172
+
+bta.musicfeeds.com.au.                               IN    A        10.64.64.75
+dev.musicfeeds.com.au.                               IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.musicfeeds.com.au.                               IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.musicfeeds.com.au.                               IN    A        97.64.84.172
+www.musicfeeds.com.au.                               IN    A        97.64.84.172
+
+origin.bta.musicfeeds.com.au.                        IN    CNAME    bta.musicfeeds.com.au.
+cdn1-bta.musicfeeds.com.au.                          IN    CNAME    bta.musicfeeds.com.au.
+cdn2-bta.musicfeeds.com.au.                          IN    CNAME    bta.musicfeeds.com.au.
+cdn3-bta.musicfeeds.com.au.                          IN    CNAME    bta.musicfeeds.com.au.
+
+origin-dev.musicfeeds.com.au.                        IN    CNAME    dev.musicfeeds.com.au.
+cdn1-dev.musicfeeds.com.au.                          IN    CNAME    dev.musicfeeds.com.au.
+cdn2-dev.musicfeeds.com.au.                          IN    CNAME    dev.musicfeeds.com.au.
+cdn3-dev.musicfeeds.com.au.                          IN    CNAME    dev.musicfeeds.com.au.
+
+origin-stg.musicfeeds.com.au.                        IN    CNAME    stg.musicfeeds.com.au.
+cdn1-stg.musicfeeds.com.au.                          IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-stg.musicfeeds.com.au.                          IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-stg.musicfeeds.com.au.                          IN    CNAME    wac.EE35.edgecastcdn.net.
+
+origin.musicfeeds.com.au.                            IN    CNAME    prd.musicfeeds.com.au.
+cdn1-www.musicfeeds.com.au.                          IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-www.musicfeeds.com.au.                          IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-www.musicfeeds.com.au.                          IN    CNAME    wac.EE35.edgecastcdn.net.
+; #### End TitanWP
+
+; #### studio_musicfeeds PBWP Migration
+;studio.musicfeeds.com.au.                            IN    A        97.64.84.172
+
+bta.studio.musicfeeds.com.au.                        IN    A        10.64.64.75
+dev.studio.musicfeeds.com.au.                        IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.studio.musicfeeds.com.au.                        IN    CNAME    stg.pbwordpress.gnmedia.net.
+;prd.studio.musicfeeds.com.au.                        IN    A        97.64.84.172
+;www.studio.musicfeeds.com.au.                        IN    A        97.64.84.172
+
+origin.bta.studio.musicfeeds.com.au.                 IN    CNAME    bta.studio.musicfeeds.com.au.
+cdn-bta.studio.musicfeeds.com.au.                    IN    CNAME    bta.studio.musicfeeds.com.au.
+cdn1-bta.studio.musicfeeds.com.au.                   IN    CNAME    bta.studio.musicfeeds.com.au.
+cdn2-bta.studio.musicfeeds.com.au.                   IN    CNAME    bta.studio.musicfeeds.com.au.
+cdn3-bta.studio.musicfeeds.com.au.                   IN    CNAME    bta.studio.musicfeeds.com.au.
+
+origin-dev.studio.musicfeeds.com.au.                 IN    CNAME    dev.studio.musicfeeds.com.au.
+cdn-dev.studio.musicfeeds.com.au.                    IN    CNAME    dev.studio.musicfeeds.com.au.
+cdn1-dev.studio.musicfeeds.com.au.                   IN    CNAME    dev.studio.musicfeeds.com.au.
+cdn2-dev.studio.musicfeeds.com.au.                   IN    CNAME    dev.studio.musicfeeds.com.au.
+cdn3-dev.studio.musicfeeds.com.au.                   IN    CNAME    dev.studio.musicfeeds.com.au.
+
+origin-stg.studio.musicfeeds.com.au.                 IN    CNAME    stg.studio.musicfeeds.com.au.
+cdn-stg.studio.musicfeeds.com.au.                    IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn1-stg.studio.musicfeeds.com.au.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-stg.studio.musicfeeds.com.au.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-stg.studio.musicfeeds.com.au.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+
+;origin.studio.musicfeeds.com.au.                     IN    CNAME    prd.studio.musicfeeds.com.au.
+;cdn-www.studio.musicfeeds.com.au.                    IN    CNAME    wac.EE35.edgecastcdn.net.
+;cdn1-www.studio.musicfeeds.com.au.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+;cdn2-www.studio.musicfeeds.com.au.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+;cdn3-www.studio.musicfeeds.com.au.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+
+dev.m.studio.musicfeeds.com.au.                      IN    CNAME    dev.studio.musicfeeds.com.au.
+stg.m.studio.musicfeeds.com.au.                      IN    CNAME    stg.studio.musicfeeds.com.au.
+www.m.studio.musicfeeds.com.au.                      IN    CNAME    prd.studio.musicfeeds.com.au.
+m.studio.musicfeeds.com.au.                          IN    CNAME    prd.studio.musicfeeds.com.au.
+
+; #### End PBWP Migration
+
+
+musicfeeds.com.au. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

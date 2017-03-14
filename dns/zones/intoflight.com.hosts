@@ -1,0 +1,27 @@
+$ORIGIN intoflight.com.
+$TTL    3600 
+intoflight.com.	IN      SOA     intoflight.com. root.intoflight.com. (
+                        2015070701	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+intoflight.com.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+intoflight.com.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+intoflight.com.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+intoflight.com.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+
+                       MX    10 ASPMX4.GOOGLEMAIL.COM.
+                       MX    10 ASPMX3.GOOGLEMAIL.COM.
+                       MX    10 ASPMX2.GOOGLEMAIL.COM.
+                       MX    10 ASPMX.L.GOOGLE.COM.
+                       MX    10 ALT2.ASPMX.L.GOOGLE.COM.
+                       MX    10 ALT1.ASPMX.L.GOOGLE.COM.
+                       MX    10 ASPMX5.GOOGLEMAIL.COM.
+                       3600 A     69.7.23.217
+www                    3600 A     69.7.23.217

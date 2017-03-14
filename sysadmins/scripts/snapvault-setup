@@ -1,0 +1,56 @@
+#!/bin/bash
+
+
+server=$(IFS=:; set -- $1; echo $1)
+volume=$(IFS=:; set -- $1; echo $2 | sed 's/\/vol\///')
+if [[ $volume =~ / ]] ;then
+    qtree=$(IFS=/; set -- $volume; echo $2)
+    volume=$(IFS=/; set -- $volume; echo $1)
+fi
+
+if [ -n "$2" ];then
+   sspolicy=$2
+fi
+
+sv_volume=sv_$volume
+if [ -n "$qtree" ];then
+    echo "No more subtree snapvaults"
+    exit 1
+else
+    path=/vol/$volume
+    sv_path=/vol/$sv_volume
+fi
+
+sv_server=netapp2-sv.gnmedia.net
+sv_aggr=$(rnetapp netapp2 aggr list -m)
+
+
+# allow use of a debug rnetapp
+if test -x ./rnetapp;then
+  rnetapp=./rnetapp
+else
+  rnetapp=rnetapp
+fi
+size=$($rnetapp $server vol size $volume | awk '{print $3}')
+
+if [ -z "$size" ];then
+   exit 1
+fi
+
+if [ -n "$sspolicy" ];then
+   policy=$sspolicy
+else
+    case $volume in
+       *shared) policy=shared;;
+       *ugc) policy=ugc;;
+       *) policy=shared;;
+    esac
+fi
+
+set -x
+$rnetapp $server vol sspolicy $volume $policy
+$rnetapp $sv_server vol create $sv_volume $size $sv_aggr dp  #<-- creates sv volume
+$rnetapp $sv_server snapshot reserve $sv_path 0
+$rnetapp $sv_server snapmirror create -t xdp -s daily1 -p gnxdp -S netapp1_nfs:$path netapp2_sv:$sv_path && \
+echo "$server:$path is set up for snapvaults"
+

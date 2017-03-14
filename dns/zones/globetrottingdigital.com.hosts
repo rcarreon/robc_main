@@ -1,0 +1,24 @@
+$TTL 3600
+globetrottingdigital.com.	IN      SOA     globetrottingdigital.com. root.globetrottingdigital.com. (
+                        2016061600  ; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+globetrottingdigital.com.     IN      NS              app3v-dns.tp.prd.lax.atomiconline.com.
+globetrottingdigital.com.     IN      NS              app4v-dns.tp.prd.lax.atomiconline.com.
+globetrottingdigital.com.     IN      NS              app1v-dns.tp.prd.lax.atomiconline.com.
+globetrottingdigital.com.     IN      NS              app2v-dns.tp.prd.lax.atomiconline.com.
+
+
+globetrottingdigital.com.     IN  MX 1 aspmx.l.google.com. 
+globetrottingdigital.com.     IN MX 5 alt1.aspmx.l.google.com. 
+globetrottingdigital.com.     IN MX 5 alt2.aspmx.l.google.com. 
+globetrottingdigital.com.     IN MX 10 alt3.aspmx.l.google.com. 
+globetrottingdigital.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+globetrottingdigital.com.       IN  A       97.64.84.103
+www                             IN  CNAME   globetrottingdigital.com.
+globetrottingdigital.com. 	IN 	TXT 	"v=spf1 a:cluster9out.us.messagelabs.com include:_spf.google.com ip4:216.82.240.0/20 ~all"

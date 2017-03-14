@@ -1,0 +1,248 @@
+#!/bin/bash
+# Gorilla Nation
+# By Rey Estrada
+# Last modification Mon Feb 18, 2013
+#
+cmd=""
+size=""
+sizeunit=""
+sizepercent=""
+used=""
+usedunit=""
+usedpercent=""
+increment=""
+incrementunit="m"
+choice="5"
+error=1
+#
+#Options
+option1=85
+option2=80
+option3=75
+option4=70
+#
+clear;
+echo "----------"
+echo "-- dfm -- "
+echo "----------" 
+echo "Tool to calculate and increment dfm size in an easy way"
+echo ""
+echo "Insert email title here "
+echo "(it's something like this: \"nfs2-netapp3:/nfs2_sql2v_ci_prd_lax_binlog\"):"
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+#
+while [[ "$error" != "0" ]]; do
+  read nfsvolume
+  nfsvolume=$(echo $nfsvolume | sed -e 's/ //g')
+  nfs=`echo "$nfsvolume" | awk -F':/' '{print $1}' | awk -F'-' '{print $1"."$2}'`
+  volume=`echo "$nfsvolume" | awk -F':/' '{print $2}'`
+  echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+  cmd="sudo rnetapp $nfs vol list -q $volume"
+  nfsvolume=`eval $cmd 2> /dev/null`
+  error=`eval echo $?`
+  #
+  if [ "$error" != "0" ]; then
+    eval tput setaf 3
+    echo "The nfs:/volume does not exist, please put it again"
+    echo "Remember, it's something like this: \"nfs2-netapp3:/nfs2_sql2v_ci_prd_lax_binlog\""
+    eval tput sgr0
+  fi
+done
+#
+eval tput setaf 6
+echo $nfsvolume
+eval tput sgr0
+echo "-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-"
+size="echo $nfsvolume | awk '{print \$2}' | awk '{print substr(\$0, 0, length() -1)}'"
+size=`eval $size`
+sizeunit="echo $nfsvolume | awk '{print \$2}' | awk '{print substr(\$0, length(), length())}'"
+sizeunit=`eval $sizeunit`
+#
+#getting used space
+used="echo $nfsvolume | awk '{print \$3}' | awk '{print substr(\$0, 0, length() -1)}'"
+used=`eval $used`
+usedunit="echo $nfsvolume | awk '{print \$3}' | awk '{print substr(\$0, length(), length())}'"
+usedunit=`eval $usedunit`
+#
+#getting used percent
+usedpercent="echo $nfsvolume | awk '{print \$4}' | awk '{print substr(\$0, 0, length() -1)}'"
+usedpercent=`eval $usedpercent`
+#
+#Starting Calculations!
+#  T | G | M
+# It's common to have volumes with mb ("M"), gb ("G") or in some rare cases tb ("T") in rnetapp
+# so the easy way to do calculations is to convert everything to mb and then 
+# convert to the unit that better fill our needs and it's more human-easy-understandable
+#
+if [ $sizeunit = "T" ]; then
+  size=`echo "scale=2;\$size*1024*1024" | bc`
+  sizeunit="M"
+else
+  if [ $sizeunit = "G" ]; then
+    size=`echo "scale=2;\$size*1024" | bc`
+    sizeunit="M"
+  else
+    if [ $sizeunit = "M" ]; then
+      sizeunit="M"
+      #nothing to do here
+    else
+      echo "Error getting the correct unit"  
+    fi
+  fi
+fi
+#
+if [ $usedunit = "T" ]; then
+  used=`echo "scale=2;\$used*1024*1024" | bc`
+  usedunit="M"
+else
+  if [ $usedunit = "G" ]; then
+    used=`echo "scale=2;\$used*1024" | bc`
+    usedunit="M"
+  else
+    if [ $usedunit = "M" ]; then
+      usedunit="M"
+      #nothing to do here
+    else
+      echo "Error getting the correct unit"  
+    fi
+  fi
+fi
+#
+while [[ "$choice" != "1" || "$choice" != "2" || "$choice" != "3" || "$choice" != "4" || "$choice" != "5" ]]; do
+  #
+  #Calculations continue.. now asking the user the % of used space that he/she want to reach
+  echo "Select the % of used space that you want to reach"
+  echo "Select an option: "
+  echo "1.- ${option1}%"
+  echo "2.- ${option2}%"
+  echo "3.- ${option3}%"
+  echo "4.- Enter manual %"
+  echo "5.- Abort!"
+  #
+  read choice
+  if [ $choice = 1 ]; then
+    if [ $usedpercent -gt $option1 ]; then 
+      exp="(($used*100)/$option1)-$size"
+      increment=$(awk "BEGIN {print $exp}" /dev/null)
+      break
+    else
+      eval tput setaf 1
+      echo "Current used percent is less than $option1"
+      eval tput sgr0
+      choice=5
+      break
+    fi
+  else
+    if [ $choice = 2 ]; then
+      if [ $usedpercent -gt $option2 ]; then 
+        exp="(($used*100)/$option2)-$size"
+        increment=$(awk "BEGIN {print $exp}" /dev/null)
+        break
+      else
+        eval tput setaf 1
+        echo "Current used percent is less than $option2"
+        eval tput sgr0
+        choice=5
+        break
+      fi
+    else
+      if [ $choice = 3 ]; then
+        if [ $usedpercent -gt $option3 ]; then 
+          exp="(($used*100)/$option3)-$size"
+          increment=$(awk "BEGIN {print $exp}" /dev/null)
+          break
+        else
+          eval tput setaf 1
+          echo "Current used percent is less than $option3"
+          eval tput sgr0
+          choice=5
+          break
+        fi
+      else
+        if [ $choice = 4 ]; then
+          error=1
+            while [[ "$error" == "1" ]]; do
+              echo "Please insert the desired percent"
+              eval tput sgr0
+              read option4
+              if [ $option4 -eq $option4 ] 2>/dev/null; then
+                if [[ $option4 -gt 49 && $option4 -lt 96 ]]; then
+                  error=0
+                else
+                  eval tput setaf 3
+                  echo "Please insert an integer value between 50 and 95"           
+                  error=1
+                fi
+              else
+                eval tput setaf 3
+                echo "Please insert an integer value between 50 and 95"
+                error=1
+              fi
+    done
+#
+        if [ $usedpercent -gt $option4 ]; then
+          exp="(($used*100)/$option4)-$size"
+          increment=$(awk "BEGIN {print $exp}" /dev/null)
+          break
+        else
+          eval tput setaf 1
+          echo "Current used percent is less than $option4"
+          tput sgr0
+          choice=5
+          break
+        fi
+      else
+        if [ $choice = 5 ]; then
+          #
+          break
+        fi  
+      fi
+    fi
+  fi
+fi 
+done
+#
+if [ $choice -ne 5 ]; then 
+#
+#round variable to an integer part
+increment=`echo "scale=0;$increment/1" | bc`
+echo ""
+#
+if [ $increment -ge 1024 ]; then
+  increment=`echo "scale=0;$increment/1024" | bc`
+  incrementunit="g"
+else
+  if [ $increment -ge 1048576 ]; then
+    increment=`echo "scale=0;$increment/1024/1024" | bc`
+    incrementunit="t"
+  fi
+fi
+#
+while [[ "$choice" != "1" || "$choice" != "2" ]]; do
+  #
+  echo -e "Do you want to execute the following line? \n"
+  #
+  cmd="sudo rnetapp $nfs volume size $volume +$increment$incrementunit"
+  eval tput setaf 1
+  echo $cmd
+  eval tput sgr0
+  echo -e "\nSelect an option:"
+  echo "1.- Yes"
+  echo "2.- No"
+  read choice
+  #
+  if [ $choice = 1 ]; then
+    eval $cmd
+    break
+  else
+    if [ $choice = 2 ]; then
+      echo "Command wasn't executed!"
+      break
+    fi
+  fi
+done
+#
+else
+  echo "Script terminated"
+fi
+#

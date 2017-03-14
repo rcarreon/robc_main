@@ -1,0 +1,8 @@
+# this shell script is managed by by puppet for adops
+if [ -f /etc/bashrc ]; then
+  . /etc/bashrc
+fi
+
+export RBENV_ROOT=$HOME/.rbenv
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"

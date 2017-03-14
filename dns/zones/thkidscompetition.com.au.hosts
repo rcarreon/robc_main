@@ -1,0 +1,32 @@
+$TTL 3600
+thkidscompetition.com.au.	IN      SOA     thkidscompetition.com.au. root.thkidscompetition.com.au. (
+                        2016061600	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+thkidscompetition.com.au.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+thkidscompetition.com.au.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+thkidscompetition.com.au.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+thkidscompetition.com.au.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+
+thkidscompetition.com.au.     IN  MX 1 aspmx.l.google.com. 
+thkidscompetition.com.au.     IN MX 5 alt1.aspmx.l.google.com. 
+thkidscompetition.com.au.     IN MX 5 alt2.aspmx.l.google.com. 
+thkidscompetition.com.au.     IN MX 10 alt3.aspmx.l.google.com. 
+thkidscompetition.com.au.     IN MX 10 alt4.aspmx.l.google.com.
+
+
+
+
+www.thkidscompetition.com.au.            IN      CNAME       cdn.campaigns.totallyher.com.
+staging.thkidscompetition.com.au.        IN      CNAME       staging.campaigns.totallyher.com.
+demo.thkidscompetition.com.au.           IN      CNAME       cdn.campaigns.totallyher.com.
+dev.thkidscompetition.com.au.            IN      CNAME       app1v-dh.si.dev.lax.gnmedia.net.
+thkidscompetition.com.au.               IN      A           97.64.84.104
+thkidscompetition.com.au. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

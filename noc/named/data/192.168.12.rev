@@ -1,0 +1,14 @@
+; $Id$
+$TTL 300
+
+@ IN SOA hmo.gnmedia.net. noc.gorillanation.com. (
+	2011062400		; serial
+	36000			; refresh
+	3600			; retry
+	3600000			; expire
+	36000 )			; default ttl
+
+
+@	IN NS	ns.hmo.gnmedia.net.
+221	IN PTR	ns.hmo.gnmedia.net.
+141	IN PTR	puppet.hmo.gnmedia.net.

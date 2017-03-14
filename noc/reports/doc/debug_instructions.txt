@@ -1,0 +1,4 @@
+Variable debug_lvl
+
+1:   Echo queries from script (not from functions)
+2:   Echo queries from script and from functions

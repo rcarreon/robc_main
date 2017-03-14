@@ -1,0 +1,72 @@
+$TTL 3600
+actiontrip.com.		IN      SOA     actiontrip.com. root.actiontrip.com. (
+                        2016061600	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+actiontrip.com.		IN	NS		app3v-dns.tp.prd.lax.craveonline.com.
+actiontrip.com.		IN	NS		app4v-dns.tp.prd.lax.craveonline.com.
+actiontrip.com.		IN	NS		app1v-dns.tp.prd.lax.craveonline.com.
+actiontrip.com.		IN	NS		app2v-dns.tp.prd.lax.craveonline.com.
+
+actiontrip.com.     IN  MX 1 aspmx.l.google.com.
+actiontrip.com.     IN MX 5 alt1.aspmx.l.google.com.
+actiontrip.com.     IN MX 5 alt2.aspmx.l.google.com.
+actiontrip.com.     IN MX 10 alt3.aspmx.l.google.com.
+actiontrip.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+
+
+local                                    IN    A        127.0.0.1
+localhost                                IN    A        127.0.0.1
+loghost                                  IN    A        127.0.0.1
+
+actiontrip.com.                          IN    A        97.64.84.137
+www.actiontrip.com.                      IN    A        97.64.84.137
+crowdignite.actiontrip.com.              IN    A        97.64.84.119 
+wap.actiontrip.com.                      IN    CNAME    at.qwapi.com.
+atrip01.actiontrip.com.                  IN    A        97.64.84.137
+atmain.actiontrip.com.                   IN    A        67.18.93.162
+ftp.actiontrip.com.                      IN    CNAME    actiontrip.com.
+www2.actiontrip.com.                     IN    A        97.64.84.137
+upload.actiontrip.com.                   IN    A        209.151.238.60
+
+
+www.origin.actiontrip.com.               IN    CNAME    www.actiontrip.com.
+www.cdn.actiontrip.com.                  IN    CNAME    wac.EE35.edgecastcdn.net.
+
+origin.campaigns                         IN    A        97.64.84.104
+campaigns                                IN    CNAME    origin.campaigns
+cdn.campaigns                            IN    CNAME    wac.1384D.sigmacdn.net.
+staging.campaigns                        IN    A        97.64.84.105
+
+origin.assets                            IN    A        97.64.84.101
+cdn.assets                               IN    CNAME    wac.1384D.sigmacdn.net.
+assets                                   IN    CNAME    cdn.assets
+staging.assets                           IN    CNAME    wac.1384D.sigmacdn.net.
+demo.assets                              IN    CNAME    wac.1384D.sigmacdn.net.
+origin.staging.assets                    IN    A        97.64.84.102
+
+paxeast.actiontrip.com.                  IN    CNAME    cdn.campaigns.actiontrip.com.
+staging.paxeast.actiontrip.com.          IN    CNAME    staging.campaigns.actiontrip.com.
+;demo.paxeast.actiontrip.com.            IN    CNAME    demo.campaigns.actiontrip.com.
+
+rmdemo                                   IN    CNAME    campaigns
+staging.rmdemo                           IN    CNAME    staging.campaigns.evolvemediacorp.com.
+files                                    IN    CNAME    cdn.assets
+
+terrortrip.actiontrip.com.               IN    CNAME    cdn.campaigns.actiontrip.com.
+staging.terrortrip.actiontrip.com.       IN    CNAME    staging.campaigns.actiontrip.com.
+demo.terrortrip.actiontrip.com.          IN    CNAME    demo.si.evolvemediallc.com.
+e3.actiontrip.com.                       IN    CNAME    cdn.campaigns.actiontrip.com.
+staging.e3.actiontrip.com.               IN    CNAME    staging.campaigns.actiontrip.com.
+demo.e3.actiontrip.com.                  IN    CNAME    demo.si.evolvemediallc.com.
+stg.actiontrip.com.                      IN    A        97.64.84.169
+origin-stg.actiontrip.com.               IN    CNAME    stg.actiontrip.com.
+stg.cdn.actiontrip.com.                  IN    CNAME    wac.EE35.edgecastcdn.net.
+m-stg.actiontrip.com.                    IN    CNAME    stg.actiontrip.com.
+m.actiontrip.com.                        IN    CNAME    actiontrip.com.
+actiontrip.com. 			 IN 	TXT 	"v=spf1 a:cluster9out.us.messagelabs.com include:_spf.google.com ip4:216.82.240.0/20 ~all"

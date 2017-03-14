@@ -1,0 +1,66 @@
+---
+:worker:
+  :legacy_db:
+    :db:
+      :<%= janitor_env %>:
+        :adapter: mysql2
+        :encoding: utf8
+        :pool: 5
+        :username: <%= legacy_db_user %>
+        :password: <%= legacy_db_pass %>
+        :database: <%= legacy_db_name %>
+        :host: <%= legacy_db_host %>
+  :adops:
+    :db:
+      :<%= janitor_env %>:
+        :adapter: mysql2
+        :encoding: utf8
+        :pool: 5
+        :username: <%= adops_db_user %>
+        :password: <%= adops_db_pass %>
+        :database: <%= adops_db_name %>
+        :host: <%= adops_db_host %>
+    :redis:
+      :password: <%= redis_pass %>
+      :host: <%= redis_host %>
+
+  :rabbit:
+    :host: <%= rabbit_host %>
+    :pass: <%= rabbit_pass %>
+    :port: <%= rabbit_port %>
+    :user: <%= rabbit_user %>
+    :vhost: <%= rabbit_vhost %>
+    :threaded: true
+    :heartbeat: 'server'
+
+  :consumer:
+    :prefetch: <%= worker_prefetch %>
+    :no_ack: <%= worker_no_ack %>
+    :exclusive: <%= worker_exclusive %>
+    :exchange: <%= worker_exchange %>
+    :exchange_options:
+      :type: :<%= worker_exchange_type %>
+      :durable: <%= worker_exchange_durable %>
+      :auto_delete: <%= worker_exchange_auto_delete %>
+      :exclusive: <%= worker_exchange_exclusive %>
+    :routing_key: <%= routing_key %>
+    :queue: <%= worker_q %>
+    :queue_opitons:
+      :durable: <%= worker_q_durable %>
+      :auto_delete: <%= worker_q_auto_delete %>
+      :exclusive: <%= worker_q_exclusive %>
+  :server:
+    :env: <%= janitor_env %>
+    :workers: <%= total_workers %>
+    :min_workers: <%= min_workers %>
+    :max_workers: <%= max_workers %>
+    :daemonize: <%= server_daemonize %>
+    :pidfile: <%= server_pid_file %>
+    :log_level: <%= server_log_level %>
+
+  :great_plains:
+    :endpoint: <%= gp_endpoint %>
+    :namespace: <%= gp_namespace %>
+    :namespaces:
+      'xmlns:ns1': <%= gp_ns1 %>
+      'xmlns:ns2': <%= gp_ns1 %>

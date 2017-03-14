@@ -1,0 +1,80 @@
+$TTL    3600 
+mandatory.com.   IN      SOA     mandatory.com. root.mandatory.com. (
+                        2016080100     ; serial
+                        28800          ; refresh
+                        14400          ; retry
+                        3600000        ; expire
+                        86400 )        ; minimum
+
+mandatory.com.           IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+mandatory.com.           IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+mandatory.com.           IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+mandatory.com.           IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+
+mandatory.com.           IN    A        64.12.79.57
+mandatory.com.           IN    A        207.200.74.38
+mandatory.com.           IN    A        64.12.89.186
+mandatory.com.           IN    A        149.174.110.102
+mandatory.com.           IN    A        149.174.107.97
+
+mandatory.com.           IN    TXT      "google-site-verification=qkkKN2hKIXkh7Hr47UG7yAJ2cK-ypFwKa3kz-FZGb7c"
+
+mandatory.com.           IN    MX    10  mx-m01.red.aol.com.
+mandatory.com.           IN    MX    10  mx-l01.red.aol.com.
+
+*.sandbox                IN    CNAME     living.blogsmith.aol.com.
+*.sandbox.grillwithguy   IN    CNAME     misc.blogsmith.aol.com.
+b.mandatory.com.         IN    CNAME     b.aol.com.
+b-aws.mandatory.com.     IN    CNAME     b-aws.aol.com.
+ca.mandatory.com.        IN    CNAME     living.blogsmith.aol.com.
+grillwithguy             IN    CNAME     hostheader.web.aol.com.
+link.mandatory.com.      IN    CNAME     cb.sailthru.com.
+search.mandatory.com.    IN    CNAME     hostheader.web.aol.com.
+shop.mandatory.com.      IN    CNAME     mandatory.myshopify.com.
+www.mandatory.com.       IN    CNAME     mandics.egslb.aol.com.
+
+deletegappsnotbefore20141025utc	IN	CNAME	case-04958776-for-mandatory.com-at.google.com.
+
+; #### mandatory PBWP Migration
+;mandatory.com.                            IN    A        97.64.84.172
+
+bta.mandatory.com.                        IN    A        10.64.64.75
+dev.mandatory.com.                        IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.mandatory.com.                        IN    CNAME    stg.pbwordpress.gnmedia.net.
+;prd.mandatory.com.                        IN    A        97.64.84.172
+;www.mandatory.com.                        IN    A        97.64.84.172
+
+origin.bta.mandatory.com.                 IN    CNAME    bta.mandatory.com.
+cdn-bta.mandatory.com.                    IN    CNAME    bta.mandatory.com.
+cdn1-bta.mandatory.com.                   IN    CNAME    bta.mandatory.com.
+cdn2-bta.mandatory.com.                   IN    CNAME    bta.mandatory.com.
+cdn3-bta.mandatory.com.                   IN    CNAME    bta.mandatory.com.
+
+origin-dev.mandatory.com.                 IN    CNAME    dev.mandatory.com.
+cdn-dev.mandatory.com.                    IN    CNAME    dev.mandatory.com.
+cdn1-dev.mandatory.com.                   IN    CNAME    dev.mandatory.com.
+cdn2-dev.mandatory.com.                   IN    CNAME    dev.mandatory.com.
+cdn3-dev.mandatory.com.                   IN    CNAME    dev.mandatory.com.
+
+origin-stg.mandatory.com.                 IN    CNAME    stg.mandatory.com.
+cdn-stg.mandatory.com.                    IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn1-stg.mandatory.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-stg.mandatory.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-stg.mandatory.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+
+;origin.mandatory.com.                     IN    CNAME    prd.mandatory.com.
+;cdn-www.mandatory.com.                    IN    CNAME    wac.EE35.edgecastcdn.net.
+;cdn1-www.mandatory.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+;cdn2-www.mandatory.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+;cdn3-www.mandatory.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+
+dev.m.mandatory.com.                      IN    CNAME    dev.mandatory.com.
+stg.m.mandatory.com.                      IN    CNAME    stg.mandatory.com.
+;www.m.mandatory.com.                      IN    CNAME    prd.mandatory.com.
+;m.mandatory.com.                          IN    CNAME    prd.mandatory.com.
+
+; #### End PBWP Migration
+
+
+

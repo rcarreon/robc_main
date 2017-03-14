@@ -1,0 +1,71 @@
+#!/bin/bash
+# vim: set ft=sh:
+#
+date_fmt="+%Y-%m-%d"
+date_cur=$(date ${date_fmt})
+date_prv=$(date --date="yesterday" ${date_fmt})
+
+cronhost=app1v-cron.ap.prd.lax.gnmedia.net
+job=Adops.run_daily_payout_cache
+
+dbhost=vip-sqlro-adops.ap.prd.lax.gnmedia.net
+dbuser=payoutcheck_r
+dbpass=<%= payoutcheck_r %>
+
+db=adops2_0_production
+tbl=payout_cache_daily
+
+read -r -d '' msg_success <<EOF
+It appears that the cron job, "${job}", has run successfully.
+
+Please log into PubOps and verify that the Royalty Estimate Report for the date
+of ${date_prv} is valid.
+
+EOF
+
+read -r -d '' msg_error <<EOF
+It appears that the cron job, "${job}" DID NOT complete successfully.
+Please verify the following:
+
+1. Log into the cron host, ${cronhost}, and verify that the job named
+"${job}", has completed running.
+
+2. If the previous job completed running, log into ${dbhost} 
+and check the output of the command: 
+    "SHOW SLAVE STATUS\G"
+    - Verify that the value of "Seconds_Behind_Master" is "0"
+
+3. If ${dbhost} is not behind the master,
+(i.e. Seconds_Behind_Master==0), contact the rest of the Ad Platform team:
+    adplatform@evolvemediallc.com
+
+EOF
+
+
+sql="SELECT COUNT(*) AS total_entries FROM ${db}.${tbl} WHERE reporting_date = '${date_prv}';"
+rows=$(mysql --host=${dbhost} --user=${dbuser} --password=${dbpass} ${db} --batch --skip-column-names --execute="${sql}")
+
+if [[ $? -ne 0 ]]; then
+    echo "${0} on host: ${HOSTNAME} has failed running the mysql command" | mail -s "${0} ERROR" addevelopers@evolvemediallc.com
+    exit 1
+fi
+
+# Check for successful run
+if [[ ${rows} > 0 ]]; then
+    status="SUCCESS"
+    msg_next_steps=${msg_success}
+else
+    status="WARNING"
+    msg_next_steps=${msg_error}
+fi
+
+subject="Check of payout_cache_daily for day - ${date_cur} (${status})"
+read -r -d '' msg <<EOF
+Checking payout_cache_daily for entires from day ${date_prv}
+
+Total number of entries: ${rows}
+
+${msg_next_steps}
+EOF
+
+echo "${msg}" | mail -s "${subject}" addevelopers@evolvemediallc.com

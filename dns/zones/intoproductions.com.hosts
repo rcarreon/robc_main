@@ -1,0 +1,32 @@
+$ORIGIN	intoproductions.com.
+$TTL    3600 
+intoproductions.com.	IN      SOA     intoproductions.com. root.intoproductions.com. (
+                        2015070800	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+intoproductions.com.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+intoproductions.com.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+intoproductions.com.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+intoproductions.com.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+                      MX    10 ASPMX4.GOOGLEMAIL.COM.
+                      MX    10 ASPMX3.GOOGLEMAIL.COM.
+                      MX    10 ASPMX2.GOOGLEMAIL.COM.
+                      MX    10 ASPMX.L.GOOGLE.COM.
+                      MX    10 ALT2.ASPMX.L.GOOGLE.COM.
+                      MX    10 ALT1.ASPMX.L.GOOGLE.COM.
+                      MX    10 ASPMX5.GOOGLEMAIL.COM.
+                      A     69.7.23.208
+aggregation           CNAME ec2-67-202-42-222.compute-1.amazonaws.com.
+assets0               CNAME www.intoproductions.com.
+assets1               CNAME www.intoproductions.com.
+assets2               CNAME www.intoproductions.com.
+assets3               CNAME www.intoproductions.com.
+content               CNAME ghs.google.com.
+dev                   CNAME ec2-72-44-51-200.z-1.compute-1.amazonaws.com.
+www                   CNAME intoproductions.com.

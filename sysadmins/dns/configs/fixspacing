@@ -1,0 +1,14 @@
+#!/usr/bin/perl -pi
+
+BEGIN { $indent=0};
+s/\{/ { /g;
+s/\{/ { /g;
+s/\} ;/};/g;
+s/^\s*//;
+s/\s+/ /g;
+s/\s*$/\n/;
+if (/^\}/) {$indent-=1;$indent=0 if $indent<0};
+if ($_ =~ /\S/) {
+print "\t" x $indent if $indent;
+}
+if (/\{$/) {$indent+=1};

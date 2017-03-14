@@ -1,0 +1,48 @@
+# comments are cool, as is whitespace
+# clogin supports a number of add directives:
+#       password
+#       user
+#       userprompt
+#       userpassword
+#       passprompt
+#       method
+#       noenable
+#       enauser
+#       enableprompt
+#       autoenable
+#       cyphertype
+#       identity
+#
+# see cloginrc(5).
+#
+
+add user *ace*	deploy
+add password *ace*	{ACE_PASSWORD}
+add method *ace*	ssh
+add autoenable *ace*            1
+
+add password *                  {PASSWORD1}  {PASSWORD2}
+add method *                    ssh
+add user *			deploy
+
+
+add user nx-core01.lax1.gnmedia.net deploy
+add password nx-core01.lax1.gnmedia.net                 {PASSWORD1}
+add method nx-core01.lax1.gnmedia.net           ssh
+add autoenable nx-core01.lax1.gnmedia.net        1
+
+add password nx-core01.lax2.gnmedia.net                 {PASSWORD1}
+add method nx-core01.lax2.gnmedia.net           ssh
+add autoenable nx-core01.lax2.gnmedia.net        1
+
+add password core1.gnmedia.net                  {PASSWORD1}
+add method core1.gnmedia.net            ssh
+add autoenable core01.gnmedia.net        1
+
+add password core2.gnmedia.net                  {PASSWORD1}
+add method core2.gnmedia.net            ssh
+add autoenable core02.gnmedia.net        1
+
+# set ssh encryption type, dflt: 3des
+add cyphertype *                {3des}
+

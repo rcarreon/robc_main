@@ -1,0 +1,254 @@
+{
+  "sql1v-56-dashboards.tp.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-puppet.tp.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vaquita.tp.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-origin.og.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-dh.si.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-cms.sbv.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-stats-cms.sbv.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-yourls.sbv.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-mc.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-sdc.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vb-bab.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vb-hfb.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vb-shh.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vb-tfs.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-wp.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-wpbeta.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-xf-ae.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-xf-psl.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-xf-sdc.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-sdc.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-api-cs.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vb-wz.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-tb.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-ep.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-xf-hfb.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-xf-wz.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-bd.og.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-api-dfp.ao.dev.lax.gnmedia.net":
+    [
+      { "time":"02:00pm",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"3",
+        "lock_timeout":"60" }
+    ]
+}

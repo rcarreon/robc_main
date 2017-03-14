@@ -1,0 +1,29 @@
+# Default system properties included when running spark-submit.
+# This is useful for setting default environmental settings
+
+<% if fqdn_env == "prd" -%>
+spark.master                    spark://app1v-spark-bd.og.prd.lax.gnmedia.net:7077,app2v-spark-bd.og.prd.lax.gnmedia.net:7077,app3v-spark-bd.og.prd.lax.gnmedia.net:7077
+<% end -%>
+<% if fqdn_env =~ /(stg|dev)/  -%>
+spark.master                    spark://app1v-bd.tp.<%= fqdn_env %>.lax.gnmedia.net:7077
+<% end -%>
+spark.eventLog.enabled          true
+spark.eventLog.dir              hdfs://zootpprd/spark/eventlog/<%= fqdn_env %>
+spark.app.name                  "Evolve Analytics"
+spark.driver.extraClassPath     /opt/spark/lib/mysql-connector-java.jar
+spark.executor.extraClassPath   /opt/spark/lib/mysql-connector-java.jar
+spark.driver.memory             2g
+<% if fqdn_env == "prd" -%>
+spark.driver.cores              12
+spark.executor.cores            12
+spark.executor.memory           16g
+<% end -%>
+<% if fqdn_env =~ /(stg|dev)/  -%>
+spark.driver.cores              8
+spark.executor.cores            8
+spark.executor.memory           12g
+<% end -%>
+spark.local.dir                 /app/data/tmp/
+spark.serializer                org.apache.spark.serializer.KryoSerializer
+spark.executor.extraJavaOptions -XX:+UseCompressedOops -XX:+UseParallelGC -XX:+UseParallelOldGC
+

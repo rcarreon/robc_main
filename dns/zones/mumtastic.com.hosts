@@ -1,0 +1,29 @@
+$TTL 3600
+mumtastic.com.       IN      SOA     mumtastic.com. root.mumtastic.com. (
+                                                       2015090200     ; serial
+                                                       28800          ; refresh
+                                                       14400          ; retry
+                                                       3600000        ; expire
+                                                       86400 )        ; minimum
+
+
+mumtastic.com.                                      IN    NS       app3v-dns.tp.prd.lax.evolvemediallc.com.
+mumtastic.com.                                      IN    NS       app4v-dns.tp.prd.lax.evolvemediallc.com.
+mumtastic.com.                                      IN    NS       app1v-dns.tp.prd.lax.evolvemediallc.com.
+mumtastic.com.                                      IN    NS       app2v-dns.tp.prd.lax.evolvemediallc.com.
+;mumtastic.com.                                      IN    MX 10    cluster9.us.messagelabs.com.
+;mumtastic.com.                                      IN    MX 20    cluster9a.us.messagelabs.com.
+
+
+
+local                                                  IN    A        127.0.0.1
+localhost                                              IN    A        127.0.0.1
+loghost                                                IN    A        127.0.0.1
+
+
+mumtastic.com.                                      IN    A        97.64.84.172
+bta.mumtastic.com.                                  IN    A        10.64.64.75
+dev.mumtastic.com.                                  IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.mumtastic.com.                                  IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.mumtastic.com.                                  IN    A        97.64.84.172
+www.mumtastic.com.                                  IN    A        97.64.84.172

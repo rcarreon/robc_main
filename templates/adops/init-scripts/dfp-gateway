@@ -1,0 +1,92 @@
+### BEGIN INIT INFO
+# Provides:          dfp-gateway
+# Required-Start:    rabbitmq
+# Required-Stop:     rabbitmq
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Ad Platform DFP sync daemon
+# Description:       Ad Platform DFP sync daemon
+#                    Pull order and performance dow from Google DFP API
+### END INIT INFO
+
+# More info
+## http://www.thegeekstuff.com/2012/03/lsbinit-script/
+## man 8 start-stop-daemon
+
+# Source lsb functions
+. /lib/lsb/init-functions
+
+# Source RHEL init functions
+. /etc/init.d/functions
+
+NAME=dfp-gateway
+APP_ROOT=/app/workers/dfp-gateway/current
+DAEMON="$APP_ROOT/exe/dfp"
+RBENV_CMD="/app/software/ruby/rbenv/bin/rbenv"
+BUNDLE_CMD="/app/software/ruby/rbenv/shims/bundle exec"
+PIDFILE=/var/run/dfp-web-worker.pid
+LOGFILE=/app/log/workers/dfp-gateway/worker.log
+
+BUNDLE_SERVER_CMD="cd $APP_ROOT && $BUNDLE_CMD exe/dfp server"
+SERVER_ARGS="--pidfile=$PIDFILE --daemonize --logfile=$LOGFILE"
+START_CMD="$BUNDLE_SERVER_CMD start $SERVER_ARGS"
+STOP_CMD="$BUNDLE_SERVER_CMD stop $SERVER_ARGS"
+
+
+cd $APP_ROOT || exit 1
+test -x ${DAEMON} || exit 5
+
+case ${1} in
+  start)
+    if [ -e $PIDFILE ]; then
+      status -p $PIDFILE $DAEMON "$NAME process" && status="0" || status="$?"
+      # If the status is SUCCESS then don't need to start again.
+      if [ $status = "0" ]; then
+        exit
+      fi
+    fi
+    log_success_msg "Starting the process ${NAME}"
+    eval $START_CMD
+    if [[ $? -eq 0 ]]; then
+      exit 0
+    else
+      log_error_msg "Failed to start ${NAME}"
+      exit 1
+    fi
+  ;;
+  stop)
+    if [ -e ${PIDFILE} ]; then
+      status -p $PIDFILE $DAEMON "$NAME process" && status="0" || status="$?"
+      if [ $status = "0" ]; then
+        eval $STOP_CMD
+        if [[ $? -eq 0 ]]; then
+          exit 0
+        else
+          log_error_msg "Failed to stop ${NAME}"
+          exit 1
+        fi
+      else
+        log_failure_msg "${NAME} process is not running"
+        exit 0
+      fi
+    fi
+  ;;
+  restart)
+    ${0} stop && sleep 3 && ${0} start
+  ;;
+
+  status)
+    if [ -e ${PIDFILE} ]; then
+      status -p $PIDFILE $DAEMON "$NAME process" && exit 0 || exit $?
+    else
+      log_warning_msg "${NAME} process is not running"
+    fi
+  ;;
+
+  *)
+    echo "Usage: ${0} {start|stop|restart|status}"
+    exit 2
+  ;;
+
+esac
+# vim: set ft=sh :

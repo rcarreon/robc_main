@@ -1,0 +1,56 @@
+# This file is managed by Puppet do not modify it from <%= fqdn %>
+# My.cnf for MySQL 5.5 for Slave default config
+# filename=<%= file %>
+
+
+[mysqld]
+datadir=<%= mysqldatadir %>
+server-id = <%= mysqld_serverid %>
+report-host = <%= fqdn %>
+
+# Error log
+log-error=/sql/log/error.log
+
+# Slow query log
+log_output=FILE
+slow_query_log=1
+slow_query_log_file=/sql/log/slow-queries.log
+long_query_time=5
+
+# Relay log format
+relay-log=/sql/binlog/relay.log
+relay-log-index=/sql/binlog/relay.index
+relay_log_info_file=/sql/binlog/relay.info
+
+# Connection params
+max_connections=500
+thread_cache_size=80
+max_connect_errors=100
+connect_timeout=20
+
+# MyISAM Params
+key_buffer_size=64M
+
+# Innodb Params
+innodb_file_per_table
+innodb_buffer_pool_size=4G
+innodb_buffer_pool_instances=4
+innodb_log_file_size=512M
+innodb_log_buffer_size=8M
+innodb_flush_method=O_DIRECT
+
+# Query cache
+query_cache_size = 64M
+
+# Table cache
+table_open_cache=1024
+
+# Other Params
+read_only
+
+# SSL playing
+ssl
+ssl-ca=/etc/mysql/ca-cert.pem
+ssl-cert=/etc/mysql/client-cert.pem
+ssl-key=/etc/mysql/client-key.pem
+

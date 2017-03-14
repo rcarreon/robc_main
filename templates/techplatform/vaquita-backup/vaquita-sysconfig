@@ -1,0 +1,7 @@
+# /etc/sysconfig/vaquita
+
+# vaquita-backup local path
+VAQUITA_LOCAL_PATH=<%= vaquita_local_path %>
+
+# vaquita-backup config file
+VAQUITA_CONFIG_PATH=<%= vaquita_config_path %>

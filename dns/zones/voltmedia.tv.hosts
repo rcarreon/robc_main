@@ -1,0 +1,45 @@
+$TTL 3600
+voltmedia.tv.	IN	SOA	voltmedia.tv.	root.voltmedia.tv. (
+			2016061600	; serial
+			28800		; refresh
+			14400		; retry
+			3600000		; expire
+			86400 ) 	; minimum
+
+voltmedia.tv.			IN	NS	app1v-dns.tp.prd.lax.gorillanation.com.
+voltmedia.tv.			IN	NS	app2v-dns.tp.prd.lax.gorillanation.com.
+voltmedia.tv.			IN	NS	app3v-dns.tp.prd.lax.gorillanation.com.
+voltmedia.tv.			IN	NS	app4v-dns.tp.prd.lax.gorillanation.com.
+
+voltmedia.tv.			IN	A	68.233.238.186
+voltmedia.tv.     IN  MX 1 aspmx.l.google.com. 
+voltmedia.tv.     IN MX 5 alt1.aspmx.l.google.com. 
+voltmedia.tv.     IN MX 5 alt2.aspmx.l.google.com. 
+voltmedia.tv.     IN MX 10 alt3.aspmx.l.google.com. 
+voltmedia.tv.     IN MX 10 alt4.aspmx.l.google.com.
+
+;voltmedia.tv.			IN	MX 5	alt1.aspmx.l.google.com.
+;voltmedia.tv.			IN	MX 5	alt2.aspmx.l.google.com.
+;voltmedia.tv.			IN	MX 10	aspmx2.googlemail.com.
+;voltmedia.tv.			IN	MX 10	aspmx3.googlemail.com.
+
+autoconfig.videos.voltmedia.tv.	IN	A	111.118.175.86
+_autodiscover._tcp.videos.voltmedia.tv.	IN	SRV 0 0 443	cpanelemaildiscovery.cpanel.net.
+autodiscover.videos.voltmedia.tv.	IN	A	111.118.175.86
+cpanel.voltmedia.tv.		IN	A	68.233.238.186
+fdp7sbhmamom.voltmedia.tv.	IN	CNAME	gv-dkdns4riyaoqdf.dv.googlehosted.com.
+ftp.voltmedia.tv.		IN	A	68.233.238.186
+test.voltmedia.tv.		IN	A	111.118.175.86
+test2.voltmedia.tv.		IN	A	207.191.225.32
+video.voltmedia.tv.		IN	A	68.233.238.186
+video1.voltmedia.tv.		IN	CNAME	d2vguli5ctvwuh.cloudfront.net.
+video2.voltmedia.tv.		IN	CNAME	sandboxcloud.solvemedia-email.com.
+videos.voltmedia.tv.		IN	A	68.233.238.186
+webdisk.voltmedia.tv.		IN	A	111.118.175.86
+webdisk.video.voltmedia.tv.	IN	A	111.118.175.86
+webdisk.videos.voltmedia.tv.	IN	A	111.118.175.86
+webmail.voltmedia.tv.		IN	A	111.118.175.86
+whm.voltmedia.tv.		IN	A	111.118.175.86
+www.voltmedia.tv.		IN	CNAME	voltmedia.tv.
+www.video.voltmedia.tv.		IN	A	111.118.175.86
+voltmedia.tv. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

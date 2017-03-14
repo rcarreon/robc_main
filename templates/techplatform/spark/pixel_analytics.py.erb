@@ -1,0 +1,133 @@
+import mysql.connector, base64, sys 
+from mysql.connector.errors import Error
+from pyspark import SparkContext, SparkConf
+from pyspark.sql import SQLContext
+from datetime import timedelta, date
+import subprocess, uuid, os, fcntl
+
+class QueryAnalytics():
+  
+  def __init__(self, user, password, hostname, database):
+    self.connection_string = {
+        "user"     : user,
+        "password" : password,
+        "host": hostname,
+        "database": database
+    } 
+
+  def execute_query(self, query):
+    cnx = mysql.connector.connect(**self.connection_string)
+    cur = cnx.cursor()
+    for result in cur.execute(query, multi = True):
+      pass
+    cnx.commit()
+    cur.close()
+    cnx.close()
+
+def daterange(start_date, end_date):
+  for n in range(int (((end_date - start_date).days) + 1)):
+    yield start_date + timedelta(n)
+
+def fileExists(_path):
+  _result = False
+  
+  p = subprocess.Popen(['hdfs', 'dfs', '-find', _path], stdout=subprocess.PIPE)
+
+  for _stdout in p.stdout:
+    if (_stdout.find('No such file or directory', 0) < 0):
+      _result = True
+
+  return _result
+
+
+def main(argv):
+
+  environment = '<%= domain.split('.')[1] %>'
+  conf = SparkConf().setAppName("Pixel ETL {0}".format(environment.upper()))
+  conf.set("spark.app.id", uuid.uuid4())
+  conf.set("spark.kryoserializer.buffer.max", 1024)
+  sc = SparkContext(conf=conf)
+  sqlContext = SQLContext(sc)
+
+  ftmp = open('/tmp/pixel_analytics.lock', 'w+')
+  fcntl.flock(ftmp, fcntl.LOCK_EX)
+
+  hdfs = 'zootpprd'
+  initial_date = date.today() - timedelta(days=5)
+  start_date = date.today() - timedelta(days=4)
+  end_date = date.today()
+
+  user = 'spark'
+  database = 'analytics'
+  cnn_string = {}
+  cnn_string['dev'] = {'server':'sql1v-bd.og.dev.lax.gnmedia.net', 'password':'QnJxU3A3YXduT0Uw'}
+  cnn_string['stg'] = {'server':'sql1v-bd.og.stg.lax.gnmedia.net', 'password':'bHFTOG5QOVBqb0ZN'}
+  #cnn_string['prd'] = {'server':'VIP-SQLRW-BD.OG.PRD.LAX.GNMEDIA.NET', 'password':'YlR0cEQwaUdzUU85'}
+  cnn_string['prd'] = {'server':'sql1v-bd.og.prd.lax.gnmedia.net', 'password':'YlR0cEQwaUdzUU85'}
+  
+  qa = QueryAnalytics(user, base64.b64decode(cnn_string[environment]['password']), cnn_string[environment]['server'], database)
+
+  query = "TRUNCATE TABLE aggregates_by_date_ver2_tmp"
+  qa.execute_query(query)
+
+  query = "TRUNCATE TABLE aggregates_device_by_adunit_tmp"
+  qa.execute_query(query)
+
+  file = "hdfs://{0}/spark/origin/processed/{1}/{2}/{3}/beacon_data.{4}".format(hdfs, environment, initial_date.year, initial_date.strftime("%m"), initial_date.strftime("%d"))
+  print "Processing file {0} ....".format(file)
+  if (fileExists(file)):
+    try:
+      master_df = sqlContext.read.json(file).filter("version >= 2.0 AND ts >= {0}".format(start_date.strftime('%s'))).select("adId", "attr", "attrLabel", "event", "isClick", "isEngagement", "isInteraction", "timespent", "ts", "isPC", "isMobile", "isTablet", "isTouchCapable")
+    except Exception as ex:
+      print str(ex)
+
+  for single_date in daterange(start_date, end_date):
+    file = "hdfs://{0}/spark/origin/processed/{1}/{2}/{3}/beacon_data.{4}".format(hdfs, environment, single_date.year, single_date.strftime("%m"), single_date.strftime("%d"))
+    print "Processing file {0} ....".format(file)
+    if (fileExists(file)):
+      try:
+        df_date = sqlContext.read.json(file).filter("version >= 2.0 AND ts <= {0}".format((end_date + timedelta(days=1)).strftime('%s'))).select("adId", "attr", "attrLabel", "event", "isClick", "isEngagement", "isInteraction", "timespent", "ts", "isPC", "isMobile", "isTablet", "isTouchCapable")
+      except Exception as ex:
+        print str(ex)
+      master_df = master_df.unionAll(df_date)
+  
+  master_df.cache()  
+  master_df.registerTempTable("pixel")
+  analytics = sqlContext.sql("SELECT IF(CAST(adId as BIGINT) IS NULL, 0, adId) as adid, UNIX_TIMESTAMP(TO_DATE(FROM_UNIXTIME(ts))) as created_at, " \
+                             "       IF(event IS NULL, '', event) as event, IF(attr IS NULL, '', attr) as attribute, " \
+                             "       IF(attrLabel IS NULL, '', attrLabel) as attribute_label, " \
+                             "       IF(SUM(isClick) IS NULL, 0, SUM(isClick)) as clicks, " \
+                             "       IF(SUM(isInteraction) IS NULL, 0, SUM(isInteraction)) as interactions, " \
+                             "       IF(SUM(isEngagement) IS NULL, 0, SUM(isEngagement)) as engagements, " \
+                             "       IF(SUM(timespent) IS NULL, 0, SUM(timespent)) as timespent, " \
+                             "       COUNT(0) as event_count " \
+                             "FROM pixel " \
+                             "WHERE ts >= {0} AND ts < {1} " \
+                             "GROUP BY TO_DATE(FROM_UNIXTIME(ts)), adId, event, attr, attrLabel ".format(start_date.strftime('%s'), (end_date + timedelta(days=1)).strftime('%s')))
+
+  mysql_url="jdbc:mysql://{0}:3306/analytics?user={1}&password={2}".format(cnn_string[environment]['server'], user, base64.b64decode(cnn_string[environment]['password']))
+  analytics.write.jdbc(url=mysql_url, table="analytics.aggregates_by_date_ver2_tmp", mode="append")
+
+  results = sqlContext.sql("SELECT IF(CAST(adId as BIGINT) IS NULL, 0, adId) as adid, UNIX_TIMESTAMP(TO_DATE(FROM_UNIXTIME(ts))) as created_at, " \
+                             "       SUM(IF(isPC = true, 1, 0)) as Desktop, " \
+                             "       SUM(IF(isMobile = true, 1, 0)) as Mobile,  " \
+                             "       SUM(IF(isTablet = true AND isTouchCapable = true, 1, 0)) as Tablet " \
+                             "FROM pixel " \
+                             "WHERE event = 'Requested Impression' AND (ts >= {0} AND ts < {1}) " \
+                             "GROUP BY adId, TO_DATE(FROM_UNIXTIME(ts))".format(start_date.strftime('%s'), (end_date + timedelta(days=1)).strftime('%s')))
+
+  mysql_url="jdbc:mysql://{0}:3306/analytics?user={1}&password={2}".format(cnn_string[environment]['server'], user, base64.b64decode(cnn_string[environment]['password']))
+  results.write.jdbc(url=mysql_url, table="analytics.aggregates_device_by_adunit_tmp", mode="append")
+
+  query = "CALL ea_og_sp_insert_pixel_data()"
+  qa.execute_query(query)
+  sc.stop()
+  ftmp.close()
+
+if __name__ == "__main__":
+   main(sys.argv[1:])
+
+
+
+
+

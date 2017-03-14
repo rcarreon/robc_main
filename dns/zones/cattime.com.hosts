@@ -1,0 +1,68 @@
+$TTL    3600 
+cattime.com.    IN      SOA     cattime.com. root.cattime.com. (
+                                        2016072800     ; serial
+                                        28800          ; refresh
+                                        14400          ; retry
+                                        3600000        ; expire
+                                        86400 )        ; minimum
+
+cattime.com.                            IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+cattime.com.                            IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+cattime.com.                            IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+cattime.com.                            IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+cattime.com.     IN  MX 1 aspmx.l.google.com. 
+cattime.com.     IN MX 5 alt1.aspmx.l.google.com. 
+cattime.com.     IN MX 5 alt2.aspmx.l.google.com. 
+cattime.com.     IN MX 10 alt3.aspmx.l.google.com. 
+cattime.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+stagging.cattime.com.                   IN    A        184.73.166.112
+
+; #### TitanWP
+cattime.com.                            IN    A        97.64.84.172
+;cattime.com.                           IN    A        50.19.219.35
+
+bta.cattime.com.                        IN    A        10.64.64.75
+dev.cattime.com.                        IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.cattime.com.                        IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.cattime.com.                        IN    A        97.64.84.172
+www.cattime.com.                        IN    CNAME    cattime.com.
+
+origin.bta.cattime.com.                 IN    CNAME    bta.cattime.com.
+cdn1-bta.cattime.com.                   IN    CNAME    bta.cattime.com.
+cdn2-bta.cattime.com.                   IN    CNAME    bta.cattime.com.
+cdn3-bta.cattime.com.                   IN    CNAME    bta.cattime.com.
+
+origin-dev.cattime.com.                 IN    CNAME    dev.cattime.com.
+cdn1-dev.cattime.com.                   IN    CNAME    dev.cattime.com.
+cdn2-dev.cattime.com.                   IN    CNAME    dev.cattime.com.
+cdn3-dev.cattime.com.                   IN    CNAME    dev.cattime.com.
+
+origin-stg.cattime.com.                 IN    CNAME    stg.cattime.com.
+cdn1-stg.cattime.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-stg.cattime.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-stg.cattime.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+
+origin.cattime.com.                     IN    CNAME    prd.cattime.com.
+cdn1-www.cattime.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-www.cattime.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-www.cattime.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+; #### End TitanWP
+
+adopt.cattime.com.                      IN    CNAME    dtm-balto.herokuapp.com.
+adopt-network.cattime.com.              IN    CNAME    dtm-balto.herokuapp.com.
+blogs.cattime.com.                      IN    CNAME    blogs.dogtime.com.
+css.cattime.com.                        IN    CNAME    cattime.com.
+files.cattime.com.                      IN    CNAME    cattime.com.
+images.cattime.com.                     IN    CNAME    cattime.com.
+js.cattime.com.                         IN    CNAME    cattime.com.
+social.cattime.com.                     IN    CNAME    social.cattime.com.srm.vitrue.com.
+test.cattime.com.		IN		A 	97.64.84.172
+cattime.com. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"
+
+
+aws.cattime.com. IN A 54.235.228.95
+aws.cattime.com. IN A 54.227.207.45
+
+

@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+
+  <property>
+    <name>fs.default.name</name>
+    <value>hdfs://<%= @hadoop_cluster_nameservices %>/</value>
+  </property>
+
+  <property>
+    <name>fs.defaultFS</name>
+    <value>hdfs://<%= @hadoop_cluster_nameservices %>/</value>
+  </property>
+
+  <property> 
+     <name>dfs.permissions</name> 
+     <value>false</value> 
+  </property>
+
+  <property>
+     <name>io.file.buffer.size</name>
+     <value>262144</value>
+  </property>
+
+  <property>
+    <name>dfs.journalnode.edits.dir</name>
+    <value><%= @hadoop_data_dir %>/hdfs/journal/node/local/data</value>
+  </property>    
+
+  <property>
+    <name>hadoop.proxyuser.hadoop.hosts</name>
+    <value><%= @members['namenodes'][0] %></value>
+  </property>
+  
+  <property>
+    <name>hadoop.proxyuser.hadoop.groups</name>
+    <value>*</value>
+  </property>
+
+  <property>
+    <name>hadoop.tmp.dir</name>
+    <value><%= @hadoop_tmp_dir %></value>
+  </property>
+
+</configuration>

@@ -1,0 +1,46 @@
+#!/usr/bin/perl -W
+use FreezeThaw qw/freeze thaw/;
+use strict;
+
+my $freezer="/var/tmp/arpfreezer.$<";
+my %ipstore;
+my %freezer;
+open(ARP,"/usr/local/bin/aceman -c 10g\@lax1 show arp|") or die;
+
+# Suck in the header
+$_="blah";
+while ($_ !~ /====/) { $_=<ARP> }
+$_="blah";
+while ($_ !~ /====/) { $_=<ARP> }
+$_="blah";
+
+# Read until footer
+while ($_=<ARP>) {
+   last if (/====/);
+   my ($ip,$mac)=split;
+   $ipstore{$ip}=$mac;
+}
+close(ARP);
+
+if (open(FREEZER,"$freezer")) {
+   local $/=undef;
+   %freezer=thaw(<FREEZER>);
+   close(FREEZER);
+}
+
+foreach my $ip (keys %ipstore) {
+   if (exists $freezer{$ip}) {
+      if ($ipstore{$ip} ne $freezer{$ip}) {
+          print "OMG! $ip changed MACs from $freezer{$ip} to $ipstore{$ip}\n";
+      }
+   }
+   $freezer{$ip}=$ipstore{$ip};
+}
+
+if (open(FREEZER,">$freezer")) {
+   local $/=undef;
+   my $bacon=freeze(%freezer);
+   print FREEZER $bacon;
+   close(FREEZER);
+}
+

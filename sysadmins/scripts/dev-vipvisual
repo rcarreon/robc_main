@@ -1,0 +1,9 @@
+#!/bin/bash
+ssh="/usr/bin/ssh -q"
+server="app1v-vipvisual.tp.dev.lax.gnmedia.net"
+if [ $# -gt 0 ];then
+    $ssh $server "/app/shared/vipvisual/cli_query.py $@"
+else
+    $ssh $server "/app/shared/vipvisual/cli_query.py"
+fi
+

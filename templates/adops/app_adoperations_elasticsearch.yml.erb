@@ -1,0 +1,15 @@
+<%= env_app_adoperations %>:
+  url: '<%= es_url_app_adoperations %>'
+  river_index: '/_river/ap_adops'
+  type: jdbc
+  jdbc:
+    url: '<%= es_river_url_app_adoperations %>'
+    user: <%= es_river_user_app_adoperations_ro %>
+    password: <%= es_river_pass_app_adoperations_ro %>
+    sql:
+      - statement: "select id, name, dfp_id from agencies" 
+      - statement: "select id, name, dfp_id from advertisers"
+      - statement: "select id, name, dfp_id from campaigns"
+      - statement: "select id, name, dfp_id from campaign_line_item_ads"
+      - statement: "select id, name from publishers"
+      - statement: "select id, name, dfp_id from websites" 

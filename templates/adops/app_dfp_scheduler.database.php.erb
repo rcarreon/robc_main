@@ -1,0 +1,38 @@
+<?php
+class DATABASE_CONFIG {
+
+        // leaving this empty as we do want to have an error 
+        // tirggered if a model uses this connection 
+        public $default = array();
+
+        // dart scheduler connection 
+        public $dfp_scheduler = array(
+                'datasource' => 'Database/Mysql',
+                'persistent' => false,
+                'host' => '<%= host_adops_app_dfp_scheduler_dfp_scheduler %>',
+                'login' => '<%= user_adops_app_dfp_scheduler_dfp_scheduler %>',
+                'password' => '<%= pw_adops_app_dfp_scheduler_dfp_scheduler %>',
+                'database' => 'dart_scheduler',
+        );
+
+        // connection to adops
+        public $adops = array(
+                'datasource' => 'Database/Mysql',
+                'persistent' => false,
+                'host' => '<%= host_adops_app_dfp_scheduler_adops %>',
+                'login' => '<%= user_adops_app_dfp_scheduler_adops %>',
+                'password' => '<%= pw_adops_app_dfp_scheduler_adops %>',
+                'database' => 'adops2_0_production',
+        );
+
+        // dummy connection
+        public $no_database = array(
+                        'datasource' => 'NoDb',
+                        'persistent' => false,
+                        'host' => '',
+                        'login' => '',
+                        'password' => '',
+                        'database' => '',
+        );
+}
+

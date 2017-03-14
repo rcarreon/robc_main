@@ -1,0 +1,35 @@
+$TTL    3600
+martinimediainc.com.	IN      SOA     martinimediainc.com. root.martinimediainc.com. (
+                        2016080300	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; 1name servers and mail servers
+;
+martinimediainc.com.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+martinimediainc.com.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+martinimediainc.com.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+martinimediainc.com.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; 1Messagelabs powered mx
+
+martinimediainc.com.	IN	               MX    10 mailstore1.secureserver.net.
+martinimediainc.com.	IN                     MX    10 smtp.secureserver.net.
+
+martinimediainc.com. 		IN	A	75.101.154.33
+
+demos.martinimediainc.com.	IN                   CNAME ec2-52-5-12-54.compute-1.amazonaws.com.
+mBoard.martinimediainc.com.	IN                  CNAME mBoardLB-103188951.us-east-1.elb.amazonaws.com.
+microstrategy.martinimediainc.com.	IN          CNAME ec2-52-7-203-102.compute-1.amazonaws.com.
+uk.martinimediainc.com.		IN   CNAME  wpc.19A0B.chicdn.net.
+video.martinimediainc.com.	IN   CNAME  wpc.19A0B.chicdn.net.
+
+;www                     A     192.124.249.3
+www.martinimediainc.com.	IN   CNAME   martini.media.
+
+origin.martinimediainc.com.	IN   CNAME   vip-app-media.af.prd.lax.gnmedia.net.
+origin.uk.video.martinimediainc.com.	IN   CNAME   vip-app-media.af.prd.lax.gnmedia.net.
+origin.video.martinimediainc.com.	IN   CNAME   vip-app-media.af.prd.lax.gnmedia.net.
+secure.video.martinimediainc.com.	IN   CNAME	vip-app-media.af.prd.lax.gnmedia.net.

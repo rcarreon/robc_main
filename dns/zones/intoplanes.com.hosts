@@ -1,0 +1,24 @@
+$ORIGIN intoplanes.com.
+$TTL    3600 
+intoplanes.com.	IN      SOA     intoplanes.com. root.intoplanes.com. (
+                        2015070702	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+intoplanes.com.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+intoplanes.com.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+intoplanes.com.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+intoplanes.com.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+
+
+
+                       A     69.7.23.217
+www                    A     69.7.23.217
+
+

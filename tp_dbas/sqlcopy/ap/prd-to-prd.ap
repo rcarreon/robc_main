@@ -1,0 +1,22 @@
+## MASTER-MASTER replication on prd environment
+<desthost sql1v-56-adops.ap.prd.lax.gnmedia.net>
+  sourcehost=sql2v-56-adops.ap.prd.lax.gnmedia.net
+  masterhost=sql2v-56-adops.ap.prd.lax.gnmedia.net
+  savegrants=yes
+  emblackout=yes
+</desthost>
+
+<desthost sql1v-56-tags.ap.prd.lax.gnmedia.net>
+  sourcehost=sql2v-56-adops.ap.prd.lax.gnmedia.net
+  masterhost=sql1v-56-adops.ap.prd.lax.gnmedia.net
+  savegrants=yes
+  emblackout=yes
+</desthost>
+
+<desthost sql2v-56-tags.ap.prd.lax.gnmedia.net>
+  sourcehost=sql2v-56-adops.ap.prd.lax.gnmedia.net
+  masterhost=sql2v-56-adops.ap.prd.lax.gnmedia.net
+  savegrants=yes
+  emblackout=yes
+</desthost>
+

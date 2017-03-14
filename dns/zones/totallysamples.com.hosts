@@ -1,0 +1,19 @@
+$TTL    3600 
+totallysamples.com.   IN      SOA     totallysamples.com. root.totallysamples.com. (
+                        2015081305     ; serial
+                        28800          ; refresh
+                        14400          ; retry
+                        3600000        ; expire
+                        86400 )        ; minimum
+
+totallysamples.com.           IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+totallysamples.com.           IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+totallysamples.com.           IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+totallysamples.com.           IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+
+totallysamples.com.                      IN      A       97.64.84.104
+www.totallysamples.com.                  IN      CNAME       campaigns.totallyher.com.
+staging.totallysamples.com.              IN      CNAME       staging.campaigns.totallyher.com.
+demo.totallysamples.com.                 IN      CNAME       cdn.campaigns.totallyher.com.
+dev.totallysamples.com.                  IN      CNAME       app1v-dh.si.dev.lax.gnmedia.net.

@@ -1,0 +1,13 @@
+#!/bin/bash
+
+tmpdir=/tmp/netapp1_nfs-exports.$$.$RANDOM
+rm -rf $tmpdir
+mkdir  $tmpdir
+cd $tmpdir
+svn co https://svn.gnmedia.net/sysadmins/trunk/backups >/dev/null || exit 1
+cd backups || exit 1
+rnetapp nfsA-netapp1 exports backup > netapp1_nfs-exports
+svn commit -m "netapp1_nfs-exports backup on $(date)" >/dev/null
+cd /
+rm -rf $tmpdir
+

@@ -1,0 +1,24 @@
+$TTL 3600
+thefashionspot.com.au.     IN      SOA     thefashionspot.com.au. root.thefashionspot.com.au. (
+                               2015110900     ; serial
+                               28800          ; refresh
+                               14400          ; retry
+                               3600000        ; expire
+                               86400 )        ; minimum
+
+thefashionspot.com.au.         IN    NS       app1v-dns.tp.prd.lax.thefashionspot.com.
+thefashionspot.com.au.         IN    NS       app2v-dns.tp.prd.lax.thefashionspot.com.
+thefashionspot.com.au.         IN    NS       app3v-dns.tp.prd.lax.thefashionspot.com.
+thefashionspot.com.au.         IN    NS       app4v-dns.tp.prd.lax.thefashionspot.com.
+
+thefashionspot.com.au.         IN    A        97.64.84.172       
+bta.thefashionspot.com.au.     IN    A        10.64.64.75
+dev.thefashionspot.com.au.     IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.thefashionspot.com.au.     IN    CNAME    stg.pbwordpress.gnmedia.net.
+www.thefashionspot.com.au.     IN    CNAME    thefashionspot.com.au.
+forums                         IN    CNAME    forums.thefashionspot.com.
+
+; rmdemo stuff
+origin.campaigns               IN    A        97.64.84.104
+campaigns                      IN    CNAME    origin.campaigns
+rmdemo                         IN    CNAME    campaigns

@@ -1,0 +1,22 @@
+$TTL    3600 
+totalbeautymedia.com.   IN      SOA     totalbeautymedia.com. root.totalbeautymedia.com. (
+                                                2015070200     ; serial
+                                                28800          ; refresh
+                                                14400          ; retry
+                                                3600000        ; expire
+                                                86400 )        ; minimum
+
+totalbeautymedia.com.                           IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+totalbeautymedia.com.                           IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+totalbeautymedia.com.                           IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+totalbeautymedia.com.                           IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+;totalbeautymedia.com.                          IN    MX 10    cluster9.us.messagelabs.com.
+;totalbeautymedia.com.                          IN    MX 20    cluster9a.us.messagelabs.com.
+totalbeautymedia.com.                           IN    MX 10    stmp.secureserver.net.
+totalbeautymedia.com.                           IN    MX 20    mailstore1.secureserver.net.
+
+totalbeautymedia.com.                           IN    A       97.64.84.173 
+www.totalbeautymedia.com.                       IN    A        97.64.84.173
+mobilemail.totalbeautymedia.com.                IN    CNAME    mobilemail-v01.prod.mesa1.secureserver.net.
+pda.totalbeautymedia.com.                       IN    CNAME    mobilemail-v01.prod.mesa1.secureserver.net.

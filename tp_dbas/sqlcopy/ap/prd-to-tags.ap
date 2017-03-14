@@ -1,0 +1,14 @@
+<desthost sql1v-tags.ap.prd.lax.gnmedia.net>
+  sourcehost=sql1v-adops.ap.prd.lax.gnmedia.net
+  masterhost=sql1v-adops.ap.prd.lax.gnmedia.net
+  savegrants=yes
+  emblackout=yes
+</desthost>
+
+<desthost sql2v-tags.ap.prd.lax.gnmedia.net>
+  sourcehost=sql2v-adops.ap.prd.lax.gnmedia.net
+  masterhost=sql2v-adops.ap.prd.lax.gnmedia.net
+  savegrants=yes
+  emblackout=yes
+</desthost>
+

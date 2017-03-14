@@ -1,0 +1,32 @@
+#!/usr/bin/python
+import libvirt
+import json
+
+conn = libvirt.openReadOnly('qemu:///system')
+
+vm_data = {}
+totalvm_memory = 0
+tvm_memory = {}
+
+# Funciton that gets the information requested from every virtual machine in host
+def vm_info():
+    for id in conn.listDomainsID():
+        global totalvm_memory
+        dom = conn.lookupByID(id)
+        infos = dom.info()
+        totalvm_memory = totalvm_memory + infos[1]
+        vm_data[dom.name()] = {
+                'name': dom.name(),
+                'vertical': dom.name().split('.')[-5:][0],
+                #'vertical': dom.name().split('.')[1],
+                'state': infos[0],
+                'memtotal': ((infos[1] / 1024.0))/1024,
+                'cpus': infos [3]
+        }
+#    tvm_memory = {
+#        'mem': totalvm_memory
+#    }
+#    print json.dumps(tvm_memory, sort_keys=True, indent=4, separators=(',', ': '))    
+    print json.dumps(vm_data, sort_keys=True, indent=4, separators=(',', ': '))
+
+vm_info()

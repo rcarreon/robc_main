@@ -1,0 +1,17 @@
+$TTL    3600 
+screenfeeds.com.au.   IN      SOA     screenfeeds.com.au. root.screenfeeds.com.au. (
+                              2016061600     ; serial
+                              28800          ; refresh
+                              14400          ; retry
+                              3600000        ; expire
+                              86400 )        ; minimum
+
+screenfeeds.com.au.           IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+screenfeeds.com.au.           IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+screenfeeds.com.au.           IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+screenfeeds.com.au.           IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+; Imported records
+*.screenfeeds.com.au.     IN     A        97.64.84.172
+www.screenfeeds.com.au.   IN     A        97.64.84.172
+screenfeeds.com.au.       IN     A        97.64.84.172

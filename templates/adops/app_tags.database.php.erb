@@ -1,0 +1,27 @@
+<?php
+class DATABASE_CONFIG {
+
+	public $read = array(
+		'datasource' => 'Database/Mysql',
+		'persistent' => false,
+		'host' => '<%= host_ap_app_tags_ro %>',
+		'login' => '<%= user_ap_app_tags_ro %>',
+		'password' => '<%= pw_ap_app_tags_ro %>',
+		'database' => '<%= db_ap_app_tags_ro %>',
+		'prefix' => '',
+		//'encoding' => 'utf8',
+	);
+
+	//Default should be the same as read.
+	public $default = array(
+		'datasource' => 'Database/Mysql',
+		'persistent' => false,
+		'host' => '<%= host_ap_app_tags_ro %>',
+		'login' => '<%= user_ap_app_tags_ro %>',
+		'password' => '<%= pw_ap_app_tags_ro %>',
+		'database' => '<%= db_ap_app_tags_ro %>',
+		'prefix' => '',
+		//'encoding' => 'utf8',
+	);
+
+}

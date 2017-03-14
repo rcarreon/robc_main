@@ -1,0 +1,159 @@
+$TTL    3600 
+dogtime.com.    IN      SOA     dogtime.com. root.dogtime.com. (
+                                                            2016061601     ; serial
+                                                            28800          ; refresh
+                                                            14400          ; retry
+                                                            3600000        ; expire
+                                                            86400 )        ; minimum
+
+dogtime.com.                                                IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+dogtime.com.                                                IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+dogtime.com.                                                IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+dogtime.com.                                                IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+email.dogtime.com.                                          IN    NS       ns1.responsys.net.
+email.dogtime.com.                                          IN    NS       ns2.responsys.net.
+
+dogtime.com.     IN  MX 1 aspmx.l.google.com. 
+dogtime.com.     IN MX 5 alt1.aspmx.l.google.com. 
+dogtime.com.     IN MX 5 alt2.aspmx.l.google.com. 
+dogtime.com.     IN MX 10 alt3.aspmx.l.google.com. 
+dogtime.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+
+; #### dogtime PBWP Migration
+;dogtime.com.                                               IN    A        50.19.219.35
+dogtime.com.                                                IN    A        97.64.84.172
+
+bta.dogtime.com.                                            IN    A        10.64.64.75
+dev.dogtime.com.                                            IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.dogtime.com.                                            IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.dogtime.com.                                            IN    A        97.64.84.172
+www.dogtime.com.                                            IN    CNAME    dogtime.com.
+
+origin.bta.dogtime.com.                                     IN    CNAME    bta.dogtime.com.
+cdn1-bta.dogtime.com.                                       IN    CNAME    bta.dogtime.com.
+cdn2-bta.dogtime.com.                                       IN    CNAME    bta.dogtime.com.
+cdn3-bta.dogtime.com.                                       IN    CNAME    bta.dogtime.com.
+
+origin-dev.dogtime.com.                                     IN    CNAME    dev.dogtime.com.
+cdn1-dev.dogtime.com.                                       IN    CNAME    dev.dogtime.com.
+cdn2-dev.dogtime.com.                                       IN    CNAME    dev.dogtime.com.
+cdn3-dev.dogtime.com.                                       IN    CNAME    dev.dogtime.com.
+
+origin-stg.dogtime.com.                                     IN    CNAME    stg.dogtime.com.
+cdn1-stg.dogtime.com.                                       IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-stg.dogtime.com.                                       IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-stg.dogtime.com.                                       IN    CNAME    wac.EE35.edgecastcdn.net.
+
+origin.dogtime.com.                                         IN    CNAME    prd.dogtime.com.
+cdn1-www.dogtime.com.                                       IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-www.dogtime.com.                                       IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-www.dogtime.com.                                       IN    CNAME    wac.EE35.edgecastcdn.net.
+; #### End PBWP Migration
+
+
+; ### adopt API migration
+*.adopt.dogtime.com.                                        IN    CNAME    vip-app-dtapi.ao.prd.lax.gnmedia.net.
+adopt.dogtime.com.                                          IN    CNAME    vip-app-dtapi.ao.prd.lax.gnmedia.net.
+adopt-network.dogtime.com.                                  IN    CNAME    vip-app-dtapi.ao.prd.lax.gnmedia.net.
+
+stg.adopt.dogtime.com.                                      IN    CNAME    vip-app-dtapi.ao.stg.lax.gnmedia.net.
+
+origin.adopt.dogtime.com.                                   IN    CNAME    vip-app-dtapi.ao.prd.lax.gnmedia.net.
+cdn.adopt.dogtime.com.                                      IN    CNAME    wac.EE35.edgecastcdn.net.
+
+origin-stg.adopt.dogtime.com.                               IN    CNAME    vip-app-dtapi.ao.stg.lax.gnmedia.net.
+cdn-stg.adopt.dogtime.com.                                  IN    CNAME    wac.EE35.edgecastcdn.net.
+
+adopt-images.dogtime.com.                                   IN    CNAME    res.cloudinary.com.
+a1.adopt-images.dogtime.com.                                IN    CNAME    res.cloudinary.com.
+a2.adopt-images.dogtime.com.                                IN    CNAME    res.cloudinary.com.
+a3.adopt-images.dogtime.com.                                IN    CNAME    res.cloudinary.com.
+a4.adopt-images.dogtime.com.                                IN    CNAME    res.cloudinary.com.
+a5.adopt-images.dogtime.com.                                IN    CNAME    res.cloudinary.com.
+
+ece5c277724a4fbba5a4ee5326113a64.adopt.dogtime.com.         IN    CNAME    verify.bing.com.
+
+cerberus.dogtime.com.                                     IN    CNAME    wac.EE35.edgecastcdn.net.
+origin.cerberus.dogtime.com.                                IN    CNAME    vip-app-dtapi.ao.prd.lax.gnmedia.net.
+
+; ### End adopt API migration
+
+
+admin.staging.dogtime.com.                                  IN    A        184.73.166.112
+
+blogs.staging.dogtime.com.                                  IN    A        184.73.166.112
+ismtp.dogtime.com.                                          IN    A        64.147.160.42
+localhost.dogtime.com.                                      IN    A        127.0.0.1
+mailer.dogtime.com.                                         IN    A        65.74.182.15
+mc.staging.dogtime.com.                                     IN    A        72.46.232.46
+o1.email.dogtime.com.                                       IN    A        74.63.202.146
+sendy.dogtime.com.                                          IN    A        50.19.223.182
+staging.dogtime.com.                                        IN    A        184.73.166.112
+staging.admin.dogtime.com.                                  IN    A        184.73.166.112
+
+*.dc2.dogtime.com.                                          IN    CNAME    dogtime.com.
+2thrc7bf4pxg3avvxwvn44sibahcu7vj._domainkey.dogtime.com.    IN    CNAME    2thrc7bf4pxg3avvxwvn44sibahcu7vj.dkim.amazonses.com.
+a1.cdn.dogtime.com.                                         IN    CNAME    dogtime-balto-res.cloudinary.com.edgesuite.net.
+a2.cdn.dogtime.com.                                         IN    CNAME    dogtime-balto-res.cloudinary.com.edgesuite.net.
+a3.cdn.dogtime.com.                                         IN    CNAME    dogtime-balto-res.cloudinary.com.edgesuite.net.
+a4.cdn.dogtime.com.                                         IN    CNAME    dogtime-balto-res.cloudinary.com.edgesuite.net.
+a5.cdn.dogtime.com.                                         IN    CNAME    dogtime-balto-res.cloudinary.com.edgesuite.net.
+admin.dogtime.com.                                          IN    CNAME    dogtime.com.
+
+adventure.dogtime.com.                                      IN    CNAME    eukanuba.voicestorm.com.
+appmailer.dogtime.com.                                      IN    CNAME    sendgrid.com.
+assets.dogtime.com.                                         IN    CNAME    d2tqrakqakze7p.cloudfront.net.
+auth.dogtime.com.                                           IN    CNAME    dtm-casper.herokuapp.com.
+blogs.dogtime.com.                                          IN    CNAME    dogtime.com.
+cdn.dogtime.com.                                            IN    CNAME    dogtime-balto-res.cloudinary.com.edgesuite.net.
+cdn.animal.dogtime.com.                                     IN    CNAME    d3bafu4vm59yns.cloudfront.net.
+cdn.animal.dev.dogtime.com.                                 IN    CNAME    d2ztudhwxhaidn.cloudfront.net.
+cdn.animal.staging.dogtime.com.                             IN    CNAME    d3vmzcxny3poet.cloudfront.net.
+cdn.partners.dogtime.com.                                   IN    CNAME    d1ogbdow4a08e8.cloudfront.net.
+
+css.dogtime.com.                                            IN    CNAME    dogtime.com.
+dog-friendly.dogtime.com.                                   IN    CNAME    dtm-toyota-center.herokuapp.com.
+; email.dogtime.com.                                        IN    CNAME    sendgrid.net.
+facebook.dogtime.com.                                       IN    CNAME    dogtime.com.
+files.dogtime.com.                                          IN    CNAME    dogtime.com.
+gmail.dogtime.com.                                          IN    CNAME    ghs.google.com.
+i1.p.dogtime.com.                                           IN    CNAME    i1.p.dogtime.com.s3.amazonaws.com.
+i1.s.dogtime.com.                                           IN    CNAME    i1.s.dogtime.com.s3.amazonaws.com.
+i1.t.dogtime.com.                                           IN    CNAME    i1.t.dogtime.com.s3.amazonaws.com.
+images.dogtime.com.                                         IN    CNAME    dogtime.com.
+insurance.dogtime.com.                                      IN    CNAME    dogtime.com.
+js.dogtime.com.                                             IN    CNAME    dogtime.com.
+layout.dogtime.com.                                         IN    CNAME    dogtime.com.
+legacy-assets.dogtime.com.                                  IN    CNAME    d2cc1ippi8wbgs.cloudfront.net.
+lx34j3dpbfv4jqxecgdlul3zohcbybfe._domainkey.dogtime.com.    IN    CNAME    lx34j3dpbfv4jqxecgdlul3zohcbybfe.dkim.amazonses.com.
+; mail.dogtime.com.                                         IN    CNAME    webmail.dogtimemedia.com.
+mc.dogtime.com.                                             IN    CNAME    dtm-mediacore.herokuapp.com.
+nv2ouafth5aajgvneefr33ixsx6ruda7._domainkey.dogtime.com.    IN    CNAME    nv2ouafth5aajgvneefr33ixsx6ruda7.dkim.amazonses.com.
+openid.dogtime.com.                                         IN    CNAME    myopenid.com.
+partners.dogtime.com.                                       IN    CNAME    dtm-hachikou.herokuapp.com.
+petphotos.dogtime.com.                                      IN    CNAME    dtm-balto.herokuapp.com.
+petties.dogtime.com.                                        IN    CNAME    petties.herokuapp.com.
+pop.dogtime.com.                                            IN    CNAME    webmail.dogtimemedia.com.
+saveacat.dogtime.com.                                       IN    CNAME    dtm-sad-sac-no-more.herokuapp.com.
+saveacat.cdn.dogtime.com.                                   IN    CNAME    d5yhjxfi72ri3.cloudfront.net.
+saveacat.dev.dogtime.com.                                   IN    CNAME    web1.tunnlr.com.
+saveadog.dogtime.com.                                       IN    CNAME    dtm-sad-sac-no-more.herokuapp.com.
+saveadog.cdn.dogtime.com.                                   IN    CNAME    d5yhjxfi72ri3.cloudfront.net.
+saveadog.dev.dogtime.com.                                   IN    CNAME    web1.tunnlr.com.
+social.dogtime.com.                                         IN    CNAME    social.dogtime.com.srm.vitrue.com.
+social.petties.dogtime.com.                                 IN    CNAME    social.petties.dogtime.com.srm.vitrue.com.
+trupanion.insurance.dogtime.com.                            IN    CNAME    dogtime.com.
+u5l5ysyko097h.openid.dogtime.com                            IN    CNAME    myopenid.com.
+wagpac.dogtime.com.                                         IN    CNAME    hyogo-5180.herokussl.com.
+dogtime.com.                                                IN    TXT      "G0O0R34839"
+dogtime.com.                                                IN    TXT      "google-site-verification=mnd_RJxknCpQ42LVbBAxHpgZnfNGc5vi0E2vLzYMKWQ"
+dogtime.com.                                                IN    TXT      "v=spf1 include:sendgrid.net include:amazonses.com include:_spf.google.com ~all"
+;_amazonses.dogtime.com.                                    IN    TXT      "Fieytz/Dc3QqSRT2or6uhUv2TXY394hLeawhbdSJzmc="
+_amazonses.dogtime.com.                                     IN    TXT      "fsGkn9sEKgg3lumkBOHjRcBdxY9aE6u2/81g7aWkX+I="
+google._domainkey.dogtime.com.                              IN    TXT      "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCRxvstrCXxKMC2KwXIFEVX1+IvAHG7C0lPgv2INypewTeSFBsiNcHH+T5bDmdGbnTfzIZ6WI4ND6ouVAckpz5nT1FVsIp2R8u2+jDGh/bs2/rfy2Ym9H+eylgklZKR6br6s32ivZVexBd3Qbzk+0aEA39VyWZ9Mvx0ha3JbeKcHwIDAQAB"
+smtpapi._domainkey.dogtime.com.                             IN    TXT      "k=rsa; t=s; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDPtW5iwpXVPiH5FzJ7Nrl8USzuY9zqqzjE0D1r04xDN6qwziDnmgcFNNfMewVKN2D1O+2J9N14hRprzByFwfQW76yojh54Xu3uSbQ3JP0A7k8o8GutRF8zbFUA8n0ZH2y0cIEjMliXY4W4LwPA7m4q0ObmvSjhd63O9d8z1XkUBwIDAQAB"
+smtpapi._domainkey.email.dogtime.com.                       IN    TXT      "k=rsa; t=s; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDPtW5iwpXVPiH5FzJ7Nrl8USzuY9zqqzjE0D1r04xDN6qwziDnmgcFNNfMewVKN2D1O+2J9N14hRprzByFwfQW76yojh54Xu3uSbQ3JP0A7k8o8GutRF8zbFUA8n0ZH2y0cIEjMliXY4W4LwPA7m4q0ObmvSjhd63O9d8z1XkUBwIDAQAB"
+
+
+dogtime.com. 	IN 	TXT 	"v=spf1 a:cluster9out.us.messagelabs.com include:_spf.google.com ip4:216.82.240.0/20 ~all"

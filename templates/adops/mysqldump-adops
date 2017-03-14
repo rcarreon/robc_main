@@ -1,0 +1,353 @@
+#!/bin/bash
+
+DATE_TODAY=$(date +%Y%m%d)
+DATE_FIRST=$(date --date="$(date +%Y-%m-15) -1 month" +%Y-%m-01)
+DATE_LAST=$(date --date="$(date +%Y-%m-01) -1 day" +%Y-%m-%d)
+DATE_MONTH=$(date --date="$(date +%Y-%m-15) -1 month" +%Y-%B)
+
+## Setup usage and command line arguments
+function usage() {
+    echo "Usage: ${0} /path/to/dump/files/"
+    echo
+    exit 1
+}
+
+# Make sure that the user enters all arguments
+if [ $# -lt 1 ]; then
+    usage
+fi
+
+if [ -z ${1} ]; then
+    usage
+else
+    dumppath=${1}
+fi
+
+# Verify that the path exists
+if [ ! -d ${dumppath} ]; then
+    echo "Error: '${dumppath}' must refer to an EXISTING DIRECTORY"
+    echo
+    exit 1
+fi
+
+# Setup filename
+dumpfilename=${DATE_TODAY}_${USER}_mysqldump_adops2_0_production
+
+## Setup MySQL User/Pass/Host
+MYSQL_HOST=sql1v-backup.ap.prd.lax.gnmedia.net
+
+echo
+read -p "Enter your MySQL username: " -r
+MYSQL_USER=${REPLY}
+
+echo
+read -p "Enter your MySQL password: " -r -s
+MYSQL_PASS=${REPLY}
+echo
+
+if [[ -z ${MYSQL_USER} || -z ${MYSQL_PASS} ]]; then
+    echo "Error, your username and password must not be empty"
+    echo
+    exit 1
+fi
+
+file_list=()
+
+### PRIMARY TABLE DUMP ###
+echo "DUMPING SMALL TABLES"
+mysqldump --verbose --host=${MYSQL_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASS} --single-transaction adops2_0_production \
+    ad_meta_informations \
+    ad_operation_fee_versions \
+    ad_operation_fees \
+    ad_serving_methods \
+    ad_types admin_informations \
+    advertiser_categories \
+    advertiser_category_notes \
+    advertisers \
+    advertisers_authorizations \
+    advertisers_geo_targets \
+    advertisers_planners \
+    advertisers_sales_execs \
+    advertising_exchange2_campaigns_websites \
+    advertising_exchange_campaigns_websites \
+    agencies \
+    agencies_authorizations \
+    agencies_geo_targets \
+    agency_contact_to_advertisers \
+    auth_group \
+    auth_group_permissions \
+    auth_message \
+    auth_permission \
+    auth_user \
+    auth_user_groups \
+    auth_user_user_permissions \
+    authority_status_histories \
+    authority_statuses \
+    authorizations \
+    branches \
+    breakdown_types \
+    breakdowns \
+    campaign_channel_geo_targets \
+    campaign_channels \
+    campaign_collections \
+    campaign_delivery_reports \
+    campaign_finalreport_completed_months \
+    campaign_invoices \
+    campaign_line_item_ad_delivery_reports \
+    campaign_line_item_ad_dfp_ids \
+    campaign_line_item_ad_final_number_versions \
+    campaign_line_item_ad_final_numbers \
+    campaign_line_item_ad_placements \
+    campaign_line_item_ads \
+    campaign_line_item_geo_targets \
+    campaign_line_items \
+    campaign_line_items_channels \
+    campaign_line_items_content_categories \
+    campaign_line_items_websites \
+    campaign_rich_media_fees \
+    campaign_third_party_informations \
+    campaigns \
+    campaigns_planners \
+    campaigns_sales_execs \
+    campaigns_websites \
+    channel_information_types \
+    channel_informations \
+    channels \
+    companies \
+    company_bugs \
+    company_commission_rates \
+    company_divisions \
+    contact_types \
+    contacts \
+    content_categories \
+    content_category_groups \
+    content_filters \
+    contract_ad_networks \
+    contract_agreements \
+    contract_attachment_templates \
+    contract_attachments \
+    contract_commission_rates \
+    contract_histories \
+    contract_minimum_guarantees \
+    contract_payment_options \
+    contract_performance_renewals \
+    contract_scopes \
+    contract_section_audits \
+    contract_sections \
+    contract_special_provision_sections \
+    contract_special_rates \
+    contract_special_rates_advertisers \
+    contract_templates \
+    contract_templates_contract_scopes \
+    contract_templates_contract_sections \
+    contract_term_languages \
+    contract_term_starts_backup \
+    contracts \
+    contracts_contract_ad_networks \
+    contracts_excluded_advertiser_categories \
+    contracts_excluded_advertisers \
+    contracts_excluded_agencies \
+    contracts_geo_targets \
+    contracts_preapproved_exclusive_advertiser_categories \
+    contracts_preapproved_exclusive_advertisers \
+    contracts_preapproved_exclusive_agencies \
+    currency_exchange_rates \
+    default_creatives \
+    demographic_type_meta_informations \
+    demographic_types \
+    demographics \
+    email \
+    email_queue \
+    email_templates \
+    emails \
+    featured_blurbs \
+    file_upload_types \
+    file_uploads \
+    geo_target_relations \
+    geo_targets \
+    gp_tasks \
+    great_plains_customers \
+    gross_ups \
+    groups \
+    groups_websites \
+    image_types \
+    images \
+    integrated_opportunities \
+    internet_verifications \
+    notes \
+    offices \
+    payout_cache_context_entries \
+    payout_cache_context_temp_ad_operation_fees \
+    payout_cache_context_temp_authorizations \
+    payout_cache_context_temp_campaign_line_item_ad_final_numbers \
+    payout_cache_context_temp_campaigns_sales_execs \
+    payout_cache_context_temp_company_commission_rates \
+    payout_cache_context_temp_contract_commission_rates \
+    payout_cache_context_temp_contract_special_rates \
+    payout_cache_context_temp_contracts \
+    payout_cache_context_temp_contracts_fallback \
+    payout_cache_context_temp_payout_proportions \
+    payout_cache_context_temp_rtb_ecpm \
+    payout_proportions_temp_clia_parent_id_ad_clicks \
+    payout_proportions_temp_clia_parent_id_ad_clicks_daily \
+    payout_proportions_temp_clia_parent_id_ad_imp \
+    payout_proportions_temp_clia_parent_id_ad_imp_daily \
+    payout_proportions_temp_clia_parent_id_col_ad_clicks \
+    payout_proportions_temp_clia_parent_id_col_ad_clicks_daily \
+    payout_proportions_temp_clia_parent_id_col_ad_imp \
+    payout_proportions_temp_clia_parent_id_col_ad_imp_daily \
+    payout_proportions_temp_r_ad_id_ad_clicks \
+    payout_proportions_temp_r_ad_id_ad_clicks_daily \
+    payout_proportions_temp_r_ad_id_ad_imp \
+    payout_proportions_temp_r_ad_id_ad_imp_daily \
+    payout_proportions_temp_r_ad_id_site_id_site_clicks \
+    payout_proportions_temp_r_ad_id_site_id_site_clicks_daily \
+    payout_proportions_temp_r_ad_id_site_id_site_imp \
+    payout_proportions_temp_r_ad_id_site_id_site_imp_daily \
+    payout_proportions_temp_r_ad_id_site_id_total_clicks \
+    payout_proportions_temp_r_ad_id_site_id_total_clicks_daily \
+    payout_proportions_temp_r_ad_id_site_id_total_imp \
+    payout_proportions_temp_r_ad_id_site_id_total_imp_daily \
+    payout_proportions_temp_sites_distinct \
+    payout_proportions_temp_sites_distinct_count \
+    payout_proportions_temp_sites_distinct_count_daily \
+    payout_proportions_temp_sites_distinct_daily \
+    performax_adx_mappings \
+    performax_adx_oauth_tokens \
+    performax_adx_raw_data \
+    performax_appnexus_mappings \
+    performax_appnexus_raw_data \
+    performax_consolidated \
+    performax_mapping_entries \
+    performax_openx_mappings \
+    performax_openx_raw_data \
+    performax_pubmatic_mappings \
+    performax_pubmatic_oauth_tokens \
+    performax_pubmatic_raw_data \
+    performax_rubicon_mappings \
+    performax_rubicon_raw_data \
+    performax_vendors \
+    permissions \
+    pitch_statuses \
+    pitches \
+    pitches_waiting_for_approval_websites \
+    plugin_schema_info \
+    products \
+    publishers \
+    publishers_contract_agreements \
+    pubops_users \
+    report_ads \
+    report_scheduler_job_statuses \
+    report_scheduler_jobs \
+    reporting_status \
+    rich_media_discrepancies \
+    rich_media_vendors \
+    roles \
+    roles_permissions \
+    scheduled_reports \
+    schema_info \
+    schema_migrations \
+    scopes \
+    simple_captcha_data \
+    site_exclusivities \
+    sub_networks \
+    tmp_website_assignments \
+    user_audits \
+    user_audits_histories \
+    users \
+    users_companies \
+    users_planners \
+    users_roles \
+    users_sales_execs \
+    w9_forms \
+    website_ads \
+    website_cmm_scores \
+    website_mincpms \
+    website_zones \
+    websites \
+    websites_authorizations \
+    websites_channels \
+    websites_content_categories \
+    websites_content_filters \
+    websites_pitches \
+    | gzip -9v > ${dumppath}/${dumpfilename}_tables_nobigtables.sql.gz
+    
+file_list+=("${dumppath}/${dumpfilename}_tables_nobigtables.sql.gz")
+
+### SINGLE TABLE EXPORTS ####
+## Note: These tables are quite large in production, so we attempt to dump ###
+## each one separately and limit the the dataset from each.                ###
+
+echo "DUMPING LARGE TABLES"
+# ad_exchange_reports
+table=ad_exchange_reports
+mysqldump --verbose --host=${MYSQL_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASS} --single-transaction adops2_0_production \
+    ${table} --where="date >= '${DATE_FIRST}' and date <= '${DATE_LAST}'" \
+    | gzip -9v > ${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz
+file_list+=("${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz")
+
+# reports
+table=reports
+mysqldump --verbose --host=${MYSQL_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASS} --single-transaction adops2_0_production \
+    ${table} --where="date >= '${DATE_FIRST}' and date <= '${DATE_LAST}'" \
+    | gzip -9v > ${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz
+file_list+=("${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz")
+
+# reports_dfp2
+table=reports_dfp2
+mysqldump --verbose --host=${MYSQL_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASS} --single-transaction adops2_0_production \
+    ${table} --where="date >= '${DATE_FIRST}' and date <= '${DATE_LAST}'" \
+    | gzip -9v > ${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz
+file_list+=("${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz")
+
+# reports_dfp3
+table=reports_dfp3
+mysqldump --verbose --host=${MYSQL_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASS} --single-transaction adops2_0_production \
+    ${table} --where="date >= '${DATE_FIRST}' and date <= '${DATE_LAST}'" \
+    | gzip -9v > ${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz
+file_list+=("${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz")
+
+# payout_cache_contexts
+table=payout_cache_contexts
+payout_cache_context_entry_id=$(mysql --host=${MYSQL_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASS} adops2_0_production --batch --skip-column_names --execute="SELECT id FROM payout_cache_context_entries WHERE reporting_date = '${DATE_LAST}' ORDER BY id DESC LIMIT 1")
+if [ -z ${payout_cache_context_entry_id} ]; then
+    echo "Payout Cache Context could not be dumped, entry id could not be retrieved"
+    echo
+    exit 1
+fi
+mysqldump --verbose --host=${MYSQL_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASS} --single-transaction adops2_0_production \
+    ${table} --where="payout_cache_context_entry_id = ${payout_cache_context_entry_id}" \
+    | gzip -9v > ${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz
+file_list+=("${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz")
+
+# payout_cache
+table=payout_cache
+mysqldump --verbose --host=${MYSQL_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASS} --single-transaction adops2_0_production \
+    ${table} --where="reporting_date >= '${DATE_FIRST}' and reporting_date <= '${DATE_LAST}'" \
+    | gzip -9v > ${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz
+file_list+=("${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz")
+
+# payout_cache_daily
+table=payout_cache_daily
+mysqldump --verbose --host=${MYSQL_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASS} --single-transaction adops2_0_production \
+    ${table} --where="reporting_date >= '${DATE_FIRST}' and reporting_date <= '${DATE_LAST}'" \
+    | gzip -9v > ${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz
+file_list+=("${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz")
+
+# payout_proportions
+table=payout_proportions
+mysqldump --verbose --host=${MYSQL_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASS} --single-transaction adops2_0_production \
+    ${table} --where="reporting_date >= '${DATE_FIRST}' and reporting_date <= '${DATE_LAST}'" \
+    | gzip -9v > ${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz
+file_list+=("${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz")
+
+# payout_proportions_daily
+table=payout_proportions_daily
+mysqldump --verbose --host=${MYSQL_HOST} --user=${MYSQL_USER} --password=${MYSQL_PASS} --single-transaction adops2_0_production \
+    ${table} --where="reporting_date >= '${DATE_FIRST}' and reporting_date <= '${DATE_LAST}'" \
+    | gzip -9v > ${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz
+file_list+=("${dumppath}/${dumpfilename}.${table}_${DATE_MONTH}.sql.gz")
+
+echo "Here are your dumpfiles":
+echo
+printf -- '%s\n' "${file_list[@]}"

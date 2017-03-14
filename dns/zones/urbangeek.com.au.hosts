@@ -1,0 +1,32 @@
+$TTL 3600
+urbangeek.com.au.    IN      SOA     urbangeek.com.au. root.urbangeek.com.au. (
+                                                            2016061600     ; serial
+                                                            28800          ; refresh
+                                                            14400          ; retry
+                                                            3600000        ; expire
+                                                            86400 )        ; minimum
+
+urbangeek.com.au.                       IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+urbangeek.com.au.                       IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+urbangeek.com.au.                       IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+urbangeek.com.au.                       IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+;imported records
+urbangeek.com.au.     IN  MX 1 aspmx.l.google.com. 
+urbangeek.com.au.     IN MX 5 alt1.aspmx.l.google.com. 
+urbangeek.com.au.     IN MX 5 alt2.aspmx.l.google.com. 
+urbangeek.com.au.     IN MX 10 alt3.aspmx.l.google.com. 
+urbangeek.com.au.     IN MX 10 alt4.aspmx.l.google.com.
+;urbangeek.com.au.                       IN    MX 10    aspmx3.googlemail.com.
+;urbangeek.com.au.                       IN    MX 10    aspmx2.googlemail.com.
+;urbangeek.com.au.                       IN    MX 5     alt2.aspmx.l.google.com.
+;urbangeek.com.au.                       IN    MX 5     alt1.aspmx.l.google.com.
+
+urbangeek.com.au.                       IN    A        68.233.238.187
+cpanel.urbangeek.com.au.                IN    A        68.233.238.187
+ftp.urbangeek.com.au.                   IN    A        68.233.238.187
+webdisk.urbangeek.com.au.               IN    A        111.118.169.14
+webmail.urbangeek.com.au.               IN    A        68.233.238.187
+whm.urbangeek.com.au.                   IN    A        111.118.169.14
+www.urbangeek.com.au.                   IN    CNAME    urbangeek.com.au.
+urbangeek.com.au. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

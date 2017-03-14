@@ -1,0 +1,214 @@
+#!/bin/bash
+#Modified for GIT
+
+usage() {
+   echo "Usage: $0 [options] (ARECORD|CNAME|IP)"
+   echo "Possible options:"
+   echo "       --test will display the git diff and not commit"
+   echo "       --commit will commit the git diff without prompting"
+   echo "       --batch dir: operate on existing git checkout without commit"
+   echo "       -m msg: set the git log message"
+   exit 1
+}
+
+commit=ask
+batch=no
+while
+case "$1" in
+   --commit) commit=yes;;
+   --test) commit=no;;
+   --batch) batch=$2;shift;;
+   -m) msg=$2;shift;;
+   --*) echo "unknown option";usage;;
+   *) false;;
+esac;do shift;done
+
+host=$1
+ip=$1
+
+
+if [ -z "$ip" ];then
+   usage;
+fi
+if [ "$batch" != no -a ! -d "$batch" ];then
+   echo "--batch takes a directory"
+   usage
+fi
+
+
+
+: ${PAGER:=less}
+if [ "$batch" == no ];then
+   tmpdir=/tmp/dnsremoveentry.$$.$RANDOM
+   rm -rf $tmpdir
+   mkdir  $tmpdir
+   cd $tmpdir
+#   svn co https://svn.gnmedia.net/sysadmins/trunk/dns>/dev/null || exit 1
+   git clone git@bitbucket.org:/evolvemediallc/tp_dns dns>/dev/null || exit 1
+   cd dns || exit 1
+else
+   cd $batch
+fi
+
+
+if [ ! -d zones ];then
+    echo "Wrong directory: can't find 'zones'"
+   exit 1
+fi
+declare -a parts
+
+###
+## This is custom in removednsentry
+###
+
+if ipcalc -n $ip/24 >/dev/null 2>&1 ;then
+	# because both host and ip have been assigned to $1 this had to be added.
+	# IP was given, host needs to be found / assigned.
+        host=$(grep -hR $ip$ zones/* zones/*/* | awk '{print $1}')
+fi
+
+###
+## End custom parts in removednsentry
+###
+
+parts=($(IFS=.; set -- $host; echo $@))
+lastbit=$((${#parts[*]}-1))
+
+
+zone=""
+
+for bit in $(seq 0 $lastbit | tac);do
+   [ -n "$zone" ] && zone=".$zone"
+   zone="${parts[$bit]}$zone"
+   if [ -f "zones/$zone.hosts" ];then
+      hostzonefile="$zone.hosts"
+   fi
+done
+
+
+
+if [ -z "$hostzonefile" ];then
+   echo "zone file not found for $host"
+   exit 1
+fi
+
+
+# Do work
+# Start of main differences between add and remove dnsentry scripts
+
+if ipcalc -n $ip/24 >/dev/null 2>&1 ;then
+	# It's an IP
+   echo "Finding A records and CNAMES to remove..."
+   revzonefile=${ip%*.*}.rev
+   if [ -f "zones/$revzonefile" ];then
+       revzonefile=$revzonefile
+   elif [ -f "zones/internal/$revzonefile" ];then
+       revzonefile=internal/$revzonefile
+   elif [ -f "zones/external/$revzonefile" ];then
+       revzonefile=external/$revzonefile
+   fi
+
+   last=${ip#*.*.*.*}
+   # find the hostname / A record to remove.
+   hostname=$(awk -v last=^${last} '$0 ~ last {print $4}' zones/$revzonefile)
+   
+   echo "found $hostname as the entry to remove."
+   
+   # comment out every instance of the hostname (which will include CNAMES) in $hostzonefile
+   sed -i "/$hostname/ s/^/;/" zones/$hostzonefile
+   # comment out every instance of the ^$last in the revzonefile
+   sed -i "/^${last} / s/^/;/" zones/$revzonefile
+
+else
+# Ok, if we are here, we are either removing a CNAME or a ARECORD
+
+   checkRecord() {
+      theRecord=$(awk -v foo="^${1}" '$0 ~ foo {print $3}' zones/$hostzonefile)
+      case $theRecord in
+         CNAME)
+            return 6
+            ;;
+         A)
+            return 7
+            ;;
+         *)
+            return 8
+            ;;
+      esac
+   }
+
+   checkRecord $host
+   output=$?
+
+   if [[ $output = "6" ]]; then
+      echo "Removing CNAME."
+      sed -i '/^'$host'\.*\s.*CNAME/d' zones/*.hosts
+   elif [[ $output = "7" ]] ; then
+      sed -i "/^$host/ s/^/;/" zones/$hostzonefile
+      sed -i "/$host.$/ s/^/;/" zones/*.rev zones/*/*.rev
+   else echo "error: Can't tell if it's a CNAME, A record, or doesn't exist."; exit
+   fi 
+
+
+fi
+
+# update all SOAs edited
+
+if [ "$batch" != no ];then
+   exit 0
+fi
+
+# Search for modified files on git status and for each do the updateserial
+# git ls-files -m shows the same output 
+#for zonefile in $(svn st | grep ^M | awk '{print $2}'); do
+for zonefile in $(git ls-files -m); do
+	dnsupdateserial $zonefile
+done
+
+
+continue() {
+   read -p "${1:-Continue?} [Y/n] " reply
+   if test -z "$reply" -o "${reply:0:1}" = Y -o "${reply:0:1}" = y ; then
+      return 0
+   else
+      return 1
+   fi
+}
+
+# Unbroken this later
+#commit="broken"
+
+if [ "$commit" = "ask" ];then
+   read -p "Please confirm DNS changes (enter to view in $PAGER)... "
+#   svn diff | $PAGER
+   git diff | $PAGER   
+   if continue "Commit changes?" ;then
+      # unbroken this later
+      # echo "svn commit -m 'blah'"
+      [ -z "$msg" ] && read -p "GIT log message? " msg
+#      svn commit -m "${msg:=Removing $host/$ip}"
+      git add .
+      git commit -m "${msg:=Removing $host/$ip}"
+      git push
+   else
+      echo "Dropping to a shell..."
+      echo "You can edit, git commit, and exit when you are done..."
+      (export PS1="dnsremoveentry> "
+      pwd
+      $SHELL)
+   fi
+elif [ "$commit" = "yes" ];then
+   # unbroken this later
+   # echo "svn commit -m 'blah 1'"
+#   svn commit -m "${msg:=Removing $host/$ip}"
+   git add .
+   git commit -m "${msg:=Removing $host/$ip}"
+   git push
+
+else
+   git diff
+   echo "Changes were not committed."
+fi
+cd 
+rm -rf $tmpdir
+

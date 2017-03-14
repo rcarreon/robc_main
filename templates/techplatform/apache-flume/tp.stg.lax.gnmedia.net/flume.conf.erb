@@ -1,0 +1,57 @@
+####################################
+#           ORIGIN-STG             #
+####################################
+origin-stg.sources = srcStg
+origin-stg.sinks = snkStg
+origin-stg.channels = chnStg
+
+origin-stg.sources.srcStg.type = http
+origin-stg.sources.srcStg.port = 11113
+origin-stg.sources.srcStg.channels = chnStg
+origin-stg.sources.srcStg.handler = org.apache.flume.source.http.JSONHandler
+
+origin-stg.sinks.snkStg.type = hdfs
+origin-stg.sinks.snkStg.hdfs.path = hdfs://zootpprd/flume/origin/stg/%Y/%m/%d
+origin-stg.sinks.snkStg.hdfs.rollInterval = 3600
+origin-stg.sinks.snkStg.hdfs.rollSize = 0
+origin-stg.sinks.snkStg.hdfs.rollCount = 0
+origin-stg.sinks.snkStg.hdfs.fileType = DataStream
+origin-stg.sinks.snkStg.hdfs.filePrefix = <%= fqdn %>
+origin-stg.sinks.snkStg.hdfs.inUsePrefix = .
+origin-stg.sinks.snkStg.hdfs.useLocalTimeStamp = true
+origin-stg.sinks.snkStg.hdfs.minBlockReplicas = 1
+origin-stg.sinks.snkStg.hdfs.batchSize = 10000
+origin-stg.sinks.snkStg.channel = chnStg
+
+origin-stg.channels.chnStg.type = memory
+origin-stg.channels.chnStg.capacity = 100000
+origin-stg.channels.chnStg.transactionCapacity = 10000
+
+####################################
+#      BEACON-ORIGIN-STG           #
+####################################
+beacon-log.sources = weblog
+beacon-log.sinks = snkHDFS
+beacon-log.channels = chnMemory
+
+beacon-log.channels.chnMemory.type = memory
+beacon-log.channels.chnMemory.capacity = 10000000
+beacon-log.channels.chnMemory.transactionCapacity = 1000000
+
+beacon-log.sources.weblog.type = exec
+beacon-log.sources.weblog.command = tail -F /tmp/log/bcn.originplatform.com-access.log
+beacon-log.sources.weblog.batchSize = 10000
+beacon-log.sources.weblog.channels = chnMemory
+
+beacon-log.sinks.snkHDFS.type = hdfs
+beacon-log.sinks.snkHDFS.channel = chnMemory
+beacon-log.sinks.snkHDFS.hdfs.path = hdfs://zootpprd/flume/origin/weblogs/stg/
+beacon-log.sinks.snkHDFS.hdfs.rollInterval = 600
+beacon-log.sinks.snkHDFS.hdfs.rollSize = 0
+beacon-log.sinks.snkHDFS.hdfs.rollCount = 0
+beacon-log.sinks.snkHDFS.hdfs.fileType = DataStream
+beacon-log.sinks.snkHDFS.hdfs.filePrefix = bcn
+beacon-log.sinks.snkHDFS.hdfs.inUsePrefix = .
+beacon-log.sinks.snkHDFS.hdfs.minBlockReplicas = 1
+beacon-log.sinks.snkHDFS.hdfs.batchSize = 10000
+beacon-log.sinks.snkHDFS.hdfs.useLocalTimeStamp = true

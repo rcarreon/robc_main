@@ -1,0 +1,92 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+
+  <property>
+    <name>yarn.nodemanager.aux-services</name>
+    <value>mapreduce_shuffle</value>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.vmem-check-enabled</name>
+    <value>false</value>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.pmem-check-enabled</name>
+    <value>false</value>
+  </property>
+
+  <property>
+    <name>yarn.resourcemanager.connect.retry-interval.ms</name>
+    <value>2000</value>
+  </property>
+
+  <property>
+    <name>yarn.resourcemanager.ha.automatic-failover.embedded</name>
+    <value>true</value>
+  </property>
+
+  <property>
+    <name>yarn.resourcemanager.ha.enabled</name>
+    <value>true</value>
+  </property>
+
+  <property>
+    <name>yarn.resourcemanager.cluster-id</name>
+    <value><%= hadoop_cluster_nameservices %></value>
+  </property>
+
+  <property>
+    <name>yarn.resourcemanager.ha.rm-ids</name>
+    <value>rm1,rm2</value>
+  </property>
+
+<% @members['namenodes'].each_with_index do |host, index| -%>
+  <property>
+    <name>yarn.resourcemanager.hostname.rm<%= index + 1 %></name>
+    <value><%= host %></value>
+  </property>
+
+  <property>
+    <name>yarn.resourcemanager.webapp.address.rm<%= index + 1 %></name>
+    <value><%= host %>:8088</value>
+  </property>
+
+<% end -%>
+
+  <property>
+    <name>yarn.resourcemanager.zk-address</name>
+    <value><%= members['zookeeper'].collect { |h| h + ':2181' }.join(',') %></value>
+  </property>
+
+  <property>
+    <name>yarn.app.mapreduce.am.scheduler.connection.wait.interval-ms</name>
+    <value>5000</value>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.resource.memory-mb</name>
+    <value>14336</value>
+    <description>Amount of physical memory, in MB, that can be allocated for containers</description>
+  </property>
+
+  <property>
+    <name>yarn.scheduler.minimum-allocation-mb</name>
+    <value>716</value>
+    <description>The minimum allocation for every container request at the RM, in MBs. Memory requests lower than this will throw a InvalidResourceRequestException</description>
+  </property>
+
+  <property>
+    <name>yarn.nodemanager.vmem-pmem-ratio</name>
+    <value>2.1</value>
+    <description>Ratio between virtual memory to physical memory when setting memory limits for containers. Container allocations are expressed in terms of physical memory, and virtual memory usage is allowed to exceed this allocation by this ratio</description>
+  </property>
+
+  <property>
+    <name>yarn.application.classpath</name>
+    <value>$HADOOP_CONF_DIR, $HADOOP_COMMON_HOME/share/hadoop/common/*, $HADOOP_COMMON_HOME/share/hadoop/common/lib/*, $HADOOP_HDFS_HOME/share/hadoop/hdfs/*, $HADOOP_HDFS_HOME/share/hadoop/hdfs/lib/*, $HADOOP_YARN_HOME/share/hadoop/yarn/*, $HADOOP_YARN_HOME/share/hadoop/yarn/lib/*, /opt/asterix/lib/*, /opt/spark/lib/*</value>
+    <description>CLASSPATH for YARN applications. A comma-separated list of CLASSPATH entries. When this value is empty, the following default CLASSPATH for YARN applications would be used</description>
+  </property>
+
+</configuration>

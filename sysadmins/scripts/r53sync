@@ -1,0 +1,369 @@
+#!/usr/bin/perl -w
+
+use strict;    
+use DNS::ZoneParse;
+use Data::Dumper;
+use WebService::Amazon::Route53;
+use File::Basename;
+use Getopt::Std;
+
+my %options=();
+getopts("tdvr:", \%options);
+my $SENDTOROUTE53 = 1;
+if ($options{t}) {
+    print "***************************************************\n";
+    print "*** Test mode set, not pushing anything to route53!\n";
+    print "***************************************************\n";
+    $SENDTOROUTE53 = 0;
+}
+my $verbose = 0;
+if ($options{v}) {
+    $verbose = 1;
+}
+
+use constant AWS_ID => 'AKIAJKZPO45Y4YPYZPKQ';
+use constant AWS_SECRET => '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';
+# set ALERT_EMAIL to FALSE to disable email alerts.
+use constant ALERT_EMAIL => 'q_la@gorillanation.com';
+use constant INFO_EMAIL => 'q_cm@gorillanation.com';
+use constant WIN_EMAIL => 'q_wachange@rt.gnmedia.net';
+
+my $newHost = $ARGV[0];
+if (not defined $newHost) {
+  print "Usage:\n\t$0 <ZONEFILE>\n\toptional:\n\t-t runs in test mode and will not push to route53\n\t-v turns on verbose.\n\tIf zone is reverse add -r xxx.xxx.xxx.in-addr.arpa\n";
+  exit;
+}
+
+my $zone = $ARGV[0];
+$zone =~ s{\.[^.]+$}{};
+unless (-f $newHost) {
+    print "[ERROR] ${newHost} file does not exist!\n";
+    exit 1;
+}
+
+my $reverse = 0;
+my $myTime=time();
+my ($origin,$zone_name);
+my $tmpXml="/tmp/.tmpZone_${myTime}.xml";
+my $tmpHost="/tmp/.tmpZone_${myTime}.host";
+
+$origin = basename($zone) . ".";
+$zone_name = basename($zone) . ".";
+$zone = basename($zone);
+
+if ($options{r}) {
+    $reverse = 1;
+    $origin = $options{r}.".";
+    $zone_name = $options{r};
+}
+
+
+# lets check if the zone exists on r53.
+my $r53 = WebService::Amazon::Route53->new(id => AWS_ID, key => AWS_SECRET);
+my $myzone = $r53->find_hosted_zone(name => $zone_name);
+if (!$myzone) {
+    print "[" . localtime() . "] $origin does not exist on route53...creating it.\n" if $verbose;
+    my $response = $r53->create_hosted_zone(name => $zone_name, caller_reference => "${origin}new_${myTime}" );
+    if (!$response) {
+        # something went wrong zone wasn't created
+        my $msg = "Zone $zone_name creation failed on route53!" . Dumper($response) . "\n";
+        send_email($msg,"[ERROR] Zone creation failed ($zone_name)!", ALERT_EMAIL, 'r53sync@gorillanation.com');
+	print "[ERROR] Zone creation failed!" . Dumper($response) . "\n";
+	exit 1;
+    }
+    
+    my $msg = "Created the following $zone_name on route53.\nThe following NS servers were assigned:\n" . Dumper($response->{delegation_set}{name_servers});;
+    send_email($msg,"[DNSINFO] $zone_name created\@route53", INFO_EMAIL, 'r53sync@gorillanation.com');
+
+    # send email out for windows dns updates
+    if ($zone =~ m/^[A-M]/i) {
+        $msg = "dnscmd EVLADC01 /ZoneAdd $zone /DsForwarder 10.11.20.68 10.11.20.69 /DP /domain";
+    } else {
+        $msg = "dnscmd EVLADC01 /ZoneAdd $zone /DsForwarder 10.11.20.69 10.11.20.68 /DP /domain";
+    }
+    send_email($msg,"[DNSINFO] $zone created\@route53", WIN_EMAIL, 'rt_svc_user@evolvemediallc.com');
+
+}
+
+#
+# we can write this next part ourselves with the API, 
+# but for now we will use already made tool from amazon.
+#
+my $r53_out = `/usr/local/bin/r53.py --zone ${zone_name} --pull > ${tmpXml}`;
+my $tobind_out = `/usr/local/bin/route53tobind.pl --origin=${origin} < ${tmpXml} > ${tmpHost}`;
+
+unless (-e $tmpXml || -z $tmpXml) {
+ print "[ERROR] tmp XML File Doesn't Exist or is Empty!";
+ exit 1;
+ } 
+
+unless (-e $tmpHost || -z $tmpHost) {
+ print "[ERROR] tmp Hosts File Doesn't Exist or is Empty!";
+ exit 1;
+ } 
+
+my ($hashA,$hashB,$nsA,$nsB) = {};
+# collect all the different parts of the zone file
+# all but soa return name,host,class,ttl
+# actually mx,srv,txt return slightly different results =p
+# soa returns ('serial', 'origin', 'primary', 'refresh', 'retry', 'ttl', 'minimumTTL', 'email', 'expire')
+# a(), cname(), mx(), ns(), ptr(), txt(), srv() ....soa()    
+    my $zonefile = DNS::ZoneParse->new($tmpHost,$origin);
+    $hashA->{'SOA'} = $zonefile->soa();
+    $hashA->{'CNAME'} = $zonefile->cname();
+    $hashA->{'A'} = $zonefile->a();
+    $hashA->{'MX'} = $zonefile->mx();
+    $hashA->{'PTR'} = $zonefile->ptr();
+    $hashA->{'TXT'} = $zonefile->txt();
+    $hashA->{'SRV'} = $zonefile->srv();
+    $hashA->{'NS'} = $zonefile->ns();
+# we grab the NS servers from amazon again because we should not be setting them to local ns
+# we only grab them like this so we can check if the overall TTL has changed and update the NS records TTL
+    $hashB->{'NS'} = $zonefile->ns();
+
+    $zonefile = DNS::ZoneParse->new($newHost,$origin);
+    $hashB->{'SOA'} = $zonefile->soa();
+    $hashB->{'CNAME'} = $zonefile->cname();
+    $hashB->{'A'} = $zonefile->a();
+    $hashB->{'MX'} = $zonefile->mx();
+    $hashB->{'PTR'} = $zonefile->ptr();
+    $hashB->{'TXT'} = $zonefile->txt();
+    $hashB->{'SRV'} = $zonefile->srv();
+
+# cleanup files
+unlink($tmpXml);
+unlink($tmpHost);
+
+print "[" . localtime() . "] Starting on $zone_name\n";
+
+print "*** Route53 Serial: $hashA->{'SOA'}{'serial'} ---- Local Serial: $hashB->{'SOA'}{'serial'}\n";
+
+my ($tmp1,$tmp2) = {};
+# now lets do some stuff!
+for (keys %$hashA) {
+#    print "Working on $_...\n" if $verbose;
+    $tmp1={};
+    $tmp2={};
+
+    if ($_ eq 'SOA') {
+	# reformat soa 
+#	my $aname = $hashA->{'SOA'}{'origin'};
+#	my $bname = ($hashB->{'SOA'}{'origin'} eq '@')? $origin : $hashB->{'SOA'}{'origin'};
+
+	my $aname = $origin;
+	my $bname = $origin;
+
+	$tmp1->{$aname}{'ttl'} = $hashA->{'SOA'}{'ttl'};
+	$tmp2->{$bname}{'ttl'} = $hashB->{'SOA'}{'ttl'};
+
+	$tmp1->{$aname}{'host'}="'$hashA->{'SOA'}{'primary'} $hashA->{'SOA'}{'email'} $hashA->{'SOA'}{'serial'} $hashA->{'SOA'}{'refresh'} $hashA->{'SOA'}{'retry'} $hashA->{'SOA'}{'expire'} $hashA->{'SOA'}{'minimumTTL'}'";
+	$tmp2->{$bname}{'host'}="'$hashA->{'SOA'}{'primary'} $hashA->{'SOA'}{'email'} $hashB->{'SOA'}{'serial'} $hashB->{'SOA'}{'refresh'} $hashB->{'SOA'}{'retry'} $hashB->{'SOA'}{'expire'} $hashB->{'SOA'}{'minimumTTL'}'";
+
+    } elsif ($_ eq 'NS') {
+        if ($hashA->{'SOA'}{'ttl'} ne $hashB->{'SOA'}{'ttl'}) {
+            print "[" . localtime() . "] SOA TTL has changed. Don't be alarmed if every record gets an UPSERT\n";
+	    # we must update the TTL of the NS records
+            $tmp1 = to_hash($hashA->{'NS'}, $origin, $_, 'A');
+            $tmp2 = to_hash($hashB->{'NS'}, $origin, $_, 'B');
+            $tmp2 = update_ttl($tmp2, $hashB->{'SOA'}{'ttl'});
+        } else {
+            next;
+        }
+    } else {
+        $tmp1 = to_hash($hashA->{$_}, $origin, $_, 'A');
+        $tmp2 = to_hash($hashB->{$_}, $origin, $_, 'B');
+    }
+
+    diff_hash($tmp1, $tmp2, $origin, $_);
+}
+
+print "[" . localtime() . "] Done with $zone_name.\n";
+
+##################################################
+##################################################
+
+sub update_ttl {
+    my $tmp = shift;
+    my $new_ttl = shift;
+
+    for ( keys %{$tmp} ) {
+        $tmp->{$_}{'ttl'} = $new_ttl
+    }
+    return $tmp;
+}
+
+sub to_hash {
+   my $tmp_arr = shift;
+   my $origin = shift;
+   my $type = shift;
+   my $whatHash = shift;
+   my $tmp_hash;
+
+    if ($type eq 'MX') {
+        @$tmp_arr =  sort { $a->{priority} <=> $b->{priority} } @$tmp_arr;
+    }
+
+    if ($type eq 'TXT') {
+        @$tmp_arr =  sort { $a->{text} cmp $b->{text} } @$tmp_arr;
+    } else {
+        @$tmp_arr =  sort { $a->{host} cmp $b->{host} } @$tmp_arr;    
+    }
+
+   my ($name,$ttl,$host);
+    
+    foreach my $record (@$tmp_arr) {
+        if ($record->{'host'}) {
+            if ($record->{'host'} eq '127.0.0.1') {
+    	        next;
+            }
+        }
+        $name = lc($record->{name});
+        if (($type eq 'A' || $type eq 'CNAME' || $type eq 'SOA') && $name eq '@') {
+            $name = $origin;
+        } 
+        
+        if (($type ne 'A') 
+           && ($type ne 'TXT')
+           && ($whatHash eq 'B')
+           && (substr($record->{'host'}, -1) ne '.')) {
+                $record->{'host'} = $record->{'host'} . "." . $origin;
+        }
+	if (index($name, $origin) == -1) {
+		$name="${name}.${origin}";
+	}
+        if ($type eq 'MX') {
+	   $host = "'$record->{'priority'} $record->{'host'}'";
+	} elsif ($type eq 'SRV') {
+	   $host = "'$record->{'priority'} $record->{'weight'} $record->{'port'} $record->{'host'}'";
+	} elsif ($type eq 'TXT') {
+	   $host = "'\"$record->{'text'}\"'";
+        } else {
+	    $host = "'$record->{host}'";
+        }
+        $host=lc($host);
+	$ttl = $record->{ttl};
+        if (exists $tmp_hash->{$name}{host}) {
+            $tmp_hash->{$name}{host}.=", ${host}";
+	}else{
+            $tmp_hash->{$name}{host}="${host}";
+        }
+	$tmp_hash->{$name}{ttl}=$ttl;
+    }
+ return $tmp_hash;
+}
+
+sub diff_hash {
+    my $ahash = shift;
+    my $bhash = shift;
+    my $origin = shift;
+    my $type = shift;
+
+    my $tmp_changes='';
+    my $r53 = WebService::Amazon::Route53->new(id => AWS_ID, key => AWS_SECRET);
+    my $myzone = $r53->find_hosted_zone(name => $origin);
+    my $count = 0;
+
+for ( keys %{$bhash} ) {
+    if ($count >= 250) {
+        sendto_route53($tmp_changes, $r53, $myzone);
+        $count = 0;
+        $tmp_changes = '';
+    }
+    unless ( exists $ahash->{$_} ) {
+        print "[" . localtime() . "] [UPSERT] (${type}) $_ | $bhash->{$_}{'host'}\n" if $verbose;
+        $count++;
+        $tmp_changes .= "{
+            action => 'upsert',
+            name => '${_}',
+            type => '${type}',
+            ttl => $bhash->{$_}{'ttl'},\n";
+        if ($bhash->{$_}{'host'} =~ /,/) {
+            $tmp_changes .= "\t\trecords => [ $bhash->{$_}{'host'} ] },";
+	} else {
+	    $tmp_changes .= "\t\tvalue => $bhash->{$_}{'host'} },";
+        }
+        next;
+    }
+    if ( $bhash->{$_}{'host'} ne $ahash->{$_}{'host'} 
+       || $bhash->{$_}{'ttl'} ne $ahash->{$_}{'ttl'}) {
+        print "[" . localtime() . "] [UPSERT] (${type}) $_ | $bhash->{$_}{'host'}\n" if $verbose;
+        $count++;
+        $tmp_changes .= "{
+            action => 'upsert',
+            name => '${_}',
+            type => '${type}',
+            ttl => $bhash->{$_}{'ttl'},\n";
+        if ($bhash->{$_}{'host'} =~ /,/) {
+            $tmp_changes .= "\t\trecords => [ $bhash->{$_}{'host'} ] },";
+	} else {    
+            $tmp_changes .= "\t\tvalue => $bhash->{$_}{'host'} },";
+       }
+    }
+}
+
+for ( keys %{$ahash} ) {
+    unless ( exists $bhash->{$_} ) {
+    if ($count >= 500) {
+        sendto_route53($tmp_changes, $r53, $myzone);
+        $count = 0;
+        $tmp_changes = '';
+    }
+        print "[" . localtime() . "] [DELETE] (${type}) $_ | $ahash->{$_}{'host'}\n" if $verbose;
+        $count++;
+        $tmp_changes .= "{
+            action => 'delete',
+            name => '${_}',
+            type => '${type}',
+            ttl => $ahash->{$_}{'ttl'},\n";
+        if ($ahash->{$_}{'host'} =~ /,/) {
+            $tmp_changes .= "\t\trecords => [ $ahash->{$_}{'host'} ] },";
+	} else {    
+            $tmp_changes .= "\t\tvalue => $ahash->{$_}{'host'} },";
+       }
+        next;
+    }
+  }
+
+    sendto_route53($tmp_changes, $r53, $myzone);
+}
+
+sub sendto_route53 {
+ my $tmp_changes = shift;
+ my $r53 = shift;
+ my $myzone = shift;
+
+ if ($tmp_changes ne "" && $SENDTOROUTE53 eq 1) {
+     print "[" . localtime() . "] **** Pushing changes to Router53...\n" if $verbose;
+     $tmp_changes = "[${tmp_changes}]";
+     my $ref = eval $tmp_changes;
+     my $change_return;
+
+     $r53->change_resource_record_sets(zone_id => $myzone->{id}, changes => $ref );
+     my $error = $r53->error;
+     if ($error->{'code'}) {
+        my $msg = "[ERROR] pushing to route53:\n" . Dumper($error) . "\n\n\nChanges sent:\n" . $tmp_changes . "\n";
+        print "[ERROR] pushing to route53:\n" . Dumper($error) . "\n";
+        print $tmp_changes . "\n";
+        send_email($msg,'[DNSERROR] Error pushing to route53!',ALERT_EMAIL, 'r53sync@gorillanation.com');
+     }
+ }
+}
+
+sub send_email {
+        my $msg = shift;
+	my $subject = shift;
+	my $email_to = shift;
+        my $from = shift;
+        if ($email_to) {
+            open(MAIL, "|/usr/sbin/sendmail -t");
+ 
+            # Email Header
+            print MAIL "To: " . $email_to . "\n";
+            print MAIL "From: $from\n";
+            print MAIL "Subject: $subject\n\n";
+            # Email Body
+            print MAIL $msg; 
+            close(MAIL);
+            print "Email Sent Successfully\n" if $verbose;
+        }
+}    

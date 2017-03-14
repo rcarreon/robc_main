@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+    <property>
+    <name>hive.querylog.location</name>
+    <value>/app/log/hive/${system:user.name}</value>
+  </property>
+
+  <property>
+      <name>hive.cli.print.header</name>
+      <value>true</value>
+  </property>
+
+  <property>
+      <name>hive.mapred.supports.subdirectories</name>
+      <value>true</value>
+  </property>
+
+  <property>
+      <name>mapreduce.input.fileinputformat.input.dir.recursive</name>
+      <value>true</value>
+  </property>
+
+  <property>
+    <name>hive.exec.parallel</name>
+    <value>true</value>
+    <description>Whether to execute jobs in parallel</description>
+  </property>
+
+  <property>
+    <name>hive.exec.parallel.thread.number</name>
+    <value>16</value>
+    <description>How many jobs at most can be executed in parallel</description>
+  </property>
+
+  <property>
+    <name>hive.metastore.schema.verification</name>
+    <value>true</value>
+  </property>
+
+  <property>
+    <name>javax.jdo.option.ConnectionURL</name>
+    <value>jdbc:mysql://localhost/metastore?createDatabaseIfNotExist=true</value>
+    <description>JDBC connect string for a JDBC metastore</description>
+  </property>
+
+  <property>
+    <name>javax.jdo.option.ConnectionDriverName</name>
+    <value>com.mysql.jdbc.Driver</value>
+    <description>MySQL JDBC driver class</description>
+  </property>
+
+  <property>
+    <name>javax.jdo.option.ConnectionUserName</name>
+    <value>hiveuser</value>
+    <description>user name for connecting to mysql server</description>
+  </property>
+
+  <property>
+    <name>javax.jdo.option.ConnectionPassword</name>
+    <value><%= mysql_hive_user %></value>
+    <description>password for connecting to mysql server</description>
+  </property>
+
+  <property>
+    <name>hive.metastore.uris</name>
+    <value>thrift://localhost:9083</value>
+  </property>
+
+  <property>
+    <name>hive.server2.authentication</name>
+    <value>NONE</value>
+  </property>
+
+</configuration>

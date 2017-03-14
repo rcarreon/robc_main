@@ -1,0 +1,18 @@
+$TTL    3600 
+musicfeeds.com.   IN      SOA     musicfeeds.com. root.musicfeeds.com. (
+                               2016061600     ; serial
+                               28800          ; refresh
+                               14400          ; retry
+                               3600000        ; expire
+                               86400 )        ; minimum
+
+musicfeeds.com.                IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+musicfeeds.com.                IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+musicfeeds.com.                IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+musicfeeds.com.                IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+; Imported Records
+*.musicfeeds.com.          IN     A        97.64.84.172
+musicfeeds.com.            IN     A        97.64.84.172
+www.musicfeeds.com.        IN     A        97.64.84.172
+staging.musicfeeds.com.    IN     A        97.64.84.172

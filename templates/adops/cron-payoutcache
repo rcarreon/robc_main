@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#set -x
+
+# because the cronjob has been scheudled to run @ 04:30, we need to supply the previous day's date. 
+rundate=$(date --date="yesterday" +%Y-%m-%d)
+
+cd /app/shared/docroots/adops.gorillanation.com/htdocs
+
+bundle exec script/runner "PayoutProportion.new.populate(\"$rundate\")"
+
+bundle exec script/runner "PayoutCacheContext.populate(\"$rundate\")"
+
+bundle exec script/runner "Adops.run_payout_cache(\"$rundate\")"
+
+bundle exec script/runner "Adops.run_daily_payout_cache(:day => \"$rundate\")"
+
+

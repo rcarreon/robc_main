@@ -1,0 +1,38 @@
+#!/bin/bash
+# Make sure you add ~/bin to your $PATH and
+# have the noc repository checked out on
+# ~/noc (this should prolly be getopts) for
+# flexibility.
+
+BINDIR=~/bin
+TOOLSROOT=~/svn/noc/bin
+
+if ! test -d $BINDIR; then
+   echo "No $BINDIR directory, creating..."
+   mkdir -p $BINDIR
+      if [[ $? = 0 ]]; then
+         echo "Created $BINDIR dir."
+      else
+         echo "Unable to create ~/bin dir."
+         exit 1
+      fi
+fi
+
+test -d $TOOLSROOT || {
+   echo "No $TOOLSROOT directory, please checkout repo in ~/svn dir.";
+   exit 1;
+}
+
+cd $TOOLSROOT && svn up >/dev/null 2>&1
+
+ for script in $(ls -1 $TOOLSROOT); do 
+   test -h $BINDIR/$script && rm $BINDIR/$script; 
+
+   test -f $BINDIR/$script || { 
+      test -x $TOOLSROOT/$script  && 
+      ln -s $TOOLSROOT/$script $BINDIR ; 
+      echo "$script -> $BINDIR"
+   } 
+ done;
+
+exit 0; 

@@ -1,0 +1,200 @@
+import apache_log_parser
+from pyspark import SparkContext, SparkConf
+import sys, subprocess
+from datetime import datetime
+from time import sleep
+from os import stat
+import json, uuid, os
+from user_agents import parse
+
+HADOOP_CLUSTER = 'zootpprd'
+ENV = '<%= domain.split('.')[1] %>'
+APACHE_LOG_FORMAT = "%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-Agent}i\""
+APACHE_LOG_PATH = "hdfs://{0}/flume/origin/weblogs/{1}".format(HADOOP_CLUSTER, ENV)
+APACHE_REPO_PATH = "hdfs://{0}/spark/origin/weblogs/{1}/{2}/{3}/{4}/".format(HADOOP_CLUSTER, ENV, datetime.today().strftime('%Y'), datetime.today().strftime('%m'), datetime.today().strftime('%d'))
+DATA_PATH = "hdfs://{0}/spark/origin/processed/{1}/{2}/{3}/".format(HADOOP_CLUSTER, ENV, datetime.today().strftime('%Y'), datetime.today().strftime('%m'))
+TMP_DIR = "/app/data/tmp/"
+logParser = None
+
+def logFileList():
+  logfiles = list()
+<% if fqdn =~ /^app*.*spark.*.prd.*/  -%>
+  p = subprocess.Popen(['hdfs', 'dfs', '-find', APACHE_LOG_PATH, '-name', 'app*bcn*'], stdout=subprocess.PIPE)
+<% end -%>
+<% if fqdn_env =~ /(stg)/  -%>
+  p = subprocess.Popen(['hdfs', 'dfs', '-find', APACHE_LOG_PATH, '-name', 'app*'], stdout=subprocess.PIPE)
+<% end -%>
+
+  for entry in p.stdout:
+    logfiles.append(entry.rstrip())
+  return logfiles
+
+def pathExists(_path):
+  _result = False
+  
+  p = subprocess.Popen(['hdfs', 'dfs', '-find', _path], stdout=subprocess.PIPE)
+
+  for _stdout in p.stdout:
+    if (_stdout.find('No such file or directory', 0) < 0):
+      _result = True
+
+  return _result
+
+def makeDir(_path):
+  p = subprocess.Popen(['hdfs', 'dfs', '-mkdir', '-p',_path], stdout=subprocess.PIPE)
+
+def moveLogFiles(_logFile):
+   
+  if not pathExists(APACHE_REPO_PATH):
+    makeDir(APACHE_REPO_PATH)
+
+  p = subprocess.Popen(['hdfs', 'dfs', '-mv', _logFile, APACHE_REPO_PATH], stdout=subprocess.PIPE)
+
+def cleanTemporary(_path):
+  p = subprocess.Popen(['hdfs', 'dfs', '-rm', '-r', '-skipTrash', _path], stdout=subprocess.PIPE)
+
+def appendData(_path, _output):
+  o = subprocess.Popen(['find', TMP_DIR, '-name', 'part*'], stdout=subprocess.PIPE)
+  for file in o.stdout:
+    subprocess.Popen(['rm', '-f', file.rstrip()],stdout=subprocess.PIPE)
+
+  p = subprocess.Popen(['hdfs', 'dfs', '-get', '{0}/part*'.format(_path), TMP_DIR], stdout=subprocess.PIPE)
+  sleep(30)
+
+  r = subprocess.Popen(['find', TMP_DIR, '-name', 'part*'], stdout=subprocess.PIPE)
+  for output_file in r.stdout:
+    output_file = output_file.rstrip()
+    print "appening {0} file ({1} bytes) on {2} file".format(output_file, stat(output_file).st_size, _output)
+    o = subprocess.Popen(['hdfs', 'dfs', '-appendToFile', output_file, _output.rstrip()], stdout=subprocess.PIPE)
+    sleep(30)
+    o = subprocess.Popen(['rm', '-f', output_file], stdout=subprocess.PIPE)
+
+  cleanTemporary(_path)
+
+def removeElements(_dict, _keys):
+  __keys = _dict.keys()
+  for __k in __keys:
+    if __k in _keys:
+      _dict.pop(__k)
+  return _dict
+
+def initializeLogParser():
+  global logParser
+  logParser = apache_log_parser.make_parser(APACHE_LOG_FORMAT)
+
+def addDeviceElements(_dict, _ua):
+  user_agent = parse(_ua)
+  
+  _dict.update({'userAgent': str(user_agent)})
+  _dict.update({'browserFamily': user_agent.browser.family})
+  _dict.update({'browserVersion': user_agent.browser.version_string})
+  _dict.update({'osFamily': user_agent.os.family})
+  _dict.update({'osVersion': user_agent.os.version_string})
+  _dict.update({'deviceFamily': user_agent.device.family})
+  _dict.update({'deviceBrand': user_agent.device.brand})
+  _dict.update({'deviceModel': user_agent.device.model})
+  _dict.update({'isMobile': user_agent.is_mobile})
+  _dict.update({'isTablet': user_agent.is_tablet})
+  _dict.update({'isPC': user_agent.is_pc})
+  _dict.update({'isTouchCapable': user_agent.is_touch_capable})
+  _dict.update({'isBot': user_agent.is_bot})
+
+def addElements(_dict, _source, _element):
+    if _element in _source:
+      _dict.update({_element: _source[_element]})
+    else:
+      _dict.update({_element: ''})
+    
+def parseLineEntry(_logentry):
+  global logParser
+  _keys = ['tss', 'env']
+  _data = {}
+
+  try:
+    _parseLine = logParser(_logentry)
+
+    if 'request_url_query_simple_dict' in _parseLine:
+      addElements(_data, _parseLine['request_url_query_simple_dict'], 'adId')
+      addElements(_data, _parseLine['request_url_query_simple_dict'], 'event')
+      addElements(_data, _parseLine['request_url_query_simple_dict'], 'version')
+      addElements(_data, _parseLine['request_url_query_simple_dict'], 'sessionid')
+      
+      if float(_parseLine['request_url_query_simple_dict']['version']) >= 2:
+        addElements(_data, _parseLine['request_url_query_simple_dict'], 'attr')
+        addElements(_data, _parseLine['request_url_query_simple_dict'], 'attrLabel')
+        addElements(_data, _parseLine['request_url_query_simple_dict'], 'attrValue')
+        addElements(_data, _parseLine['request_url_query_simple_dict'], 'isClick')
+        addElements(_data, _parseLine['request_url_query_simple_dict'], 'isEngagement')
+        addElements(_data, _parseLine['request_url_query_simple_dict'], 'isInteraction')
+        addElements(_data, _parseLine['request_url_query_simple_dict'], 'state')
+        addElements(_data, _parseLine['request_url_query_simple_dict'], 'timespent')
+
+        _data.update({'attrLabel': _data['attrLabel'][:100]})
+
+        if (_parseLine['request_header_user_agent__browser__family'] == 'IE' and _parseLine['request_header_user_agent__browser__version_string'] == '7' and _parseLine['request_header_user_agent__os__family'] == 'Windows XP'):
+          _data.update({'attrLabel': _data['attrLabel'].replace('-20', '%20')})
+          _data.update({'attr': _data['attr'].replace('-20', '%20')})
+          _data.update({'event': _data['event'].replace('-20', '%20')})
+      else:
+        addElements(_data, _parseLine['request_url_query_simple_dict'], 'attribute')
+        addElements(_data, _parseLine['request_url_query_simple_dict'], 'label')
+        addElements(_data, _parseLine['request_url_query_simple_dict'], 'product')
+        addElements(_data, _parseLine['request_url_query_simple_dict'], 'tss')
+        addElements(_data, _parseLine['request_url_query_simple_dict'], 'value')
+
+        if (_parseLine['request_header_user_agent__browser__family'] == 'IE' and _parseLine['request_header_user_agent__browser__version_string'] == '7' and _parseLine['request_header_user_agent__os__family'] == 'Windows XP'):
+          _data.update({'event': _data['event'].replace('-20', '%20')})
+          
+    _data.update({'ts': _parseLine['time_received_datetimeobj'].strftime('%s')})
+    addElements(_data, _parseLine, 'remote_host')
+    addDeviceElements(_data, _parseLine['request_header_user_agent'])
+
+  except Exception as ex:
+    print "Unexpected error: %s \n %s" %(ex, _logentry)
+
+  return json.dumps(_data) 
+
+def main(argv):
+
+  initializeLogParser()
+
+<% if fqdn =~ /^app*.*spark.*.prd.*/  -%>
+  partitions = 3
+<% end -%>
+
+<% if fqdn_env =~ /(stg)/  -%>
+  partitions = 1
+<% end -%>
+
+  conf = SparkConf().setAppName("ApacheLogParser")
+  conf.set("spark.kryoserializer.buffer.max", 1024)
+  conf.set("spark.app.id", uuid.uuid4())
+
+  sc = SparkContext(conf=conf)
+  output = '{0}/output'.format(APACHE_LOG_PATH)
+  output_file = '{0}beacon_data.{1}'.format(DATA_PATH, datetime.today().strftime('%d'))
+      
+  logfiles = logFileList()
+  cleanTemporary(output)
+
+  for logfile in logfiles:
+    print "Processing log file => {0}".format(logfile)
+    rdd = sc.textFile(logfile, partitions)
+    rdd.cache()
+    dataRdd = rdd.map(parseLineEntry).coalesce(1, True)
+    
+    print "Saving json result into {0} directory".format(output)
+    if (pathExists(output)):
+      cleanTemporary(output)    
+    dataRdd.saveAsTextFile(output)
+
+    print "Appending json result"
+    appendData(output, output_file)
+
+    print "Moving log file into repository directory path {0}".format(APACHE_REPO_PATH)
+    moveLogFiles(logfile)
+
+  sc.stop()
+
+if __name__ == "__main__":
+  main(sys.argv[1:])

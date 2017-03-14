@@ -1,0 +1,114 @@
+$TTL 3600
+liveoutdoors.com.            IN    SOA    liveoutdoors.com. root.liveoutdoors.com. (
+                                            2016061600     ; serial
+                                            28800          ; refresh
+                                            14400          ; retry
+                                            3600000        ; expire
+                                            86400 )        ; minimum
+
+liveoutdoors.com.                                   IN    NS       app3v-dns.tp.prd.lax.atomiconline.com.
+liveoutdoors.com.                                   IN    NS       app4v-dns.tp.prd.lax.atomiconline.com.
+liveoutdoors.com.                                   IN    NS       app1v-dns.tp.prd.lax.atomiconline.com.
+liveoutdoors.com.                                   IN    NS       app2v-dns.tp.prd.lax.atomiconline.com.
+
+
+liveoutdoors.com.     IN  MX 1 aspmx.l.google.com. 
+liveoutdoors.com.     IN MX 5 alt1.aspmx.l.google.com. 
+liveoutdoors.com.     IN MX 5 alt2.aspmx.l.google.com. 
+liveoutdoors.com.     IN MX 10 alt3.aspmx.l.google.com. 
+liveoutdoors.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+
+local                                               IN    A        127.0.0.1
+localhost                                           IN    A        127.0.0.1
+loghost                                             IN    A        127.0.0.1
+
+
+; #### liveoutdoors PBWP
+liveoutdoors.com.                                   IN    A        97.64.84.172
+
+bta.liveoutdoors.com.                               IN    A        10.64.64.75
+dev.liveoutdoors.com.                               IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.liveoutdoors.com.                               IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.liveoutdoors.com.                               IN    A        97.64.84.172
+www.liveoutdoors.com.                               IN    A        97.64.84.172
+
+origin.bta.liveoutdoors.com.                        IN    CNAME    bta.liveoutdoors.com.
+cdn-bta.liveoutdoors.com.                           IN    CNAME    bta.liveoutdoors.com.
+cdn1-bta.liveoutdoors.com.                          IN    CNAME    bta.liveoutdoors.com.
+cdn2-bta.liveoutdoors.com.                          IN    CNAME    bta.liveoutdoors.com.
+cdn3-bta.liveoutdoors.com.                          IN    CNAME    bta.liveoutdoors.com.
+
+origin-dev.liveoutdoors.com.                        IN    CNAME    dev.liveoutdoors.com.
+cdn-dev.liveoutdoors.com.                           IN    CNAME    dev.liveoutdoors.com.
+cdn1-dev.liveoutdoors.com.                          IN    CNAME    dev.liveoutdoors.com.
+cdn2-dev.liveoutdoors.com.                          IN    CNAME    dev.liveoutdoors.com.
+cdn3-dev.liveoutdoors.com.                          IN    CNAME    dev.liveoutdoors.com.
+
+origin-stg.liveoutdoors.com.                        IN    CNAME    stg.liveoutdoors.com.
+cdn-stg.liveoutdoors.com.                           IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn1-stg.liveoutdoors.com.                          IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-stg.liveoutdoors.com.                          IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-stg.liveoutdoors.com.                          IN    CNAME    wac.EE35.edgecastcdn.net.
+
+origin.liveoutdoors.com.                            IN    CNAME    prd.liveoutdoors.com.
+cdn.liveoutdoors.com.                               IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn1.liveoutdoors.com.                              IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2.liveoutdoors.com.                              IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3.liveoutdoors.com.                              IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn1-www.liveoutdoors.com.                          IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-www.liveoutdoors.com.                          IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-www.liveoutdoors.com.                          IN    CNAME    wac.EE35.edgecastcdn.net.
+
+dev.m.liveoutdoors.com.                             IN    CNAME    dev.liveoutdoors.com.
+stg.m.liveoutdoors.com.                             IN    CNAME    stg.liveoutdoors.com.
+www.m.liveoutdoors.com.                             IN    CNAME    prd.liveoutdoors.com.
+;m.liveoutdoors.com.                                IN    A        97.64.84.172
+; #### End PBWP
+
+
+
+crowdignite.liveoutdoors.com.                       IN    A        97.64.84.119
+stg.crowdignite.liveoutdoors.com.                   IN    A        10.64.75.76
+dev.crowdignite.liveoutdoors.com.                   IN    A        10.64.64.176
+;chaggstrom.sbx.crowdignite.liveoutdoors.com.       IN    CNAME    uid1v-chaggstrom.ci.dev.lax.gnmedia.net. ;decomm
+ddurand.sbx.crowdignite.liveoutdoors.com.           IN    CNAME    uid1v-ddurand.ci.dev.lax.gnmedia.net.
+;fdavis.sbx.crowdignite.liveoutdoors.com.           IN    CNAME    uid1v-fdavis.ci.dev.lax.gnmedia.net. ;decomm
+fgonzalez.sbx.crowdignite.liveoutdoors.com.         IN    CNAME    uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+jcortes.sbx.crowdignite.liveoutdoors.com.           IN    CNAME    uid1v-jcortes.ci.dev.lax.gnmedia.net.
+jcrawford.sbx.crowdignite.liveoutdoors.com.         IN    CNAME    uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+jrodriguez.sbx.crowdignite.liveoutdoors.com.        IN    CNAME    uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+jurodriguez.sbx.crowdignite.liveoutdoors.com.       IN    CNAME    uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+;mpatino.sbx.crowdignite.liveoutdoors.com.          IN    CNAME    uid1v-mpatino.ci.dev.lax.gnmedia.net. ;decomm
+;rvicchiullo.sbx.crowdignite.liveoutdoors.com.      IN    CNAME    uid1v-rvicchiullo.ci.dev.lax.gnmedia.net. ;decomm
+ssalazar.sbx.crowdignite.liveoutdoors.com.          IN    CNAME    uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+uacosta.sbx.crowdignite.liveoutdoors.com.           IN    CNAME    uid1v-uacosta.ci.dev.lax.gnmedia.net.
+
+origin.microsites                                   IN    CNAME    origin.campaigns.liveoutdoors.com.
+cdn.microsites                                      IN    CNAME    wac.1384D.sigmacdn.net.
+
+origin.campaigns                                    IN    A        97.64.84.104
+campaigns                                           IN    CNAME    origin.campaigns
+cdn.campaigns                                       IN    CNAME    wac.1384D.sigmacdn.net.
+staging.campaigns                                   IN    A        97.64.84.105
+
+origin.assets                                       IN    A        97.64.84.101
+cdn.assets                                          IN    CNAME    wac.1384D.sigmacdn.net.
+assets                                              IN    CNAME    cdn.assets
+staging.assets                                      IN    CNAME    wac.1384D.sigmacdn.net.
+demo.assets                                         IN    CNAME    wac.1384D.sigmacdn.net.
+origin.staging.assets                               IN    A        97.64.84.102
+
+rmdemo                                              IN    CNAME    campaigns
+staging.rmdemo                                      IN    CNAME    staging.campaigns
+files                                               IN    CNAME    cdn.assets
+
+gearguide.liveoutdoors.com.                         IN    CNAME    cdn.campaigns.liveoutdoors.com.
+staging.gearguide.liveoutdoors.com.                 IN    CNAME    staging.campaigns.liveoutdoors.com.
+demo.gearguide.liveoutdoors.com.                    IN    CNAME    demo.si.evolvemediallc.com.
+
+microsites.liveoutdoors.com.                        IN    CNAME    cdn.campaigns.liveoutdoors.com.
+johndeeregator.liveoutdoors.com.                    IN    CNAME    cdn.campaigns.liveoutdoors.com.
+staging.johndeeregator.liveoutdoors.com.            IN    CNAME    staging.campaigns.liveoutdoors.com.
+demo.johndeeregator.liveoutdoors.com.               IN    CNAME    demo.si.evolvemediallc.com.
+liveoutdoors.com. 	IN 	TXT 	"v=spf1 a:cluster9out.us.messagelabs.com include:_spf.google.com ip4:216.82.240.0/20 ~all"

@@ -1,0 +1,18 @@
+$TTL    3600 
+fashionfeeds.com.au.   IN      SOA     fashionfeeds.com.au. root.fashionfeeds.com.au. (
+                                2016061600     ; serial
+                                28800          ; refresh
+                                14400          ; retry
+                                3600000        ; expire
+                                86400 )        ; minimum
+
+fashionfeeds.com.au.            IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+fashionfeeds.com.au.            IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+fashionfeeds.com.au.            IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+fashionfeeds.com.au.            IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+; Imported records
+*.fashionfeeds.com.au.      IN     A        97.64.84.172
+www.fashionfeeds.com.au.    IN     A        97.64.84.172
+fashionfeeds.com.au.        IN     A        97.64.84.172
+

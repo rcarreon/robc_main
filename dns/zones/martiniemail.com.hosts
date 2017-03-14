@@ -1,0 +1,30 @@
+$ORIGIN martiniemail.com.
+$TTL    3600 
+martiniemail.com.	IN      SOA     martiniemail.com. root.martiniemail.com. (
+                        2015070600	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+martiniemail.com.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+martiniemail.com.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+martiniemail.com.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+martiniemail.com.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+
+martiniemail.com.      IN	 MX    10 ASPMX4.GOOGLEMAIL.COM.
+martiniemail.com.      IN	 MX    10 ASPMX3.GOOGLEMAIL.COM.
+martiniemail.com.      IN	 MX    10 ASPMX2.GOOGLEMAIL.COM.
+martiniemail.com.      IN	 MX    10 ASPMX.L.GOOGLE.COM.
+martiniemail.com.      IN	 MX    10 ALT1.ASPMX.L.GOOGLE.COM.
+martiniemail.com.      IN	 MX    10 ASPMX5.GOOGLEMAIL.COM.
+
+martiniemail.com.	IN	A	69.7.23.208
+googleffffffffaeac90e8.martiniemail.com.	IN	CNAME	google.com.
+www.martiniemail.com.	IN	CNAME	martiniemail.com.
+
+

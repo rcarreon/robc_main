@@ -1,0 +1,3 @@
+#!/bin/bash
+
+find /app/ugc/storage \( -iname '*.avi' -o -iname '*.webm' -o -iname '*.flv' -o -iname '*.mp4' -o -iname '*.mov' -o -iname '*.wmv' -o -iname '*.3gp' -o -iname '*.m4v' -o -iname '*.mpg' \) -mtime +14 -path '/app/ugc/storage/*/incoming/*' -exec rm -f {} \;

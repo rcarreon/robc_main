@@ -1,0 +1,194 @@
+#!/bin/bash
+#
+# the no-longer-Quick-n-dirty script to see an ldap user's lock status.
+# 
+# Looks for both administrative and security (login failed attempts) account lockouts.
+# 
+### 
+
+#set -x
+
+
+###
+#
+# Config Options and other variables
+#
+###
+
+
+read -r -d '' usage <<EOF 
+Usage: ${0} username   
+
+Where <username> is the account you wish to check.
+EOF
+
+# Current time in UTC, formatted like what would be found in ldap password lock timestamp
+curtime=$(date -u +%Y%m%d%H%M%SZ)
+
+#host=dev.ldap.gnmedia.net
+host=ldap.gnmedia.net
+
+# some ldap command line options formatted
+baseuserdn="ou=People,dc=gnmedia,dc=net"
+basegroupdn="ou=Groups,dc=gnmedia,dc=net"
+binddn="uid=$USER,$baseuserdn"
+
+
+
+# Formatting shortcuts
+B="\033[1m" #boldface
+P="\033[0m" #plain text
+F="\033[5m" #flashing text
+R="\033[0;31m" #red text
+G="\033[0;32m" #green text
+
+
+##
+#
+#  Define Functions
+#
+##
+
+
+convertLdapTimestamp () {
+
+attribdate=$1
+
+shopt -qs nocasematch
+if [[ ${#attribdate} -eq 15 ]] && [[ ${attribdate:14:1} =~ Z ]]; then
+
+ #the following 2 lines have been verified to work.
+ reformatted="${attribdate:0:4}-${attribdate:4:2}-${attribdate:6:2} ${attribdate:8:2}:${attribdate:10:2}:${attribdate:12:2}"
+
+ date --date="TZ=\"UTC\" ${reformatted}"
+
+
+else
+    echo "String ${attribdate} not in appropriate format for this conversion"
+    exit 1
+fi;
+
+shopt -qu nocasematch
+
+};
+
+
+
+getLdapStatus () {
+
+echo -n "($binddn)'s LDAP password: "
+stty -echo
+read password
+stty echo
+echo
+
+ldapargs="-D $binddn -h $host"
+openldapargs="-w $password -x $ldapargs"
+
+
+#test if server available by checking RootDSE, which should always be available.
+ldapsearch -x -h $host -b "" -s base > /dev/null  2>&1
+
+if [ $? != 0 ];then
+   echo "There was a problem with the ldap server. Exiting."
+   exit 1
+fi
+
+# Retrieve the relevant lock attributes
+unlocktime=$(ldapsearch $openldapargs -LLL -b $baseuserdn "(uid=$username)" accountUnlockTime | grep ^accountUnlockTime | awk '{print $2}')
+
+lockstatus=$(ldapsearch $openldapargs -LLL -b $baseuserdn "(uid=$username)" nsAccountLock | grep ^nsAccountLock | awk '{print $2}')
+
+# FIXME: consider adding additional check to see if user even exists.  currently will show unlocked for nonexistent user.
+
+#  If accountUnlockTime has a value, and matches the proper format (e.g. 20140408182122Z), 
+#  do comparison and set passwordlock flag if applicable.
+shopt -qs nocasematch
+if [[ ${#unlocktime} -eq 15 ]] && [[ ${unlocktime:14:1} =~ Z ]]; then
+
+    if [[ ${unlocktime%Z} -gt ${curtime%Z} ]]; then
+        passwordlock="TRUE"
+    else
+        passwordlock="FALSE"
+    fi
+fi
+
+#  Check if nsAccountLock is set to true, and sanitize its value
+if [[ ${lockstatus} =~ TRUE ]]; then
+    lockstatus="TRUE"
+else
+    lockstatus="FALSE"
+fi
+
+shopt -qs nocasematch
+
+
+};
+
+
+
+outputResults () {
+
+if [[ ${lockstatus} == TRUE ]] || [[ ${passwordlock} == TRUE ]]; then
+    echo -e "Account ${username} is currently: ${R}LOCKED${P}" 
+else
+    echo -e "Account ${username} is currently: ${G}UNLOCKED${P}"
+fi
+
+
+if [[ ${lockstatus} == TRUE ]]; then
+    echo "Account ${username} is administratively locked"
+fi
+
+
+if [[ ${passwordlock} == TRUE ]]; then
+
+    echo "Account ${username} is locked out for too many failed login attempts." 
+    echo -n "Lockout will clear: "
+    convertLdapTimestamp ${unlocktime}
+    echo -n "Current time: "
+    date
+fi
+
+};
+
+
+
+
+###
+#
+# Main
+#
+###
+
+
+
+if test -z "$USER" ;then
+  echo "USER not set" 1>&2
+  exit 1
+fi
+
+# FIXME:  try to detect if running as root and use proper login name
+#if [[ ${USER} == root ]] && [[ $(logname) == root ]]; then
+#    echo "Please do not run as root."
+#    exit 1
+#elif [[ ${USER} == root ]]; then
+#    USER=$(logname)
+#fi
+
+if [[ $# < 1 ]]
+    then
+        echo "$usage"
+        exit 1;
+fi
+
+username=$1
+
+getLdapStatus
+
+outputResults
+
+
+
+
+

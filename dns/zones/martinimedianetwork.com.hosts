@@ -1,0 +1,37 @@
+$ORIGIN martinimedianetwork.com.
+$TTL    3600 
+martinimedianetwork.com.	IN      SOA     martinimedianetwork.com. root.martinimedianetwork.com. (
+                        2015070600	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+martinimedianetwork.com.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+martinimedianetwork.com.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+martinimedianetwork.com.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+martinimedianetwork.com.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+
+			    NS    ns1.p15.dynect.net.
+                      	    NS    ns4.p15.dynect.net.
+                      	    NS    ns3.p15.dynect.net.
+                            NS    ns2.p15.dynect.net.
+                       	    MX    10 ASPMX5.GOOGLEMAIL.COM.
+                            MX    10 ASPMX4.GOOGLEMAIL.COM.
+                            MX    10 ASPMX3.GOOGLEMAIL.COM.
+                            MX    10 ASPMX2.GOOGLEMAIL.COM.
+                            MX    10 ASPMX.L.GOOGLE.COM.
+                            A     216.146.46.10
+                            A     216.146.46.11
+extranet                    CNAME martinicorp.s3.amazonaws.com.
+googlec1934ab13fb7c81       CNAME google.com.
+unfriendly                  CNAME ec2-54-175-99-198.compute-1.amazonaws.com.
+wiki                        CNAME ghs.google.com.
+www                         CNAME martinimedianetwork.com.
+
+
+

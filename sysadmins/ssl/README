@@ -1,0 +1,9 @@
+Here lives the various ssl certificates we've been using on our sites.
+
+
+Note:
+If you got a ssl certificate with a password and need to remove the password (typically httpd won't want to type for the ssl password)
+
+Run :
+
+$  openssl rsa -in server.key -out server.key.unencrypted

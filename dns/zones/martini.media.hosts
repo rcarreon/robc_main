@@ -1,0 +1,25 @@
+$TTL    3600
+martini.media.   IN      SOA     martini.media. root.martini.media. (
+                        2016061600     ; serial
+                        28800          ; refresh
+                        14400          ; retry
+                        3600000        ; expire
+                        86400 )        ; minimum
+
+martini.media.           IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+martini.media.           IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+martini.media.           IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+martini.media.           IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+
+martini.media.     IN  MX 1 aspmx.l.google.com.
+martini.media.     IN MX 5 alt1.aspmx.l.google.com.
+martini.media.     IN MX 5 alt2.aspmx.l.google.com.
+martini.media.     IN MX 10 alt3.aspmx.l.google.com.
+martini.media.     IN MX 10 alt4.aspmx.l.google.com.
+
+martini.media. 		IN 		TXT 	"G0O0R34839"
+
+martini.media. 		IN 		A 	192.124.249.62	
+www.martini.media.	IN 		CNAME 	martini.media.
+martini.media. 	IN 	TXT 	"v=spf1 a:cluster9out.us.messagelabs.com include:_spf.google.com ip4:216.82.240.0/20 ~all"

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+#set -x
+
+log_file=/app/log/pingdom-checks.log
+pid_file=/tmp/pingdom_checks.pid
+date=$(date)
+
+cmmd=/bin/bash
+cmmd2=/app/shared/http/reports/bin/pingdom_checks_bg
+
+if [ -f $pid_file ]
+then
+    echo "Stopping process pingdom_checks_bg"
+    echo "Pid file exists removing it"
+    pid=$(ps -fea | grep -v grep | grep -v vim | grep $cmmd2 | awk '{print $2}')
+    rm -fr $pid_file && echo Pid file removed >> $log_file
+    kill $pid && echo Process killed >> $log_file
+    echo "Stopped pingdom_checks_bg $date" >> $log_file
+else
+    echo "Unable to stop application: "
+    echo "Pingdom_checks_bg isn't running"
+    echo "Pid file doesn't exists"
+fi
+

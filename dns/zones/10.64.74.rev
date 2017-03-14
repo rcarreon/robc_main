@@ -1,0 +1,144 @@
+$TTL 3600
+@      IN      SOA     gnmedia.net. root@gnmedia.net. (
+                                2016071200 	; Serial
+                                36262		; Refresh
+                                300		; Retry
+                                3600000		; Expire
+                                3600 )		; Minimum
+
+	IN	NS	app1v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app2v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app3v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app4v-dns.tp.prd.lax.gnmedia.net.
+$ORIGIN 74.64.10.in-addr.arpa.
+
+;1	IN	PTR	core1-vlan100.gnmedia.net.
+81	IN	PTR	mem1v-origin.og.stg.lax.gnmedia.net.
+90	IN	PTR	mem2v-origin.og.stg.lax.gnmedia.net.
+;AP     ap      ap      ap
+67      IN      PTR     app1v-cron.ap.stg.lax.gnmedia.net.
+68      IN      PTR     app1v-geoip.ap.stg.lax.gnmedia.net.
+70      IN      PTR     app1v-rabbit.ap.stg.lax.gnmedia.net.
+71      IN      PTR     app2v-rabbit.ap.stg.lax.gnmedia.net.
+78      IN      PTR     mem1v-adops.ap.stg.lax.gnmedia.net.
+87      IN      PTR     mem2v-adops.ap.stg.lax.gnmedia.net.
+100     IN      PTR     sql1v-56-backup.ap.stg.lax.gnmedia.net.
+;CI
+69	IN	PTR	app1v-mgmt.ci.stg.lax.gnmedia.net.
+74	IN	PTR	eng1v-ci.ci.stg.lax.gnmedia.net.
+75	IN	PTR	eng2v-ci.ci.stg.lax.gnmedia.net.
+76	IN	PTR	kes1v-ci.ci.stg.lax.gnmedia.net.
+77	IN	PTR	kes2v-ci.ci.stg.lax.gnmedia.net.
+80	IN	PTR	mem1v-ci.ci.stg.lax.gnmedia.net.
+89	IN	PTR	mem2v-ci.ci.stg.lax.gnmedia.net.
+96	IN	PTR	mem3v-ci.ci.stg.lax.gnmedia.net.
+97	IN	PTR	mem4v-ci.ci.stg.lax.gnmedia.net.
+98	IN	PTR	spx1v-ci.ci.stg.lax.gnmedia.net.
+99	IN	PTR	spx2v-ci.ci.stg.lax.gnmedia.net.
+;SBV
+73     IN      PTR     app5v-cms.sbv.stg.lax.gnmedia.net.
+101     IN      PTR     sql5v-56-stats-cms.sbv.stg.lax.gnmedia.net.
+102     IN      PTR     sql6v-56-stats-cms.sbv.stg.lax.gnmedia.net.
+
+;AO
+66     IN      PTR     app1v-atp.ao.stg.lax.gnmedia.net.
+72     IN      PTR     app2v-vb.ao.stg.lax.gnmedia.net.
+79     IN      PTR     mem1v-api-cs.ao.stg.lax.gnmedia.net.
+82     IN      PTR     mem1v-vb.ao.stg.lax.gnmedia.net.
+83     IN      PTR     mem1v-wp.ao.stg.lax.gnmedia.net.
+84     IN      PTR     mem1v-xf-ae.ao.stg.lax.gnmedia.net.
+85     IN      PTR     mem1v-xf-psl.ao.stg.lax.gnmedia.net.
+86     IN      PTR     mem1v-xf-sdc.ao.stg.lax.gnmedia.net.
+88     IN      PTR     mem2v-api-cs.ao.stg.lax.gnmedia.net.
+91     IN      PTR     mem2v-vb.ao.stg.lax.gnmedia.net.
+92     IN      PTR     mem2v-wp.ao.stg.lax.gnmedia.net.
+93     IN      PTR     mem2v-xf-ae.ao.stg.lax.gnmedia.net.
+94     IN      PTR     mem2v-xf-psl.ao.stg.lax.gnmedia.net.
+95     IN      PTR     mem2v-xf-sdc.ao.stg.lax.gnmedia.net.
+248     IN      PTR     pxy1v-vb.ao.stg.lax.gnmedia.net.
+253     IN      PTR     sql1v-56-gr.ao.stg.lax.gnmedia.net.
+210     IN      PTR     sql1v-56-mc.ao.stg.lax.gnmedia.net.
+254     IN      PTR     sql2v-56-gr.ao.stg.lax.gnmedia.net.
+211     IN      PTR     sql2v-56-mc.ao.stg.lax.gnmedia.net.
+;AO VIPS
+249     IN      PTR     vip-sqlrw-atp.ao.stg.lax.gnmedia.net.
+252     IN      PTR     vip-sqlrw-gr.ao.stg.lax.gnmedia.net.
+206     IN      PTR     vip-sqlrw-mal.ao.stg.lax.gnmedia.net.
+209     IN      PTR     vip-sqlrw-mc.ao.stg.lax.gnmedia.net.
+212     IN      PTR     vip-sqlrw-sdc.ao.stg.lax.gnmedia.net.
+215     IN      PTR     vip-sqlrw-vb-bab.ao.stg.lax.gnmedia.net.
+218     IN      PTR     vip-sqlrw-vb-hfb.ao.stg.lax.gnmedia.net.
+221     IN      PTR     vip-sqlrw-vb-psl.ao.stg.lax.gnmedia.net.
+224     IN      PTR     vip-sqlrw-vb-sdc.ao.stg.lax.gnmedia.net.
+227     IN      PTR     vip-sqlrw-vb-shh.ao.stg.lax.gnmedia.net.
+230     IN      PTR     vip-sqlrw-vb-tfs.ao.stg.lax.gnmedia.net.
+233     IN      PTR     vip-sqlrw-vb-wz.ao.stg.lax.gnmedia.net.
+236     IN      PTR     vip-sqlrw-wp.ao.stg.lax.gnmedia.net.
+239     IN      PTR     vip-sqlrw-xf-ae.ao.stg.lax.gnmedia.net.
+242     IN      PTR     vip-sqlrw-xf-psl.ao.stg.lax.gnmedia.net.
+245     IN      PTR     vip-sqlrw-xf-sdc.ao.stg.lax.gnmedia.net.
+6	IN	PTR	vip-app-xf-hfb.ao.stg.lax.gnmedia.net.
+7	IN	PTR	vip-sqlrw-xf-hfb.ao.stg.lax.gnmedia.net.
+8	IN	PTR	vip-sqlro-xf-hfb.ao.stg.lax.gnmedia.net.
+9	IN	PTR	vip-app-xf-wz.ao.stg.lax.gnmedia.net.
+10	IN	PTR	vip-sqlrw-xf-wz.ao.stg.lax.gnmedia.net.
+13	IN	PTR	vip-sqlro-xf-wz.ao.stg.lax.gnmedia.net.
+208	IN	PTR	vip-sqlrw-ep.ao.stg.lax.gnmedia.net.
+
+
+;TP
+200		IN		PTR		app2v-em.tp.stg.lax.gnmedia.net.
+199		IN		PTR		app1v-em.tp.stg.lax.gnmedia.net.
+
+14	IN	PTR	app1v-tb.ao.stg.lax.gnmedia.net.
+15	IN	PTR	app3v-adops.ap.stg.lax.gnmedia.net.
+16	IN	PTR	app4v-adops.ap.stg.lax.gnmedia.net.
+243	IN	PTR	stg.geoip.evolvemediallc.com.
+
+105	IN	PTR	app1v-dtapi.ao.stg.lax.gnmedia.net.
+106	IN	PTR	els1v-dtapi.ao.stg.lax.gnmedia.net.
+107	IN	PTR	mem1v-dtapi.ao.stg.lax.gnmedia.net.
+17	IN	PTR	app1v-ep.ao.stg.lax.gnmedia.net.
+18	IN	PTR	app2v-ep.ao.stg.lax.gnmedia.net.
+19	IN	PTR	mem1v-ep.ao.stg.lax.gnmedia.net.
+20	IN	PTR	mem2v-ep.ao.stg.lax.gnmedia.net.
+21	IN	PTR	sql1v-ep.ao.stg.lax.gnmedia.net.
+22	IN	PTR	sql2v-ep.ao.stg.lax.gnmedia.net.
+114	IN	PTR	app1v-mdbdt.ao.stg.lax.gnmedia.net.
+117	IN	PTR	app2v-cron.ap.stg.lax.gnmedia.net.
+23	IN	PTR	app1v-pubops-martini.ap.stg.lax.gnmedia.net.
+24	IN	PTR	app2v-pubops-martini.ap.stg.lax.gnmedia.net.
+25	IN	PTR	sql1v-pubops-martini.ap.stg.lax.gnmedia.net.
+26	IN	PTR	sql2v-pubops-martini.ap.stg.lax.gnmedia.net.
+28	IN	PTR	app1v-build.ap.stg.lax.gnmedia.net.
+154	IN	PTR	app1v-xf-wz.ao.stg.lax.gnmedia.net.
+155	IN	PTR	app1v-xf-hfb.ao.stg.lax.gnmedia.net.
+157	IN	PTR	app2v-xf-hfb.ao.stg.lax.gnmedia.net.
+156	IN	PTR	app2v-xf-wz.ao.stg.lax.gnmedia.net.
+158	IN	PTR	mem1v-xf-wz.ao.stg.lax.gnmedia.net.
+159	IN	PTR	mem2v-xf-wz.ao.stg.lax.gnmedia.net.
+160	IN	PTR	mem1v-xf-hfb.ao.stg.lax.gnmedia.net.
+161	IN	PTR	mem2v-xf-hfb.ao.stg.lax.gnmedia.net.
+162	IN	PTR	sql1v-xf-hfb.ao.stg.lax.gnmedia.net.
+163     IN      PTR     sql2v-xf-hfb.ao.stg.lax.gnmedia.net.
+164	IN	PTR	sql1v-xf-wz.ao.stg.lax.gnmedia.net.  
+165	IN	PTR	sql2v-xf-wz.ao.stg.lax.gnmedia.net.
+29	IN	PTR	sql1v-bd.og.stg.lax.gnmedia.net.
+33	IN	PTR	app1v-bd.tp.stg.lax.gnmedia.net.
+34	IN	PTR	rds1v-adops.ap.stg.lax.gnmedia.net.
+35	IN	PTR	rds2v-adops.ap.stg.lax.gnmedia.net.
+166	IN	PTR	app3v-origin.og.stg.lax.gnmedia.net.
+120	IN	PTR	app1v-vb-pf.ao.stg.lax.gnmedia.net.
+121	IN	PTR	app2v-vb-pf.ao.stg.lax.gnmedia.net.
+36	IN	PTR	sql1v-vb-pf.ao.stg.lax.gnmedia.net.
+37	IN 	PTR	sql2v-vb-pf.ao.stg.lax.gnmedia.net.
+38	IN	PTR	vip-sqlro-pf.ao.stg.lax.gnmedia.net.
+39	IN	PTR	vip-sqlrw-pf.ao.stg.lax.gnmedia.net.
+169	IN	PTR	sql1v-api-dfp.ao.stg.lax.gnmedia.net.
+170	IN	PTR	sql2v-api-dfp.ao.stg.lax.gnmedia.net.
+123	IN	PTR	vip-sqlrw-api-dfp.ao.stg.lax.gnmedia.net.
+124	IN	PTR	vip-sqlro-api-dfp.ao.stg.lax.gnmedia.net.
+125	IN	PTR	vip-app-api-dfp.ao.stg.lax.gnmedia.net.
+173	IN	PTR	worker1v.ap.stg.lax.gnmedia.net.
+174	IN	PTR	api1v.ap.stg.lax.gnmedia.net.
+175	IN	PTR	api2v.ap.stg.lax.gnmedia.net.

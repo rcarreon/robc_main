@@ -1,0 +1,40 @@
+#!/bin/bash
+# This script will copy the logs from the mysql log directories into a local 
+# folder within $HOME.
+
+if [[ ! -f /etc/my.cnf ]]; then
+    echo my.cnf file is not there or is not a file
+    exit 1
+fi
+
+logdirlocalbase=${HOME}/log
+# create directory for copies of the logs
+if [[ ! -d ${logdirlocalbase} ]]; then
+    mkdir -pv ${logdirlocalbase}
+fi
+
+logdirlocal=${logdirlocalbase}/$(hostname)/$(date +%Y%m%d)/
+if [[ ! -d ${localdirlocal} ]]; then
+    echo $logdirlocal
+    mkdir -pv ${logdirlocal}
+fi
+
+eval $(grep slow_query_log_file /etc/my.cnf | sed -e 's/slow_query_log_file/logslow/g')
+eval $(grep -E log-bin /etc/my.cnf | grep -v log-bin-index | tr --delete ' ' | sed -e 's/log-bin/logbin/g' )
+
+# copy slow logs
+if [[ -n ${logslow} ]]; then
+    logdirslow=$(dirname ${logslow})
+    mkdir -pv ${logdirlocal}/slow
+    echo Copying slow logs
+    rsync --verbose --perms --times ${logdirslow}/slow-queries.log* ${logdirlocal}/slow/
+fi
+
+# copy binary logs
+if [[ -n ${logbin} ]]; then
+    logdirbin=$(dirname ${logbin})
+    mkdir -pv ${logdirlocal}/bin
+    echo Copying binary logs
+    rsync --verbose --perms --times ${logdirbin}/bin.?????? ${logdirlocal}/bin/
+fi
+

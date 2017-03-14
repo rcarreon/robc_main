@@ -1,0 +1,435 @@
+!RANCID-CONTENT-TYPE: cisco
+!
+!
+!
+!
+!
+!
+!
+!BootFlash: BOOT variable = "disk0:c6ace-t1k9-mz.A2_3_4.bin;disk0:c6ace-t1k9-mz.A2_2_4.bin" 
+!BootFlash: Configuration register is 0x1
+!
+!BootFlash: BOOT variable = "disk0:c6ace-t1k9-mz.A2_3_4.bin;disk0:c6ace-t1k9-mz.A2_2_4.bin" 
+!BootFlash: Configuration register is 0x1
+!
+! NAME: "module 1", DESCR: "Application Control Engine Service Module"
+! PID: ACE20-MOD-K9      , VID: V03, SN: SAD123500TR 
+! NAME: "temperature", DESCR: "Inlet Temperature"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "Outlet Temperature"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "SIBYTE Temperature Sensor"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "HYPERION Temperature Sensor"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "CDE0 Temperature Sensor"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "CDE1 Temperature Sensor"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "IXP0 Temperature Sensor"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "IXP1 Temperature Sensor"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "SSA Temperature Sensor"
+! PID:                   , VID:    , SN:             
+!
+Generating configuration....
+
+
+
+logging enable
+logging timestamp
+logging trap 3
+logging buffered 3
+logging host 10.11.20.27 udp/514 
+logging message 111008 level 2
+
+
+
+login timeout 60
+boot system image:c6ace-t1k9-mz.A2_3_4.bin
+boot system image:c6ace-t1k9-mz.A2_2_4.bin
+shared-vlan-hostid 3
+
+resource-class sticky
+  limit-resource all minimum 0.00 maximum unlimited
+  limit-resource sticky minimum 10.00 maximum equal-to-min
+
+clock timezone standard PST
+
+access-list ALL line 10 extended permit ip any any 
+
+
+probe http http_503_probe
+  interval 5
+  passdetect interval 10
+  passdetect count 1
+  receive 3
+  expect status 503 503
+  open 3
+probe http http_probe
+  interval 5
+  expect status 200 200
+  expect status 302 302
+  expect status 500 510
+probe icmp icmp_probe
+  interval 5
+  faildetect 2
+  passdetect interval 10
+  passdetect count 1
+  receive 3
+probe tcp mysql_probe
+  port 3306
+  interval 5
+  faildetect 1
+  passdetect interval 10
+  passdetect count 1
+  receive 3
+  open 3
+
+
+rserver host APP1V-MAL.AO.PRD.LAX
+  ip address 10.11.34.30
+  probe icmp_probe
+  inservice
+rserver host APP1V-MAL.AO.STG.LAX
+  ip address 10.11.134.29
+  probe icmp_probe
+  inservice
+rserver host APP1V-SORRY.TP.PRD.LAX
+  ip address 10.11.20.39
+  probe icmp_probe
+  inservice
+rserver host APP2V-MAL.AO.PRD.LAX
+  ip address 10.11.34.31
+  probe icmp_probe
+  inservice
+rserver host APP2V-MAL.AO.STG.LAX
+  ip address 10.11.134.30
+  probe icmp_probe
+  inservice
+rserver host APP2V-SORRY.TP.PRD.LAX
+  ip address 10.11.20.32
+  probe icmp_probe
+  inservice
+rserver host APP3V-MAL.AO.PRD.LAX
+  ip address 10.11.34.52
+  probe icmp_probe
+  inservice
+rserver host APP3V-MAL.AO.STG.LAX
+  ip address 10.11.134.60
+  probe icmp_probe
+  inservice
+rserver host APP3V-SORRY.TP.PRD.LAX
+  ip address 10.11.20.97
+  probe icmp_probe
+  inservice
+rserver host APP4V-MAL.AO.PRD.LAX
+  ip address 10.11.34.141
+  probe icmp_probe
+  inservice
+rserver host APP5V-MAL.AO.PRD.LAX
+  ip address 10.11.34.160
+  probe icmp_probe
+  inservice
+rserver host APP6V-MAL.AO.PRD.LAX
+  ip address 10.11.34.194
+  probe icmp_probe
+  inservice
+rserver host APP7V-MAL.AO.PRD.LAX
+  ip address 10.11.34.200
+  probe icmp_probe
+  inservice
+rserver host APP8V-MAL.AO.PRD.LAX
+  ip address 10.11.34.201
+  probe icmp_probe
+  inservice
+rserver host APP9V-MAL.AO.PRD.LAX
+  ip address 10.11.34.202
+  probe icmp_probe
+  inservice
+rserver host SQL1V-MAL.AO.PRD.LAX
+  ip address 10.12.34.79
+  probe icmp_probe
+  inservice
+rserver host SQL1V-MAL.AO.STG.LAX
+  ip address 10.12.134.28
+  probe icmp_probe
+  inservice
+rserver host SQL2V-MAL.AO.PRD.LAX
+  ip address 10.12.34.52
+  probe icmp_probe
+  weight 4
+  inservice
+rserver host SQL2V-MAL.AO.STG.LAX
+  ip address 10.12.134.29
+  probe icmp_probe
+  inservice
+rserver host SQL3V-MAL.AO.PRD.LAX
+  ip address 10.12.34.77
+  probe icmp_probe
+  inservice
+rserver host SQL4V-MAL.AO.PRD.LAX
+  ip address 10.12.34.78
+  probe icmp_probe
+  inservice
+
+serverfarm host VIP-APP-MAL.AO.PRD.LAX
+  description This is mAL's production vip on the segregated circuit.
+  predictor leastconns
+  probe http_probe
+  rserver APP1V-MAL.AO.PRD.LAX
+    conn-limit max 250 min 185
+    inservice
+  rserver APP2V-MAL.AO.PRD.LAX
+    conn-limit max 250 min 185
+    inservice
+  rserver APP3V-MAL.AO.PRD.LAX
+    conn-limit max 250 min 185
+    inservice
+  rserver APP4V-MAL.AO.PRD.LAX
+    conn-limit max 250 min 185
+    inservice
+  rserver APP5V-MAL.AO.PRD.LAX
+    conn-limit max 250 min 185
+    inservice
+  rserver APP6V-MAL.AO.PRD.LAX
+    conn-limit max 250 min 185
+    inservice
+  rserver APP7V-MAL.AO.PRD.LAX
+    conn-limit max 250 min 185
+    inservice
+  rserver APP8V-MAL.AO.PRD.LAX
+    conn-limit max 250 min 185
+    inservice
+  rserver APP9V-MAL.AO.PRD.LAX
+    conn-limit max 250 min 185
+    inservice
+serverfarm host VIP-APP-MAL.AO.STG.LAX
+  probe http_probe
+  rserver APP1V-MAL.AO.STG.LAX
+    inservice
+serverfarm host VIP-APP-SORRY.TP.PRD.LAX
+  probe http_503_probe
+  rserver APP1V-SORRY.TP.PRD.LAX
+    inservice
+  rserver APP2V-SORRY.TP.PRD.LAX
+    inservice
+  rserver APP3V-SORRY.TP.PRD.LAX
+    inservice
+serverfarm host VIP-SQLRO-MAL.AO.PRD.LAX
+  predictor leastconns slowstart 20
+  probe mysql_probe
+  rserver SQL1V-MAL.AO.PRD.LAX
+  rserver SQL2V-MAL.AO.PRD.LAX
+    inservice
+  rserver SQL3V-MAL.AO.PRD.LAX
+    inservice
+  rserver SQL4V-MAL.AO.PRD.LAX
+    inservice
+serverfarm host VIP-SQLRO-MAL.AO.STG.LAX
+  probe mysql_probe
+  rserver SQL1V-MAL.AO.STG.LAX
+  rserver SQL2V-MAL.AO.STG.LAX
+    inservice
+serverfarm host VIP-SQLRW-MAL.AO.PRD.LAX
+  probe mysql_probe
+  rserver SQL1V-MAL.AO.PRD.LAX
+    inservice
+  rserver SQL2V-MAL.AO.PRD.LAX
+serverfarm host VIP-SQLRW-MAL.AO.STG.LAX
+  probe mysql_probe
+  rserver SQL1V-MAL.AO.STG.LAX
+    inservice
+  rserver SQL2V-MAL.AO.STG.LAX
+
+parameter-map type connection GN_TCP_PARAM
+  set timeout inactivity 60
+  set tcp timeout half-closed 60
+  syn-data drop
+  exceed-mss allow
+parameter-map type http HTTP_PARAMETER_MAP
+  persistence-rebalance
+  set header-maxparse-length 8192
+  length-exceed continue
+
+class-map type management match-any HTTPS-ALLOW_CLASS
+  6 match protocol https source-address 10.2.10.33 255.255.255.0
+  9 match protocol https source-address 10.11.20.28 255.255.255.255
+class-map match-any L4_CLASS_VIP-APP-MAL.AO.PRD.LAX
+  2 match virtual-address 10.2.11.101 tcp eq www
+class-map match-any L4_CLASS_VIP-APP-MAL.AO.STG.LAX
+  2 match virtual-address 10.2.11.100 tcp eq www
+class-map match-all L4_CLASS_VIP-SQLRO-MAL.AO.PRD.LAX
+  2 match virtual-address 10.12.34.93 tcp eq 3306
+class-map match-any L4_CLASS_VIP-SQLRO-MAL.AO.STG.LAX
+  2 match virtual-address 10.12.134.44 tcp eq 3306
+class-map match-any L4_CLASS_VIP-SQLRW-MAL.AO.PRD.LAX
+  3 match virtual-address 10.12.34.94 tcp eq 3306
+class-map match-any L4_CLASS_VIP-SQLRW-MAL.AO.STG.LAX
+  2 match virtual-address 10.12.134.48 tcp eq 3306
+class-map type management match-any REMOTE_ACCESS
+  description remote access traffic match
+  4 match protocol icmp any
+  12 match protocol snmp source-address 192.168.1.0 255.255.255.0
+  13 match protocol ssh source-address 192.168.1.0 255.255.255.0
+  19 match protocol https source-address 192.168.1.0 255.255.255.0
+  22 match protocol ssh source-address 10.11.20.27 255.255.255.255
+  23 match protocol https source-address 10.11.220.42 255.255.255.255
+  24 match protocol https source-address 10.11.20.28 255.255.255.255
+  25 match protocol https source-address 10.11.20.27 255.255.255.255
+  26 match protocol snmp source-address 10.11.20.27 255.255.255.255
+  27 match protocol snmp source-address 10.2.10.32 255.255.255.255
+  28 match protocol snmp source-address 10.2.10.246 255.255.255.255
+  29 match protocol snmp source-address 10.2.10.247 255.255.255.255
+  31 match protocol https source-address 10.2.10.32 255.255.255.255
+  32 match protocol https source-address 10.2.10.246 255.255.255.255
+  33 match protocol https source-address 10.2.10.247 255.255.255.255
+  34 match protocol https source-address 10.11.20.81 255.255.255.255
+  35 match protocol snmp source-address 10.11.20.81 255.255.255.255
+  36 match protocol https source-address 10.11.20.79 255.255.255.255
+  37 match protocol https source-address 10.11.20.80 255.255.255.255
+  38 match protocol snmp source-address 10.11.20.79 255.255.255.255
+  40 match protocol https source-address 10.11.20.91 255.255.255.255
+  41 match protocol snmp source-address 10.11.20.91 255.255.255.255
+  42 match protocol ssh source-address 10.11.20.91 255.255.255.255
+
+policy-map type management first-match MGMT_HTTPS_POLICY
+  class HTTPS-ALLOW_CLASS
+    permit
+policy-map type management first-match REMOTE_MGMT_ALLOW_POLICY
+  class REMOTE_ACCESS
+    permit
+
+policy-map type loadbalance first-match L7_POLICY_VIP-APP-MAL.AO.PRD.LAX
+  class class-default
+    serverfarm VIP-APP-MAL.AO.PRD.LAX backup VIP-APP-SORRY.TP.PRD.LAX
+    insert-http X-Forwarded-For header-value "%is"
+policy-map type loadbalance first-match L7_POLICY_VIP-APP-MAL.AO.STG.LAX
+  class class-default
+    serverfarm VIP-APP-MAL.AO.STG.LAX
+policy-map type loadbalance first-match L7_POLICY_VIP-SQLRO-MAL.AO.PRD.LAX
+  class class-default
+    serverfarm VIP-SQLRO-MAL.AO.PRD.LAX
+policy-map type loadbalance first-match L7_POLICY_VIP-SQLRO-MAL.AO.STG.LAX
+  class class-default
+    serverfarm VIP-SQLRO-MAL.AO.STG.LAX
+policy-map type loadbalance first-match L7_POLICY_VIP-SQLRW-MAL.AO.PRD.LAX
+  class class-default
+    serverfarm VIP-SQLRW-MAL.AO.PRD.LAX
+policy-map type loadbalance first-match L7_POLICY_VIP-SQLRW-MAL.AO.STG.LAX
+  class class-default
+    serverfarm VIP-SQLRW-MAL.AO.STG.LAX
+
+policy-map multi-match L4_POLICY_VIP-APP-MAL.AO.PRD.LAX
+  class L4_CLASS_VIP-APP-MAL.AO.PRD.LAX
+    loadbalance vip inservice
+    loadbalance policy L7_POLICY_VIP-APP-MAL.AO.PRD.LAX
+    loadbalance vip icmp-reply
+    nat dynamic 1 vlan 1034
+    appl-parameter http advanced-options HTTP_PARAMETER_MAP
+    connection advanced-options GN_TCP_PARAM
+policy-map multi-match L4_POLICY_VIP-APP-MAL.AO.STG.LAX
+  class L4_CLASS_VIP-APP-MAL.AO.STG.LAX
+    loadbalance vip inservice
+    loadbalance policy L7_POLICY_VIP-APP-MAL.AO.STG.LAX
+    loadbalance vip icmp-reply
+    nat dynamic 1 vlan 1134
+policy-map multi-match L4_POLICY_VIP-SQLRO-MAL.AO.PRD.LAX
+  class L4_CLASS_VIP-SQLRO-MAL.AO.PRD.LAX
+    loadbalance vip inservice
+    loadbalance policy L7_POLICY_VIP-SQLRO-MAL.AO.PRD.LAX
+    loadbalance vip icmp-reply
+    nat dynamic 1 vlan 2034
+policy-map multi-match L4_POLICY_VIP-SQLRO-MAL.AO.STG.LAX
+  class L4_CLASS_VIP-SQLRO-MAL.AO.STG.LAX
+    loadbalance vip inservice
+    loadbalance policy L7_POLICY_VIP-SQLRO-MAL.AO.STG.LAX
+    loadbalance vip icmp-reply
+    nat dynamic 1 vlan 2134
+policy-map multi-match L4_POLICY_VIP-SQLRW-MAL.AO.PRD.LAX
+  class L4_CLASS_VIP-SQLRW-MAL.AO.PRD.LAX
+    loadbalance vip inservice
+    loadbalance policy L7_POLICY_VIP-SQLRW-MAL.AO.PRD.LAX
+    loadbalance vip icmp-reply
+    nat dynamic 1 vlan 2034
+policy-map multi-match L4_POLICY_VIP-SQLRW-MAL.AO.STG.LAX
+  class L4_CLASS_VIP-SQLRW-MAL.AO.STG.LAX
+    loadbalance vip inservice
+    loadbalance policy L7_POLICY_VIP-SQLRW-MAL.AO.STG.LAX
+    loadbalance vip icmp-reply
+    nat dynamic 1 vlan 2134
+
+interface vlan 10
+  ip address 10.2.10.13 255.255.255.0
+  access-group input ALL
+  service-policy input REMOTE_MGMT_ALLOW_POLICY
+  service-policy input MGMT_HTTPS_POLICY
+  no shutdown
+interface vlan 11
+  ip address 10.2.11.13 255.255.255.0
+  mac-sticky enable
+  access-group input ALL
+  service-policy input REMOTE_MGMT_ALLOW_POLICY
+  service-policy input MGMT_HTTPS_POLICY
+  service-policy input L4_POLICY_VIP-APP-MAL.AO.STG.LAX
+  service-policy input L4_POLICY_VIP-APP-MAL.AO.PRD.LAX
+  no shutdown
+interface vlan 12
+  ip address 10.2.12.6 255.255.254.0
+  access-group input ALL
+  service-policy input REMOTE_MGMT_ALLOW_POLICY
+  no shutdown
+interface vlan 1020
+  ip address 10.11.20.5 255.255.254.0
+  access-group input ALL
+  nat-pool 1 10.11.20.11 10.11.20.11 netmask 255.255.254.0 pat
+  nat-pool 1 10.11.20.12 10.11.20.12 netmask 255.255.254.0 pat
+  service-policy input REMOTE_MGMT_ALLOW_POLICY
+  no shutdown
+interface vlan 1034
+  ip address 10.11.34.13 255.255.254.0
+  access-group input ALL
+  nat-pool 1 10.11.34.17 10.11.34.17 netmask 255.255.255.255 pat
+  service-policy input REMOTE_MGMT_ALLOW_POLICY
+  no shutdown
+interface vlan 1134
+  ip address 10.11.134.7 255.255.254.0
+  access-group input ALL
+  nat-pool 1 10.11.134.9 10.11.134.9 netmask 255.255.255.255 pat
+  service-policy input REMOTE_MGMT_ALLOW_POLICY
+  no shutdown
+interface vlan 2034
+  ip address 10.12.34.13 255.255.254.0
+  access-group input ALL
+  nat-pool 1 10.12.34.17 10.12.34.17 netmask 255.255.255.255 pat
+  service-policy input REMOTE_MGMT_ALLOW_POLICY
+  service-policy input L4_POLICY_VIP-SQLRW-MAL.AO.PRD.LAX
+  service-policy input L4_POLICY_VIP-SQLRO-MAL.AO.PRD.LAX
+interface vlan 2134
+  ip address 10.12.134.7 255.255.254.0
+  access-group input ALL
+  nat-pool 1 10.12.134.9 10.12.134.9 netmask 255.255.255.255 pat
+  service-policy input REMOTE_MGMT_ALLOW_POLICY
+  service-policy input L4_POLICY_VIP-SQLRO-MAL.AO.STG.LAX
+  service-policy input L4_POLICY_VIP-SQLRW-MAL.AO.STG.LAX
+  no shutdown
+
+ip route 0.0.0.0 0.0.0.0 10.2.11.1
+
+snmp-server contact "sysadmins@gorillanation.com"
+snmp-server location "Net2EZ"
+!snmp-server community <removed> group Network-Monitor
+
+!snmp-server host 10.2.11.8 traps version 2c <removed> 
+
+snmp-server enable traps snmp coldstart
+snmp-server enable traps snmp authentication
+snmp-server enable traps snmp linkup
+snmp-server enable traps snmp linkdown
+  
+username admin password 5 $1$rgCpRYfY$XT555IAvlT.jLX/Mqwckb.  role Admin domain default-domain 
+username rancid password 5 $1$tO4C05H3$nOlgWN6gsoQ8scGUTHQu..  role Admin domain default-domain 
+username www password 5 $1$d9hy2bZO$GyUA24EJDqsW//mjTXxWh.  role Admin domain default-domain 
+ssh key rsa 1024 force
+

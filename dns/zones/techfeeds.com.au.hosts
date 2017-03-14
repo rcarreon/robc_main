@@ -1,0 +1,17 @@
+$TTL    3600 
+techfeeds.com.au.   IN      SOA     techfeeds.com.au. root.techfeeds.com.au. (
+                            2016061600     ; serial
+                            28800          ; refresh
+                            14400          ; retry
+                            3600000        ; expire
+                            86400 )        ; minimum
+
+techfeeds.com.au.           IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+techfeeds.com.au.           IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+techfeeds.com.au.           IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+techfeeds.com.au.           IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+; Imported records
+*.techfeeds.com.au.     IN     A        97.64.84.172
+www.techfeeds.com.au.   IN     A        97.64.84.172
+techfeeds.com.au.       IN     A        97.64.84.172

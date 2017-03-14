@@ -1,0 +1,17 @@
+$TTL    3600 
+gigfeeds.com.au.   IN      SOA     gigfeeds.com.au. root.gigfeeds.com.au. (
+                           2016061600     ; serial
+                           28800          ; refresh
+                           14400          ; retry
+                           3600000        ; expire
+                           86400 )        ; minimum
+
+gigfeeds.com.au.           IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+gigfeeds.com.au.           IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+gigfeeds.com.au.           IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+gigfeeds.com.au.           IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+; Imported Records
+*.gigfeeds.com.au.     IN     A        97.64.84.172
+www.gigfeeds.com.au.   IN     A        97.64.84.172
+gigfeeds.com.au.       IN     A        97.64.84.172

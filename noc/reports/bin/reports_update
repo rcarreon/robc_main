@@ -1,0 +1,15 @@
+
+#!/bin/bash
+
+log_file=/app/log/nocreports_update.log
+date=$(date)
+#echo "$date Starting Backup...$0" >> $log_file
+#/usr/local/bin/reports_mysql_backup
+#echo "$date Backup Succesfully Completed...$0" >> $log_file
+
+echo "$date Updating Host from vipvisual.gnmedia.net...$0" >> $log_file
+/app/shared/http/reports/update.php >> $log_file
+echo "$date Update Completed... $0" >> $log_file
+	
+
+

@@ -1,0 +1,52 @@
+$TTL 3600
+dvdfile.com.          IN      SOA     dvdfile.com. root.dvdfile.com. (
+                                                   2016050100     ; serial
+                                                   28800          ; refresh
+                                                   14400          ; retry
+                                                   3600000        ; expire
+                                                   86400 )        ; minimum
+
+; name servers and mail servers
+;
+dvdfile.com.                                       IN    NS       app3v-dns.tp.prd.lax.craveonline.com.
+dvdfile.com.                                       IN    NS       app4v-dns.tp.prd.lax.craveonline.com.
+dvdfile.com.                                       IN    NS       app1v-dns.tp.prd.lax.craveonline.com.
+dvdfile.com.                                       IN    NS       app2v-dns.tp.prd.lax.craveonline.com.
+
+dvdfile.com.                                       IN    MX 1	aspmx.l.google.com
+dvdfile.com.                                       IN    MX 5	alt1.aspmx.l.google.com
+dvdfile.com.                                       IN    MX 5	alt2.aspmx.l.google.com
+dvdfile.com.                                       IN    MX 10	alt3.aspmx.l.google.com
+dvdfile.com.                                       IN    MX 10	alt4.aspmx.l.google.com
+
+;
+; local host
+;
+local                                              IN    A        127.0.0.1
+localhost                                          IN    A        127.0.0.1
+loghost                                            IN    A        127.0.0.1
+
+
+dvdfile.com.                                       IN    A        97.64.84.172
+www.dvdfile.com.                                   IN    A        97.64.84.172
+
+
+; new FE infrastructure -dib
+origin.campaigns                                   IN    A        97.64.84.104
+campaigns                                          IN    CNAME    origin.campaigns
+cdn.campaigns                                      IN    CNAME    wac.1384D.sigmacdn.net.
+staging.campaigns                                  IN    A        97.64.84.105
+
+
+; Microsites - last two lines need to be the END OF THIS FILE
+microsites.dvdfile.com.                            IN    CNAME    cdn.campaigns.dvdfile.com.
+microsites.staging                                 IN    A        72.172.76.15
+giftguide                                          IN    CNAME    wac.1384D.sigmacdn.net.
+*.origin.dvdfile.com.                              IN    CNAME    microsites
+*.staging.dvdfile.com.                             IN    CNAME    microsites.staging
+*.dvdfile.com.                                     IN    CNAME    microsites
+
+;sailacross.dvdfile.com.                           IN    CNAME    cdn.campaigns.dvdfile.com.
+;staging.sailacross.dvdfile.com.                   IN    CNAME    staging.campaigns.dvdfile.com.
+demo.sailacross.dvdfile.com.                       IN    CNAME    demo.si.evolvemediallc.com.
+dvdfile.com. 	IN 	TXT 	"v=spf1 a:cluster9out.us.messagelabs.com include:_spf.google.com ip4:216.82.240.0/20 ~all"

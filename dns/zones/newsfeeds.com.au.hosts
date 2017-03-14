@@ -1,0 +1,17 @@
+$TTL    3600 
+newsfeeds.com.au.   IN      SOA     newsfeeds.com.au. root.newsfeeds.com.au. (
+                            2016061600     ; serial
+                            28800          ; refresh
+                            14400          ; retry
+                            3600000        ; expire
+                            86400 )        ; minimum
+
+newsfeeds.com.au.           IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+newsfeeds.com.au.           IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+newsfeeds.com.au.           IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+newsfeeds.com.au.           IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+; Imported records
+*.newsfeeds.com.au.     IN     A        97.64.84.172
+www.newsfeeds.com.au.   IN     A        97.64.84.172
+newsfeeds.com.au.       IN     A        97.64.84.172

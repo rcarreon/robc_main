@@ -1,0 +1,29 @@
+$TTL 3600
+wholesomebabyfood.com.  IN      SOA     wholesomebabyfood.com. root.wholesomebabyfood.com. (
+                                              2016061600     ; serial
+                                              28800          ; refresh
+                                              14400          ; retry
+                                              3600000        ; expire
+                                              86400 )        ; minimum
+
+wholesomebabyfood.com.                        IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+wholesomebabyfood.com.                        IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+wholesomebabyfood.com.                        IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+wholesomebabyfood.com.                        IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+wholesomebabyfood.com.     IN  MX 1 aspmx.l.google.com. 
+wholesomebabyfood.com.     IN MX 5 alt1.aspmx.l.google.com. 
+wholesomebabyfood.com.     IN MX 5 alt2.aspmx.l.google.com. 
+wholesomebabyfood.com.     IN MX 10 alt3.aspmx.l.google.com. 
+wholesomebabyfood.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+
+wholesomebabyfood.com.                        IN    A        97.64.84.172
+
+dev.wholesomebabyfood.com.                    IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.wholesomebabyfood.com.                    IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.wholesomebabyfood.com.                    IN    A        97.64.84.172
+www.wholesomebabyfood.com.                    IN    A        97.64.84.172
+
+legacy.wholesomebabyfood.com.                 IN    A        97.64.84.154
+wholesomebabyfood.com. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

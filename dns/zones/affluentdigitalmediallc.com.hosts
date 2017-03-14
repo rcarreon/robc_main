@@ -1,0 +1,26 @@
+$TTL    3600 
+affluentdigitalmediallc.com.   IN      SOA     affluentdigitalmediallc.com. root.affluentdigitalmediallc.com. (
+                        2016061600     ; serial
+                        28800          ; refresh
+                        14400          ; retry
+                        3600000        ; expire
+                        86400 )        ; minimum
+
+affluentdigitalmediallc.com.           IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+affluentdigitalmediallc.com.           IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+affluentdigitalmediallc.com.           IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+affluentdigitalmediallc.com.           IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+affluentdigitalmediallc.com.     IN  MX 1 aspmx.l.google.com. 
+affluentdigitalmediallc.com.     IN MX 5 alt1.aspmx.l.google.com. 
+affluentdigitalmediallc.com.     IN MX 5 alt2.aspmx.l.google.com. 
+affluentdigitalmediallc.com.     IN MX 10 alt3.aspmx.l.google.com. 
+affluentdigitalmediallc.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+affluentdigitalmediallc.com.           IN    TXT      "G0O0R34839"
+
+dev.pubops.affluentdigitalmediallc.com.          IN      CNAME   app1v-pubops-martini.ap.dev.lax.gnmedia.net.
+stg.pubops.affluentdigitalmediallc.com. 	 IN	 A 	10.64.75.224
+pubops.affluentdigitalmediallc.com. 		 IN	 A 	97.64.84.184
+
+affluentdigitalmediallc.com. 			 IN 	TXT 	"v=spf1 a:cluster9out.us.messagelabs.com include:_spf.google.com ip4:216.82.240.0/20 ~all"

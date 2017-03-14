@@ -1,0 +1,11 @@
+export SPARK_HOME=/opt/spark/
+export SPARK_CONF_DIR=/etc/spark/
+export SPARK_LOG_DIR=/app/log/spark/
+export SPARK_WORKER_DIR=/app/log/spark/work
+export SPARK_PID_DIR=/var/run/hadoop/
+export SPARK_WORKER_OPTS="-Dspark.worker.cleanup.enabled=true -Dspark.worker.cleanup.interval=3600 -Dspark.worker.cleanup.appDataTtl=86400"
+export SPARK_MASTER_OPTS="-Dspark.deploy.retainedApplications=50 -Dspark.deploy.defaultCores=36"
+<% if fqdn =~ /^app*.*spark.*.prd.*/  -%>
+export SPARK_DAEMON_JAVA_OPTS="-Dspark.deploy.recoveryMode=ZOOKEEPER -Dspark.deploy.zookeeper.url=app1v-zookeeper-bd.tp.prd.lax.gnmedia.net:2181,app2v-zookeeper-bd.tp.prd.lax.gnmedia.net:2181,app3v-zookeeper-bd.tp.prd.lax.gnmedia.net:2181 -Dspark.deploy.zookeeper.dir=/app/log/spark/evolve"
+<% end -%>
+export PATH=${PATH}:${SPARK_HOME}/bin:${SPARK_HOME}/sbin

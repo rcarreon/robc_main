@@ -1,0 +1,22 @@
+; adops triggertag db conf file
+; this file is managed by puppet
+
+[adops]
+user = <%= ap_trigdb_user %>  
+password = <%= ap_trigdb_pass %>
+host = <%= ap_trigdb_vip %> 
+database = adops2_0_production
+
+[js]
+output = /app/ugc/triggertag/js
+
+; Development uses the STAGING CDN.  If we absolutely need a dev CDN , create a story for the SA team to work on.
+[cdn]
+host = http://cdn.triggertag.gorillanation.com
+wsdl = https://ccuapi.akamai.com/ccuapi-axis.wsdl
+akamai_host = https://api.ccu.akamai.com
+akamai_url_purge = /ccu/v2/queues/default
+user = <%= ap_cdn_user %>
+passwd = <%= ap_cdn_pass %>
+email = AdPlatform@gorillanation.com
+log_dir = /app/log/triggertag

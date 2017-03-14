@@ -1,0 +1,222 @@
+#!/usr/bin/env python
+
+import re
+import sys
+import json
+import os.path
+import logging
+import urllib2
+import optparse
+
+class Indices(object):
+    """Manages the communication, retrieval and processing of information
+    coming from elasticsearch.
+
+    e.g:
+    >>> i = Indices('app301v-logstash.tp.prd.lax.gnmedia.net:9200',
+    ...             {'logstash'})
+    >>> i.get()
+    ['myanimelist.net_ao_access', 'thefashionspot.com_ao_access']
+    """
+    def __init__(self, elasticsearch, excluded):
+        self.elasticsearch = elasticsearch
+        self.excluded = excluded
+
+    def __fetch_elasticsearch_indices(self):
+        req = urllib2.Request("http://{0}/_aliases"
+                              .format(self.elasticsearch))
+        try:
+            res = json.loads(urllib2.urlopen(req).read())
+        except urllib2.HTTPError as e:
+            logging.error("elasticsearch is unavailable at '{0}': <<{1}>>"
+                          .format(self.elasticsearch, e))
+            sys.exit(255)
+        except ValueError as e:
+            logging.error("couldn't obtain valid JSON from elasticsearch: "
+                          "<<{0}>>"
+                          .format(e))
+            sys.exit(255)
+        return res.keys()
+
+    def __filter_out_invalid_indices(self, indices):
+        dashboardable_indices = {}
+        for alias in indices:
+            m = re.match(r"^(.+_(.+))-\d{4}\.\d{2}\.\d{2}$", alias)
+            if m and m.group(1) not in self.excluded:
+                dashboardable_indices[m.group(1)] = m.group(2)
+        return dashboardable_indices
+
+    def get(self):
+        """Returns the dashboard-able indices as a list"""
+        return self.__filter_out_invalid_indices(
+            self.__fetch_elasticsearch_indices())
+
+class JsonTemplate(object):
+    """Loads and decodes a kibana3 dashboard template from a JSON file.
+
+    e.g:
+    >>> jt = JsonTemplate('kibana3_default_dashboard.json')
+    >>> jt.content # template as python dict
+    >>> jt.age # mtime of the template file
+    """
+    def __init__(self, template_path):
+        (self.content, self.age) = self.__load_template(template_path)
+
+    @staticmethod
+    def __load_template(template_path):
+        try:
+            with open(template_path) as fh:
+                contents = json.loads(fh.read())
+        except IOError as e:
+            logging.error("couldn't load the '{0}' template file: <<{1}>>"
+                          .format(os.path.abspath(template_path), e))
+            sys.exit(255)
+        except ValueError as e:
+            logging.error("'{0}' template file isn't valid JSON: <<{1}>>"
+                          .format(os.path.abspath(template_path), e))
+        return (contents, os.path.getmtime(template_path))
+
+class Dashboard(object):
+    """Creates a new Kibana3 dashboard from a JsonTemplate and a Index.
+
+    e.g:
+    >>> d = Dashboard(JsonTemplate('kibana3_default_dashboard.json'),
+    ...               'dev.myanimelist.net_ao_access')
+    >>> d.store('/app/shared/docroots/dev.kibana.gnmedia.net/current/dashboards' )
+    """
+    def __init__(self, template, index):
+        self.template = template
+        self.index = index
+        self.content = self.template.content.copy()
+        self.set_custom_content()
+
+    def set_custom_content(self):
+        pass
+
+    def store(self, directory):
+        """Stores the Kibana3 dashboard somewhere in the filesystem"""
+        json_dashboard = json.dumps(self.content,
+                                    sort_keys=True,
+                                    indent=2)
+        target_file = os.path.abspath(os.path.join(
+            directory,"{0}.json".format(self.index.replace(".", "_"))))
+
+        try:
+            with open(target_file, "w") as fh:
+                fh.write(json_dashboard)
+                logging.info("successfully saved the '{0}' dashboard in '{1}'"
+                    .format(self.index, target_file))
+        except IOError as e:
+            logging.error("couldn't write the '{0}' dashboard file: <<{1}>>"
+                .format(target_file, e))
+            sys.exit(255)
+
+class SiteDashboard(Dashboard):
+    def set_custom_content(self):
+        self.content["title"] = self.index;
+        self.content["index"]["pattern"] \
+            = "[{0}-]YYYY.MM.DD".format(self.index)
+
+class HomepageDashboard(Dashboard):
+    def __init__(self, template, index, indices, environment):
+        self.indices = indices
+        self.environment = environment
+        Dashboard.__init__(self, template, index)
+
+    def set_custom_content(self):
+        section = {}
+        output = ""
+
+        for index in self.indices:
+            uri =  "index.html#/dashboard/file/" + index.replace(".", "_") + ".json"
+            m = re.match(r'^(.+)_.+_(.+)$', index)
+
+            if m.group(2) not in section:
+                section[m.group(2)] = []
+
+            section[m.group(2)].append("- [{0}]({1})".format(m.group(1), uri))
+
+        for kind, sites in section.items():
+            output = output + "\n\n### %(kind)s:\n\n%(sites)s" % {"kind": kind, "sites": "\n".join(sites)}
+
+        self.content["title"] = self.index
+        self.content["rows"][0]["panels"][1]["content"] \
+            = self.content["rows"][0]["panels"][1]["content"] % {"environment": self.environment, "sites": output}
+
+def getopts():
+    parser = optparse.OptionParser()
+    parser.add_option("-e", "--elasticsearch",
+                      dest="elasticsearch",
+                      help="elasticsearch server where the indices are contained")
+    parser.add_option("-s", "--site-template",
+                      dest="site_template",
+                      help="template files which define the defaults for all site dashboards")
+    parser.add_option("-p", "--homepage-template",
+                      dest="homepage_template",
+                      help="template file which defines the defaults for the homepage dashboard")    
+    parser.add_option("-d", "--directory",
+                      dest="directory",
+                      help="directory in which the dashboard files will reside")
+    parser.add_option("-x", "--excluded",
+                      dest="excluded",
+                      help="indices which won't be dashboarded, comma separated. The logstash index is excluded by default")
+    parser.add_option("-l", "--log",
+                      dest="log",
+                      help="write informational or error messages in a log file")
+    parser.add_option("-E", "--environment",
+                      dest="environment",
+                      default="dev",
+                      help="specify to which environment the dashboards belong. Defaults to dev.")
+                      
+    (options, _) = parser.parse_args()
+
+    if not options.elasticsearch:
+        parser.error("-e|--elasticsearch is a required argument")
+
+    if not options.site_template:
+        parser.error("-s|--site-template is a required argument")
+    else:
+        options.site_template = dict(
+            (key, value) for (key, value) in [x.split("=") for x in options.site_template.split(",")]
+        )
+
+    if not options.homepage_template:
+        parser.error("-p|--homepage-template is a required argument")
+
+    if not options.directory:
+        parser.error("-d|--directory is a required argument")
+
+    options.excluded \
+        = set(options.excluded.split(",")) if options.excluded else set()
+
+    if options.log:
+        logging.basicConfig(
+            format='[%(asctime)s] - %(levelname)s - "%(message)s"',
+            filename=options.log,
+            level=logging.INFO
+        )
+        del options.log
+
+    return options
+
+def main():
+    config = getopts()
+    config.excluded.add('logstash')
+
+    indices = Indices(config.elasticsearch, config.excluded).get()
+
+    for index, kind in indices.iteritems():
+        try:
+            json_template = JsonTemplate(config.site_template[kind])
+        except KeyError as e:
+            pass
+
+        SiteDashboard(json_template, index) \
+            .store(config.directory)
+
+    HomepageDashboard(JsonTemplate(config.homepage_template),
+                      "default", indices, config.environment) \
+        .store(config.directory)
+
+if __name__ == "__main__":
+    main()

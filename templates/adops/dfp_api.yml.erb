@@ -1,0 +1,19 @@
+---
+:authentication:
+  :method: OAuth2
+  :oauth2_client_id: <%= dfp_oauth_client_id %>
+  :oauth2_client_secret: <%= dfp_oauth_client_secret %>
+  :application_name: <%= dfp_app_name %>
+  :network_code: <%= dfp_network_code %>
+  :oauth2_token:
+    :access_token: <%= dfp_oauth_access_token %>
+    :refresh_token: <%= dfp_oauth_refresh_token %>
+    :issued_at: 2015-02-04 15:32:15.047608000 -08:00
+    :expires_in: 3600
+    :id_token:
+:service:
+  :environment: PRODUCTION
+:connection:
+  :enable_gzip: true
+:library:
+  :log_level: INFO

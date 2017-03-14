@@ -1,0 +1,107 @@
+#!/bin/bash
+# vim: set ft=sh:
+#
+date_fmt="+%Y-%m-%d"
+date_cur=$(date ${date_fmt})
+date_prv=$(date --date="-$(($(date +%d)-1)) days" ${date_fmt})
+
+cronhost='<%= fqdn %>'
+job=Adops.check_rtb_mappings
+
+dbhost='<%= host_adops_cron_check_db %>'
+dbuser=payoutcheck_r
+dbpass='<%= payoutcheck_r %>'
+
+db=adops2_0_production
+
+mysqlcmd="mysql --host=${dbhost} --user=${dbuser} --password=${dbpass} ${db} --batch --table"
+
+tmpmsg=$(mktemp)
+
+read -r -d '' msg_success <<EOF
+It appears that the cron job, "${job}", has run successfully.
+
+Please log into AdOps and correct the mappings for the RTB entries listed below
+EOF
+
+read -r -d '' msg_error <<EOF
+It appears that the cron job, "${job}" DID NOT complete successfully.
+Please verify the following:
+
+1. Log into the cron host, ${cronhost}, and verify that the job named
+"${job}", has completed running.
+
+2. If the previous job completed running, log into ${dbhost} 
+and check the output of the command: 
+    "SHOW SLAVE STATUS\G"
+    - Verify that the value of "Seconds_Behind_Master" is "0"
+
+3. If ${dbhost} is not behind the master,
+(i.e. Seconds_Behind_Master==0), contact the rest of the Ad Platform team:
+    adplatform@evolvemediallc.com
+
+EOF
+
+# RTBs
+declare -A rtbs
+rtbs[adx]=AdX
+rtbs[appnexus]=AppNexus
+rtbs[openx]=OpenX
+rtbs[pubmatic]=Pubmatic
+rtbs[rubicon]=Rubicon
+
+# QUERY DB
+for rtb in "${!rtbs[@]}"
+do
+  # SQL
+  read -r -d '' check_clia_entry <<EOF
+    select
+    prm.ad_unit_code ${rtb}_code,
+    prm.dfp_ad_id
+    from performax_${rtb}_mappings prm
+    left outer join performax_${rtb}_raw_data prrd on prm.ad_unit_code = prrd.ad_unit_code
+    left outer join campaign_line_item_ads clia on prm.dfp_ad_id = clia.dfp_id
+    where date >= '${date_prv}'
+    and name is null
+    GROUP BY prm.ad_unit_code;
+EOF
+
+  read -r -d '' check_mapping <<EOF
+    select
+    prd.ad_unit_code ${rtb}_code
+    from performax_${rtb}_raw_data prd
+    left join performax_${rtb}_mappings pmd on prd.ad_unit_code = pmd.ad_unit_code
+    where date >= '${date_prv}'
+    and dfp_ad_id is null
+    GROUP BY prd.ad_unit_code;
+EOF
+
+  echo The following ${rtbs[${rtb}]} ad units seem to have a DFP entry, but the >> ${tmpmsg}
+  echo DFP entries have not been synced to AdOps:                               >> ${tmpmsg}
+  ${mysqlcmd} --execute="${check_clia_entry}" >> ${tmpmsg}
+  echo >> ${tmpmsg}
+  echo The following ${rtbs[${rtb}]} ad units have not been mapped or synced to >> ${tmpmsg}
+  echo AdOps:                                                                   >> ${tmpmsg}
+  ${mysqlcmd} --execute="${check_mapping}" >> ${tmpmsg}
+  echo >> ${tmpmsg}
+done
+
+if [[ $? -ne 0 ]]; then
+    echo "${0} on host: ${HOSTNAME} has failed running the mysql command" | mail -s "${0} ERROR" addevelopers@evolvemediallc.com
+    exit 1
+fi
+
+subject="Adops / RTB Map - ${date_cur}"
+read -r -d '' msg <<EOF
+Checking RTB for entires on ${date_prv}
+
+$(cat ${tmpmsg})
+
+EOF
+
+echo "${msg}" | mail -s "${subject}" addevelopers@evolvemediallc.com,RTBMappingIssues@evolvemediallc.com
+
+
+if [[ -f ${tmpmsg} ]]; then
+  rm ${tmpmsg}
+fi

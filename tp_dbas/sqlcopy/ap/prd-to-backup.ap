@@ -1,0 +1,7 @@
+<desthost sql1v-56-backup.ap.prd.lax.gnmedia.net>
+  sourcehost=sql1v-56-adops.ap.prd.lax.gnmedia.net
+  masterhost=sql1v-56-adops.ap.prd.lax.gnmedia.net
+  savegrants=yes
+  emblackout=yes
+</desthost>
+

@@ -1,0 +1,36 @@
+$TTL 3600
+babyandbump.com.    IN      SOA     babyandbump.com. root.babyandbump.com. (
+                        2016061600     ; serial
+                        28800          ; refresh
+                        14400          ; retry
+                        3600000        ; expire
+                        86400 )        ; minimum
+
+babyandbump.com.        IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+babyandbump.com.        IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+babyandbump.com.        IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+babyandbump.com.        IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+
+babyandbump.com.     IN  MX 1 aspmx.l.google.com. 
+babyandbump.com.     IN MX 5 alt1.aspmx.l.google.com. 
+babyandbump.com.     IN MX 5 alt2.aspmx.l.google.com. 
+babyandbump.com.     IN MX 10 alt3.aspmx.l.google.com. 
+babyandbump.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+babyandbump.com.        IN    A        97.64.84.171
+stg.babyandbump.com.    IN    A        10.64.75.146
+mail                    IN    CNAME    babyandbump.com.
+www                     IN    CNAME    babyandbump.com.
+
+;babyandbump.com.       IN    A        174.120.25.53
+;localhost              IN    A        127.0.0.1
+;ftp                    IN    CNAME    babyandbump.com.
+;cpanel                 IN    A        174.120.25.53
+;whm                    IN    A        174.120.25.53
+;webmail                IN    A        174.120.25.53
+;webdisk                IN    A        174.120.25.53
+;www2                   IN    CNAME    redirect.skimlinks.com.
+;dbserv                 IN    A        174.132.181.98
+;webserv                IN    A        174.120.25.50
+
+babyandbump.com. 	IN 	TXT 	"v=spf1 a:cluster9out.us.messagelabs.com include:_spf.google.com ip4:216.82.240.0/20 ~all"

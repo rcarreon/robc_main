@@ -1,0 +1,40 @@
+#!/bin/bash
+
+vm=$1
+
+if [ -z "$vm" ];then
+  echo "Usage: $0 vm"
+  exit 1
+fi
+
+oldvmstorage=$(nodels $vm vm.storage | awk '{print $2}')
+if [ -z "$oldvmstorage" ];then
+   echo "wtf. no vm.storage."
+   exit 1
+fi
+case $oldvmstorage in
+   *-netapp1*) echo "Already migrated"; exit 1;;
+esac
+
+
+prevstate=$(rpower $vm stat | cut -d " " -f 2)
+ssh $vm sudo /sbin/shutdown -hf now
+sleep 10
+
+until rpower $vm stat | grep -q off ;do
+   echo $vm is still on
+   sleep 10
+done
+echo $vm power is off
+sleep 10
+
+oldstoragepath=/$(echo "$oldvmstorage" | cut -d / -f 4-)
+newvmstorage=$(echo "$oldvmstorage" | sed -e 's/netapp3/netapp1/' -e 's/nfs1_/nac1a_/g' -e 's/nfs2_/nac1b_/g' -e 's/nfs1.netapp/nfsA-netapp/g' -e 's/nfs2.netapp/nfsB-netapp/g')
+newstoragepath=/$(echo "$newvmstorage" | cut -d / -f 4-)
+echo $oldvmstorage $oldstoragepath
+echo $newvmstorage $newstoragepath
+
+echo Moving $vm image...
+sudo mv -vf $oldstoragepath/$vm* $newstoragepath/ && nodech $vm vm.storage=$newvmstorage
+
+rpower $vm $prevstate

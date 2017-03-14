@@ -1,0 +1,17 @@
+$TTL    3600 
+musicfeedstv.com.au.   IN      SOA     musicfeedstv.com.au. root.musicfeedstv.com.au. (
+                                2016061600     ; serial
+                                28800          ; refresh
+                                14400          ; retry
+                                3600000        ; expire
+                                86400 )        ; minimum
+
+musicfeedstv.com.au.            IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+musicfeedstv.com.au.            IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+musicfeedstv.com.au.            IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+musicfeedstv.com.au.            IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+; Imported records
+*.musicfeedstv.com.au.      IN     A        97.64.84.172
+www.musicfeedstv.com.au.    IN     A        97.64.84.172
+musicfeedstv.com.au.        IN     A        97.64.84.172

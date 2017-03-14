@@ -1,0 +1,33 @@
+#########################################
+##  sqlmulticopy mapfile for AdOps DFP ##
+#########################################
+
+## MASTER-MASTER replication on STG environment
+<desthost sql2v-56-adops.ap.stg.lax.gnmedia.net>
+  sourcehost=sql1v-56-adops.ap.stg.lax.gnmedia.net
+  masterhost=sql1v-56-adops.ap.stg.lax.gnmedia.net
+  savegrants=yes
+  emblackout=yes
+</desthost>
+
+<desthost sql1v-56-tags.ap.stg.lax.gnmedia.net>
+  sourcehost=sql1v-56-adops.ap.stg.lax.gnmedia.net
+  masterhost=sql1v-56-adops.ap.stg.lax.gnmedia.net
+  savegrants=yes
+  emblackout=yes
+</desthost>
+
+<desthost sql2v-56-tags.ap.stg.lax.gnmedia.net>
+  sourcehost=sql1v-56-adops.ap.stg.lax.gnmedia.net
+  masterhost=sql2v-56-adops.ap.stg.lax.gnmedia.net
+  savegrants=yes
+  emblackout=yes
+</desthost>
+
+<desthost sql1v-56-backup.ap.stg.lax.gnmedia.net>
+  sourcehost=sql1v-56-adops.ap.stg.lax.gnmedia.net
+  masterhost=sql1v-56-adops.ap.stg.lax.gnmedia.net
+  savegrants=yes
+  emblackout=yes
+</desthost>
+

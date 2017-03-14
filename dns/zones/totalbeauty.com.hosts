@@ -1,0 +1,107 @@
+$TTL    3600
+totalbeauty.com.    IN      SOA     totalbeauty.com. root.totalbeauty.com. (
+                                        2016080200     ; serial
+                                        28800          ; refresh
+                                        14400          ; retry
+                                        3600000        ; expire
+                                        86400 )        ; minimum
+ 
+totalbeauty.com.                        IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+totalbeauty.com.                        IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+totalbeauty.com.                        IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+totalbeauty.com.                        IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+tbmedia.totalbeauty.com.                IN    NS       ns1.responsys.net.
+tbmedia.totalbeauty.com.                IN    NS       ns2.responsys.net.
+                                                                           
+
+totalbeauty.com.     IN  MX 1 aspmx.l.google.com.
+totalbeauty.com.     IN MX 5 alt1.aspmx.l.google.com.
+totalbeauty.com.     IN MX 5 alt2.aspmx.l.google.com.
+totalbeauty.com.     IN MX 10 alt3.aspmx.l.google.com.
+totalbeauty.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+ 
+ 
+totalbeauty.com.                        IN    A        97.64.84.173
+media.totalbeauty.com.                  IN    A        97.64.84.173
+dev.totalbeauty.com.                    IN    A        10.64.64.28
+inv.totalbeauty.com.                    IN    A        67.201.56.44
+m.totalbeauty.com.                      IN    A        97.64.84.173
+partners.totalbeauty.com.               IN    A        10.64.74.14
+pulse.totalbeauty.com.                  IN    A        10.64.74.14
+reports.totalbeauty.com.                IN    A        10.64.74.14
+west.totalbeauty.com.                   IN    A        10.64.64.28
+zblogger.totalbeauty.com.               IN    A        97.64.84.174
+zdev.totalbeauty.com.                   IN    A        10.64.64.28
+zhpi.totalbeauty.com.                   IN    A        10.64.74.14
+zjm2.totalbeauty.com.                   IN    A        10.64.64.28
+zreports.totalbeauty.com.               IN    A        10.64.74.14
+zstaging.totalbeauty.com.               IN    A        97.64.84.174
+dashboard.totalbeauty.com.              IN    A        10.64.74.14
+ztn.totalbeauty.com.                    IN    A        10.64.64.28
+efelix.totalbeauty.com.                 IN    CNAME    dev.totalbeauty.com.
+cchavez.totalbeauty.com.                 IN    CNAME    dev.totalbeauty.com.
+igonzalez.totalbeauty.com.                 IN    CNAME    dev.totalbeauty.com.
+community.totalbeauty.com.              IN    CNAME    affiliate.kickapps.com.
+
+;Back to edgecast CDN 
+
+images.totalbeauty.com.        IN     CNAME    wac.14d0.edgecastcdn.net.
+static1.totalbeauty.com.       IN     CNAME    wac.14d0.edgecastcdn.net.
+static2.totalbeauty.com.       IN     CNAME    wac.14d0.edgecastcdn.net.
+videos.totalbeauty.com.        IN     CNAME    wac.14d0.edgecastcdn.net.
+secure.totalbeauty.com.        IN     CNAME    secure.wac.14d0.edgecastcdn.net.
+
+
+static.totalbeauty.com.                 IN    CNAME    d16144006izcco.cloudfront.net.
+
+www.totalbeauty.com.                    IN    CNAME    totalbeauty.com.
+totalbeauty.com.                        IN    TXT      "G0O0R34839"
+totalbeauty.com.                        IN    TXT      "v=spf1 include:collaborationhost.net ~all" 
+totalbeauty.com.                    IN     TXT      "globalsign-domain-verification=KaParXxs1OHDy7o8CMbPpHBN-2m_mzwdPqKMMQ66a6"
+fgonzalez.totalbeauty.com.              IN    CNAME    dev.totalbeauty.com.
+dgarcia.totalbeauty.com.                IN    CNAME    dev.totalbeauty.com.
+dgrbavcic.totalbeauty.com.                IN    CNAME    dev.totalbeauty.com.
+
+
+; #### awards_totalbeauty PBWP Migration
+awards.totalbeauty.com.                            IN    A        97.64.84.172
+
+bta.awards.totalbeauty.com.                        IN    A        10.64.64.75
+dev.awards.totalbeauty.com.                        IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.awards.totalbeauty.com.                        IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.awards.totalbeauty.com.                        IN    A        97.64.84.172
+www.awards.totalbeauty.com.                        IN    A        97.64.84.172
+
+origin.bta.awards.totalbeauty.com.                 IN    CNAME    bta.awards.totalbeauty.com.
+cdn-bta.awards.totalbeauty.com.                    IN    CNAME    bta.awards.totalbeauty.com.
+cdn1-bta.awards.totalbeauty.com.                   IN    CNAME    bta.awards.totalbeauty.com.
+cdn2-bta.awards.totalbeauty.com.                   IN    CNAME    bta.awards.totalbeauty.com.
+cdn3-bta.awards.totalbeauty.com.                   IN    CNAME    bta.awards.totalbeauty.com.
+
+origin-dev.awards.totalbeauty.com.                 IN    CNAME    dev.awards.totalbeauty.com.
+cdn-dev.awards.totalbeauty.com.                    IN    CNAME    dev.awards.totalbeauty.com.
+cdn1-dev.awards.totalbeauty.com.                   IN    CNAME    dev.awards.totalbeauty.com.
+cdn2-dev.awards.totalbeauty.com.                   IN    CNAME    dev.awards.totalbeauty.com.
+cdn3-dev.awards.totalbeauty.com.                   IN    CNAME    dev.awards.totalbeauty.com.
+
+origin-stg.awards.totalbeauty.com.                 IN    CNAME    stg.awards.totalbeauty.com.
+cdn-stg.awards.totalbeauty.com.                    IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn1-stg.awards.totalbeauty.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-stg.awards.totalbeauty.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-stg.awards.totalbeauty.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+
+origin.awards.totalbeauty.com.                     IN    CNAME    prd.awards.totalbeauty.com.
+cdn-www.awards.totalbeauty.com.                    IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn1-www.awards.totalbeauty.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-www.awards.totalbeauty.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-www.awards.totalbeauty.com.                   IN    CNAME    wac.EE35.edgecastcdn.net.
+
+dev.m.awards.totalbeauty.com.                      IN    CNAME    dev.awards.totalbeauty.com.
+stg.m.awards.totalbeauty.com.                      IN    CNAME    stg.awards.totalbeauty.com.
+www.m.awards.totalbeauty.com.                      IN    CNAME    prd.awards.totalbeauty.com.
+m.awards.totalbeauty.com.                          IN    CNAME    prd.awards.totalbeauty.com.
+
+; #### End PBWP Migration
+
+totalbeauty.com. 	IN 	TXT 	  "v=spf1 a:cluster9out.us.messagelabs.com include:_spf.google.com ip4:216.82.240.0/20 ~all"

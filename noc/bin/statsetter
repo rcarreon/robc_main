@@ -1,0 +1,29 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+
+import csv, sys, os, pwd, grp, errno
+
+def main():
+    exit_status = 0
+
+    reader = csv.reader(sys.stdin)
+
+    for fullname, mode, user, group in reader:
+        try:
+            os.chmod(fullname, int(mode))
+        except OSError as e:
+            # Skip broken symlinks, autoreferential symlinks and places we don't have access to
+            if e.errno == errno.ENOENT or e.errno == errno.ELOOP or e.errno == errno.EACCES:
+                print('warning: "{0}"'.format(e),
+                      file=sys.stderr)
+                exit_status = -1
+                continue
+            # Let it fail otherwise
+            else:
+                raise e
+
+    sys.exit(exit_status)
+
+if __name__ == "__main__":
+    main()

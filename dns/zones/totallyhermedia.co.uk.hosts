@@ -1,0 +1,45 @@
+$TTL 3600
+totallyhermedia.co.uk.  IN      SOA     totallyhermedia.co.uk. root.totallyhermedia.co.uk. (
+                                                  2016061600     ; serial
+                                                  28800          ; refresh
+                                                  14400          ; retry
+                                                  3600000        ; expire
+                                                  86400 )        ; minimum
+
+totallyhermedia.co.uk.                            IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+totallyhermedia.co.uk.                            IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+totallyhermedia.co.uk.                            IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+totallyhermedia.co.uk.                            IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+
+totallyhermedia.co.uk.     IN  MX 1 aspmx.l.google.com. 
+totallyhermedia.co.uk.     IN MX 5 alt1.aspmx.l.google.com. 
+totallyhermedia.co.uk.     IN MX 5 alt2.aspmx.l.google.com. 
+totallyhermedia.co.uk.     IN MX 10 alt3.aspmx.l.google.com. 
+totallyhermedia.co.uk.     IN MX 10 alt4.aspmx.l.google.com.
+
+
+;totallyhermedia.co.uk.                           IN    A        97.64.84.103
+;www.totallyhermedia.co.uk.                       IN    CNAME    wac.1384D.sigmacdn.net.
+
+; #### TitanWP
+totallyhermedia.co.uk.                            IN    A        97.64.84.172
+bta.totallyhermedia.co.uk.                        IN    A        10.64.64.75
+dev.totallyhermedia.co.uk.                        IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.totallyhermedia.co.uk.                        IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.totallyhermedia.co.uk.                        IN    A        97.64.84.172
+www.totallyhermedia.co.uk.                        IN    A        97.64.84.172
+; #### End TitanWP
+
+; new FE infrastructure
+origin.campaigns                                  IN    A        97.64.84.104
+campaigns                                         IN    CNAME    origin.campaigns
+cdn.campaigns                                     IN    CNAME    wac.1384D.sigmacdn.net.
+staging.campaigns                                 IN    A        97.64.84.105
+
+origin.assets                                     IN    A        97.64.84.101
+cdn.assets                                        IN    CNAME    wac.1384D.sigmacdn.net.
+assets                                            IN    CNAME    cdn.assets
+staging.assets                                    IN    CNAME    wac.1384D.sigmacdn.net.
+demo.assets                                       IN    CNAME    wac.1384D.sigmacdn.net.
+origin.staging.assets                             IN    A        97.64.84.102
+totallyhermedia.co.uk. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

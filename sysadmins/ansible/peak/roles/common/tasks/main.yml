@@ -1,0 +1,10 @@
+---
+
+- name: find ip for fqdn
+  command: dig +short {{ ansible_fqdn }}
+  register: dig_ip
+
+- name: fail if eth0 ip and dig_ip don't match
+  fail: msg="my eth0 ip {{ ansible_eth0.ipv4.address }} does not match dig response {{ dig_ip.stdout }}"
+  when: ansible_eth0.ipv4.address != dig_ip.stdout
+

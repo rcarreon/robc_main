@@ -1,0 +1,103 @@
+#!/usr/bin/perl
+
+# gstaples @ Gorilla Nation
+
+$ENV{PATH}="/bin:/usr/sbin:/usr/bin:/opt/xcat/bin";
+$ENV{XCATROOT}="/opt/xcat";
+$ENV{HOME}="/root";
+
+if (defined $ARGV[0] and $ARGV[0] eq "-v") {
+   $ENV{VERBOSE}=1;
+}
+
+use strict;
+use Sys::Virt;
+use JSON;
+use IO::Socket;
+use Data::Dumper;
+
+#my $Nodes=`nodels metal | xargs  echo`;
+my $Nodes=`nodels metal | xargs  echo`;
+chomp($Nodes);
+my @nodes=(split(/ /,$Nodes));
+
+open(BUSUNITS,"/usr/local/etc/businessunits") or die;
+my  @BUs=(<BUSUNITS>);
+chomp(@BUs);
+close(BUSUNITS);
+
+my $data=();
+
+
+foreach my $node (@nodes) {
+   next unless $node;
+
+   print STDERR "tcp connect to $node\n" if ($ENV{VERBOSE});
+   my $socket;
+   eval {
+    local $SIG{ALRM} = sub { die "$node connect timeout"; };
+      alarm(2);
+      $socket = IO::Socket::INET->new
+          (PeerAddr=>$node,
+          PeerPort=>1456,
+          Proto=>'tcp',
+          Type=>SOCK_STREAM);
+      alarm(0);
+   };
+
+   if (!$socket) {
+      alarm(0);
+      next;
+   }
+   my $line;
+   eval {
+    local $SIG{ALRM} = sub { print STDERR "$node read timeout"; close($socket); };
+      alarm(2);
+   $line=(<$socket>);
+   alarm(0);
+   };
+   chomp($line);
+   foreach my $elem (split(/ /,$line)) {
+      my ($n,$v)=split(/:/,$elem);
+      $data->{$node}->{$n}=$v;
+   }
+   eval {
+    local $SIG{ALRM} = sub { print STDERR "$node close timeout"; };
+      alarm(2);
+   close($socket);
+   alarm(0);
+   };
+
+}
+
+foreach my $bu (@BUs) {
+    open(VMDATA,"nodels vm\@$bu vm.host vm.memory 2>/dev/null|") or die;
+    my $metal="";
+    my $memory="";
+    my $host="";
+    while (my $line=<VMDATA>) {
+       #tester8.tp.dev.lax.gnmedia.net: vm.memory: 1024
+       #tester8.tp.dev.lax.gnmedia.net: vm.host: metal-1419.lax.gnmedia.net
+       # This weird parsing is because I don't trust the order I get these lines from xcat
+       if ($line =~ /(.*): vm.(.*): (.*)/) {
+          $memory=($3*1024) if ($2 eq "memory");
+          $metal=$3 if ($2 eq "host");
+          $host=$1;
+          if ($memory && $metal) {
+             $data->{$metal}->{domains}->{$host}->{maxMem}=$memory;
+             $data->{$metal}->{domains}->{$host}->{businessUnit}=$bu;
+             $data->{$metal}->{domains}->{$host}->{name}=$host;
+             $memory="";
+             $host="";
+             $metal="";
+          }
+       }
+    }
+}
+
+
+
+my $json = new JSON;
+my $json_text   = $json->pretty->encode($data);
+print $json_text;
+

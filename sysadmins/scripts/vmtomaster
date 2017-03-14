@@ -1,0 +1,39 @@
+#!/bin/bash
+
+# gstaples @ Gorilla Nation
+
+if test -z "$1"; then
+  echo "$0 vmhostname"
+  exit 1
+fi
+
+
+# Try xCAT first so that noderanges can work
+if [ -x /opt/xcat/bin/nodels ];then
+   metal=$(/opt/xcat/bin/nodels "$1" vm.host 2>/dev/null)
+
+   if [ -n "$metal" ];then
+      echo "$metal"
+      exit 0
+   fi
+fi  
+
+
+# Try RT...
+vmid=$(rt list -i -t asset "Name = '$1'")
+if test -z "$vmid" -o "No matching results." = "$vmid";then
+  vmid=$(rt list -i -t asset "Name = '$1.gnmedia.net'")
+fi
+if test -z "$vmid" -o "No matching results." = "$vmid";then
+  echo "$1 not found in rt" 1>&2
+  exit 1
+fi
+line=$(rt show $vmid/links | grep RunsOn)
+if test -z "$line";then
+  echo "$1 doesn't have links in rt" 1>&2
+  exit 1
+fi
+masterid=${line##*/}
+rt list -s -t asset "Id = $masterid" | awk '{print $2}'
+
+

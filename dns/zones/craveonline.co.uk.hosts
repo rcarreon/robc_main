@@ -1,0 +1,18 @@
+$TTL 3600
+craveonline.co.uk.     IN      SOA     craveonline.co.uk. root.craveonline.co.uk. (
+                               2015051100     ; serial
+                               28800          ; refresh
+                               14400          ; retry
+                               3600000        ; expire
+                               86400 )        ; minimum
+
+craveonline.co.uk.             IN    NS       app1v-dns.tp.prd.lax.craveonline.com.
+craveonline.co.uk.             IN    NS       app2v-dns.tp.prd.lax.craveonline.com.
+craveonline.co.uk.             IN    NS       app3v-dns.tp.prd.lax.craveonline.com.
+craveonline.co.uk.             IN    NS       app4v-dns.tp.prd.lax.craveonline.com.
+
+craveonline.co.uk.             IN    A        97.64.84.172       
+bta.craveonline.co.uk.         IN    A        10.64.64.75
+dev.craveonline.co.uk.         IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.craveonline.co.uk.         IN    CNAME    stg.pbwordpress.gnmedia.net.
+www.craveonline.co.uk.         IN    CNAME    craveonline.co.uk.

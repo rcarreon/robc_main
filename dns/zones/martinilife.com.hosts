@@ -1,0 +1,49 @@
+$ORIGIN martinilife.com.
+$TTL    3600 
+martinilife.com.	IN      SOA     martinilife.com. root.martinilife.com. (
+                        2015070600	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+martinilife.com.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+martinilife.com.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+martinilife.com.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+martinilife.com.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+
+                       3600 MX    10 ASPMX5.GOOGLEMAIL.COM.
+                       3600 MX    10 ASPMX4.GOOGLEMAIL.COM.
+                       3600 MX    10 ASPMX3.GOOGLEMAIL.COM.
+                       3600 MX    10 ASPMX2.GOOGLEMAIL.COM.
+                       3600 MX    10 ASPMX.L.GOOGLE.COM.
+                       3600 MX    10 ALT2.ASPMX.L.GOOGLE.COM.
+                       3600 MX    10 ALT1.ASPMX.L.GOOGLE.COM.
+                       3600 A     173.201.0.1
+art                    3600 A     50.63.68.1
+autos                  3600 A     69.59.144.51
+cigars                 3600 A     69.7.23.217
+classiccars            3600 A     69.7.23.217
+diving                 3600 A     69.7.23.217
+equestrian             3600 A     69.7.23.217
+flying                 3600 A     69.7.23.217
+golf                   3600 A     69.7.23.217
+google9cdc26dd13fb7c81     3600 CNAME google.com.
+horses                 3600 A     69.7.23.217
+lifestyle              3600 A     69.7.23.217
+passions               3600 A     69.7.23.217
+philanthropy           3600 A     69.7.23.217
+sailing                3600 A     69.7.23.217
+skiing                 3600 A     69.7.23.217
+snowsports             3600 A     69.7.23.217
+tennis                 3600 A     69.7.23.217
+travel                 3600 A     69.7.23.217
+wine                   3600 A     69.7.23.217
+www                    3600 A     50.63.68.1
+
+
+

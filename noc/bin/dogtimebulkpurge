@@ -1,0 +1,108 @@
+#!/usr/bin/env python
+
+from __future__ import print_function
+
+import sys
+import csv
+from datetime import datetime as dt
+import getpass
+import optparse
+import ConfigParser
+
+import cloudinary
+import cloudinary.api
+
+class DogTimeBulkPurge(object):
+    def __init__(self, cloud_name, api_key, api_secret):
+        cloudinary.config(cloud_name=cloud_name,
+                          api_key=api_key,
+                          api_secret=api_secret)
+        
+    def dump_resources(self, start_date, end_date, type="fetch", direction="asc"):
+        next_cursor, results = None, None
+        common = {"type": type, "direction": direction, "max_results": 500}
+        writer = csv.writer(sys.stdout)
+        while True:
+            results = cloudinary.api.resources(**(
+                dict(next_cursor=next_cursor, **common) \
+                if next_cursor else \
+                dict(start_at=start_date, **common))
+            )
+            next_cursor = results["next_cursor"]
+
+            try:
+                for entry in results["resources"]:
+                    if dt.strptime(entry["created_at"], "%Y-%m-%dT%H:%M:%SZ") \
+                       >= dt.strptime(end_date, "%Y-%m-%d"):
+                        raise StopIteration
+
+                    writer.writerow([entry["created_at"], entry["public_id"]])
+            except StopIteration:
+                break
+
+    @staticmethod
+    def __load_resources():
+        reader = csv.reader(sys.stdin)
+        rows, bulk, i = [], [], 0
+        for row in reader:
+            if i >= 1000:
+                bulk += [rows]
+                rows, i = [], 0
+            rows += [row]
+            i += 1
+        else:
+            bulk += [rows]
+
+        return bulk
+
+    def purge(self):
+        for bunch in DogTimeBulkPurge.__load_resources():
+            print(cloudinary.api.delete_resources([x[1] for x in bunch], type="fetch"))
+
+
+def main():
+    parser = optparse.OptionParser()
+    parser.add_option("-c", "--cloud-name", dest="cloud_name")
+    parser.add_option("-d", "--dump", dest="dump")
+    parser.add_option("-l", "--purge", dest="purge", action="store_true")
+    options, _ = parser.parse_args()
+
+    if len(sys.argv) < 2:
+        print("""Usage:
+        e.g. We'd like to purge the whole month of December 2015:
+
+        sudo {0} --cloud-name dogtime-balto --dump from=2015-12-01,to=2015-12-31 | tee dec.csv
+        sudo {0} --cloud-name dogtime-balto --purge < dec.csv\
+        """.format(sys.argv[0]))
+        sys.exit(-1)
+
+    if not options.cloud_name:
+        print("--cloud-name is a required parameter.", file=sys.stderr)
+        sys.exit(-1)
+
+    config = ConfigParser.ConfigParser()
+    config.read("/etc/dogtimebulkpurge.conf")
+    api_key = config.get(options.cloud_name, "api-key")
+    api_secret = config.get(options.cloud_name, "api-secret")
+
+    dtbp = DogTimeBulkPurge(cloud_name=options.cloud_name,
+                            api_key=api_key,
+                            api_secret=api_secret)
+
+    if not (options.dump or options.purge):
+        print("You must choose either --dump or --purge.", file=sys.stderr)
+        sys.exit(-1)
+
+    if options.dump and options.purge:
+        print("--dump & --purge are mutually exclusive. Choose only one.", file=sys.stderr)
+        sys.exit(-1)
+
+    if options.dump:
+        dates = dict(x.split("=") for x in options.dump.split(","))
+        dtbp.dump_resources(dates["from"], dates["to"])
+
+    if options.purge:
+        dtbp.purge()
+
+if __name__ == "__main__":
+    main()

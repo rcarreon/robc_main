@@ -1,0 +1,686 @@
+{
+  "sql1v-56-adops.ap.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"14",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-adops.ap.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"14",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-dh.si.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-ews.si.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vaquita.tp.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "app1v-noc.tp.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-dashboards.tp.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-dbops.tp.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-inv.tp.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-phab.tp.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-puppet.tp.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "app1v-em.tp.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "app1v-em.tp.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-origin.og.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-audit.ci.stg.lax.gnmedia.net":
+    [
+      { "time":"01:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-cms.sbv.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-yourls.sbv.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-stats-cms.sbv.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql5v-56-stats-cms.sbv.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-api-cs.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-atp.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-gr.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-mc.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-sdc.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vb-bab.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vb-hfb.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vb-shh.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vb-tfs.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vb-wz.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-wp.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-xf-ae.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-xf-psl.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-xf-sdc.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-ep.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-origin.og.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-dh.si.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-ews.si.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-stats-cms.sbv.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-cms.sbv.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-yourls.sbv.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "app1v-deploy.sbv.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-rt.tp.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "app1v-wiki.tp.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-audit.ci.prd.lax.gnmedia.net":
+    [
+      { "time":"04:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-ci.ci.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-dw.ci.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-api-cs.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-atp.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-xf-ae.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vb-bab.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-gr.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vb-hfb.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-mc.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-wp.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-xf-psl.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-sdc.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-xf-sdc.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vb-shh.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vb-tfs.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-56-vb-wz.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-tb.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"04:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-ep.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-reports-qa.ap.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-pubops-martini.ap.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-pubops-martini.ap.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-xf-hfb.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-xf-hfb.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-xf-wz.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-xf-wz.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-bd.og.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-bd.og.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-vb-pf.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-vb-pf.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-mstr.tp.prd.lax.gnmedia.net":
+    [
+      { "time":"00:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-api-dfp.ao.stg.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ],
+  "sql1v-api-dfp.ao.prd.lax.gnmedia.net":
+    [
+      { "time":"02:15am",
+        "type":"snapshot_netapp",
+        "backup_mode":"full",
+        "hours":"24",
+        "retention":"7",
+        "lock_timeout":"60" }
+    ]
+}

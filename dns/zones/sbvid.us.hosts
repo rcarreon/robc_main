@@ -1,0 +1,35 @@
+$TTL 3600
+sbvid.us.	IN      SOA     sbvid.us. root.sbvid.us. (
+                        2016061600	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+sbvid.us.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+sbvid.us.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+sbvid.us.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+sbvid.us.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+sbvid.us.     IN  MX 1 aspmx.l.google.com. 
+sbvid.us.     IN MX 5 alt1.aspmx.l.google.com. 
+sbvid.us.     IN MX 5 alt2.aspmx.l.google.com. 
+sbvid.us.     IN MX 10 alt3.aspmx.l.google.com. 
+sbvid.us.     IN MX 10 alt4.aspmx.l.google.com.
+
+sbvid.us.                                IN      A       97.64.84.114
+
+
+
+
+dev.sbvid.us.                            IN      CNAME       app1v-yourls.sbv.dev.lax.gnmedia.net.
+prd.sbvid.us.                            IN      CNAME       vip-app-yourls.sbv.prd.lax.gnmedia.net.
+origin.sbvid.us.                         IN      CNAME       sbvid.us.
+www.sbvid.us.                            IN      CNAME       wpc.F127.edgecastcdn.net.
+stg.www.sbvid.us.                        IN      CNAME       wpc.F127.edgecastcdn.net.
+stg.sbvid.us.                            IN      A       97.64.84.167
+origin-stg.sbvid.us.                     IN      CNAME   stg.sbvid.us.
+sbvid.us. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

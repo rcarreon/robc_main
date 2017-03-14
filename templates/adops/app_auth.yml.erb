@@ -1,0 +1,14 @@
+default: &default
+  token_lifetime: 14400 #4 hours in seconds
+
+development:
+  <<: *default
+
+staging:
+  <<: *default
+
+production:
+  <<: *default
+
+test:
+  <<: *default

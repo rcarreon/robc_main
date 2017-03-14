@@ -1,0 +1,64 @@
+# This file is managed by Puppet do not modify it from <%= fqdn %>
+# My.cnf for MySQL 5.6 for Standalone default config
+# filename=<%= file %>
+
+[mysqld]
+datadir=<%= mysqldatadir %>
+server-id = <%= mysqld_serverid %>
+report-host = <%= fqdn %>
+
+# Error log
+log-error=/sql/log/error.log
+
+# Slow query log
+log_output=FILE
+slow_query_log=1
+slow_query_log_file=/sql/log/slow-queries.log
+long_query_time=2
+
+# Binlog format
+log-bin = /sql/binlog/bin.log
+log-bin-index = /sql/binlog/bin.index
+expire_logs_days = 7
+
+# Connection params
+max_connections=500
+thread_cache_size=80
+connect_timeout=20
+
+# MyISAM Params
+key_buffer_size=64M
+
+# Innodb Params
+binlog-format=MIXED
+innodb_data_file_path = ibdata1:100M:autoextend
+innodb_buffer_pool_size=8G
+innodb_log_file_size=512M
+innodb_flush_method=O_DIRECT
+innodb_stats_on_metadata=OFF
+innodb_flush_log_at_trx_commit=0
+
+# Query cache
+query_cache_size=0
+
+# Turn off the nonstandard behaviors for  TIMESTAMP
+explicit-defaults-for-timestamp
+
+# Keep server warm 
+innodb_buffer_pool_dump_at_shutdown=ON
+innodb_buffer_pool_load_at_startup=ON
+innodb_buffer_pool_filename=ib_buffer_pool
+
+# Undo tablespace
+innodb_undo_directory=<%= mysqldatadir %>
+innodb_undo_tablespaces=10
+innodb_undo_logs=5
+
+# GTID - needs more research
+# gtid-mode = ON
+# enforce-gtid-consistency = true
+
+# Other params
+max_allowed_packet=64M
+max_heap_table_size=128M
+tmp_table_size=128M

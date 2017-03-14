@@ -1,0 +1,16 @@
+# NewRelic NFSIOSTAT Config
+[proxy]
+enable_proxy = False
+
+[nfs]
+device_list = []
+
+[plugin]
+key = <%= newrelic_lic %>
+interval = <%= log_interval %>
+loglevel = <%= log_level %>
+logfile  = <%= log_file %>
+pidfile  = <%= pid_file %>
+
+enable_nfs_aggregate = True
+enable_nfs_reportvolumes = True

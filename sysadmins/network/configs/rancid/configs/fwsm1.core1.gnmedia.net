@@ -1,0 +1,439 @@
+!RANCID-CONTENT-TYPE: cisco
+!
+!Chassis type: WS-SVC-FWM-1 - a PIX
+!CPU: Pentium III 1000 MHz
+!
+!Memory: 1024 MB RAM
+!Memory: Flash 20MB
+!Serial Number: SAD123500EV!
+!Key: 0x5437928b 0x1d6b9bfb 0xd0770fca 0x1886c7eb 
+!
+!
+!Image: Compiled: on Thu 17-Oct-13 08:11 by fwsmbld
+!
+!Flash: flash file system:  version:3  magic:0x12345679
+!Flash:   file 0: origin:       0 length:6390272
+!Flash:   file 1: origin: 6390272 length:5632060
+!Flash:   file 2: origin:12022784 length:5223
+!Flash:   file 3: origin:12028416 length:19968
+!Flash:   file 4: origin:21085696 length:280
+!
+!
+FWSM Version 4.1(15) 
+!
+hostname FWSM
+!enable password <removed>
+no names
+dns-guard
+!
+interface Vlan3
+ description LAN/STATE Failover Interface
+!
+interface Vlan8
+ nameif dmz8
+ security-level 50
+ ip address 10.2.8.5 255.255.254.0 standby 10.2.8.6 
+!
+interface Vlan10
+ nameif dmz10
+ security-level 50
+ ip address 10.2.10.7 255.255.255.0 standby 10.2.10.8 
+ ospf priority 2
+!
+interface Vlan11
+ nameif admin
+ security-level 50
+ ip address 10.2.11.16 255.255.255.0 standby 10.2.11.17 
+!
+interface Vlan12
+ shutdown
+ nameif legacy
+ security-level 50
+ ip address 10.2.12.1 255.255.254.0 standby 10.2.12.3 
+!
+interface Vlan15
+ nameif vpn-internal
+ security-level 50
+ ip address 10.2.15.1 255.255.255.0 standby 10.2.15.2 
+!
+interface Vlan50
+ nameif inside
+ security-level 50
+ ip address 10.2.50.1 255.255.255.0 standby 10.2.50.2 
+!
+interface Vlan100
+ nameif outside
+ security-level 0
+ ip address 72.172.76.3 255.255.254.0 standby 72.172.76.4 
+!
+interface Vlan330
+ no nameif
+ no security-level
+ no ip address
+!
+!passwd <removed>
+ftp mode passive
+same-security-traffic permit inter-interface
+object-group network EXT-NAMESERVERS
+ network-object host 67.15.66.42
+ network-object host 67.15.66.43
+ network-object host 64.34.172.209
+ network-object host 72.51.41.238
+ network-object host 208.94.147.135
+ network-object host 208.94.150.198
+ network-object host 63.219.151.12
+object-group network netez_address_space
+ network-object 72.172.76.0 255.255.254.0
+object-group icmp-type icmp_outside
+ description Allows pings & traceroutes from the internet
+ icmp-object echo
+ icmp-object echo-reply
+ icmp-object time-exceeded
+ icmp-object unreachable
+ icmp-object source-quench
+object-group network Core_network_interfaces
+ network-object host 72.172.76.1
+ network-object host 72.172.76.2
+ network-object host 72.172.76.3
+ network-object host 72.172.76.4
+ network-object host 72.172.76.8
+access-list Internet remark Allow IP connections to Core network Interface
+access-list Internet extended permit ip any object-group Core_network_interfaces 
+access-list Internet remark Allow Pings and Traceroutes to the NetEz IP address block
+access-list Internet extended permit icmp any object-group netez_address_space object-group icmp_outside 
+access-list Internet extended permit tcp any host 72.172.76.162 eq 5222 
+access-list Internet extended permit tcp any host 72.172.76.171 eq www 
+access-list Internet extended permit tcp any host 72.172.76.32 eq www 
+access-list Internet extended permit tcp any host 72.172.76.114 eq www 
+access-list Internet extended permit tcp any host 72.172.76.110 eq https 
+access-list Internet extended permit tcp any host 72.172.76.113 eq www 
+access-list Internet extended permit tcp any host 72.172.76.154 eq www 
+access-list Internet extended permit tcp any host 72.172.77.154 eq www 
+access-list Internet extended permit tcp any host 72.172.76.154 eq https 
+access-list Internet extended permit tcp any host 72.172.76.166 eq https 
+access-list Internet extended permit tcp any host 72.172.76.175 eq www 
+access-list Internet extended permit tcp any host 72.172.76.190 eq www 
+access-list Internet extended permit tcp any host 72.172.76.176 eq www 
+access-list Internet extended permit tcp any host 72.172.76.180 eq www 
+access-list Internet extended permit tcp any host 72.172.76.191 eq www 
+access-list Internet extended permit tcp any host 72.172.76.137 eq https 
+access-list Internet extended permit tcp any host 72.172.76.155 eq https 
+access-list Internet extended permit tcp any host 72.172.76.29 eq www 
+access-list Internet extended permit tcp any host 72.172.76.36 eq www 
+access-list Internet extended permit tcp any host 72.172.76.37 eq www 
+access-list Internet extended permit tcp any host 72.172.76.23 
+access-list Internet extended permit tcp any host 72.172.76.40 eq www 
+access-list Internet extended permit tcp any host 72.172.76.20 eq www 
+access-list Internet extended permit tcp any host 72.172.76.19 eq www 
+access-list Internet extended permit tcp any host 72.172.76.45 eq www 
+access-list Internet extended permit tcp any host 72.172.76.45 eq https 
+access-list Internet extended permit tcp any host 72.172.76.46 eq www 
+access-list Internet extended permit tcp any host 72.172.76.46 eq https 
+access-list Internet extended permit tcp any host 72.172.76.47 eq www 
+access-list Internet extended permit tcp any host 72.172.76.47 eq https 
+access-list Internet extended permit tcp any host 72.172.76.22 eq www 
+access-list Internet extended permit tcp any host 72.172.76.23 eq www 
+access-list Internet extended permit tcp any host 72.172.76.39 eq www 
+access-list Internet extended permit tcp any host 72.172.76.44 eq www 
+access-list Internet extended permit tcp any host 72.172.76.50 eq www 
+access-list Internet extended permit tcp any host 72.172.76.82 eq www 
+access-list Internet extended permit tcp any host 72.172.76.131 eq www 
+access-list Internet extended permit tcp any host 72.172.76.198 eq www 
+access-list Internet extended permit tcp any host 72.172.76.201 eq www 
+access-list Internet extended permit tcp any host 72.172.76.202 eq www 
+access-list Internet extended permit tcp any host 72.172.76.71 eq www 
+access-list Internet extended permit tcp any host 72.172.76.138 eq www 
+access-list Internet extended permit tcp any host 72.172.76.205 eq www 
+access-list Internet extended permit tcp any host 72.172.76.81 eq www 
+access-list Internet extended permit tcp any host 72.172.76.117 eq www 
+access-list Internet extended permit tcp any host 72.172.76.136 eq www 
+access-list Internet extended permit tcp any host 72.172.76.156 eq www 
+access-list Internet extended permit tcp any host 72.172.76.155 eq www 
+access-list Internet extended permit tcp any host 72.172.76.174 eq www 
+access-list Internet extended permit tcp any host 72.172.76.164 eq www 
+access-list Internet extended permit tcp any host 72.172.76.164 eq https 
+access-list Internet extended permit tcp any host 72.172.76.163 eq www 
+access-list Internet extended permit tcp any host 72.172.76.26 eq www 
+access-list Internet extended permit tcp any host 72.172.76.31 eq www 
+access-list Internet extended permit tcp any host 72.172.76.43 eq www 
+access-list Internet extended permit tcp any host 72.172.76.122 eq www 
+access-list Internet extended permit tcp any host 72.172.76.121 eq www 
+access-list Internet extended permit tcp any host 72.172.76.143 eq www 
+access-list Internet extended permit tcp any host 72.172.76.145 eq www 
+access-list Internet extended permit tcp any host 72.172.76.161 eq www 
+access-list Internet extended permit tcp any host 72.172.76.166 eq www 
+access-list Internet extended permit tcp any host 72.172.76.172 eq www 
+access-list Internet extended permit tcp any host 72.172.76.172 eq https 
+access-list Internet extended permit tcp any host 72.172.76.51 eq www 
+access-list Internet extended permit tcp any host 72.172.76.52 eq www 
+access-list Internet extended permit tcp any host 72.172.76.167 eq www 
+access-list Internet extended permit tcp any host 72.172.76.177 eq www 
+access-list Internet extended permit tcp any host 72.172.76.28 eq www 
+access-list Internet extended permit tcp any host 72.172.76.95 eq www 
+access-list Internet extended permit tcp any host 72.172.76.108 eq www 
+access-list Internet extended permit tcp any host 72.172.76.110 eq www 
+access-list Internet extended permit tcp any host 72.172.76.119 eq www 
+access-list Internet extended permit tcp any host 72.172.76.137 eq www 
+access-list Internet extended permit tcp any host 72.172.76.147 eq www 
+access-list Internet extended permit tcp any host 72.172.76.148 eq www 
+access-list Internet extended permit tcp any host 72.172.76.150 eq www 
+access-list Internet extended permit tcp any host 72.172.76.169 eq www 
+access-list Internet extended permit tcp any host 72.172.76.90 eq www 
+access-list Internet extended permit tcp any host 72.172.76.111 eq www 
+access-list Internet extended permit tcp any host 72.172.76.149 eq www 
+access-list Internet extended permit tcp any host 72.172.76.151 eq www 
+access-list Internet extended permit tcp any host 72.172.76.253 eq https 
+access-list Internet extended permit tcp any host 72.172.76.27 eq www 
+access-list Internet extended permit tcp any host 72.172.76.160 eq www 
+access-list Internet extended permit tcp any host 72.172.76.34 eq www 
+access-list Internet extended permit tcp any host 72.172.76.21 eq www 
+access-list Internet extended permit tcp any host 72.172.76.48 eq www 
+access-list Internet extended permit tcp any host 72.172.76.48 eq https 
+access-list Internet extended permit tcp any host 72.172.76.123 eq www 
+access-list Internet extended permit tcp any host 72.172.76.96 eq www 
+access-list Internet extended deny ip any any 
+access-list dmz10 extended deny tcp any any eq 9999 
+access-list dmz10 extended deny tcp any any eq 6667 
+access-list dmz10 extended permit ip any any 
+access-list admin extended deny tcp any any eq 9999 
+access-list admin extended deny tcp any any eq 6667 
+access-list admin extended permit ip any any 
+access-list legacy extended deny tcp any any eq 9999 
+access-list legacy extended deny tcp any any eq 6667 
+access-list legacy extended permit ip any any 
+access-list vpn-internal extended permit ip any any 
+access-list 13 standard permit 10.2.50.0 255.255.255.0 
+access-list 13 standard permit 10.2.15.0 255.255.255.0 
+access-list dmz8 extended deny tcp any any eq 9999 
+access-list dmz8 extended deny tcp any any eq 6667 
+access-list dmz8 extended permit ip any any 
+access-list conn_defense remark Monitors Session connections
+access-list conn_defense extended permit ip any object-group netez_address_space 
+pager lines 30
+logging enable
+logging timestamp
+logging buffer-size 1000000
+logging buffered errors
+logging trap errors
+logging host dmz10 10.11.20.27
+mtu dmz8 1500
+mtu dmz10 1500
+mtu admin 1500
+mtu legacy 1500
+mtu vpn-internal 1500
+mtu inside 1500
+mtu outside 1500
+failover
+failover lan unit primary
+failover lan interface fover Vlan3
+failover link fover Vlan3
+failover interface ip fover 10.2.3.1 255.255.255.0 standby 10.2.3.2
+monitor-interface dmz8
+monitor-interface dmz10
+monitor-interface admin
+monitor-interface legacy
+monitor-interface vpn-internal
+monitor-interface inside
+monitor-interface outside
+icmp permit any dmz8
+icmp permit any dmz10
+icmp permit any admin
+icmp permit any legacy
+icmp permit any vpn-internal
+icmp permit any inside
+icmp permit any outside
+no asdm history enable
+arp timeout 14400
+nat-control
+global (inside) 1 interface
+global (outside) 1 interface
+nat (dmz8) 1 0.0.0.0 0.0.0.0
+nat (dmz10) 1 0.0.0.0 0.0.0.0
+nat (legacy) 1 0.0.0.0 0.0.0.0
+nat (inside) 1 0.0.0.0 0.0.0.0
+static (dmz8,outside) 72.172.76.201 10.2.8.72 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.202 10.2.8.73 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.138 10.2.8.74 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.119 10.2.8.66 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.39 10.2.8.57 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.31 10.2.8.67 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.81 10.2.8.77 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.198 10.2.8.71 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.143 10.2.8.79 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.34 10.2.8.55 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.117 10.2.8.54 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.122 10.2.8.81 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.121 10.2.8.80 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.111 10.2.8.89 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.110 10.2.8.90 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.147 10.2.8.85 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.148 10.2.8.86 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.149 10.2.8.103 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.22 10.2.8.92 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.95 10.2.8.106 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.151 10.2.8.93 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.26 10.2.8.113 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.28 10.2.8.107 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.113 10.2.8.118 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.108 10.2.8.111 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.27 10.2.8.120 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.156 10.2.8.84 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.155 10.2.8.87 netmask 255.255.255.255 
+static (dmz10,outside) 72.172.76.154 10.11.20.89 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.145 10.2.8.78 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.160 10.2.8.124 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.169 10.2.8.125 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.161 10.2.8.117 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.21 10.2.8.51 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.131 10.2.8.56 netmask 255.255.255.255 
+static (dmz10,outside) 72.172.76.162 10.11.20.41 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.205 10.2.8.130 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.163 10.2.8.133 netmask 255.255.255.255 
+static (admin,outside) 72.172.76.253 10.2.11.252 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.164 10.2.8.134 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.150 10.2.8.135 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.166 10.2.8.140 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.172 10.2.8.143 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.82 10.2.8.63 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.174 10.2.8.144 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.32 10.2.8.82 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.175 10.2.8.146 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.190 10.2.8.53 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.176 10.2.8.147 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.114 10.2.8.83 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.180 10.2.8.112 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.191 10.2.8.149 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.137 10.2.8.123 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.177 10.2.8.150 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.167 10.2.8.64 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.171 10.2.8.68 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.29 10.2.8.69 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.50 10.2.8.96 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.36 10.2.8.97 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.37 10.2.8.98 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.23 10.2.8.88 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.51 10.2.8.100 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.52 10.2.8.99 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.40 10.2.8.91 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.43 10.2.8.101 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.44 10.2.8.102 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.19 10.2.8.104 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.20 10.2.8.105 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.45 10.2.8.95 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.46 10.2.8.70 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.47 10.2.8.52 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.48 10.2.8.60 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.123 10.2.8.151 netmask 255.255.255.255 
+static (dmz8,outside) 72.172.76.96 10.2.8.152 netmask 255.255.255.255 
+access-group dmz8 in interface dmz8
+access-group dmz10 in interface dmz10
+access-group admin in interface admin
+access-group legacy in interface legacy
+access-group vpn-internal in interface vpn-internal
+access-group admin in interface inside
+access-group Internet in interface outside
+!
+route-map conn2bgp permit 10
+ match ip address 13
+!
+route dmz10 192.168.0.0 255.255.0.0 10.2.10.58 1
+route dmz10 10.11.20.0 255.255.254.0 10.2.10.56 1
+route inside 10.2.10.139 255.255.255.255 10.2.50.5 1
+route inside 10.2.10.140 255.255.255.255 10.2.50.5 1
+route inside 10.2.10.210 255.255.255.255 10.2.50.5 1
+route inside 10.2.10.211 255.255.255.255 10.2.50.5 1
+route inside 10.2.12.59 255.255.255.255 10.2.50.12 1
+route inside 10.2.12.20 255.255.255.255 10.2.50.12 1
+route inside 10.2.12.21 255.255.255.255 10.2.50.12 1
+route inside 10.2.12.26 255.255.255.255 10.2.50.12 1
+route inside 10.2.12.27 255.255.255.255 10.2.50.12 1
+route inside 10.2.12.31 255.255.255.255 10.2.50.12 1
+route inside 10.2.12.32 255.255.255.255 10.2.50.12 1
+route inside 10.2.12.33 255.255.255.255 10.2.50.12 1
+route inside 10.2.12.34 255.255.255.255 10.2.50.12 1
+route inside 10.2.12.35 255.255.255.255 10.2.50.12 1
+route outside 0.0.0.0 0.0.0.0 72.172.76.8 1
+!
+router ospf 101
+ network 10.2.10.0 255.255.255.0 area 0
+ router-id 10.2.10.7
+ log-adj-changes
+ redistribute connected subnets route-map conn2bgp
+!
+timeout xlate 3:00:00
+timeout conn 1:00:00 half-closed 0:10:00 udp 0:02:00 icmp 0:00:02
+timeout sunrpc 0:10:00 h323 1:00:00 h225 1:00:00 mgcp 0:05:00
+timeout mgcp-pat 0:05:00 sip 0:30:00 sip_media 0:02:00
+timeout sip-invite 0:03:00 sip-disconnect 0:02:00
+timeout pptp-gre 0:02:00
+timeout uauth 0:05:00 absolute
+!username admin password <removed>
+!username rancid password <removed>
+aaa authentication ssh console LOCAL 
+snmp-server host dmz10 10.11.20.78 poll community apetime1
+snmp-server host dmz10 10.11.20.80 poll community apetime1
+snmp-server host dmz10 10.11.20.81 poll community apetime1
+snmp-server host dmz10 10.2.10.32 poll community apetime1
+snmp-server location Net2ez
+snmp-server contact sysadmins@gorillanation.com
+!snmp-server community <removed>
+snmp-server enable traps snmp authentication linkup linkdown coldstart
+service reset no-connection
+no service reset connection marked-for-deletion
+crypto ipsec transform-set 3des esp-3des esp-md5-hmac 
+crypto map 3des 10 set peer 63.139.86.4 
+crypto map 3des 10 set transform-set 3des
+crypto map 3des interface outside
+isakmp enable outside
+isakmp policy 10 authentication pre-share
+isakmp policy 10 encryption 3des
+isakmp policy 10 hash md5
+isakmp policy 10 group 2
+isakmp policy 10 lifetime 86400
+tunnel-group 63.139.86.4 type ipsec-l2l
+tunnel-group 63.139.86.4 ipsec-attributes
+! pre-shared-key  <removed> 
+telnet timeout 60
+ssh 10.11.20.27 255.255.255.255 dmz8
+ssh 10.30.30.61 255.255.255.255 dmz10
+ssh 10.11.20.27 255.255.255.255 dmz10
+ssh 192.168.1.0 255.255.255.0 dmz10
+ssh 10.2.11.0 255.255.255.0 inside
+ssh 10.30.30.0 255.255.255.0 inside
+ssh 10.30.30.61 255.255.255.255 inside
+ssh 192.168.1.0 255.255.255.0 inside
+ssh 10.11.20.27 255.255.255.255 inside
+ssh 63.139.86.0 255.255.255.240 outside
+ssh timeout 60
+console timeout 0
+management-access dmz10
+!
+class-map conn_defense
+ match access-list conn_defense
+class-map inspection_default
+ match default-inspection-traffic
+!
+policy-map global_policy
+ class inspection_default
+  inspect ftp 
+  inspect h323 h225 
+  inspect h323 ras 
+  inspect netbios 
+  inspect rsh 
+  inspect skinny 
+  inspect smtp 
+  inspect sqlnet 
+  inspect sunrpc 
+  inspect tftp 
+  inspect sip 
+  inspect xdmcp 
+  inspect dns 
+policy-map conn_defense
+ class conn_defense
+  set connection timeout embryonic 0:00:20 half-closed 0:00:30 
+  set connection timeout idle 0:10:00 
+!
+service-policy global_policy global
+service-policy conn_defense interface outside
+prompt hostname context 
+: end

@@ -1,0 +1,11 @@
+#!/bin/bash
+
+#credentials for 
+export RTUSER="rt_svc_user"
+export RTPASSWD="FN#27?Pq"
+#export RTPASSWD="addaa4c8c74bb2a6ae07ba9778669332"
+export RTSERVER="https://rt.gorillanation.com/"
+
+  search="/usr/local/bin/rt ls \" Queue = 'Q_NOC'  AND  (  Status = 'open'  OR Status = 'new'  OR Status = 'stalled'  )  AND Subject LIKE 'visual check'\""
+
+eval $search

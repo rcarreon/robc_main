@@ -1,0 +1,31 @@
+$TTL    3600 
+thefeedsnetwork.com.   IN      SOA     thefeedsnetwork.com. root.thefeedsnetwork.com. (
+                                         2016061600     ; serial
+                                         28800          ; refresh
+                                         14400          ; retry
+                                         3600000        ; expire
+                                         86400 )        ; minimum
+
+thefeedsnetwork.com.                     IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+thefeedsnetwork.com.                     IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+thefeedsnetwork.com.                     IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+thefeedsnetwork.com.                     IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+; Imported records
+thefeedsnetwork.com.                 IN     MX 20    alt1.aspmx.l.google.com.
+thefeedsnetwork.com.                 IN     MX 10    aspmx.l.google.com.
+thefeedsnetwork.com.                 IN     MX 30    aspmx3.googlemail.com.
+thefeedsnetwork.com.                 IN     MX 20    alt2.aspmx.l.google.com.
+thefeedsnetwork.com.                 IN     MX 30    aspmx2.googlemail.com.
+
+assets1.thefeedsnetwork.com.         IN     CNAME    assets1.thefeedsnetwork.com.s3.amazonaws.com.
+images1.thefeedsnetwork.com.         IN     CNAME    images1.thefeedsnetwork.com.s3.amazonaws.com.
+photos1.thefeedsnetwork.com.         IN     CNAME    photos1.thefeedsnetwork.com.s3.amazonaws.com.
+46oftmppu7ic.thefeedsnetwork.com.    IN     CNAME    gv-wiqr7noomzrsga.dv.googlehosted.com.
+images2.thefeedsnetwork.com.         IN     CNAME    images2.thefeedsnetwork.com.s3.amazonaws.com.
+
+thefeedsnetwork.com.                 IN     A        97.64.84.172
+mail.thefeedsnetwork.com.            IN     A        97.64.84.172
+www.thefeedsnetwork.com.             IN     A        97.64.84.172
+*.thefeedsnetwork.com.               IN     A        97.64.84.172
+thefeedsnetwork.com. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

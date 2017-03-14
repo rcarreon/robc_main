@@ -1,0 +1,64 @@
+<?php
+return array(
+
+    'fetch' => PDO::FETCH_CLASS,
+
+    'audit_db' => 'audit',
+
+    'default' => 'mysql_origin',
+
+    'connections' => array(
+
+        # Origin database connection
+        'mysql_origin' => array(
+            'read'  => array(
+                'host'      => '<%= origin_ro_host %>',
+                'database'  => '<%= origin_ro_db %>',
+                'username'  => '<%= origin_ro_user %>',     
+                'password'  => '<%= origin_ro_pw %>',     
+            ),
+            'write' => array(
+                'host'      => '<%= origin_rw_host %>',
+                'database'  => '<%= origin_rw_db %>',
+                'username'  => '<%= origin_rw_user %>',     
+                'password'  => '<%= origin_rw_pw %>',
+            ),
+            'driver'    => 'mysql',
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => '',
+        ),
+
+        # Origin analytics database connection
+        'mysql_analytics' => array(
+                'driver'    => 'mysql',
+                'host'      => '<%= analytics_ro_host %>',
+                'database'  => '<%= analytics_ro_db %>',
+                'username'  => '<%= analytics_ro_user %>',
+                'password'  => '<%= analytics_ro_pw %>',
+                'charset'   => 'utf8',
+                'collation' => 'utf8_unicode_ci',
+                'prefix'    => '',
+        ),
+
+        # Audit database connection
+        'mysql_audit' => array(
+            'read'  => array(
+                'host'      => '<%= audit_ro_host %>',
+                'database'  => '<%= audit_ro_db %>',
+                'username'  => '<%= audit_ro_user %>',     
+                'password'  => '<%= audit_ro_pw %>',     
+            ),
+            'write' => array(
+                'host'      => '<%= audit_rw_host %>',
+                'database'  => '<%= audit_rw_db %>',
+                'username'  => '<%= audit_rw_user %>',     
+                'password'  => '<%= audit_rw_pw %>',     
+            ),
+            'driver'    => 'mysql',
+            'charset'   => 'utf8',
+            'collation' => 'utf8_unicode_ci',
+            'prefix'    => '',
+        ),
+    ),
+);

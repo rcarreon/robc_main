@@ -1,0 +1,197 @@
+$TTL 3600
+evolvemediallc.com. IN      SOA     evolvemediallc.com. root.evolvemediallc.com (
+                                                           2016061602     ; serial
+                                                           28800          ; refresh
+                                                           14400          ; retry
+                                                           3600000        ; expire
+                                                           86400 )        ; minimum
+
+evolvemediallc.com.                                        IN    NS       app1v-dns.tp.prd.lax.evolvemediallc.com.
+evolvemediallc.com.                                        IN    NS       app2v-dns.tp.prd.lax.evolvemediallc.com.
+evolvemediallc.com.                                        IN    NS       app3v-dns.tp.prd.lax.evolvemediallc.com.
+evolvemediallc.com.                                        IN    NS       app4v-dns.tp.prd.lax.evolvemediallc.com.
+
+ns3.evolvemediallc.com.                                    IN    A        67.15.66.42
+ns4.evolvemediallc.com.                                    IN    A        67.15.66.43
+ns5.evolvemediallc.com.                                    IN    A        64.34.172.209
+ns6.evolvemediallc.com.                                    IN    A        72.51.41.238
+
+app1v-dns.tp.prd.lax.evolvemediallc.com.                   IN    A        10.64.81.86
+app2v-dns.tp.prd.lax.evolvemediallc.com.                   IN    A        10.64.81.160
+app3v-dns.tp.prd.lax.evolvemediallc.com.                   IN    A        10.64.81.189
+app4v-dns.tp.prd.lax.evolvemediallc.com.                   IN    A        10.64.81.168
+
+evolvemediallc.com.     IN  MX 1 aspmx.l.google.com. 
+evolvemediallc.com.     IN MX 5 alt1.aspmx.l.google.com. 
+evolvemediallc.com.     IN MX 5 alt2.aspmx.l.google.com. 
+evolvemediallc.com.     IN MX 10 alt3.aspmx.l.google.com. 
+evolvemediallc.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+g.evolvemediallc.com.     IN  MX 1 aspmx.l.google.com.
+g.evolvemediallc.com.     IN MX 5 alt1.aspmx.l.google.com.
+g.evolvemediallc.com.     IN MX 5 alt2.aspmx.l.google.com.
+g.evolvemediallc.com.     IN MX 10 alt3.aspmx.l.google.com.
+g.evolvemediallc.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+; #### Begin TitanWP
+evolvemediallc.com.                                        IN    A        97.64.84.172
+;evolvemediallc.com.                                       IN    A        97.64.84.103
+
+bta.evolvemediallc.com.                                    IN    A        10.11.234.71
+dev.evolvemediallc.com.                                    IN    A        10.64.65.27
+stg.evolvemediallc.com.                                    IN    A        97.64.84.134
+prd.evolvemediallc.com.                                    IN    A        97.64.84.172
+www.evolvemediallc.com.                                    IN    CNAME    prd.evolvemediallc.com.
+;www.evolvemediallc.com.                                   IN    A        97.64.84.104
+;www.evolvemediallc.com.                                   IN    CNAME    cdn.campaigns.evolvemediacorp.com.
+
+origin.bta.evolvemediallc.com.                             IN    CNAME    bta.evolvemediallc.com.
+cdn1-bta.evolvemediallc.com.                               IN    CNAME    bta.evolvemediallc.com.
+cdn2-bta.evolvemediallc.com.                               IN    CNAME    bta.evolvemediallc.com.
+cdn3-bta.evolvemediallc.com.                               IN    CNAME    bta.evolvemediallc.com.
+
+origin-dev.evolvemediallc.com.                             IN    CNAME    dev.evolvemediallc.com.
+cdn1-dev.evolvemediallc.com.                               IN    CNAME    dev.evolvemediallc.com.
+cdn2-dev.evolvemediallc.com.                               IN    CNAME    dev.evolvemediallc.com.
+cdn3-dev.evolvemediallc.com.                               IN    CNAME    dev.evolvemediallc.com.
+
+origin-stg.evolvemediallc.com.                             IN    CNAME    stg.evolvemediallc.com.
+cdn1-stg.evolvemediallc.com.                               IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-stg.evolvemediallc.com.                               IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-stg.evolvemediallc.com.                               IN    CNAME    wac.EE35.edgecastcdn.net.
+
+origin.evolvemediallc.com.                                 IN    CNAME    prd.evolvemediallc.com.
+cdn1-www.evolvemediallc.com.                               IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-www.evolvemediallc.com.                               IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-www.evolvemediallc.com.                               IN    CNAME    wac.EE35.edgecastcdn.net.
+; #### End TitanWP
+
+
+; #### Begin TitanWP for base theme
+bta.base.evolvemediallc.com.                               IN    A        10.64.64.75
+dev.base.evolvemediallc.com.                               IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+
+origin.bta.base.evolvemediallc.com.                        IN    CNAME    bta.base.evolvemediallc.com.
+cdn1-bta.base.evolvemediallc.com.                          IN    CNAME    bta.base.evolvemediallc.com.
+cdn2-bta.base.evolvemediallc.com.                          IN    CNAME    bta.base.evolvemediallc.com.
+cdn3-bta.base.evolvemediallc.com.                          IN    CNAME    bta.base.evolvemediallc.com.
+
+origin-dev.base.evolvemediallc.com.                        IN    CNAME    dev.base.evolvemediallc.com.
+cdn1-dev.base.evolvemediallc.com.                          IN    CNAME    dev.base.evolvemediallc.com.
+cdn2-dev.base.evolvemediallc.com.                          IN    CNAME    dev.base.evolvemediallc.com.
+cdn3-dev.base.evolvemediallc.com.                          IN    CNAME    dev.base.evolvemediallc.com.
+; #### End TitanWP for base theme
+
+
+intl.evolvemediallc.com.                                   IN    CNAME    vip-app-corp.si.prd.lax.gnmedia.net.
+www.intl.evolvemediallc.com.                               IN    CNAME    vip-app-corp.si.prd.lax.gnmedia.net.
+cdn.campaigns.evolvemediallc.com.                          IN    CNAME    wac.1384D.sigmacdn.net.
+rmdemo                                                     IN    CNAME    campaigns.evolvemediacorp.com.
+staging.rmdemo                                             IN    CNAME    staging.campaigns.evolvemediacorp.com.
+origin.assets.evolvemediallc.com.                          IN    A        97.64.84.101
+cdn.assets.evolvemediallc.com.                             IN    CNAME    wac.1384D.sigmacdn.net.
+assets.evolvemediallc.com.                                 IN    CNAME    cdn.assets.evolvemediallc.com.
+origin.staging.assets.evolvemediallc.com.                  IN    A        97.64.84.102
+staging.assets.evolvemediallc.com.                         IN    CNAME    wac.1384D.sigmacdn.net.
+demo.fastlikefios.evolvemediallc.com.                      IN    CNAME    demo.si.evolvemediallc.com.
+dev.originlabs.evolvemediallc.com.                         IN    CNAME    app1v-ews.si.dev.lax.gnmedia.net.
+dev.specs.evolvemediallc.com.                              IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+corp-y483FmG-doublehelix.evolvemediallc.com.               IN    A        97.64.84.103
+dev.originv5.evolvemediallc.com.                           IN    CNAME    app1v-ews.si.dev.lax.gnmedia.net.
+mediaads.evolvemediallc.com.                               IN    A        97.64.84.125
+;demos.evolvemediallc.com.                                 IN    A        72.172.76.153
+demo.si.evolvemediallc.com.                                IN    CNAME    app1a-dh.si.prd.use1b.gnmedia.net.
+;ogdev.evolvemediallc.com.                                 IN    CNAME    app1v-ogdev.si.dev.lax.gnmedia.net. ;decomm
+render.evolvemediallc.com.                                 IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+dev.tags.evolvemediallc.com.                               IN    CNAME    app1v-tags.ap.dev.lax.gnmedia.net.
+prd.tags.evolvemediallc.com.                               IN    A        97.64.84.128
+stg.tags.evolvemediallc.com.                               IN    A        97.64.84.129
+tags.evolvemediallc.com.                                   IN    CNAME    cs585.wac.sigmacdn.net.
+origin.tags.evolvemediallc.com.                            IN    CNAME    prd.tags.evolvemediallc.com.
+tags.stg.evolvemediallc.com.                               IN    CNAME    cs585.wac.sigmacdn.net.
+origin.stg.tags.evolvemediallc.com.                        IN    CNAME    stg.tags.evolvemediallc.com.
+corp.evolvemediallc.com.                                   IN    A        97.64.84.103
+demo.ozthegreatandpowerful.sheknows.evolvemediallc.com.    IN    CNAME    demo.si.evolvemediallc.com.
+*.iframe.evolvemediallc.com.                               IN    CNAME    cs664.wac.sigmacdn.net.
+*.stg.iframe.evolvemediallc.com.                           IN    CNAME    stg.doublehelix.evolvemediacorp.com.
+*.dev.iframe.evolvemediallc.com.                           IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+dev.flow.evolvemediallc.com.                               IN    CNAME    app1v-55-dh.si.dev.lax.gnmedia.net.
+dev.flow-upgrade.evolvemediallc.com.                       IN    CNAME    app1v-55-dh.si.dev.lax.gnmedia.net.
+stg.flow.evolvemediallc.com.                               IN    CNAME    vip-app-55-dh.si.stg.lax.gnmedia.net.
+stg.flow-upgrade.evolvemediallc.com.                       IN    CNAME    vip-app-55-dh.si.stg.lax.gnmedia.net.
+flow.evolvemediallc.com.                                   IN    CNAME    wac.EBD2.edgecastcdn.net.
+origin.flow.evolvemediallc.com.                            IN    A        97.64.84.170
+origin-stg.flow.evolvemediallc.com.                        IN    A        97.64.84.180
+ap-gems.evolvemediallc.com.                                IN    CNAME    app1v-build.ap.dev.lax.gnmedia.net.
+m1.evolvemediallc.com.                                     IN    A        97.64.84.3
+geoip.evolvemediallc.com.                                  IN    CNAME    prd.geoip.evolvemediallc.com.
+prd.geoip.evolvemediallc.com.                              IN    A        97.64.84.124
+stg.geoip.evolvemediallc.com.                              IN    A        10.64.74.243
+;dev.geoip.evolvemediallc.com.                             IN    CNAME    app2v-adops.ap.dev.lax.gnmedia.net.
+dev.geoip.evolvemediallc.com.                              IN    CNAME    app1v-geoip.ap.dev.lax.gnmedia.net.
+standup.evolvemediallc.com.                                IN    CNAME    utils.gorillanation.com.
+*.standup.evolvemediallc.com.                              IN    CNAME    utils.gorillanation.com.
+
+secureassets.evolvemediallc.com.                           IN    CNAME    cs585.wac.sigmacdn.net.
+origin.secureassets.evolvemediallc.com.                           IN    CNAME    vip-app-assets.si.prd.lax.gnmedia.net.
+
+dev.showcase.evolvemediallc.com.         IN      CNAME       app1v-55-dh.si.dev.lax.gnmedia.net.
+stg.showcase.evolvemediallc.com.         IN      CNAME       vip-app-55-dh.si.stg.lax.gnmedia.net.
+showcase.evolvemediallc.com.             IN      CNAME       vip-app-55-dh.si.prd.lax.gnmedia.net.
+adops.evolvemediallc.com.                IN      CNAME       adops.evolvemediallc.com.s3-website-us-west-1.amazonaws.com.
+adops-api.evolvemediallc.com.            IN      CNAME       vip-app-adops-ng.ap.prd.lax.gnmedia.net.
+stg.adops.evolvemediallc.com.            IN      CNAME       stg.adops.evolvemediallc.com.s3-website-us-west-1.amazonaws.com.
+stg.adops-api.evolvemediallc.com.        IN      CNAME       vip-app-adops-ng.ap.stg.lax.gnmedia.net.
+dev.adops.evolvemediallc.com.            IN      CNAME       dev.adops.evolvemediallc.com.s3-website-us-west-1.amazonaws.com.
+dev.adops-api.evolvemediallc.com.        IN      CNAME       app2v-adops.ap.dev.lax.gnmedia.net.
+
+happyholidays.evolvemediallc.com.                IN    A        97.64.84.104
+www.happyholidays.evolvemediallc.com.            IN    CNAME    campaigns.evolvemediacorp.com.
+staging.happyholidays.evolvemediallc.com.        IN    CNAME    staging.campaigns.evolvemediacorp.com.
+demo.happyholidays.evolvemediallc.com.           IN    CNAME    cdn.campaigns.evolvemediacorp.com.
+dev.happyholidays.evolvemediallc.com.            IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+
+;status on mon1.aws2.gnmedia.net
+status.evolvemediallc.com. 					     IN    A        174.129.19.161
+
+
+;Starting DEMO custom destinations section
+;All this locations are going to the aws si demo box 
+
+demo.cars2sweepstakes.evolvemediallc.com. 			IN	 CNAME	 demo.si.evolvemediallc.com.
+demo.cineworldextras.evolvemediallc.com. 			IN	 CNAME	 demo.si.evolvemediallc.com.
+demo.collectkeys.evolvemediallc.com. 				IN	 CNAME	 demo.si.evolvemediallc.com.
+demo.collectthegoldmasks.evolvemediallc.com. 		IN	 CNAME	 demo.si.evolvemediallc.com.
+demo.disneydescendantsquest.evolvemediallc.com. 	IN	 CNAME	 demo.si.evolvemediallc.com.
+
+demo.gamenighthasbro.evolvemediallc.com. 			IN	 CNAME	 demo.si.evolvemediallc.com.
+demo.giftguidemen.evolvemediallc.com. 				IN	 CNAME	 demo.si.evolvemediallc.com.
+demo.howibringitsweeps.evolvemediallc.com. 			IN	 CNAME	 demo.si.evolvemediallc.com.
+demo.infamous2sweepstakes.evolvemediallc.com. 		IN	 CNAME	 demo.si.evolvemediallc.com.
+demo.sanmarcossweeps.evolvemediallc.com. 			IN	 CNAME	 demo.si.evolvemediallc.com.
+demo.shocktillyoudrop.evolvemediallc.com. 			IN	 CNAME	 demo.si.evolvemediallc.com.
+demo.sonicgenerationssweeps.evolvemediallc.com. 	IN	 CNAME	 demo.si.evolvemediallc.com.
+demo.thisistheendsurvivalguyd.evolvemediallc.com. 	IN	 CNAME	 demo.si.evolvemediallc.com.
+demo.totallysamples.evolvemediallc.com. 			IN	 CNAME	 demo.si.evolvemediallc.com.
+
+
+;End of DEMO custom destination section
+
+
+origin.iframe.evolvemediallc.com. 	IN 	A 	97.64.84.104
+iframe.evolvemediallc.com. 			IN 	CNAME 	cs664.wac.sigmacdn.net.
+ac-2489.iframe.evolvemediallc.com. 	IN 	CNAME 	cs664.wac.sigmacdn.net.
+ac-14-27.iframe.evolvemediallc.com. IN 	CNAME 	cs664.wac.sigmacdn.net.
+
+
+;MicroStrategy 
+
+mstr.evolvemediallc.com. 		 IN 	CNAME 	app1v-mstr.tp.prd.lax.gnmedia.net.
+martinitools.evolvemediallc.com. IN  	CNAME 	app1v-msapp.tp.prd.lax.gnmedia.net.
+
+evolvemediallc.com. 	IN 	TXT 	 "v=spf1 a:cluster9out.us.messagelabs.com include:_spf.google.com ip4:216.82.240.0/20 ~all"
+g.evolvemediallc.com.     IN      TXT     "v=spf1 a:cluster9out.us.messagelabs.com include:_spf.google.com ip4:216.82.240.0/20 ~all"
+
+helpdesk.evolvemediallc.com. 	IN 	A 	174.129.19.161
+
+

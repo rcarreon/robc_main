@@ -1,0 +1,20 @@
+$TTL    3600 
+testzones.com.	IN      SOA     testzones.com. root.testzones.com. (
+                        2015070800	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+testzones.com.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+testzones.com.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+testzones.com.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+testzones.com.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+
+
+
+

@@ -1,0 +1,163 @@
+# This file is managed by Puppet do not modify it from <%= fqdn %>
+# My.cnf for MySQL 5.6 for Slave default config
+# filename=<%= file %>
+
+[mysqld]
+datadir=<%= mysqldatadir %>
+server-id = <%= mysqld_serverid %>
+report-host = <%= fqdn %>
+
+# Error log
+log-error=/sql/log/error.log
+
+# Slow query log
+log_output=FILE
+slow_query_log=1
+slow_query_log_file=/sql/log/slow-queries.log
+long_query_time=5
+
+# Relay log format
+relay-log=/sql/binlog/relay.log
+relay-log-index=/sql/binlog/relay.index
+relay_log_info_file=/sql/binlog/relay.info
+
+# Connection params
+max_connections=100
+thread_cache_size=80
+connect_timeout=20
+
+# MyISAM Params
+key_buffer_size=64M
+
+# Innodb Params
+innodb_buffer_pool_size=10G
+innodb_log_file_size=512M
+innodb_flush_method=O_DIRECT
+innodb_stats_on_metadata=OFF
+
+# Query cache
+query_cache_size = 64M
+
+# Other Params
+# 20160128 - sdejean
+# No read_only, server needs to write it's own data data for QA purposes
+# read_only
+
+# Turn off the nonstandard behaviors for  TIMESTAMP
+explicit-defaults-for-timestamp
+
+# Keep server warm
+innodb_buffer_pool_dump_at_shutdown=ON
+innodb_buffer_pool_load_at_startup=ON
+innodb_buffer_pool_filename=ib_buffer_pool
+
+# Undo tablespace
+innodb_undo_directory=<%= mysqldatadir %>
+innodb_undo_tablespaces=10
+innodb_undo_logs=5
+
+# GTID - needs more research
+# gtid-mode = ON
+# enforce-gtid-consistency = true
+
+## Extra options
+#
+# Binlog opts
+binlog-format=MIXED
+
+# Replication filters
+# The current pubops box does not need the reporting tables, so let's exclude
+# them
+# filters=adops2_0_production.*
+replicate-ignore-table=adops2_0_production.payout_cache
+replicate-ignore-table=adops2_0_production.payout_cache_2008
+replicate-ignore-table=adops2_0_production.payout_cache_context_entries
+replicate-ignore-table=adops2_0_production.payout_cache_context_temp_ad_operation_fees
+replicate-ignore-table=adops2_0_production.payout_cache_context_temp_authorizations
+replicate-ignore-table=adops2_0_production.payout_cache_context_temp_campaign_line_item_ad_final_numbers
+replicate-ignore-table=adops2_0_production.payout_cache_context_temp_campaigns_sales_execs
+replicate-ignore-table=adops2_0_production.payout_cache_context_temp_company_commission_rates
+replicate-ignore-table=adops2_0_production.payout_cache_context_temp_contract_commission_rates
+replicate-ignore-table=adops2_0_production.payout_cache_context_temp_contract_special_rates
+replicate-ignore-table=adops2_0_production.payout_cache_context_temp_contracts
+replicate-ignore-table=adops2_0_production.payout_cache_context_temp_contracts_fallback
+replicate-ignore-table=adops2_0_production.payout_cache_context_temp_payout_proportions
+replicate-ignore-table=adops2_0_production.payout_cache_context_temp_rtb_ecpm
+replicate-ignore-table=adops2_0_production.payout_cache_contexts
+replicate-ignore-table=adops2_0_production.payout_cache_daily
+replicate-ignore-table=adops2_0_production.payout_cache_historical
+replicate-ignore-table=adops2_0_production.payout_cache_legacy
+replicate-ignore-table=adops2_0_production.payout_proportions
+replicate-ignore-table=adops2_0_production.payout_proportions_daily
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_clia_parent_id_ad_clicks
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_clia_parent_id_ad_clicks_daily
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_clia_parent_id_ad_imp
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_clia_parent_id_ad_imp_daily
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_clia_parent_id_col_ad_clicks
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_clia_parent_id_col_ad_clicks_daily
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_clia_parent_id_col_ad_imp
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_clia_parent_id_col_ad_imp_daily
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_r_ad_id_ad_clicks
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_r_ad_id_ad_clicks_daily
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_r_ad_id_ad_imp
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_r_ad_id_ad_imp_daily
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_r_ad_id_site_id_site_clicks
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_r_ad_id_site_id_site_clicks_daily
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_r_ad_id_site_id_site_imp
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_r_ad_id_site_id_site_imp_daily
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_r_ad_id_site_id_total_clicks
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_r_ad_id_site_id_total_clicks_daily
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_r_ad_id_site_id_total_imp
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_r_ad_id_site_id_total_imp_daily
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_sites_distinct
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_sites_distinct_count
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_sites_distinct_count_daily
+replicate-ignore-table=adops2_0_production.payout_proportions_temp_sites_distinct_daily
+replicate-ignore-table=adops2_0_production.sessions
+replicate-ignore-table=adops2_0_production.scheduled_reports
+replicate-ignore-table=adops2_0_production.user_audits_histories
+# filters=ap_adops_reporting.*
+replicate-ignore-table=ap_adops_reporting.payout_cache
+replicate-ignore-table=ap_adops_reporting.payout_cache_2008
+replicate-ignore-table=ap_adops_reporting.payout_cache_context_entries
+replicate-ignore-table=ap_adops_reporting.payout_cache_context_temp_ad_operation_fees
+replicate-ignore-table=ap_adops_reporting.payout_cache_context_temp_authorizations
+replicate-ignore-table=ap_adops_reporting.payout_cache_context_temp_campaign_line_item_ad_final_numbers
+replicate-ignore-table=ap_adops_reporting.payout_cache_context_temp_campaigns_sales_execs
+replicate-ignore-table=ap_adops_reporting.payout_cache_context_temp_company_commission_rates
+replicate-ignore-table=ap_adops_reporting.payout_cache_context_temp_contract_commission_rates
+replicate-ignore-table=ap_adops_reporting.payout_cache_context_temp_contract_special_rates
+replicate-ignore-table=ap_adops_reporting.payout_cache_context_temp_contracts
+replicate-ignore-table=ap_adops_reporting.payout_cache_context_temp_contracts_fallback
+replicate-ignore-table=ap_adops_reporting.payout_cache_context_temp_payout_proportions
+replicate-ignore-table=ap_adops_reporting.payout_cache_context_temp_rtb_ecpm
+replicate-ignore-table=ap_adops_reporting.payout_cache_contexts
+replicate-ignore-table=ap_adops_reporting.payout_cache_daily
+replicate-ignore-table=ap_adops_reporting.payout_cache_historical
+replicate-ignore-table=ap_adops_reporting.payout_cache_legacy
+replicate-ignore-table=ap_adops_reporting.payout_proportions
+replicate-ignore-table=ap_adops_reporting.payout_proportions_daily
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_clia_parent_id_ad_clicks
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_clia_parent_id_ad_clicks_daily
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_clia_parent_id_ad_imp
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_clia_parent_id_ad_imp_daily
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_clia_parent_id_col_ad_clicks
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_clia_parent_id_col_ad_clicks_daily
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_clia_parent_id_col_ad_imp
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_clia_parent_id_col_ad_imp_daily
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_r_ad_id_ad_clicks
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_r_ad_id_ad_clicks_daily
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_r_ad_id_ad_imp
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_r_ad_id_ad_imp_daily
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_r_ad_id_site_id_site_clicks
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_r_ad_id_site_id_site_clicks_daily
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_r_ad_id_site_id_site_imp
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_r_ad_id_site_id_site_imp_daily
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_r_ad_id_site_id_total_clicks
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_r_ad_id_site_id_total_clicks_daily
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_r_ad_id_site_id_total_imp
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_r_ad_id_site_id_total_imp_daily
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_sites_distinct
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_sites_distinct_count
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_sites_distinct_count_daily
+replicate-ignore-table=ap_adops_reporting.payout_proportions_temp_sites_distinct_daily

@@ -1,0 +1,19 @@
+$TTL 86400
+evolvemedia.com.au.	IN      SOA     evolvemedia.com.au. root.evolvemedia.com.au (
+                        2014061900	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+;
+; name servers and mail servers
+;
+evolvemedia.com.au.		IN	NS		app1v-dns.tp.prd.lax.evolvemediallc.com.
+evolvemedia.com.au.		IN	NS		app2v-dns.tp.prd.lax.evolvemediallc.com.
+evolvemedia.com.au.		IN	NS		app3v-dns.tp.prd.lax.evolvemediallc.com.
+evolvemedia.com.au.		IN	NS		app4v-dns.tp.prd.lax.evolvemediallc.com.
+;
+; Messagelabs powered mx
+evolvemedia.com.au.         IN      TXT     "G0O0R34839"
+evolvemedia.com.au.      IN      MX      10      cluster9.us.messagelabs.com.
+evolvemedia.com.au.      IN      MX      20      cluster9a.us.messagelabs.com.

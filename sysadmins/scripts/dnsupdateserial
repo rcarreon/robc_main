@@ -1,0 +1,46 @@
+#!/bin/bash
+
+for zonefile in $@;do
+   test -f "$zonefile" || continue
+
+   serial=$(dnsextractserial $zonefile)
+
+   syear=${serial:0:4}
+   smonth=${serial:4:2}
+   sday=${serial:6:2}
+   sincr=${serial:8:2}
+   date=$(date +"%Y%m%d")
+   year=${date:0:4}
+   month=${date:4:2}
+   day=${date:6:2}
+   resetincr=0
+
+   if [ $syear != $year ];then
+      syear=$year
+      resetincr=1
+   fi
+   if [ $smonth != $month ];then
+      smonth=$month
+      resetincr=1
+   fi
+   if [ $sday != $day ];then
+      sday=$day
+      resetincr=1
+   fi
+   if [ $resetincr = 1 ];then
+      incr=00
+   else
+      sincr=$(echo $sincr | sed 's/^0//')
+      incr=$((sincr+1))
+      if [ $incr -lt 10 ];then
+          incr=0$incr
+      fi
+   fi
+   newserial=$(expr $syear$smonth${sday}00 + $incr)
+   if [ $newserial -le $serial ];then
+      echo "Warning: serial is set in the future" 1>&2
+      newserial=$((serial+1))
+   fi
+   sed -i 's/\([[:space:]]\)'$serial'\([^[:digit:]]\)/\1'$newserial'\2/' $zonefile
+   echo "$serial -> $newserial"
+done

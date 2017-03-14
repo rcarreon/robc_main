@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title></title>
+    <link rel="stylesheet" type="text/css" href="cycler.css" />
+  </head>
+  <body>
+    <div id="container">
+      <div id="wrap">
+	<h1 id="counter"></h1>
+	<hr />
+	<div class="reminder" id="weekly">Weekly Metrics Reminder</div>
+	<div class="reminder" id="monthly">Monthly Metrics Reminder</div>
+	<hr />
+	<div id="control">
+	  <input id="backwardSkip" type="button" value="Skip Backward" />
+	  <input id="forwardSkip" type="button" value="Skip Forward" />
+	  <input id="next" type="button" value="Next!" />
+	</div>
+	<table cellspacing="0" cellpadding="0">
+	  <tr>
+	    <th></th>
+	    <th>Cycle</th>
+	    <th>Site</th>
+	  </tr>
+	  <tr>
+	    <td>Previous:</td>
+	    <td><span id="prevSitesCycle">N/A</span></td>
+	    <td>
+	      <ul id="prevSitesUrls"></ul>	
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>Current:</td>
+	    <td><span id="currSitesCycle">N/A</span></td>
+	    <td>
+	      <ul id="currSitesUrls"></ul>
+	    </td>
+	  </tr>
+	  <tr>
+	    <td>Next:</td>
+	    <td><span id="nextSitesCycle">N/A</span></td>
+	    <td>
+	      <ul id="nextSitesUrls"></ul>
+	    </td>
+	  </tr>
+	</table>
+	<script src="cycler.js"></script>
+	<script>
+          Cycler.start({urls: [
+	      $urls
+	  ]});
+	</script>
+      </div>
+    </div>
+  </body>
+</html>

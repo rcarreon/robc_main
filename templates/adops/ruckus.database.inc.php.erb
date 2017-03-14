@@ -1,0 +1,30 @@
+<?php
+
+
+//----------------------------
+// DATABASE CONFIGURATION
+//----------------------------
+$ruckusing_db_config = array(
+
+    'local' => array(
+        'type'      => 'mysql',
+        'host'      => 'localhost',
+        'port'      => 3306,
+        'database'  => 'adops2_0_production',
+        'user'      => 'root',
+        'password'  => ''
+    ),
+	
+    '<%= env_adops_ruckus %>' => array(
+        'type'      => 'mysql',
+        'host'      => '<%= host_adops_ruckus %>',
+        'port'      => 3306,
+        'database'  => 'adops2_0_production',
+        'user'      => '<%= user_adops_ruckus %>',
+        'password'  => '<%= pw_adops_ruckus %>'
+    )
+
+);
+
+
+?>

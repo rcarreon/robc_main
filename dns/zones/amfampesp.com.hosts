@@ -1,0 +1,30 @@
+$TTL    3600 
+amfampesp.com.	IN      SOA     amfampesp.com. root.amfampesp.com. (
+                        2016061600	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+amfampesp.com.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+amfampesp.com.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+amfampesp.com.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+amfampesp.com.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+amfampesp.com.     IN  MX 1 aspmx.l.google.com. 
+amfampesp.com.     IN MX 5 alt1.aspmx.l.google.com. 
+amfampesp.com.     IN MX 5 alt2.aspmx.l.google.com. 
+amfampesp.com.     IN MX 10 alt3.aspmx.l.google.com. 
+amfampesp.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+
+
+amfampesp.com.                           IN      A           97.64.84.104   
+www.amfampesp.com.                       IN      CNAME       cdn.campaigns.craveonline.com.
+staging.amfampesp.com.                   IN      CNAME       staging.campaigns.craveonline.com.
+demo.amfampesp.com.                      IN      CNAME       cdn.campaigns.craveonline.com.
+dev.amfampesp.com.                       IN      CNAME       app1v-dh.si.dev.lax.gnmedia.net.
+amfampesp.com. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

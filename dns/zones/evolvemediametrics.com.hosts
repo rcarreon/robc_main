@@ -1,0 +1,31 @@
+$TTL 3600
+evolvemediametrics.com.	IN      SOA     evolvemediametrics.com. root.evolvemediametrics.com. (
+                        2015051101	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+evolvemediametrics.com.	IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+evolvemediametrics.com.	IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+evolvemediametrics.com.	IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+evolvemediametrics.com.	IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+;evolvemediametrics.com.	IN      MX      10      cluster9.us.messagelabs.com.
+;evolvemediametrics.com.	IN      MX      20      cluster9a.us.messagelabs.com.
+;
+; local host
+;
+local           IN      A       127.0.0.1
+localhost       IN      A       127.0.0.1
+loghost         IN      A       127.0.0.1
+;
+; Prod
+siteanalytics.evolvemediametrics.com.	IN	A	97.64.84.130
+cdn.siteanalytics.evolvemediametrics.com.      IN      CNAME   wac.13B87.deltacdn.net.
+origin.siteanalytics.evolvemediametrics.com.	IN	CNAME	siteanalytics.evolvemediametrics.com.
+;
+; Staging
+siteanalytics.stg.evolvemediametrics.com.	IN	A	97.64.84.131
+cdn.siteanalytics.stg.evolvemediametrics.com.	IN      CNAME   wac.13B87.deltacdn.net.
+origin.siteanalytics.stg.evolvemediametrics.com.	IN	CNAME	siteanalytics.stg.evolvemediametrics.com.

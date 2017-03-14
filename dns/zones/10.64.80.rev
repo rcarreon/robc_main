@@ -1,0 +1,132 @@
+$TTL 3600 ; 1 day
+@      IN      SOA     gnmedia.net. root@gnmedia.net. (
+			2016071200	; Serial
+			36262		; Refresh
+			300		; Retry
+			3600000		; Expire
+			3600 )		; Minimum
+
+	IN      NS      app1v-dns.tp.prd.lax.gnmedia.net.
+        IN      NS      app2v-dns.tp.prd.lax.gnmedia.net.
+        IN      NS      app3v-dns.tp.prd.lax.gnmedia.net.
+        IN      NS      app4v-dns.tp.prd.lax.gnmedia.net.
+
+30	IN	PTR	app1v-ep.ao.prd.lax.gnmedia.net.
+31	IN	PTR	app2v-ep.ao.prd.lax.gnmedia.net.
+32	IN	PTR	mem1v-ep.ao.prd.lax.gnmedia.net.
+33	IN	PTR	mem2v-ep.ao.prd.lax.gnmedia.net.
+34	IN	PTR	sql1v-ep.ao.prd.lax.gnmedia.net.
+35	IN	PTR	sql2v-ep.ao.prd.lax.gnmedia.net.
+40      IN      PTR     metal-1.lax.gnmedia.net.
+41      IN      PTR     metal-2.lax.gnmedia.net.
+42      IN      PTR     metal-3.lax.gnmedia.net.
+43      IN      PTR     metal-4.lax.gnmedia.net.
+44      IN      PTR     metal-5.lax.gnmedia.net.
+45      IN      PTR     metal-6.lax.gnmedia.net.
+46      IN      PTR     metal-7.lax.gnmedia.net.
+47      IN      PTR     metal-8.lax.gnmedia.net.
+48      IN      PTR     metal-9.lax.gnmedia.net.
+49      IN      PTR     metal-10.lax.gnmedia.net.
+50      IN      PTR     metal-11.lax.gnmedia.net.
+51      IN      PTR     metal-12.lax.gnmedia.net.
+52      IN      PTR     metal-13.lax.gnmedia.net.
+53      IN      PTR     metal-14.lax.gnmedia.net.
+54      IN      PTR     metal-15.lax.gnmedia.net.
+55      IN      PTR     metal-16.lax.gnmedia.net.
+56      IN      PTR     metal-17.lax.gnmedia.net.
+57      IN      PTR     metal-18.lax.gnmedia.net.
+58      IN      PTR     metal-19.lax.gnmedia.net.
+59      IN      PTR     metal-20.lax.gnmedia.net.
+60      IN      PTR     metal-21.lax.gnmedia.net.
+61      IN      PTR     metal-22.lax.gnmedia.net.
+62      IN      PTR     metal-23.lax.gnmedia.net.
+63      IN      PTR     metal-24.lax.gnmedia.net.
+64      IN      PTR     metal-25.lax.gnmedia.net.
+65      IN      PTR     metal-26.lax.gnmedia.net.
+
+18	IN	PTR	app1v-tb.ao.prd.lax.gnmedia.net.
+19      IN      PTR     app2v-tb.ao.prd.lax.gnmedia.net.
+20      IN      PTR     app3v-tb.ao.prd.lax.gnmedia.net.
+21      IN      PTR     app4v-tb.ao.prd.lax.gnmedia.net.
+22      IN      PTR     app5v-tb.ao.prd.lax.gnmedia.net.
+23      IN      PTR     app6v-tb.ao.prd.lax.gnmedia.net.
+24      IN      PTR	sql1v-tb.ao.prd.lax.gnmedia.net.
+25      IN      PTR	sql2v-tb.ao.prd.lax.gnmedia.net.
+
+26	IN	PTR	app3v-adops.ap.prd.lax.gnmedia.net.
+27	IN	PTR	app4v-adops.ap.prd.lax.gnmedia.net.
+
+14	IN	PTR	app1v-webdav.tp.prd.lax.gnmedia.net.
+28	IN	PTR	app3v-origin.og.prd.lax.gnmedia.net.
+29	IN	PTR	app4v-origin.og.prd.lax.gnmedia.net.
+
+77	IN	PTR	app2v-hadoop-bd.tp.prd.lax.gnmedia.net.
+78	IN	PTR	app3v-hadoop-bd.tp.prd.lax.gnmedia.net.
+79	IN	PTR	app4v-hadoop-bd.tp.prd.lax.gnmedia.net.
+80      IN      PTR     app5v-hadoop-bd.tp.prd.lax.gnmedia.net.
+87	IN	PTR	app1v-mstr.tp.prd.lax.gnmedia.net.
+119	IN	PTR	app14v-wp.ao.prd.lax.gnmedia.net.
+120	IN	PTR	app15v-wp.ao.prd.lax.gnmedia.net.
+118	IN	PTR	app13v-wp.ao.prd.lax.gnmedia.net.
+121	IN	PTR	app16v-wp.ao.prd.lax.gnmedia.net.
+
+67	IN	PTR	metal-28.lax.gnmedia.net.
+81	IN	PTR	app1v-zookeeper-bd.tp.prd.lax.gnmedia.net.
+82	IN	PTR	app2v-zookeeper-bd.tp.prd.lax.gnmedia.net.
+85	IN	PTR	app100v-nagios.tp.prd.lax.gnmedia.net.
+;84	IN	PTR	app8v-cms.sbv.prd.lax.gnmedia.net. decom 
+;87	IN	PTR	app7v-cms.sbv.prd.lax.gnmedia.net. decom
+112	IN	PTR	app1v-demiurge.tp.prd.lax.gnmedia.net.
+38	IN	PTR	app1v-build.ap.prd.lax.gnmedia.net.
+89	IN	PTR	mem1v-xf-wz.ao.prd.lax.gnmedia.net.
+90	IN	PTR	mem2v-xf-wz.ao.prd.lax.gnmedia.net.
+91	IN	PTR	mem1v-xf-hfb.ao.prd.lax.gnmedia.net.
+92	IN	PTR	mem2v-xf-hfb.ao.prd.lax.gnmedia.net.
+94	IN	PTR	sql2v-xf-hfb.ao.prd.lax.gnmedia.net.
+93	IN	PTR	sql1v-xf-hfb.ao.prd.lax.gnmedia.net.
+96	IN	PTR	app4v-55-dh.si.prd.lax.gnmedia.net.
+95	IN	PTR	app3v-55-dh.si.prd.lax.gnmedia.net.
+
+;AO VIPs
+6 	IN	PTR	vip-app-xf-hfb.ao.prd.lax.gnmedia.net.   
+7	IN	PTR	vip-sqlrw-xf-hfb.ao.prd.lax.gnmedia.net.   
+8	IN	PTR	vip-sqlro-xf-hfb.ao.prd.lax.gnmedia.net.      
+9	IN	PTR	vip-app-xf-wz.ao.prd.lax.gnmedia.net.         
+10	IN	PTR	vip-sqlrw-xf-wz.ao.prd.lax.gnmedia.net.         
+13	IN	PTR	vip-sqlro-xf-wz.ao.prd.lax.gnmedia.net.
+74	IN	PTR	metal-34.lax.gnmedia.net.
+97	IN	PTR	app6v-hadoop-bd.tp.prd.lax.gnmedia.net.
+69	IN	PTR	metal-30.lax.gnmedia.net.
+16	IN	PTR	sql1v-bd.og.prd.lax.gnmedia.net.
+17	IN	PTR	sql2v-bd.og.prd.lax.gnmedia.net.
+98	IN	PTR	app5v-xf-sdc.ao.prd.lax.gnmedia.net.
+99	IN	PTR	app6v-xf-sdc.ao.prd.lax.gnmedia.net.
+100	IN	PTR	app2v-bd.tp.prd.lax.gnmedia.net.
+101	IN	PTR	app3v-bd.tp.prd.lax.gnmedia.net.
+102	IN	PTR	app7v-xf-sdc.ao.prd.lax.gnmedia.net.
+103	IN	PTR	app8v-xf-sdc.ao.prd.lax.gnmedia.net.
+104	IN	PTR	app1v-orchestrator.tp.prd.lax.gnmedia.net.
+105	IN	PTR	app2v-orchestrator.tp.prd.lax.gnmedia.net.
+106	IN	PTR	rds1v-adops.ap.prd.lax.gnmedia.net.
+107	IN	PTR	rds2v-adops.ap.prd.lax.gnmedia.net.
+108	IN	PTR	app1v-vb-pf.ao.prd.lax.gnmedia.net.
+109	IN	PTR	app2v-vb-pf.ao.prd.lax.gnmedia.net.
+113	IN	PTR	vip-sqlro-pf.ao.prd.lax.gnmedia.net.
+114	IN	PTR	vip-sqlrw-pf.ao.prd.lax.gnmedia.net.
+111	IN	PTR	sql2v-vb-pf.ao.prd.lax.gnmedia.net.
+110	IN	PTR	sql1v-vb-pf.ao.prd.lax.gnmedia.net.
+116	IN	PTR	app11v-wp.ao.prd.lax.gnmedia.net.
+122	IN	PTR	app1v-msapp.tp.prd.lax.gnmedia.net.
+123	IN	PTR	sql1v-mstr.tp.prd.lax.gnmedia.net.
+124	IN	PTR	sql2v-mstr.tp.prd.lax.gnmedia.net.
+129	IN	PTR	vip-sqlrw-api-dfp.ao.prd.lax.gnmedia.net.
+130	IN	PTR	vip-sqlro-api-dfp.ao.prd.lax.gnmedia.net.
+131	IN	PTR	vip-app-api-dfp.ao.prd.lax.gnmedia.net.
+132	IN	PTR	app1v-spark-bd.og.prd.lax.gnmedia.net.
+133	IN	PTR	app2v-spark-bd.og.prd.lax.gnmedia.net.
+134	IN	PTR	app3v-spark-bd.og.prd.lax.gnmedia.net.
+127     IN      PTR     app1v-bcn-bd.og.prd.lax.gnmedia.net.
+128     IN      PTR     app2v-bcn-bd.og.prd.lax.gnmedia.net.
+135	IN	PTR	worker1v.ap.prd.lax.gnmedia.net.
+136	IN	PTR	api1v.ap.prd.lax.gnmedia.net.
+137	IN	PTR	api2v.ap.prd.lax.gnmedia.net.

@@ -1,0 +1,35 @@
+#!/bin/bash
+#
+# Generate thumbnails of every single file in the ../screenshots/ folder
+# You need to have ImageMagick installed
+currentDir=$(pwd)
+
+# Backing up actual thumbnails
+cd ../screenshots/thumbs
+FILES=$(ls | egrep 'jpg$|png$')
+if [[ $? -eq  0 ]]
+then
+  for i in $FILES
+  do
+    mv -f $i thumbs-old/$i
+  done
+else
+  "Errors detected., maybe there were no files to backup"
+fi
+
+cd $currentDir
+
+# Genereting the new thumbnails
+cd ../screenshots
+FILES=$(ls | egrep 'jpg$|png$')
+for i in $FILES
+do
+  echo -n "Processing image $i ... "
+  convert -thumbnail 200 $i thumbs\/thumb-$i
+  if [[ $? -eq  0 ]]
+    then
+    echo "done"
+  else
+    echo "something went wrong with this image"
+  fi
+done

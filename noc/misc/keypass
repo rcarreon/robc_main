@@ -1,0 +1,166 @@
+Access to the mac-mini in the NOC room 
+
+IPaddress 	192.168.12.186
+user 		noc
+pass		hm0n0c !
+
+Note: yes there is an space on the password (:
+
+To access Pingdom 
+
+user 	techops@evolvemediallc.com
+pass	G0ri11a!
+
+When you need to reboot the nfs1.lax3 log in with these credentials if 
+yours is not working
+
+user	noc 
+pass	r33bt923	 
+
+
+# Babyhold.com Catrika ticket support access
+/
+https://cartikasupport.com/helpdesk/
+
+user	noc@gorillanation.com
+pass	bazel32
+
+# Babyhold.com Control panel
+
+http://cp.cartikahosting.com/
+
+user	mailalon
+pass	bazel32
+
+
+https://zmanda.gnmedia.net
+
+user 	noc
+pass    yuewr571
+
+
+# HMO Backup circuit router password 
+IP 192.168.12.7
+pass 2340615793
+
+
+#Geosurf credentials (AdClarity Toolbar)
+u: admin@gorillanation.com
+p: dfh456
+
+#RT generic Creds
+user	rt_svc_user
+pass    FN#27?Pq
+
+# Spam Manager password for noc@gorillanation.com
+user noc@gorillanation.com
+pass nD3gGvRcxt7G 
+
+# https://control.akamai.com/EdgeAuth/login.jsp
+roberto.carreon@gorillanation.com
+changeme3
+
+
+#Login credentials for teenspot
+www.virtacoresupport.com/index.php
+
+User: hanna.miranda@atomiconline.com
+Pass: hgq2z40s
+
+#MyAniumuList.net ~ugu
+
+User: animunoc
+Pass: automagically
+
+Incapsula 
+
+https://my.incapsula.com/admin/login
+
+email: noc@evolvemediallc.com
+passwd: Uiopzxcv$
+
+http://evlamom01
+user: guest
+Pass: (no password)
+
+NetDataCenters
+
+https://portal.netdatacenters.com/customer/login/index
+
+user: evolvenoc
+pass: 4nt1n0my
+
+user: nocleads
+pass: uFqhP2xN
+
+== Akamai purge script ==
+http://utils.atomiconline.com/utilities/akamai_content_refresh.php?command=log
+User: admin
+Pass: kw7RAx4gw4B
+
+== Peak Support Portal ==
+
+https://helpdesk.peakhosting.com
+User: noc@evolvemediallc.com
+Pass: {&uGY8YAs8)+#vH 
+
+== admin.sherdog.com ==
+url: http://admin.sherdog.com/accounts/login
+user/pass: atomiconline/Ju5T4Xp8gcYF
+then user/pass: atomiconline/kluges8!taunt
+
+== PEAK F5 ==
+url: https://evolve.f5.peakhosting.com/xui/
+user: evolve
+pass: 7ujEduth
+
+== AdminTool Peak ==
+url: https://admintool.peakhosting.com
+user: evolvenoc
+Pass: qErH4s7bVn
+
+== vsftp for edgecastlogs == 
+75.101.154.33
+user:elogs
+pass:Edg3l0gs
+
+== Netapp CLI ==
+# Remember to ssh first to the noc box or xcat box
+ssh evolve@97.64.65.16
+hs#4Un@L2
+
+== http://status.evolvemediallc.com/ ==
+user: TechOps
+user email: techops@evolvemediallc.com
+password: @tech0ps9
+--------------------
+DB_DATABASE=cachet
+DB_USERNAME=cachet_rw
+DB_PASSWORD=B7okU0js
+--------------------
+
+-----------------------------------------
+== SI Demo Requests (used for JIRA) ==
+user: si-demo-requests@evolvemediallc.com
+pass: 5#1@d3#m0@r3#qu3#575
+-----------------------------------------
+
+-----------------------------------------
+== Origin Board (used for JIRA) ==
+user: originanalytics@evolvemediallc.com
+pass: @n@l_!7y(5@0r!6!n
+-----------------------------------------
+
+-----------------------------------------
+Opcache webstats for forums
+user: noc 
+pass: 3v0lven0c@dmin
+forums.sherdog.com/opcache/op.php
+----------------------------------------
+
+----------------------------------------
+Opcache webstats for martini.media
+user: noc 
+pass: nocadmin / n0c@dmin
+martini.media/opcache2/op.php
+---------------------------------------

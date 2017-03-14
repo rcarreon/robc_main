@@ -1,0 +1,105 @@
+$TTL    300 
+afterellen.com.    IN    SOA    afterellen.com.    root.afterellen.com. (
+                                           2014120900     ; serial
+                                           28800          ; refresh
+                                           14400          ; retry
+                                           3600000        ; expire
+                                           86400 )        ; minimum
+
+
+
+afterellen.com.                           IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+afterellen.com.                           IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+afterellen.com.                           IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+afterellen.com.                           IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+; Messagelabs powered mx
+afterellen.com.                           IN    MX 10    cluster9.us.messagelabs.com.
+afterellen.com.                           IN    MX 20    cluster9a.us.messagelabs.com.
+afterellen.com.                           IN    TXT      "G0O0R34839"
+
+; Imported data
+;afterellen.com.                            IN    SOA      a1.verisigndns.com. dnssupport.verisign-grs.com. 2282381381 600 600 1209600      
+;afterellen.com.                            IN    MX       10 mail1.viacom.com.
+;afterellen.com.                            IN    MX       50 mailw.viacom.com.
+;afterellen.com.                            IN    MX       10 mail.viacom.com.
+;afterellen.com.                            IN    A        206.220.43.92
+;afterellen.com.                            IN    NS       a1.verisigndns.com.
+;afterellen.com.                            IN    NS       a2.verisigndns.com.
+;afterellen.com.                            IN    NS       a3.verisigndns.com.
+;afterellen.com.                            IN    NS       ns1.p41.dynect.net.
+;afterellen.com.                            IN    NS       ns2.p41.dynect.net.
+;afterellen.com.                            IN    NS       ns3.p41.dynect.net.
+;afterellen.com.                            IN    NS       ns4.p41.dynect.net.
+afterellen.com.                            IN    TXT      "google-site-verification:X0vvlPt38Il3dJPblIdpU5Z3hz9LOa7alASeOZJIDy0"
+afterellen.com.                            IN    TXT      "v=spf1 a:mailout01.viacom.com a:mailout02.viacom.com a:mailout03.viacom.com a:mailout04.viacom.com ~all"
+;*.afterellen.com.                          IN    A        206.220.43.92
+;auth.afterellen.com.                       IN    CNAME    auth.afterellen.com.edgesuite.net.
+;community.afterellen.com.                  IN    A        129.228.38.30
+;exodus.afterellen.com.                     IN    CNAME    exodus.afterellen.com.edgesuite.net.
+;origin.exodus.afterellen.com.              IN    CNAME    origin.exodus.mtvnservices.com.
+;forums.afterellen.com.                 300 IN    CNAME    forums.afterellen.com.edgesuite.net.
+;origin.forums.afterellen.com.          300 IN    A        129.228.24.26
+;gs.afterellen.com.                         IN    CNAME    gs.afterellen.com.edgesuite.net.
+;origin.gs.afterellen.com.                  IN    A        206.220.43.155
+;m.afterellen.com.                          IN    A        206.220.43.92
+;mail.afterellen.com.                       IN    A        65.98.68.206
+;old.afterellen.com.                        IN    A        129.228.37.98
+;relaunch.afterellen.com.                   IN    CNAME    relaunch.afterellen.com.edgesuite.net.
+;origin.relaunch.afterellen.com.            IN    A        129.228.24.80
+;sc.afterellen.com.                         IN    CNAME    vmn.112.2o7.net.
+;wap.afterellen.com.                        IN    A        206.220.43.92
+;www.afterellen.com.                        IN    CNAME    www.afterellen.com.edgesuite.net.
+;origin.www.afterellen.com.                 IN    A        129.228.24.80
+; End Imported Data
+
+
+
+; #### afterellen TitanWP Migration
+afterellen.com.                            IN    A        72.172.76.151
+
+bta.afterellen.com.                        IN    A        10.11.234.71
+dev.afterellen.com.                        IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.afterellen.com.                        IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.afterellen.com.                        IN    A        72.172.76.151
+www.afterellen.com.                        IN    CNAME    prd.afterellen.com.
+m.afterellen.com.                          IN    A        72.172.76.151
+
+origin.bta.afterellen.com.                 IN    CNAME    bta.afterellen.com.
+cdn1-bta.afterellen.com.                   IN    CNAME    bta.afterellen.com.
+cdn2-bta.afterellen.com.                   IN    CNAME    bta.afterellen.com.
+cdn3-bta.afterellen.com.                   IN    CNAME    bta.afterellen.com.
+
+origin-dev.afterellen.com.                 IN    CNAME    dev.afterellen.com.
+cdn1-dev.afterellen.com.                   IN    CNAME    dev.afterellen.com.
+cdn2-dev.afterellen.com.                   IN    CNAME    dev.afterellen.com.
+cdn3-dev.afterellen.com.                   IN    CNAME    dev.afterellen.com.
+
+origin-stg.afterellen.com.                 IN    CNAME    stg.afterellen.com.
+cdn1-stg.afterellen.com.                   IN    CNAME    wac.11EE9.edgecastcdn.net.
+cdn2-stg.afterellen.com.                   IN    CNAME    wac.11EE9.edgecastcdn.net.
+cdn3-stg.afterellen.com.                   IN    CNAME    wac.11EE9.edgecastcdn.net.
+
+origin.afterellen.com.                     IN    CNAME    prd.afterellen.com.
+cdn1-www.afterellen.com.                   IN    CNAME    wac.11EE9.edgecastcdn.net.
+cdn2-www.afterellen.com.                   IN    CNAME    wac.11EE9.edgecastcdn.net.
+cdn3-www.afterellen.com.                   IN    CNAME    wac.11EE9.edgecastcdn.net.
+; #### End TitanWP Migration
+
+
+
+; #### TitanXF Migration
+dev.forums.afterellen.com.                 IN    A        10.11.234.123
+orgin-dev.forums.afterellen.com.           IN    CNAME    dev.forums.afterellen.com.
+cdn1-dev.forums.afterellen.com.            IN    CNAME    dev.forums.afterellen.com.
+
+stg.forums.afterellen.com.                 IN    A        72.172.76.123
+origin-stg.forums.afterellen.com.          IN    CNAME    stg.forums.afterellen.com.
+cdn1-stg.forums.afterellen.com.            IN    CNAME    wac.11EE9.edgecastcdn.net.
+
+forums.afterellen.com.                     IN    A        72.172.76.96
+prd.forums.afterellen.com.                 IN    A        72.172.76.96
+origin.forums.afterellen.com.              IN    A        72.172.76.96
+cdn1-www.forums.afterellen.com.            IN    CNAME    wac.11EE9.edgecastcdn.net.
+cdn1-forums.afterellen.com.                IN    CNAME    wac.11EE9.edgecastcdn.net.
+; #### End TitanXF Migration

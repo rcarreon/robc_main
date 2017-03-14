@@ -1,0 +1,9 @@
+<%= env_app_adoperations %>:
+  host: ldap.gorillanation.local
+  port: 389
+  attribute: samaccountname
+  base: dc=gorillanation,dc=local
+  admin_user: cn=svc_adops,ou=Service Accounts,ou=Global Resources,dc=gorillanation,dc=local
+  admin_password: '<%= ldap_pass_app_adoperations %>'
+  ssl: false
+  # <<: *AUTHORIZATIONS

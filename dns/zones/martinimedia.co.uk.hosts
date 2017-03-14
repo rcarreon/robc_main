@@ -1,0 +1,24 @@
+$ORIGIN martinimedia.co.uk
+$TTL    3600 
+martinimedia.co.uk.	IN      SOA     martinimedia.co.uk. root.martinimedia.co.uk. (
+                        2015070600	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+martinimedia.co.uk.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+martinimedia.co.uk.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+martinimedia.co.uk.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+martinimedia.co.uk.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+
+
+                          A     216.146.46.10
+                          A     216.146.46.11
+www                     A     85.133.38.1
+
+

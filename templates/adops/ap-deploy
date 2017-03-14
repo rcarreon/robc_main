@@ -1,0 +1,168 @@
+
+#: Title        : ap-deploy
+#: Date         : 2015-09-03
+#: Author       : "Robert Scott-Buccleuch" <Robert.Scott-Buccleuch@evolvemediallc.com
+#: Version      : 0.2.0
+#: Description  : wrapper to deploy adops application via capistrano
+#                 so that our continuous delivery system can deploy
+#: Options      : None
+
+progname=${0##*/} # get the name of the script without its path
+version="0.2.0"
+default_repo_path=/app/shared/cap
+repo_path=
+cap_app_dir=
+
+cap_app=
+cap_stage=
+cap_target=
+cap_git_object=
+cap_opt_trace=
+cap_opt_dry_run=
+cap_opt_version=
+git_object=
+
+cap_cmd=
+cap_opts=
+output=
+
+export RBENV_VERSION=2.2.2-railsexpress
+
+#
+#@ description: print error message and exit with ERRNO code
+#@ usage: die ERRNO MESSAGE ...
+die() {
+  error=$1
+  shift
+  [ -n "$*" ] && printf "%s\n" "$*" >&2
+  exit "$error"
+}
+
+#
+#@ description: print usage info
+#@ usage: usage
+usage() {
+  version
+  printf "\n\nUSAGE: %s REPO_PATH\n" "$progname"
+  printf "\nREPO_PATH \t path to ap_cap repository default is /app/shared/cap\n\n"
+
+  printf "Options:\n"
+  printf " --%s -%s\t\t%s\n" "app" "a" "capistrano application like geoip"
+  printf " --%s -%s\t\t%s\n" "stage" "s" "capistrano stage like dev, prod etc..."
+  printf " --%s -%s\t\t%s\n" "target" "t" "capistrano target like deploy, deploy:check etc..."
+  printf " --%s -%s\t%s\n" "git-object" "g" "the git branch, revsion or tag to deploy"
+  printf " --%s -%s\t\t%s\n" "dry-run" "n" "capistrano options dry-run"
+  printf " --%s -%s\t\t%s\n" "trace" "T" "capistrano options trace"
+  printf " --%s -%s\t\t%s\n" "version" "v" "version of this script"
+  printf " --%s -%s\t%s\n" "cap-version" "V" "capistrano version this script uses"
+}
+
+#
+#@ description: print out the version of this script
+#@ usage: version
+version() {
+  printf "%s version %s\n" "$progname" "${version:-1}"
+}
+
+#
+#@ description: check the existance of the ap_cap repository
+#@ usage: check_repo_path
+validate_cap_dependencies() {
+  if [ ! -d "$repo_path" ]; then
+    die 1 "$repo_path does not exit"
+  fi
+
+  if [ ! -x "$cap_cmd" ]; then
+    die 1 "$cap_cmd is not executable"
+  fi
+
+  if [ ! -d "$cap_app_dir" ]; then
+    die 1 "$cap_app_dir does not exit"
+  fi
+}
+
+# show usage when cli is empty
+if [ $# -eq 0 ]; then
+  usage
+  exit 0
+fi
+
+long_opts="app:,stage:,target:,git-object:,dry-run,trace,help,version,cap-version"
+short_opts="a:s:t:g:hvTnV"
+args=$(getopt -l "$long_opts" -o "$short_opts" -- "$@")
+eval set -- "$args"
+while [ $# -ge 1 ]; do
+  case "$1" in
+    --)
+    # No more options
+    shift
+    break
+    ;;
+
+    -a|--app)
+    cap_app="$2"
+    shift
+    ;;
+    -s|--stage)
+    cap_stage="$2"
+    shift
+    ;;
+    -t|--target)
+    cap_target="$2"
+    shift
+    ;;
+    -g|--git-object)
+    git_object="$2"
+    shift
+    ;;
+    -V|--cap-version)
+    cap_opt_version=1
+    ;;
+    -n|--dry-run)
+    cap_opt_dry_run=1
+    ;;
+    -T|--trace)
+    cap_opt_trace=1
+    ;;
+    -h|--help)
+    usage
+    exit 0
+    ;;
+    -v|--version)
+    version
+    exit 0
+    ;;
+  esac
+  shift
+done
+
+repo_path=${1:-"$default_repo_path"}
+cap_app_dir="$repo_path/$cap_app"
+
+cap_cmd="$repo_path/bin/cap"
+deploy_cmd="$cap_cmd $cap_stage $cap_target"
+cap_opts=""
+if [ ! -z "$cap_opt_version" ]; then
+  cap_opts="--version"
+fi
+
+if [ ! -z "$cap_opt_trace" ]; then
+  cap_opts="--trace $cap_opts"
+fi
+
+if [ ! -z "$cap_opt_dry_run" ]; then
+  cap_opts="--dry-run $cap_opts"
+fi
+
+deploy_cmd="$deploy_cmd branch_name=$git_object $cap_opts"
+
+
+validate_cap_dependencies
+
+# swtich to repo to run the capistrano command
+cd $cap_app_dir || die 1 "can not cd into $repo_path"
+echo "[$RBENV_VERSION] calling: $deploy_cmd"
+# run capistrano deploy command
+$deploy_cmd
+
+exit $?

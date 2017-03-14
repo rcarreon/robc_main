@@ -1,0 +1,33 @@
+$TTL 3600
+totallyhermedia.com.au. IN      SOA     totallyhermedia.com.au. root.totallyhermedia.com.au. (
+                                                  2016061600      ; serial
+                                                  28800           ; refresh
+                                                  14400           ; retry
+                                                  3600000         ; expire
+                                                  86400 )         ; minimum
+
+totallyhermedia.com.au.                           IN    NS        app1v-dns.tp.prd.lax.gorillanation.com.
+totallyhermedia.com.au.                           IN    NS        app2v-dns.tp.prd.lax.gorillanation.com.
+totallyhermedia.com.au.                           IN    NS        app3v-dns.tp.prd.lax.gorillanation.com.
+totallyhermedia.com.au.                           IN    NS        app4v-dns.tp.prd.lax.gorillanation.com.
+ns3.totallyhermedia.com.au.                       IN    A         67.15.66.42
+ns4.totallyhermedia.com.au.                       IN    A         67.15.66.43
+ns5.totallyhermedia.com.au.                       IN    A         64.34.172.209
+ns6.totallyhermedia.com.au.                       IN    A         72.51.41.238
+
+
+totallyhermedia.com.au.     IN  MX 1 aspmx.l.google.com. 
+totallyhermedia.com.au.     IN MX 5 alt1.aspmx.l.google.com. 
+totallyhermedia.com.au.     IN MX 5 alt2.aspmx.l.google.com. 
+totallyhermedia.com.au.     IN MX 10 alt3.aspmx.l.google.com. 
+totallyhermedia.com.au.     IN MX 10 alt4.aspmx.l.google.co.
+
+; #### TitanWP
+totallyhermedia.com.au.                            IN    A        97.64.84.172
+bta.totallyhermedia.com.au.                        IN    A        10.64.64.75
+dev.totallyhermedia.com.au.                        IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.totallyhermedia.com.au.                        IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd.totallyhermedia.com.au.                        IN    A        97.64.84.172
+www.totallyhermedia.com.au.                        IN    A        97.64.84.172
+; #### End TitanWP
+totallyhermedia.com.au. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

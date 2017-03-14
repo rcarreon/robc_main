@@ -1,0 +1,25 @@
+---
+:worker_manager: 'ApAdopsReporting::WorkerManager'
+:configs:
+  :report_scheduler: 'ApAdopsReporting::Config::ReportScheduler'
+
+:prefetch: 1
+:no_ack: true
+:exclusive: false
+
+:exchange: adplatform
+:exchange_options:
+  :type: :direct
+  :durable: true
+  :auto_delete: false
+  :exclusive: false
+
+:routing_key: reporting
+:queue: reporting
+:queue_options:
+  :durable: true
+  :auto_delete: false
+  :exclusive: false
+
+:content_type: application/json
+:content_encoding: utf-8

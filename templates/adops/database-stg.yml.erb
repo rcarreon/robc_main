@@ -1,0 +1,33 @@
+#
+# NOTE: The staging servers are a production environment.  The look like prod, they
+# taste like prod.  They are the most economically practical attempt to
+# replicate the production-LIVE environment
+#
+
+staging:
+  adapter: mysql
+  database: adops2_0_production
+  username: <%= user_adplatform_rw_stg %>
+  password: <%= pw_adplatform_rw_stg %>
+  host: <%= host_adplatform_rw_stg %>
+
+staging_adops_reporting:
+  adapter: mysql
+  database: ap_adops_reporting
+  username: <%= user_adplatform_rw_stg %>
+  password: <%= pw_adplatform_rw_stg %>
+  host: <%= host_adplatform_rw_stg %>
+
+staging_read:
+  adapter: mysql
+  database: adops2_0_production
+  username: <%= user_adplatform_ro_stg %>
+  password: <%= pw_adplatform_ro_stg %>
+  host: <%= host_adplatform_ro_stg %>
+
+staging_migration:
+  adapter: mysql
+  database: adops2_0_production
+  username: <%= user_ap_migration_rw_stg %>
+  password: <%= pw_ap_migration_rw_stg %>
+  host: <%= host_adplatform_rw_stg %>

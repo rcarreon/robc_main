@@ -1,0 +1,79 @@
+#!/bin/bash
+
+BACKUP_DIR=/sql/archive
+BACKUP_EXT="*.sql.gz"
+BACKUP_MAX_DAYS=120
+BACKUP_MIN_DAYS=7
+
+MAILTO="adplatform@evolvemediallc.com"
+TMPFILE_DIR=/tmp
+TMPFILE_BASE=tempfile-db-backup-prune-adops.XXXXXXXX
+TMPFILE_EMAIL=$(mktemp ${TMPFILE_DIR}/${TMPFILE_BASE})a
+
+# Databases we need to verify backups for
+VERIFY_DBS="adops2_0_production dart_scheduler salesforce_local"
+VERIFY_PERIOD="daily weekly"
+VERIFY_TYPES="dfn data events routines triggers"
+
+function usage() {
+    echo Usage: ${0}
+    echo
+    echo This script will prune all files modified more than ${BACKUP_MAX_DAYS} days old, with an extension of \'${BACKUP_EXT}\'
+    exit 1
+}
+
+# Display help if necessary
+while getopts :h opt; do
+    case ${opt} in
+        h)
+            usage
+            exit 1
+            ;;
+    esac
+done
+
+echo pruning of Ad Platform database backups started on $(date --rfc-3339=seconds) >>${TMPFILE_EMAIL}
+echo  >>${TMPFILE_EMAIL}
+
+# Verify that we have backups taken within ${BACKUP_MIN_DAYS} timeframe before we
+# attempt to delete old backups
+missing_backups=''
+# find weekly backups, build a list of whatever is missing
+for period in ${VERIFY_PERIOD}; do
+    for db in ${VERIFY_DBS}; do
+        for backup_type in ${VERIFY_TYPES}; do
+            if [[ -z $(find ${BACKUP_DIR}/ -type f -mtime -${BACKUP_MIN_DAYS} -name "${period}-${db}-????????-${backup_type}.sql.gz" 2>/dev/null) ]]; then
+                missing_backups="${period}\t${db}\t${backup_type}\n${missing_backups}"
+            fi
+        done
+    done
+done
+
+if [[ -z ${missing_backups} ]]; then    
+    # delete old backups
+    echo Deleting old backups >>${TMPFILE_EMAIL} 
+    find ${BACKUP_DIR} -depth -type f -mtime +${BACKUP_MAX_DAYS} -name "${BACKUP_EXT}" -print -delete 2>&1 1>>${TMPFILE_EMAIL} 
+else
+    echo ERROR: The following backup files are missing  >>${TMPFILE_EMAIL}
+    echo -e "PERIOD\tDATABASE\tBACKUP_TYPE" >>${TMPFILE_EMAIL}
+    echo -e ${missing_backups} >>${TMPFILE_EMAIL}
+    echo >>${TMPFILE_EMAIL}
+    echo \"$(basename ${0})\" is exiting WITHOUT pruning any files >>${TMPFILE_EMAIL}
+fi
+
+echo  >>${TMPFILE_EMAIL}
+echo pruning of Ad Platform database backups ended on $(date --rfc-3339=seconds) >>${TMPFILE_EMAIL}
+
+function send_email() {
+    subject="Pruning Ad Platform Database Backup"
+    cat ${TMPFILE_EMAIL} | mail -s "${subject}" ${MAILTO}
+    if [ $? -ne 0 ]; then
+        echo "Failed to send email"
+        exit 1
+    else
+        rm -f ${TMPFILE_EMAIL}
+    fi
+}
+
+# Send email w/ status
+send_email

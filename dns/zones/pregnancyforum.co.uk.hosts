@@ -1,0 +1,46 @@
+$TTL 3600
+pregnancyforum.co.uk.   IN      SOA     pregnancyforum.co.uk. root.pregnancyforum.co.uk. (
+                                   2016061600     ; serial
+                                   28800          ; refresh
+                                   14400          ; retry
+                                   3600000        ; expire
+                                   86400 )        ; minimum
+
+pregnancyforum.co.uk.              IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+pregnancyforum.co.uk.              IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+pregnancyforum.co.uk.              IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+pregnancyforum.co.uk.              IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+
+
+pregnancyforum.co.uk.     IN  MX 1 aspmx.l.google.com. 
+pregnancyforum.co.uk.     IN MX 5 alt1.aspmx.l.google.com. 
+pregnancyforum.co.uk.     IN MX 5 alt2.aspmx.l.google.com. 
+pregnancyforum.co.uk.     IN MX 10 alt3.aspmx.l.google.com. 
+pregnancyforum.co.uk.     IN MX 10 alt4.aspmx.l.google.com.
+
+;pregnancyforum.co.uk.              IN    A        70.87.155.226
+mx.pregnancyforum.co.uk.              IN    A        70.87.155.226
+pregnancyforum.co.uk.              IN    A        97.64.84.190
+;www.pregnancyforum.co.uk.          IN    A        70.87.155.226
+www.pregnancyforum.co.uk.          IN    A        97.64.84.190
+stg.pregnancyforum.co.uk.	   IN	 CNAME	  vip-app-pf.ao.stg.lax.gnmedia.net.
+	
+
+mail.pregnancyforum.co.uk.         IN    CNAME    mx.pregnancyforum.co.uk.
+ftp.pregnancyforum.co.uk.          IN    CNAME    pregnancyforum.co.uk.    
+whm.pregnancyforum.co.uk.          IN    CNAME    pregnancyforum.co.uk.
+cpanel.pregnancyforum.co.uk.       IN    CNAME    pregnancyforum.co.uk.
+webdisk.pregnancyforum.co.uk.      IN    CNAME    pregnancyforum.co.uk.
+webmail.pregnancyforum.co.uk.      IN    CNAME    pregnancyforum.co.uk.
+www2.pregnancyforum.co.uk.         IN    CNAME    redirect.skimlinks.com.
+cdn.pregnancyforum.co.uk.          IN    CNAME    pregnancyforum.webbymedialtd.netdna-cdn.com.
+
+
+stg.mail.pregnancyforum.co.uk.         IN    CNAME	stg.pregnancyforum.co.uk.
+stg.ftp.pregnancyforum.co.uk.          IN    CNAME 	stg.pregnancyforum.co.uk.
+stg.whm.pregnancyforum.co.uk.	       IN    CNAME	stg.pregnancyforum.co.uk.
+stg.cpanel.pregnancyforum.co.uk.       IN    CNAME	stg.pregnancyforum.co.uk.
+stg.webdisk.pregnancyforum.co.uk.      IN    CNAME	stg.pregnancyforum.co.uk.
+stg.webmail.pregnancyforum.co.uk.      IN    CNAME	stg.pregnancyforum.co.uk.
+pregnancyforum.co.uk. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

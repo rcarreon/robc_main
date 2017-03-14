@@ -1,0 +1,58 @@
+$TTL 3600
+craveonline.ca. IN      SOA     craveonline.ca. root.craveonline.ca. (
+                                            2016061600     ; serial
+                                            28800          ; refresh
+                                            14400          ; retry
+                                            3600000        ; expire
+                                            86400 )        ; minimum
+
+
+
+craveonline.ca.                             IN    NS       app3v-dns.tp.prd.lax.craveonline.ca.
+craveonline.ca.                             IN    NS       app4v-dns.tp.prd.lax.craveonline.ca.
+craveonline.ca.                             IN    NS       app1v-dns.tp.prd.lax.craveonline.ca.
+craveonline.ca.                             IN    NS       app2v-dns.tp.prd.lax.craveonline.ca.
+craveonline.ca.     IN  MX 1 aspmx.l.google.com. 
+craveonline.ca.     IN MX 5 alt1.aspmx.l.google.com. 
+craveonline.ca.     IN MX 5 alt2.aspmx.l.google.com. 
+craveonline.ca.     IN MX 10 alt3.aspmx.l.google.com. 
+craveonline.ca.     IN MX 10 alt4.aspmx.l.google.com.
+
+
+
+ns3.craveonline.ca.                         IN    A        67.15.66.42
+ns4.craveonline.ca.                         IN    A        67.15.66.43
+ns5.craveonline.ca.                         IN    A        64.34.172.209
+ns6.craveonline.ca.                         IN    A        72.51.41.238
+
+; Pointing to craveonline.com
+craveonline.ca.                             IN    A        97.64.84.172
+bta.craveonline.ca.                         IN    A        10.64.64.75
+dev.craveonline.ca.                         IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.craveonline.ca.                         IN    CNAME    stg.pbwordpress.gnmedia.net.
+www.craveonline.ca.                         IN    CNAME    craveonline.ca. 
+
+
+; Created on 20100419 by jrottenberg
+macgruber.craveonline.ca.                   IN    CNAME    wac.1384D.sigmacdn.net.
+staging.macgruber.craveonline.ca.           IN    CNAME    staging.microsites.craveonline.com.
+demo.macgruber.craveonline.ca.              IN    CNAME    demo.campaigns.craveonline.com.
+
+; comiccon.craveonline.ca entries 
+; Created on 20100609 by jjohnson
+comiccon.craveonline.ca.                    IN    CNAME    wac.1384D.sigmacdn.net.
+staging.comiccon.craveonline.ca.            IN    CNAME    staging.microsites.craveonline.com.
+demo.comiccon.craveonline.ca.               IN    CNAME    demo.campaigns.craveonline.com.
+
+; kickasssweeps.craveonline.ca entries 
+; Created on 20100622 by jjohnson
+kickasssweeps.craveonline.ca.               IN    CNAME    wac.1384D.sigmacdn.net.
+staging.kickasssweeps.craveonline.ca.       IN    CNAME    staging.microsites.craveonline.com.
+demo.kickasssweeps.craveonline.ca.          IN    CNAME    demo.campaigns.craveonline.com.
+
+
+app1v-dns.tp.prd.lax.craveonline.ca.        IN    A        10.64.81.86
+app2v-dns.tp.prd.lax.craveonline.ca.        IN    A        10.64.81.160
+app3v-dns.tp.prd.lax.craveonline.ca.        IN    A        10.64.81.189
+app4v-dns.tp.prd.lax.craveonline.ca.        IN    A        10.64.81.168
+craveonline.ca. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

@@ -1,0 +1,11 @@
+if [ -s "${HOME}/.rbenv/bin" ]; then
+    rbenv_root="$HOME/.rbenv"
+elif [ -s "/app/software/ruby/rbenv" ]; then
+    rbenv_root="/app/software/ruby/rbenv"
+    export RBENV_ROOT="$rbenv_root"
+fi
+
+if [ -n "$rbenv_root" ]; then
+    export PATH="${rbenv_root}/bin:$PATH"
+    eval "$(rbenv init -)"
+fi

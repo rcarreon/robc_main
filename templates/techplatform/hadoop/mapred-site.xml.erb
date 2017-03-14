@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<?xml-stylesheet type="text/xsl" href="configuration.xsl"?>
+<configuration>
+
+  <property>
+    <name>mapreduce.framework.name</name>
+    <value>yarn</value>
+  </property>
+
+  <property>
+    <name>mapreduce.map.sort.spill.percent</name>
+    <value>0.75</value>
+    <description>The soft limit in the serialization buffer. Once reached, a thread will begin to spill the contents to disk in the background. Note that collection will not block if this threshold is exceeded while a spill is already in progress, so spills may be larger than this threshold when it is set to less than .5</description>
+  </property>
+
+  <property>
+    <name>mapreduce.task.io.sort.factor</name>
+    <value>40</value>
+    <description>The number of streams to merge at once while sorting files. This determines the number of open file handles. default 10</description>
+  </property>
+
+  <property>
+    <name>mapreduce.task.io.sort.mb</name>
+    <value>200</value>
+    <description>The total amount of buffer memory to use while sorting files, in megabytes. By default, gives each merge stream 1MB, which should minimize seeks. default 100</description>
+  </property>
+
+  <property>
+    <name>mapreduce.map.memory.mb</name>
+    <value>6144</value>
+    <description>The amount of memory to request from the scheduler for each map task</description>
+  </property>
+
+  <property>
+    <name>mapreduce.reduce.memory.mb</name>
+    <value>10240</value>
+    <description>The amount of memory to request from the scheduler for each reduce task</description>
+  </property>
+
+  <property>
+    <name>mapreduce.job.jvm.numtasks</name>
+    <value>-1</value>
+    <description>How many tasks to run per jvm. If set to -1, there is no limit.</description>
+  </property>
+
+  <property>
+    <name>mapreduce.reduce.shuffle.parallelcopies</name>
+    <value>8</value>
+    <description>The default number of parallel transfers run by reduce during the copy(shuffle) phase</description>
+  </property>
+
+  <property>
+    <name>mapreduce.map.java.opts</name>
+    <value>-Xmx3072m</value>
+  </property>
+
+  <property>
+    <name>mapreduce.reduce.java.opts</name>
+    <value>-Xmx6144m</value>
+  </property>
+
+</configuration>

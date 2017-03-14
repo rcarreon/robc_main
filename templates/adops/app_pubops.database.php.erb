@@ -1,0 +1,46 @@
+<?php
+class DATABASE_CONFIG {
+
+	public $read = array(
+		'datasource' => 'Database/Mysql',
+		'persistent' => false,
+		'host' => '<%= host_adops_app_pubops_ro %>',
+		'login' => '<%= user_adops_app_pubops_ro %>',
+		'password' => '<%= pw_adops_app_pubops_ro %>',
+		'database' => 'adops3',
+		'prefix' => '',
+		//'encoding' => 'utf8',
+	);
+
+	//Default should be the same as read.
+	public $default = array(
+		'datasource' => 'Database/Mysql',
+		'persistent' => false,
+		'host' => '<%= host_adops_app_pubops_ro %>',
+		'login' => '<%= user_adops_app_pubops_ro %>',
+		'password' => '<%= pw_adops_app_pubops_ro %>',
+		'database' => 'adops3',
+		'prefix' => '',
+		//'encoding' => 'utf8',
+	);
+
+	public $write = array(
+		'datasource' => 'Database/Mysql',
+		'persistent' => false,
+		'host' => '<%= host_adops_app_pubops_rw %>',
+		'login' => '<%= user_adops_app_pubops_rw %>',
+		'password' => '<%= pw_adops_app_pubops_rw %>',
+		'database' => 'adops2_0_production',
+		'prefix' => '',
+		//'encoding' => 'utf8',
+	);
+
+	public $pubops_reports = array (
+		'datasource' => 'PubopsReports',
+		'url' => '<%= url_adops_app_pubops_pubops_reports %>',
+		'prefix' => '',
+		'login' => '<%= user_adops_app_pubops_pubops_reports %>',
+		'password' => '<%= pw_adops_app_pubops_pubops_reports %>'
+	);
+
+}

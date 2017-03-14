@@ -1,0 +1,6 @@
+<desthost uid2v-sdejean.ap.dev.lax.gnmedia.net>
+  sourcehost=sql1v-adops.ap.prd.lax.gnmedia.net
+  masterhost=none
+  savegrants=yes
+  emblackout=no
+</desthost>

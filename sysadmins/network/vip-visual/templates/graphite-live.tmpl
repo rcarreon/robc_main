@@ -1,0 +1,41 @@
+<img src='http://graphite.gnmedia.net/render/?width=586&height=308&target=alias(sumSeries(${hostname}.load.load.shortterm),"1 Min")&target=alias(sumSeries(${hostname}.load.load.midterm),"5 Min")&target=alias(sumSeries(${hostname}.load.load.longterm),"15 Min")&title=System Load on ${hostname}&bgcolor=FFFFFF&fgcolor=000000&fontName=Helvetica&fontBold=true&fontSize=10&from=-1hours' </img>
+<br />
+<br />
+<img src='http://graphite.gnmedia.net/render/?width=586&height=308&target=alias(sumSeries(${hostname}.memory.memory.buffered.value),"Buffered")&target=alias(sumSeries(${hostname}.memory.memory.cached.value),"Cached")&target=alias(sumSeries(${hostname}.memory.memory.free.value),"Free")&target=alias(sumSeries(${hostname}.memory.memory.used.value),"Used")&title=Physical memory utilization on ${hostname}&bgcolor=FFFFFF&fgcolor=000000&fontName=Helvetica&fontBold=true&fontSize=10&from=-1hours' </img>
+<br />
+<br />
+<img src='http://graphite.gnmedia.net/render/?width=586&height=308&target=alias(sumSeries(${hostname}.interface.eth0.if_octets.rx),"Interface RX")&target=alias(sumSeries(${hostname}.interface.eth0.if_octets.tx),"Interface TX")&title=Interface eth0 on ${hostname}&bgcolor=FFFFFF&fgcolor=000000&fontName=Helvetica&fontBold=true&fontSize=10&from=-1hours' </img>
+<br />
+<br />
+<img src='http://graphite.gnmedia.net/render/?width=586&height=308&target=alias(sumSeries(${hostname}.memcached.memcached_connections.current.value),"connections")&title=Memcached on ${hostname}&bgcolor=FFFFFF&fgcolor=000000&fontName=Helvetica&fontBold=true&fontSize=10&from=-1hours' </img>
+<br />
+<br />
+<br />
+<br />
+<img src='http://graphite.gnmedia.net/render/?width=586&height=308&target=alias(sumSeries(${hostname}.apache.apache80.apache_connections.value),"Apache Connections")&title=Apache connections on ${hostname}&bgcolor=FFFFFF&fgcolor=000000&fontName=Helvetica&fontBold=true&fontSize=10&from=-1hours' </img>
+<br />
+<br />
+<img src='http://graphite.gnmedia.net/render/?width=586&height=308&target=alias(sumSeries(${hostname}.apache.apache80.apache_bytes.value),"Apache Bytes")&title=Apache bytes on ${hostname}&bgcolor=FFFFFF&fgcolor=000000&fontName=Helvetica&fontBold=true&fontSize=10&from=-1hours' </img>
+<br />
+<br />
+<img src='http://graphite.gnmedia.net/render/?width=586&height=308&target=alias(sumSeries(${hostname}.apache.apache80.apache_requests.value),"Apache Requests")&title=Apache requests on ${hostname}&bgcolor=FFFFFF&fgcolor=000000&fontName=Helvetica&fontBold=true&fontSize=10&from=-1hours' </img>
+<br />
+<br />
+<img src='http://graphite.gnmedia.net/render/?width=586&height=308&target=alias(sumSeries(${hostname}.apache.apache80.apache_scoreboard.closing.value),"Closing")&target=alias(sumSeries(${hostname}.apache.apache80.apache_scoreboard.dnslookup.value),"DNS Lookup")&target=alias(sumSeries(${hostname}.apache.apache80.apache_scoreboard.finishing.value),"Finishing")&target=alias(sumSeries(${hostname}.apache.apache80.apache_scoreboard.idle_cleanup.value),"Idle Cleanup")&target=alias(sumSeries(${hostname}.apache.apache80.apache_scoreboard.keepalive.value),"Keepalive")&target=alias(sumSeries(${hostname}.apache.apache80.apache_scoreboard.logging.value),"Logging")&target=alias(sumSeries(${hostname}.apache.apache80.apache_scoreboard.open.value),"Open")&target=alias(sumSeries(${hostname}.apache.apache80.apache_scoreboard.reading.value),"Reading")&target=alias(sumSeries(${hostname}.apache.apache80.apache_scoreboard.sending.value),"Sending")&target=alias(sumSeries(${hostname}.apache.apache80.apache_scoreboard.starting.value),"Starting")&target=alias(sumSeries(${hostname}.apache.apache80.apache_scoreboard.waiting.value),"Waiting")&title=Apache scoreboard ${hostname}&bgcolor=FFFFFF&fgcolor=000000&fontName=Helvetica&fontBold=true&fontSize=10&from=-1hours' </img>
+<br />
+<br />
+<img src='http://graphite.gnmedia.net/render/?width=586&height=308&target=alias(sumSeries(${hostname}.processes.fork_rate.value),"Processes Fork Rate (in sec)")&title=Process fork rate on ${hostname}&bgcolor=FFFFFF&fgcolor=000000&fontName=Helvetica&fontBold=true&fontSize=10&from=-1hours' </img>
+<br />
+<br />
+<img src='http://graphite.gnmedia.net/render/?width=586&height=308&target=alias(sumSeries(${hostname}.processes.ps_state.blocked.value),"Blocked")&target=alias(sumSeries(${hostname}.processes.ps_state.paging.value),"Paging")&target=alias(sumSeries(${hostname}.processes.ps_state.running.value),"Running")&target=alias(sumSeries(${hostname}.processes.ps_state.sleeping.value),"Sleeping")&target=alias(sumSeries(${hostname}.processes.ps_state.stopped.value),"Stopped")&target=alias(sumSeries(${hostname}.processes.ps_state.zombies.value),"Zombies")&title=Processes on ${hostname}&bgcolor=FFFFFF&fgcolor=000000&fontName=Helvetica&fontBold=true&fontSize=10&from=-1hours' </img>
+<br />
+<br />
+<img src='http://graphite.gnmedia.net/render/?width=586&height=308&target=alias(sumSeries(${hostname}.swap.swap.cached.value),"Cached")&target=alias(sumSeries(${hostname}.swap.swap.free.value),"Free")&target=alias(sumSeries(${hostname}.swap.swap.used.value),"Used")&title=Swap utilization on ${hostname}&bgcolor=FFFFFF&fgcolor=000000&fontName=Helvetica&fontBold=true&fontSize=10&from=-1hours' </img>
+<br />
+<br />
+<img src='http://graphite.gnmedia.net/render/?width=586&height=308&target=alias(sumSeries(${hostname}.swap.swap_io.in.value),"In")&target=alias(sumSeries(${hostname}.swap.swap_io.out.value),"Out")&title=Swap IO Pages on ${hostname}&bgcolor=FFFFFF&fgcolor=000000&fontName=Helvetica&fontBold=true&fontSize=10&from=-1hours' </img>
+<br />
+<br />
+<img src='http://graphite.gnmedia.net/render/?width=586&height=308&target=alias(sumSeries(${hostname}.vmem.vmpage_faults.majflt),"Major")&target=alias(sumSeries(${hostname}.vmem.vmpage_faults.minflt),"Minor")&title=Page faults on ${hostname}&bgcolor=FFFFFF&fgcolor=000000&fontName=Helvetica&fontBold=true&fontSize=10&from=-1hours' </img>
+<br />
+<br />

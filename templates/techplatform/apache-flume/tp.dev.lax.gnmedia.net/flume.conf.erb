@@ -1,0 +1,93 @@
+####################################
+#           ORIGIN-DEV             #
+####################################
+origin-dev.sources = srcDev
+origin-dev.sinks = snkDev
+origin-dev.channels = chnDev
+
+origin-dev.sources.srcDev.type = http
+origin-dev.sources.srcDev.port = 11114
+origin-dev.sources.srcDev.channels = chnDev
+origin-dev.sources.srcDev.handler = org.apache.flume.source.http.JSONHandler
+
+origin-dev.sinks.snkDev.type = hdfs
+origin-dev.sinks.snkDev.hdfs.path = hdfs://app1v-hadoop-bd.tp.prd.lax.gnmedia.net:8020/flume/origin/dev/%Y/%m/%d
+origin-dev.sinks.snkDev.hdfs.rollInterval = 3600
+origin-dev.sinks.snkDev.hdfs.rollSize = 0
+origin-dev.sinks.snkDev.hdfs.rollCount = 0
+origin-dev.sinks.snkDev.hdfs.fileType = DataStream
+origin-dev.sinks.snkDev.hdfs.filePrefix = <%= fqdn %>
+origin-dev.sinks.snkDev.hdfs.inUsePrefix = .
+origin-dev.sinks.snkDev.hdfs.useLocalTimeStamp = true
+
+origin-dev.sinks.snkDev.hdfs.minBlockReplicas = 1
+origin-dev.sinks.snkDev.hdfs.batchSize = 10000
+
+origin-dev.sinks.snkDev.channel = chnDev
+
+origin-dev.channels.chnDev.type = memory
+origin-dev.channels.chnDev.capacity = 100000
+origin-dev.channels.chnDev.transactionCapacity = 10000
+
+####################################
+#           agent-test             #
+####################################
+test.sources = srcTest
+test.sinks = snkTest
+test.channels = chnTest
+
+test.sources.srcTest.type = http
+test.sources.srcTest.port = 11111
+test.sources.srcTest.channels = chnTest
+test.sources.srcTest.handler = org.apache.flume.source.http.JSONHandler
+
+test.sinks.snkTest.type = hdfs
+test.sinks.snkTest.hdfs.path = hdfs://app1v-hadoop-bd.tp.prd.lax.gnmedia.net:8020/flume/test/%Y/%m/%d
+test.sinks.snkTest.hdfs.rollInterval = 3600
+test.sinks.snkTest.hdfs.rollSize = 0
+test.sinks.snkTest.hdfs.rollCount = 0
+test.sinks.snkTest.hdfs.fileType = DataStream
+test.sinks.snkTest.hdfs.filePrefix = flumeOG
+test.sinks.snkTest.hdfs.inUsePrefix = .
+test.sinks.snkTest.hdfs.useLocalTimeStamp = true
+
+test.sinks.snkTest.hdfs.minBlockReplicas = 1
+test.sinks.snkTest.hdfs.batchSize = 10000
+
+test.sinks.snkTest.channel = chnTest
+
+test.channels.chnTest.type = memory
+test.channels.chnTest.capacity = 100000
+test.channels.chnTest.transactionCapacity = 10000
+
+
+#############################################
+#     Apache webserver logs Pixel Agent           #
+#############################################
+
+beacon-log.sources = weblog
+beacon-log.sinks = snkHDFS
+beacon-log.channels = chnMemory
+
+beacon-log.channels.chnMemory.type = memory
+beacon-log.channels.chnMemory.capacity = 10000000
+beacon-log.channels.chnMemory.transactionCapacity = 1000000
+
+beacon-log.sources.weblog.type = exec
+beacon-log.sources.weblog.command = tail -F /tmp/log/bcn.originplatform.com-access.log
+beacon-log.sources.weblog.batchSize = 10000
+beacon-log.sources.weblog.channels = chnMemory
+
+beacon-log.sinks.snkHDFS.type = hdfs
+beacon-log.sinks.snkHDFS.channel = chnMemory
+beacon-log.sinks.snkHDFS.hdfs.path = hdfs://zootpprd/flume/origin/weblogs/dev/
+beacon-log.sinks.snkHDFS.hdfs.rollInterval = 600
+beacon-log.sinks.snkHDFS.hdfs.rollSize = 0
+beacon-log.sinks.snkHDFS.hdfs.rollCount = 0
+beacon-log.sinks.snkHDFS.hdfs.fileType = DataStream
+beacon-log.sinks.snkHDFS.hdfs.filePrefix = bcn
+beacon-log.sinks.snkHDFS.hdfs.inUsePrefix = .
+beacon-log.sinks.snkHDFS.hdfs.minBlockReplicas = 1
+beacon-log.sinks.snkHDFS.hdfs.batchSize = 10000
+beacon-log.sinks.snkHDFS.hdfs.useLocalTimeStamp = true
+

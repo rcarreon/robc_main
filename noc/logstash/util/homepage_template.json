@@ -1,0 +1,91 @@
+{
+  "title": "Introduction",
+  "services": {
+    "query": {
+      "list": {
+        "0": {
+          "query": "*",
+          "alias": "",
+          "color": "#7EB26D",
+          "id": 0,
+          "pin": false,
+          "type": "lucene",
+          "enable": true
+        }
+      },
+      "ids": [
+        0
+      ]
+    },
+    "filter": {
+      "list": {},
+      "ids": []
+    }
+  },
+  "rows": [
+    {
+      "title": "Intro",
+      "height": "450px",
+      "editable": false,
+      "collapse": false,
+      "collapsable": false,
+      "panels": [
+        {
+          "error": false,
+          "span": 4,
+          "editable": false,
+          "group": [
+            "default"
+          ],
+          "type": "text",
+          "mode": "markdown",
+          "content": "##### Kibana \nThis is the Kibana deployment of Evolve Media LLC, \n\nIf you are lost or need guidance please go to this wiki page.\n\n[kibana dashboard guide](http://docs.gnmedia.net/wiki/Kibana_3) \n\n ![kibana](img/logstash.png) ",
+          "style": {},
+          "title": "",
+          "status": "Stable"
+        },
+        {
+          "error": false,
+          "span": 8,
+          "editable": false,
+          "group": [
+            "default"
+          ],
+          "type": "text",
+          "mode": "markdown",
+          "content": "### EVOLVE Kibana %(environment)s. \nThis kibana deployment shows you the log data for the %(environment)s sites listed below. \n\n##### Requirements\n* **A good browser.**  \n    The latest version of Chrome or Firefox is recommended. Safari (latest version) and Internet Explorer 9 and above are also supported.\n  \n%(sites)s",
+          "style": {},
+          "status": "Stable"
+        }
+      ],
+      "notice": false
+    }
+  ],
+  "editable": false,
+  "index": {
+    "interval": "none",
+    "pattern": "[logstash-]YYYY.MM.DD",
+    "default": "_all",
+    "warm_fields": false
+  },
+  "style": "light",
+  "failover": false,
+  "panel_hints": true,
+  "pulldowns": [],
+  "nav": [],
+  "loader": {
+    "save_gist": false,
+    "save_elasticsearch": false,
+    "save_local": true,
+    "save_default": false,
+    "save_temp": true,
+    "save_temp_ttl_enable": true,
+    "save_temp_ttl": "30d",
+    "load_gist": false,
+    "load_elasticsearch": false,
+    "load_elasticsearch_size": 20,
+    "load_local": true,
+    "hide": false
+  },
+  "refresh": false
+}

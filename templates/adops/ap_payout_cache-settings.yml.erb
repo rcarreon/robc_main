@@ -1,0 +1,26 @@
+
+:env: :<%= pc_env %>
+:log_level: <%= pc_log_level %>
+:logfile: <%= pc_logfile %>
+
+:payout_cache:
+  :limit: <%= pc_limit %>
+  :page: 0
+  :csv_dir: '/tmp'
+
+:db:
+  :<%= pc_env %>:
+    :main:
+      :adapter: :mysql2
+      :database: <%= pc_db_main_database %>
+      :username: <%= pc_db_main_user %>
+      :password: <%= pc_db_main_pass %>
+      :host: <%= pc_db_main_host %>
+      :local_infile: true
+    :reporting:
+      :adapter: :mysql2
+      :database: <%= pc_db_reporting_database %>
+      :username: <%= pc_db_reporting_user %>
+      :password: <%= pc_db_reporting_pass %>
+      :host: <%= pc_db_reporting_host %>
+      :local_infile: true

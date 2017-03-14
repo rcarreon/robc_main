@@ -1,0 +1,46 @@
+#!/bin/bash
+# Usage: pingdom_checks_bg [logfile [-d]]
+# pass -d as 3rd argument to get debug messages
+# 2012,2013 Eduardo Osorio. Gorilla Nation Media
+
+#set -x
+
+args=("$@")
+args_num=${#args[@]}
+
+dir_bin="/app/shared/http/reports/bin"
+tmp="/tmp"
+
+if [ -z ${args[0]} ]
+then
+  log_file=/app/log/pingdom-checks.log
+else
+  log_file=${args[0]}
+fi
+
+lockfile=/tmp/pingdom_checks_bg
+script=$dir_bin/pingdom_checks_bg
+date=$(date)
+
+if ( set -o noclobber; echo "$$" > "$lockfile") 2> /dev/null;
+then
+    trap 'rm -f "$lockfile"; exit $?' INT TERM EXIT
+    echo "Starting process pingdom_checks_bg..."
+    echo "Starting process pingdom_checks_bg..." >> $log_file
+    echo "Starting $date"
+    echo "Starting $date" >> $log_file
+    while true; do
+        $dir_bin/pingdom_checks.php >> $log_file
+        sleep 50
+    done
+
+    # clean up and release trap
+    rm -f "$lockfile"
+    trap - INT TERM EXIT
+else
+    echo "Lock Exists: $lockfile owned by $(cat $lockfile)" 
+    echo -n $date >> $log_file
+    echo "Lock Exists: $lockfile owned by $(cat $lockfile)" >> $log_file
+    exit 0
+fi
+

@@ -1,0 +1,53 @@
+#
+# NOTE: The staging servers are a production environment.  The look like prod, they
+# taste like prod.  They are the most economically practical attempt to
+# replicate the production-LIVE environment
+#
+
+production:
+  adapter: mysql
+  database: adops2_0_production 
+  username: <%= user_adplatform_rw_prd %>
+  password: <%= pw_adplatform_rw_prd %>
+  host: <%= host_adplatform_rw_prd %>
+
+production_adops_reporting:
+  adapter: mysql
+  database: ap_adops_reporting
+  username: <%= user_adplatform_rw_prd %>
+  password: <%= pw_adplatform_rw_prd %>
+  host: <%= host_adplatform_rw_prd %>
+
+production_read:
+  adapter: mysql
+  database: adops2_0_production
+  username: <%= user_adplatform_ro_prd %>
+  password: <%= pw_adplatform_ro_prd %>
+  host: <%= host_adplatform_ro_prd %>
+
+production_migration:
+  adapter: mysql
+  database: adops2_0_production
+  username: <%= user_ap_migration_rw_prd %>
+  password: <%= pw_ap_migration_rw_prd %>
+  host: <%= host_adplatform_rw_prd %>
+
+# NOTE: When we first started using SalesForce, we wanted to integrate it with
+# AdOps, however the Sales team was able to rapidly customize reports and data
+# in SalesForce at a rate that deemed attempting to keep up with impractical.
+#
+# However for just in case you ever want to attempt to sync the data between
+# the two, here you go.
+#
+salesforce_development:
+  adapter: mysql
+  host: localhost
+  username: dev
+  password: dev
+  database: salesforce_local
+
+salesforce:
+  adapter: activesalesforce
+  url: https://www.salesforce.com/services/Soap/u/7.0
+  username: <%= user_adplatform_salesforce %>
+  password: <%= pw_adplatform_salesforce %>

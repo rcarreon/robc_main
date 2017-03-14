@@ -1,0 +1,44 @@
+$TTL 3600 ; 1 day
+@      IN      SOA     gnmedia.net. root@gnmedia.net. (
+			2016041300	; Serial
+			36262		; Refresh
+			300		; Retry
+			3600000		; Expire
+			3600 )		; Minimum
+
+	IN      NS      app1v-dns.tp.prd.lax.gnmedia.net.
+        IN      NS      app2v-dns.tp.prd.lax.gnmedia.net.
+        IN      NS      app3v-dns.tp.prd.lax.gnmedia.net.
+        IN      NS      app4v-dns.tp.prd.lax.gnmedia.net.
+
+37	IN	PTR	app1v-dtapi.ao.prd.lax.gnmedia.net.
+38	IN	PTR	app2v-dtapi.ao.prd.lax.gnmedia.net.
+39	IN	PTR	els1v-dtapi.ao.prd.lax.gnmedia.net.
+40	IN	PTR	els2v-dtapi.ao.prd.lax.gnmedia.net.
+41	IN	PTR	mem1v-dtapi.ao.prd.lax.gnmedia.net.
+2	IN	PTR	sql1v-reports-qa.ap.prd.lax.gnmedia.net.
+1	IN	PTR	app1v-reports-qa.ap.prd.lax.gnmedia.net.
+
+5	IN	PTR	app2v-cron.ap.prd.lax.gnmedia.net.
+6	IN	PTR	app2v-pubops-martini.ap.prd.lax.gnmedia.net.
+7	IN	PTR	app1v-pubops-martini.ap.prd.lax.gnmedia.net.
+8	IN	PTR	sql1v-pubops-martini.ap.prd.lax.gnmedia.net.
+9	IN	PTR	sql2v-pubops-martini.ap.prd.lax.gnmedia.net.
+
+10  IN	PTR app3v-assets.si.prd.lax.gnmedia.net.
+11  IN	PTR app4v-assets.si.prd.lax.gnmedia.net.
+12  IN	PTR app5v-assets.si.prd.lax.gnmedia.net.
+13  IN	PTR app6v-assets.si.prd.lax.gnmedia.net.
+16	IN	PTR	app1v-xf-wz.ao.prd.lax.gnmedia.net.
+17	IN	PTR	app2v-xf-wz.ao.prd.lax.gnmedia.net.
+18	IN	PTR	app1v-xf-hfb.ao.prd.lax.gnmedia.net.
+19	IN	PTR	app2v-xf-hfb.ao.prd.lax.gnmedia.net.
+20	IN	PTR	sql1v-xf-wz.ao.prd.lax.gnmedia.net.
+21	IN	PTR	sql2v-xf-wz.ao.prd.lax.gnmedia.net.
+22      IN      PTR     app1v-bd.tp.prd.lax.gnmedia.net.
+44	IN	PTR	app1v-mdbdt.ao.prd.lax.gnmedia.net.
+45	IN	PTR	app2v-mdbdt.ao.prd.lax.gnmedia.net.
+46	IN	PTR	app3v-mdbdt.ao.prd.lax.gnmedia.net.
+4	IN 	PTR	vip-sqlrw-ep.ao.prd.lax.gnmedia.net.
+49	IN 	PTR	sql1v-api-dfp.ao.prd.lax.gnmedia.net.
+50	IN	PTR	sql2v-api-dfp.ao.prd.lax.gnmedia.net.

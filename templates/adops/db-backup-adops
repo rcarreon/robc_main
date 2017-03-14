@@ -1,0 +1,120 @@
+#!/bin/bash
+
+BACKUP_DIR=/sql/archive
+
+MAILTO="adplatform@evolvemediallc.com"
+TMPFILE_DIR=/tmp
+TMPFILE_BASE=tempfile-db-backup-adops.XXXXXXXX
+TMPFILE_EMAIL=$(mktemp ${TMPFILE_DIR}/${TMPFILE_BASE})
+
+if [[ ! -e ${TMPFILE_EMAIL} ]]; then
+    echo "Error: Email tmpfile could not be created, check permissions on the directory '${TMPFILE_DIR}' and try again"
+    exit 1
+fi
+
+DUMP=/usr/bin/mysqldump
+DUMP_OPTS_DEFAULT="--verbose --single-transaction"
+
+function usage() {
+    echo "Usage: ${0} <daily|weekly> <database> [table]"
+    echo
+    exit 1
+}
+
+# Validate arguments
+if [ $# -lt 2 ]; then
+    usage
+fi
+
+if [[ ${1} =~ (^daily$|^weekly$) ]]; then
+    report_type=${1}
+else
+   usage 
+fi
+
+if [[ -z ${2} ]]; then
+    usage
+else
+    database=${2}
+fi
+
+if [[ -n ${3} ]]; then
+    table=${3}
+fi
+
+if [[ -n ${3} && -n ${4} ]]; then
+    where="--where='${4}'"
+fi
+
+echo "${report_type} backup started for database \'${database}\' on $(date --rfc-3339=seconds)" >> "${TMPFILE_EMAIL}"
+
+# Setup special dump opts
+dump_opts_extra=''
+if [[ ${database} == "adops2_0_production" && -z ${table} ]]; then
+    dump_opts_extra="${dump_opts_extra} --ignore-table=adops2_0_production.adops_loggers "
+    dump_opts_extra="${dump_opts_extra} --ignore-table=adops2_0_production.payout_cache "
+    dump_opts_extra="${dump_opts_extra} --ignore-table=adops2_0_production.payout_cache_daily "
+    dump_opts_extra="${dump_opts_extra} --ignore-table=adops2_0_production.reports "
+    dump_opts_extra="${dump_opts_extra} --ignore-table=adops2_0_production.reports_old "
+    dump_opts_extra="${dump_opts_extra} --ignore-table=adops2_0_production.sessions "
+fi
+
+if [[ -n ${table} ]]; then
+    backup_basename=${report_type}-${database}.${table}-$(date +%Y%m%d)
+else
+    backup_basename=${report_type}-${database}-$(date +%Y%m%d)
+fi
+
+
+# We need to get a copy of the schema/data/events/routines/triggers separately.
+# Make sure there is a case for backing up a single table
+
+# schema
+echo Dumping schema... >> "${TMPFILE_EMAIL}"
+${DUMP} ${DUMP_OPTS_DEFAULT} ${dump_opts_extra} \
+    --skip-triggers --no-data ${database} ${table} 2>>${TMPFILE_EMAIL} \
+    | gzip --best > ${BACKUP_DIR}/${backup_basename}-dfn.sql.gz
+
+# If we ARE NOT backing up a single table, make sure to get the 
+# events/routines/triggers
+if [[ -z ${table} ]]; then
+    
+    echo Dumping events/routines/triggers.. >> "${TMPFILE_EMAIL}"
+    # events
+    ${DUMP} ${DUMP_OPTS_DEFAULT} ${dump_opts_extra} \
+        --skip-triggers --no-create-info --no-data --events ${database} 2>>${TMPFILE_EMAIL} \
+        | gzip --best > ${BACKUP_DIR}/${backup_basename}-events.sql.gz 
+    # routines
+    ${DUMP} ${DUMP_OPTS_DEFAULT} ${dump_opts_extra} \
+        --skip-triggers --no-create-info --no-data --routines ${database} 2>>${TMPFILE_EMAIL} \
+        | gzip --best > ${BACKUP_DIR}/${backup_basename}-routines.sql.gz 
+    # triggers
+    ${DUMP} ${DUMP_OPTS_DEFAULT} ${dump_opts_extra} \
+        --no-create-info --no-data ${database} 2>>${TMPFILE_EMAIL} \
+        | gzip --best > ${BACKUP_DIR}/${backup_basename}-triggers.sql.gz
+
+fi
+
+# data
+echo Dumping data... >> "${TMPFILE_EMAIL}"
+${DUMP} ${DUMP_OPTS_DEFAULT} ${dump_opts_extra} \
+    --skip-triggers ${database} ${table} ${where} 2>> "${TMPFILE_EMAIL}" \
+    | gzip --best > ${BACKUP_DIR}/${backup_basename}-data.sql.gz
+
+echo "${report_type} backup ended for database \'${database}\' on $(date --rfc-3339=seconds)" >> "${TMPFILE_EMAIL}"
+
+function send_email() {
+    subject="Ad Platform Database Backup: ${report_type} for database '${database}'"
+    cat "${TMPFILE_EMAIL}" | mail -s "${subject}" ${MAILTO}
+    if [ $? -ne 0 ]; then
+        echo "Failed to send email"
+        exit 1
+    else
+        rm -f "${TMPFILE_EMAIL}"
+    fi
+}
+
+# Send email w/ status
+send_email
+
+

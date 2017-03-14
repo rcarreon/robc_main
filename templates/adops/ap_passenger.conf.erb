@@ -1,0 +1,10 @@
+LoadModule passenger_module <%= ap_passenger_module %>
+
+PassengerRoot <%= ap_passenger_root %>
+PassengerUser apache
+PassengerDefaultRuby <%= ap_passenger_default_ruby %>
+
+# Passenger Tuning
+PassengerUserSwitching off
+PassengerDefaultUser apache
+PassengerMaxPoolSize 4

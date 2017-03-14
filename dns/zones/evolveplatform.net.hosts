@@ -1,0 +1,32 @@
+$TTL 3600 
+evolveplatform.net. IN      SOA     evolveplatform.net. root.evolveplatform.net. (
+                                             2016072800     ; serial
+                                             28800          ; refresh
+                                             14400          ; retry
+                                             3600000        ; expire
+                                             86400 )        ; minimum
+
+evolveplatform.net.                          IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+evolveplatform.net.                          IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+evolveplatform.net.                          IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+evolveplatform.net.                          IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+evolveplatform.net.     IN  MX 1 aspmx.l.google.com. 
+evolveplatform.net.     IN MX 5 alt1.aspmx.l.google.com. 
+evolveplatform.net.     IN MX 5 alt2.aspmx.l.google.com. 
+evolveplatform.net.     IN MX 10 alt3.aspmx.l.google.com. 
+evolveplatform.net.     IN MX 10 alt4.aspmx.l.google.com.
+
+
+evolveplatform.net.                          IN    A        97.64.84.183
+dev.evolveplatform.net.                      IN    CNAME    app1v-ep.ao.dev.lax.gnmedia.net.
+stg.evolveplatform.net.                      IN    A        97.64.84.182
+prd.evolveplatform.net.                      IN    A        97.64.84.183
+www.evolveplatform.net.                      IN    A        97.64.84.183
+
+dev.dashboard.evolveplatform.net.            IN    CNAME    app1v-ep.ao.dev.lax.gnmedia.net.
+stg.dashboard.evolveplatform.net.            IN    A        97.64.84.182
+dashboard.evolveplatform.net.                IN    A        97.64.84.183
+www.dashboard.evolveplatform.net. 	     IN    CNAME    dashboard.evolveplatform.net.
+status.evolveplatform.net. 					 IN    A        75.101.154.33
+evolveplatform.net. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

@@ -1,0 +1,88 @@
+#!/bin/bash
+# vim: set ft=sh:
+#
+
+# date info
+DATE_FMT="+%Y-%m-%d"
+date_cur=$(date ${DATE_FMT})
+# date_from=$(date --date="-$(($(date +%d)-1)) days" "${DATE_FMT}")
+date_from=$(date --date="-$(date --date="-1 days" +%d) days" "${DATE_FMT}")
+date_to="${date_cur}"
+
+# cron info
+cronhost='<%= fqdn %>'
+job='adops2_0_production.sp_report_mistrafficked_parent_line_items'
+
+# email info
+to='AdPlatform@evolvemediallc.com'
+to="${to},AdTraffic-CA@evolvemediallc.com"
+to="${to},AdTraffic-UK@evolvemediallc.com"
+to="${to},AdTraffic-US@evolvemediallc.com"
+subject='Break-Out/Make-Good line item check'
+
+dbhost='<%= host_adops_cron_check_db %>'
+dbuser=payoutcheck_r
+dbpass='<%= payoutcheck_r %>'
+
+db=adops2_0_production
+
+mysqlcmd="mysql --host=${dbhost} --user=${dbuser} --password=${dbpass} ${db} --batch"
+
+tmpcsv="/tmp/mistrafficked_parent_line_items_${date_cur}.csv"
+
+# TODO(sdejean): Add note that requests them to reach out to us if a parent
+# line item is never intended to have traffic so we can manually remove it
+# from the list.
+read -r -d '' msg_success <<EOF
+The following entries reflect parent line items that have no impressions, but
+their children do. Please review these entries and check to see if they have
+been set up as intended.
+
+1. If the parent line item in question should be trafficked / delivering please
+check AdOps and DFP to make sure it's set up correctly.
+
+2. If the parent really is just a placeholder and does not need to run somewhere,
+please open a ticket via QT in the AdOps queue and we'll manually fix the issue.
+
+3. If the entry is simply missing a DFP id, please make sure to open a ticket
+via QT in the AdOps queue and we can manually sync the id.
+
+NOTE: If you have already 'fixed' the line items and their campaigns but the
+the entry is still listed in this email, it is probably related to issue #2.
+Please open a ticket with AdOps and let us know.
+
+EOF
+
+read -r -d '' msg_error <<EOF
+It appears that the cron job, "${job}" DID NOT complete successfully.
+Please verify the following:
+
+1. Log into the cron host, ${cronhost}, and verify that the job named
+"${job}", has completed running.
+
+2. If the previous job completed running, log into ${dbhost} 
+and check the output of the command: 
+    "SHOW SLAVE STATUS\G"
+    - Verify that the value of "Seconds_Behind_Master" is "0"
+
+3. If ${dbhost} is not behind the master,
+(i.e. Seconds_Behind_Master==0), contact the rest of the Ad Platform team:
+    adplatform@evolvemediallc.com
+
+EOF
+
+# QUERY DB
+report_mistrafficked_parent_line_items="CALL sp_report_mistrafficked_parent_line_items('${date_from}', '${date_to}');"
+${mysqlcmd} --execute="${report_mistrafficked_parent_line_items}" | tr "\t" ',' > "${tmpcsv}"
+
+if [[ $? -ne 0 ]]; then
+    echo "${0} on host: ${HOSTNAME} has failed running the mysql command" | mail -s "${0} ERROR" addevelopers@evolvemediallc.com
+    exit 1
+fi
+
+if [[ -f ${tmpcsv} ]]; then
+  echo "${msg_success}" | mail -a "${tmpcsv}" -s "${subject}" "${to}" && rm "${tmpcsv}"
+else
+  echo "${msg_error}" | mail -s "ERROR: ${subject}" addevelopers@evolvemediallc.com
+fi
+

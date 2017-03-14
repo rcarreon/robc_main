@@ -1,0 +1,133 @@
+# /!\ It's a Read/Write server, known as publishers.gorillanation.com /!\ 
+# This file is puppetized.  Please do not try to change it locally
+# file=<%= file %>
+#
+
+[db_network]
+host        = <%= cms_DBnetwork_host %> 
+user        = <%= cms_DBnetwork_user %> 
+password    = <%= cms_DBnetwork_pass %>
+database    = springboard
+
+[db_cpv_sync]
+host        = <%= cms_DBcpv_host %> 
+user        = cpv_import_w
+password    = <%= cms_DBcpv_pass %>
+database    = springboard
+
+[db_adops_sync]
+host        = <%= cms_DBadops_host %> 
+user        = sbv_cpv_r
+password    = <%= cms_DBadops_pass %>
+database    = adops2_0_production
+
+[db_users]
+host        = <%= cms_DBuser_host %> 
+user        = sbvcms_w
+password    = <%= cms_DBuser_pass %>
+database    = vbulletin
+
+[db_analytics_test_dynamic]
+host		= <%= cms_DB_test_analytics_host %>
+user		= <%= cms_DB_test_analytics_user %>
+password	= <%= cms_DB_test_analytics_pass %>
+database	= test
+
+[db_analytics_write]
+host		= <%= cms_DB_write_analytics_host %> 
+user		= <%= cms_DB_write_analytics_user %> 
+password	= <%= cms_DB_write_analytics_pass %>
+database	= test
+
+[db_aliases]
+db_default_domain       = gorillanation.com		; Used to select default domain
+db_table_network_pool   = videos 				; Used in videos_controller.php and sharev_video_pool_controller.php
+
+[logging]
+log_dir		= /app/ugc/logs/					; Default log path
+log_dir_fetch = /app/ugc/logs/fetch/			; Log path for fetch
+log_dir_upload = /app/ugc/logs/upload/			; Log path for upload
+log_dir_conversion = /app/ugc/logs/conversion/	; Log path for conversion
+
+[project]
+environment     = <%= cms_environment %> 					; Set environment
+login_enabled   = 1 						; Set to 0 to REMOVE LOGIN FORM. set to 1 to enable LOGIN FORM.
+debug_email = sb.debug@gmail.com;				; Set debug email
+
+[filesystem_paths]
+superconfig_dir         = /app/ugc/superconfig	; Superconfig path
+shared_file_system_path = /app/ugc/storage		; Storage path
+
+[url_paths]
+http_cdn_root               = <%= cms_cdn_url %> 
+http_shared_file_system     =	
+http_superconfig_dir        =	
+http_mediaplayer_dir        =	
+http_player_skins_dir       =	
+sfw_object                  =	
+default_player_id           = yo033
+default_player_skin         = <%= cms_url_default_skin %>
+default_list_player_id      = yo034
+default_list_player_skin    = <%= cms_url_list_skin %>
+default_lightbox_player_skin = <%= cms_url_lightbox_skin %>
+ro_cms                      =  <%= cms_url_ro_cms %> 
+
+[url]
+mediaplayerPath 		= <%= cms_url_mediaplayer %>  
+mediaplayerPathPretty 		= <%= cms_url_mediaplayer_pretty %>
+mediaplayerPluginsPath 		= <%= cms_url_mediaplayer_plugins %>
+contentWidgetPath 		= <%= cms_url_content_widget %>
+cmsPath				= <%= cms_url_cms_path %>
+mediaPath			= <%= cms_url_media_path %>
+cdnPath				= <%= cms_url_cdn_path %>
+storagePath			= <%= cms_url_storage_path %>
+storagePathNew			= <%= cms_url_new_storage_path %>
+superconfigPath			= <%= cms_url_super_config %>
+superconfigPathNew		= <%= cms_url_new_super_config %>
+embedJs				= <%= cms_url_embed_js %>
+sbPlatform			= <%= cms_url_sbPlatform %>
+
+[mediaplayer]
+pluginsPrefix = flowplayer.
+defaultPlayerId = yo252
+defaultListWidgetId = yo256
+defaultPreviewPlayerId = yo253 ; Used in analytics engagement and video preview
+defaultYoutubePlayerId = yo257
+
+[cpv]
+partnerId = 1095
+zone = cpv
+
+[cms]
+defaultPartnerId = 36
+wordpress_user = <%= cms_wp_user %>
+cpv_id = <%= cms_cpv_id %>
+jsselectbox = 1
+
+[ads]
+networkId = 4403
+
+[permissions]
+article_section_enabled     = <%= cms_perms %> 
+
+[rc4_encryption]
+secret_key = <%= cms_rc4_key %>
+
+[akamai]
+wsdl        = https://ccuapi.akamai.com/ccuapi-axis.wsdl
+username	= springboardplatform@gorillanation.com
+password	= <%= cms_akamai_pass %> 
+
+[bitly]
+api_url     = http://api.bit.ly/v3/
+username    = springboardplatform
+api_key     = <%= cms_bitly_key %> 
+
+[search]
+host        = http://search.atomiconline.com
+
+[feed]
+expires		= 600 ;in seconds
+defaultItemNumber = 10
+maxItemNumber = 50
+maxItemNumberDfp = 100

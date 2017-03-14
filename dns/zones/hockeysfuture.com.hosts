@@ -1,0 +1,100 @@
+$TTL 3600
+hockeysfuture.com.                         IN    SOA      hockeysfuture.com. root.hockeysfuture.com. (
+                                           2016061600     ; serial
+                                           28800          ; refresh
+                                           14400          ; retry
+                                           3600000        ; expire
+                                           86400 )        ; minimum
+
+hockeysfuture.com.                         IN    NS       app3v-dns.tp.prd.lax.craveonline.com.
+hockeysfuture.com.                         IN    NS       app4v-dns.tp.prd.lax.craveonline.com.
+hockeysfuture.com.                         IN    NS       app1v-dns.tp.prd.lax.craveonline.com.
+hockeysfuture.com.                         IN    NS       app2v-dns.tp.prd.lax.craveonline.com.
+
+hockeysfuture.com.     IN  MX 1 aspmx.l.google.com. 
+hockeysfuture.com.     IN MX 5 alt1.aspmx.l.google.com. 
+hockeysfuture.com.     IN MX 5 alt2.aspmx.l.google.com. 
+hockeysfuture.com.     IN MX 10 alt3.aspmx.l.google.com. 
+hockeysfuture.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+hockeysfuture.com.                         IN    TXT      "MS=ms13583009"
+hockeysfuture.com.                         IN    TXT      "v=spf1 include:outlook.com ~all"
+hockeysfuture.com.                         IN    TXT      "G0O0R34839"
+
+local                                      IN    A        127.0.0.1
+localhost                                  IN    A        127.0.0.1
+loghost                                    IN    A        127.0.0.1
+
+; hosts
+hockeysfuture.com.                         IN    A        97.64.84.172   
+hockeysfuture.hockeysfuture.com.           IN    A        97.64.84.172   
+www.hockeysfuture.com.                     IN    CNAME    hockeysfuture.com.      
+
+; hfboards (forums)
+dev.hfboards.hockeysfuture.com.            IN    A        10.64.64.70
+orgin-dev.hfboards.hockeysfuture.com.      IN    CNAME    dev.hfboards.hockeysfuture.com.
+cdn1-dev.hfboards.hockeysfuture.com.       IN    CNAME    dev.hfboards.hockeysfuture.com.
+
+stg.hfboards.hockeysfuture.com.            IN    A        97.64.84.147
+origin-stg.hfboards.hockeysfuture.com.     IN    CNAME    stg.hfboards.hockeysfuture.com.
+cdn1-stg.hfboards.hockeysfuture.com.       IN    CNAME    wac.EE35.edgecastcdn.net.
+
+hfboards.hockeysfuture.com.                IN    A        97.64.84.171
+;hfboards.hockeysfuture.com.               IN    A        97.64.84.xx
+;prd.hfboards.hockeysfuture.com.           IN    A        97.64.84.xx
+;origin.hfboards.hockeysfuture.com.        IN    A        97.64.84.xx
+;cdn1-www.hfboards.hockeysfuture.com.      IN    CNAME    wac.EE35.edgecastcdn.net.
+;cdn1-hfboards.hockeysfuture.com.          IN    CNAME    wac.EE35.edgecastcdn.net.
+
+; CDN entries
+www.cdn.hockeysfuture.com.                 IN    CNAME    cdn.hockeysfuture.com.
+cdn.hockeysfuture.com.                     IN    CNAME    wac.14528.systemcdn.net.
+www.origin.hockeysfuture.com.              IN    A        97.64.84.172
+
+dev                                        IN    CNAME    pb-wp.dev.gnmedia.net.
+dev.m                                      IN    CNAME    pb-wp.dev.gnmedia.net.
+stg                                        IN    CNAME    stg.pbwordpress.gnmedia.net.
+stg.m                                      IN    CNAME    stg.pbwordpress.gnmedia.net.
+prd                                        IN    CNAME    lax.pbwordpress.gnmedia.net.
+bta                                        IN    A        10.64.64.75
+
+origin.www.hockeysfuture.com.              IN    A        97.64.84.172
+origin-stg                                 IN    CNAME    stg
+origin                                     IN    CNAME    prd
+
+cdn-dev                                    IN    CNAME    dev
+cdn1-dev                                   IN    CNAME    dev
+cdn2-dev                                   IN    CNAME    dev
+cdn3-dev                                   IN    CNAME    dev
+
+cdn-stg                                    IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn1-stg                                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-stg                                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-stg                                   IN    CNAME    wac.EE35.edgecastcdn.net.
+
+cdn1                                       IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2                                       IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3                                       IN    CNAME    wac.EE35.edgecastcdn.net.
+
+cdn-www                                    IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn1-www                                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn2-www                                   IN    CNAME    wac.EE35.edgecastcdn.net.
+cdn3-www                                   IN    CNAME    wac.EE35.edgecastcdn.net.
+
+origin.bta                                 IN    CNAME    bta
+cdn-bta                                    IN    CNAME    bta
+cdn1-bta                                   IN    CNAME    bta
+cdn2-bta                                   IN    CNAME    bta
+cdn3-bta                                   IN    CNAME    bta
+
+legacy.hockeysfuture.com.                  IN    A        72.172.76.206
+
+*                                          IN    A        97.64.84.172
+; txt entries
+hockeysfuture.com.                         IN    TXT      "v=spf1 ip4: 66.154.15.26 ip4:69.61.39.173 ip4: 66.154.56.73 ip4:69.61.38.225 ip4: 69.61.38.196 ip4:69.61.38.202 ip4: 69.61.39.184 ip"
+mail.hockeysfuture.com.                    IN    TXT      "v=spf1 a -all"
+
+preview.lax                                IN    A        97.64.84.160
+
+autodiscover.hockeysfuture.com.            IN    CNAME    autodiscover.outlook.com.
+hockeysfuture.com. 	IN 	TXT 	"v=spf1 a:cluster9out.us.messagelabs.com include:_spf.google.com ip4:216.82.240.0/20 ~all"

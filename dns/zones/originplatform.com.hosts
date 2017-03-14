@@ -1,0 +1,69 @@
+$TTL 3600
+originplatform.com. IN      SOA     originplatform.com. root.originplatform.com. (
+                                         2016061600     ; serial
+                                         28800          ; refresh
+                                         14400          ; retry
+                                         3600000        ; expire
+                                         86400 )        ; minimum
+; name servers and mail servers
+;
+originplatform.com.                      IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+originplatform.com.                      IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+originplatform.com.                      IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+originplatform.com.                      IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+originplatform.com.     IN  MX 1 aspmx.l.google.com. 
+originplatform.com.     IN MX 5 alt1.aspmx.l.google.com. 
+originplatform.com.     IN MX 5 alt2.aspmx.l.google.com. 
+originplatform.com.     IN MX 10 alt3.aspmx.l.google.com. 
+originplatform.com.     IN MX 10 alt4.aspmx.l.google.com.
+;
+; Prd
+;
+prd.originplatform.com.                  IN    A        97.64.84.117
+originplatform.com.                      IN    A        97.64.84.117
+www.originplatform.com.                  IN    CNAME    wac.11EE9.edgecastcdn.net.
+origin.originplatform.com.               IN    CNAME    prd.originplatform.com.
+management.originplatform.com.           IN    A        97.64.84.115
+support.originplatform.com.           	 IN    A        97.64.84.115
+mgmt.originplatform.com.                 IN    CNAME    management.originplatform.com.
+;
+; Stg
+;
+stg.originplatform.com.                  IN    A        97.64.84.118
+stg.management.originplatform.com.       IN    A        97.64.84.116
+stg.mgmt.originplatform.com.             IN    CNAME    stg.management.originplatform.com.
+stg.support.originplatform.com.			 IN	   CNAME	stg.management.originplatform.com.
+origin-stg.originplatform.com.           IN    CNAME    stg.originplatform.com.
+www-stg.originplatform.com.              IN    CNAME    wac.11EE9.edgecastcdn.net.
+;
+; Dev
+;
+dev.originplatform.com.                  IN    A        10.64.64.197
+dev.management.originplatform.com.       IN    CNAME    app1v-mgmt.og.dev.lax.gnmedia.net.
+dev.support.originplatform.com.       	 IN    CNAME    app1v-mgmt.og.dev.lax.gnmedia.net.
+;
+; Uid
+;
+fdavis.originplatform.com.               IN    CNAME    uid1v-fdavis.tp.dev.lax.gnmedia.net.
+fdavis.uid.dev.originplatform.com.       IN    CNAME    uid1v-fdavis.og.dev.lax.gnmedia.net.
+pmilosevic.uid.dev.originplatform.com.   IN    CNAME    uid1v-pmilosevic.og.dev.lax.gnmedia.net.
+mtodorovic.uid.dev.originplatform.com.   IN    CNAME    uid1v-mtodorovic.og.dev.lax.gnmedia.net.
+dstankovic.uid.dev.originplatform.com.   IN    CNAME    uid1v-dstankovic.og.dev.lax.gnmedia.net.
+ookafor.uid.dev.originplatform.com.      IN    CNAME    uid1v-ookafor.og.dev.lax.gnmedia.net.
+bmurillo.uid.dev.originplatform.com.     IN    CNAME    uid1v-bmurillo.og.dev.lax.gnmedia.net.
+rtejeda.uid.dev.originplatform.com.      IN    CNAME    uid1v-rtejeda.og.dev.lax.gnmedia.net.
+;
+; Tools
+;
+jenkins.originplatform.com.              IN    CNAME    app1v-build.og.dev.lax.gnmedia.net.
+deploy.originplatform.com.               IN    CNAME    uid1v-fdavis.tp.dev.lax.gnmedia.net.
+dev.metrics.originplatform.com.          IN    CNAME    app1v-origin.og.dev.lax.gnmedia.net.
+stg.metrics.originplatform.com.          IN    CNAME    vip-app-origin.og.stg.lax.gnmedia.net.
+metrics.originplatform.com.		 IN	CNAME	vip-app-origin.og.prd.lax.gnmedia.net.
+edge.originplatform.com.                 IN      CNAME       app1v-origin.og.dev.lax.gnmedia.net.
+stg.bcn.originplatform.com.                  IN      A       97.64.84.9
+bcn.originplatform.com. 		IN 	CNAME  vip-app-bcn-bd.og.prd.lax.gnmedia.net.
+originplatform.com. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

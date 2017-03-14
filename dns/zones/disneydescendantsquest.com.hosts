@@ -1,0 +1,26 @@
+$TTL    3600 
+disneydescendantsquest.com. IN      SOA     disneydescendantsquest.com. root.disneydescendantsquest.com. (
+                                           2016061600     ; serial
+                                           28800          ; refresh
+                                           14400          ; retry
+                                           3600000        ; expire
+                                           86400 )        ; minimum
+
+disneydescendantsquest.com.                IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+disneydescendantsquest.com.                IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+disneydescendantsquest.com.                IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+disneydescendantsquest.com.                IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+disneydescendantsquest.com.     IN  MX 1 aspmx.l.google.com. 
+disneydescendantsquest.com.     IN MX 5 alt1.aspmx.l.google.com. 
+disneydescendantsquest.com.     IN MX 5 alt2.aspmx.l.google.com. 
+disneydescendantsquest.com.     IN MX 10 alt3.aspmx.l.google.com. 
+disneydescendantsquest.com.     IN MX 10 alt4.aspmx.l.google.com.
+
+
+disneydescendantsquest.com.                IN    A        97.64.84.104
+www.disneydescendantsquest.com.            IN    CNAME    campaigns.totallyher.com.
+staging.disneydescendantsquest.com.        IN    CNAME    staging.campaigns.totallyher.com.
+demo.disneydescendantsquest.com.           IN    CNAME    demo.si.evolvemediallc.com.
+dev.disneydescendantsquest.com.            IN    CNAME    app1v-dh.si.dev.lax.gnmedia.net.
+disneydescendantsquest.com. 	IN 	TXT 	"v=spf1 include:_spf.google.com ~all"

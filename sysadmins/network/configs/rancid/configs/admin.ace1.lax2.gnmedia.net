@@ -1,0 +1,136 @@
+!RANCID-CONTENT-TYPE: cisco
+!
+!
+!
+!
+!
+!
+!
+!BootFlash: BOOT variable = "disk0:c6ace-t1k9-mz.A2_3_4.bin;disk0:c6ace-t1k9-mz.A2_2_4.bin" 
+!BootFlash: Configuration register is 0x1
+!
+!BootFlash: BOOT variable = "disk0:c6ace-t1k9-mz.A2_3_4.bin;disk0:c6ace-t1k9-mz.A2_2_4.bin" 
+!BootFlash: Configuration register is 0x1
+!
+! NAME: "module 1", DESCR: "Application Control Engine Service Module"
+! PID: ACE20-MOD-K9      , VID: V03, SN: SAD123500UL 
+! NAME: "temperature", DESCR: "Inlet Temperature"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "Outlet Temperature"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "SIBYTE Temperature Sensor"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "HYPERION Temperature Sensor"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "CDE0 Temperature Sensor"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "CDE1 Temperature Sensor"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "IXP0 Temperature Sensor"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "IXP1 Temperature Sensor"
+! PID:                   , VID:    , SN:             
+! NAME: "temperature", DESCR: "SSA Temperature Sensor"
+! PID:                   , VID:    , SN:             
+!
+Generating configuration....
+
+
+
+logging enable
+logging timestamp
+logging trap 4
+logging buffered 4
+logging host 10.2.10.71 udp/514 
+
+
+
+login timeout 60
+boot system image:c6ace-t1k9-mz.A2_3_4.bin
+boot system image:c6ace-t1k9-mz.A2_2_4.bin
+shared-vlan-hostid 4
+
+clock timezone standard PST
+
+access-list ALL line 10 extended permit ip any any 
+
+
+probe http http_probe
+  interval 5
+  expect status 200 200
+  expect status 301 302
+  expect status 500 510
+
+
+class-map type management match-any HTTPS-ALLOW_CLASS
+  5 match protocol https source-address 10.2.10.33 255.255.255.0
+  7 match protocol https source-address 10.2.11.5 255.255.255.255
+  8 match protocol https source-address 10.11.20.28 255.255.255.255
+class-map type management match-any REMOTE_ACCESS
+  description remote access traffic match
+  4 match protocol icmp any
+  12 match protocol snmp source-address 192.168.1.0 255.255.255.0
+  13 match protocol ssh source-address 192.168.1.0 255.255.255.0
+  21 match protocol ssh source-address 10.11.20.27 255.255.255.255
+  22 match protocol https source-address 10.11.20.27 255.255.255.255
+  23 match protocol snmp source-address 10.11.20.27 255.255.255.255
+  24 match protocol snmp source-address 10.2.10.32 255.255.255.255
+  25 match protocol snmp source-address 10.2.10.246 255.255.255.255
+  26 match protocol snmp source-address 10.2.10.247 255.255.255.255
+  28 match protocol https source-address 10.2.10.32 255.255.255.255
+  29 match protocol https source-address 10.2.10.246 255.255.255.255
+  30 match protocol https source-address 10.2.10.247 255.255.255.255
+  31 match protocol https source-address 10.11.20.79 255.255.255.255
+  32 match protocol https source-address 10.11.20.80 255.255.255.255
+  33 match protocol https source-address 10.11.20.81 255.255.255.255
+  34 match protocol snmp source-address 10.11.20.79 255.255.255.255
+  35 match protocol snmp source-address 10.11.20.80 255.255.255.255
+  36 match protocol snmp source-address 10.11.20.81 255.255.255.255
+  37 match protocol https source-address 10.11.20.91 255.255.255.255
+  38 match protocol snmp source-address 10.11.20.91 255.255.255.255
+  39 match protocol ssh source-address 10.11.20.91 255.255.255.255
+
+policy-map type management first-match MGMT_HTTPS_POLICY
+  class HTTPS-ALLOW_CLASS
+    permit
+policy-map type management first-match REMOTE_MGMT_ALLOW_POLICY
+  class REMOTE_ACCESS
+    permit
+
+interface vlan 10
+  ip address 10.2.10.14 255.255.255.0
+  access-group input ALL
+  service-policy input REMOTE_MGMT_ALLOW_POLICY
+  service-policy input MGMT_HTTPS_POLICY
+  no shutdown
+interface vlan 11
+  ip address 10.2.11.14 255.255.255.0
+  access-group input ALL
+  service-policy input REMOTE_MGMT_ALLOW_POLICY
+  service-policy input MGMT_HTTPS_POLICY
+  no shutdown
+interface vlan 12
+  ip address 10.2.12.8 255.255.254.0
+  access-group input ALL
+  service-policy input REMOTE_MGMT_ALLOW_POLICY
+  no shutdown
+
+ip route 192.168.0.0 255.255.0.0 10.2.11.1
+ip route 0.0.0.0 0.0.0.0 10.2.11.1
+
+snmp-server contact "sysadmins@gorillanation.com"
+snmp-server location "Net2EZ"
+!snmp-server community <removed> group Network-Monitor
+
+!snmp-server host 10.2.11.8 traps version 2c <removed> 
+
+snmp-server enable traps snmp coldstart
+snmp-server enable traps snmp authentication
+snmp-server enable traps snmp linkup
+snmp-server enable traps snmp linkdown
+  
+username admin password 5 $1$rbVCcSKt$uhcd7H2q/Wt5Hzax8dVfS.  role Admin domain default-domain 
+username rancid password 5 $1$gk1Oqv8Y$13QUffDDSwuuYgMAEQtio/  role Admin domain default-domain 
+username www password 5 $1$Iv0iG35O$ZU9hvPAP4J4gHxWBBnMhE/  role Admin domain default-domain 
+ssh key rsa 1024 force
+

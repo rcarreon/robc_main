@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# gstaples @ Gorilla Nation
+
+rpower $1 reset </dev/null
+

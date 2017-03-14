@@ -1,0 +1,6112 @@
+#!@PERL@ -W
+
+# RNetApp baby!
+
+# Copyright 2011, 2012, 2013 Gorilla Nation, LLC
+# License is GPLv2 or above
+
+use strict;
+use Cwd;
+use Net::IP;
+use Socket;
+use Data::Dumper;
+use Config::General;
+use Sys::Syslog;
+
+BEGIN {
+    map { -d "$_/NetApp" && unshift( @INC, "$_/NetApp" ) } @INC;
+}
+use NaServer;
+use NaElement;
+
+my %Uconfig;
+my %config;
+my $CLUSTER_MODE = 0;    # Set by init_netapp
+my $VSERVER_MODE = 0;    # Set by init_netapp
+
+if ( -e "/etc/rnetapprc" ) {
+    my $conf = new Config::General("/etc/rnetapprc");
+    %config = $conf->getall;
+}
+if ( -e "$ENV{HOME}/.rnetapprc" ) {
+    my $conf = new Config::General("$ENV{HOME}/.rnetapprc");
+    %Uconfig = $conf->getall;
+}
+foreach my $key ( keys %Uconfig ) {
+    $config{$key} = $Uconfig{$key};
+}
+
+my %smreltypes = (
+    "DP"  => "data_protection",
+    "LS"  => "load_sharing",
+    "V"   => "vault",
+    "XDP" => "vault",
+    "R"   => "restore",
+    "TDP" => "transition_data_protection"
+);
+
+my %ignorethese = (    # FIXME: this is dumb
+    "vol"                 => 1,
+    "rootvol"             => 1,
+    "root_netapp1_nfs"    => 1,
+    "root_netapp1_nfs_m1" => 1,
+    "root_netapp1_nfs_m2" => 1,
+);
+
+# List new commands in tis section
+
+my %aggrcmds = (
+    help => \&aggr_help,
+    list => \&aggr_list,
+);
+
+my %lifcmds = (
+    help => \&lif_help,
+    list => \&lif_list,
+    move => \&lif_move,
+);
+my %snapmirrorcmds = (
+    help    => \&snapmirror_help,
+    list    => \&snapmirror_list,
+    delete  => \&snapmirror_delete,
+    break   => \&snapmirror_break,
+    update  => \&snapmirror_update,
+    create  => \&snapmirror_create,
+    wait    => \&snapmirror_wait,
+    release => \&snapmirror_release,
+);
+
+my %volumecmds = (
+    help     => \&volume_help,
+    list     => \&volume_list,
+    rename   => \&volume_rename,
+    create   => \&volume_create,
+    delete   => \&volume_delete,
+    remove   => \&volume_delete,
+    size     => \&volume_size,
+    resize   => \&volume_size,
+    maxfiles => \&volume_maxfiles,
+    mkdir    => \&volume_mkdir,
+    rmdir    => \&volume_rmdir,
+    online   => \&volume_online,
+    offline  => \&volume_offline,
+    autosize => \&volume_autosize,
+    junction => \&volume_junction,
+    option   => \&volume_option,
+    options  => \&volume_option,
+    policy   => \&volume_expolicy,
+    expolicy => \&volume_expolicy,
+    sspolicy => \&volume_sspolicy,
+    move     => \&volume_move,
+);
+
+my %exportscmds = (
+    help       => \&exports_help,
+    list       => \&exports_list,
+    add        => \&exports_add,
+    delete     => \&exports_remove,
+    remove     => \&exports_remove,
+    copy       => \&exports_copy,
+    search     => \&exports_search,
+    searchhost => \&exports_search,
+    searchip   => \&exports_search,
+    removehost => \&exports_removehost,
+    removeip   => \&exports_removehost,
+    file       => \&exports_file,
+    policy     => \&export_policy,
+    rule       => \&export_rule,
+    rules      => \&export_rule,
+    backup      => \&export_backup,
+);
+
+my %snapshotcmds = (
+    help    => \&snapshot_help,
+    list    => \&snapshot_list,
+    sched   => \&snapshot_sched,
+    reserve => \&snapshot_reserve,
+    create  => \&snapshot_create,
+    delete  => \&snapshot_delete,
+    remove  => \&snapshot_delete,
+    rename  => \&snapshot_rename,
+    mount   => \&snapshot_mount,
+    umount  => \&snapshot_umount,
+);
+
+my %nfsmonitorcmds = (
+    help        => \&nfsmonitor_help,
+    list        => \&nfsmonitor_list,
+    reclaim     => \&nfsmonitor_reclaim,
+    remove      => \&nfsmonitor_remove,
+    removelocks => \&nfsmonitor_removelocks,
+);
+
+my %nfsstatcmds = (
+    help => \&nfsstat_help,
+    get  => \&nfsstat_get,
+    top  => \&nfsstat_top,
+    zero => \&nfsstat_zero,
+);
+
+my %snapvaultcmds = (
+    help    => \&snapvault_help,
+    sched   => \&snapvault_sched,
+    list    => \&snapvault_list,
+    start   => \&snapvault_start,
+    stop    => \&snapvault_stop,
+    release => \&snapvault_release,
+    update  => \&snapvault_update,
+    status  => \&snapvault_status,
+);
+
+my %luncmds = (
+    help    => \&lun_help,
+    list    => \&lun_list,
+    create  => \&lun_create,
+    resize  => \&lun_resize,
+    destroy => \&lun_destroy,
+    map     => \&lun_map,
+    unmap   => \&lun_unmap,
+);
+
+my %igroupcmds = (
+    help    => \&igroup_help,
+    create  => \&igroup_create,
+    list    => \&igroup_list,
+    add     => \&igroup_add,
+    remove  => \&igroup_remove,
+    destroy => \&igroup_destroy,
+);
+
+my %systemcmds = (
+    help          => \&system_help,
+    info          => \&system_info,
+    ontapiversion => \&system_ontapiversion,
+    vendorinfo    => \&system_vendorinfo,
+    version       => \&system_version,
+    getapis       => \&system_getapis,
+    nodeinfo      => \&system_nodeinfo,
+);
+
+my %qtreecmds = (
+    help   => \&qtree_help,
+    create => \&qtree_create,
+    delete => \&qtree_delete,
+    list   => \&qtree_list,
+    rename => \&qtree_rename,
+    info   => \&qtree_info,
+);
+
+my %countercmds = (
+    help          => \&counter_help,
+    listobj       => \&counter_listobject,
+    listobject    => \&counter_listobject,
+    listobjects   => \&counter_listobject,
+    objlist       => \&counter_listobject,
+    objectlist    => \&counter_listobject,
+    listinst      => \&counter_listinstance,
+    listinstance  => \&counter_listinstance,
+    listinstances => \&counter_listinstance,
+    instancelist  => \&counter_listinstance,
+    instanceslist => \&counter_listinstance,
+    listcounter   => \&counter_listcounter,
+    listcounters  => \&counter_listcounter,
+    counterlist   => \&counter_listcounter,
+    counterslist  => \&counter_listcounter,
+    fetch         => \&counter_fetch,
+);
+
+my %helpcmds = (
+    help       => \&help_help,
+    volume     => \&volume_help,
+    exports    => \&exports_help,
+    aggr       => \&aggr_help,
+    snapshot   => \&snapshot_help,
+    nfsmonitor => \&nfsmonitor_help,
+    nfsstat    => \&nfsstat_help,
+    snapvault  => \&snapvault_help,
+    lif        => \&lif_help,
+    snapmirror => \&snapmirror_help,
+    lun        => \&lun_help,
+    igroup     => \&igroup_help,
+    system     => \&system_help,
+    qtree      => \&qtree_help,
+    counter    => \&counter_help,
+);
+
+my %commands = (
+    vol        => \%volumecmds,
+    volume     => \%volumecmds,
+    volumes    => \%volumecmds,
+    aggr       => \%aggrcmds,
+    aggregate  => \%aggrcmds,
+    aggregates => \%aggrcmds,
+    export     => \%exportscmds,
+    exports    => \%exportscmds,
+    snap       => \%snapshotcmds,
+    snapshot   => \%snapshotcmds,
+    snapshots  => \%snapshotcmds,
+    nfsmonitor => \%nfsmonitorcmds,
+    nfsmon     => \%nfsmonitorcmds,
+    stat       => \%nfsstatcmds,
+    nfsstat    => \%nfsstatcmds,
+    sv         => \%snapvaultcmds,
+    snapv      => \%snapvaultcmds,
+    snapvault  => \%snapvaultcmds,
+    lif        => \%lifcmds,
+    snapmirror => \%snapmirrorcmds,
+    lun        => \%luncmds,
+    igroup     => \%igroupcmds,
+    system     => \%systemcmds,
+    qtree      => \%qtreecmds,
+    counter    => \%countercmds,
+    counters   => \%countercmds,
+    help       => \%helpcmds,
+);
+my @commands =
+  qw/aggr volume exports snapshot nfsmonitor nfsstat snapvault lif snapmirror lun igroup qtree system counter/;
+
+my $filer;
+my $list_headerf  = "%-40.40s    %8.8s %9.9s %5.5s %7.7s\n";
+my $list_sheaderf = "%-40.40s    %8.8s %9.9s %5.5s %7.7s %8.8s %8.8s\n";
+my $list_bodyf    = "%-40.40s   %9s %9s %4d%% %7s\n";
+my $list_ibodyf   = "%-40.40s   %9d %9d %4d%% %7s\n";
+
+my $list_headerf_cmode = "%-40.40s %-13.13s %-20.20s   %9s %9s %4s %7s\n";
+my $list_sheaderf_cmode =
+  "%-40.40s %-13.13s %-20.20s   %9s %9s %4s %7s %8.8s %8.8s\n";
+my $list_bodyf_cmode = "%-40.40s %-13.13s %-20.20s   %9s %9s %4d%% %7s\n";
+my $list_sbodyf_cmode =
+  "%-40.40s %-13.13s %-20.20s   %9s %9s %4d%% %7s %8.8s %8.8s\n";
+
+###############################################################
+## MAIN BEGIN
+
+my @exargs = @ARGV;
+
+$filer = shift @exargs || "help";
+
+if ( $filer eq "help" ) {
+    my $topic = shift @exargs;
+    if ( defined $topic and exists $commands{$topic}{"help"} ) {
+        $commands{$topic}{"help"}(undef);
+    }
+    else { usage(); }
+    exit;
+}
+
+my $command    = shift @exargs || "none";
+my $subcommand = shift @exargs || "none";
+my $s          = init_netapp($filer);
+
+if ( exists $commands{$command} ) {
+    if ( exists $commands{$command}{$subcommand} ) {
+
+        openlog( "rnetapp", "ndelay,pid", "local0" );
+        syslog "notice", "@ARGV by user "
+          . (
+              exists $ENV{SUDO_USER} ? $ENV{SUDO_USER} . " (sudo)"
+            : exists $ENV{USER}      ? $ENV{USER}
+            : $<
+          );
+        closelog;
+
+        if ($CLUSTER_MODE) {
+
+            # if subroute_cmode() exists, dispatch that instead
+            use B qw(svref_2object);
+            my $cv      = svref_2object( $commands{$command}{$subcommand} );
+            my $gv      = $cv->GV;
+            my $subname = $gv->NAME;
+
+            if ( exists &{ $subname . "_cmode" } ) {
+                $commands{$command}{$subcommand} = \&{ $subname . "_cmode" };
+            }
+        }
+
+        # Actually run the command
+        my $ret = $commands{$command}{$subcommand}( $s, @exargs );
+        if ( $ret == -5 ) {
+            $commands{$command}{"help"}(undef);
+            exit(5);
+        }
+        else {
+            exit( $ret != 0 );
+        }
+    }
+    else {
+        $commands{$command}{"help"}(undef);
+    }
+}
+else {
+    usage();
+}
+
+exit(5);
+
+#
+## END HERE
+######################################################################3
+
+sub cmode_notsupported {
+    if ($CLUSTER_MODE) {
+        print STDERR "Not supported in Cluster Mode.\n";
+        exit(1);
+    }
+}
+
+sub cmode_required {
+    if ( !$CLUSTER_MODE ) {
+        print STDERR "Only supported in Cluster Mode.\n";
+        exit(1);
+    }
+}
+
+sub humanize($) {
+    my $a   = shift;
+    my %hum = (
+        1024    => "K",
+        1024**2 => "M",
+        1024**3 => "G",
+        1024**4 => "T",
+        1024**5 => "P"
+    );
+    foreach my $step ( reverse sort keys %hum ) {
+        if ( $a > $step ) {
+            return sprintf( "%.2f%s", $a / $step, $hum{$step} );
+        }
+    }
+    return sprintf( "%d", $a );
+}
+
+sub dehumanize {
+
+    # TODO: more beatings
+    my $strsize = shift;
+
+    # FIXME: future-proof this
+    my %hum = (
+        k => 2**10,
+        m => 2**20,
+        g => 2**30,
+        t => 2**40,
+        p => 2**50,
+        e => 2**60,
+        z => 2**70,
+        y => 2**80
+    );
+    my ( $bytes, $exp ) = $strsize =~ /^([\d.]+)([kmgtpezy])?$/;
+    $exp = lc($exp);
+    $bytes *= ( $hum{$exp} ? $hum{$exp} : 1 );
+    return $bytes;
+}
+
+sub usage {
+    print STDERR "RNetApp @VERSION@\n";
+    print STDERR "Usage: rnetapp <filer> help|" . join( "|", sort @commands ),
+      "\n";
+    foreach my $cmd ( sort @commands ) {
+        $commands{$cmd}{"help"}(undef);
+    }
+    print STDERR "          help options: " . join( "|", sort @commands ), "\n";
+}
+
+sub init_netapp {
+    my $filer = shift;
+    my $user;
+    my $pw;
+    my $vserver = "";
+
+    if ( $filer =~ m{(.*)/(.*)} ) {
+        $filer        = $1;
+        $vserver      = $2;
+        $VSERVER_MODE = $2;
+    }
+
+    my $conffiler = $filer;
+    foreach my $a ( keys %config ) {
+        if ( ref( $config{$a} ) eq "HASH" ) {
+            if ( exists $config{$a}{"match"} ) {
+                if ( $filer =~ m/^($config{$a}{match})$/i ) {
+                    $conffiler = $a;
+                }
+            }
+        }
+    }
+
+    $user =
+        $ENV{"RNETAPP_USERNAME"}        ? $ENV{"RNETAPP_USERNAME"}
+      : $config{$conffiler}{"username"} ? $config{$conffiler}{"username"}
+      : $config{"username"}             ? $config{"username"}
+      :                                   $ENV{"USER"};
+    $pw =
+        $ENV{"RNETAPP_PASSWORD"}        ? $ENV{"RNETAPP_PASSWORD"}
+      : $config{$conffiler}{"password"} ? $config{$conffiler}{"password"}
+      : $config{"password"}             ? $config{"password"}
+      :                                   "";
+
+    unless ($pw) {
+        use Term::ReadKey;
+        print "Password: ";
+        ReadMode('noecho');
+        $pw = ReadLine(0);
+        chomp($pw);
+        ReadMode(0);
+        print "\n";
+    }
+
+    my $apiversion = $config{$conffiler}{"apiversion"} ? $config{$conffiler}{"apiversion"} : 
+                     $config{"apiversion"}             ? $config{"apiversion"} : "1.20";
+    my ( $maj, $min ) = split( /[.]/, $apiversion );
+    my $s = NaServer->new( $conffiler, $maj, $min );
+    my $response = $s->set_style("LOGIN");
+    $s->set_admin_user( $user, $pw );
+    $s->set_transport_type("HTTP");
+
+    if ($vserver) {
+        $s->set_vserver($vserver);
+    }
+
+    my $out = $s->invoke("system-get-version");
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to retrieve system version: "
+          . $out->results_reason() . "\n";
+        exit(1);
+    }
+
+   #print STDERR "Connected to ", $out->child_get_string("version"),"\n"; #DEBUG
+    if ( $out->child_get_string("version") =~ m/Cluster-Mode/ ) {
+        $CLUSTER_MODE = 1;
+
+        #print STDERR "Cluster Mode.\n"; #DEBUG
+    }
+
+    return $s;
+}
+
+sub parsepathname {
+    my $arg = shift;
+
+    defined $arg or return 0;
+    my $pathname;
+    my $volume;
+
+    if ( defined $arg and $arg =~ m|^/vol/([^/]+)| ) {
+        $volume   = $1;
+        $pathname = $arg;
+    }
+    else {
+        $volume   = $arg;
+        $pathname = "/vol/$volume";
+    }
+    return ( $volume, $pathname );
+}
+
+sub humanize_seconds {
+    my $sec = shift or return "NA";
+    my $hours   = int( $sec / ( 60 * 60 ) );
+    my $mins    = ( $sec / 60 ) % 60;
+    my $seconds = $sec % 60;
+    return "$hours:$mins:$seconds";
+}
+
+sub volume_help {
+    my $s = shift;
+    print STDERR "          volume options: list|create|delete|size|maxfiles
+              list [-i] [-s] [-q] [-b] [<volname>]
+              rename <volname> <new-volname>
+              create <volname> <aggr> <size>k|m|g|t
+              create <volname> like <oldvolume> (copies size and aggr)
+              delete <volname>
+              size <volname> [+|-]<size>k|m|g|t]
+              maxfiles [<volname> [<numfiles>]]
+              mkdir <volname> <directory>
+              rmdir <volname> <directory>
+              online <volname>
+              offline <volname>
+              junction <volname> [<path>|remove]
+              option <volname> [<option> [<value>]]
+              move [<volname>] [<aggr> <vserver>]
+              autosize <volname> [-m <size>[k|m|g|t]] [-i <size>[k|m|g|t]]
+                   [ on | off | reset ]
+              expolicy [<volname> [<policy>]] (export policy)
+              sspolicy [<volname> [<policy>]] (snapshot policy)\n";
+
+}
+
+sub volume_create {
+    my $s    = shift;
+    my $arg  = shift;
+    my $aggr = shift;
+    my $size = shift;
+    my $type = shift || "rw";
+
+    my $snappercentresv = -1;
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    my $out;
+    my $sourcevol;
+    my ( $days, $hours, $weeks, $whichhours ) = ( -1, -1, -1, -1 );
+
+    if ( !$size ) { return (-5); }
+
+    if ( $aggr eq "like" ) {
+        cmode_notsupported();
+        $sourcevol = $size;
+        print "'$sourcevol'\n";
+        $out = $s->invoke( "volume-list-info", "volume", $sourcevol );
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+        my $volume_info = $out->child_get("volumes");
+        if ( !$volume_info ) {
+            print STDERR "No volume named '$sourcevol'\n";
+            exit(1);
+        }
+
+        my @result = $volume_info->children_get();
+
+        foreach my $vol (@result) {
+            $aggr = $vol->child_get_string("containing-aggregate");
+            $size = $vol->child_get_int("size-total");
+
+            # "snapshot-blocks-reserved" is defined
+            # as "the number of 1024 byte blocks"...
+            # there is no way to discover a block size
+            my $snapbytesresv =
+              $vol->child_get_int("snapshot-blocks-reserved") * 1024;
+            $snappercentresv = $vol->child_get_int("snapshot-percent-reserved");
+
+            my $out =
+              $s->invoke( "snapshot-get-schedule", "volume", $sourcevol );
+            if ( $out->results_status() eq "failed" ) {
+                print STDERR $out->results_reason(), "\n";
+                return (1);
+            }
+
+            $days       = $out->child_get_int("days");
+            $hours      = $out->child_get_int("hours");
+            $weeks      = $out->child_get_int("weeks");
+            $whichhours = $out->child_get_string("which-hours");
+
+#if (defined $whichhours and (($whichhours cmp " ") != 0) and (($whichhours cmp "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23") != 0)) {
+
+            printf(
+"Creating %s (%s usable, %s snapshot reserve (%s%%) in aggr '%s'.\n",
+                humanize $size+ $snapbytesresv,
+                humanize $size,
+                humanize $snapbytesresv,
+                $snappercentresv, $aggr
+            );
+            $size += $snapbytesresv;
+        }
+    }
+
+    if ( $aggr =~ /^[0-9]/ && $size !~ /^[0-9]/ ) {
+        ( $size, $aggr ) = ( $aggr, $size );
+    }
+
+    my $in = NaElement->new("volume-create");
+    $in->child_add_string( "containing-aggr-name", $aggr );
+    $in->child_add_string( "volume",               $volume );
+    $in->child_add_string( "size",                 $size );
+    if ($CLUSTER_MODE) {
+        $in->child_add_string( "volume-type", $type );
+        if ( $type eq "rw" ) {
+
+           # FIXME: hardcoded junction-path (fails if this volume doesn't exist)
+            $in->child_add_string( "junction-path", "/vol/$volume" );
+        }
+        else {
+            print
+"Creating volume without junction-path because it is not type RW.\n";
+        }
+    }
+
+    $out = $s->invoke_elem($in);
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    print "Volume '$volume' created.\n";
+
+    if (!$CLUSTER_MODE) {
+        exports_delete( $s, $volume );
+    }
+    if ( $snappercentresv > -1 ) {
+        print "Setting snap percent to $snappercentresv\n";
+        $out =
+          $s->invoke( "snapshot-set-reserve", "volume", $volume, "percentage",
+            $snappercentresv );
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+    }
+
+    if ( $days > -1 ) {
+
+        print "Setting snapshot schedule.\n";
+        my $out = $s->invoke(
+            "snapshot-set-schedule",
+            "volume",
+            $volume,
+            "weeks",
+            $weeks ? $weeks : 0,
+            "days",
+            $days ? $days : 0,
+            "hours",
+            $hours ? $hours : 0,
+            "which-hours",
+            $whichhours
+            ? $whichhours
+            : "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23"
+        );
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+    }
+
+    return (0);
+}
+
+sub allvolumenames {
+    my $s = shift;
+    my @vols;
+    my $numlines = 0;
+
+    if ($CLUSTER_MODE) {
+
+        my $tag = "";
+        while ( defined($tag) ) {
+            my $in = NaElement->new("volume-get-iter");
+            $in->child_add_string( "max-records", 1000 );
+            if ( $tag ne "" ) {
+                $in->child_add_string( "tag", $tag );
+            }
+            my $out = $s->invoke_elem($in);
+            if ( $out->results_status() eq "failed" ) {
+                print( $out->results_reason() . "\n" );
+                exit(-1);
+            }
+            if ( $out->child_get_int("num-records") == 0 ) {
+                last;
+            }
+            $tag = $out->child_get_string("next-tag");
+            my @volList = $out->child_get("attributes-list")->children_get();
+            foreach my $volInfo (@volList) {
+                my $volIdAttrs = $volInfo->child_get("volume-id-attributes");
+                next
+                  if (
+                    exists $ignorethese{ $volIdAttrs->child_get_string("name") }
+                  );
+                $numlines++;
+                push( @vols, $volIdAttrs->child_get_string("name") );
+            }
+        }
+    }
+    else {
+
+        my $out = $s->invoke("volume-list-info");
+
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+
+        my $volume_info = $out->child_get("volumes");
+        my @result      = $volume_info->children_get();
+
+        foreach my $vol (@result) {
+            push( @vols, $vol->child_get_string("name") );
+        }
+    }
+    return wantarray ? @vols : \@vols;
+}
+
+sub volume_expolicy {
+    my $s      = shift;
+    my $volume = shift;
+    my $policy = shift;
+
+    if ( defined $policy ) {
+        return export_setvolexpolicy( $s, $volume, $policy );
+    }
+
+    my $tag      = "";
+    my $numlines = 0;
+    while ( defined($tag) ) {
+        my $in = NaElement->new("volume-get-iter");
+        $in->child_add_string( "max-records", 1000 );
+        if ( $tag ne "" ) {
+            $in->child_add_string( "tag", $tag );
+        }
+        if ( defined $volume ) {
+            $in->child_add( makeVolQuery( "id", "name", $volume, "string" ) );
+        }
+        my $desAttrs = makeVolDesAttr( [qw/export policy/] );
+        $in->child_add($desAttrs);
+
+        my $out = $s->invoke_elem($in);
+        if ( $out->results_status() eq "failed" ) {
+            print( $out->results_reason() . "\n" );
+            exit(-1);
+        }
+        if ( $out->child_get_int("num-records") == 0 ) {
+            return ( $numlines == 0 );
+        }
+        $tag = $out->child_get_string("next-tag");
+        my @volList = $out->child_get("attributes-list")->children_get();
+        my $volInfo;
+        my (
+            $vserverName, $volName, $aggrName, $volType,
+            $volState,    $size,    $availSize
+        );
+
+        #print("----------------------------------------------------\n");
+        foreach $volInfo (@volList) {
+            my $volIdAttrs = $volInfo->child_get("volume-id-attributes");
+            my $volExAttrs = $volInfo->child_get("volume-export-attributes");
+            printf "%-50s %-20s\n", $volIdAttrs->child_get_string("name"),
+              $volExAttrs->child_get_string("policy");
+        }
+    }
+}
+
+sub volume_list_cmode {
+    my $s            = shift;
+    my $arg          = shift;
+    my $getinodeinfo = 0;
+    my $getsnapinfo  = 0;
+    my $quiet        = 0;
+    my $nohuman      = 0;
+    while ( defined $arg and $arg =~ /^-/ ) {
+        $getinodeinfo = ( $getinodeinfo | $arg eq "-i" );
+        $quiet        = ( $quiet | $arg        eq "-q" );
+        $nohuman      = ( $nohuman | $arg      eq "-n" );
+        $arg          = shift;
+    }
+
+    if ( !$quiet ) {
+        printf( $list_headerf_cmode,
+            "Volume Name", "Vserver", "Aggregate", "Total",
+            "Used",        "Use",     "State"
+        );
+    }
+    my $tag      = "";
+    my $numlines = 0;
+    while ( defined($tag) ) {
+        my $in = NaElement->new("volume-get-iter");
+        $in->child_add_string( "max-records", 1000 );
+        if ( $tag ne "" ) {
+            $in->child_add_string( "tag", $tag );
+        }
+        if ( defined $arg ) {
+            $in->child_add( makeVolQuery( "id", "name", $arg, "string" ) );
+        }
+        my $desAttrs = makeVolDesAttr(
+            [qw/id name/],                      [qw/id owning-vserver-name/],
+            [qw/id containing-aggregate-name/], [qw/id type/],
+            [qw/state state/],                  [qw/state state/],
+            [qw/inode files-used/],             [qw/inode files-total/],
+            [qw/space size/],                   [qw/space size-used/],
+            [qw/space percentage-size-used/],
+        );
+        $in->child_add($desAttrs);
+        my $out = $s->invoke_elem($in);
+        if ( $out->results_status() eq "failed" ) {
+            print( $out->results_reason() . "\n" );
+            exit(-1);
+        }
+        if ( $out->child_get_int("num-records") == 0 ) {
+            return ( $numlines == 0 );
+        }
+        $tag = $out->child_get_string("next-tag");
+        my @volList = $out->child_get("attributes-list")->children_get();
+        my $volInfo;
+        my (
+            $vserverName, $volName, $aggrName, $volType,
+            $volState,    $size,    $availSize
+        );
+
+        #print("----------------------------------------------------\n");
+        foreach $volInfo (@volList) {
+            $vserverName = $volName = $aggrName = $volType = $volState = $size =
+              $availSize = "";
+            my $volIdAttrs = $volInfo->child_get("volume-id-attributes");
+
+            #next if ($arg && ($arg ne $volIdAttrs->child_get_string("name")));
+            $numlines++;
+            if ($volIdAttrs) {
+                $vserverName =
+                  $volIdAttrs->child_get_string("owning-vserver-name");
+                $volName = $volIdAttrs->child_get_string("name");
+                $aggrName =
+                  $volIdAttrs->child_get_string("containing-aggregate-name");
+                $volType = $volIdAttrs->child_get_string("type");
+            }
+            next if ( exists $ignorethese{ $volName } );
+
+            my $volStateAttrs = $volInfo->child_get("volume-state-attributes");
+            if ($volStateAttrs) {
+                $volState = $volStateAttrs->child_get_string("state")
+                  || "Unknown";
+            }
+
+            my $used      = 0;
+            my $total     = 0;
+            my $pcentused = 0;
+            if ($getinodeinfo) {
+                my $volSizeAttrs =
+                  $volInfo->child_get("volume-inode-attributes");
+                if ($volSizeAttrs) {
+                    $total = $volSizeAttrs->child_get_int("files-total") || 0;
+                    $used  = $volSizeAttrs->child_get_int("files-used")  || 0;
+                    $pcentused = $total ? $used / $total * 100 : 0;
+                }
+            }
+            else {
+                my $volSizeAttrs =
+                  $volInfo->child_get("volume-space-attributes");
+                if ($volSizeAttrs) {
+                    $total = $volSizeAttrs->child_get_string("size");
+                    $used = $volSizeAttrs->child_get_string("size-used") || 0;
+                    $pcentused =
+                      $volSizeAttrs->child_get_string("percentage-size-used")
+                      || 0;
+                }
+            }
+
+            my $snapResvSize = 0;
+            my $snapUsedPerc = 0;
+
+            my $retinfo = sprintf(
+                !$quiet ? $list_bodyf_cmode : "%s %s %s %s %s %d%% %s\n",
+                $volName,
+                $vserverName,
+                $aggrName,
+                $nohuman ? $total : humanize $total,
+                $nohuman ? $used  : humanize $used,
+                $pcentused,
+                $volState
+            );
+            print $retinfo;
+        }
+    }
+    if ( $numlines == 0 ) {
+
+        # FIXME: this is dumb
+        print "Volume not found.\n";
+        exit 1;
+    }
+}
+
+sub volume_list {
+    my $s            = shift;
+    my $arg          = shift;
+    my $getinodeinfo = 0;
+    my $getsnapinfo  = 0;
+    my $quiet        = 0;
+    my $nohuman      = 0;
+    while ( defined $arg and $arg =~ /^-/ ) {
+        $getinodeinfo = ( $getinodeinfo | $arg eq "-i" );
+        $getsnapinfo  = ( $getsnapinfo | $arg  eq "-s" );
+        $quiet        = ( $quiet | $arg        eq "-q" );
+        $nohuman      = ( $nohuman | $arg      eq "-n" );
+        $arg          = shift;
+    }
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    my $out;
+    if ( !$volume ) {
+        $out = $s->invoke("volume-list-info");
+    }
+    else {
+        $out = $s->invoke( "volume-list-info", "volume", $volume );
+    }
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    my $volume_info = $out->child_get("volumes");
+    my @result      = $volume_info->children_get();
+
+    if ( !$quiet ) {
+        if ($getsnapinfo) {
+            printf( $list_sheaderf,
+                "Volume Name", "Total",    "Used", "Use",
+                "State",       "SnapResv", "SnapUsed" );
+        }
+        else {
+            printf( $list_headerf,
+                "Volume Name", "Total", "Used", "Use", "State" );
+        }
+    }
+    foreach my $vol (@result) {
+
+        my $vol_name = $vol->child_get_string("name");
+        my ( $total, $used, $pcentused );
+        if ($getinodeinfo) {
+            $total     = $vol->child_get_int("files-total");
+            $used      = $vol->child_get_int("files-used");
+            $pcentused = $total ? $used / $total * 100 : 0;
+        }
+        else {
+            $total     = $vol->child_get_int("size-total");
+            $used      = $vol->child_get_int("size-used");
+            $pcentused = $vol->child_get_int("percentage-used");
+        }
+        my $state          = $vol->child_get_string("state");
+        my $snapusedperc   = 0;
+        my $snapblocksresv = 0;
+        my $snapresvbytes  = 0;
+        if ($getsnapinfo) {
+            my $snapcumtotal = 0;
+
+            #$snapresvperc = $vol->child_get_int("snapshot-percent-reserved");
+            $snapblocksresv = $vol->child_get_int("snapshot-blocks-reserved")
+              || 0;
+
+            my $snapout =
+              $s->invoke( "snapshot-list-info", "volume", $vol_name );
+            if ( $snapout->results_status() ne "failed" ) {
+
+                my $snapshots = $snapout->child_get("snapshots");
+                my @snapshots = $snapshots->children_get();
+                foreach my $snap (@snapshots) {
+                    $snapcumtotal = $snap->child_get_int("cumulative-total");
+                }
+            }
+            else {
+                $snapcumtotal = $snapout->results_reason();
+            }
+
+            #$snapused = $snapblocksresv - $snapcumtotal;
+
+            if ($snapblocksresv) {
+                $snapusedperc = $snapcumtotal / $snapblocksresv * 100;
+            }
+            $snapresvbytes =
+              $snapblocksresv * 1024;    # defined as "1024 byte blocks"
+        }
+
+        my $retinfo;
+        if ($getinodeinfo) {
+            $retinfo = sprintf( !$quiet ? $list_ibodyf : "%s %d %d %d%% %s\n",
+                $vol_name, $total, $used, $pcentused, $state );
+        }
+        else {
+            $retinfo = sprintf(
+                !$quiet ? $list_bodyf : "%s %s %s %d%% %s\n",
+                $vol_name,
+                $nohuman ? $total : humanize $total,
+                $nohuman ? $used  : humanize $used,
+                $pcentused, $state
+            );
+        }
+        if ($getsnapinfo) {
+            chomp($retinfo);
+            $retinfo .= sprintf( " %7s %7.2f%%\n",
+                $nohuman ? $snapresvbytes : humanize $snapresvbytes,
+                $snapusedperc );
+        }
+        print $retinfo;
+    }
+}
+
+sub volume_rename_cmode {
+    my $s       = shift;
+    my $arg     = shift;
+    my $newname = shift;
+
+    if ( !$newname ) {
+        print STDERR "Usage: <old-volume> <new-volume>\n";
+        return (-5);
+    }
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    my $out =
+      $s->invoke( "volume-rename", "volume", $volume, "new-volume-name",
+        $newname );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR "Rename failed: ", $out->results_reason(), "\n";
+        exit(1);
+    }
+    else {
+        print "Volume renamed.\n";
+
+        volume_junction( $s, $newname, "/vol/$newname" );
+        my $policy=export_fetchvolexpolicy($s, $newname);
+        if ($policy) {
+            export_policy($s,"rename",$policy,$newname);
+        }
+    }
+
+    return 0;
+}
+
+sub volume_rename {
+    my $s       = shift;
+    my $arg     = shift;
+    my $newname = shift;
+
+    if ( !$newname ) {
+        print STDERR "Usage: <old-volume> <new-volume>\n";
+        return (-5);
+    }
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    my $out = $s->invoke( "nfs-exportfs-list-rules-2", "pathname", $pathname );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR "Failed to list export rules of $pathname: ",
+          $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    my $rules_info = $out->child_get("rules");
+
+    $out =
+      $s->invoke( "volume-rename", "volume", $volume, "new-volume-name",
+        $newname );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR "Rename failed: ", $out->results_reason(), "\n";
+        exit(1);
+    }
+    else {
+        print "Volume renamed.\n";
+
+        # Netapp only moves the in-memory export, not the on-disk version
+        if ($rules_info) {
+            exports_delete( $s, $volume );
+            my $forceappend = 1;
+            exports_add_real( $s, $newname, undef, $forceappend );
+        }
+    }
+
+    return 0;
+}
+
+sub volume_size {
+    my $s    = shift;
+    my $arg  = shift;
+    my $size = shift;
+
+    if ( !$arg ) { return (-5); }
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    my $out;
+    if ($size) {
+        $size =~ s/^plus/+/;
+        $size =~ s/^minus/-/;
+        $out =
+          $s->invoke( "volume-size", "volume", $volume, "new-size", $size );
+    }
+    else {
+        $out = $s->invoke( "volume-size", "volume", $volume );
+    }
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    my $volume_size = $out->child_get_string("volume-size");
+    print "Total Size: $volume_size\n";    # For some reason, already in gigs
+
+    if ($size) {
+        volume_autosize( $s, $arg, "reset" );
+    }
+
+    return (0);
+}
+
+sub volume_maxfiles {
+    my $s    = shift;
+    my $arg  = shift;
+    my $size = shift;
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    my $out;
+    if ($size) {
+        $out = $s->invoke( "volume-set-total-files", "volume", $volume,
+            "requested-total-files", $size );
+
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+    }
+
+    if ( !$volume ) {
+        $out = $s->invoke("volume-list-info");
+    }
+    else {
+        $out = $s->invoke( "volume-list-info", "volume", $volume );
+    }
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    my $volume_info = $out->child_get("volumes");
+    my @result      = $volume_info->children_get();
+
+    foreach my $vol (@result) {
+        my $vol_name       = $vol->child_get_string("name");
+        my $vol_filestotal = $vol->child_get_int("files-total");
+        my $vol_filesused  = $vol->child_get_int("files-used");
+        print
+"$vol_name: Max Files: $vol_filestotal, Current Files: $vol_filesused\n";
+    }
+
+    return (0);
+}
+
+sub volume_maxfiles_cmode {
+    my $s    = shift;
+    my $arg  = shift;
+    my $size = shift;
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    my $out;
+    if ($size) {
+        $out = $s->invoke( "volume-set-total-files", "volume", $volume,
+            "requested-total-files", $size );
+
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+    }
+
+    my $tag      = "";
+    my $numlines = 0;
+    while ( defined($tag) ) {
+        my $in = NaElement->new("volume-get-iter");
+        $in->child_add_string( "max-records", 1000 );
+        if ( $tag ne "" ) {
+            $in->child_add_string( "tag", $tag );
+        }
+        my $desAttrs =
+          makeVolDesAttr( [qw/id name/], [qw/inode files-used/],
+            [qw/inode files-total/] );
+        $in->child_add($desAttrs);
+
+        if ($volume) {
+            $in->child_add( makeVolQuery( "id", "name", $volume, "string" ) );
+        }
+
+        my $out = $s->invoke_elem($in);
+        if ( $out->results_status() eq "failed" ) {
+            print( $out->results_reason() . "\n" );
+            exit(-1);
+        }
+        if ( $out->child_get_int("num-records") == 0 ) {
+            return ( $numlines == 0 );
+        }
+        $tag = $out->child_get_string("next-tag");
+        my @volList = $out->child_get("attributes-list")->children_get();
+        my $volInfo;
+        foreach $volInfo (@volList) {
+            my $volIdAttrs = $volInfo->child_get("volume-id-attributes");
+
+       #next if ($volume && ($volume ne $volIdAttrs->child_get_string("name")));
+            $numlines++;
+            if ($volIdAttrs) {
+                my $volSizeAttrs =
+                  $volInfo->child_get("volume-inode-attributes");
+                if ($volSizeAttrs) {
+                    my $volName = $volIdAttrs->child_get_string("name");
+                    my $total   = $volSizeAttrs->child_get_int("files-total")
+                      || 0;
+                    my $used = $volSizeAttrs->child_get_int("files-used") || 0;
+                    print "$volName: Max Files: $total, Current Files: $used\n";
+                }
+            }
+        }
+    }
+    if ( $numlines == 0 ) {
+
+        # FIXME: this is dumb
+        print "Volume not found.\n";
+        exit 1;
+    }
+    return (0);
+}
+
+sub volume_delete {
+    my $s   = shift;
+    my $arg = shift;
+
+    if ( !$arg ) { return (-5); }
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    if (!$CLUSTER_MODE) {
+        my $out = $s->invoke( "nfs-exportfs-list-rules-2", "pathname", $pathname );
+
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+
+        my $rules_info = $out->child_get("rules");
+        if ($rules_info) {
+            my @rules_info = $rules_info->children_get();
+            if ( scalar @rules_info > 0 ) {
+                print "Remove exports first.\n";
+                return (1);
+            }
+        }
+    }
+
+    if ($CLUSTER_MODE) {
+
+        my $policy=export_fetchvolexpolicy( $s, $volume );
+        if (defined $policy && $policy ne "default") {
+            if (export_fetchruleindexes( $s, $policy )) {
+                print STDERR "Remove exports first.\n";
+                return (1);
+            }
+        }
+        #print STDERR "Umounting $volume\n"; #DEBUG
+        my $out=$s->invoke( "volume-unmount", "volume-name", $volume );
+        if ( $out->results_status() eq "failed" ) {
+            if ( $out->results_reason() ne "Invalid pathname" ) {
+                print STDERR $out->results_reason(), "\n";
+            }
+        }
+    }
+
+
+    my $out = $s->invoke( "volume-offline", "name", $volume );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    $out = $s->invoke( "volume-destroy", "name", $volume );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+    print "Volume '$volume' deleted.\n";
+    return (0);
+}
+
+sub volume_mkdir {
+    my $s         = shift;
+    my $arg       = shift;
+    my $directory = shift;
+
+    if ( !$directory ) { return (-5); }
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+    my $host = `hostname`;
+    chomp($host);
+
+    my $out =
+      $s->invoke( "file-create-directory", "path", "$pathname/$directory",
+        "perm", 755 );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR "mkdir: $pathname/$directory: ",$out->results_reason(), "\n";
+        exit(1);
+    }
+
+    print "Directory $pathname/$directory created.\n";
+    return (0);
+
+}
+
+sub volume_rmdir {
+    my $s         = shift;
+    my $arg       = shift;
+    my $directory = shift;
+
+    if ( !$directory ) { return (-5); }
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+    my $host = `hostname`;
+    chomp($host);
+
+    my $out =
+      $s->invoke( "file-delete-directory", "path", "$pathname/$directory" );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR "rmdir: $pathname/$directory: ", $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    print "Directory $pathname/$directory deleted.\n";
+    return (0);
+
+}
+
+sub volume_online {
+    my $s   = shift;
+    my $vol = shift;
+
+    if ( !$vol ) { return (-5); }
+
+    my ( $volume, $pathname ) = parsepathname($vol);
+
+    my $out = $s->invoke( "volume-online", "name", "$volume" );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    print "Volume '$volume' online.\n";
+    return (0);
+}
+
+sub volume_offline {
+    my $s   = shift;
+    my $vol = shift;
+
+    if ( !$vol ) { return (-5); }
+
+    my ( $volume, $pathname ) = parsepathname($vol);
+
+    my $out = $s->invoke( "volume-offline", "name", "$volume" );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    print "Volume '$volume' offline.\n";
+    return (0);
+}
+
+sub volume_autosize {
+    my $s   = shift;
+    my $vol = shift;
+
+    if ( !$vol ) { return (-5); }
+
+    my $incrsize;
+    my $enabled;
+    my $maxsize;
+    while ( scalar @_ > 0 ) {
+        if ( $_[0] eq "-i" )    { shift; $incrsize = shift;   next; }
+        if ( $_[0] eq "-m" )    { shift; $maxsize  = shift;   next; }
+        if ( $_[0] eq "on" )    { shift; $enabled  = "true";  next; }
+        if ( $_[0] eq "off" )   { shift; $enabled  = "false"; next; }
+        if ( $_[0] eq "reset" ) { shift; $enabled  = "reset"; next; }
+        return (-5);
+    }
+
+    my ( $volume, $pathname ) = parsepathname($vol);
+
+    if ( defined $incrsize || defined $enabled || defined $maxsize ) {
+        my @setargs = ();
+        if ( defined $enabled ) {
+            if ( $enabled eq "reset" ) {
+                my $out = $s->invoke( "volume-size", "volume", $volume );
+                if ( $out->results_status() eq "failed" ) {
+                    print STDERR $out->results_reason(), "\n";
+                    exit(1);
+                }
+                my $size = $out->child_get_string("volume-size");
+                $size = dehumanize($size);
+
+                if ( !defined $incrsize ) {
+                    $incrsize = int( ( $size * .05 ) );
+                }
+                if ( !defined $maxsize ) {
+                    $maxsize = int( ( $size * 1.2 ) );
+                }
+            }
+            else {
+                push( @setargs, "is-enabled" );
+                push( @setargs, $enabled );
+            }
+        }
+        if ( defined $incrsize ) {
+            push( @setargs, "increment-size" );
+            push( @setargs, $incrsize );
+        }
+        if ( defined $maxsize ) {
+            push( @setargs, "maximum-size" );
+            push( @setargs, $maxsize );
+        }
+
+        my $out =
+          $s->invoke( "volume-autosize-set", "volume", "$volume", @setargs );
+
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), " ($enabled)\n";
+            exit(1);
+        }
+    }
+    my $out = $s->invoke( "volume-autosize-get", "volume", "$volume" );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    $incrsize = $out->child_get_int("increment-size") * 1024;
+    $enabled  = $out->child_get_string("is-enabled");
+    $maxsize  = $out->child_get_int("maximum-size") * 1024;
+
+    printf(
+        "%s autosize %s max: %s incr: %s\n",
+        $volume, $enabled eq "true" ? "ON" : "OFF",
+        humanize($maxsize), humanize($incrsize)
+    );
+    return (0);
+}
+
+sub volume_junction {
+    cmode_required();
+    my $s    = shift;
+    my $vol  = shift;
+    my $path = shift;    # optional, if $vol is a full path
+
+    if ( !$vol ) { return (-5); }
+
+    my ( $volume, $pathname ) = parsepathname($vol);
+
+    if ( defined $path && $path eq "remove" ) {
+        my $out = $s->invoke( "volume-unmount", "volume-name", "$volume" );
+
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+
+        print "Volume '$volume' junction removed.\n";
+    }
+    elsif ( defined $path ) {
+        my $junction = $path;
+        if ( $junction !~ m{$volume$} ) {
+            $junction .= "/$volume";
+        }
+        my $out = $s->invoke( "volume-unmount", "volume-name", "$volume" );
+        $out = $s->invoke(
+            "volume-mount", "volume-name", "$volume", "junction-path",
+            "$junction"
+        );
+
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+
+        print "Volume '$volume' junction $junction added.\n";
+    }
+    else {
+        my $out = $s->invoke(
+            "volume-get-volume-path", "volume",
+            "$volume",                "is-style-cifs",
+            "false"
+        );
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+        my $junction = $out->child_get_string("junction");
+        print $junction, "\n";
+    }
+
+    return (0);
+}
+
+sub volume_option {
+    my $s      = shift;
+    my $vol    = shift;
+    my $option = shift;    # optional, if $vol is a full path
+    my $value  = shift;    # optional, if $vol is a full path
+
+    if ( !$vol ) { return (-5); }
+
+    my ( $volume, $pathname ) = parsepathname($vol);
+
+    if ( defined $value ) {
+        my $out = $s->invoke( "volume-set-option", "option-name", $option,
+            "option-value", $value, "volume", $volume );
+
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+
+        print "Volume '$volume' option set.\n";
+    }
+    else {
+        my $out = $s->invoke( "volume-options-list-info", "volume", $volume );
+
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+
+        my $volume_info = $out->child_get("options");
+        my @result      = $volume_info->children_get();
+        my %results;
+        foreach my $result (@result) {
+            $results{ $result->child_get_string("name") } =
+              $result->child_get_string("value");
+        }
+        if ( defined $option ) {
+            print $option, " ", $results{$option}, "\n";
+        }
+        else {
+            foreach my $option ( sort keys %results ) {
+                print $option, " ", $results{$option}, "\n";
+            }
+        }
+
+    }
+    return (0);
+}
+
+sub volume_move_cmode {
+    my $s       = shift;
+    my $arg     = shift;
+    my $quiet   = 0;
+    my $nohuman = 0;
+    while ( defined $arg and $arg =~ /^-/ ) {
+        $quiet   = ( $quiet | $arg   eq "-q" );
+        $nohuman = ( $nohuman | $arg eq "-n" );
+        $arg     = shift;
+    }
+
+    my $vol  = $arg;
+    my $aggr = shift;
+    my $vserver = shift;
+
+    if ( defined $vserver ) {
+
+        # start a move
+        my $out =
+          $s->invoke( "volume-move-start", "source-volume", $vol, "dest-aggr",
+            $aggr, "vserver", $vserver );
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+    }
+
+    if ( !$quiet ) {
+
+        # FIXME: make list output nice and pretty
+        #printf( "%s %s %s %s %s\n",
+        #"Volume Name","Vserver","State", "Phase", "Complete");
+    }
+    my $tag      = "";
+    my $numlines = 0;
+    while ( defined($tag) ) {
+        my $in = NaElement->new("volume-move-get-iter");
+        if ( $tag ne "" ) {
+            $in->child_add_string( "tag", $tag );
+        }
+        my $out = $s->invoke_elem($in);
+        if ( $out->results_status() eq "failed" ) {
+            print( $out->results_reason() . "\n" );
+            exit(-1);
+        }
+        if ( $out->child_get_int("num-records") == 0 ) {
+            return ( $numlines == 0 );
+        }
+        $tag = $out->child_get_string("next-tag");
+        my @volList = $out->child_get("attributes-list")->children_get();
+        my $volInfo;
+        foreach $volInfo (@volList) {
+
+            #my $volIdAttrs = $volInfo->child_get("volume-move-info") or die;
+            next
+              if ( $vol && ( $vol ne $volInfo->child_get_string("volume") ) );
+            $numlines++;
+            if ($volInfo) {
+                my $volName     = $volInfo->child_get_string("volume");
+                my $vserverName = $volInfo->child_get_string("vserver");
+                my $state       = $volInfo->child_get_string("state");
+                my $phase       = $volInfo->child_get_string("phase");
+                my $pcentcomplete =
+                  $volInfo->child_get_string("percent-complete") || 0;
+                my $estcompl =
+                  $volInfo->child_get_string("estimated-completion-time") || "";
+                printf( "%s %s %s %s %d%% %s\n",
+                    $volName, $vserverName, $state, $phase, $pcentcomplete,
+                    $estcompl ? scalar localtime $estcompl : "" );
+
+            }
+        }
+    }
+}
+
+sub volume_sspolicy {
+    my $s    = shift;
+    my $vol  = shift;
+    my $policy = shift;
+
+    if (! $vol) { return (-5) }
+
+    my ( $volume, $pathname ) = parsepathname($vol);
+
+    if ($policy) {
+        volume_modify_attr($s,$volume,"snapshot","snapshot-policy",$policy,"string");
+    } else {
+        print volume_fetch_attr($s,$volume,"snapshot","snapshot-policy","string"),"\n";
+    }
+    
+    return (0);
+}
+    
+    
+
+sub lif_help {
+    my $s = shift;
+    print STDERR "          lif options: list [-v] [-q] [<lif>]\n";
+}
+
+sub lif_list {
+    print STDERR "LIF Operations only in Cluster mode\n";
+    exit 1;
+}
+
+sub lif_list_cmode {
+    my $s   = shift;
+    my $arg = shift;
+    my $tag = "";
+
+    my $quiet   = 0;
+    my $verbose = 0;
+    while ( defined $arg and $arg =~ /^-/ ) {
+        $quiet   = ( $quiet | $arg   eq "-q" );
+        $verbose = ( $verbose | $arg eq "-v" );
+        $arg     = shift;
+    }
+    if ( !$quiet ) {
+        if ($verbose) {
+            printf
+"%-18.18s %15s %12.12s:%-8s %12.12s:%-8s %12s %12s %12s %8s %15s %15s %9.9s\n",
+              qw/Name Address CurNode CurPort HomeNode HomePort FO-Group FO-Policy
+              FW-Policy Status RouteGroup Role IsHome/;
+        }
+        else {
+            printf "%-18.18s %15s %12.12s %12.12s\n",
+              qw/Name Address CurNode HomeNode/;
+        }
+    }
+
+    my $numlines = 0;
+    while ( defined($tag) ) {
+        my $in = NaElement->new("net-interface-get-iter");
+        if ( $tag ne "" ) {
+            $in->child_add_string( "tag", $tag );
+        }
+        my $out = $s->invoke_elem($in);
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            if ( $out->results_reason() =~ m/Unable to find API/ ) {
+                print STDERR
+"Hint: Maybe you need to connect to the cluster vserver (not the data vserver).\n";
+            }
+            exit(1);
+        }
+        if ( $out->child_get_int("num-records") == 0 ) {
+            return ( $numlines == 0 );
+        }
+        $tag = $out->child_get_string("next-tag");
+        my @lifList = $out->child_get("attributes-list")->children_get();
+        my $lifInfo;
+        foreach $lifInfo (@lifList) {
+            next
+              if ( $arg
+                && ( $arg ne $lifInfo->child_get_string("interface-name") ) );
+            $numlines++;
+            if ($verbose) {
+                printf
+"%-18.18s %15s %12.12s:%-8s %12.12s:%-8s %12s %12s %12s %8s %15s %15s %9.9s\n",
+                  $lifInfo->child_get_string("interface-name"),
+                  $lifInfo->child_get_string("address"),
+                  $lifInfo->child_get_string("current-node"),
+                  $lifInfo->child_get_string("current-port"),
+                  $lifInfo->child_get_string("home-node"),
+                  $lifInfo->child_get_string("home-port"),
+                  $lifInfo->child_get_string("failover-group"),
+                  $lifInfo->child_get_string("failover-policy"),
+                  $lifInfo->child_get_string("firewall-policy"),
+                  $lifInfo->child_get_string("operational-status"),
+                  $lifInfo->child_get_string("routing-group-name"),
+                  $lifInfo->child_get_string("role"),
+                  ( $lifInfo->child_get_string("is-home") eq "true" )
+                  ? "home"
+                  : "not-home";
+            }
+            else {
+                printf "%-18.18s %15s %12.12s %12.12s\n",
+                  $lifInfo->child_get_string("interface-name"),
+                  $lifInfo->child_get_string("address"),
+                  $lifInfo->child_get_string("current-node"),
+                  $lifInfo->child_get_string("home-node");
+            }
+
+        }
+    }
+}
+
+sub lif_move_cmode {
+    my $s   = shift;
+    my $lif = shift;
+    my $node = shift;
+    
+    if (!$node) { return (-5) }
+
+
+    my $q   = NaElement->new("query");
+    my $qnii   = NaElement->new("net-interface-info");
+    $q->child_add($qnii);
+    $qnii->child_add_string("interface-name",$lif);
+
+    my $a   = NaElement->new("attributes");
+    my $anii   = NaElement->new("net-interface-info");
+    $a->child_add($anii);
+    $anii->child_add_string("home-node",$node);
+
+
+    my $in = NaElement->new("net-interface-modify-iter");
+    $in->child_add($a);
+    $in->child_add($q);
+    my $out = $s->invoke_elem($in);
+    if ( $out->results_status() eq "failed" ) {
+        print( $out->results_reason() . "\n" );
+        exit(-1);
+    }
+    if ( $out->child_get_int("num-failed") > 0 ) {
+        my @failList = $out->child_get("failure-list")->children_get();
+        foreach my $fail (@failList) {
+            if (0) {
+            my $volkey = $fail->child_get("volume-key");
+            my $va     = $volkey->child_get("volume-attributes");
+            my $via    = $va->child_get("volume-id-attributes");
+            my $name   = $via->child_get_string("name");
+            printf "%s: %s (%d)\n",
+              $name,
+              $fail->child_get_string("error-message"),
+              $fail->child_get_int("error-code");
+            }
+            print $fail->sprintf;
+        }
+        return $out->child_get_int("num-failed");
+    }
+}
+
+    
+
+sub snapmirror_help {
+    my $s = shift;
+    print STDERR
+      "          snapmirror options: list|create|update|break|delete|wait
+              list [-x] [<destvfiler:/destination-path>] (use -x on destination filers)
+              create -S sourcevfiler:/sourcepath [-t <DP|LS|V|R|TDP>] [-p <snapshot-policy>] <destvfiler:/destination-path>
+              update <destvfiler:/destination-path>
+              release -s <[<sourcefiler:>]/source-path> -d <destvfiler:/destination-path>
+              break <destvfiler:/destination-path>
+              delete <destvfiler:/destination-path>
+              wait <destvfiler:/destination-path>
+";
+}
+
+sub snapmirror_list {
+    my $s   = shift;
+    my $arg = shift;
+
+    my $in = NaElement->new("snapmirror-list-destinations");
+    if ($arg) {
+        $in->child_add_string( "source-location", $arg );
+    }
+    my $out = $s->invoke_elem($in);
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    my $volume_info = $out->child_get("destinations");
+    my @result      = $volume_info->children_get();
+
+    foreach my $vol (@result) {
+        printf "%20s %20s\n", $vol->child_get_string("source-location"),
+          $vol->child_get_string("destination-location");
+    }
+    return (0);
+}
+
+sub snapmirror_list_cmode {
+    my $s   = shift;
+    my $arg = shift;
+    my $api = "snapmirror-get-destination-iter";
+    if ($arg and $arg eq "-x") {
+       $api="snapmirror-get-iter";
+       $arg=shift;
+    }
+
+
+    my $tag = "";
+
+    my $numlines = 0;
+    while ( defined($tag) ) {
+        my $in = NaElement->new($api);
+        if ( $tag ne "" ) {
+            $in->child_add_string( "tag", $tag );
+        }
+        my $out = $s->invoke_elem($in);
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+        if ( $out->child_get_int("num-records") == 0 ) {
+            return ( $numlines == 0 );
+        }
+        $tag = $out->child_get_string("next-tag");
+        my @smList = $out->child_get("attributes-list")->children_get();
+        my $smInfo;
+        foreach $smInfo (@smList) {
+            next
+              if ( $arg
+                && ( $arg ne $smInfo->child_get_string("destination-location") )
+              );
+            next
+              if ( $smInfo->child_get_string("destination-location") =~
+                m/\/root_/ );
+            $numlines++;
+            print join( "\t",
+                $smInfo->child_get_string("source-location"),
+                $smInfo->child_get_string("destination-location"),
+              ),
+              "\n";
+            print "\t",
+                "",
+                $smInfo->child_get_int("is-healthy") 
+                    ? $smInfo->child_get_int("is-healthy") eq "true"
+                        ? "Healthy   "
+                        : "NotHealthy"
+                    : "";
+            print "\t",$smInfo->child_get_string("relationship-status") || "Unknown";
+            print "\t",$smInfo->child_get_string("mirror-state") || "-";
+            print "\t",$smInfo->child_get_string("relationship-type");
+            print "\t",$smInfo->child_get_string("lag-time") ? humanize_seconds($smInfo->child_get_string("lag-time")) :"" ,
+              "\n";
+            if (defined $smInfo->child_get_int("is-healthy")) {
+                if ( $smInfo->child_get_int("is-healthy") ne "true" ) {
+                    if (defined $smInfo->child_get_string("last-transfer-error")) {
+                        print "\tError: ",
+                          $smInfo->child_get_string("last-transfer-error"), "\n";
+                    }
+                }
+            }
+            if ( $smInfo->child_get_int("relationship-status") and 
+                 $smInfo->child_get_int("relationship-status") eq "transferring" and
+                 $smInfo->child_get_int("relationship-progress") )
+            {
+                print "\tTransferred: ",
+                  humanize( $smInfo->child_get_int("relationship-progress") ),
+                  "\n";
+            }
+            print "\n";
+        }
+    }
+    return (0);
+}
+
+sub snapmirror_update {
+    my $s   = shift;
+    my $arg = shift;
+
+    my $wait = 0;
+    while ( defined $arg and $arg =~ /^-/ ) {
+        $wait = ( $wait | $arg eq "-w" );
+        $arg = shift;
+    }
+
+    if ( !$arg ) { return (-5); }
+
+    my $out;
+    $out = $s->invoke( "snapmirror-update", "destination-location", $arg );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+    if ($wait) {
+        snapmirror_wait( $s, $arg );
+    }
+    else {
+        print "Snapmirror '$arg' updating.\n";
+    }
+    return (0);
+}
+
+sub snapmirror_break {
+    my $s   = shift;
+    my $arg = shift;
+
+    if ( !$arg ) { return (-5); }
+
+    my $out;
+    $out = $s->invoke( "snapmirror-break", "destination-location", $arg );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+    print "Snapmirror '$arg' breakenated.\n";
+
+    return (0);
+}
+
+sub snapmirror_delete {
+    my $s   = shift;
+    my $arg = shift;
+
+    if ( !$arg ) { return (-5); }
+
+    my $out;
+    $out = $s->invoke( "snapmirror-destroy", "destination-location", $arg );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+    print "Snapmirror '$arg' deleted.\n";
+
+    return (0);
+}
+
+sub snapmirror_release {
+    my $s           = shift;
+    my $source      = "";
+    my $destination = "";
+    while ( scalar @_ > 0 ) {
+        if ( $_[0] eq "-s" ) { shift; $source      = shift; next; }
+        if ( $_[0] eq "-d" ) { shift; $destination = shift; next; }
+        return (-5);
+    }
+
+    my $in = NaElement->new("snapmirror-release");
+    if ($source) {
+        $in->child_add_string( "source-location", $source );
+    }
+    if ($destination) {
+        $in->child_add_string( "destination-location", $destination );
+    }
+    my $out;
+    $out = $s->invoke_elem($in);
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+    print "Snapmirror '$destination' released.\n";
+
+    return (0);
+}
+
+sub snapmirror_wait {
+    my $s   = shift;
+    my $arg = shift;
+
+    if ( !$arg ) { return (-5); }
+    my $out;
+
+    my $status = "transferring";
+
+    while ( $status eq "transferring" ) {
+        $out = $s->invoke( "snapmirror-get", "destination-location", $arg );
+
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+
+        my $attributes = $out->child_get("attributes") or die;
+        my $smInfo = $attributes->child_get("snapmirror-info");
+        $status = $smInfo->child_get_string("relationship-status");
+        if ( $status eq "transferring" ) {
+            print "\rTransferred: ",
+              humanize( $smInfo->child_get_int("relationship-progress") ),
+              "       ";
+        }
+        sleep(2);
+    }
+    print "\nDone.\n";
+
+    return (0);
+}
+
+sub snapmirror_create {
+    my $s           = shift;
+    my $arg         = shift;
+    my $source      = "";
+    my $destination = "";
+    my $type="dp";
+    my $policy;
+    my $schedule;
+    my $wait = 0;
+    while ( defined $arg and $arg =~ /^-/ ) {
+        $source = $arg eq "-S" ? shift : $source;
+        $type   = $arg eq "-t" ? shift : $type;
+        $policy = $arg eq "-p" ? shift : $policy;
+        $schedule = $arg eq "-s" ? shift : $schedule;
+        $wait   = ( $wait | $arg eq "-w" );
+        $arg = shift;
+    }
+    $destination = $arg;
+    if ( !$source ) { return (-5); }
+    if ( !$destination ) { return (-5); }
+
+    if ( exists $smreltypes{ uc($type) } ) {
+        $type = $smreltypes{ uc($type) };
+    }
+
+    my $in=NaElement->new("snapmirror-create");
+    $in->child_add_string("source-location", $source);
+    $in->child_add_string("destination-location", $destination);
+    $in->child_add_string("relationship-type", $type);
+    if (defined $schedule) {
+        $in->child_add_string("schedule", $schedule);
+    }
+    if (defined $policy) {
+        $in->child_add_string("policy", $policy);
+    }
+    my $out = $s->invoke_elem( $in );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+    print "Snapmirror '$destination' created.\n";
+
+    $out =
+      $s->invoke( "snapmirror-initialize", "destination-location", $destination,
+        "source-location", $source );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+    if ($wait) {
+        snapmirror_wait( $s, $arg );
+    }
+    else {
+        print "Snapmirror '$arg' initializing.\n";
+    }
+    return (0);
+}
+
+sub aggr_help {
+    my $s = shift;
+    print STDERR
+      "          aggr options: list [-q] [-n] [-v [-l]] [<aggrname>]\n";
+}
+
+sub aggr_list {
+    my $s   = shift;
+    my $arg = shift;
+
+    my $quiet    = 0;
+    my $nohuman  = 0;
+    my $verbose  = 0;
+    my $listvols = 0;
+
+    while ( defined $arg and $arg =~ /^-/ ) {
+        $quiet    = ( $quiet | $arg    eq "-q" );
+        $nohuman  = ( $nohuman | $arg  eq "-n" );
+        $verbose  = ( $verbose | $arg  eq "-v" );
+        $listvols = ( $listvols | $arg eq "-l" );
+        $arg      = shift;
+    }
+
+    if ( scalar @_ > 0 ) {
+        return (-5);
+    }
+
+    my $out;
+    if ( !$arg ) {
+        $out = $s->invoke("aggr-list-info");
+    }
+    else {
+        $out = $s->invoke( "aggr-list-info", "aggregate", $arg );
+    }
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    my $aggr_info = $out->child_get("aggregates");
+    my @result    = $aggr_info->children_get();
+
+    if ( !$verbose ) {
+        if ( !$quiet ) {
+            printf( $list_headerf,
+                "Aggregate Name",
+                "Total", "Used", "Use", "State" );
+        }
+        foreach my $aggrp (@result) {
+            my $aggr_name = $aggrp->child_get_string("name");
+            my $total     = $aggrp->child_get_int("size-total");
+            my $used      = $aggrp->child_get_int("size-used");
+            my $use       = $aggrp->child_get_int("size-percentage-used");
+            my $state     = $aggrp->child_get_string("state");
+            printf(
+                !$quiet ? $list_bodyf : "%s %s %s %d%% %s\n",
+                $aggr_name,
+                $nohuman ? $total : humanize $total,
+                $nohuman ? $used  : humanize $used,
+                $use, $state
+            );
+        }
+    }
+    else {
+
+        # verbose output
+        print "           Aggr State           Status            Options\n";
+        foreach my $aggrp (@result) {
+            my $aggr_name  = $aggrp->child_get_string("name");
+            my $state      = $aggrp->child_get_string("state");
+            my $raidstatus = $aggrp->child_get_string("raid-status");
+            my $raidsize   = $aggrp->child_get_string("raid-size");
+            my $type       = $aggrp->child_get_string("type");
+            my $blocktype  = $aggrp->child_get_string("block-type");
+            my $localroot  = $aggrp->child_get_string("has-local-root");
+
+            my $asd = $aggrp->child_get("aggregate-space-details");
+            my $asi = $asd->child_get("aggregate-space-info");
+            my $ss  = $asi->child_get("snapshot-space");
+            my $ssi = $ss->child_get("snapshot-space-info");
+            my $sst = $ssi->child_get_int("snapshot-size-total");
+
+            my @options = ();
+            $localroot eq "true" && push( @options, "root" );
+            $sst == 0 && push( @options, "nosnap=on" );
+            $raidsize ne "16" && push( @options, "raidsize=$raidsize" );
+            $blocktype =~ s/_/-/;
+
+            printf(
+                "%15s %-15s %-17s %-16s\n",
+                $aggr_name, $state,
+                join( ", ", $raidstatus, $type ),
+                join( ", ", @options )
+            );
+            printf( "%15s %-15s %-17s %-16s\n", "", "", $blocktype, "" );
+
+            if ($listvols) {
+                print "\n";
+                my $volumes = $aggrp->child_get("volumes");
+                my @results = $volumes->children_get();
+                my @volumes =
+                  sort map { $_->child_get_string("name") } @results;
+                my $header = "Volumes:";
+                foreach my $volname (@volumes) {
+                    printf( "%25s %s,\n", $header, $volname );
+                    $header = "";
+
+                }
+                print "\n";
+            }
+        }
+    }
+
+}
+
+sub aggr_list_cmode {
+    my $s   = shift;
+    my $arg = shift;
+    my $tag = "";
+
+    my $quiet    = 0;
+    my $nohuman  = 0;
+    my $verbose  = 0;
+    my $listvols = 0;
+    my $mostspace = 0;
+
+    my $aggr;
+
+    while ( defined $arg and $arg =~ /^-/ ) {
+        $quiet    = ( $quiet | $arg    eq "-q" );
+        $nohuman  = ( $nohuman | $arg  eq "-n" );
+        $verbose  = ( $verbose | $arg  eq "-v" );
+        $listvols = ( $listvols | $arg eq "-l" );
+        $mostspace = ( $mostspace | $arg eq "-m" );
+        $arg      = shift;
+    }
+
+    if ($quiet) {
+        print STDERR
+"Warning: quiet mode not supported in cmode. (go bug Garrick if you want this)\n";
+    }
+    if ($verbose) {
+        print STDERR
+"Warning: verbose mode not supported in cmode. (go bug Garrick if you want this)\n";
+    }
+    if ($listvols) {
+        print STDERR
+"Warning: listvols mode not supported in cmode. (go bug Garrick if you want this)\n";
+    }
+
+    my $numlines = 0;
+    while ( defined($tag) ) {
+        my $in = NaElement->new("aggr-get-iter");
+        if ( $tag ne "" ) {
+            $in->child_add_string( "tag", $tag );
+        }
+        my $out = $s->invoke_elem($in);
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            if ( $out->results_reason() =~ m/Unable to find API/ ) {
+                print STDERR
+"Hint: Maybe you need to connect to the cluster vserver (not the data vserver).\n";
+            }
+            exit(1);
+        }
+        if ( $out->child_get_int("num-records") == 0 ) {
+            return ( $numlines == 0 );
+        }
+        $tag = $out->child_get_string("next-tag");
+        my @aggrList = $out->child_get("attributes-list")->children_get();
+        my $aggrInfo;
+        print("----------------------------------------------------\n") unless ($mostspace);
+        foreach $aggrInfo (@aggrList) {
+            next
+              if ( $arg
+                && ( $arg ne $aggrInfo->child_get_string("aggregate-name") ) );
+            $numlines++;
+            my $aggrSizeAttrs = $aggrInfo->child_get("aggr-space-attributes");
+            my $total         = $aggrSizeAttrs->child_get_int("size-total");
+            my $sizeAvail     = $aggrSizeAttrs->child_get_int("size-available");
+            my $perUsedCap =
+              $aggrSizeAttrs->child_get_int("percent-used-capacity");
+
+            if ($mostspace) {
+                if ($mostspace < $sizeAvail) {
+                    $mostspace=$sizeAvail;
+                    $aggr=$aggrInfo->child_get_string("aggregate-name");
+                }
+            } else {
+                print( "Aggregate Name          : ",
+                    $aggrInfo->child_get_string("aggregate-name"), "\n" );
+                print( "Size (bytes)            : ",
+                    $nohuman ? $total : humanize $total , "\n" );
+                print( "Available Size (bytes)  : ",
+                    $nohuman ? $sizeAvail : humanize $sizeAvail , "\n" );
+                print( "Used Percentage         : ",
+                    $nohuman ? $perUsedCap : humanize $perUsedCap , "\n" );
+                my $aggrRaidAttrs = $aggrInfo->child_get("aggr-raid-attributes");
+                print(  "Aggregate State         : "
+                      . $aggrRaidAttrs->child_get_string("state")
+                      . "\n" );
+                print("----------------------------------------------------\n");
+            }
+        }
+        if ($mostspace) {print $aggr,"\n";}
+    }
+}
+
+sub exports_help {
+    my $s = shift;
+    print STDERR "          exports options: list|add|remove|delete
+              file    (generate exports file from memory)
+              list [<path>]
+              add <path> [ro:]<hostname|IP|network>
+              remove <path> <hostname|IP|network>|all
+              copy <sourcepath> to <destpath>
+              copy <destpath> from <sourcepath>
+              search <IP> (slow!)
+              removehost <IP|hostname>
+              policy list [<policy>]
+                    create <policy>
+                    delete <policy>
+                    rename <policy> <newpolicy>
+              rule  list [<policy>]
+                    create <policy>
+                    delete <policy>
+                    find <volname> [<IP|hostname>]\n";
+}
+
+sub exports_file {
+    cmode_notsupported();
+    my $s = shift;
+    exports_list( $s, "file" );
+}
+
+sub exports_list_cmode {
+    my $s   = shift;
+    my $arg = shift;
+
+    my %pol2clients = ();
+    my %vol2pols    = ();
+    my %vol2paths   = ();
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    # First, get volume->polices
+    my $tag      = "";
+    my $numlines = 0;
+    while ( defined($tag) ) {
+        my $in = NaElement->new("volume-get-iter");
+        $in->child_add_string( "max-records", 1000 );
+        if ( $tag ne "" ) {
+            $in->child_add_string( "tag", $tag );
+        }
+        if ( defined $arg ) {
+            $in->child_add( makeVolQuery( "id", "name", $volume, "string" ) );
+        }
+        my $desAttrs =
+          makeVolDesAttr( [qw/id name/], [qw/export policy/],
+            [qw/id junction-path/], );
+        $in->child_add($desAttrs);
+        my $out = $s->invoke_elem($in);
+        if ( $out->results_status() eq "failed" ) {
+            print( $out->results_reason() . "\n" );
+            exit(-1);
+        }
+        if ( $out->child_get_int("num-records") == 0 ) {
+            return ( $numlines == 0 );
+        }
+        $tag = $out->child_get_string("next-tag");
+        my @volList = $out->child_get("attributes-list")->children_get();
+        my $volInfo;
+        foreach $volInfo (@volList) {
+            my $volIdAttrs = $volInfo->child_get("volume-id-attributes");
+            my $volExAttrs = $volInfo->child_get("volume-export-attributes");
+            $vol2pols{ $volIdAttrs->child_get_string("name") } =
+              $volExAttrs->child_get_string("policy");
+            $vol2paths{ $volIdAttrs->child_get_string("name") } =
+              $volIdAttrs->child_get_string("junction-path");
+        }
+    }
+
+    $numlines = 0;
+    $tag      = "";
+    while ( defined($tag) ) {
+        my $in = NaElement->new("export-rule-get-iter");
+        $in->child_add_string( "max-records", 1000 );
+        if ( $tag ne "" ) {
+            $in->child_add_string( "tag", $tag );
+        }
+        if ($volume) {
+            my $desAttrs = NaElement->new("query");
+            my $eri      = NaElement->new("export-rule-info");
+            $eri->child_add_string( "policy-name", $vol2pols{$volume} );
+            $desAttrs->child_add($eri);
+            $in->child_add($desAttrs);
+        }
+        my $out = $s->invoke_elem($in);
+        if ( $out->results_status() eq "failed" ) {
+            print( $out->results_reason() . "\n" );
+            exit(-1);
+        }
+        if ( $out->child_get_int("num-records") == 0 ) {
+            last;
+        }
+        $tag = $out->child_get_string("next-tag");
+        my @attrList = $out->child_get("attributes-list")->children_get();
+        foreach my $attrInfo (@attrList) {
+
+#next if (defined $policyname && $policyname ne $attrInfo->child_get_string("policy-name"));
+            $numlines++;
+            my $policyname  = $attrInfo->child_get_string("policy-name");
+            my $clientmatch = $attrInfo->child_get_string("client-match");
+            push( @{ $pol2clients{$policyname} }, $clientmatch );
+        }
+    }
+
+    foreach my $vol ( sort keys %vol2pols ) {
+        my $policy = $vol2pols{$vol}  || "none";
+        my $path   = $vol2paths{$vol} || "no path for $vol";
+        print "$path ($policy):\n";
+
+        foreach my $client ( @{ $pol2clients{$policy} } ) {
+            print "\t$client\n";
+        }
+    }
+}
+sub export_backup {
+    my $s   = shift;
+
+    my %pol2clients = ();
+    my %vol2pols    = ();
+    my %vol2paths   = ();
+
+
+    # First, make policies
+            my $numlines = 0;
+            my $tag      = "";
+            while ( defined($tag) ) {
+                my $in = NaElement->new("export-policy-get-iter");
+                $in->child_add_string( "max-records", 1000 );
+                if ( $tag ne "" ) {
+                    $in->child_add_string( "tag", $tag );
+                }
+                my $out = $s->invoke_elem($in);
+                if ( $out->results_status() eq "failed" ) {
+                    print( $out->results_reason() . "\n" );
+                    exit(-1);
+                }
+                if ( $out->child_get_int("num-records") == 0 ) {
+                    last;
+                }
+                $tag = $out->child_get_string("next-tag");
+                my @attrList =
+                  $out->child_get("attributes-list")->children_get();
+                foreach my $attrInfo (@attrList) {
+                    $numlines++;
+                    printf "export-policy create -vserver %s -policyname %s\n",
+                      $attrInfo->child_get_string("vserver"),
+                      $attrInfo->child_get_string("policy-name");
+                }
+            }
+
+
+    # Second, modify policies
+    $tag      = "";
+    $numlines = 0;
+    while ( defined($tag) ) {
+        my $in = NaElement->new("volume-get-iter");
+        $in->child_add_string( "max-records", 1000 );
+        if ( $tag ne "" ) {
+            $in->child_add_string( "tag", $tag );
+        }
+        my $desAttrs =
+          makeVolDesAttr( [qw/id name/], [qw/id owning-vserver-name/], [qw/export policy/], [qw/id junction-path/], );
+        $in->child_add($desAttrs);
+        my $out = $s->invoke_elem($in);
+        if ( $out->results_status() eq "failed" ) {
+            print( $out->results_reason() . "\n" );
+            exit(-1);
+        }
+        if ( $out->child_get_int("num-records") == 0 ) {
+            return ( $numlines == 0 );
+        }
+        $tag = $out->child_get_string("next-tag");
+        my @volList = $out->child_get("attributes-list")->children_get();
+        my $volInfo;
+        foreach $volInfo (@volList) {
+            my $volIdAttrs = $volInfo->child_get("volume-id-attributes");
+            my $volExAttrs = $volInfo->child_get("volume-export-attributes");
+
+            printf "volume modify -vserver %s -volume %s -policy %s -junction-path %s\n",
+                 $volIdAttrs->child_get_string("owning-vserver-name"),
+                 $volIdAttrs->child_get_string("name"),
+                 $volExAttrs->child_get_string("policy"),
+                 $volIdAttrs->child_get_string("junction-path") || "";
+        }
+    }
+    
+
+    $numlines = 0;
+    $tag      = "";
+    while ( defined($tag) ) {
+        my $in = NaElement->new("export-rule-get-iter");
+        $in->child_add_string( "max-records", 1000 );
+        if ( $tag ne "" ) {
+            $in->child_add_string( "tag", $tag );
+        }
+        my $out = $s->invoke_elem($in);
+        if ( $out->results_status() eq "failed" ) {
+            print( $out->results_reason() . "\n" );
+            exit(-1);
+        }
+        if ( $out->child_get_int("num-records") == 0 ) {
+            last;
+        }
+        $tag = $out->child_get_string("next-tag");
+        my @attrList = $out->child_get("attributes-list")->children_get();
+        foreach my $attrInfo (@attrList) {
+            $numlines++;
+            my $policyname  = $attrInfo->child_get_string("policy-name");
+            my $clientmatch = $attrInfo->child_get_string("client-match");
+
+            printf "export-policy rule create -vserver %s -policyname %s -ruleindex %d -protocol %s -clientmatch %s -rorule %s -rwrule %s -anon %s -superuser %s -allow-suid %s -allow-dev %s\n",
+                $attrInfo->child_get_string("vserver-name"),
+                $attrInfo->child_get_string("policy-name"),
+                $attrInfo->child_get_int("rule-index"),
+                $attrInfo->child_get("protocol")->child_get_string("access-protocol"),
+                $attrInfo->child_get_string("client-match"),
+                $attrInfo->child_get("ro-rule")->child_get_string("security-flavor"),
+                $attrInfo->child_get("rw-rule")->child_get_string("security-flavor"),
+                $attrInfo->child_get_string("anonymous-user-id"),
+                $attrInfo->child_get("super-user-security")->child_get_string("security-flavor"),
+                $attrInfo->child_get_string("is-allow-set-uid-enabled"),
+                $attrInfo->child_get_string("is-allow-dev-is-enabled");
+        }
+           
+    }
+
+}
+
+sub exports_list {
+    my $s   = shift;
+    my $arg = shift;
+
+    my $asfile = 0;
+    if ( defined $arg && $arg eq "file" ) {
+        $asfile = 1;
+        undef $arg;
+    }
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    my $out;
+    if ( !$pathname ) {
+        $out = $s->invoke("nfs-exportfs-list-rules-2");
+    }
+    else {
+        $out = $s->invoke( "nfs-exportfs-list-rules-2", "pathname", $pathname );
+    }
+
+    #print $out->sprintf;
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    my $rules_info = $out->child_get("rules");
+    if ( !$rules_info ) {
+        print "No exports\n";
+        return (0);
+    }
+
+    my @rules_info = $rules_info->children_get();
+    if ( scalar @rules_info == 0 ) {
+        print "No exports\n";
+        return (0);
+    }
+
+    #print Dumper(\@rules_info);
+
+    foreach my $exports2 (@rules_info) {
+        my $path_name = $exports2->child_get_string("pathname");
+        my @rules     = $exports2->child_get("security-rules");
+
+        foreach my $secrule (@rules) {
+            my $secrule_ = $secrule->child_get("security-rule-info");
+            my $nosuid = $secrule_->child_get_string("nosuid") || "false";
+            if ($asfile) {
+                print "$path_name\t-sec=sys";
+            }
+            else {
+                print "Exported Path: $path_name (nosuid: $nosuid)\n";
+            }
+
+            foreach my $type (qw/read-only read-write root/) {
+                my $rule = $secrule_->child_get($type);
+                if ($rule) {
+                    my @hosts         = $rule->children_get();
+                    my @hostsasstring = ();
+                    foreach my $host (@hosts) {
+                        if ( defined $host->child_get_string("name") ) {
+                            if ($asfile) {
+                                push( @hostsasstring,
+                                    $host->child_get_string("name") );
+                            }
+                            else {
+                                print "   $type: "
+                                  . $host->child_get_string("name") . "\n";
+                            }
+                        }
+                        else {
+                            print "   $type: undefined\n" if !$asfile;
+                        }
+                    }
+                    if ($asfile) {
+                        my $asfiletype = $type;
+                        if ( $type eq "read-write" ) { $asfiletype = "rw" }
+                        if ( $type eq "read-only" )  { $asfiletype = "ro" }
+                        if (@hostsasstring) {
+                            print ",$asfiletype=", join( ":", @hostsasstring );
+                        }
+                    }
+                }
+            }
+            if ($asfile) {
+                print $nosuid eq "true" ? ",nosuid" : "", "\n";
+            }
+        }
+
+        if ( !$asfile ) {
+            print "--------------------------------------\n" if ( !$pathname );
+        }
+    }    # END foreach rules_info
+    return (0);
+}
+
+sub makeVolQuery {
+    my $attrcategory = shift;
+    my $attrname     = shift;
+    my $attrvalue    = shift;
+    my $attrtype     = shift;
+    my $q            = NaElement->new("query");
+    my $vaq          = NaElement->new("volume-attributes");
+    my $viaq         = NaElement->new("volume-$attrcategory-attributes");
+    if ( $attrtype eq "int" ) {
+        $viaq->child_add_int( $attrname, $attrvalue );
+    }
+    else {
+        $viaq->child_add_string( $attrname, $attrvalue );
+    }
+    $vaq->child_add($viaq);
+    $q->child_add($vaq);
+    return $q;
+}
+
+sub makeVolDesAttr {
+
+    my $q   = NaElement->new("desired-attributes");
+    my $vaq = NaElement->new("volume-attributes");
+
+    my $viaq;
+    my $prevattrcat = "";
+    foreach my $attr ( sort { $a->[0] cmp $b->[0] } @_ ) {
+        use Data::Dumper;
+
+        #print Dumper($attr);
+        my $attrcategory = $attr->[0];
+        my $attrname     = $attr->[1];
+
+        if ( $attrcategory ne $prevattrcat ) {
+            $prevattrcat = $attrcategory;
+            $viaq        = NaElement->new("volume-$attrcategory-attributes");
+            $vaq->child_add($viaq);
+        }
+        $viaq->child_add_string( $attrname, 1 );
+    }
+    $q->child_add($vaq);
+    return $q;
+}
+
+sub export_fetchvolexpolicy {
+    my $s      = shift;
+    my $volume = shift;
+    return volume_fetch_attr($s,$volume,"export","policy","string");
+}
+sub volume_fetch_attr {
+    my $s      = shift;
+    my $volume = shift;
+    my $attrgroup = shift;
+    my $attrname = shift;
+    my $attrtype = shift;
+    die if ( !$attrtype );
+    my $tag = "";
+    while ( defined($tag) ) {
+        my $in = NaElement->new("volume-get-iter");
+        $in->child_add_string( "max-records", 1000 );
+        if ( $tag ne "" ) {
+            $in->child_add_string( "tag", $tag );
+        }
+        $in->child_add( makeVolQuery( "id", "name", $volume, "string" ) );
+        $in->child_add( makeVolDesAttr( [$attrgroup,$attrname] ) );
+
+        my $out = $s->invoke_elem($in);
+        if ( $out->results_status() eq "failed" ) {
+            print( $out->results_reason() . "\n" );
+            exit(-1);
+        }
+        if ( $out->child_get_int("num-records") == 0 ) {
+            last;
+        }
+        $tag = $out->child_get_string("next-tag");
+        my @volList = $out->child_get("attributes-list")->children_get();
+        foreach my $volInfo (@volList) {
+            my $volAttrs = $volInfo->child_get("volume-$attrgroup-attributes");
+            if ($attrtype eq "string") {
+               return $volAttrs->child_get_string($attrname);
+            } else {
+               return $volAttrs->child_get_int($attrname);
+            }
+        }
+    }
+    return undef;
+}
+
+sub export_setvolexpolicy {
+    my $s      = shift;
+    my $volume = shift;
+    my $policy = shift;
+    volume_modify_attr($s,$volume,"export","policy",$policy,"string");
+}
+
+# This is not as messy as it looks.
+sub volume_modify_attr {
+    my $s      = shift;
+    my $volume = shift;
+    my $attrgroup = shift;
+    my $attrname = shift;
+    my $attrvalue = shift;
+    my $attrtype = shift;
+
+    my $da = makeVolDesAttr( [qw/id name/] );
+
+    my $q = makeVolQuery( "id", "name", $volume, "string" );
+
+   # $q holds the 'query' attributes that will be used, unchanged, when checking
+   # for 1 volume and for the actual policy change.
+
+    # Do a 'get' first and continue iff we find 1 volume.
+    my $in = NaElement->new("volume-get-iter");
+    $in->child_add($da);
+    $in->child_add($q);
+    my $out = $s->invoke_elem($in);
+    if ( $out->results_status() eq "failed" ) {
+        print( $out->results_reason() . "\n" );
+        exit(-1);
+    }
+    if ( $out->child_get_int("num-records") == 0 ) {
+        print STDERR "Volume was not found.\n";
+        exit(1);
+    }
+
+    if ( $out->child_get_int("num-records") > 1 ) {
+
+      # IMPORTANT: DO NOT REMOVE THIS SUPER-IMPORTANT CHECK
+      # DO YOU WANT TO ACCIDENTALLY SET THE POLICIES ON ALL OF YOUR VOLUMES? NO.
+        print STDERR
+          "Refusing to change $attrgroup-$attrname because multiple volumes were matched.\n";
+        exit(1);
+    }
+
+
+    my $a   = NaElement->new("attributes");
+    my $va  = NaElement->new("volume-attributes");
+    my $via = NaElement->new("volume-$attrgroup-attributes");
+    $via->child_add_string( $attrname, $attrvalue );
+    $va->child_add($via);
+    $a->child_add($va);
+
+    $in = NaElement->new("volume-modify-iter");
+    $in->child_add($a);
+    $in->child_add($q);
+    $out = $s->invoke_elem($in);
+    if ( $out->results_status() eq "failed" ) {
+        print( $out->results_reason() . "\n" );
+        exit(-1);
+    }
+    if ( $out->child_get_int("num-failed") > 0 ) {
+        my @failList = $out->child_get("failure-list")->children_get();
+        foreach my $fail (@failList) {
+            my $volkey = $fail->child_get("volume-key");
+            my $va     = $volkey->child_get("volume-attributes");
+            my $via    = $va->child_get("volume-id-attributes");
+            my $name   = $via->child_get_string("name");
+            printf "%s: %s (%d)\n",
+              $name,
+              $fail->child_get_string("error-message"),
+              $fail->child_get_int("error-code");
+        }
+        return $out->child_get_int("num-failed");
+    }
+    print "$volume $attrgroup/$attrname set to $attrvalue.\n";
+    return (0);
+}
+
+sub exports_add_cmode {
+    my $s         = shift;
+    my $path      = shift;
+    my $hostnames = shift;
+
+    my ( $volume, $pathname ) = parsepathname($path);
+
+    # Does this volume have a policy?
+    my $policy = export_fetchvolexpolicy( $s, $volume );
+    if ( !$policy ) {
+        print "No policy found, does the volume exist?\n";
+        exit(1);
+    }
+    elsif ( ( $policy eq "default" ) || ( $policy eq "unexport_policy" ) ) {
+        export_policy( $s, "create", $volume );
+        $policy = $volume;
+        export_setvolexpolicy( $s, $volume, $policy );
+
+        #} else {
+        #print "$volume has policy $policy\n";
+    }
+
+    # Does this client already have a rule in the policy?
+    foreach my $client ( sort split( /,/, $hostnames ) ) {
+        if ( export_fetchruleindexes( $s, $policy, $client ) ) {
+            print "$client already exported in $volume\n";
+        }
+        else {
+            export_rule( $s, "create", $policy, $client );
+        }
+    }
+
+    my $out = $s->invoke(
+        "volume-get-volume-path", "volume",
+        "$volume",                "is-style-cifs",
+        "false"
+    );
+    if ( $out->results_status() eq "failed" ) {
+        volume_junction( $s, $volume, $pathname );
+    }
+    else {
+        my $junction = $out->child_get_string("junction");
+        if ( $junction ne $pathname ) {
+            volume_junction( $s, $volume, $pathname );
+        }
+    }
+    return(0);
+}
+
+sub exports_add {
+    my $s         = shift;
+    my $arg       = shift;
+    my $hostnames = shift;
+    my $source    = shift;    # optional
+
+    if ( !$hostnames ) { return (-5); }
+
+    my $ret = exports_add_real( $s, $arg, $hostnames, $source );
+    if ( $ret != 0 ) {
+        return ($ret);
+    }
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    exports_list( $s, $pathname );
+}
+
+sub exports_remove {
+    my $s        = shift;
+    my $arg      = shift;
+    my $hostname = shift;
+
+    if ( !$hostname ) { return (-5); }
+
+    if ( $hostname eq "all" ) {
+        exports_delete( $s, $arg );
+        return (0);
+    }
+
+    my $ret = exports_remove_real( $s, $arg, $hostname );
+    if ( $ret == 0 ) {
+        return ($ret);
+    }
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    exports_list( $s, $pathname );
+    return (0);
+}
+
+sub export_policy {
+    cmode_required();
+    my $s = shift;
+    my $cmd = shift || return (-5);
+
+    if ( $cmd eq "list" ) {
+        my $policyname = shift;
+        if ( defined $policyname ) {
+            my $out =
+              $s->invoke( "export-policy-get", "policy-name", $policyname );
+            if ( $out->results_status() eq "failed" ) {
+                print STDERR "Failed to export: " . $out->results_reason(),
+                  "\n";
+                return (1);
+            }
+            my $attrList = $out->child_get("attributes");
+            my @result   = $attrList->children_get();
+            foreach my $attrInfo (@result) {
+                printf "%04d %20s %20s\n",
+                  $attrInfo->child_get_int("policy-id"),
+                  $attrInfo->child_get_string("policy-name"),
+                  $attrInfo->child_get_string("vserver");
+            }
+
+        }
+        else {
+            my $numlines = 0;
+            my $tag      = "";
+            while ( defined($tag) ) {
+                my $in = NaElement->new("export-policy-get-iter");
+                $in->child_add_string( "max-records", 1000 );
+                if ( $tag ne "" ) {
+                    $in->child_add_string( "tag", $tag );
+                }
+                my $out = $s->invoke_elem($in);
+                if ( $out->results_status() eq "failed" ) {
+                    print( $out->results_reason() . "\n" );
+                    exit(-1);
+                }
+                if ( $out->child_get_int("num-records") == 0 ) {
+                    last;
+                }
+                $tag = $out->child_get_string("next-tag");
+                my @attrList =
+                  $out->child_get("attributes-list")->children_get();
+                foreach my $attrInfo (@attrList) {
+                    $numlines++;
+                    printf "%4d %-20s %-20s\n",
+                      $attrInfo->child_get_int("policy-id"),
+                      $attrInfo->child_get_string("policy-name"),
+                      $attrInfo->child_get_string("vserver");
+                }
+            }
+
+        }
+    }
+    elsif ( $cmd eq "create" ) {
+        my $policyname = shift;
+        if ( !defined $policyname ) {
+            return (-5);
+        }
+        my $out =
+          $s->invoke( "export-policy-create", "policy-name", $policyname );
+        if ( $out->results_status() eq "failed" ) {
+            if ( $out->results_reason() eq "duplicate entry" ) {
+                print "Policy $policyname exists.\n";
+            }
+            else {
+                print( $out->results_reason() . "\n" );
+                exit(-1);
+            }
+        }
+        else {
+            print "Export policy $policyname created.\n";
+        }
+    }
+    elsif ( $cmd eq "delete" ) {
+        my $policyname = shift;
+        if ( !defined $policyname ) {
+            return (-5);
+        }
+        my $out =
+          $s->invoke( "export-policy-destroy", "policy-name", $policyname );
+        if ( $out->results_status() eq "failed" ) {
+            print( $out->results_reason() . "\n" );
+            exit(-1);
+        }
+        print "Export policy $policyname deleted.\n";
+    }
+    elsif ( $cmd eq "rename" ) {
+        my $policyname    = shift;
+        my $newpolicyname = shift;
+        if ( !defined $newpolicyname ) {
+            return (-5);
+        }
+        my $out =
+          $s->invoke( "export-policy-rename", "policy-name", $policyname,
+            "new-policy-name ",
+            $newpolicyname );
+        if ( $out->results_status() eq "failed" ) {
+            print( $out->results_reason() . "\n" );
+            exit(-1);
+        }
+        print "Export policy $policyname renamed to $newpolicyname.\n";
+    }
+    else {
+        return (-5);
+    }
+}
+
+sub export_fetchruleindexes {
+    my $s           = shift;
+    my $policyname  = shift;
+    my $clientmatch = shift;
+    if ($clientmatch) {
+        $clientmatch =~ s/^[^:]*://;
+    }
+
+    my @indexes  = ();
+    my $numlines = 0;
+    my $tag      = "";
+    while ( defined($tag) ) {
+        my $in = NaElement->new("export-rule-get-iter");
+        $in->child_add_string( "max-records", 1000 );
+        if ( $tag ne "" ) {
+            $in->child_add_string( "tag", $tag );
+        }
+        if ( $policyname ne "" ) {
+            my $si = NaElement->new("query");
+            $si->child_add_string( "policy-name", $policyname );
+            $in->child_add($si);
+        }
+
+        #print $in->sprintf;
+        my $out = $s->invoke_elem($in);
+        if ( $out->results_status() eq "failed" ) {
+            print( $out->results_reason() . "\n" );
+            exit(-1);
+        }
+        if ( $out->child_get_int("num-records") == 0 ) {
+            last;
+        }
+        $tag = $out->child_get_string("next-tag");
+        my @attrList = $out->child_get("attributes-list")->children_get();
+        foreach my $attrInfo (@attrList) {
+            if ( $policyname eq $attrInfo->child_get_string("policy-name") ) {
+                if ($clientmatch) {
+                    if ( $clientmatch eq
+                        $attrInfo->child_get_string("client-match") )
+                    {
+                        push( @indexes,
+                            $attrInfo->child_get_int("rule-index") );
+                    }
+                }
+                else {
+                    push( @indexes, $attrInfo->child_get_int("rule-index") );
+                }
+            }
+        }
+    }
+    return @indexes;
+
+}
+
+sub export_rule {
+    cmode_required();
+    my $s = shift;
+    my $cmd = shift || return (-5);
+
+    if ( $cmd eq "list" ) {
+        my $policyname = shift;
+        my $numlines   = 0;
+        my $tag        = "";
+        while ( defined($tag) ) {
+            my $in = NaElement->new("export-rule-get-iter");
+            $in->child_add_string( "max-records", 1000 );
+            if ( $tag ne "" ) {
+                $in->child_add_string( "tag", $tag );
+            }
+            if ( defined $policyname ) {
+                my $desAttrs = NaElement->new("query");
+                my $eri      = NaElement->new("export-rule-info");
+                $eri->child_add_string( "policy-name", $policyname );
+                $desAttrs->child_add($eri);
+                $in->child_add($desAttrs);
+            }
+            my $out = $s->invoke_elem($in);
+            if ( $out->results_status() eq "failed" ) {
+                print( $out->results_reason() . "\n" );
+                exit(-1);
+            }
+            if ( $out->child_get_int("num-records") == 0 ) {
+                last;
+            }
+            $tag = $out->child_get_string("next-tag");
+            my @attrList = $out->child_get("attributes-list")->children_get();
+            foreach my $attrInfo (@attrList) {
+                next
+                  if ( defined $policyname
+                    && $policyname ne $attrInfo->child_get_string("policy-name")
+                  );
+                $numlines++;
+                printf "%4d %-20s %-20s\n",
+                  $attrInfo->child_get_int("rule-index"),
+                  $attrInfo->child_get_string("policy-name"),
+                  $attrInfo->child_get_string("client-match");
+            }
+        }
+
+    }
+    elsif ( $cmd eq "create" ) {
+        my $policyname = shift;
+        my $hostname   = shift;
+        if ( !defined $hostname ) {
+            return (-5);
+        }
+
+        my $rwenable = ($hostname =~ s/^ro://) ? 0 : 1;
+
+        # implicitly create the policy
+        my $out = $s->invoke( "export-policy-get", "policy-name", $policyname );
+        if ( $out->results_status() eq "failed" ) {
+            $s->invoke( "export-policy-create", "policy-name", $policyname );
+            if ( $out->results_status() ne "failed" ) {
+                print "Created new export policy '$policyname'.\n";
+            }
+        }
+
+#export-policy rule create -vserver netapp1_nfs  -policyname netapp1_nfs55  -rorule sys -protocol any -rwrule sys -allow-suid false -superuser sys -allow-dev true -anon 65534 -clientmatch 1.1.1.39
+        my $access = NaElement->new("protocol");
+        $access->child_add_string( "access-protocol", "any" );
+        my $rorule = NaElement->new("ro-rule");
+        $rorule->child_add_string( "security-flavor", "sys" );
+        my $rwrule = NaElement->new("rw-rule");
+        $rwrule->child_add_string( "security-flavor", $rwenable ? "sys" : "none" );
+        my $susec = NaElement->new("super-user-security");
+        $susec->child_add_string( "security-flavor", "sys" );
+
+        my $erc = NaElement->new("export-rule-create");
+        $erc->child_add_string( "anonymous-user-id",        "65534" );
+        $erc->child_add_string( "client-match",             $hostname );
+        $erc->child_add_string( "is-allow-dev-is-enabled",  "true" );
+        $erc->child_add_string( "is-allow-set-uid-enabled", "false" );
+        $erc->child_add_string( "policy-name",              $policyname );
+        $erc->child_add($access);
+        $erc->child_add($rorule);
+        $erc->child_add($rwrule);
+        $erc->child_add($susec);
+
+        $out = $s->invoke_elem($erc);
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR "Failed to export: " . $out->results_reason(),
+              "\n";
+            return (1);
+        }
+        print "Rule $policyname/$hostname created.\n";
+    }
+    elsif ( $cmd eq "delete" ) {
+        my $policyname = shift;
+        my $ruleindex  = shift;
+        if ( !defined $ruleindex ) {
+            return (-5);
+        }
+        my $out = $s->invoke( "export-rule-destroy", "policy-name", $policyname,
+            "rule-index", $ruleindex );
+        if ( $out->results_status() eq "failed" ) {
+            print( $out->results_reason() . "\n" );
+            exit(-1);
+        }
+        print "Rule $policyname/$ruleindex deleted.\n";
+    }
+    elsif ( $cmd eq "find" ) {
+        if ( !defined $_[1] ) { return (-5) }
+        print join( " ", export_fetchruleindexes( $s, @_ ) ), "\n";
+    }
+    else {
+        return (-5);
+    }
+    return 0;
+}
+
+sub exports_add_real {
+    my $s           = shift;
+    my $arg         = shift;
+    my $hostnames   = shift;
+    my $source      = shift;    # optional
+    my $forceappend = shift;    # optional
+
+    if ( !$hostnames && !$forceappend ) { return (-5); }
+
+    my %hosts;
+    my $doupdate = 0;
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    if ( $pathname =~ s{^(/[^/]+/[^/]+)/.*}{$1} ) {
+        print STDERR "Warning: Truncated path to $pathname.\n";
+    }
+
+    if ($CLUSTER_MODE) {
+        exports_add_cmode( $s, $volume, $hostnames );
+        return (0);
+    }
+
+
+    my $out = $s->invoke( "volume-list-info", "volume", $volume );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR "Failed to list $volume: " . $out->results_reason(),
+          "\n";
+        return (1);
+    }
+
+    my %typep;
+    $typep{"read-only"}  = NaElement->new("read-only");
+    $typep{"read-write"} = NaElement->new("read-write");
+    $typep{"root"}       = NaElement->new("root");
+
+    $out = $s->invoke( "nfs-exportfs-list-rules-2", "pathname", $pathname );
+    if ( $out->results_status() eq "failed" ) {
+        if ( $out->results_reason() ne "Invalid pathname" ) {
+            print STDERR "Failed to list: " . $out->results_reason(), "\n";
+            return (1);
+        }
+    }
+
+    # Get the previous names
+    my $rules_info = $out->child_get("rules");
+    if ($rules_info) {
+        my @rules_info = $rules_info->children_get();
+        if ( scalar @rules_info == 0 ) { undef $rules_info; }
+
+        foreach my $exports2 (@rules_info) {
+            my $path_name = $exports2->child_get_string("pathname");
+            my @rules     = $exports2->child_get("security-rules");
+
+            foreach my $secrule (@rules) {
+                my $secrule_ = $secrule->child_get("security-rule-info");
+                foreach my $type (qw/read-only read-write root/) {
+                    my $rule = $secrule_->child_get($type);
+                    if ($rule) {
+                        foreach my $host ( $rule->children_get() ) {
+                            my $name = $host->child_get_string("name");
+                            if ( defined $name ) {
+                                $hosts{$type}{$name} = 1;
+                                if ($CLUSTER_MODE) {
+
+                               # Cmode calls this a duplicate when setting rules
+                                    if (    exists $hosts{"read-only"}{$name}
+                                        and exists $hosts{"read-write"}{$name} )
+                                    {
+                                        delete $hosts{"read-only"}{$name};
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    # Add previous names to new request
+    foreach my $type (qw/read-only read-write root/) {
+        foreach my $h ( keys %{ $hosts{$type} } ) {
+            if ( !$h ) { next; }
+            if ( $h =~ m{/} ) {
+                my $test = new Net::IP($h);
+                if ( !$test ) {
+                    print STDERR "Warning: $h is an invalid network.\n";
+                }
+            }
+
+            my $e = NaElement->new("exports-hostname-info");
+            $doupdate = 1;
+            $e->child_add_string( "name", $h );
+            $typep{"$type"}->child_add($e);
+        }
+    }
+
+    if ( $hostnames eq "like" ) {
+
+        $hostnames = "";
+        $out = $s->invoke( "nfs-exportfs-list-rules-2", "pathname", $source );
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR "Failed to list exports on $source: "
+              . $out->results_reason(), "\n";
+            return (1);
+        }
+
+        # Get the copied names
+        my $rules_info = $out->child_get("rules");
+        if ($rules_info) {
+            my @rules_info = $rules_info->children_get();
+
+            foreach my $exports2 (@rules_info) {
+                my $path_name = $exports2->child_get_string("pathname");
+                my @rules     = $exports2->child_get("security-rules");
+
+                foreach my $secrule (@rules) {
+                    my $secrule_ = $secrule->child_get("security-rule-info");
+                    foreach my $type (qw/read-only read-write root/) {
+                        my $rule = $secrule_->child_get($type);
+                        if ($rule) {
+                            foreach my $host ( $rule->children_get() ) {
+                                my $name = $host->child_get_string("name");
+                                $hosts{$type}{$name} = 1 if ( defined $name );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    #print Dumper(\%hosts); #DEBUG
+
+    # Add new names if they don't already exist
+  nexthost:
+    foreach my $h ( split( /,/, $hostnames ) ) {
+        my $perm = "read-write";
+        if ( !$h ) { next; }
+        if ( $h =~ s/^ro:// ) { $perm = "read-only"; }
+        if ( $h =~ s/^rw:// ) { $perm = "read-write"; }
+        if ( $h =~ m{/} ) {
+            my $test = new Net::IP($h);
+            if ( !$test ) {
+                print STDERR "$h is an invalid network. No.\n";
+                next;
+            }
+        }
+        my $ipaddr = "";
+        if ( my $tmp = inet_aton($h) ) {
+            $ipaddr = inet_ntoa($tmp);
+        }
+
+        if ($ipaddr) {
+            my $ipo = new Net::IP($ipaddr);
+            foreach my $net ( grep m{/}, keys %{ $hosts{$perm} } ) {
+                my $sharedrange = new Net::IP($net);
+                if ( !$sharedrange ) {
+                    print STDERR
+                      "Warning: exports includes invalid network: $net\n";
+                    next;
+                }
+                if ( $sharedrange->overlaps($ipo) == $IP_B_IN_A_OVERLAP ) {
+
+                    print STDERR
+"Warning: $pathname already shared to $h ($ipaddr) via $net.\n";
+
+                    #next nexthost;
+                }
+            }
+        }
+
+        my $root_ehip = NaElement->new("exports-hostname-info");
+        my $perm_ehip = NaElement->new("exports-hostname-info");
+
+        unless ( exists $hosts{"root"}{$h} or exists $hosts{"root"}{$ipaddr} ) {
+            $doupdate = 1;
+            $root_ehip->child_add_string( "name", $h );
+            $typep{"root"}->child_add($root_ehip);
+        }
+        if ( $perm eq "read-only" ) {
+            if (   exists $hosts{"read-write"}{$h}
+                or exists $hosts{"read-write"}{$ipaddr} )
+            {
+                print "$h is already read-write.\n";
+                next nexthost;
+            }
+        }
+        if ( $perm eq "read-write" ) {
+            if (   exists $hosts{"read-only"}{$h}
+                or exists $hosts{"read-only"}{$ipaddr} )
+            {
+                print "$h is already read-only.\n";
+                next nexthost;
+            }
+        }
+        unless ( exists $hosts{$perm}{$h} or exists $hosts{$perm}{$ipaddr} ) {
+            $doupdate = 1;
+            $perm_ehip->child_add_string( "name", $h );
+            $typep{$perm}->child_add($perm_ehip);
+        }
+    }
+
+    if ($CLUSTER_MODE) {
+        my $out = $s->invoke(
+            "volume-get-volume-path", "volume",
+            "$volume",                "is-style-cifs",
+            "false"
+        );
+        if ( $out->results_status() eq "failed" ) {
+            volume_junction( $s, $volume, $pathname );
+        }
+        else {
+            my $junction = $out->child_get_string("junction");
+            if ( $junction ne $pathname ) {
+                volume_junction( $s, $volume, $pathname );
+            }
+        }
+    }
+
+    if ($forceappend) {
+        $doupdate = 1;
+        undef $rules_info;
+        print STDERR "Warning: Deleting exports for $pathname.\n";
+        exports_delete( $s, $pathname );
+    }
+
+    #undef $rules_info; # force an append
+    if ($doupdate) {
+        my $in =
+          $rules_info
+          ? NaElement->new("nfs-exportfs-modify-rule-2")
+          : NaElement->new("nfs-exportfs-append-rules-2");
+        $in->child_add_string( "persistent", "true" );
+
+        my $rulesp =
+          $rules_info ? NaElement->new("rule") : NaElement->new("rules");
+        $in->child_add($rulesp);
+
+        my $eri2 = new NaElement("exports-rule-info-2");
+        $rulesp->child_add($eri2);
+
+        #if ($pathname eq "/vol//vol") {
+        #$pathname="/vol";  # needed this to bootstrap mounting
+        #}
+        print STDERR "Exporting $pathname\n";
+        $eri2->child_add_string( "pathname", $pathname );
+
+        my $secrules = NaElement->new("security-rules");
+        $eri2->child_add($secrules);
+
+        my $sri = NaElement->new("security-rule-info");
+        $secrules->child_add($sri);
+
+        $sri->child_add_string( "nosuid", "true" );
+        $sri->child_add( $typep{"read-only"} );
+        $sri->child_add( $typep{"read-write"} );
+        $sri->child_add( $typep{"root"} );
+
+        #print $in->sprintf; #DEBUG
+        $out = $s->invoke_elem($in);
+
+        #print $out->sprintf;
+
+        # TODO: this always returns an error for some reason
+        # Not true in cluster mode
+        # Failed to export: Modify failed with error: No such file or directory
+        if ( $out->results_status() eq "failed" ) {
+            if ( $out->results_reason() ne
+                "Modify failed with error: No such file or directory " )
+            {
+                print STDERR "Failed to export: -->"
+                  . $out->results_reason() . "<--\n";
+                return (1);
+            }
+            if ($CLUSTER_MODE) {
+                print STDERR "Failed to export: -->"
+                  . $out->results_reason() . "<--\n";
+                return (1);
+            }
+        }
+    }
+
+    return (0);
+}
+
+sub exports_remove_real {
+    my $s         = shift;
+    my $arg       = shift;
+    my $hostnames = shift;
+
+    my $hasexport = 0;
+    if ( !$hostnames ) { return (-5); }
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+    if ( $arg =~ m{/} ) {
+        $pathname = $volume = $arg;
+    }
+
+    if ($CLUSTER_MODE) {
+        my $policy = export_fetchvolexpolicy( $s, $volume );
+        if ($policy) {
+            foreach my $h ( split( /,/, $hostnames ) ) {
+                my @indexes = export_fetchruleindexes( $s, $policy, $h );
+                foreach my $index (@indexes) {
+                    export_rule( $s, "delete", $policy, $index );
+                }
+            }
+            my @indexes = export_fetchruleindexes( $s, $policy, undef );
+            if ( scalar @indexes == 0 ) {
+                exports_delete( $s, $volume );
+            }
+        }
+        else {
+            print "Unable to find export policy for $volume.\n";
+            exit(1);
+        }
+        return (0);
+    }
+
+    my %typep = ();
+    my %hosts = ();
+    $typep{"read-only"}  = NaElement->new("read-only");
+    $typep{"read-write"} = NaElement->new("read-write");
+    $typep{"root"}       = NaElement->new("root");
+
+    my $out = $s->invoke( "nfs-exportfs-list-rules-2", "pathname", $pathname );
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        return (1);
+    }
+
+    # Get the previous names
+    my $rules_info = $out->child_get("rules");
+    if ( !$rules_info ) {
+        print "No exports\n";
+        return 0;
+    }
+    my $nosuid;
+    if ($rules_info) {
+
+        my @rules_info = $rules_info->children_get();
+        if ( scalar @rules_info == 0 ) {
+            print "No exports\n";
+            return 0;
+        }
+
+        foreach my $exports2 (@rules_info) {
+            my $path_name = $exports2->child_get_string("pathname");
+            my @rules     = $exports2->child_get("security-rules");
+
+            foreach my $secrule (@rules) {
+                my $secrule_ = $secrule->child_get("security-rule-info");
+                foreach my $type (qw/read-only read-write root/) {
+                    my $rule = $secrule_->child_get($type);
+                    if ($rule) {
+                        foreach my $host ( $rule->children_get() ) {
+                            my $name = $host->child_get_string("name");
+                            $hosts{$type}{$name} = 1 if ( defined $name );
+                            if ($CLUSTER_MODE) {
+
+                               # Cmode calls this a duplicate when setting rules
+                                if (    exists $hosts{"read-only"}{$name}
+                                    and exists $hosts{"read-write"}{$name} )
+                                {
+                                    delete $hosts{"read-only"}{$name};
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    # Remove names to be deleted
+    foreach my $h ( split( /,/, $hostnames ) ) {
+        delete $hosts{"root"}{$h};
+        delete $hosts{"read-write"}{$h};
+        delete $hosts{"read-only"}{$h};
+    }
+
+    # Add names back into new request
+    foreach my $type (qw/read-only read-write root/) {
+        map {
+            $hasexport = 1;
+            my $e = NaElement->new("exports-hostname-info");
+            $e->child_add_string( "name", $_ );
+            $typep{"$type"}->child_add($e);
+        } keys %{ $hosts{$type} };
+    }
+
+    if ($hasexport) {
+
+        my $in = NaElement->new("nfs-exportfs-modify-rule-2");
+        $in->child_add_string( "persistent", "true" );
+
+        my $rulesp = NaElement->new("rule");
+        $in->child_add($rulesp);
+
+        my $eri2 = new NaElement("exports-rule-info-2");
+        $rulesp->child_add($eri2);
+
+        $eri2->child_add_string( "pathname", $pathname );
+
+        my $secrules = NaElement->new("security-rules");
+        $eri2->child_add($secrules);
+
+        my $sri = NaElement->new("security-rule-info");
+        $secrules->child_add($sri);
+
+        $sri->child_add_string( "nosuid", "true" );    #FIXME
+        $sri->child_add( $typep{"read-only"} );
+        $sri->child_add( $typep{"read-write"} );
+        $sri->child_add( $typep{"root"} );
+
+        #print $in->sprintf; #DEBUG
+        $out = $s->invoke_elem($in);
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            return (1);
+        }
+    }
+    else {
+        return exports_delete( $s, $pathname );
+    }
+    return 0;
+}
+
+sub exports_delete {
+    my $s   = shift;
+    my $arg = shift;
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+    if ( $arg =~ m{/} ) {
+        $pathname = $volume = $arg;
+    }
+
+    if ($CLUSTER_MODE) {
+        my $policy = export_fetchvolexpolicy( $s, $arg );
+        export_setvolexpolicy( $s, $arg, "unexport_policy" );
+        export_policy( $s, "delete", $policy );
+    }
+    else {
+
+        # No hostnames left, delete the rule
+        my $rulesp = NaElement->new("pathnames");
+        my $erip   = NaElement->new("pathname-info");
+        my $in     = NaElement->new("nfs-exportfs-delete-rules");
+        $erip->child_add_string( "name", $pathname )
+          ;    # documentation is wrong, it says "pathname"
+        $rulesp->child_add($erip);
+        $in->child_add($rulesp);
+        $in->child_add_string( "persistent", "true" );
+        my $out = $s->invoke_elem($in);
+
+        if ( $out->results_status() eq "failed" ) {
+            if ( $out->results_reason() ne "Invalid pathname" ) {
+                print STDERR "Exports delete failed: ", $out->results_reason(),
+                  "\n";
+                return (1);
+            }
+        }
+    }
+
+    return (0);
+}
+
+sub exports_copy {
+    cmode_notsupported();
+    my $s      = shift;
+    my $path1  = shift;
+    my $adverb = shift;
+    my $path2  = shift;
+
+    my $sourcepath;
+    my $pathname;
+    my $doupdate = 0;
+
+    if ( !defined $path2 ) {
+        return (-5);
+    }
+
+    if ( $adverb eq "to" ) {
+        $sourcepath = $path1;
+        $pathname   = $path2;
+    }
+    elsif ( $adverb eq "from" ) {
+        $pathname   = $path1;
+        $sourcepath = $path2;
+    }
+
+    ( undef, $sourcepath ) = parsepathname($sourcepath);
+    ( undef, $pathname )   = parsepathname($pathname);
+
+    my $out = $s->invoke( "nfs-exportfs-list-rules-2", "pathname", $pathname );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    my $rules_info = $out->child_get("rules");
+    if ($rules_info) {
+        my @rules_info = $rules_info->children_get();
+        if ( scalar @rules_info != 0 ) {
+            print STDERR "Remove exports first.\n";
+            exit(1);
+        }
+    }
+
+    $out = $s->invoke( "nfs-exportfs-list-rules-2", "pathname", "$sourcepath" );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR "Failed list rules from $sourcepath: "
+          . $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    # Get the previous names
+    $rules_info = $out->child_get("rules");
+    my %hosts = ();
+    if ( !$rules_info ) {
+        print "No exports\n";
+        return 0;
+    }
+    my $nosuid;
+    if ($rules_info) {
+
+        my @rules_info = $rules_info->children_get();
+        if ( scalar @rules_info == 0 ) {
+            print "No exports\n";
+            return 0;
+        }
+
+        foreach my $exports2 (@rules_info) {
+            my $path_name = $exports2->child_get_string("pathname");
+            my @rules     = $exports2->child_get("security-rules");
+
+            foreach my $secrule (@rules) {
+                my $secrule_ = $secrule->child_get("security-rule-info");
+                foreach my $type (qw/read-only read-write root/) {
+                    my $rule = $secrule_->child_get($type);
+                    if ($rule) {
+                        foreach my $host ( $rule->children_get() ) {
+                            my $name = $host->child_get_string("name");
+                            $hosts{$type}{$name} = 1 if ( defined $name );
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    my %typep;
+    $typep{"read-only"}  = NaElement->new("read-only");
+    $typep{"read-write"} = NaElement->new("read-write");
+    $typep{"root"}       = NaElement->new("root");
+
+    # Add previous names to new request
+    foreach my $type (qw/read-only read-write root/) {
+        foreach my $h ( keys %{ $hosts{$type} } ) {
+            if ( !$h ) { next; }
+            if ( $h =~ m{/} ) {
+                my $test = new Net::IP($h);
+                if ( !$test ) {
+                    print STDERR "Warning: $h is an invalid network.\n";
+                }
+            }
+
+            my $e = NaElement->new("exports-hostname-info");
+            $doupdate = 1;
+            $e->child_add_string( "name", $h );
+            $typep{"$type"}->child_add($e);
+        }
+    }
+
+    my $in = NaElement->new("nfs-exportfs-append-rules-2");
+    $in->child_add_string( "persistent", "true" );
+
+    my $rulesp = NaElement->new("rules");
+    $in->child_add($rulesp);
+
+    my $eri2 = new NaElement("exports-rule-info-2");
+    $rulesp->child_add($eri2);
+
+    $eri2->child_add_string( "pathname", $pathname );
+
+    my $secrules = NaElement->new("security-rules");
+    $eri2->child_add($secrules);
+
+    my $sri = NaElement->new("security-rule-info");
+    $secrules->child_add($sri);
+
+    $sri->child_add_string( "nosuid", "true" );    #FIXME
+    $sri->child_add( $typep{"read-only"} );
+    $sri->child_add( $typep{"read-write"} );
+    $sri->child_add( $typep{"root"} );
+
+    $out = $s->invoke_elem($in);
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR "Failed to export: " . $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    exports_list( $s, $pathname );
+    return 0;
+}
+
+sub exports_search {
+    my $s   = shift;
+    my $arg = shift;
+
+    if ( !$arg ) { return (-5); }
+
+    my @vols = allvolumenames($s);
+
+    foreach my $vol_name (@vols) {
+
+        my $out = $s->invoke(
+            "nfs-exportfs-check-permission", "host",
+            "$arg",                          "pathname",
+            "/vol/$vol_name",                "permission",
+            "read-only"
+        );
+        if ( $out->results_status() eq "failed" ) {
+            next;
+        }
+
+        if ( $out->child_get_string("is-permissible") eq "true" ) {
+            my @perms = qw/read-only/;
+            foreach my $type (qw/read-write root/) {
+                $out = $s->invoke( "nfs-exportfs-check-permission",
+                    "host", "$arg", "pathname", "/vol/$vol_name", "permission",
+                    "$type" );
+
+                if ( $out->results_status() eq "failed" ) {
+                    next;
+                }
+
+                if ( $out->child_get_string("is-permissible") eq "true" ) {
+                    push( @perms, $type );
+                }
+            }
+            if ( scalar @perms ) {
+                print "/vol/$vol_name: @perms\n";
+            }
+        }
+    }
+}
+
+sub exports_removehost {
+    my $s   = shift;
+    my $arg = shift;
+
+    if ( !$arg ) { return (-5); }
+
+    my $ip;
+    my $tmp = inet_aton("$arg");
+    if ($tmp) {
+        $ip = inet_ntoa($tmp);
+    }
+    else {
+        print STDERR "Cannot resolve $arg\n";
+        exit(1);
+    }
+
+    if ( !$arg ) { return (-5); }
+
+    print "Removing $arg ($ip) from all exports...\n";
+
+    my $out = $s->invoke("nfs-exportfs-list-rules-2");
+
+    if ( $out->results_status() eq "failed" ) {
+        next;
+    }
+
+    my $deleteme   = 0;
+    my $rules_info = $out->child_get("rules");
+    if ( !$rules_info ) {
+        next;
+    }
+
+    my @rules_info = $rules_info->children_get();
+    if ( scalar @rules_info == 0 ) {
+        next;
+    }
+
+    foreach my $exports2 (@rules_info) {
+        my $path_name = $exports2->child_get_string("pathname");
+        my @rules     = $exports2->child_get("security-rules");
+
+        foreach my $secrule (@rules) {
+            my $secrule_ = $secrule->child_get("security-rule-info");
+            foreach my $type (qw/read-only read-write root/) {
+                my $rule = $secrule_->child_get($type);
+                if ($rule) {
+                    foreach my $host ( $rule->children_get() ) {
+                        if ( defined $host->child_get_string("name") ) {
+                            if ( $host->child_get_string("name") eq "$arg" ) {
+                                $deleteme = 1;
+                            }
+                            if ( $host->child_get_string("name") eq "$ip" ) {
+                                $deleteme = 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        if ( $deleteme == 1 ) {
+            print "Removing $arg from $path_name export\n";
+            $deleteme = 0;
+            exports_remove_real( $s, $path_name, $arg );
+            if ( $arg ne $ip ) {
+                exports_remove_real( $s, $path_name, $ip );
+            }
+        }
+    }    # foreach my $export object
+
+}    # END exports_removehost
+
+sub snapshot_help {
+    my $s = shift;
+    print STDERR
+      "          snapshot options: list|sched|reserve|create|delete|rename
+              list [-q] [<volname>]
+              sched [<volname> [weeks [days [hours[@<list>]]]]]
+              reserve [<volname> [percent]]
+              create <volname> <snapshot-name> [<label>]
+              delete <volname> <snapshot-name>|ALL
+              rename <volname> <old-snapshot-name> <new-snapshot-name>
+              mount <volname> <snapshot-name> <hostname|IP>
+              umount <volname> <snapshot-name> <hostname|IP>\n";
+}
+
+sub snapshot_create {
+    my $s    = shift;
+    my $arg  = shift;
+    my $name = shift;
+    my $label = shift;
+
+    if ( !$name ) {
+        print STDERR "Need volume and snapshot name\n";
+        return -5;
+    }
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    my $out;
+    if ($label) {
+        $out = $s->invoke( "snapshot-create", "volume", $volume, "snapshot", $name, "snapmirror-label", $label );
+    } else {
+        $out = $s->invoke( "snapshot-create", "volume", $volume, "snapshot", $name );
+    }
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+    else {
+        print "Snapshot created.\n";
+    }
+    return (0);
+}
+
+sub snapshot_delete_cmode {
+    my $s    = shift;
+    my $arg  = shift;
+    my $name = shift;
+
+    if ( !$name ) {
+        print STDERR "Need volume and snapshot name\n";
+        return (-5);
+    }
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    if ( $name eq "ALL" ) {
+        my $tag      = "";
+        my $numlines = 0;
+        while ( defined($tag) ) {
+
+            my $in = NaElement->new("snapshot-get-iter");
+            $in->child_add_string( "max-records", 1000 );
+            if ( $tag ne "" ) {
+                $in->child_add_string( "tag", $tag );
+            }
+            if ( $volume ne "" ) {
+                my $si = NaElement->new("query");
+                $si->child_add_string( "volume", $volume );
+                $in->child_add($si);
+            }
+
+            my $out = $s->invoke_elem($in);
+            if ( $out->results_status() eq "failed" ) {
+                print( $out->results_reason() . "\n" );
+                exit(-1);
+            }
+            if ( $out->child_get_int("num-records") == 0 ) {
+                return ( $numlines == 0 );
+            }
+
+            $tag = $out->child_get_string("next-tag");
+            my @AttrList = $out->child_get("attributes-list")->children_get();
+            foreach my $snap (@AttrList) {
+                next
+                  if ( $volume
+                    && ( $volume ne $snap->child_get_string("volume") ) );
+                next
+                  if (
+                    exists $ignorethese{ $snap->child_get_string("volume") } );
+                $numlines++;
+                my $snap_name = $snap->child_get_string("name");
+
+                my $out =
+                  $s->invoke( "snapshot-delete", "volume", $volume, "snapshot",
+                    $snap_name );
+                if ( $out->results_status() eq "failed" ) {
+                    print STDERR $out->results_reason(), "\n";
+                    exit(1);
+                }
+                else {
+                    print "Snapshot $volume:$snap_name deleted.\n";
+                }
+            }
+        }
+
+    }
+    else {
+
+        my $out =
+          $s->invoke( "snapshot-delete", "volume", $volume, "snapshot", $name );
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+        else {
+            print "Snapshot $volume:$name deleted.\n";
+        }
+    }
+    return (0);
+}
+
+sub snapshot_delete {
+    my $s    = shift;
+    my $arg  = shift;
+    my $name = shift;
+
+    if ( !$name ) {
+        print STDERR "Need volume and snapshot name\n";
+        return (-5);
+    }
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    if ( $name eq "ALL" ) {
+        my $out = $s->invoke( "snapshot-list-info", "target-name", $volume,
+            "target-type", "volume" );
+
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            return (1);
+        }
+
+        my $snap_info = $out->child_get("snapshots");
+        next if not $snap_info;
+        my @result = $snap_info->children_get();
+
+        foreach my $snap (@result) {
+            my $snap_name = $snap->child_get_string("name");
+            $out =
+              $s->invoke( "snapshot-delete", "volume", $volume, "snapshot",
+                $snap_name );
+            if ( $out->results_status() eq "failed" ) {
+                print STDERR $out->results_reason(), "\n";
+                exit(1);
+            }
+            else {
+                print "Snapshot $volume:$snap_name deleted.\n";
+            }
+        }
+
+    }
+    else {
+
+        my $out =
+          $s->invoke( "snapshot-delete", "volume", $volume, "snapshot", $name );
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+        else {
+            print "Snapshot $volume:$name deleted.\n";
+        }
+    }
+    return (0);
+}
+
+sub snapshot_rename {
+    my $s     = shift;
+    my $arg   = shift;
+    my $name1 = shift;
+    my $name2 = shift;
+
+    if ( !$name2 ) {
+        print STDERR "Usage: <volume> <old-snap> <new-snap>\n";
+        return -5;
+    }
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    my $out =
+      $s->invoke( "snapshot-rename", "volume", $volume, "current-name", $name1,
+        "new-name", $name2 );
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+    else {
+        print "Snapshot renamed.\n";
+    }
+    return (0);
+}
+
+sub snapshot_list {
+    my $s     = shift;
+    my $arg   = shift;
+    my $quiet = 0;
+
+    while ( defined $arg && $arg =~ /^-/ ) {
+        $quiet = ( $quiet | $arg eq "-q" );
+        $arg = shift;
+    }
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    my @volumes;
+    if ( !$volume ) {
+        @volumes = allvolumenames($s);
+    }
+    else {
+        $volumes[0] = $volume;
+    }
+
+    foreach my $vol (@volumes) {
+        my $out =
+          $s->invoke( "snapshot-list-info", "target-name", $vol, "target-type",
+            "volume" );
+
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            next;
+        }
+
+        my $snap_info = $out->child_get("snapshots");
+        next if not $snap_info;
+        my @result = $snap_info->children_get();
+
+        if ( !$quiet ) {
+            print "\nVolume $vol...\n";
+            print "  %/used       %/total  date              name\n";
+            print "----------  ----------  ----------------  --------\n";
+        }
+        foreach my $snap (@result) {
+
+            my $snap_name = $snap->child_get_string("name");
+            my $access    = $snap->child_get_int("access-time");
+            if ($quiet) {
+                print "$vol: $snap_name: ", scalar localtime $access, "\n";
+            }
+            else {
+                my $cpub =
+                  $snap->child_get_int("cumulative-percentage-of-used-blocks");
+                my $pub = $snap->child_get_int("percentage-of-used-blocks");
+                my $cptb =
+                  $snap->child_get_int("cumulative-percentage-of-total-blocks");
+                my $ptb = $snap->child_get_int("percentage-of-total-blocks");
+                printf "%3d%% (%2d%%)  %3d%% (%2d%%)  %16.16s  %s %s\n",
+                  $cpub, $pub, $cptb, $ptb, scalar localtime $access,
+                  $snap_name;
+            }
+        }
+    }
+    return (0);
+}
+
+sub snapshot_list_cmode {
+    my $s     = shift;
+    my $arg   = shift;
+    my $quiet = 0;
+
+    while ( defined $arg && $arg =~ /^-/ ) {
+        $quiet = ( $quiet | $arg eq "-q" );
+        $arg = shift;
+    }
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    my $numlines = 0;
+    my $tag      = "";
+    my $prevvol  = "";
+    while ( defined($tag) ) {
+
+        my $in = NaElement->new("snapshot-get-iter");
+        $in->child_add_string( "max-records", 1000 );
+        if ( $tag ne "" ) {
+            $in->child_add_string( "tag", $tag );
+        }
+        if ( $volume ne "" ) {
+            my $si = NaElement->new("query");
+            $si->child_add_string( "volume", $volume );
+            $in->child_add($si);
+        }
+
+        my $out = $s->invoke_elem($in);
+        if ( $out->results_status() eq "failed" ) {
+            print( $out->results_reason() . "\n" );
+            exit(-1);
+        }
+        if ( $out->child_get_int("num-records") == 0 ) {
+            return ( $numlines == 0 );
+        }
+
+        $tag = $out->child_get_string("next-tag");
+        my @AttrList = $out->child_get("attributes-list")->children_get();
+        foreach my $snap (@AttrList) {
+            next
+              if ( $volume
+                && ( $volume ne $snap->child_get_string("volume") ) );
+            next
+              if ( exists $ignorethese{ $snap->child_get_string("volume") } );
+            $numlines++;
+            my $vol_name = $snap->child_get_string("volume");
+            if ( $vol_name cmp $prevvol ) {
+                if ( !$quiet ) {
+                    print "\nVolume $vol_name...\n";
+                    print "  %/used       %/total  date              name label\n";
+                    print
+                      "----------  ----------  ----------------  -------------\n";
+                }
+                $prevvol = $snap->child_get_string("volume");
+            }
+
+            my $snap_name = $snap->child_get_string("name");
+            my $snap_label = $snap->child_get_string("snapmirror-label");
+            my $access    = $snap->child_get_int("access-time");
+            my $busy      = $snap->child_get_string("busy");
+            my $is7mode   = $snap->child_get_string("is-7-mode-snapshot");
+            if ($quiet) {
+                print "$vol_name: $snap_name: ", scalar localtime $access,
+                  $snap_label ? ": $snap_label" : "",
+                  $busy eq "true" && " (busy)",
+                  $is7mode eq "true" && " (7mode)", "\n";
+            }
+            else {
+                my $cpub =
+                  $snap->child_get_int("cumulative-percentage-of-used-blocks");
+                my $pub = $snap->child_get_int("percentage-of-used-blocks");
+                my $cptb =
+                  $snap->child_get_int("cumulative-percentage-of-total-blocks");
+                my $ptb = $snap->child_get_int("percentage-of-total-blocks");
+                printf "%3d%% (%2d%%)  %3d%% (%2d%%)  %16.16s  %s %s%s%s\n",
+                  $cpub, $pub, $cptb, $ptb, scalar localtime $access,
+                  $snap_name, $snap_label ? $snap_label : "",
+                  $busy eq "true" && " (busy)",
+                  $is7mode eq "true" && " (7mode)";
+
+            }
+        }
+    }
+    return (0);
+}
+
+sub snapshot_sched {
+    my $s   = shift;
+    my $arg = shift;
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    if ( !$volume ) {
+        foreach my $vol ( allvolumenames($s) ) {
+            snapshot_sched_list( $s, $vol );
+        }
+    }
+    else {
+        if ( scalar @_ > 0 ) {
+            my $weeks = shift;
+            my $days  = shift;
+            my $hours = shift;
+            $hours =~ s/@(.*)//;
+            my $whichhours = $1;
+            my $out        = $s->invoke(
+                "snapshot-set-schedule",
+                "volume",
+                $volume,
+                "weeks",
+                $weeks ? $weeks : 0,
+                "days",
+                $days ? $days : 0,
+                "hours",
+                $hours ? $hours : 0,
+                "which-hours",
+                $whichhours
+                ? $whichhours
+                : "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23"
+            );
+            if ( $out->results_status() eq "failed" ) {
+                print STDERR $out->results_reason(), "\n";
+                exit(1);
+            }
+        }
+        snapshot_sched_list( $s, $volume );
+    }
+    return (0);
+}
+
+sub snapshot_sched_list {
+    my $s   = shift;
+    my $vol = shift;
+    my $out = $s->invoke( "snapshot-get-schedule", "volume", $vol );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        return (1);
+    }
+
+    my $days       = $out->child_get_int("days");
+    my $hours      = $out->child_get_int("hours");
+    my $weeks      = $out->child_get_int("weeks");
+    my $whichhours = $out->child_get_string("which-hours");
+    print "Volume $vol: $weeks $days $hours";
+    if (
+            defined $whichhours
+        and ( ( $whichhours cmp " " ) != 0 )
+        and (
+            (
+                $whichhours cmp
+                "0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23"
+            ) != 0
+        )
+      )
+    {
+        print "\@$whichhours";
+    }
+    print "\n";
+}
+
+sub snapshot_reserve {
+    my $s   = shift;
+    my $arg = shift;
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    if ( !$volume ) {
+        foreach my $vol ( allvolumenames($s) ) {
+            snapshot_reserve_list( $s, $vol );
+        }
+    }
+    else {
+        if ( scalar @_ > 0 ) {
+            my $reserve = shift;
+            my $out     = $s->invoke( "snapshot-set-reserve", "volume", $volume,
+                "percentage", $reserve );
+            if ( $out->results_status() eq "failed" ) {
+                print STDERR $out->results_reason(), "\n";
+                exit(1);
+            }
+        }
+        snapshot_reserve_list( $s, $volume );
+    }
+    return (0);
+}
+
+sub snapshot_reserve_list {
+    my $s   = shift;
+    my $vol = shift;
+    my $out = $s->invoke( "snapshot-get-reserve", "volume", $vol );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        return (1);
+    }
+
+    my $blocks  = $out->child_get_int("blocks-reserved");
+    my $percent = $out->child_get_int("percent-reserved");
+    print
+"Volume $vol: current snapshot reserve is $percent% or $blocks k-bytes.\n";
+    return (0);
+}
+
+sub snapshot_mount {
+    my $s    = shift;
+    my $arg  = shift;
+    my $snap = shift;
+    my $host = shift;
+    if ( !$host ) { return (-5); }
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    my $ip;
+    my $tmp = inet_aton("$host");
+    if ($tmp) {
+        $ip = inet_ntoa($tmp);
+    }
+    if ( !$ip ) {
+        print STDERR "$host does not resolve.\n";
+        exit(1);
+    }
+
+    if ( my $ret = exports_add_real( $s, $pathname, $ip ) ) {
+        print STDERR "Export failed\n";
+        exit($ret);
+    }
+
+    my $mnt = "/mnt/snapshot/$volume/$snap";
+    `ssh -n $host :`;    # Dummy ssh to accept host key. Stupid, I know.
+    my $ret =
+`ssh -n $host 'mkdir -p $mnt; mount | fgrep -q $mnt || mount $filer:$pathname/.snapshot/$snap $mnt' 2>&1`;
+    if ($ret) {
+        exports_remove_real( $s, $pathname, $ip );
+        print STDERR "Mount failed: $ret\n";
+        exit(1);
+    }
+    else {
+        print "Mounted at $mnt\n";
+    }
+    return (0);
+}
+
+sub snapshot_umount {
+    my $s    = shift;
+    my $arg  = shift;
+    my $snap = shift;
+    my $host = shift;
+    if ( !$host ) { return (-5); }
+
+    my $ip;
+    my $tmp = inet_aton("$host");
+    if ($tmp) {
+        $ip = inet_ntoa($tmp);
+    }
+    if ( !$ip ) {
+        print STDERR "$host does not resolve\n";
+        exit(1);
+    }
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    my $mnt = "/mnt/snapshot/$volume/$snap";
+    my $ret = `ssh -n $host 'umount $mnt' 2>&1`;
+    chomp($ret);
+    if ( $ret eq "" ) {
+        $ret = 0;
+        print "Unmounted $mnt\n";
+
+    }
+    else {
+        $ret = 1;
+        print STDERR "Unmount failed: $ret\n";
+    }
+
+    my $ret2 = system("ssh -n $host 'mount | fgrep -q $volume' 2>&1");
+    if ($ret2) {
+        exports_remove_real( $s, $pathname, $ip );
+        print "Unexported $mnt\n";
+    }
+    return ( $ret && 1 );
+}
+
+sub nfsmonitor_help {
+    my $s = shift;
+    print STDERR
+"          nfsmonitor options: list reclaim remove removelocks #EXPERIMENTAL
+              list
+              remove <host>  (remove host from monitoring)
+              reclaim <host> (reclaims locks)
+              removelocks <host> <port>\n";
+}
+
+sub nfsmonitor_list {
+    my $s = shift;
+
+    my $out = $s->invoke("nfs-monitor-list");
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+    my $hosts_info = $out->child_get("hosts");
+    my @result     = $hosts_info->children_get();
+
+#FIXME: something is weird in the API. The normal "->child_get_string()" isn't working
+    my $output = join "\n", map { $_->{content} } @result;
+    print $output. "\n";
+
+    return (0);
+}
+
+sub nfsmonitor_reclaim {
+    my $s    = shift;
+    my @args = @_;
+
+    print STDERR "Warning: This option is experimental\n";
+    my $out = $s->invoke( "nfs-monitor-reclaim", "hosts", $args[0] );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+    return (0);
+}
+
+sub nfsmonitor_remove {
+    my $s    = shift;
+    my @args = @_;
+
+    print STDERR "Warning: This option is experimental\n";
+
+    my $out = $s->invoke( "nfs-monitor-remove", "hosts", $args[0] );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+    return (0);
+}
+
+sub nfsmonitor_removelocks {
+    my $s    = shift;
+    my @args = @_;
+
+    print STDERR "Warning: This option is experimental\n";
+
+    #owner-info[] owners  = [ string client-host, string client-host-pid  ]
+    my $ownerinfo = NaElement->new("owner-info");
+    $ownerinfo->child_add_string( "client-host",     $args[0] );
+    $ownerinfo->child_add_string( "client-host-pid", $args[1] );
+
+    my $out = $s->invoke( "nfs-monitor-remove-locks", "owners", $ownerinfo );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+    return (0);
+}
+
+sub nfsstat_help {
+    my $s = shift;
+    print STDERR "          nfsstat options: get zero top
+              get <host>
+              zero
+              top [-c <clients>] [-i <iterations> [-s <sleepsecs>] [-t] [-n]
+                  (-t is show initial counter totals)
+                  (-n inet numbers only, don't resolve client IPs)\n";
+}
+
+sub nfsstat_get {
+    my $s    = shift;
+    my $host = shift;
+    if ( !$host ) { return (-5); }
+    my $out = $s->invoke( "nfs-stats-get-client-stats", "host", $host );
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    $host = $out->child_get_string("client-info");
+    my $statstop = $out->child_get("nfs-stats");
+
+    # in the past, this was an array for some reason despite what the docs said,
+    # I'm leaving this here in case it comes back.
+    #my $nfsstatsinfo =
+    #( $statstop->children_get() )[0];
+    my $nfsstatsinfo = $statstop;
+
+    my %nfsv2stat;
+    my %nfsv3stat;
+    my %nfsv4stat;
+    my $badcalls   = $nfsstatsinfo->child_get_int("badcalls-total");
+    my $totalcalls = $nfsstatsinfo->child_get_int("calls-total");
+
+    #print Dumper( $nfsv3clientstatsinfo);
+    my @nfsv2stattypes =
+      qw/create getattr link lookup mkdir null read readdir readlink remove rename rmdir root setattr statfs symlink wrcache write/;
+    my @nfsv3stattypes =
+      qw/access commit create fsinfo fsstat getattr link lookup mkdir mknod null pathconf read readdir readdirplus readlink remove rename rmdir setattr symlink write/;
+    my @nfsv4stattypes =
+      qw/access  badproc2 close commit compound create delegpurge delegret getattr getfh link lock lockt locku lookup lookupp null nverify open-confirm openattr putfh putpubfh read readdir readlink remove rename renew restorefh rlsowner savefh secinfo setattr setclntid-cfm setclntid verify write/;
+
+    my $nfsv2clientstatsinfo = $nfsstatsinfo->child_get("nfsv2-client-stats");
+    my $nfsv3clientstatsinfo = $nfsstatsinfo->child_get("nfsv3-client-stats");
+    my $nfsv4clientstatsinfo = $nfsstatsinfo->child_get("nfsv4-client-stats");
+    if ($nfsv2clientstatsinfo) {
+        foreach my $s (@nfsv2stattypes) {
+            $nfsv2stat{$s} = $nfsv2clientstatsinfo->child_get_int("$s-ops");
+        }
+    }
+    if ($nfsv3clientstatsinfo) {
+        foreach my $s (@nfsv3stattypes) {
+            $nfsv3stat{$s} = $nfsv3clientstatsinfo->child_get_int("$s-ops");
+        }
+    }
+    if ($nfsv4clientstatsinfo) {
+        foreach my $s (@nfsv4stattypes) {
+            $nfsv4stat{$s} = $nfsv4clientstatsinfo->child_get_int("$s-ops");
+        }
+    }
+
+    if ($nfsv2clientstatsinfo) {
+
+        # Filter out v2 if all of the stats are empty
+        my $c = 0;
+        foreach my $s (@nfsv2stattypes) {
+            $c += $nfsv2stat{$s};
+        }
+        if ( $c > 0 ) {
+            print "NFSv2 Statistics: \n";
+            foreach my $s (@nfsv2stattypes) {
+                print "$s: $nfsv2stat{$s}\n";
+            }
+            print " \n";
+        }
+    }
+    if ($nfsv3clientstatsinfo) {
+        print "NFSv3 Statistics: \n";
+        foreach my $s (@nfsv3stattypes) {
+            print "$s: $nfsv3stat{$s}\n";
+        }
+        print " \n";
+    }
+    if ($nfsv4clientstatsinfo) {
+        print "NFSv4 Statistics: \n";
+        foreach my $s (@nfsv4stattypes) {
+            print "$s: $nfsv4stat{$s}\n";
+        }
+    }
+    print "totalcalls: $totalcalls\n";
+    print "badcalls: $badcalls\n";
+    return (0);
+}
+
+sub nfsstat_top {
+    my $s = shift;
+
+    my $maxclients = 0;
+    my $resolve    = 1;
+    my $sleep      = 4;
+    my $iterations = -1;
+    my $showtotals = 0;
+
+    my $arg = shift;
+    while ( defined $arg && $arg =~ /^-/ ) {
+        $maxclients = shift if ( $arg eq "-c" );
+        $iterations = shift if ( $arg eq "-i" );
+        $sleep      = shift if ( $arg eq "-s" );
+        $showtotals = 1     if ( $arg eq "-t" );
+        $resolve    = 0     if ( $arg eq "-n" );
+        $arg        = shift;
+    }
+    $maxclients ||= $resolve ? 10 : 20;
+
+    my @headparts =
+      qw/Client Create Getattr Lookup Read Readdir Readlink Remove Write Total/;
+
+    my $stats = nfsstat_getdata( $s, $maxclients );    # initial data load
+
+    # init a few vars from the size of the data
+    my $nstats     = $#headparts - 1;
+    my $headformat = "%-15.15s " . " %10s" x $#headparts . "\n";
+    my $statformat = "%-15.15s " . " %10u" x $#headparts . "\n";
+
+    if ($resolve) {
+        $headformat = "%-6.6s " . " %10s" x $#headparts . "\n";
+        $statformat = "%-50.50s\n       " . " %10u" x $#headparts . "\n";
+    }
+
+    my %namecache = ();
+
+    # print out initial data
+    printf( $headformat, @headparts ) if ($showtotals);
+    foreach my $clientip (
+        sort { $stats->{$b}[$nstats] <=> $stats->{$a}[$nstats] }
+        keys %{$stats}
+      )
+    {
+
+        # $nstats is the last field, so we are sorting by "total"
+        my $clientname = $clientip;
+        if ($resolve) {
+            $clientname =
+              exists $namecache{$clientip}
+              ? $namecache{$clientip}
+              : ( $namecache{$clientip} =
+                  gethostbyaddr( inet_aton($clientip), AF_INET ) || $clientip );
+        }
+        printf( $statformat, $clientname, @{ $stats->{$clientip} } )
+          if ($showtotals);
+    }
+    print "\n";
+
+    # loop forever
+    while ( ( $iterations < 0 ) || ( $iterations-- > 0 ) ) {
+        sleep $sleep;
+
+        # load new data
+        my $newstats = nfsstat_getdata( $s, $maxclients );
+
+        # diff the new data with the "current" data
+        my %diffstats;
+        printf( $headformat, @headparts );
+        foreach my $clientip ( keys %{$stats} ) {
+            for ( $a = 0 ; $a <= ( $#headparts - 1 ) ; $a++ ) {
+                $diffstats{$clientip}[$a] =
+                  exists $newstats->{$clientip}
+                  ? $newstats->{$clientip}[$a] - $stats->{$clientip}[$a]
+                  : $stats->{$clientip}[$a];
+            }
+        }
+        $stats = $newstats;    # new is now "current"
+
+        # print out the diff
+        foreach my $clientip (
+            sort { $diffstats{$b}[$nstats] <=> $diffstats{$a}[$nstats] }
+            keys %diffstats
+          )
+        {
+            my $clientname = $clientip;
+            if ($resolve) {
+                $clientname =
+                  exists $namecache{$clientip}
+                  ? $namecache{$clientip}
+                  : ( $namecache{$clientip} =
+                      gethostbyaddr( inet_aton($clientip), AF_INET )
+                      || $clientip );
+            }
+            printf( $statformat, $clientname, @{ $diffstats{$clientip} } );
+        }
+        print "\n";
+    }
+    return (0);
+}
+
+sub nfsstat_getdata {
+    my $s = shift;
+    my $maxclients = shift || 10;
+
+    my %stats;
+
+    my $out = $s->invoke( "nfs-stats-top-clients-list-iter-start",
+        "maxclients", $maxclients );
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+    my $maxnumrecords = $out->child_get_int("records");
+    my $tag           = $out->child_get_string("tag");
+
+    $out = $s->invoke( "nfs-stats-top-clients-list-iter-next",
+        "tag", $tag, "maximum", $maxnumrecords );
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    my $nfstop  = $out->child_get("nfs-top");
+    my @results = $nfstop->children_get();
+    foreach my $result (@results) {
+        my $client = $result->child_get_string("client-info");
+        $client =~ s/^::ffff://;
+        @{ $stats{$client} } = (
+            $result->child_get_int("create-ops"),
+            $result->child_get_int("getattr-ops"),
+            $result->child_get_int("lookup-ops"),
+            $result->child_get_int("read-ops"),
+            $result->child_get_int("readdir-ops"),
+            $result->child_get_int("readlink-ops"),
+            $result->child_get_int("remove-ops"),
+            $result->child_get_int("write-ops"),
+            $result->child_get_int("total-ops")
+        );
+    }
+
+    $out = $s->invoke( "nfs-stats-top-clients-list-iter-end", "tag", $tag );
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    return \%stats;
+}
+
+sub nfsstat_zero {
+    my $s = shift;
+
+    my $out = $s->invoke("nfs-stats-zero-stats");
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+    print "NFS counters have been cleared.\n";
+    return (0);
+}
+
+sub snapvault_sched {
+    my $s   = shift;
+    my $arg = shift;
+
+    my $which = "primary";
+    if ( defined $arg && $arg eq "-x" ) {
+        $which = "secondary";
+        $arg   = shift;
+    }
+    my ( $volume, $pathname ) = parsepathname($arg);
+
+    if ( !$volume ) {
+        foreach my $vol ( allvolumenames($s) ) {
+            snapvault_sched_list( $s, $vol, $which );
+        }
+    }
+    else {
+        if ( scalar @_ > 0 ) {
+            my $out;
+            my $volume_name   = $volume;
+            my $schedule_name = shift;
+
+            my $snapspec = shift;
+            return (-5) if ( !defined $snapspec );
+            if ( $snapspec eq "delete" ) {
+                $out = $s->invoke( "snapvault-$which-delete-snapshot-schedule",
+                    "schedule-name", $schedule_name, "volume-name",
+                    $volume_name );
+
+            }
+            else {
+                my ( $retention, $days, $hours ) = split( /@/, $snapspec );
+
+                my $schedinfo =
+                  NaElement->new("snapvault-$which-snapshot-schedule-info");
+                if ( $which eq "secondary" ) {
+                    $schedinfo->child_add_string( "is-auto-update", "true" );
+                }
+                $schedinfo->child_add_string( "retention-count", $retention );
+                $schedinfo->child_add_string( "volume-name",     $volume_name );
+                $schedinfo->child_add_string( "schedule-name", $schedule_name );
+                my $schedp = NaElement->new("schedule");
+                $schedinfo->child_add($schedp);
+                my $schedinfop = NaElement->new("snapvault-schedule-info");
+                $schedp->child_add($schedinfop);
+                $schedinfop->child_add_string( "days-of-week", $days )
+                  if ($days);
+                $schedinfop->child_add_string( "hours-of-day", $hours )
+                  if ($hours);
+
+                my $snapsched = NaElement->new("snapshot-schedule");
+                $snapsched->child_add($schedinfo);
+                my $in =
+                  NaElement->new("snapvault-$which-set-snapshot-schedule");
+                $in->child_add($snapsched);
+
+                #print $in->sprintf();
+                $out = $s->invoke_elem($in);
+            }
+
+            if ( $out->results_status() eq "failed" ) {
+                print STDERR $out->results_reason(), "\n";
+                exit(1);
+            }
+        }
+        snapvault_sched_list( $s, $volume, $which );
+    }
+    return (0);
+}
+
+sub snapvault_sched_list {
+    my $s     = shift;
+    my $vol   = shift;
+    my $which = shift;
+    my $out   = $s->invoke( "snapvault-$which-snapshot-schedule-list-info",
+        "volume-name", $vol );
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        return (1);
+    }
+
+    my @results = $out->children_get();
+    foreach my $result (@results) {
+        my @schedules = $result->children_get();
+        foreach my $sched (@schedules) {
+            next if ( !defined $sched );
+            my $options = $sched->child_get("snapvault-schedule-options")
+              ;    # not using for now
+            my $retention_count = $sched->child_get_int("retention-count");
+            my $schedule        = $sched->child_get("schedule");
+            my $schedinfo     = $schedule->child_get("snapvault-schedule-info");
+            my $scheduledays  = $schedinfo->child_get_string("days-of-week");
+            my $schedulehours = $schedinfo->child_get_string("hours-of-day");
+            my $schedule_name = $sched->child_get_string("schedule-name");
+            my $volume_name   = $sched->child_get_string("volume-name");
+            printf(
+                "%s %s %s (%s, %s)\n",
+                $volume_name, $schedule_name, $retention_count,
+                $scheduledays  || "mon-sun",
+                $schedulehours || "0"
+            );
+        }
+    }
+    return (0);
+}
+
+sub snapvault_list {
+    my $s   = shift;
+    my $arg = shift;
+
+    if ( defined $arg && $arg eq "-x" ) {
+        my $vol = shift;
+
+        my $out = $s->invoke("snapvault-secondary-configuration-list-info");
+
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            return (1);
+        }
+
+        #print $out->sprintf();
+        my @results = $out->children_get();
+        foreach my $result (@results) {
+            my @configinfo =
+              $result->children_get("snapvault-configuration-info");
+            foreach my $configinfo (@configinfo) {
+
+                #print $configinfo->sprintf();
+                my $system   = $configinfo->child_get_string("primary-system");
+                my $primpath = $configinfo->child_get_string("primary-path");
+                my $secpath  = $configinfo->child_get_string("secondary-path");
+                if ( defined $vol ) {
+                    if ( $vol eq $secpath ) {
+                        print "$system:$primpath $secpath\n";
+                    }
+                }
+                else {
+                    print "$system:$primpath $secpath\n";
+                }
+            }
+        }
+    }
+    else {
+
+        my @paths;
+        if ( !$arg ) {
+            my $out     = $s->invoke("qtree-list");
+            my @results = $out->children_get();
+            foreach my $result (@results) {
+                my @qtreeinfo = $result->children_get("qtree-info");
+                foreach my $qtreeinfo (@qtreeinfo) {
+                    my $v = $qtreeinfo->child_get_string("volume");
+                    my $q = $qtreeinfo->child_get_string("qtree");
+                    push( @paths, "/vol/$v" );
+                    push( @paths, "/vol/$v/-" );
+                    if ($q) {
+                        push( @paths, "/vol/$v/$q" );
+                    }
+                }
+            }
+            my %seen;
+            @paths = grep { !$seen{$_}++ } @paths;
+        }
+        else {
+            push( @paths, $arg );
+        }
+        foreach my $pathname (@paths) {
+            my $out = $s->invoke( "snapvault-primary-destinations-list-info",
+                "source-path", $pathname );
+            if ( $out->results_status() eq "failed" ) {
+                print STDERR $out->results_reason(), "\n";
+                exit(1);
+            }
+
+            my @results = $out->children_get();
+            foreach my $result (@results) {
+                my @destinations = $result->children_get();
+                foreach my $destinfo (@destinations) {
+                    my $chaineddestinations =
+                      $destinfo->child_get("chained-destinations");
+                    my @chained = $chaineddestinations->children_get();
+                    foreach my $chaindest (@chained) {
+                        print "$pathname "
+                          . $chaindest->child_get_string("destination-system")
+                          . ":"
+                          . $chaindest->child_get_string("destination-path")
+                          . "\n";
+                    }
+                }
+            }
+        }
+    }
+    return (0);
+}
+
+sub snapvault_start {
+    my $s   = shift;
+    my $arg = shift;
+
+    my $primary       = "";
+    my $primarysystem = "";
+    my $primarypath   = "";
+    my $secondary     = "";
+    my $bandwidth     = "";
+    my $tries         = "";
+    while ( defined $arg && $arg =~ /^-/ ) {
+        $primary   = shift if ( $arg eq "-S" );
+        $bandwidth = shift if ( $arg eq "-k" );
+        $tries     = shift if ( $arg eq "-t" );
+        $arg       = shift;
+    }
+    $secondary = $arg;
+
+    return (-5) if ( !$secondary );
+
+    if ( $primary =~ /(.*):(.*)/ ) {
+        $primarysystem = $1;
+        $primarypath   = $2;
+    }
+    else {
+        $primarypath = $primary;
+    }
+
+#snapvault start [-r [-f]] [-w] [-k <kbs>] [-t <n>] [-o <options>] [-S [<primary_system>:]<primary_path>] [<secondary_filer>:]<secondary_path>
+# -k bandwidth limit
+# -t number of times updates are tried
+# -w wait for baseline transfer to complete
+# -r restart updates
+#where <options> is <opt_name>=<opt_value>[[,<opt_name>=<opt_value>]...]
+#For more information about the available options, please see the
+#SnapVault man page.
+
+    my $in        = NaElement->new("snapvault-secondary-create-relationship");
+    my $sv_config = NaElement->new("configuration");
+    $in->child_add($sv_config);
+
+    my $sv_configinfo = NaElement->new("snapvault-configuration-info");
+    $sv_config->child_add($sv_configinfo);
+
+    $sv_configinfo->child_add_string( "secondary-path", $secondary );
+    $sv_configinfo->child_add_string( "primary-system", $primarysystem )
+      if $primarysystem;
+    $sv_configinfo->child_add_string( "primary-path", $primarypath )
+      if $primarypath;
+    $sv_configinfo->child_add_string( "max-transfer-rate", $bandwidth )
+      if $bandwidth;
+    $sv_configinfo->child_add_string( "tries-count", $tries ) if $tries;
+    my $out = $s->invoke_elem($in);
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+}
+
+sub snapvault_stop {
+    my $s   = shift;
+    my $arg = shift;
+
+    if ( $arg eq "-x" ) {
+
+        # ignore -x as a convienence
+        $arg = shift;
+    }
+    if ( !$arg ) {
+        return (-5);
+    }
+
+    my ( $volume, $pathname ) = parsepathname($arg);
+    my $out = $s->invoke( "snapvault-secondary-delete-relationship",
+        "secondary-path", $pathname );
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+}
+
+sub snapvault_release {
+    my $s         = shift;
+    my $primpath  = shift;
+    my $secondary = shift;
+
+    if ( !$primpath ) {
+        return (-5);
+    }
+
+    if ( !$secondary ) {
+
+        # Go find a $secondary destination, but bail out if more than one.
+        my $out = $s->invoke( "snapvault-primary-get-relationship-status",
+            "system-path", $primpath );
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+
+        my @results = $out->children_get();
+        foreach my $result (@results) {
+            my @configinfo = $result->children_get("snapvault-status-info");
+            if ( scalar @configinfo == 0 ) {
+                print "No snapvault for $primpath\n";
+                exit(1);
+            }
+            foreach my $configinfo (@configinfo) {
+                $secondary =
+                    $configinfo->child_get_string("destination-system") . ":"
+                  . $configinfo->child_get_string("destination-path");
+            }
+        }
+    }
+    my ( $secsystem, $secpath ) = split( /:/, $secondary );
+
+    my $out = $s->invoke( "snapvault-primary-release-relationship",
+        "primary-path", $primpath, "secondary-path", $secpath,
+        "secondary-system", $secsystem );
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+}
+
+sub snapvault_update {
+    my $s   = shift;
+    my $arg = shift;
+
+    if ( !$arg ) {
+        return (-5);
+    }
+
+    my $out = $s->invoke( "snapvault-secondary-initiate-incremental-transfer",
+        "secondary-path", $arg );
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+}
+
+sub snapvault_status {
+    my $s   = shift;
+    my $arg = shift;
+
+    my $which   = "primary";
+    my $verbose = 0;
+    while ( defined $arg and $arg =~ /^-/ ) {
+        $which   = "secondary" if ( $arg eq "-x" );
+        $verbose = 1           if ( $arg eq "-v" );
+        $arg     = shift;
+    }
+
+    if ($arg) { $verbose = 1 }
+
+    my @paths;
+    if ( !$arg ) {
+        if ( $which eq "primary" ) {
+
+            # pickup every possible path
+            my $out     = $s->invoke("qtree-list");
+            my @results = $out->children_get();
+            foreach my $result (@results) {
+                my @qtreeinfo = $result->children_get("qtree-info");
+                foreach my $qtreeinfo (@qtreeinfo) {
+                    my $v = $qtreeinfo->child_get_string("volume");
+                    my $q = $qtreeinfo->child_get_string("qtree");
+                    push( @paths, "/vol/$v" );
+                    push( @paths, "/vol/$v/-" );
+                    if ($q) {
+                        push( @paths, "/vol/$v/$q" );
+                    }
+                }
+            }
+            my %seen;
+            @paths = grep { !$seen{$_}++ } @paths;
+        }
+        else {
+            my $out = $s->invoke("snapvault-secondary-configuration-list-info");
+
+            if ( $out->results_status() eq "failed" ) {
+                print STDERR $out->results_reason(), "\n";
+                return (1);
+            }
+
+            my @results = $out->children_get();
+            foreach my $result (@results) {
+                my @configinfo =
+                  $result->children_get("snapvault-configuration-info");
+                foreach my $configinfo (@configinfo) {
+
+                    push( @paths,
+                        $configinfo->child_get_string("secondary-path") );
+                }
+            }
+        }
+    }
+    else {
+        push( @paths, $arg );
+    }
+
+    foreach my $pathname (@paths) {
+        my $out = $s->invoke( "snapvault-$which-get-relationship-status",
+            "system-path", $pathname );
+        if ( $out->results_status() eq "failed" ) {
+            print STDERR $out->results_reason(), "\n";
+            exit(1);
+        }
+
+        my @results = $out->children_get();
+        foreach my $result (@results) {
+            my @configinfo = $result->children_get("snapvault-status-info");
+            if ( scalar @configinfo == 0 ) {
+                print "No snapvault for $pathname\n" if ($verbose);
+            }
+            foreach my $configinfo (@configinfo) {
+                my $source =
+                    $configinfo->child_get_string("source-system") . ":"
+                  . $configinfo->child_get_string("source-path");
+                my $dest =
+                    $configinfo->child_get_string("destination-system") . ":"
+                  . $configinfo->child_get_string("destination-path");
+                my $state = $configinfo->child_get_string("state");
+                my $lag =
+                  humanize_seconds( $configinfo->child_get_string("lag-time") )
+                  || "";
+                my $status = $configinfo->child_get_string("status");
+                print "$source\t$dest\t$state\t$lag\t$status\n";
+
+                #print $configinfo->sprintf();
+            }
+        }
+    }
+    return (0);
+}
+
+sub snapvault_help {
+    my $s = shift;
+    print STDERR
+      "          snapvault options: list|release|sched|start|stop|status
+              (-x implies destination filer)
+              release <primarypath> [<secondary:/destination-path>]
+              status [-x] [-v] [path]
+              sched [-x] [<volname> [<schedname> delete|<retention>[\@<days>[\@<hours>]]]]
+              list [-x]
+              Destination filers only:
+                 start [-k <kbs>] [-t <n>] [-S source-system:source-path] destination-path
+                 stop destination-path
+                 update destination-path
+";
+}
+
+sub lun_help {
+    my $s = shift;
+    print STDERR <<EHELP;
+          lun options: create|resize|destroy|list|map|unmap
+              create <path> <size>k|m|g|t
+              resize <path> <size>k|m|g|t
+              destroy <path>
+              list [-q] [-b] [<path>]
+              map [<path> [<igroup>]]
+              unmap <path> <igroup>
+EHELP
+}
+
+sub lun_list {
+    my $s = shift;
+
+    my $arg = shift;
+
+    my $quiet   = 0;
+    my $nohuman = 0;
+
+    while ( defined $arg and $arg =~ /^-/ ) {
+        $quiet   = ( $quiet | $arg   eq "-q" );
+        $nohuman = ( $nohuman | $arg eq "-n" );
+        $arg     = shift;
+    }
+
+    my @luns = _list_luns( $s, $arg );
+
+    if ( !@luns ) {
+        print STDERR "no luns found\n";
+        exit(1);
+    }
+    elsif ( !$quiet ) {
+        printf( "%-60.60s %10s %10s %9s\n", "Path", "State", "Size", "Mapped" );
+    }
+
+    foreach my $lun (@luns) {
+        my $path   = $lun->child_get_string("path");
+        my $state  = $lun->child_get_int("online") ? "online" : "offline";
+        my $size   = $lun->child_get_int("size");
+        my $mapped = $lun->child_get_int("mapped") ? "yes" : "no";
+
+        printf( "%-60.60s %10s %10s %9s\n",
+            $path, $state, $nohuman ? $size : humanize $size, $mapped );
+    }
+
+    return 0;
+}
+
+sub _list_luns {
+    my $s   = shift;
+    my $lun = shift;
+
+    my $out;
+    if ($lun) {
+        $out = $s->invoke( "lun-list-info", path => $lun );
+    }
+    else {
+        $out = $s->invoke("lun-list-info");
+    }
+
+    my $lun_info = $out->child_get("luns");
+    return $lun_info->children_get();
+}
+
+sub lun_create {
+    my $s = shift;
+    my ( $lun, $size ) = @_;
+
+    if ( !$size ) { return (-5); }
+
+    $size = dehumanize($size);
+
+    my $out = $s->invoke(
+        "lun-create-by-size",
+        size   => $size,
+        path   => $lun,
+        ostype => 'linux'
+    );
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to create: -->" . $out->results_reason() . "<--\n";
+        return (1);
+    }
+
+    print "lun $lun created\n";
+    return 0;
+}
+
+sub lun_resize {
+    my $s = shift;
+    my ( $lun, $size ) = @_;
+
+    if ( !$size ) { return (-5); }
+
+    $size = dehumanize($size);
+
+    my $out = $s->invoke( "lun-resize", size => $size, path => $lun );
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to resize: -->" . $out->results_reason() . "<--\n";
+        return 1;
+    }
+
+    print "lun $lun resized\n";
+    return 0;
+}
+
+sub lun_destroy {
+    my $s = shift;
+    my ($lun) = @_;
+
+    if ( !$lun ) {
+        return -5;
+    }
+
+    my $out = $s->invoke( "lun-destroy", path => $lun );
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to destroy: -->"
+          . $out->results_reason() . "<--\n";
+        return 1;
+    }
+
+    print "lun $lun destroyed\n";
+    return 0;
+}
+
+sub lun_map {
+    my ( $s, $lun, $igroup ) = @_;
+
+    if ($igroup) {
+        return _map_lun( $s, $lun, $igroup );
+    }
+
+# while I realize that if the user gives a lun, this call is redundant, this simplifies
+# the code a bit for a neglible performance hit
+    foreach my $lun ( _list_luns( $s, $lun ) ) {
+        my $path = $lun->child_get_string("path");
+        print "lun: $path:\n";
+        my $out = $s->invoke( "lun-map-list-info", path => $path );
+        my $igroup_info = $out->child_get("initiator-groups");
+        foreach my $igroup ( $igroup_info->children_get() ) {
+            my $name = $igroup->child_get_string("initiator-group-name");
+            print "\tigroup: $name\n";
+        }
+        print "---------------------------\n";
+    }
+
+    return 0;
+}
+
+sub _map_lun {
+    my ( $s, $lun, $igroup ) = @_;
+
+    my $out =
+      $s->invoke( "lun-map", path => $lun, 'initiator-group' => $igroup );
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to map: -->" . $out->results_reason() . "<--\n";
+        return 1;
+    }
+
+    print "lun $lun mapped to igroup $igroup\n";
+    return 0;
+}
+
+sub lun_unmap {
+    my ( $s, $lun, $igroup ) = @_;
+
+    if ( !$igroup ) {
+        return -5;
+    }
+
+    my $out =
+      $s->invoke( "lun-unmap", path => $lun, 'initiator-group' => $igroup );
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to unmap: -->" . $out->results_reason() . "<--\n";
+        return 0;
+    }
+
+    print "lun $lun unmapped from igroup $igroup\n";
+    return 0;
+}
+
+sub igroup_help {
+    my $s = shift;
+    print STDERR <<EHELP;
+          igroup options: create|destroy|list|map|unmap
+              create <igroup> [<initiator iqn>... ]
+              destroy <igroup>
+              list [<igroup>]
+              add <igroup> <initiator iqn> [<initiator iqn>... ]
+              remove <igroup> <initiator iqn> [<initiator iqn>... ]
+EHELP
+}
+
+sub igroup_create {
+    cmode_notsupported();
+    my ( $s, $igroup, @iqns ) = @_;
+
+    if ( !$igroup ) {
+        return -5;
+    }
+
+    my $out = $s->invoke(
+        "igroup-create",
+        'initiator-group-name' => $igroup,
+        'initiator-group-type' => 'iscsi'
+    );
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to create: -->" . $out->results_reason() . "<--\n";
+        return 1;
+    }
+
+    print "igroup $igroup created\n";
+
+    foreach my $iqn (@iqns) {
+        _add_igroup( $s, $igroup, $iqn );
+    }
+    return 0;
+}
+
+sub igroup_add {
+    cmode_notsupported();
+    my ( $s, $igroup, @iqns ) = @_;
+
+    if ( !@iqns ) {
+        return -5;
+    }
+
+    foreach my $iqn (@iqns) {
+        _add_igroup( $s, $igroup, $iqn );
+    }
+
+    return 0;
+}
+
+sub _add_igroup {
+    my ( $s, $igroup, $iqn ) = @_;
+
+    my $out = $s->invoke(
+        "igroup-add",
+        'initiator-group-name' => $igroup,
+        initiator              => $iqn
+    );
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to add: -->" . $out->results_reason() . "<--\n";
+        return 1;
+    }
+
+    print "iqn $iqn added to igroup $igroup\n";
+    return 0;
+}
+
+sub igroup_remove {
+    cmode_notsupported();
+    my ( $s, $igroup, @iqns ) = @_;
+
+    if ( !@iqns ) {
+        return -5;
+    }
+
+    foreach my $iqn (@iqns) {
+        my $out = $s->invoke(
+            "igroup-remove",
+            'initiator-group-name' => $igroup,
+            initiator              => $iqn
+        );
+        if ( $out->results_status() eq 'failed' ) {
+            print STDERR "Failed to remove: -->"
+              . $out->results_reason() . "<--\n";
+            next;
+        }
+
+        print "iqn $iqn removed from igroup $igroup\n";
+    }
+
+    return 0;
+}
+
+sub igroup_list {
+    cmode_notsupported();
+    my ( $s, $igroup ) = @_;
+
+    my @igroups = _list_igroups( $s, $igroup );
+
+    foreach my $igroup (@igroups) {
+        next unless $igroup;
+        print "igroup: "
+          . $igroup->child_get_string("initiator-group-name") . "\n";
+        my $igroup_members_list = $igroup->child_get("initiators");
+        foreach my $iqn ( $igroup_members_list->children_get() ) {
+            print "\tiqn: " . $iqn->child_get_string("initiator-name") . "\n";
+        }
+        print "------------------------------------\n";
+    }
+
+    return 0;
+
+}
+
+sub _list_igroups {
+    my ( $s, $igroup ) = @_;
+
+    my $out;
+    if ($igroup) {
+        $out =
+          $s->invoke( "igroup-list-info", 'initiator-group-name' => $igroup );
+    }
+    else {
+        $out = $s->invoke("igroup-list-info");
+    }
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to list: -->" . $out->results_reason() . "<--\n";
+        return undef;
+    }
+
+    my $igroup_list = $out->child_get("initiator-groups");
+    return $igroup_list->children_get();
+}
+
+sub igroup_destroy {
+    cmode_notsupported();
+    my ( $s, $igroup ) = @_;
+
+    if ( !$igroup ) {
+        return -5;
+    }
+
+    my $out = $s->invoke( "igroup-destroy", 'initiator-group-name' => $igroup );
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to destroy: -->"
+          . $out->results_reason() . "<--\n";
+        return (1);
+    }
+
+    print "igroup $igroup destroyed\n";
+    return 0;
+}
+
+sub system_help {
+    my $s = shift;
+    print STDERR <<EHELP;
+          system options: info|ontapiversion|vendorinfo|version|getapis|nodeinfo
+              nodeinfo <nodename>
+EHELP
+}
+
+sub system_info {
+    my ($s) = @_;
+    my $out = $s->invoke("system-get-info");
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed " . $out->results_reason() . "\n";
+        return (1);
+    }
+
+    my @results = $out->children_get();
+
+    foreach my $result (@results) {
+        my @configinfo = $result->children_get("system-info");
+        foreach my $configinfo (@configinfo) {
+            print $configinfo->{name}, ": ", $configinfo->{content}, "\n";
+        }
+    }
+    return (0);
+}
+sub system_getapis {
+    my ($s) = @_;
+    my $out = $s->invoke("system-api-list");
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed " . $out->results_reason() . "\n";
+        return (1);
+    }
+
+    my @results = $out->children_get();
+
+    foreach my $result (@results) {
+        my @configinfo = $result->children_get("system-api-info");
+        foreach my $configinfo (@configinfo) {
+            print $configinfo->child_get_string("name"),"\n";
+        }
+    }
+    return (0);
+}
+sub system_ontapiversion {
+    my ($s) = @_;
+    my $out = $s->invoke("system-get-ontapi-version");
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed " . $out->results_reason() . "\n";
+        return (1);
+    }
+
+    print $out->child_get_int("major-version"), ".",
+      $out->child_get_int("minor-version") . "\n";
+    return (0);
+}
+
+sub system_vendorinfo {
+    my ($s) = @_;
+    my $out = $s->invoke("system-get-vendor-info");
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed " . $out->results_reason() . "\n";
+        return (1);
+    }
+
+    my @results = $out->children_get();
+    foreach my $result (@results) {
+        print $result->{name}, ": ", $result->{content}, "\n";
+    }
+    return (0);
+}
+
+sub system_version {
+    my ($s) = @_;
+    my $out = $s->invoke("system-get-version");
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed " . $out->results_reason() . "\n";
+        return (1);
+    }
+
+    print $out->child_get_string("version"), "\n";
+    return (0);
+}
+sub system_nodeinfo {
+    my ($s,$node) = @_;
+    if ( !$node ) {
+        return -5;
+    }
+    my $out = $s->invoke("system-node-get", "node",$node);
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed " . $out->results_reason() . "\n";
+        return (1);
+    }
+
+    my @results = $out->children_get();
+
+    foreach my $result (@results) {
+        my @configinfo = $result->children_get("node-details-info");
+        foreach my $configinfo (@configinfo) {
+            print "Node: ",$configinfo->child_get_string("node"),"\n";
+            print "Model: ",$configinfo->child_get_string("node-model"),"\n";
+            print "Healthy: ",$configinfo->child_get_string("is-node-healthy"),"\n";
+            print "Firmware: ",$configinfo->child_get_string("cpu-firmware-release"),"\n";
+            print "Overtemp: ",$configinfo->child_get_string("env-over-temperature"),"\n";
+            print "Serial Number: ",$configinfo->child_get_string("node-serial-number"),"\n";
+            print "NVRAM Status: ",$configinfo->child_get_string("nvram-battery-status"),"\n";
+            print "Failed PS Count: ",$configinfo->child_get_string("env-failed-power-supply-count"),"\n";
+            if ($configinfo->child_get_int("env-failed-power-supply-count") != 0) {
+                print "Failed PS Message: ",$configinfo->child_get_string("env-failed-power-supply-message"),"\n";
+            }
+            print "Failed Fan Count: ",$configinfo->child_get_string("env-failed-fan-count"),"\n";
+            if ($configinfo->child_get_int("env-failed-fan-count") != 0) {
+                print "Failed Fan Message: ",$configinfo->child_get_string("env-failed-fan-message"),"\n";
+            }
+        }
+    }
+    return (0);
+}
+
+sub qtree_help {
+    my $s = shift;
+    print STDERR <<EHELP;
+          qtree options: create|delete|list|rename|info
+              create <volume> <qtree> <mode>
+              create <qtreepath>
+              delete <qtreepath>
+              list [<volume>]
+              rename <oldpath> <newpath>
+EHELP
+}
+
+sub qtree_create {
+    my $s = shift;
+    my ( $vol, $qtree, $mode ) = @_;
+
+    $vol =~ s{^/vol/}{};
+    if ( $vol =~ m{([^/]*)/(.*)} and !$qtree ) {
+        $vol   = $1;
+        $qtree = $2;
+    }
+
+    if ( !$qtree ) { return (-5); }
+
+    if ( !defined $mode ) {
+        $mode = '0755';
+    }
+
+    my $out = $s->invoke(
+        "qtree-create",
+        volume => $vol,
+        qtree  => $qtree,
+        mode   => $mode
+    );
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to create qtree: $qtree: "
+          . $out->results_reason() . "\n";
+        return (1);
+    }
+
+    print "qtree /vol/$vol/$qtree created\n";
+    return 0;
+}
+
+sub qtree_delete {
+    my $s     = shift;
+    my $arg   = shift;
+    my $force = "false";
+    while ( defined $arg && $arg =~ /^-/ ) {
+        $force = "true" if ( $arg eq "-r" );
+        $arg = shift;
+    }
+    my $qtree = $arg;
+
+    if ( !$qtree ) { return (-5); }
+
+    my $out = $s->invoke(
+        "qtree-delete",
+        qtree => $qtree,
+        force => $force
+    );
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to delete: -->" . $out->results_reason() . "<--\n";
+        return (1);
+    }
+
+    print "qtree $qtree deleted\n";
+    return 0;
+}
+
+sub qtree_list {
+    my $s = shift;
+    my ($volume) = @_;
+
+    my $out;
+    if ( defined $volume ) {
+        $volume =~ s{^/vol/}{};
+        $out = $s->invoke( "qtree-list", volume => $volume );
+    }
+    else {
+        $out = $s->invoke("qtree-list");
+    }
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to list: -->" . $out->results_reason() . "<--\n";
+        return (1);
+    }
+
+    #Volume   Tree     Style Oplocks  Status
+    #-------- -------- ----- -------- ---------
+    #vol0              unix  enabled  normal
+    #hcabral_test          unix  enabled  normal
+    #nfs1_vm_images          unix  enabled  normal
+
+    printf( "%-40s   Tree     Style Oplocks  Status\n",  "Volume" );
+    printf( "%-40s -------- ----- -------- ---------\n", "--------" );
+    my @results = $out->children_get();
+    foreach my $result (@results) {
+        my @qtreeinfo = $result->children_get("qtree-info");
+        foreach my $qtreeinfo (@qtreeinfo) {
+            printf(
+                "%-40s %8s %5s %8s %8s\n",
+                $qtreeinfo->child_get_string("volume"),
+                $qtreeinfo->child_get_string("qtree"),
+                $qtreeinfo->child_get_string("security-style"),
+                $qtreeinfo->child_get_string("oplocks"),
+                $qtreeinfo->child_get_string("status")
+            );
+        }
+    }
+
+    return 0;
+}
+
+sub qtree_list_cmode {
+    my $s   = shift;
+    my $arg = shift;
+    my $tag = "";
+
+    my $numlines = 0;
+    while ( defined($tag) ) {
+        my $in = NaElement->new("qtree-list-iter");
+        if ( $tag ne "" ) {
+            $in->child_add_string( "tag", $tag );
+        }
+        my $out = $s->invoke_elem($in);
+        if ( $out->child_get_int("num-records") == 0 ) {
+            return ( $numlines == 0 );
+        }
+        $tag = $out->child_get_string("next-tag");
+        my @qtreeList = $out->child_get("attributes-list")->children_get();
+        foreach my $qtreeInfo (@qtreeList) {
+            next
+              if ( $arg && ( $arg ne $qtreeInfo->child_get_string("qtree") ) );
+            $numlines++;
+            printf(
+                "%-40s %8s %5s %8s %8s\n",
+                $qtreeInfo->child_get_string("volume"),
+                $qtreeInfo->child_get_string("qtree"),
+                $qtreeInfo->child_get_string("security-style"),
+                $qtreeInfo->child_get_string("oplocks"),
+                $qtreeInfo->child_get_string("status")
+            );
+        }
+    }
+
+    return (0);
+}
+
+sub qtree_rename {
+    my $s = shift;
+    my ( $qtree, $newname ) = @_;
+
+    my $out = $s->invoke(
+        "qtree-rename",
+        qtree            => $qtree,
+        "new-qtree-name" => $newname
+    );
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to rename: -->" . $out->results_reason() . "<--\n";
+        return (1);
+    }
+
+    print "Qtree renamed to $newname\n";
+    return (0);
+}
+
+sub counter_help {
+    my $s = shift;
+    print STDERR <<EHELP;
+          counter options: listobjects|listinstances|listcounters [-d]|fetch
+              listobjects [-d]
+              listinstances <objectname>
+              listcounters <objectname> [-d] [-v] [countername]
+              fetch <object> <instance,...>|all <counter,...>|all
+EHELP
+}
+
+sub counter_listobject {
+    my $s = shift;
+
+    my $diag = 0;
+    my $arg  = shift;
+    while ( defined $arg && $arg =~ /^-/ ) {
+        $diag = 1 if ( $arg eq "-d" );
+        $arg = shift;
+    }
+
+    my $out = $s->invoke("perf-object-list-info");
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to list: -->" . $out->results_reason() . "<--\n";
+        return (1);
+    }
+
+    #print $out->sprintf;
+    my @results = $out->children_get();
+    foreach my $result (@results) {
+        my @objects = $result->children_get("object-info");
+        foreach my $objectinfo (@objects) {
+            next
+              if ( $objectinfo->child_get_string("privilege-level") eq "diag"
+                and !$diag );
+            printf( "%-40s %s\n",
+                $objectinfo->child_get_string("name"),
+                $objectinfo->child_get_string("privilege-level") );
+        }
+    }
+    return (0);
+}
+
+sub counter_listinstance {
+    my $s = shift;
+    my ($object) = @_;
+
+    if ( !$object ) { return (-5); }
+
+        my $tag = "";
+        while ( defined($tag) ) {
+            my $in = NaElement->new("perf-object-instance-list-info-iter");
+            $in->child_add_string( "max-records", 1000 );
+            if ( $tag ne "" ) {
+                $in->child_add_string( "tag", $tag );
+            }
+            $in->child_add_string( "objectname", $object );
+            my $out = $s->invoke_elem($in);
+            if ( $out->results_status() eq "failed" ) {
+                print( $out->results_reason() . "\n" );
+                exit(-1);
+            }
+            if ( $out->child_get_int("num-records") == 0 ) {
+                last;
+            }
+            $tag = $out->child_get_string("next-tag");
+            my @instances = $out->child_get("attributes-list")->children_get();
+            if ( scalar @instances == 0 ) {
+                print "None found.\n";
+            }
+            foreach my $instanceinfo (@instances) {
+                printf( "%-40s\n", $instanceinfo->child_get_string("name") );
+            }
+        }
+
+
+    return (0);
+}
+
+sub counter_listcounter {
+    my $s      = shift;
+    my $object = shift;
+
+    if ( !$object ) { return (-5); }
+
+    my $diag    = 0;
+    my $verbose = 0;
+    my $arg     = shift;
+    while ( defined $arg && $arg =~ /^-/ ) {
+        $diag    = 1 if ( $arg eq "-d" );
+        $verbose = 1 if ( $arg eq "-v" );
+        $arg     = shift;
+    }
+
+    if ($arg) { $verbose = 1; $diag = 1 }
+
+    my $out =
+      $s->invoke( "perf-object-counter-list-info", "objectname", $object );
+
+    if ( $out->results_status() eq 'failed' ) {
+        print STDERR "Failed to list: -->" . $out->results_reason() . "<--\n";
+        return (1);
+    }
+
+    my @results = $out->children_get();
+    foreach my $result (@results) {
+        my @counters = $result->children_get("counters");
+        if ( scalar @counters == 0 ) {
+            print "None found.\n";
+        }
+        foreach my $counterinfo (@counters) {
+            next
+              if ( $counterinfo->child_get_string("privilege-level") eq "diag"
+                and !$diag );
+            next if ( $arg and $arg ne $counterinfo->child_get_string("name") );
+
+            if ($verbose) {
+                printf(
+"%-20s\n\tDescription: %s\n\tBase: %s\n\tUnit: %s\n\tType: %s\tLabels: %s\n\tPrivilege Level: %s\n\tProperties: %s\n\n",
+                    $counterinfo->child_get_string("name"),
+                    $counterinfo->child_get_string("desc"),
+                    $counterinfo->child_get_string("base-counter") || "None",
+                    $counterinfo->child_get_string("unit")         || "Unknown",
+                    $counterinfo->child_get_string("type")         || "Scalar",
+                    $counterinfo->child_get_string("labels")       || "None",
+                    $counterinfo->child_get_string("privilege-level")
+                      || "Unknown",
+                    $counterinfo->child_get_string("properties") || "None",
+                );
+            }
+            else {
+                print $counterinfo->child_get_string("name"), "\n";
+            }
+
+        }
+    }
+    return (0);
+}
+
+sub counter_fetch {
+    my $s = shift;
+    my ( $object, $instances, $counters ) = @_;
+
+    if ( !$object ) {
+        print STDERR "Error: Missing object. Choose one from below:\n";
+        return counter_listobject($s);
+    }
+    if ( !$instances ) {
+        print STDERR
+          "Error: Missing instance(s). Choose one or more from below:\n";
+        return counter_listinstance( $s, $object );
+    }
+    if ( !$counters ) {
+        print STDERR
+          "Error: Missing counter(s). Choose one or more from below:\n";
+        return counter_listcounter( $s, $object );
+    }
+
+    my $pogi = NaElement->new("perf-object-get-instances");
+
+    if (    defined $instances
+        and $instances ne ""
+        and $instances ne "-"
+        and $instances ne "all" )
+    {
+        my $instanceobj = NaElement->new("instances");
+        foreach ( split( /,/, $instances ) ) {
+            $instanceobj->child_add_string( "instance", $_ );
+        }
+        $pogi->child_add($instanceobj);
+    }
+
+    if (    defined $counters
+        and $counters ne ""
+        and $counters ne "-"
+        and $counters ne "all" )
+    {
+        my $counterobj = NaElement->new("counters");
+        foreach ( split( /,/, $counters ) ) {
+            $counterobj->child_add_string( "counter", $_ );
+        }
+        $pogi->child_add($counterobj);
+    }
+    $pogi->child_add_string( "objectname", $object );
+
+    my $out = $s->invoke_elem($pogi);
+
+    if ( $out->results_status() eq "failed" ) {
+        print STDERR $out->results_reason(), "\n";
+        exit(1);
+    }
+
+    my $num_records;
+    my $max_records = 10;
+
+
+    my $instances_list = $out->child_get("instances");
+    my @instances      = $instances_list->children_get();
+
+    foreach my $inst (@instances) {
+        my $inst_name = $inst->child_get_string("name");
+
+        #print ("Instance = $inst_name\n");
+        my $counters_list = $inst->child_get("counters");
+        my @counters      = $counters_list->children_get();
+        foreach my $counter (@counters) {
+            my $counter_name  = $counter->child_get_string("name");
+            my $counter_value = $counter->child_get_string("value");
+            printf( "%-40s %s %s\n",
+                $inst_name, $counter_name, $counter_value );
+
+        }
+    }
+
+
+    return (0);
+}
+
+sub help_help {
+    my $s = shift;
+    usage();
+}
+

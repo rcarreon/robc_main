@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# gstaples @ Gorilla Nation
+
+# Generate networks table based on http://docs.gnmedia.net/wiki/Ip_Scheme#Future_Vlans
+
+
+mask=255.255.254.0
+mgtifname='!remote!'
+dhcpserver=10.11.20.91
+tftpserver=10.11.20.91
+nameservers=10.11.20.68,10.11.20.69
+
+for lax in 1 2 3;do
+  for stub in {20,22,24,26,28,30,32,34};do
+    for a in 0 1 2;do
+      vlan=$lax$a$stub
+      prefix=10.1$lax.$([ $a -gt 0 ] && echo $a)$stub
+      netname=vlan$vlan
+      net=$prefix.0
+      gateway=$prefix.1
+      dnrange=$prefix.230-$prefix.250
+
+      echo $netname $net $gateway $dnrange
+      mkdef -t network -o $netname net=$net mask=$mask mgtifname=$mgtifname gateway=$gateway dhcpserver=$dhcpserver tftpserver=$tftpserver nameservers=$nameservers dynamicrange=$dnrange
+      
+    done
+  done
+done
+

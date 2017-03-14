@@ -1,0 +1,70 @@
+# This file is managed by Puppet do not modify it from <%= fqdn %>
+# My.cnf for MySQL 5.5 for Toolshed Standalone
+# filename=<%= file %>
+
+
+[mysqld]
+datadir=<%= mysqldatadir %>
+server-id = <%= mysqld_serverid %>
+report-host = <%= fqdn %>
+
+# Error log
+log-error=/sql/log/error.log
+
+# Slow query log
+log_output=FILE
+slow_query_log=1
+slow_query_log_file=/sql/log/slow-queries.log
+long_query_time=2
+
+# Binlog format
+log-bin = /sql/binlog/bin.log
+log-bin-index = /sql/binlog/bin.index
+expire_logs_days = 3
+
+# Connection params
+max_connections=500
+thread_cache_size=80
+max_connect_errors=100
+connect_timeout=20
+
+# MyISAM Params
+key_buffer_size=64M
+
+# Innodb Params
+innodb_file_per_table
+innodb_buffer_pool_size=512M
+innodb_buffer_pool_instances=1
+innodb_log_file_size=512M
+innodb_log_buffer_size=8M
+innodb_flush_method=O_DIRECT
+
+# Query cache
+query_cache_size = 64M
+
+# Table cache
+table_open_cache = 1024
+
+##########################################################
+# Options imported from old toolshed config - SYD 20130603
+#
+
+# Buffers
+sort_buffer_size = 8M
+read_buffer_size = 4M
+join_buffer_size = 2M
+read_rnd_buffer_size = 8M
+
+# InnoDB Opts
+innodb_flush_log_at_trx_commit=2
+innodb_additional_mem_pool_size = 20M
+innodb_lock_wait_timeout = 300 
+# The following was set in the original config, no idea why
+# SYD 20130603
+innodb_data_file_path = ibdata1:100M:autoextend 
+innodb_support_xa=0 
+
+# Temp tables
+max_heap_table_size = 32M
+tmp_table_size = 32M
+

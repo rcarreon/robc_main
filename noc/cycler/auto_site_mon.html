@@ -1,0 +1,94 @@
+<html>
+    <head>
+        <meta http-equiv="Cache-control" content="no-cache">
+        <meta http-equiv="expires" content="-1">
+        <!-- 
+            This file lives at:
+            https://svn.gnmedia.net/deploytools/trunk/sites/cycler-monitorX.html
+            Just commit changes to subversion and the monitor will eventualy be updated 
+        -->
+        <style type="text/css">
+            body {padding: 0; margin: 0;}
+        </style>
+        <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+        <script type="text/javascript">
+            var currentUrl = false;
+            var nextpagesecs = 15000;
+            var url = 0;
+
+            // Add new URLs here...
+            var urls = [
+                ['http://chefmom.sheknows.com', 2200],
+                ['http://cms.springboard.gorillanation.com', 1000],
+                ['http://comingsoon.net', 2800],
+                ['http://www.dvdfile.com', 2300],
+                ['http://connect.sheknows.com/login', 1000],
+                ['http://crowdignite.com', 4000],
+                ['http://forum.drinksmixer.com', 1500],
+                ['http://forums.superherohype.com', 7300],
+                ['http://forums.thefashionspot.com', 3000],
+                ['http://forums.wrestlezone.com', 4300],
+                ['http://geoparent.sheknows.com', 1800],
+                ['http://hfboards.com', 3700],
+                ['http://pregnancyandbaby.sheknows.com', 2000],
+                ['http://pregnancysearch.com',2800],
+                ['http://realmomsguide.sheknows.com', 4000],
+                ['http://soaps.sheknows.com', 2500],
+                ['http://talk.realitytvmagazine.com', 2800],
+                ['http://talk.sheknows.com', 3200],
+                ['http://talk.soapoperafan.com', 2000],
+                ['http://www.actiontrip.com', 5200],
+               //['http://www.babyandbump.com', 2500],
+                ['http://www.comingsoon.net', 3000],
+                ['http://www.craveonline.com', 4500],
+              //['http://www.drinksmixer.com', 2500],
+                ['http://www.fabulousfoods.com', 3000],
+                ['http://www.fabulousliving.com', 2800],
+                ['http://www.fabuloustravel.com', 1800],
+                ['http://www.gamerevolution.com', 2500],
+                ['http://www.gorillanation.com', 1200],
+                ['http://www.harrypotterfans.com', 8000],
+                ['http://www.hockeysfuture.com', 2000],
+                ['http://www.hoopsvibe.com', 3900],
+                ['http://www.iconator.com', 2800],
+                ['http://www.idontlikeyouinthatway.com', 11000],
+                ['http://www.liveoutdoors.com', 2500],
+                ['http://www.momtastic.com', 3500],
+                ['http://www.myanimelist.net', 1500],
+                ['http://www.sheknows.com', 3000],
+                ['http://www.sherdog.com', 3200],
+                ['http://www.sherdog.net', 3000],
+                ['http://www.shocktillyoudrop.com', 6700],
+                ['http://www.soapoperafan.com', 1000],
+                ['http://www.superherohype.com', 2800],
+                ['http://www.thefashionspot.com', 2500],
+                ['http://www.wrestlezone.com', 2800]
+            ];
+            
+            function nextpage() {
+                currentUrl = urls[url];
+                if (!currentUrl) {
+                    $('html, body').stop(true).animate({scrollTop:0}, 0);
+                    window.location.reload(true);
+                } else {
+                    $("#showframe").attr('src', currentUrl[0]).attr('height', currentUrl[1]);
+                    $('html, body').stop(true).animate({scrollTop:0}, 0).delay(5000).animate({scrollTop: currentUrl[1]}, 10000);
+                    document.title = 'Cycler: ' + (url++) + ': ' + currentUrl[0];
+                    setTimeout("nextpage()", nextpagesecs);
+                }
+                
+            }
+
+            var d = new Date();
+            if (d.getDay() == 5) {
+                urls.push(['http://beer30.gnmedia.net/', 1100]);
+            }
+
+        </script>
+    </head>
+    <body onload="javascript:nextpage(); return false;">
+        <iframe id="showframe" frameborder="0" scrolling="no" marginwidth="0" marginheight="0" width="100%" height="2500px" style="padding: 0; margin: 0; border: 0;">
+            <p>Your browser does not support iframes.</p>
+        </iframe>
+    </body>
+</html>

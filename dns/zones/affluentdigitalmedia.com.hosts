@@ -1,0 +1,16 @@
+$ORIGIN affluentdigitalmedia.com.
+$TTL    3600 
+affluentdigitalmedia.com.   IN      SOA     affluentdigitalmedia.com. root.affluentdigitalmedia.com. (
+                        2016041300     ; serial
+                        28800          ; refresh
+                        14400          ; retry
+                        3600000        ; expire
+                        86400 )        ; minimum
+
+affluentdigitalmedia.com.           IN    NS       app1v-dns.tp.prd.lax.gorillanation.com.
+affluentdigitalmedia.com.           IN    NS       app2v-dns.tp.prd.lax.gorillanation.com.
+affluentdigitalmedia.com.           IN    NS       app3v-dns.tp.prd.lax.gorillanation.com.
+affluentdigitalmedia.com.           IN    NS       app4v-dns.tp.prd.lax.gorillanation.com.
+
+affluentdigitalmedia.com.           IN    TXT      "G0O0R34839"
+

@@ -1,0 +1,30 @@
+$ORIGIN martini-corp.net.
+
+$TTL    3600 
+martini-corp.net.	IN      SOA     martini-corp.net. root.martini-corp.net. (
+                        2015070600	; serial
+                        28800		; refresh
+                        14400		; retry
+                        3600000		; expire
+                        86400 )		; minimum
+; name servers and mail servers
+;
+martini-corp.net.		IN	NS		app1v-dns.tp.prd.lax.gorillanation.com.
+martini-corp.net.		IN	NS		app2v-dns.tp.prd.lax.gorillanation.com.
+martini-corp.net.		IN	NS		app3v-dns.tp.prd.lax.gorillanation.com.
+martini-corp.net.		IN	NS		app4v-dns.tp.prd.lax.gorillanation.com.
+;
+;
+; Messagelabs powered mx
+martini-corp.net.     IN      MX    10 ASPMX4.GOOGLEMAIL.COM.
+martini-corp.net.     IN      MX    10 ASPMX3.GOOGLEMAIL.COM.
+martini-corp.net.     IN      MX    10 ASPMX2.GOOGLEMAIL.COM.
+martini-corp.net.     IN      MX    10 ASPMX.L.GOOGLE.COM.
+martini-corp.net.     IN      MX    10 ALT2.ASPMX.L.GOOGLE.COM.
+martini-corp.net.     IN      MX    10 ALT1.ASPMX.L.GOOGLE.COM
+
+martini-corp.net.	IN	A	216.146.46.10
+martini-corp.net.	IN	A	216.146.46.11
+googleffffffffaeac90e8.martini-corp.net.	IN	CNAME	google.com.
+www.martini-corp.net.	IN	CNAME	martini-corp.net.
+

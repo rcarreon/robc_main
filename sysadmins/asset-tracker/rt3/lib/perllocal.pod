@@ -1,0 +1,44 @@
+=head2 Mon Aug 30 15:16:25 2010: C<Module> L<RT::Authen::ExternalAuth|RT::Authen::ExternalAuth>
+
+=over 4
+
+=item *
+
+C<installed into: /usr/local/lib/rt3/lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.05>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+
+=head2 Fri Mar  9 11:01:12 2012: C<Module> L<RT::Authen::ExternalAuth|RT::Authen::ExternalAuth>
+
+=over 4
+
+=item *
+
+C<installed into: /usr/local/lib/rt3/lib>
+
+=item *
+
+C<LINKTYPE: dynamic>
+
+=item *
+
+C<VERSION: 0.10>
+
+=item *
+
+C<EXE_FILES: >
+
+=back
+

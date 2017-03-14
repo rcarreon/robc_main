@@ -1,0 +1,225 @@
+!RANCID-CONTENT-TYPE: cisco
+!
+!Chassis type: 2811 - a 2811 router
+!
+!Memory: main 196608K/65536K
+!Memory: nvram 239K
+!
+!Processor ID: FTX1212A4GF
+!
+!
+!Image: Software: C2800NM-SPSERVICESK9-M, 12.4(17), RELEASE SOFTWARE (fc1)
+!Image: Compiled: Fri 07-Sep-07 16:46 by prod_rel_team
+!Image: flash:c2800nm-spservicesk9-mz.124-17.bin
+!
+!ROM Bootstrap: Version 12.4(13r)T, RELEASE SOFTWARE (fc1)
+!
+!Flash: -#- --length-- -----date/time------ path
+!Flash: 1         3165 Jun 2 2013 20:40:14 +00:00 backup_config.cfg
+!Flash: 2         2748 Mar 21 2008 23:02:26 +00:00 sdmconfig-2811.cfg
+!Flash: 3      6389760 Mar 21 2008 23:03:00 +00:00 sdm.tar
+!Flash: 4       931840 Mar 21 2008 23:03:16 +00:00 es.tar
+!Flash: 5      1505280 Mar 21 2008 23:03:38 +00:00 common.tar
+!Flash: 6         1038 Mar 21 2008 23:03:54 +00:00 home.shtml
+!Flash: 7       112640 Mar 21 2008 23:04:10 +00:00 home.tar
+!Flash: 8      1697952 Mar 21 2008 23:04:34 +00:00 securedesktop-ios-3.1.1.45-k9.pkg
+!Flash: 9       415956 Mar 21 2008 23:04:54 +00:00 sslclient-win-1.1.4.176.pkg
+!Flash: 10    34371156 Sep 25 2007 11:58:08 +00:00 c2800nm-spservicesk9-mz.124-17.bin
+!Flash: 18567168 bytes available (45449216 bytes used)
+!
+!Flash: nvram: Directory of nvram:/
+!Flash: nvram:   234  -rw-        2509                    <no date>  startup-config
+!Flash: nvram:   235  ----        1947                    <no date>  private-config
+!Flash: nvram:   236  -rw-        2509                    <no date>  underlying-config
+!Flash: nvram:     1  -rw-           0                    <no date>  ifIndex-table
+!Flash: nvram:     2  ----          12                    <no date>  persistent-data
+!Flash: nvram: 245752 bytes total (239196 bytes free)
+!
+!Interface: FastEthernet0/0, MV96340
+!Interface: FastEthernet0/1, MV96340
+!Interface: Serial0/0/0:1, GT96Kidb at 0x454AE5E4, driver data structure at 0x454B5D00
+!Interface: Serial0/0/1:1, GT96Kidb at 0x454B85C8, driver data structure at 0x454BFCE4
+!
+!Slot 0: fru CISCO2811
+!Slot 0: type C2811 Motherboard with 2FE and integrated VPN, 2 ports
+!Slot 0: hvers 1.0 rev A0
+!Slot 0: part 73-10258-05, serial 
+!
+!Slot 0/0: fru VWIC2-2MFT-T1/E1
+!Slot 0/0: type VWIC2-2MFT-T1/E1 - 2-Port RJ-48 Multiflex Trunk - T1/E1
+!Slot 0/0: hvers 0.0 rev B0
+!Slot 0/0: part 800-22629-05, serial FOC120340C2
+!
+!NAME: "2811 chassis",          DESCR: "2811 chassis"
+!PID: CISCO2811
+!VID: V05
+!SN: FTX1212A4GF
+!NAME: "C2811 Chassis Slot 0",  DESCR: "C2811 Chassis Slot"
+!NAME: "c2811 Motherboard with 2FE and integrated VPN", DESCR: "c2811 Motherboard with 2FE and integrated VPN"
+!VID: V05
+!SN: FOC12113GHW
+!NAME: "DaughterCard Slot 0 on Card 0", DESCR: "C2811 DaughterCard Slot"
+!NAME: "VWIC2-2MFT-T1/E1 - 2-Port RJ-48 Multiflex Trunk - T1/E1", DESCR: "VWIC2-2MFT-T1/E1 - 2-Port RJ-48 Multiflex Trunk - T1/E1"
+!PID: VWIC2-2MFT-T1/E1
+!VID: V01
+!SN: FOC120340C2
+!NAME: "DaughterCard Slot 0 on Card 0 on Card 0", DESCR: "C2811 DaughterCard Slot"
+!NAME: "T1 0/0/0",              DESCR: "T1 0/0/0"
+!NAME: "T1 0/0/1",              DESCR: "T1 0/0/1"
+!NAME: "DaughterCard Slot 1 on Card 0", DESCR: "C2811 DaughterCard Slot"
+!NAME: "DaughterCard Slot 2 on Card 0", DESCR: "C2811 DaughterCard Slot"
+!NAME: "DaughterCard Slot 3 on Card 0", DESCR: "C2811 DaughterCard Slot"
+!NAME: "DaughterCard Slot 4 on Card 0", DESCR: "C2811 DaughterCard Slot"
+!NAME: "DaughterCard Slot 5 on Card 0", DESCR: "C2811 DaughterCard Slot"
+!NAME: "AIM Container Slot 0",  DESCR: "AIM Container Slot 0"
+!NAME: "AIM Container Slot 1",  DESCR: "AIM Container Slot 1"
+!NAME: "FastEthernet0/0",       DESCR: "MV96340 Ethernet"
+!NAME: "FastEthernet0/1",       DESCR: "MV96340 Ethernet"
+!NAME: "C2811 Chassis Slot 1",  DESCR: "C2811 Chassis Slot"
+!
+!VTP: VTP Version                     : 2
+!VTP: Configuration Revision          : 0
+!VTP: Maximum VLANs supported locally : 256
+!VTP: Number of existing VLANs        : 5
+!VTP: VTP Operating Mode              : Server
+!VTP: VTP Domain Name                 : 
+!VTP: VTP Pruning Mode                : Disabled
+!VTP: VTP V2 Mode                     : Disabled
+!VTP: VTP Traps Generation            : Disabled
+!VTP: MD5 digest                      : 0xBF 0x86 0x94 0x45 0xFC 0xDF 0xB5 0x70 
+!VTP: Local updater ID is 192.168.6.1 on interface Fa0/0 (first interface found)
+!
+!VLAN: VLAN Name                             Status    Ports
+!VLAN: ---- -------------------------------- --------- -------------------------------
+!VLAN: 1    default                          active    
+!VLAN: 1002 fddi-default                     active    
+!VLAN: 1003 token-ring-default               active    
+!VLAN: 1004 fddinet-default                  active    
+!VLAN: 1005 trnet-default                    active    
+!VLAN: VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+!VLAN: ---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+!VLAN: 1    enet  100001     1500  -      -      -        -    -        1002   1003
+!VLAN: 1002 fddi  101002     1500  -      -      -        -    -        1      1003
+!VLAN: 1003 tr    101003     1500  1005   0      -        -    srb      1      1002
+!VLAN: 1004 fdnet 101004     1500  -      -      1        ibm  -        0      0   
+!VLAN: 1005 trnet 101005     1500  -      -      1        ibm  -        0      0   
+!
+!
+config-register 0x2102
+!
+version 12.4
+service timestamps debug datetime localtime show-timezone
+service timestamps log datetime localtime show-timezone
+service password-encryption
+!
+hostname EVTOMPLS01
+!
+boot-start-marker
+boot-end-marker
+!
+card type t1 0 0
+logging buffered 4096 debugging
+enable secret 5 $1$8vyd$7QsKEtsjx9XqsHBnjDthh0
+!
+aaa new-model
+!
+aaa accounting system default start-stop group AAAlist
+!
+aaa session-id common
+memory-size iomem 25
+no network-clock-participate wic 0 
+no ip source-route
+!
+ip cef
+!
+no ip domain lookup
+ip domain name gorillanation.local
+!
+voice-card 0
+ no dspfarm
+!
+!username cisco password <removed>
+!username rancid password <removed>
+!
+controller T1 0/0/0
+ framing esf
+ linecode b8zs
+ channel-group 1 timeslots 1-24
+!
+controller T1 0/0/1
+ framing esf
+ linecode b8zs
+ channel-group 1 timeslots 1-24
+!
+interface Multilink1
+ description => internet via PaeTec/Global Crossing
+ ip address 162.97.61.22 255.255.255.252
+ no cdp enable
+ ppp multilink
+ ppp multilink group 1
+!
+interface FastEthernet0/0
+ description => Cisco 2811 s/n FTX1212A4GF
+ ip address 192.168.6.1 255.255.255.0
+ duplex auto
+ speed auto
+!
+interface FastEthernet0/1
+ no ip address
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0:1
+ description => PAETEC Circuit ID#
+ no ip address
+ encapsulation ppp
+ ppp multilink
+ ppp multilink group 1
+!
+interface Serial0/0/1:1
+ description => PAETEC Circuit ID#
+ no ip address
+ encapsulation ppp
+ ppp multilink
+ ppp multilink group 1
+!
+ip forward-protocol nd
+ip route 0.0.0.0 0.0.0.0 192.168.6.254
+ip route 10.0.0.0 255.0.0.0 Multilink1
+ip route 63.139.151.26 255.255.255.255 Multilink1
+ip route 64.80.115.0 255.255.255.224 Multilink1
+ip route 64.80.255.220 255.255.255.255 Multilink1
+ip route 64.80.255.247 255.255.255.255 Multilink1
+ip route 64.80.255.253 255.255.255.255 Multilink1
+ip route 74.8.141.64 255.255.255.252 Multilink1
+ip route 192.168.0.0 255.255.0.0 Multilink1
+!
+no ip http server
+no ip http secure-server
+!
+ip access-list standard Cust_SNMP
+ permit 192.168.1.55
+ip access-list standard NOTES
+ remark Modem Number: <MODEM>
+ remark Chassis Serial Number: <SERIALNUM>
+!
+!snmp-server community <removed> RW
+!snmp-server community <removed> RO
+!snmp-server host 192.168.1.178 <removed> 
+!
+control-plane
+!
+banner motd ^CC
+
+This is a private network facility. Unauthorized access is prohibited.
+
+^C
+!
+line con 0
+line aux 0
+line vty 0 4
+ transport input ssh
+!
+scheduler allocate 20000 1000
+!
+end

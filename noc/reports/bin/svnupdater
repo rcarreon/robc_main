@@ -1,0 +1,17 @@
+#!/bin/bash
+
+PROJECT_HOME=/home/svn/project
+STABLE_DIR=$PROJECT_HOME/reports
+TEST_DIR=$PROJECT_HOME/deploy-reports
+HTML_DIR=/app/shared/http/reports
+HTML_TEST_DIR=/var/www/html/deploy-reports
+
+cd $PROJECT_HOME
+svn update
+cp $STABLE_DIR/*php $HTML_DIR/ 2>&1 > /dev/null
+cp $STABLE_DIR/include/* $HTML_DIR/include/ 2>&1 > /dev/null
+cp $STABLE_DIR/images/* $HTML_DIR/images/ 2>&1 > /dev/null
+cp $STABLE_DIR/bin/* $HTML_DIR/bin/ 2>&1 > /dev/null
+cp $TEST_DIR/*php $HTML_TEST_DIR/ 2>&1 > /dev/null
+cp $TEST_DIR/include/* $HTML_TEST_DIR/include/ 2>&1 > /dev/null
+cp $TEST_DIR/images/* $HTML_TEST_DIR/images/ 2>&1 > /dev/null

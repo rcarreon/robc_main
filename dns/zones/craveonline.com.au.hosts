@@ -1,0 +1,18 @@
+$TTL 3600
+craveonline.com.au.     IN      SOA     craveonline.com.au. root.craveonline.com.au. (
+                               2015051100     ; serial
+                               28800          ; refresh
+                               14400          ; retry
+                               3600000        ; expire
+                               86400 )        ; minimum
+
+craveonline.com.au.            IN    NS       app1v-dns.tp.prd.lax.craveonline.com.
+craveonline.com.au.            IN    NS       app2v-dns.tp.prd.lax.craveonline.com.
+craveonline.com.au.            IN    NS       app3v-dns.tp.prd.lax.craveonline.com.
+craveonline.com.au.            IN    NS       app4v-dns.tp.prd.lax.craveonline.com.
+
+craveonline.com.au.            IN    A        97.64.84.172       
+bta.craveonline.com.au.        IN    A        10.64.64.75
+dev.craveonline.com.au.        IN    CNAME    vip-pxy-wp.ao.dev.lax.gnmedia.net.
+stg.craveonline.com.au.        IN    CNAME    stg.pbwordpress.gnmedia.net.
+www.craveonline.com.au.        IN    CNAME    craveonline.com.au.

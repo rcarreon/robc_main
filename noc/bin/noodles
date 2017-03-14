@@ -1,0 +1,36 @@
+#!/usr/bin/env python
+
+import re
+import os
+import sys
+import multiprocessing
+import subprocess
+import itertools
+
+def get_vms(metal):
+    vms = []
+    p = subprocess.Popen(["sudo", "ssh", "-i", "/root/reporter_id_rsa",
+                          "-oStrictHostKeyChecking=no",
+                          "@".join(["reporter", metal]),
+                          "sudo virsh list --all"],
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    out, _ = p.communicate()
+
+    for line in out.split("\n"):
+        m = re.match(r"^\s+(?:\d+|-)\s+(\S+).+$", line)
+        if m:
+            vms += [m.group(1)]
+
+    return vms
+
+def main():
+    # Numbers of hypervisors we have, some aren't functional.
+    hypervisors = 35
+    p = multiprocessing.Pool(hypervisors)
+    vms = list(itertools.chain(*p.map(get_vms, ["metal-" + str(i) + ".lax.gnmedia.net" for i in xrange(1,hypervisors)])))
+    pattern = "^.*" + re.escape(sys.argv[1]).replace("\@", ".+") + ".*$"
+    print("\n".join(sorted(vm for vm in vms if re.match(pattern, vm))))
+
+if __name__ == "__main__":
+    main()

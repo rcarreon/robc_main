@@ -1,0 +1,197 @@
+#!/bin/bash
+#
+# ETL job downloads data from Martini's servers in Amazon and loads it locally
+# vim: set ft=sh ts=2 sw=2 tw=2:
+
+HOST_REMOTE="<%= martini_etl_host_remote %>"
+HOST_LOCAL="<%=  martini_etl_host_local  %>"
+
+USER_REMOTE="<%= martini_etl_user_remote %>"
+USER_LOCAL="<%= martini_etl_user_local %>"
+
+PASSWORD_REMOTE="<%= martini_etl_pass_remote %>"
+PASSWORD_LOCAL="<%= martini_etl_pass_local %>"
+
+# Pulling a date range starting three months back to the end of the current
+# month.
+DATE_FIRST=$(date -d "-3 month -$(($(date +%d)-1)) days" +%Y-%m-%d)
+DATE_LAST=$(date -d "-$(date +%d) days" +%Y-%m-%d)
+
+CSV_DIR=/tmp
+
+SSL_CA=/app/shared/rdscertificate/rds-ca-2015-root.pem
+SSL_OPT=''
+
+if [[ -f ${SSL_CA} ]]; then
+  SSL_OPT="--ssl-ca=${SSL_CA}"
+fi
+
+mysql \
+    ${SSL_OPT} \
+    --host="${HOST_REMOTE}" \
+    --user="${USER_REMOTE}" \
+    --password="${PASSWORD_REMOTE}" \
+    --database=MicroStrategy <<EOS \
+    | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g' > ${CSV_DIR}/reports.csv
+SELECT
+  CONCAT(MONTHNAME(perf_report.Date), YEAR(perf_report.Date)) 'Month',
+  pub.Publisher_Name 'Publisher',
+  pub.ID_Publisher 'Publisher ID',
+  sites.SiteURL 'Site URL',
+  sites.ID_Site 'Site ID',
+  adv.Advertiser_Name 'Advertiser',
+  #cng_name.CNG_Name 'CNG Names',
+  perf_report.CampaignId 'CNG Names',
+  perf_report.Date 'Date',
+  u2.Unit2 AS 'CNG Product',
+  cng_device.Device_Name 'CNG Device',
+  SUM(perf_report.Impressions) 'SitePayout Impressions',
+  #perf_report.CPM 'CPM to Pub',
+  #payment_mapping.CPM_net_to_pub 'CPM to Pub',
+  AVG(camp_plan.CPM) 'CPM to Pub',
+  SUM(camp_plan.CPM * perf_report.Impressions / 1000) 'Site Payout'
+FROM
+  ReportSummaryDB.CampaignPerformanceReport perf_report
+LEFT JOIN
+  MSTR_Sites sites ON perf_report.SiteId = sites.SiteId
+LEFT JOIN
+  MSTR_Publisher_Site_Mapping psm ON psm.ID_Site = sites.ID_Site
+LEFT JOIN
+  MSTR_Publisher_Campaign_Plan camp_plan
+    ON perf_report.CampaignID = camp_plan.CNG_Name
+    AND camp_plan.ID_Site = sites.ID_Site
+LEFT JOIN
+  MSTR_CNG_Mapping cng_mapping ON cng_mapping.ID_CNG = camp_plan.ID_CNG
+LEFT JOIN
+  MSTR_Site_Payment_Mapping payment_mapping
+    ON payment_mapping.ID_Unit2 = cng_mapping.ID_Product
+    AND cng_mapping.ID_Device = payment_mapping.ID_Device
+    AND sites.ID_Site = payment_mapping.ID_Site
+LEFT JOIN
+  MSTR_Publisher pub ON pub.ID_Publisher = psm.ID_Publisher
+LEFT JOIN
+  MSTR_Advertiser adv ON adv.ID_Advertiser = cng_mapping.ID_Advertiser
+LEFT JOIN
+  MSTR_CNG_Name cng_name ON camp_plan.ID_CNG = cng_name.ID_CNG
+LEFT JOIN
+  MSTR_Unit2 u2 ON u2.ID_Unit2 = cng_mapping.ID_Product
+LEFT JOIN
+  MSTR_Device cng_device ON cng_mapping.ID_Device = cng_device.ID_Device
+WHERE
+  perf_report.Date BETWEEN '${DATE_FIRST}' AND '${DATE_LAST}'
+GROUP BY
+  pub.ID_Publisher,
+  sites.SiteURL,
+  adv.Advertiser_Name,
+  perf_report.CampaignId,
+  perf_report.Date,
+  u2.Unit2,
+  cng_device.Device_Name;
+EOS
+
+
+mysql \
+    --host="${HOST_LOCAL}" \
+    --user="${USER_LOCAL}" \
+    --password="${PASSWORD_LOCAL}" \
+    --database=ap_pubops_martini <<EOS
+DELETE FROM reports WHERE date BETWEEN '${DATE_FIRST}' AND '${DATE_LAST}';
+LOAD DATA LOCAL INFILE '${CSV_DIR}/reports.csv' INTO TABLE reports
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(
+  month,
+  publisher_name,
+  publisher_id,
+  url,
+  website_id,
+  advertiser,
+  cng_name,
+  date,
+  product,
+  cng_device,
+  impressions,
+  cpm,
+  site_payout
+);
+EOS
+
+mysql \
+    ${SSL_OPT} \
+    --host="${HOST_REMOTE}" \
+    --user="${USER_REMOTE}" \
+    --password="${PASSWORD_REMOTE}" \
+    --database=MicroStrategy <<EOS \
+    | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g' > ${CSV_DIR}/publishers.csv
+SELECT
+  p.ID_Publisher,
+  p.Publisher_Name,
+  pcd.Contact_email,
+  pcd.Contact_name,
+  pcd.Contact_lasname
+FROM
+  MSTR_Publisher p
+JOIN
+  MSTR_Publisher_contact_details pcd ON p.ID_Publisher = pcd.Publisher_ID
+GROUP BY
+  p.Publisher_Name;
+EOS
+
+mysql \
+    --host="${HOST_LOCAL}" \
+    --user="${USER_LOCAL}" \
+    --password="${PASSWORD_LOCAL}" \
+    --database=ap_pubops_martini <<EOS
+LOAD DATA LOCAL INFILE '${CSV_DIR}/publishers.csv' INTO TABLE publishers
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(
+  id,
+  name,
+  email,
+  contact_firstname,
+  contact_lastname
+);
+EOS
+
+mysql \
+    ${SSL_OPT} \
+    --host="${HOST_REMOTE}" \
+    --user="${USER_REMOTE}" \
+    --password="${PASSWORD_REMOTE}" \
+    --database=MicroStrategy <<EOS \
+    | sed 's/\t/","/g;s/^/"/;s/$/"/;s/\n//g' > ${CSV_DIR}/websites.csv
+SELECT
+  sites.ID_Site,
+  sites_map.ID_Publisher,
+  sites.SiteName,
+  sites.SiteURL
+FROM
+  MSTR_Sites sites
+JOIN
+  MSTR_Publisher_Site_Mapping sites_map ON sites.ID_Site = sites_map.ID_Site
+EOS
+
+mysql \
+    --host="${HOST_LOCAL}" \
+    --user="${USER_LOCAL}" \
+    --password="${PASSWORD_LOCAL}" \
+    --database=ap_pubops_martini <<EOS
+LOAD DATA LOCAL INFILE '${CSV_DIR}/websites.csv' INTO TABLE websites
+FIELDS TERMINATED BY ','
+ENCLOSED BY '"'
+LINES TERMINATED BY '\n'
+IGNORE 1 LINES
+(
+  id,
+  publisher_id,
+  name,
+  url
+);
+EOS
+
+

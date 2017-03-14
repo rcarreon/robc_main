@@ -1,0 +1,12 @@
+#!/bin/sh
+# vim: set ft=sh :
+
+if [ -f /etc/profile.d/spark.sh ]; then
+    . /etc/profile.d/spark.sh
+fi
+# Needed to know the hadoop namespace
+if [ -f /etc/profile.d/hadoop.sh ]; then
+    . /etc/profile.d/hadoop.sh
+fi
+
+/opt/spark/bin/spark-submit --jars /opt/spark/lib/mysql-connector-java.jar /usr/local/bin/analytics.py &>> /app/log/spark/analytics.log

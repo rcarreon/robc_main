@@ -1,0 +1,16 @@
+The source files to edit are rnetapp.in and nfstop.in.
+
+Docs to edit are rnetapp.pod and nfstop.pod.
+
+The buildsystem files to edit are configure.ac, Makefile.am, and rnetapp.spec.in.
+
+Pretty much all other files are generated.
+
+
+When ready to commit, 
+  - bump the version in configure.ac,
+  - add an entry to the top of ChangeLog,
+  - run 'autoreconf -v -f -i',
+  - and 'make distcheck'.
+
+rpmbuild -ta rnetapp-X.X.tar.gz

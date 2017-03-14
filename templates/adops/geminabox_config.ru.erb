@@ -1,0 +1,8 @@
+require 'rubygems'
+require 'geminabox'
+
+Geminabox.build_legacy = false
+Geminabox.rubygems_proxy = true
+Geminabox.allow_remote_failure = true
+Geminabox.data = "<%=geminabox_data_path%>"
+run Geminabox::Server
