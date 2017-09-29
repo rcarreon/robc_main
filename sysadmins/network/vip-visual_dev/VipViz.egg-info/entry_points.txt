@@ -1,5 +1,0 @@
-      [paste.app_factory]
-      main = vipviz:main
-      [console_scripts]
-      populate_VipViz = vipviz.scripts.populate:main
-      

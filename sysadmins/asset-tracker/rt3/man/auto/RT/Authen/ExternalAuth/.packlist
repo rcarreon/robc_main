@@ -1,5 +1,0 @@
-/usr/local/lib/rt3/lib/RT/Authen/ExternalAuth.pm
-/usr/local/lib/rt3/lib/RT/Authen/ExternalAuth/DBI.pm
-/usr/local/lib/rt3/lib/RT/Authen/ExternalAuth/DBI/Cookie.pm
-/usr/local/lib/rt3/lib/RT/Authen/ExternalAuth/LDAP.pm
-/usr/local/lib/rt3/man/man3/RT::Authen::ExternalAuth.3pm

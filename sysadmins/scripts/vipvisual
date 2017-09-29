@@ -1,8 +1,0 @@
-#!/bin/bash
-ssh="/usr/bin/ssh -q -t"
-server="vipvisual.gnmedia.net"
-if [ $# -gt 0 ];then
-    $ssh $server "/app/shared/vipvisual/cli_query.py $@"
-else
-    $ssh $server "/app/shared/vipvisual/cli_query.py"
-fi

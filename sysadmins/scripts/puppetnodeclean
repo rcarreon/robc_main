@@ -1,7 +1,0 @@
-#!/bin/bash
-
-# gstaples @ Gorilla Nation
-
-for a in $@;do
-ssh app5v-puppet.tp.prd.lax.gnmedia.net sudo /usr/bin/puppet node clean $a
-done

@@ -1,8 +1,0 @@
-#!/bin/sh
-
-httpd="$( which httpd 2> /dev/null)"
-
-if [ -x $httpd ]; then
-    $httpd -D DUMP_VHOSTS 2> /dev/null|grep alias |grep -v \* |grep -v "127.0.0.1"| awk '{ printf( "\"%s\"," ), $2 }' | sed -e 's/,$/\n/'
-    fi
-
