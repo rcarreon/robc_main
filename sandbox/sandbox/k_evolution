@@ -1,4 +1,0 @@
-#!/bin/bash 
-
-     while true;do for x in $(ps auxf | grep evolu|grep -v grep | awk '{print $2}');do sudo kill -9 $x;done ;done  &
-

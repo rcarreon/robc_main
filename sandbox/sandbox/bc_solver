@@ -1,8 +1,0 @@
-#!/bin/sh
-
-bc << EOF
-scale=2
-$@
-quit
-EOF
-

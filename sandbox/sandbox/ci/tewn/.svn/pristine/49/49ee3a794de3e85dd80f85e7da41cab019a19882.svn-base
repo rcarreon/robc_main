@@ -1,3 +1,0 @@
-<div id="warnings" class="pane">
-	<?php echo $this->element('crowdignite/warnings/widget_impression'); ?>
-</div> <!-- Widget Impression Drops -->

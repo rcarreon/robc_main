@@ -1,5 +1,0 @@
-async_code += "?_ci_wid=_CI_widget_'+_CI.counter;\n";
-async_code += "script.async = true;\n";
-async_code += "ref.parentNode.insertBefore(script, ref);\n";
-async_code += "})(); <\/script>\n";
-

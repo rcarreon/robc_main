@@ -1,3 +1,0 @@
-#!/bin/bash
-#echo -e "#Added Google dns to avoid megacable's \nnameserver 8.8.8.8 \nnameserver 8.8.4.4" > /etc/resolv.conf
-echo -e "#Added Google dns to avoid megacable's \nnameserver 8.8.8.8 \nnameserver 8.8.4.4" > /var/run/NetworkManager/resolv.conf

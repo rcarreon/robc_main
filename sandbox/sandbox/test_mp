@@ -1,5 +1,0 @@
-#!/bin/bash 
-
-
-echo `ssh xcat.gnmedia.net 'sudo aceman -c gn1@core1 sfarm  VIP-SQLRO-CI.CI.PRD.LAX | awk {'print $3'}'`
-

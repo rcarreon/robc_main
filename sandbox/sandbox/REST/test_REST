@@ -1,8 +1,0 @@
-#!/bin/bash
-#query="Queue = 'Q_NOC' AND  (  Status = 'open' OR Status = 'new' OR Status = 'stalled' OR Status = 'resolved' ) AND Created > '2014-01-01 00:00:00' AND Created <= '2014-01-05 23:59:59' AND Subject NOT LIKE 'ZRM' AND Subject NOT LIKE 'Fwd:' AND Subject NOT LIKE 'Re:'  AND 'CF.{Vertical}' = 'Atomic_Sites'"
-#uname="roberto.carreon"
-#string="https://rt.gorillanation.com/REST/1.0/search/ticket?query='$query'"
-data=$1
-#`curl -s --data 'user=rt_svc_user&pass=FN#27?Pq'  https://rt.gorillanation.com/REST/1.0/search/ticket?query='$query'`
-echo "`curl -s  -c invertory_cookie  --data 'user=rt_svc_user&pass=FN#27?Pq' --output rt_result  https://rt.gorillanation.com/REST/1.0/ticket/$data/show`"
- 

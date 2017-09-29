@@ -1,7 +1,0 @@
-<?php
-
-class SettingsFixture extends CakeTestFixture {
-	var $name = 'settings';
-	var $import = array('model' => 'Setting', 'records' => true);
-}
-

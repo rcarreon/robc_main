@@ -1,7 +1,0 @@
-<?php
-class SimilarEngine extends AppModel {
-
-	var $useTable = false;
-	var $name = 'SimilarEngine';
-}
-?>

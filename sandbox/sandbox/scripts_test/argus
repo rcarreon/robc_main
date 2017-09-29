@@ -1,6 +1,0 @@
-#!/bin/bash
-site=0
-echo "give a site"
-read site
-for x in {1..20};do echo `curl -Is $site | egrep -i http`;done
-echo -e "\n $#"

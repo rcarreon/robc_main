@@ -1,7 +1,0 @@
-#!/bin/bash
-#script:
-#desired output: testing
-k=1
-echo $$k #output: 1
-echo $"$k" #output: $1
-echo \$"$k" #output: $1

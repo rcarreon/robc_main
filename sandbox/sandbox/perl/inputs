@@ -1,7 +1,0 @@
-#!/usr/bin/perl
-
-print "Give me a string to print \n";
-$string = <STDIN>;
-print "$string \n";
-print "Now printing 2nd argument  . $ARGV[0]  \n";
-

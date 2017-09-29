@@ -1,7 +1,0 @@
-<?php
-class WidgetStyle extends AppModel {
-
-	var $name = 'WidgetStyle';
-
-}
-?>

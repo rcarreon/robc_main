@@ -1,8 +1,0 @@
-<?php
-class HistoryTimer extends AppModel {
-
-	var $name = 'HistoryTimer';
-	var $useDbConfig = 'warehouse';
-
-}
-?>

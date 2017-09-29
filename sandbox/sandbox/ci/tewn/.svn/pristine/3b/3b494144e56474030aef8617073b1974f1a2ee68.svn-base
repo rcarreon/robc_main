@@ -1,7 +1,0 @@
-<?php
-class WidgetStylesController extends AppController {
-
-	var $name = 'WidgetStyles';
-	var $scaffold;
-}
-?>

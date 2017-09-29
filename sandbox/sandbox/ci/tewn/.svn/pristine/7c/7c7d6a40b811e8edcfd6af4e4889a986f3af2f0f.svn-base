@@ -1,6 +1,0 @@
-<?php
-    if (!empty($DebugBarRenderer)) {
-        echo $DebugBarRenderer->renderHead();
-        echo $DebugBarRenderer->render();
-    }
-?>

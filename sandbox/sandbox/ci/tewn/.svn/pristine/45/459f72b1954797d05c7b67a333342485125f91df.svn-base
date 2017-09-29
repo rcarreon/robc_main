@@ -1,6 +1,0 @@
-<select class="form-control multiselect" id="<?php echo $component_name ?>" name="<?php echo $component_name ?>" <?php echo $component_data['options']['multiple'] ?>>
-<?php $category_id = $component_data['options']['category_id']; ?>
-<?php foreach ($component_data['list'] as $id => $category_name): ?>
-    <option value="<?php echo $id; ?>" <?php echo in_array($id, $category_id) ? 'selected="selected"' : '' ?>><?php echo $category_name; ?></option>
-<?php endforeach ?>
-</select>

@@ -1,7 +1,0 @@
-#! /bin/bash 
-
-tail -20 < /etc/httpd/conf/httpd.conf  | head -n30 > ./output
-
-exit
-
-

@@ -1,6 +1,0 @@
-<?php
-    $sphinx_config = array(
-        'prd'   => 'spx1v-ci'
-    );
-
-return $sphinx_config[ENVIRONMENT];

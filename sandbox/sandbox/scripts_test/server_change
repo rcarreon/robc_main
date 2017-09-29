@@ -1,7 +1,0 @@
-#!/bin/bash
-
-echo " Server name : "
-read A 
-#cat $A > serverf
-echo `sed 's/\./\_/p' $A > serverf`
-
