@@ -1,0 +1,74 @@
+#!/usr/bin/perl -w
+
+# gstaples @ Gorilla Nation
+
+use strict;
+use IO::Socket;
+use JSON;
+use Data::Dumper;
+my %report;
+
+sub usage() {
+   print "Usage: $0";
+   exit(1);
+}
+
+open(BUSUNITS,"/usr/local/etc/businessunits") or die;
+my  @busunits=(<BUSUNITS>);
+chomp(@busunits);
+close(BUSUNITS);
+
+#my @busunits=qw/
+   #HFBoards
+   #AdPlatform
+   #SBVideo
+   #Momtastic
+   #PebbleBed
+   #TheFashionSpot
+   #CraveOnline
+   #CrowdIgnite
+   #GameRevolution
+   #DoubleHelix
+   #SheKnows
+   #TeenCrunch
+   #TechPlatform
+   #Spare
+   #Sherdog
+   #MyAnimeList/;
+
+my %vmtobo=();
+foreach my $bo (@busunits) {
+   $report{busunit}{$bo}{memory}=0;
+   open(BO,"nodels $bo vm.memory vm.host|") or die;
+   while (my $line=<BO>) {
+      chomp($line);
+      $line=~ m/(.*): (.*) (.*)/;
+      
+      my ($vm,$type,$value)=($1,$2,$3);
+      $report{vm}{$vm}{bo}=$bo;
+      if ($type =~ m/memory/) {
+         $report{vm}{$vm}{memory}=$value;
+         $report{busunit}{$bo}{memory}+=$value;
+      } elsif ($type =~ m/host/) {
+         $report{vm}{$vm}{host}=$value;
+      }
+   }
+   close(BO);
+}
+
+#print Dumper(\%report);
+
+print "<html><head><link rel=\"stylesheet\" href=\"report.css\" type=\"text/css\" media=\"all\" /></head><body>\n";
+print "<table><tr><td>BusinessUnit</td><td>Memory</td></tr>\n";
+foreach my $bo (sort keys %{$report{busunit}}) {
+   print "<tr><td>$bo</td><td>",$report{busunit}{$bo}{memory},"</td></tr>\n";
+}
+print "</tr></table>\n";
+print "\n";
+print "<table><tr><td>Name</td><td>BusinessUnit</td><td>Memory</td></tr>\n";
+foreach my $vm (sort keys %{$report{vm}}) {
+   print "<tr><td>$vm</td><td>",$report{vm}{$vm}{bo},"</td><td>",$report{vm}{$vm}{memory},"</td></tr>\n";
+}
+print "</tr></table>\n";
+print "</body></html>\n";
+

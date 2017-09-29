@@ -1,0 +1,220 @@
+!RANCID-CONTENT-TYPE: cisco
+!
+!Chassis type: 3845 - a 3800 router
+!
+!Memory: main 196608K/65536K
+!Memory: nvram 479K
+!
+!Processor ID: FTX1118A4X8
+!
+!
+!Image: Software: C3845-IPBASEK9-M, 12.4(4)T8, RELEASE SOFTWARE (fc3)
+!Image: Compiled: Fri 10-Aug-07 20:26 by khuie
+!Image: flash:c3845-ipbasek9-mz.124-4.T8.bin
+!
+!ROM Bootstrap: Version 12.4(13r)T, RELEASE SOFTWARE (fc1)
+!
+!Flash: -#- --length-- -----date/time------ path
+!Flash: 1         7821 Sep 23 2010 22:27:44 +00:00 bkcnf_20100923_0527PM
+!Flash: 2         1826 May 4 2007 20:52:34 +00:00 sdmconfig-38xx.cfg
+!Flash: 3      4734464 May 4 2007 20:53:02 +00:00 sdm.tar
+!Flash: 4       833024 May 4 2007 20:53:16 +00:00 es.tar
+!Flash: 5      1052160 May 4 2007 20:53:30 +00:00 common.tar
+!Flash: 6         1038 May 4 2007 20:53:44 +00:00 home.shtml
+!Flash: 7       102400 May 4 2007 20:53:56 +00:00 home.tar
+!Flash: 8       714850 May 4 2007 20:54:14 +00:00 256MB.sdf
+!Flash: 9      1684577 May 4 2007 20:54:34 +00:00 securedesktop-ios-3.1.1.27-k9.pkg
+!Flash: 10      398305 May 4 2007 20:54:52 +00:00 sslclient-win-1.1.0.154.pkg
+!Flash: 11      197007 Jan 2 2014 23:00:44 +00:00 crashinfo_20140102-230044
+!Flash: 12    19033368 Apr 25 2008 00:13:30 +00:00 c3845-ipbasek9-mz.124-4.T8.bin
+!Flash: 35229696 bytes available (28782592 bytes used)
+!
+!Flash: nvram: Directory of nvram:/
+!Flash: nvram:   474  -rw-        3063                    <no date>  startup-config
+!Flash: nvram:   475  ----        1950                    <no date>  private-config
+!Flash: nvram:   476  -rw-        3063                    <no date>  underlying-config
+!Flash: nvram:     1  ----           4                    <no date>  rf_cold_starts
+!Flash: nvram:     2  -rw-           0                    <no date>  ifIndex-table
+!Flash: nvram:     3  ----          12                    <no date>  persistent-data
+!Flash: nvram: 491512 bytes total (483375 bytes free)
+!
+!Interface: GigabitEthernet0/0, BCM1125 Internal MAC (Revision )
+!Interface: GigabitEthernet0/1, BCM1125 Internal MAC (Revision )
+!Slot : fru CISCO3845
+!Slot : hvers 1.0 rev B0
+!Slot : part 73-8639-04, serial FOC11162MD9
+!
+!Slot 0: fru CISCO3845-MB
+!Slot 0: type C3845 Mother board 1GETX,SFP,1GETX, integrated VPN and 4W, 2 ports
+!Slot 0: hvers 1.3 rev B0
+!Slot 0: part 73-8799-08, serial 
+!
+!Slot 1: fru NM-1T3/E3
+!Slot 1: type NM-1T3/E3 clear/subrate, 1 ports
+!Slot 1: hvers 1.0 rev B0
+!Slot 1: part 800-19180-03, serial FOC11172AB8
+!
+!NAME: "3845 chassis",          DESCR: "3845 chassis"
+!PID: CISCO3845
+!VID: V01
+!SN: FTX1118A4X8
+!NAME: "C3845 Chassis Slot 0",  DESCR: "C3845 Chassis Slot"
+!NAME: "c3845 Motherboard with Gigabit Ethernet on Slot 0", DESCR: "c3845 Motherboard with Gigabit Ethernet"
+!PID: CISCO3845-MB
+!VID: V05
+!SN: FOC11162KZC
+!NAME: "DaughterCard Slot 0 on Card 0", DESCR: "C3845 DaughterCard Slot"
+!NAME: "SBETH-1GE SFP Container", DESCR: "SBETH-1GE SFP Container"
+!NAME: "DaughterCard Slot 1 on Card 0", DESCR: "C3845 DaughterCard Slot"
+!NAME: "DaughterCard Slot 2 on Card 0", DESCR: "C3845 DaughterCard Slot"
+!NAME: "DaughterCard Slot 3 on Card 0", DESCR: "C3845 DaughterCard Slot"
+!NAME: "DaughterCard Slot 4 on Card 0", DESCR: "C3845 DaughterCard Slot"
+!NAME: "DaughterCard Slot 5 on Card 0", DESCR: "C3845 DaughterCard Slot"
+!NAME: "DaughterCard Slot 6 on Card 0", DESCR: "C3845 DaughterCard Slot"
+!NAME: "DaughterCard Slot 7 on Card 0", DESCR: "C3845 DaughterCard Slot"
+!NAME: "AIM Container Slot 0",  DESCR: "AIM Container Slot 0"
+!NAME: "AIM Container Slot 1",  DESCR: "AIM Container Slot 1"
+!NAME: "GigabitEthernet0/0",    DESCR: "BCM1125 Internal MAC"
+!NAME: "GigabitEthernet0/1",    DESCR: "BCM1125 Internal MAC"
+!NAME: "C3845 Chassis Slot 1",  DESCR: "C3845 Chassis Slot"
+!NAME: "Clear/Subrate T3/E3 WAN on Slot 1", DESCR: "Clear/Subrate T3/E3 WAN"
+!PID: NM-1T3/E3
+!VID: V01
+!SN: FOC11172AB8
+!NAME: "C3845 Chassis Slot 2",  DESCR: "C3845 Chassis Slot"
+!NAME: "C3845 Chassis Slot 3",  DESCR: "C3845 Chassis Slot"
+!NAME: "C3845 Chassis Slot 4",  DESCR: "C3845 Chassis Slot"
+!
+!VTP: VTP Version                     : 2
+!VTP: Configuration Revision          : 0
+!VTP: Maximum VLANs supported locally : 64
+!VTP: Number of existing VLANs        : 5
+!VTP: VTP Operating Mode              : Server
+!VTP: VTP Domain Name                 : 
+!VTP: VTP Pruning Mode                : Disabled
+!VTP: VTP V2 Mode                     : Disabled
+!VTP: VTP Traps Generation            : Disabled
+!VTP: MD5 digest                      : 0xBF 0x86 0x94 0x45 0xFC 0xDF 0xB5 0x70 
+!VTP: Local updater ID is 72.172.79.66 on interface Gi0/0 (first interface found)
+!
+!VLAN: VLAN Name                             Status    Ports
+!VLAN: ---- -------------------------------- --------- -------------------------------
+!VLAN: 1    default                          active    
+!VLAN: 1002 fddi-default                     active    
+!VLAN: 1003 token-ring-default               active    
+!VLAN: 1004 fddinet-default                  active    
+!VLAN: 1005 trnet-default                    active    
+!VLAN: VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+!VLAN: ---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+!VLAN: 1    enet  100001     1500  -      -      -        -    -        1002   1003
+!VLAN: 1002 fddi  101002     1500  -      -      -        -    -        1      1003
+!VLAN: 1003 tr    101003     1500  1005   0      -        -    srb      1      1002
+!VLAN: 1004 fdnet 101004     1500  -      -      1        ibm  -        0      0   
+!VLAN: 1005 trnet 101005     1500  -      -      1        ibm  -        0      0   
+!
+!
+config-register 0x2102
+!
+version 12.4
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname MAL_Router
+!
+boot-start-marker
+boot-end-marker
+!
+!card type command needed for slot 1
+logging buffered 4096 informational
+no logging console
+enable secret 5 $1$I37J$Kao/wwZUvfxqzbVYwc4JW/
+!
+aaa new-model
+!
+aaa session-id common
+!
+resource policy
+!
+memory-size iomem 25
+ip subnet-zero
+ip cef
+!
+ip domain name swx1.mal.gnmedia.net
+!
+username admin secret 5 $1$HNr7$Gl2K.YQpRbPgIUYwOGODO1
+username rancid secret 5 $1$4fkk$g0MzzQ97dhAqviB0wmxFc/
+!
+interface GigabitEthernet0/0
+ ip address 72.172.79.66 255.255.255.192
+ ip access-group 2016 in
+ ip flow ingress
+ ip nat outside
+ duplex auto
+ speed auto
+ media-type rj45
+ negotiation auto
+!
+interface GigabitEthernet0/1
+ ip address 10.2.11.240 255.255.255.0
+ ip flow ingress
+ ip nat inside
+ duplex auto
+ speed auto
+ media-type rj45
+ negotiation auto
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 72.172.79.65
+ip route 10.11.20.0 255.255.254.0 10.2.11.1
+ip route 10.11.34.0 255.255.254.0 10.2.11.1
+ip route 10.11.134.0 255.255.254.0 10.2.11.1
+ip route 10.12.22.0 255.255.254.0 10.2.11.1
+ip route 10.12.34.0 255.255.254.0 10.2.11.1
+ip route 10.12.134.0 255.255.254.0 10.2.11.1
+ip flow-export source GigabitEthernet0/1
+ip flow-export version 5
+ip flow-export destination 10.11.20.26 2055
+!
+no ip http server
+no ip http secure-server
+ip nat translation tcp-timeout 300
+ip nat translation udp-timeout 20
+ip nat inside source list 1 interface GigabitEthernet0/0 overload
+ip nat inside source static tcp 10.2.11.100 80 72.172.79.67 80 extendable
+ip nat inside source static tcp 10.2.11.101 80 72.172.79.68 80 extendable
+!
+access-list 1 permit 10.2.11.0 0.0.0.255
+access-list 2014 deny   tcp any 72.172.79.64 0.0.0.63 eq telnet
+access-list 2014 deny   tcp any 72.172.79.64 0.0.0.63 eq 22
+access-list 2014 permit ip any any
+access-list 2016 remark Anti-bogon ACL and Incapsula White List
+access-list 2016 permit ip 199.83.128.0 0.0.7.255 host 72.172.79.68
+access-list 2016 permit ip 198.143.32.0 0.0.31.255 host 72.172.79.68
+access-list 2016 permit ip 149.126.72.0 0.0.7.255 host 72.172.79.68
+access-list 2016 permit ip 103.28.248.0 0.0.3.255 host 72.172.79.68
+access-list 2016 permit ip 185.11.124.0 0.0.3.255 host 72.172.79.68
+access-list 2016 permit ip 192.230.64.0 0.0.63.255 host 72.172.79.68
+access-list 2016 permit ip host 63.139.86.3 host 72.172.79.68
+access-list 2016 permit ip host 63.139.86.3 host 72.172.79.67
+access-list 2016 permit ip host 187.216.89.242 host 72.172.79.68
+access-list 2016 permit ip host 187.216.89.242 host 72.172.79.67
+access-list 2016 deny   ip any host 72.172.79.68
+access-list 2016 deny   ip any host 72.172.79.67
+access-list 2016 deny   tcp any 72.172.79.64 0.0.0.63 eq telnet
+access-list 2016 deny   tcp any 72.172.79.64 0.0.0.63 eq 22
+access-list 2016 permit ip any any
+!snmp-server community <removed> RO
+!
+control-plane
+!
+line con 0
+ stopbits 1
+line aux 0
+ stopbits 1
+line vty 0 4
+ transport input ssh
+!
+scheduler allocate 20000 1000
+!
+end

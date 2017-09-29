@@ -1,0 +1,205 @@
+#!/bin/bash
+
+
+set -o noglob
+if test -z "$USER" ;then
+  echo "USER not set" 1>&2
+  exit 1
+fi
+usage="Usage: $0 group [-c [-p \"regex pattern\"] | -d | -l]  (-c create [-p for regex pattern], -d delete, -l list)"
+if [[ $# < 2 ]]
+    then
+        echo "$usage"
+        exit 1;
+fi
+
+case "$1" in
+  -*) echo "$usage"; exit 1;;
+esac
+
+
+group=$1;shift
+
+cset=0
+dset=0
+lset=0
+pset=0
+patterns=("objectClass: extensibleObject")
+
+# Use getopts to get remaining arguments, and set flags for later processing.
+while getopts ":cdlp:" opt; do
+    case $opt in
+        c)
+        cset=1
+        ;;
+        d)
+        dset=1
+        ;;
+        l)
+        lset=1
+        ;;
+        p)
+        pset=1
+        # Since -p can be called multiple times, push any patterns found into an array.
+        patterns=("${patterns[@]}" "gnHostAccessPattern: $OPTARG")
+        ;;
+        \?)
+        echo "ERROR: Invalid option: -$OPTARG" >&2
+        echo "$usage"
+        exit 1;
+        ;;
+        :)
+        echo "ERROR: Option -$OPTARG requires an argument." >&2
+        echo "$usage"
+        exit 1
+        ;;
+
+    esac
+done
+
+
+
+# Error on improper combinations of switches.
+
+if [[ $cset > 0 ]] && [[ $dset > 0 ]]
+then
+    echo "ERROR: Both the  create (-c) and delete (-d) switches were specified."
+    echo "$usage"
+    exit 1;
+fi
+
+if [[ $cset > 0 ]] && [[ $lset >0 ]]
+then
+    echo "ERROR: Both create (-c) and list (-l) switches were specified."
+    echo "$usage"
+    exit 1;
+fi
+
+if [[ $dset > 0 ]] && [[ $lset > 0 ]]
+then
+    echo "ERROR: Both delete (-d) and list (-l) switches were specified."
+    echo "$usage"
+    exit 1;
+fi
+
+if [[ $pset > 0 ]] && [[ $cset < 1 ]]
+then
+    echo "ERROR: Please specify the create flag -c if specifying a host pattern with -p"    
+    echo "$usage" 
+    exit 1;
+fi
+
+
+# Set the mode of action. 
+if [[ $cset = 1 ]]
+then
+    mode=create;
+fi
+
+if [[ $dset = 1 ]]
+then
+    mode=delete;
+fi
+
+if [[ $lset = 1 ]]
+then
+    mode=list
+fi
+
+
+host=ldap.gnmedia.net
+#host=app1v-ldap.tp.dev.lax.gnmedia.net
+baseuserdn="ou=People,dc=gnmedia,dc=net"
+basegroupdn="ou=Groups,dc=gnmedia,dc=net"
+binddn="uid=$USER,$baseuserdn"
+
+echo -n "($binddn)'s LDAP password: "
+stty -echo
+read password
+stty echo
+echo
+
+ldapargs="-D $binddn -h $host"
+openldapargs="-w $password -x $ldapargs"
+
+testlist=$(ldapsearch $openldapargs -LLL -b $basegroupdn "(cn=$group)" cn)
+if [ $? != 0 ];then
+   exit 1
+fi
+
+
+case $mode in
+   list)
+   # A special shortcut group name to see all groups with host access patterns on them.
+   if [ "$group" == "hostaccess" ]
+        then 
+           ldapsearch $openldapargs -b $basegroupdn  "(&(objectclass=groupOfUniqueNames)(gnHostAccessPattern=*))" memberUid gnHostAccessPattern | perl -p00e "s/\r?\n //g";
+   else
+      echo "$testlist"
+      gidNumber=$(ldapsearch $openldapargs -b $basegroupdn  "(cn=$group)" gidNumber | grep ^gidNumber | awk '{print $2}' | sort -n | tail -1)
+      echo "Primary group members: "
+      ldapsearch $openldapargs -LLL -b $baseuserdn "(gidNumber=$gidNumber)" uid | grep ^uid || echo '(none)'
+      echo "Secondary group members: "
+      ldapsearch $openldapargs -LLL -b $basegroupdn "(cn=$group)" uniqueMember memberUid gnHostAccessPattern | perl -p00e "s/\r?\n //g"
+   fi  
+      ;;
+       
+   create)
+      if [ -n "$testlist" ];then
+          echo "Group $group already exists."; exit;
+      fi
+      nextgid=$(ldapsearch $openldapargs -b $basegroupdn '(&(gidNumber>=20000)(gidNumber<=29999))' gidNumber | grep ^gidNumber | awk '{print $2}' | sort -n | tail -1)
+      nextgid=$((nextgid+1))
+      template="dn: cn=GROUP,ou=Groups,dc=gnmedia,dc=net
+gidNumber: GID
+objectClass: top
+objectClass: groupofuniquenames
+objectClass: posixgroup
+"
+      # Get the pattern list out of the array
+      pats=$( IFS=$'\n'; echo "${patterns[*]}" )
+
+      # Send changes to LDAP
+      if [[ $cset > 0 ]] && [[ $pset > 0 ]]
+      then
+
+          echo "$template""$pats" | sed \
+                         -e s/GID/$nextgid/ \
+                         -e s/GROUP/$group/ | \
+                         ldapadd $openldapargs
+
+      else
+          echo "$template" | sed \
+                         -e s/GID/$nextgid/ \
+                         -e s/GROUP/$group/ | \
+                         ldapadd $openldapargs
+      fi
+      ;;
+   delete)
+      if [ -z "$testlist" ];then
+         echo "Group $group does not exist."; exit;
+      fi
+      gidNumber=$(echo "$testlist" | grep ^gidNumber | awk '{print $2}')
+      
+      members=$(ldapsearch $openldapargs -LLL -b $basegroupdn "(cn=$group)" uniqueMember memberUid | grep ^uniqueMember | awk '{print $2}')
+      if [ -n "$members" ] ;then
+         echo "Will not delete group $group."
+         echo "Group $group has members: $members"
+         exit
+      fi
+         
+      if [ -n "$gidNumber" ];then
+         usernames=$(ldapsearch $openldapargs -LLL -b $baseuserdn "(gidNumber=$gidNumber)" uid | grep ^uid)
+         if [ -n "$usernames" ];then
+            echo "Will not delete group $group."
+            echo "Group $group is the primary group for these user(s): $usernames"
+            exit
+         fi
+      fi
+
+      ldapdelete $openldapargs cn=$group,$basegroupdn
+      ;;
+esac
+      
+
+

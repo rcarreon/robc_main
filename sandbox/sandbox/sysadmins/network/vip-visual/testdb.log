@@ -1,0 +1,752 @@
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP1V-STATS-CMS.sb.dev 529
+IP 10.2.50.121
+Serverfarm ---- 506 APP1V-STATS-CMS.sb.dev 1 host
+RSERVER ---- 473 APP1V-STATS-CMS.sb.dev.LAX3 1 10.30.30.20
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_ASSETS_SI 530
+IP 10.2.50.79
+Serverfarm ---- 507 APP_ASSETS_SI_LAX1 1 host
+RSERVER ---- 474 APP1V_ASSETS_SI_LAX1 1 10.10.30.207 app1v-asset.si.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_DEMO_SI 531
+IP 10.2.50.81
+Serverfarm ---- 509 APP_DEMO_SI_LAX1 1 
+RSERVER ---- 476 APP1V_DEMO_SI_LAX1 1 10.10.30.205 app1v-demo.si.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_INV 532
+IP 10.2.50.109
+Serverfarm ---- 503 APP-INV 1 
+RSERVER ---- 468 APP-INV.LAX2 1 10.20.30.147 app-inv.lax2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 255 APP-INV.LAX2 None 
+---- RSERVER ---- 242 APP2V-INV.LAX2 1 10.20.30.146 app2v-inv.lax2
+---- RSERVER ---- 233 APP1V-INV.LAX2 1 10.20.30.145 app1v-inv.lax2
+RSERVER ---- 467 APP-INV.LAX1 None 10.10.30.147 app-inv.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 63 APP-INV.LAX1 None 
+---- RSERVER ---- 44 APP2V-INV.LAX1 1 10.10.30.146 app2v-inv.lax1
+---- RSERVER ---- 34 APP1V-INV.LAX1 1 10.10.30.145 app1v-inv.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_PUPPET 533
+IP 10.2.50.112
+Serverfarm ---- 504 APP-PUPPET 1 
+RSERVER ---- 470 APP-PUPPET.LAX2 1 10.20.30.162 vip.app-puppet.lax2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 256 APP-PUPPET.LAX2 None 
+---- RSERVER ---- 243 APP2V-PUPPET.LAX2 1 10.20.30.149 app2v-puppet.lax2
+---- RSERVER ---- 234 APP1V-PUPPET.LAX2 1 10.20.30.148 app1v-puppet.lax2
+RSERVER ---- 469 APP-PUPPET.LAX1 None 10.10.30.162 vip.app-puppet.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 64 APP-PUPPET.LAX1 None 
+---- RSERVER ---- 45 APP2V-PUPPET.LAX1 1 10.10.30.149 app2v-puppet.lax1
+---- RSERVER ---- 35 APP1V-PUPPET.LAX1 1 10.10.30.148 app1v-puppet.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_SORRY 534
+IP 10.2.50.116
+Serverfarm ---- 505 APP-SORRY 1 
+RSERVER ---- 472 APP-SORRY.TP.LAX2.GNMEDIA.NET 1 10.20.30.202
+RSERVER ---- 471 APP-SORRY.TP.LAX1.GNMEDIA.NET 1 10.10.30.220
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PHP_LAX 535
+IP 10.2.50.89
+Serverfarm ---- 511 PHP_LAX 1 
+RSERVER ---- 479 PHP_LAX2 1 10.2.10.218 php.lax2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 220 PHP1_LAX2 None 
+---- RSERVER ---- 206 APP4V-PHP1_LAX2 0 10.20.30.163
+---- RSERVER ---- 204 APP2V-PHP1_LAX2 1 10.20.30.161 app2v.lax2
+---- RSERVER ---- 202 APP1V-PHP1_LAX2 1 10.20.30.160 app1v.lax2
+---- RSERVER ---- 205 APP3V-PHP1_LAX2 0 10.20.30.162 vip.app-puppet.lax2
+RSERVER ---- 478 PHP_LAX1 None 10.2.10.245 php.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 19 PHP1_LAX1 None 
+---- RSERVER ---- 3 APP2V-PHP1_LAX1 1 10.10.30.161 app2v.lax1
+---- RSERVER ---- 5 APP4V-PHP1_LAX1 0 10.10.30.163
+---- RSERVER ---- 1 APP1V-PHP1_LAX1 1 10.10.30.160 app1v.lax1
+---- RSERVER ---- 4 APP3V-PHP1_LAX1 0 10.10.30.162 vip.app-puppet.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_LAX 536
+IP 10.2.50.44
+Serverfarm ---- 512 PXY1_LAX 1 
+RSERVER ---- 481 PXY1_LAX2 1 10.2.10.249 pxy1v.lax2
+RSERVER ---- 480 PXY1_LAX1 1 10.2.10.240 pxy1v.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_STG 537
+IP 10.2.50.40
+Serverfarm ---- 513 PXY1_STG 1 
+RSERVER ---- 483 PXY1_STG2 1 10.2.10.42 pxy1v.stg2
+RSERVER ---- 482 PXY1_STG1 1 10.2.10.41 pxy1v.stg1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SQLRO_CMS-WUO_LAX 538
+IP 10.2.50.100
+Serverfarm ---- 527 SQL_CMS-WUO_LAX_RO 1 
+RSERVER ---- 487 SQL1_CMS-WUO_LAX2 1 10.20.30.27
+RSERVER ---- 486 SQL1_CMS-WUO_LAX1 0 10.10.30.26
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SQLRO_CMS-WUO_STG 539
+IP 10.2.50.98
+Serverfarm ---- 524 SQL2_CMS-WUO_STG_RO 1 
+RSERVER ---- 489 SQL1_CMS-WUO_STG2 1 10.20.11.27
+RSERVER ---- 497 SQL2_CMS-WUO_STG2 0 10.20.11.28
+RSERVER ---- 496 SQL2_CMS-WUO_STG1 0 10.10.11.28
+RSERVER ---- 488 SQL1_CMS-WUO_STG1 1 10.10.11.27
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SQLRO_REP_WUO_LAX 540
+IP 10.2.50.122
+Serverfarm ---- 525 SQL2_REP_WUO_LAX_RO 1 
+RSERVER ---- 498 SQL2_REP_WUO_LAX2 1 10.20.30.30
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SQLRO_WP_WUO_LAX 541
+IP 10.2.50.106
+Serverfarm ---- 518 SQL1_WP_WUO_LAX_RO 1 
+RSERVER ---- 491 SQL1_WP_WUO_LAX2 1 10.20.30.29 vip-sqlrw.wp-wuo.lax2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 267 SQL1_WP_WUO_LAX2_RW None 
+---- RSERVER ---- 252 SQL1_WP_WUO_LAX2 1 10.20.40.71 sql1v-wp.wuo.lax2
+RSERVER ---- 490 SQL1_WP_WUO_LAX1 None 10.10.30.29 vip-sqlrw.wp-wuo.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 79 SQL1_WP_WUO_LAX1_RW None 
+---- RSERVER ---- 58 SQL1_WP_WUO_LAX1 1 10.10.40.74 sql1v-wp.wuo.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SQLRO_WP_WUO_STG 542
+IP 10.2.50.105
+Serverfarm ---- 520 SQL1_WP_WUO_STG_RO 1 
+RSERVER ---- 493 SQL1_WP_WUO_STG2 1 10.20.11.29 vip-sqlrw.wp-wuo.stg2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 377 SQL1_WP_WUO_STG2 None 
+---- RSERVER ---- 370 SQL1_WP_WUO_STG2 1 10.20.41.71 sql1v-wp.wuo.stg2
+RSERVER ---- 492 SQL1_WP_WUO_STG1 None 10.10.11.29 vip-sqlrw.wp-wuo.stg1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 190 SQL1_WP_WUO_STG1 None 
+---- RSERVER ---- 183 SQL1_WP_WUO_STG1 1 10.10.41.71 sql1v-wp.wuo.stg1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SQLRO_WUO_STG 543
+IP 10.2.50.94
+Serverfarm ---- 523 SQL1_WUO_STG_RO 1 
+RSERVER ---- 495 SQL1_WUO_STG2 1 10.20.11.26
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SQLRW_CMS-WUO_LAX 544
+IP 10.2.50.99
+Serverfarm ---- 528 SQL_CMS-WUO_LAX_RW 1 
+RSERVER ---- 487 SQL1_CMS-WUO_LAX2 0 10.20.30.27
+RSERVER ---- 486 SQL1_CMS-WUO_LAX1 1 10.10.30.26
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SQLRW_CMS-WUO_STG 545
+IP 10.2.50.97
+Serverfarm ---- 517 SQL1_CMS-WUO_STG_RW 1 
+RSERVER ---- 489 SQL1_CMS-WUO_STG2 0 10.20.11.27
+RSERVER ---- 488 SQL1_CMS-WUO_STG1 1 10.10.11.27
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SQLRW_REP_WUO_LAX 546
+IP 10.2.50.123
+Serverfarm ---- 526 SQL2_REP_WUO_LAX_RW 1 
+RSERVER ---- 498 SQL2_REP_WUO_LAX2 0 10.20.30.30
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SQLRW_WP_WUO_LAX 547
+IP 10.2.50.104
+Serverfarm ---- 519 SQL1_WP_WUO_LAX_RW 1 
+RSERVER ---- 491 SQL1_WP_WUO_LAX2 0 10.20.30.29 vip-sqlrw.wp-wuo.lax2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 267 SQL1_WP_WUO_LAX2_RW None 
+---- RSERVER ---- 252 SQL1_WP_WUO_LAX2 1 10.20.40.71 sql1v-wp.wuo.lax2
+RSERVER ---- 490 SQL1_WP_WUO_LAX1 None 10.10.30.29 vip-sqlrw.wp-wuo.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 79 SQL1_WP_WUO_LAX1_RW None 
+---- RSERVER ---- 58 SQL1_WP_WUO_LAX1 1 10.10.40.74 sql1v-wp.wuo.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SQLRW_WP_WUO_STG 548
+IP 10.2.50.101
+Serverfarm ---- 521 SQL1_WP_WUO_STG_RW 1 
+RSERVER ---- 493 SQL1_WP_WUO_STG2 0 10.20.11.29 vip-sqlrw.wp-wuo.stg2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 377 SQL1_WP_WUO_STG2 None 
+---- RSERVER ---- 370 SQL1_WP_WUO_STG2 1 10.20.41.71 sql1v-wp.wuo.stg2
+RSERVER ---- 492 SQL1_WP_WUO_STG1 None 10.10.11.29 vip-sqlrw.wp-wuo.stg1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 190 SQL1_WP_WUO_STG1 None 
+---- RSERVER ---- 183 SQL1_WP_WUO_STG1 1 10.10.41.71 sql1v-wp.wuo.stg1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SQLRW_WUO_STG 549
+IP 10.2.50.93
+Serverfarm ---- 522 SQL1_WUO_STG 1 
+RSERVER ---- 495 SQL1_WUO_STG2 0 10.20.11.26
+RSERVER ---- 494 SQL1_WUO_STG1 1 10.10.11.26
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SQL_INV_RO 550
+IP 10.2.50.111
+Serverfarm ---- 514 SQL-INV.RO 1 
+RSERVER ---- 500 SQLRO-INV.LAX2 1 10.20.40.46 sqlro-inv.lax2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 270 SQLRO-INV.LAX2 None 
+---- RSERVER ---- 248 SQL1V-INV.LAX2 1 10.20.40.145 sql1v-inv.lax2
+RSERVER ---- 499 SQLRO-INV.LAX1 None 10.10.40.46 sqlro-inv.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 80 SQLRO-INV.LAX1 None 
+---- RSERVER ---- 54 SQL1V-INV.LAX1 1 10.10.40.145 sql1v-inv.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SQL_INV_RW 551
+IP 10.2.50.110
+Serverfarm ---- 515 SQL-INV.RW 1 
+RSERVER ---- 502 SQLRW-INV.LAX2 0 10.20.40.45 sqlrw-inv.lax2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 271 SQLRW-INV.LAX2 None 
+---- RSERVER ---- 248 SQL1V-INV.LAX2 1 10.20.40.145 sql1v-inv.lax2
+RSERVER ---- 501 SQLRW-INV.LAX1 None 10.10.40.45 sqlrw-inv.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 81 SQLRW-INV.LAX1 None 
+---- RSERVER ---- 54 SQL1V-INV.LAX1 1 10.10.40.145 sql1v-inv.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SQL_PUPPET 552
+IP 10.2.50.113
+Serverfarm ---- 516 SQL-PUPPET 1 
+RSERVER ---- 485 SQL-PUPPET.LAX2 1 10.20.40.44 vip.sql-puppet.lax2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 264 SQL-PUPPET.LAX2 None 
+---- RSERVER ---- 249 SQL1V-PUPPET.LAX2 1 10.20.40.146 sql1v-puppet.lax2
+RSERVER ---- 484 SQL-PUPPET.LAX1 None 10.10.40.44 vip.sql-puppet.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 74 SQL-PUPPET.LAX1 None 
+---- RSERVER ---- 55 SQL1V-PUPPET.LAX1 1 10.10.40.146 sql1v-puppet.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_CONNECT_WUO_LAX 584
+IP 10.2.50.115
+Serverfarm ---- 575 APP_CONNECT_WUO_LAX 1 
+RSERVER ---- 560 APP_CONNECT_WUO_LAX2 1 10.20.10.32 vip-connect.wuo.lax2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 260 APP_CONNECT_WUO_LAX2 None 
+---- RSERVER ---- 237 APP1V_CONNECT_WUO_LAX2 1 10.20.30.136 app1v-connect.wuo.lax2
+RSERVER ---- 559 APP_CONNECT_WUO_LAX1 None 10.10.10.32 vip-connect.wuo.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 68 APP_CONNECT_WUO_LAX1 None 
+---- RSERVER ---- 39 APP1V_CONNECT_WUO_LAX1 1 10.10.30.136 app1v-connect.wuo.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_FAB_WUO_LAX 585
+IP 10.2.50.108
+Serverfarm ---- 576 APP_FAB_WUO_LAX 1 
+RSERVER ---- 562 APP_FAB_WUO_LAX2 1 10.20.10.31 vip-fab.wuo.lax2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 261 APP_FAB_WUO_LAX2 None 
+---- RSERVER ---- 238 APP1V_FAB_WUO_LAX2 1 10.20.30.135 app1v-fab.wuo.lax2
+RSERVER ---- 561 APP_FAB_WUO_LAX1 None 10.10.10.31 vip-fab.wuo.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 69 APP_FAB_WUO_LAX1 None 
+---- RSERVER ---- 40 APP1V_FAB_WUO_LAX1 1 10.10.30.135 app1v-fab.wuo.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_SK 586
+IP 10.2.50.78
+Serverfarm ---- 577 APP_SK 1 
+RSERVER ---- 558 APP1_SK_LAX2 1 10.20.10.25 vip-sk.wuo.lax2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 262 APP_SK None 
+---- RSERVER ---- 245 APP2V_SK 1 10.20.30.70 app2v-sk.wuo.lax2
+---- RSERVER ---- 247 APP4V_SK 1 10.20.30.73 app4v-sk.wuo.lax2
+---- RSERVER ---- 239 APP1V_SK 1 10.20.30.71 app1v-sk.wuo.lax2
+---- RSERVER ---- 246 APP3V_SK 1 10.20.30.72 app3v-sk.wuo.lax2
+RSERVER ---- 557 APP1_SK_LAX1 None 10.10.10.25 vip-sk.wuo.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 70 APP_SK None 
+---- RSERVER ---- 48 APP2V_SK 1 10.10.30.71 app2v-sk.wuo.lax1
+---- RSERVER ---- 50 APP3V_SK 1 10.10.30.72 app3v-sk.wuo.lax1
+---- RSERVER ---- 41 APP1V_SK 1 10.10.30.70 app1v-sk.wuo.lax1
+---- RSERVER ---- 51 APP4V_SK 1 10.10.30.73 app4v-sk.wuo.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_SORRY 587
+IP 10.2.50.116
+Serverfarm ---- 574 APP-SORRY 1 
+RSERVER ---- 472 APP-SORRY.TP.LAX2.GNMEDIA.NET 1 10.20.30.202
+RSERVER ---- 471 APP-SORRY.TP.LAX1.GNMEDIA.NET 1 10.10.30.220
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_SORRY2 588
+IP 10.2.50.117
+Serverfarm ---- 574 APP-SORRY 1 
+RSERVER ---- 472 APP-SORRY.TP.LAX2.GNMEDIA.NET 1 10.20.30.202
+RSERVER ---- 471 APP-SORRY.TP.LAX1.GNMEDIA.NET 1 10.10.30.220
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_SORRY3 589
+IP 10.2.50.118
+Serverfarm ---- 574 APP-SORRY 1 
+RSERVER ---- 472 APP-SORRY.TP.LAX2.GNMEDIA.NET 1 10.20.30.202
+RSERVER ---- 471 APP-SORRY.TP.LAX1.GNMEDIA.NET 1 10.10.30.220
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_SORRY4 590
+IP 10.2.50.119
+Serverfarm ---- 574 APP-SORRY 1 
+RSERVER ---- 472 APP-SORRY.TP.LAX2.GNMEDIA.NET 1 10.20.30.202
+RSERVER ---- 471 APP-SORRY.TP.LAX1.GNMEDIA.NET 1 10.10.30.220
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_SORRY5 591
+IP 10.2.50.120
+Serverfarm ---- 574 APP-SORRY 1 
+RSERVER ---- 472 APP-SORRY.TP.LAX2.GNMEDIA.NET 1 10.20.30.202
+RSERVER ---- 471 APP-SORRY.TP.LAX1.GNMEDIA.NET 1 10.10.30.220
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_TT 592
+IP 10.2.50.50
+Serverfarm ---- 578 APP_TT 1 
+RSERVER ---- 556 APP1V_TT_LAX2 1 10.2.10.140 app1v-php1.lax2
+RSERVER ---- 555 APP1V_TT_LAX1 1 10.2.10.139 app1v-php1.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_WP_WUO_LAX 593
+IP 10.2.50.103
+Serverfarm ---- 579 APP_WP_WUO_LAX 1 
+RSERVER ---- 564 APP_WP_WUO_LAX2 1 10.20.10.30 vip-wp.wuo.lax2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 263 APP_WP_WUO_LAX2 None 
+---- RSERVER ---- 240 APP1V_WP_WUO_LAX2 1 10.20.30.74 app1v-wp.wuo.lax2
+RSERVER ---- 563 APP_WP_WUO_LAX1 None 10.10.10.30 vip-wp.wuo.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 71 APP_WP_WUO_LAX1 None 
+---- RSERVER ---- 42 APP1V_WP_WUO_LAX1 1 10.10.30.74 app1v-wp.wuo.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_ADOPS_SSL 594
+IP 10.2.50.41
+Serverfarm ---- 580 PXY1_ADOPS 1 
+RSERVER ---- 569 PXY1_ADOPS_LAX2 1 10.2.10.242
+RSERVER ---- 568 PXY1_ADOPS_LAX1 1 10.2.10.122
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_PUBOPS_SSL 595
+IP 10.2.50.42
+Serverfarm ---- 581 PXY1_PUBOPS 1 
+RSERVER ---- 571 PXY1_PUBOPS_LAX2 1 10.2.10.243
+RSERVER ---- 570 PXY1_PUBOPS_LAX1 1 10.2.10.123
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_REPORTS_SSL 596
+IP 10.2.50.43
+Serverfarm ---- 582 PXY1_REPORTS 1 
+RSERVER ---- 573 PXY1_REPORTS_LAX2 1 10.2.10.244
+RSERVER ---- 572 PXY1_REPORTS_LAX1 1 10.2.10.124
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_CONNECT_WUO_STG 630
+IP 10.2.50.114
+Serverfarm ---- 621 APP_CONNECT_WUO_STG 1 
+RSERVER ---- 600 APP1V_CONNECT_WUO_STG2 1 10.20.11.32 vip-connect.wuo.stg2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 373 APP_CONNECT_WUO_STG2 None 
+---- RSERVER ---- 362 APP1V_CONNECT_WUO_STG2 1 10.20.31.76 app1v-connect.wuo.stg2
+RSERVER ---- 599 APP1V_CONNECT_WUO_STG1 None 10.10.11.32 vip-connect.wuo.stg1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 186 APP_CONNECT_WUO_STG1 None 
+---- RSERVER ---- 175 APP1V_CONNECT_WUO_STG1 1 10.10.31.76 app1v-connect.wuo.stg1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_FAB_WUO_STG 631
+IP 10.2.50.107
+Serverfarm ---- 622 APP_FAB_WUO_STG 1 
+RSERVER ---- 602 APP1V_FAB_WUO_STG2 1 10.20.11.31 vip-fab.wuo.stg2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 374 APP_FAB_WUO_STG2 None 
+---- RSERVER ---- 363 APP1V_FAB_WUO_STG2 1 10.20.31.75 app1v-fab.wuo.stg2
+RSERVER ---- 601 APP1V_FAB_WUO_STG1 None 10.10.11.31 vip-fab.wuo.stg1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 187 APP_FAB_WUO_STG1 None 
+---- RSERVER ---- 176 APP1V_FAB_WUO_STG1 1 10.10.31.75 app1v-fab.wuo.stg1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_SK 632
+IP 10.2.50.80
+Serverfarm ---- 623 APP_SK 1 
+RSERVER ---- 558 APP1_SK_LAX2 1 10.20.10.25 vip-sk.wuo.lax2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 262 APP_SK None 
+---- RSERVER ---- 245 APP2V_SK 1 10.20.30.70 app2v-sk.wuo.lax2
+---- RSERVER ---- 247 APP4V_SK 1 10.20.30.73 app4v-sk.wuo.lax2
+---- RSERVER ---- 239 APP1V_SK 1 10.20.30.71 app1v-sk.wuo.lax2
+---- RSERVER ---- 246 APP3V_SK 1 10.20.30.72 app3v-sk.wuo.lax2
+RSERVER ---- 557 APP1_SK_LAX1 None 10.10.10.25 vip-sk.wuo.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 70 APP_SK None 
+---- RSERVER ---- 48 APP2V_SK 1 10.10.30.71 app2v-sk.wuo.lax1
+---- RSERVER ---- 50 APP3V_SK 1 10.10.30.72 app3v-sk.wuo.lax1
+---- RSERVER ---- 41 APP1V_SK 1 10.10.30.70 app1v-sk.wuo.lax1
+---- RSERVER ---- 51 APP4V_SK 1 10.10.30.73 app4v-sk.wuo.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_SORRY 633
+IP 10.2.50.116
+Serverfarm ---- 620 APP-SORRY 1 
+RSERVER ---- 472 APP-SORRY.TP.LAX2.GNMEDIA.NET 1 10.20.30.202
+RSERVER ---- 471 APP-SORRY.TP.LAX1.GNMEDIA.NET 1 10.10.30.220
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_TT 634
+IP 10.2.50.75
+Serverfarm ---- 624 APP_TT 1 
+RSERVER ---- 604 APP1V_TT_STG2 1 10.20.30.159 app1v-tt.ap.stg2
+RSERVER ---- 603 APP1V_TT_STG1 1 10.10.30.159 app1v-tt.ap.stg1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_WP_WUO_STG 635
+IP 10.2.50.102
+Serverfarm ---- 625 APP_WP_WUO_STG 1 
+RSERVER ---- 606 APP1V_WP_WUO_STG2 1 10.20.11.30 vip-wp.wuo.stg2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 376 APP_WP_WUO_STG2 None 
+---- RSERVER ---- 365 APP1V_WP_WUO_STG2 1 10.20.31.74 app1v-wp.wuo.stg2
+RSERVER ---- 605 APP1V_WP_WUO_STG1 None 10.10.11.30 vip-wp.wuo.stg1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 189 APP_WP_WUO_STG1 None 
+---- RSERVER ---- 178 APP1V_WP_WUO_STG1 1 10.10.31.74 app1v-wp.wuo.stg1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_ADOPS21_SSL 636
+IP 10.2.50.69
+Serverfarm ---- 627 PXY1_ADOPS21 1 
+RSERVER ---- 617 PXY1_REPORTS_STG2 1 10.2.10.119 pxy2v-vip3.stg2
+RSERVER ---- 616 PXY1_REPORTS_STG1 1 10.2.10.109 pxy2v-vip3.stg1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_ADOPS_SSL 637
+IP 10.2.50.141
+Serverfarm ---- 626 PXY1_ADOPS 1 
+RSERVER ---- 613 PXY1_ADOPS_STG2 1 10.2.10.117 pxy2v-vip1.stg2
+RSERVER ---- 619 RB1_STG2_VIP 0 10.2.10.115 adops-vip.stg2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 431 RB1_STG2 None 
+---- RSERVER ---- 417 APP1V-RB2_STG2 1 10.60.30.121 app1v-ao.ap.stg2
+---- RSERVER ---- 421 APP2V-RB1_STG2 0 10.60.30.172 app2v-rb1.stg2
+---- RSERVER ---- 415 APP1V-RB1_STG2 0 10.60.30.171 app1v-rb1.stg2
+---- RSERVER ---- 423 APP2V-RB2_STG2 1 10.60.30.122 app2v-ao.ap.stg2
+RSERVER ---- 612 PXY1_ADOPS_STG1 None 10.2.10.107 pxy2v-vip1.stg1
+RSERVER ---- 618 RB1_STG1_VIP None 10.2.10.105 adops-vip.stg1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 430 RB1_STG1 None 
+---- RSERVER ---- 416 APP1V-RB2_STG1 1 10.50.30.121 app1v-ao.ap.stg1
+---- RSERVER ---- 422 APP2V-RB2_STG1 1 10.50.30.122 app2v-ao.ap.stg1
+---- RSERVER ---- 420 APP2V-RB1_STG1 0 10.50.30.172 app2v-rb1.stg1
+---- RSERVER ---- 414 APP1V-RB1_STG1 0 10.50.30.171 app1v-rb1.stg1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_PUBOPS_SSL 638
+IP 10.2.50.142
+Serverfarm ---- 628 PXY1_PUBOPS 1 
+RSERVER ---- 615 PXY1_PUBOPS_STG2 1 10.2.10.118 pxy2v-vip2.stg2
+RSERVER ---- 614 PXY1_PUBOPS_STG1 1 10.2.10.108 pxy2v-vip2.stg1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_REPORTS_SSL 639
+IP 10.2.50.143
+Serverfarm ---- 629 PXY1_REPORTS 1 
+RSERVER ---- 617 PXY1_REPORTS_STG2 1 10.2.10.119 pxy2v-vip3.stg2
+RSERVER ---- 616 PXY1_REPORTS_STG1 1 10.2.10.109 pxy2v-vip3.stg1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_SORRY 655
+IP 10.2.50.116
+Serverfarm ---- 654 APP-SORRY 1 
+RSERVER ---- 472 APP-SORRY.TP.LAX2.GNMEDIA.NET 1 10.20.30.202
+RSERVER ---- 471 APP-SORRY.TP.LAX1.GNMEDIA.NET 1 10.10.30.220
+==========================================================================================
+VIP : L4_VIP_CLASS_APP_FE_DH_LAX1 656
+IP 10.2.50.91
+Serverfarm ---- 650 APP-FE.DH.LAX1 1 
+RSERVER ---- 646 APP2V-FE.DH.LAX1 1 10.10.30.142 app2v-fe.dh.lax1
+RSERVER ---- 642 APP1V-FE.DH.LAX1 1 10.10.30.141 app1v-fe.dh.lax1
+==========================================================================================
+VIP : L4_VIP_CLASS_APP_FE_DH_STG1 657
+IP 10.2.50.92
+Serverfarm ---- 651 APP-FE.DH.STG1 1 
+RSERVER ---- 647 APP2V-FE.DH.STG1 1 10.10.31.142 app2v-fe.dh.stg1
+RSERVER ---- 643 APP1V-FE.DH.STG1 1 10.10.31.141 app1v-fe.dh.stg1
+==========================================================================================
+VIP : L4_VIP_CLASS_APP_FS_DH_LAX1 658
+IP 10.2.50.95
+Serverfarm ---- 652 APP-FS.DH.LAX1 1 
+RSERVER ---- 648 APP2V-FS.DH.LAX1 1 10.10.30.144 app2v-fs.dh.lax1
+RSERVER ---- 644 APP1V-FS.DH.LAX1 1 10.10.30.143 app1v-fs.dh.lax1
+==========================================================================================
+VIP : L4_VIP_CLASS_APP_FS_DH_STG1 659
+IP 10.2.50.96
+Serverfarm ---- 653 APP-FS.DH.STG1 1 
+RSERVER ---- 649 APP2V-FS.DH.STG1 1 10.10.31.144 app2v-fs.dh.stg1
+RSERVER ---- 645 APP1V-FS.DH.STG1 1 10.10.31.143 app1v-fs.dh.stg1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_ADS_GORILLANATION_COM 748
+IP 10.2.50.64
+Serverfarm ---- 725 ADS_GORILLANATION_COM 1 
+RSERVER ---- 674 FS-LAX-002 1 10.2.12.116
+RSERVER ---- 673 FS-LAX-001 1 10.2.12.115
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_SORRY 749
+IP 10.2.50.116
+Serverfarm ---- 726 APP-SORRY 1 
+RSERVER ---- 472 APP-SORRY.TP.LAX2.GNMEDIA.NET 1 10.20.30.202
+RSERVER ---- 471 APP-SORRY.TP.LAX1.GNMEDIA.NET 1 10.10.30.220
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_VIDEO 750
+IP 10.2.50.90
+Serverfarm ---- 727 APP_VIDEO 1 
+RSERVER ---- 668 APP_VIDEO_LAX2 1 10.20.10.24
+RSERVER ---- 667 APP_VIDEO_LAX1 1 10.10.10.24
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_ASSETMANAGER_SI_EVCORP 751
+IP 10.2.50.76
+Serverfarm ---- 728 ASSETMANAGER_SI_EVCORP 1 
+RSERVER ---- 662 APP1V-DAM.SI.LAX1.GNMEDIA.NET 1 10.10.30.204 app1v-dam.si.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_ASSMAN_SI_REDIRECT 752
+IP 10.2.50.76
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_FS_CRAVEONLINE_COM 753
+IP 10.2.50.63
+Serverfarm ---- 729 FS_CRAVEONLINE_COM 1 
+RSERVER ---- 672 FILE4 1 10.2.12.114
+RSERVER ---- 670 FILE2 1 10.2.12.112
+RSERVER ---- 669 FILE1 0 10.2.12.111
+RSERVER ---- 671 FILE3 1 10.2.12.113
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_FS_CRAVEONLINE_COM_INTERNAL 754
+IP 10.2.10.224
+Serverfarm ---- 730 FS_CRAVEONLINE_COM_INTERNAL 1 
+RSERVER ---- 670 FILE2 1 10.2.12.112
+RSERVER ---- 671 FILE3 1 10.2.12.113
+RSERVER ---- 669 FILE1 0 10.2.12.111
+RSERVER ---- 672 FILE4 1 10.2.12.114
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_IMG_CRAVEONLINE_COM 755
+IP 10.2.50.65
+Serverfarm ---- 731 IMG_CRAVEONLINE_COM 1 
+RSERVER ---- 678 IMG2_CRAVEONLINE_COM 1 10.2.12.118
+RSERVER ---- 676 IMG1_CRAVEONLINE_COM 1 10.2.12.117
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_IMG_ICONATOR 756
+IP 10.2.50.56
+Serverfarm ---- 732 IMG_ICONATOR 1 
+RSERVER ---- 679 IMG2_ICONATOR 1 10.2.12.60 img-lax-002
+RSERVER ---- 677 IMG1_ICONATOR 1 10.2.12.59 img-lax-001
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_QA_SHERDOG_COM 757
+IP 10.2.50.59
+Serverfarm ---- 733 QA_SHERDOG_COM 1 
+RSERVER ---- 700 WWW1_SHERDOG_COM 1 10.2.12.87
+RSERVER ---- 683 PXY2V-SHERDOG.SB.LAX2.GNMEDIA.NET 0 10.20.20.102 pxy2v-sherdog.sb.lax2
+RSERVER ---- 682 PXY1V-SHERDOG.SB.LAX2.GNMEDIA.NET 0 10.20.20.101 pxy1v-sherdog.sb.lax2
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_SPEAKEASY_CRAVEONLINE_COM 758
+IP 10.2.50.67
+Serverfarm ---- 734 SPEAKEASY_CRAVEONLINE_COM 1 
+RSERVER ---- 705 WWW2_FORUMS_GNMEDIA_NET 1 10.2.12.126 www2.forums
+RSERVER ---- 695 WWW1_FORUMS_GNMEDIA_NET 1 10.2.12.125 www1.forums
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_VIDEO_GORILLANATION_COM 759
+IP 10.2.50.62
+Serverfarm ---- 735 VIDEO_GORILLANATION_COM 1 
+RSERVER ---- 688 VIDEO3 1 10.2.12.106
+RSERVER ---- 691 VIDEO8 1 10.2.12.109
+RSERVER ---- 690 VIDEO5 1 10.2.12.108
+RSERVER ---- 686 VIDEO10 1 10.2.12.110
+RSERVER ---- 689 VIDEO4 1 10.2.12.107
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_WWW_AT 760
+IP 10.2.50.48
+Serverfarm ---- 736 WWW_AT 1 
+RSERVER ---- 702 WWW2_AT 1 10.2.12.21
+RSERVER ---- 702 WWW2_AT 1 10.2.12.98
+RSERVER ---- 692 WWW1_AT 1 10.2.12.97
+RSERVER ---- 692 WWW1_AT 1 10.2.12.20
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_WWW_ATOMIC_SEARCH 761
+IP 10.2.50.60
+Serverfarm ---- 737 WWW_ATOMIC_SEARCH 1 
+RSERVER ---- 665 APP2V-SPX.SB.LAX1.GNMEDIA.NET 0 10.10.30.210 app2v-spx.sb.lax1
+RSERVER ---- 663 APP1V-SPX.SB.LAX1.GNMEDIA.NET 1 10.10.30.206 app1v-spx.sb.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_WWW_ATOMIC_SEARCH_INTERNAL 762
+IP 10.2.10.204
+Serverfarm ---- 738 WWW_ATOMIC_SEARCH_INTERNAL 1 
+RSERVER ---- 665 APP2V-SPX.SB.LAX1.GNMEDIA.NET 0 10.10.30.210 app2v-spx.sb.lax1
+RSERVER ---- 663 APP1V-SPX.SB.LAX1.GNMEDIA.NET 1 10.10.30.206 app1v-spx.sb.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_WWW_CRAVEONLINE_COM 763
+IP 10.2.50.66
+Serverfarm ---- 739 WWW_CRAVEONLINE_COM 1 
+RSERVER ---- 704 WWW2_CRAVEONLINE_COM 1 10.2.12.122
+RSERVER ---- 694 WWW1_CRAVEONLINE_COM 1 10.2.12.121
+RSERVER ---- 712 WWW3_CRAVEONLINE_COM 1 10.2.12.123
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_WWW_GR 764
+IP 10.2.50.49
+Serverfarm ---- 740 WWW_GR 1 
+RSERVER ---- 696 WWW1_GR 0 10.2.12.26
+RSERVER ---- 666 APP_GAMEREV_LAX1 1 10.10.10.15 vip-www.gr.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 62 APP-GAMEREV None 
+---- RSERVER ---- 47 APP2V.GR.LAX1.GNMEDIA.NET 1 10.10.30.213 app2v.gr.lax1
+---- RSERVER ---- 38 APP1V.GR.LAX1.GNMEDIA.NET 1 10.10.30.212 app1v.gr.lax1
+RSERVER ---- 706 WWW2_GR None 10.2.12.27
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_WWW_HFBOARDS 765
+IP 10.2.50.52
+Serverfarm ---- 741 WWW_HFBOARDS 1 
+RSERVER ---- 721 WWW5_HFBOARDS 1 10.2.12.35 www-lax-003.forums.a
+RSERVER ---- 707 WWW2_HFBOARDS 1 10.2.12.32 www-lax-002.forums.a
+RSERVER ---- 718 WWW4_HFBOARDS 1 10.2.12.34 www-lax-005.forums.a
+RSERVER ---- 697 WWW1_HFBOARDS 1 10.2.12.31 www-lax-001.forums.a
+RSERVER ---- 713 WWW3_HFBOARDS 1 10.2.12.33 www-lax-004.forums.a
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_WWW_ICONATOR 766
+IP 10.2.50.55
+Serverfarm ---- 742 WWW_ICONATOR 1 
+RSERVER ---- 680 PXY1V-ICO.AO.LAX1.GNMEDIA.NET 1 10.2.12.40 pxy1v-ico.ao.lax1
+RSERVER ---- 681 PXY1V-ICO.AO.LAX3.GNMEDIA.NET 1 10.2.12.39 pxy1v-ico.ao.lax3
+RSERVER ---- 708 WWW2_ICONATOR 0 10.2.12.44 www-lax-002
+RSERVER ---- 722 WWW5_ICONATOR 0 10.2.12.47 www-lax-005
+RSERVER ---- 698 WWW1_ICONATOR 0 10.2.12.43 www-lax-001
+RSERVER ---- 714 WWW3_ICONATOR 0 10.2.12.45 animator
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_WWW_MAL 767
+IP 10.2.50.70
+Serverfarm ---- 743 WWW_MAL 1 
+RSERVER ---- 709 WWW2_MAL 1 10.2.10.236 www2v.mal.lax3
+RSERVER ---- 699 WWW1_MAL 1 10.2.10.232 www1v.mal.lax3
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_WWW_SHERDOG_COM 768
+IP 10.2.50.58
+Serverfarm ---- 744 WWW_SHERDOG_COM 1 
+RSERVER ---- 683 PXY2V-SHERDOG.SB.LAX2.GNMEDIA.NET 1 10.20.20.102 pxy2v-sherdog.sb.lax2
+RSERVER ---- 685 PXY4V-SHERDOG.SB.LAX2.GNMEDIA.NET 1 10.20.20.104 pxy4v-sherdog.sb.lax2
+RSERVER ---- 682 PXY1V-SHERDOG.SB.LAX2.GNMEDIA.NET 1 10.20.20.101 pxy1v-sherdog.sb.lax2
+RSERVER ---- 684 PXY3V-SHERDOG.SB.LAX2.GNMEDIA.NET 1 10.20.20.103 pxy3v-sherdog.sb.lax2
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_WWW_SHERDOG_COM_INTERNAL 769
+IP 10.2.10.203
+Serverfarm ---- 745 WWW_SHERDOG_COM_INTERNAL 1 
+RSERVER ---- 723 WWW5_SHERDOG_COM 1 10.2.12.91
+RSERVER ---- 710 WWW2_SHERDOG_COM 1 10.2.12.88
+RSERVER ---- 719 WWW4_SHERDOG_COM 1 10.2.12.90
+RSERVER ---- 700 WWW1_SHERDOG_COM 1 10.2.12.87
+RSERVER ---- 715 WWW3_SHERDOG_COM 1 10.2.12.89
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_WWW_SHERDOG_NET 770
+IP 10.2.50.57
+Serverfarm ---- 746 WWW_SHERDOG_NET 1 
+RSERVER ---- 720 WWW4_SHERDOG_NET 1 10.2.12.69
+RSERVER ---- 711 WWW2_SHERDOG_NET 1 10.2.12.67
+RSERVER ---- 724 WWW5_SHERDOG_NET 1 10.2.12.70
+RSERVER ---- 701 WWW1_SHERDOG_NET 1 10.2.12.66
+RSERVER ---- 716 WWW3_SHERDOG_NET 1 10.2.12.68
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_WWW_SOAPS_COM 771
+IP 10.2.50.61
+Serverfarm ---- 747 WWW_SOAPS_COM 1 
+RSERVER ---- 717 WWW3_SOAPS_COM 1 10.2.12.102
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_SORRY 806
+IP 10.2.50.116
+Serverfarm ---- 790 APP-SORRY 1 
+RSERVER ---- 472 APP-SORRY.TP.LAX2.GNMEDIA.NET 1 10.20.30.202
+RSERVER ---- 471 APP-SORRY.TP.LAX1.GNMEDIA.NET 1 10.10.30.220
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_APP_STATS_CMS_SB_STG 807
+IP 10.2.50.150
+Serverfarm ---- 791 APP-STATS-CMS.SB.STG 1 
+RSERVER ---- 775 APP-STATS-CMS.SB.STG2 1 10.20.11.13 vip.app-stats-cms.sb.stg2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 322 APP-STATS-CMS.SB.STG2 None 
+---- RSERVER ---- 289 APP1V-STATS-CMS.SB.STG2 1 10.20.31.145 app1v-stats-cms.sb.stg2
+RSERVER ---- 774 APP-STATS-CMS.SB.STG1 None 10.10.11.13 vip.app-stats-cms.sb.stg1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 135 APP-STATS-CMS.SB.STG1 None 
+---- RSERVER ---- 102 APP1V-STATS-CMS.SB.STG1 1 10.10.31.145 app1v-stats-cms.sb.stg1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1 808
+IP 10.2.50.45
+Serverfarm ---- 792 PXY1 1 
+RSERVER ---- 784 PXY2V_LAX1 1 10.2.10.179 pxy2v.sb.lax1
+RSERVER ---- 782 PXY1V_LAX2 1 10.2.10.198 pxy1v.sb.lax2
+RSERVER ---- 782 PXY1V_LAX2 1 10.2.10.211 pxy3v.sb.lax2
+RSERVER ---- 785 PXY2V_LAX2 1 10.2.10.199 pxy2v.sb.lax2
+RSERVER ---- 780 PXY1V_LAX1 1 10.2.10.178 pxy1v.sb.lax1
+RSERVER ---- 780 PXY1V_LAX1 1 10.2.10.210 pxy3v.sb.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_INTERNAL 809
+IP 10.2.12.18
+Serverfarm ---- 793 PXY1_INTERNAL 1 
+RSERVER ---- 782 PXY1V_LAX2 1 10.2.10.198 pxy1v.sb.lax2
+RSERVER ---- 782 PXY1V_LAX2 1 10.2.10.211 pxy3v.sb.lax2
+RSERVER ---- 784 PXY2V_LAX1 1 10.2.10.179 pxy2v.sb.lax1
+RSERVER ---- 780 PXY1V_LAX1 1 10.2.10.178 pxy1v.sb.lax1
+RSERVER ---- 780 PXY1V_LAX1 1 10.2.10.210 pxy3v.sb.lax1
+RSERVER ---- 785 PXY2V_LAX2 1 10.2.10.199 pxy2v.sb.lax2
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_JOOMLA 810
+IP 10.2.50.71
+Serverfarm ---- 793 PXY1_INTERNAL 1 
+RSERVER ---- 782 PXY1V_LAX2 1 10.2.10.198 pxy1v.sb.lax2
+RSERVER ---- 782 PXY1V_LAX2 1 10.2.10.211 pxy3v.sb.lax2
+RSERVER ---- 784 PXY2V_LAX1 1 10.2.10.179 pxy2v.sb.lax1
+RSERVER ---- 780 PXY1V_LAX1 1 10.2.10.178 pxy1v.sb.lax1
+RSERVER ---- 780 PXY1V_LAX1 1 10.2.10.210 pxy3v.sb.lax1
+RSERVER ---- 785 PXY2V_LAX2 1 10.2.10.199 pxy2v.sb.lax2
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_LAX1 811
+IP 10.2.50.46
+Serverfarm ---- 795 PXY1_LAX1 1 
+RSERVER ---- 784 PXY2V_LAX1 1 10.2.10.179 pxy2v.sb.lax1
+RSERVER ---- 780 PXY1V_LAX1 1 10.2.10.178 pxy1v.sb.lax1
+RSERVER ---- 780 PXY1V_LAX1 1 10.2.10.210 pxy3v.sb.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_LAX1_INTERNAL 812
+IP 10.2.10.187
+Serverfarm ---- 796 PXY1_LAX1_INTERNAL 1 
+RSERVER ---- 784 PXY2V_LAX1 1 10.2.10.179 pxy2v.sb.lax1
+RSERVER ---- 780 PXY1V_LAX1 1 10.2.10.178 pxy1v.sb.lax1
+RSERVER ---- 780 PXY1V_LAX1 1 10.2.10.210 pxy3v.sb.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_LAX1_JOOMLA 813
+IP 10.2.50.72
+Serverfarm ---- 797 PXY1_LAX1_JOOMLA 1 
+RSERVER ---- 781 PXY1V_LAX1_JOOMLA 1 10.2.10.210 pxy3v.sb.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_LAX2 814
+IP 10.2.50.47
+Serverfarm ---- 798 PXY1_LAX2 1 
+RSERVER ---- 785 PXY2V_LAX2 1 10.2.10.199 pxy2v.sb.lax2
+RSERVER ---- 782 PXY1V_LAX2 1 10.2.10.198 pxy1v.sb.lax2
+RSERVER ---- 782 PXY1V_LAX2 1 10.2.10.211 pxy3v.sb.lax2
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_LAX2_INTERNAL 815
+IP 10.2.10.188
+Serverfarm ---- 799 PXY1_LAX2_INTERNAL 1 
+RSERVER ---- 785 PXY2V_LAX2 1 10.2.10.199 pxy2v.sb.lax2
+RSERVER ---- 782 PXY1V_LAX2 1 10.2.10.198 pxy1v.sb.lax2
+RSERVER ---- 782 PXY1V_LAX2 1 10.2.10.211 pxy3v.sb.lax2
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_LAX2_JOOMLA 816
+IP 10.2.50.73
+Serverfarm ---- 800 PXY1_LAX2_JOOMLA 1 
+RSERVER ---- 783 PXY1V_LAX2_JOOMLA 1 10.2.10.211 pxy3v.sb.lax2
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_PXY1_WRITABLE 817
+IP 10.2.50.51
+Serverfarm ---- 801 PXY1_WRITABLE 1 
+RSERVER ---- 782 PXY1V_LAX2 0 10.2.10.198 pxy1v.sb.lax2
+RSERVER ---- 782 PXY1V_LAX2 0 10.2.10.211 pxy3v.sb.lax2
+RSERVER ---- 784 PXY2V_LAX1 1 10.2.10.179 pxy2v.sb.lax1
+RSERVER ---- 780 PXY1V_LAX1 1 10.2.10.178 pxy1v.sb.lax1
+RSERVER ---- 780 PXY1V_LAX1 1 10.2.10.210 pxy3v.sb.lax1
+RSERVER ---- 785 PXY2V_LAX2 0 10.2.10.199 pxy2v.sb.lax2
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_STATS_CMS 818
+IP 10.2.50.74
+Serverfarm ---- 803 SF-STATS-CMS 1 
+RSERVER ---- 787 STATS-CMS-LAX2 1 10.2.10.182 app-stats-cms.sb.lax2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 329 APP_STATS_CMS None 
+---- RSERVER ---- 304 APP2V_STATS_CMS 1 10.20.30.180 app2v-stats-cms.sb.lax2
+---- RSERVER ---- 296 APP1V_STATS_CMS 1 10.20.30.179 app1v-stats-cms.sb.lax2
+RSERVER ---- 786 STATS-CMS-LAX1 None 10.2.10.128 app-stats-cms.sb.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 142 APP_STATS_CMS None 
+---- RSERVER ---- 117 APP2V_STATS_CMS 1 10.10.30.180 app2v-stats-cms.sb.lax1
+---- RSERVER ---- 109 APP1V_STATS_CMS 1 10.10.30.179 app1v-stats-cms.sb.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_STG_JM 819
+IP 10.2.50.30
+Serverfarm ---- 803 SF-STATS-CMS 1 
+RSERVER ---- 787 STATS-CMS-LAX2 1 10.2.10.182 app-stats-cms.sb.lax2
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 329 APP_STATS_CMS None 
+---- RSERVER ---- 304 APP2V_STATS_CMS 1 10.20.30.180 app2v-stats-cms.sb.lax2
+---- RSERVER ---- 296 APP1V_STATS_CMS 1 10.20.30.179 app1v-stats-cms.sb.lax2
+RSERVER ---- 786 STATS-CMS-LAX1 None 10.2.10.128 app-stats-cms.sb.lax1
+------------------------------------------------------------------------------------------
+---- 2nd VIP ---- 142 APP_STATS_CMS None 
+---- RSERVER ---- 117 APP2V_STATS_CMS 1 10.10.30.180 app2v-stats-cms.sb.lax1
+---- RSERVER ---- 109 APP1V_STATS_CMS 1 10.10.30.179 app1v-stats-cms.sb.lax1
+==========================================================================================
+VIP : L4_VIP_ADDRESS_CLASS_WWW_CONCERT 820
+IP 10.2.50.68
+Serverfarm ---- 805 WWW_CONCERTS 1 
+RSERVER ---- 777 APP1V_DJ_LAX2 1 10.20.30.199 app1v-dj.sb.lax2
+RSERVER ---- 776 APP1V_DJ_LAX1 1 10.10.30.199 app1v-dj.sb.lax1

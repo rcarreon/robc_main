@@ -1,0 +1,43 @@
+Name:		rnetapp
+Version:	@VERSION@
+Release:	1%{?dist}
+License:	GPLv2+
+Group:		Applications/System
+Summary:	Remote NetApp Management
+Source0:	rnetapp-%{version}.tar.gz
+BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
+BuildRequires:	perl
+BuildArch:	noarch
+Requires: perl(Net::IP)  perl(Socket)  perl(Term::ReadKey) perl-NetApp
+
+# because I don't expect to have NaServer.pm and NaElement.pm installed via rpm
+AutoReqProv: no
+
+%description
+rnetapp is an easy way to handle day-to-day tasks on your NetApp filers. It can
+help you manage volumes, exports, snapshots, and retreive NFS counters. It was
+created to deal with extreme laziness and a complete inability to bother with
+continually finding out who is currently logged in to the NetApp.
+
+
+%prep
+%setup -q
+
+%build
+%configure
+make %{?_smp_mflags}
+
+%install
+rm -rf $RPM_BUILD_ROOT
+make DESTDIR=$RPM_BUILD_ROOT install
+
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root,-)
+%doc AUTHORS ChangeLog COPYING NEWS README
+%{_bindir}/*
+%{_mandir}/man1/*
+
+%changelog

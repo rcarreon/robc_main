@@ -1,0 +1,12 @@
+#!/bin/bash
+
+for a in $(nodels $1);do
+   metalvacate $a
+   if [ -z "$(lsvm $a)" ];then
+      chtab -d node=$a chain
+      nodeset $a runcmd=bmcsetup
+      rreset $a
+   fi
+done
+
+echo

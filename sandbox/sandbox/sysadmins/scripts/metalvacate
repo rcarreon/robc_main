@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# gstaples @ Gorilla Nation
+
+metal=$1
+
+echo "Setting $metal offline"
+metaloffline $metal
+   
+
+groups=$(nodels $metal groups | awk -F: '{print $2}')
+if [ -z "$groups" ];then
+   echo "No groups?" 1>&2
+   exit 1
+fi
+
+lsvm $metal
+
+vmhost=$(lsvm $metal | head -1 | awk '{print $2}')
+while [ -n "$vmhost" ];do
+   host=$(metalallocator $vmhost </dev/null)
+   echo "Migrating $vmhost to $host..."
+   rmigrate $vmhost $host </dev/null
+   vmhost=$(lsvm $metal | head -1 | awk '{print $2}')
+done
+
+lines=$(lsvm $metal)
+if [ -n "$lines" ];then
+   echo "Remaining VMs:"
+   echo "$lines"
+fi

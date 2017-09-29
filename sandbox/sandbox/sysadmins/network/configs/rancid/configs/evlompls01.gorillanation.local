@@ -1,0 +1,321 @@
+!RANCID-CONTENT-TYPE: cisco
+!
+!Chassis type: 2811 - a 2811 router
+!
+!Memory: main 393216K/131072K
+!Memory: nvram 191K
+!
+!Processor ID: FTX1437AJ3V
+!
+!
+!Image: Software: C2800NM-IPBASEK9-M, 15.0(1)M3, RELEASE SOFTWARE (fc2)
+!Image: Compiled: Sun 18-Jul-10 02:24 by prod_rel_team
+!Image: flash:c2800nm-ipbasek9-mz.150-1.M3.bin
+!
+!ROM Bootstrap: Version 12.4(13r)T11, RELEASE SOFTWARE (fc1)
+!
+!Flash: -#- --length-- -----date/time------ path
+!Flash: 1     32244652 Sep 10 2010 01:02:28 c2800nm-ipbase-mz.150-1.M3.bin
+!Flash: 2         2900 Sep 10 2010 01:11:18 cpconfig-2811.cfg
+!Flash: 3      2938880 Sep 10 2010 01:11:40 cpexpress.tar
+!Flash: 4         1038 Sep 10 2010 01:11:50 home.shtml
+!Flash: 5       122880 Sep 10 2010 01:12:00 home.tar
+!Flash: 6       527849 Sep 10 2010 01:12:08 128MB.sdf
+!Flash: 7      1697952 Sep 10 2010 01:12:28 securedesktop-ios-3.1.1.45-k9.pkg
+!Flash: 8       415956 Sep 10 2010 01:12:40 sslclient-win-1.1.4.176.pkg
+!Flash: 9     34451640 Jul 15 2013 21:09:26 c2800nm-ipbasek9-mz.150-1.M3.bin
+!Flash: 56315904 bytes available (72421376 bytes used)
+!
+!Flash: nvram: Directory of nvram:/
+!Flash: nvram:   183  -rw-        5540                    <no date>  startup-config
+!Flash: nvram:   184  ----        1921                    <no date>  private-config
+!Flash: nvram:   185  -rw-        5540                    <no date>  underlying-config
+!Flash: nvram:     1  -rw-        2945                    <no date>  cwmp_inventory
+!Flash: nvram:     4  ----          51                    <no date>  persistent-data
+!Flash: nvram:     5  -rw-           0                    <no date>  ifIndex-table
+!Flash: nvram: 196600 bytes total (183967 bytes free)
+!
+!Interface: FastEthernet0/0, MV96340
+!Interface: FastEthernet0/1, MV96340
+!Interface: Serial0/0/0:1, GT96Kidb at 0x458C2BF4, driver data structure at 0x458CA3D8
+!Interface: Serial0/0/1:1, GT96Kidb at 0x458CD8F8, driver data structure at 0x458CF0A8
+!
+!Slot 0: fru CISCO2811
+!Slot 0: type C2811 Motherboard with 2FE and integrated VPN, 2 ports
+!Slot 0: hvers 1.0 rev A0
+!Slot 0: part 73-10258-07, serial 
+!
+!Slot 0/0: fru VWIC2-2MFT-T1/E1
+!Slot 0/0: type VWIC2-2MFT-T1/E1 - 2-Port RJ-48 Multiflex Trunk - T1/E1
+!Slot 0/0: hvers 0.0 rev C0
+!Slot 0/0: part 800-22629-05, serial FOC14382EPQ
+!
+!NAME: "2811 chassis",          DESCR: "2811 chassis"
+!PID: CISCO2811
+!VID: V09
+!SN: FTX1437AJ3V
+!NAME: "C2811 Chassis Slot 0",  DESCR: "C2811 Chassis Slot"
+!NAME: "c2811 Motherboard with 2FE and integrated VPN on Slot 0", DESCR: "c2811 Motherboard with 2FE and integrated VPN"
+!VID: V09
+!SN: FOC14333R10
+!NAME: "DaughterCard Slot 0 on Card 0", DESCR: "C2811 DaughterCard Slot"
+!NAME: "VWIC2-2MFT-T1/E1 - 2-Port RJ-48 Multiflex Trunk - T1/E1 on Slot 0 SubSlot 0", DESCR: "VWIC2-2MFT-T1/E1 - 2-Port RJ-48 Multiflex Trunk - T1/E1"
+!PID: VWIC2-2MFT-T1/E1
+!VID: V01
+!SN: FOC14382EPQ
+!NAME: "DaughterCard Slot 0 on Card 0 on Card 0", DESCR: "C2811 DaughterCard Slot"
+!NAME: "E1 0/0/0",              DESCR: "E1 0/0/0"
+!NAME: "E1 0/0/1",              DESCR: "E1 0/0/1"
+!NAME: "DaughterCard Slot 1 on Card 0", DESCR: "C2811 DaughterCard Slot"
+!NAME: "DaughterCard Slot 2 on Card 0", DESCR: "C2811 DaughterCard Slot"
+!NAME: "DaughterCard Slot 3 on Card 0", DESCR: "C2811 DaughterCard Slot"
+!NAME: "DaughterCard Slot 4 on Card 0", DESCR: "C2811 DaughterCard Slot"
+!NAME: "DaughterCard Slot 5 on Card 0", DESCR: "C2811 DaughterCard Slot"
+!NAME: "AIM Container Slot 0",  DESCR: "AIM Container Slot 0"
+!NAME: "AIM Container Slot 1",  DESCR: "AIM Container Slot 1"
+!NAME: "FastEthernet0/0",       DESCR: "MV96340 Ethernet"
+!NAME: "FastEthernet0/1",       DESCR: "MV96340 Ethernet"
+!NAME: "C2811 Chassis Slot 1",  DESCR: "C2811 Chassis Slot"
+!NAME: "Container of powerSupply Containers", DESCR: "Container of powerSupply Containers"
+!NAME: "Container of Power Supply 1", DESCR: "Container of Power Supply 1"
+!NAME: "Main Power Supply",     DESCR: "Main Power Supply"
+!NAME: "Container of RPS",      DESCR: "Container of RPS"
+!
+!VTP: VTP Version                     : 2
+!VTP: Configuration Revision          : 0
+!VTP: Maximum VLANs supported locally : 36
+!VTP: Number of existing VLANs        : 5
+!VTP: VTP Operating Mode              : Server
+!VTP: VTP Domain Name                 : 
+!VTP: VTP Pruning Mode                : Disabled
+!VTP: VTP V2 Mode                     : Disabled
+!VTP: VTP Traps Generation            : Enabled
+!VTP: MD5 digest                      : 0xBF 0x86 0x94 0x45 0xFC 0xDF 0xB5 0x70 
+!VTP: Local updater ID is 100.65.0.2 on interface Fa0/0 (first interface found)
+!
+!VLAN: VLAN Name                             Status    Ports
+!VLAN: ---- -------------------------------- --------- -------------------------------
+!VLAN: 1    default                          active    
+!VLAN: 1002 fddi-default                     act/unsup 
+!VLAN: 1003 token-ring-default               act/unsup 
+!VLAN: 1004 fddinet-default                  act/unsup 
+!VLAN: 1005 trnet-default                    act/unsup 
+!VLAN: VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+!VLAN: ---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+!VLAN: 1    enet  100001     1500  -      -      -        -    -        1002   1003
+!VLAN: 1002 fddi  101002     1500  -      -      -        -    -        1      1003
+!VLAN: 1003 tr    101003     1500  1005   0      -        -    srb      1      1002
+!VLAN: 1004 fdnet 101004     1500  -      -      1        ibm  -        0      0   
+!VLAN: 1005 trnet 101005     1500  -      -      1        ibm  -        0      0   
+!
+!
+config-register 0x2102
+!
+version 15.0
+service timestamps debug datetime localtime show-timezone
+service timestamps log datetime localtime show-timezone
+service password-encryption
+!
+hostname EVLOMPLS01
+!
+boot-start-marker
+boot system flash:c2800nm-ipbasek9-mz.150-1.M3.bin
+boot-end-marker
+!
+card type e1 0 0
+logging buffered 4096
+enable secret 5 $1$Ec.Z$IbkLo0K9F.LDW3GPCZVIs.
+!
+no aaa new-model
+memory-size iomem 25
+clock timezone GMT 0
+no network-clock-participate wic 0 
+!
+dot11 syslog
+no ip source-route
+!
+ip cef
+!
+ip domain name gorillanation.local
+multilink bundle-name authenticated
+!
+license udi pid CISCO2811 sn FTX1437AJ3V
+!username cisco password <removed>
+!username rancid password <removed>
+!
+controller E1 0/0/0
+ framing NO-CRC4 
+ channel-group 1 timeslots 1-31
+!
+controller E1 0/0/1
+ framing NO-CRC4 
+ channel-group 1 timeslots 1-31
+!
+class-map match-any af41
+ match ip dscp af41 
+class-map match-any ef
+ match ip dscp ef 
+!
+policy-map 75_24
+ class ef
+    priority percent 75
+  set ip dscp ef
+ class af41
+    bandwidth percent 24
+  set ip dscp af41
+ class class-default
+  set ip dscp default
+    fair-queue
+!
+interface Multilink1
+ no ip address
+ ip flow ingress
+ load-interval 30
+ shutdown
+ ppp multilink
+ ppp multilink group 1
+ no cdp enable
+ max-reserved-bandwidth 100
+ service-policy output 75_24
+!
+interface FastEthernet0/0
+ description MPLS Gateway
+ ip address 100.65.0.2 255.255.255.252
+ ip flow ingress
+ duplex full
+ speed 100
+!
+interface FastEthernet0/1
+ description SG200 Port17
+ ip address 192.168.16.3 255.255.255.0
+ ip flow ingress
+ duplex auto
+ speed auto
+!
+interface Serial0/0/0:1
+ description MLPPP
+ bandwidth 1984
+ no ip address
+ no ip redirects
+ no ip proxy-arp
+ encapsulation ppp
+ tx-ring-limit 26
+ tx-queue-limit 26
+ ppp multilink
+ ppp multilink group 1
+ no cdp enable
+!
+interface Serial0/0/1:1
+ description MLPPP
+ bandwidth 1984
+ no ip address
+ no ip redirects
+ no ip proxy-arp
+ encapsulation ppp
+ tx-ring-limit 26
+ tx-queue-limit 26
+ ppp multilink
+ ppp multilink group 1
+ no cdp enable
+!
+ip forward-protocol nd
+!
+no ip http server
+no ip http secure-server
+ip flow-export version 9
+ip flow-export destination 192.168.1.178 2055
+!
+ip route 0.0.0.0 0.0.0.0 100.65.0.1
+!
+access-list 21 permit 10.0.0.0 0.255.255.255
+access-list 21 permit 192.168.1.0 0.0.0.255
+!
+!snmp-server community <removed> RW
+!snmp-server community <removed> RO
+snmp-server trap-source Multilink1
+snmp-server enable traps snmp authentication linkdown linkup coldstart warmstart
+snmp-server enable traps vrrp
+snmp-server enable traps ds1
+snmp-server enable traps tty
+snmp-server enable traps eigrp
+snmp-server enable traps ospf state-change
+snmp-server enable traps ospf errors
+snmp-server enable traps ospf retransmit
+snmp-server enable traps ospf lsa
+snmp-server enable traps ospf cisco-specific state-change nssa-trans-change
+snmp-server enable traps ospf cisco-specific state-change shamlink interface-old
+snmp-server enable traps ospf cisco-specific state-change shamlink neighbor
+snmp-server enable traps ospf cisco-specific errors
+snmp-server enable traps ospf cisco-specific retransmit
+snmp-server enable traps ospf cisco-specific lsa
+snmp-server enable traps flash insertion removal
+snmp-server enable traps c3g
+snmp-server enable traps adslline
+snmp-server enable traps ds3
+snmp-server enable traps envmon
+snmp-server enable traps icsudsu
+snmp-server enable traps isdn call-information
+snmp-server enable traps isdn layer2
+snmp-server enable traps isdn chan-not-avail
+snmp-server enable traps isdn ietf
+snmp-server enable traps ds0-busyout
+snmp-server enable traps ds1-loopback
+snmp-server enable traps ethernet cfm cc mep-up mep-down cross-connect loop config
+snmp-server enable traps ethernet cfm crosscheck mep-missing mep-unknown service-up
+snmp-server enable traps license
+snmp-server enable traps bgp
+snmp-server enable traps isis
+snmp-server enable traps aaa_server
+snmp-server enable traps atm subif
+snmp-server enable traps cef resource-failure peer-state-change peer-fib-state-change inconsistency
+snmp-server enable traps memory bufferpeak
+snmp-server enable traps cnpd
+snmp-server enable traps config-copy
+snmp-server enable traps config
+snmp-server enable traps config-ctid
+snmp-server enable traps entity
+snmp-server enable traps fru-ctrl
+snmp-server enable traps resource-policy
+snmp-server enable traps frame-relay multilink bundle-mismatch
+snmp-server enable traps frame-relay
+snmp-server enable traps frame-relay subif
+snmp-server enable traps hsrp
+snmp-server enable traps ipmulticast
+snmp-server enable traps msdp
+snmp-server enable traps mvpn
+snmp-server enable traps nhrp nhs
+snmp-server enable traps nhrp nhc
+snmp-server enable traps nhrp nhp
+snmp-server enable traps nhrp quota-exceeded
+snmp-server enable traps pim neighbor-change rp-mapping-change invalid-pim-message
+snmp-server enable traps pppoe
+snmp-server enable traps cpu threshold
+snmp-server enable traps rsvp
+snmp-server enable traps syslog
+snmp-server enable traps l2tun session
+snmp-server enable traps l2tun pseudowire status
+snmp-server enable traps vtp
+!snmp-server host 192.168.1.178 <removed> 
+!
+control-plane
+!
+banner motd ^C
+
+This is a private network facility. Unauthorized access is prohibited.
+
+^C
+!
+line con 0
+ exec-timeout 0 0
+line aux 0
+line vty 0 4
+ access-class 21 in
+ login local
+ transport input ssh
+!
+no scheduler allocate
+ntp update-calendar
+ntp server 83.231.183.4
+ntp server 151.236.19.231
+ntp server 192.168.1.10
+end

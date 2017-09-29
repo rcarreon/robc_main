@@ -1,0 +1,3785 @@
+!RANCID-CONTENT-TYPE: cisco
+!
+!Chassis type: WS-C6509-E - a WS-C6509-E router
+!CPU: R7000, SR71000 CPU at 600Mhz, impl 1284, Rev 1.2, 512KB L2 Cache
+!
+!Memory: main 516096K/8192K
+!Memory: nvram 1917K
+!Memory: bootflash 65536K
+!
+!Catalyst Chassis type: WS-C6509-E, Catalyst 6500 9-slot backplane
+!Catalyst Chassis S/N: SMG1232N25T
+!Catalyst Chassis assembly: 73-9221-06, rev A0, ver 1.4
+!Processor ID: SMG1232N25T
+!
+!
+!Image: Software: s72033_rp-IPSERVICESK9_WAN-VM, 12.2(33)SXH4, RELEASE SOFTWARE (fc1)
+!Image: Compiled: Mon 10-Nov-08 14:11 by prod_rel_team
+!Image: sup-bootdisk:s72033-ipservicesk9_wan-vz.122-33.SXH4.bin
+!Image: active is not a valid search root for this operation
+!Image: Search root must be <valid filesystem>:/<sys|newsys|oldsys>[/<directory>]
+!
+!ROM Bootstrap: Version 12.2(17r)SX5, RELEASE SOFTWARE (fc1)
+!
+!BootFlash: BOOT variable = sup-bootdisk:s72033-ipservicesk9_wan-vz.122-33.SXH4.bin,1;sup-bootdisk:s72033-ipservicesk9_wan-vz.122-33.SXH3.bin,1;
+!BootFlash: CONFIG_FILE variable = 
+!BootFlash: BOOTLDR variable = 
+!BootFlash: Configuration register is 0x2102
+!BootFlash: Standby is not present.
+!
+!BootFlash: BOOT variable = sup-bootdisk:s72033-ipservicesk9_wan-vz.122-33.SXH4.bin,1;sup-bootdisk:s72033-ipservicesk9_wan-vz.122-33.SXH3.bin,1;
+!BootFlash: CONFIG_FILE variable = 
+!BootFlash: BOOTLDR variable = 
+!BootFlash: Configuration register is 0x2102
+!BootFlash: Standby is not present.
+!
+!Flash: nvram: Directory of nvram:/
+!Flash: nvram:  1918  -rwx       67926                    <no date>  startup-config
+!Flash: nvram:  1919  ----        1941                    <no date>  private-config
+!Flash: nvram:  1920  -rwx       67926                    <no date>  underlying-config
+!Flash: nvram:     1  ----           4                    <no date>  rf_cold_starts
+!Flash: nvram:     2  ----          48                    <no date>  persistent-data
+!Flash: nvram:     3  -rwx           0                    <no date>  ifIndex-table
+!Flash: nvram: 1964024 bytes total (1891033 bytes free)
+!
+!Flash: bootflash: Directory of bootflash:/
+!Flash: bootflash: No files in directory
+!Flash: bootflash: 65536000 bytes total (65536000 bytes free)
+!
+!Flash: disk0: Directory of disk0:/
+!Flash: disk0: No files in directory
+!Flash: disk0: 1024196608 bytes total (1024196608 bytes free)
+!
+!Flash: sup-bootflash: Directory of sup-bootdisk:/
+!Flash: sup-bootflash:     1  -rwx   119874212   Sep 8 2008 12:03:56 -07:00  s72033-ipservicesk9_wan-vz.122-33.SXH3.bin
+!Flash: sup-bootflash:     2  -rwx    33554432   Sep 8 2008 18:24:24 -07:00  sea_log.dat
+!Flash: sup-bootflash:     3  -rwx   119971492  Feb 14 2013 14:18:42 -08:00  s72033-ipservicesk9_wan-vz.122-33.SXH4.bin
+!Flash: sup-bootflash: 512106496 bytes total (238698496 bytes free)
+!
+!Flash: sup-microcode: Directory of sup-microcode:/
+!Flash: sup-microcode:     0  drwx   <no size>                    <no date>  
+!Flash: sup-microcode:     1  -rwx     5810410                    <no date>  CWPA2_version_10.10
+!Flash: sup-microcode:     2  -rwx     7597458                    <no date>  SIP1_version_10.10
+!Flash: sup-microcode:     3  -rwx     8169266                    <no date>  SIP2_version_10.10
+!Flash: sup-microcode:     4  -rwx     4513498                    <no date>  SMSC_version_10.10
+!Flash: sup-microcode:     5  -rwx    29937926                    <no date>  DRACO2_MP
+!Flash: sup-microcode:     6  -rwx    14458702                    <no date>  CHEVYS-LC
+!Flash: sup-microcode:     7  -rwx    16707662                    <no date>  C2LC
+!Flash: sup-microcode:     8  -rwx      327932                    <no date>  LCP_LX10100
+!Flash: sup-microcode:     9  -rwx      298256                    <no date>  LCP_LX1000
+!Flash: sup-microcode:    10  -rwx      320626                    <no date>  LCP_AX1000
+!Flash: sup-microcode:    11  -rwx      391146                    <no date>  LCP_AX10100
+!Flash: sup-microcode:    12  -rwx      366686                    <no date>  LCP_CPFAB
+!Flash: sup-microcode:    13  -rwx      724702                    <no date>  LCP_CPGBIT
+!Flash: sup-microcode:    14  -rwx      468350                    <no date>  LCP_CP10G
+!Flash: sup-microcode:    15  -rwx      788926                    <no date>  LCP_CPMBIT2
+!Flash: sup-microcode:    16  -rwx      889470                    <no date>  LCP_CPMBIT
+!Flash: sup-microcode:    17  -rwx     1108030                    <no date>  LCP_CPXBIT
+!Flash: sup-microcode:    18  -rwx       65318                    <no date>  LCP_ABOOT
+!Flash: sup-microcode:    19  -rwx       60490                    <no date>  LCP_BOOT
+!Flash: sup-microcode:    20  -rwx     1225250                    <no date>  CWPA2_FPD_version_10.10
+!Flash: sup-microcode: 94230104 bytes total (0 bytes free)
+!
+!
+!Slot 1: type Application Control Engine Module, 1 ports
+!Slot 1: part ACE20-MOD-K9, serial SAD123500UL
+!Slot 1: hvers 2.4, firmware ace2t_main_d, sw A2(3.4)
+!
+!Slot 2: type CEF720 48 port 10/100/1000mb Ethernet, 48 ports
+!Slot 2: part WS-X6748-GE-TX, serial SAL12351QS0
+!Slot 2: hvers 3.0, firmware 12.2(18r)S1, sw 12.2(33)SXH4
+!
+!Slot 2/0: type  Centralized Forwarding Card
+!Slot 2/0: part WS-F6700-CFC, serial SAL12351N8C
+!Slot 2/0: hvers 4.1
+!
+!Slot 3: type CEF720 48 port 10/100/1000mb Ethernet, 48 ports
+!Slot 3: part WS-X6748-GE-TX, serial SAL123305V8
+!Slot 3: hvers 3.0, firmware 12.2(18r)S1, sw 12.2(33)SXH4
+!
+!Slot 3/0: type  Centralized Forwarding Card
+!Slot 3/0: part WS-F6700-CFC, serial SAL12351EDT
+!Slot 3/0: hvers 4.1
+!
+!Slot 4: type CEF720 48 port 10/100/1000mb Ethernet, 48 ports
+!Slot 4: part WS-X6748-GE-TX, serial SAL12351QSZ
+!Slot 4: hvers 3.0, firmware 12.2(18r)S1, sw 12.2(33)SXH4
+!
+!Slot 4/0: type  Centralized Forwarding Card
+!Slot 4/0: part WS-F6700-CFC, serial SAL12351L9U
+!Slot 4/0: hvers 4.1
+!
+!Slot 5: type Supervisor Engine 720 (Active), 2 ports
+!Slot 5: part WS-SUP720-3B, serial SAL12340VRJ
+!Slot 5: hvers 5.7, firmware 8.5(2), sw 12.2(33)SXH4
+!
+!Slot 5/0: type  Policy Feature Card 3      
+!Slot 5/0: part WS-F6K-PFC3B, serial SAL12340SVQ
+!Slot 5/0: hvers 2.4
+!
+!Slot 5/1: type  MSFC3 Daughterboard        
+!Slot 5/1: part WS-SUP720, serial SAL12330KR8
+!Slot 5/1: hvers 3.2
+!
+!Slot 7: type CEF720 48 port 10/100/1000mb Ethernet, 48 ports
+!Slot 7: part WS-X6748-GE-TX, serial SAL12351H25
+!Slot 7: hvers 3.0, firmware 12.2(18r)S1, sw 12.2(33)SXH4
+!
+!Slot 7/0: type  Centralized Forwarding Card
+!Slot 7/0: part WS-F6700-CFC, serial SAL12351EKY
+!Slot 7/0: hvers 4.1
+!
+!Slot 9: type CEF720 8 port 10GE with DFC, 8 ports
+!Slot 9: part WS-X6708-10GE, serial SAL1630HK76
+!Slot 9: hvers 3.5, firmware 12.2(18r)S1, sw 12.2(33)SXH4
+!
+!Slot 9/0: type  Distributed Forwarding Card
+!Slot 9/0: part WS-F6700-DFC3C, serial SAL1630J3SF
+!Slot 9/0: hvers 1.5
+!
+!NAME: "WS-C6509-E",            DESCR: "Cisco Systems Catalyst 6500 9-slotChassis System"
+!PID: WS-C6509-E
+!VID: V04
+!SN: SMG1232N25T
+!NAME: "Backplane",             DESCR: "Cisco Systems Catalyst 6500 9-slot backplane"
+!NAME: "Container of VTT 1",    DESCR: "Container of VTT"
+!NAME: "WS-C6K-VTT-E 1",        DESCR: "VTT-E FRU 1"
+!PID: WS-C6K-VTT-E
+!SN: SMT1222E203
+!NAME: "VTT 1 OK Sensor",       DESCR: "VTT-E FRU 1 OK Sensor"
+!NAME: "VTT 1 outlet temperature Sensor", DESCR: "VTT-E FRU 1 outlet temperature Sensor"
+!NAME: "Container of VTT 2",    DESCR: "Container of VTT"
+!NAME: "WS-C6K-VTT-E 2",        DESCR: "VTT-E FRU 2"
+!PID: WS-C6K-VTT-E
+!SN: SMT1225A629
+!NAME: "VTT 2 OK Sensor",       DESCR: "VTT-E FRU 2 OK Sensor"
+!NAME: "VTT 2 outlet temperature Sensor", DESCR: "VTT-E FRU 2 outlet temperature Sensor"
+!NAME: "Container of VTT 3",    DESCR: "Container of VTT"
+!NAME: "WS-C6K-VTT-E 3",        DESCR: "VTT-E FRU 3"
+!PID: WS-C6K-VTT-E
+!SN: SMT1222E369
+!NAME: "VTT 3 OK Sensor",       DESCR: "VTT-E FRU 3 OK Sensor"
+!NAME: "VTT 3 outlet temperature Sensor", DESCR: "VTT-E FRU 3 outlet temperature Sensor"
+!NAME: "Container of Clock 1",  DESCR: "Container of Clock"
+!NAME: "CLK-7600 1",            DESCR: "OSR-7600 Clock FRU 1"
+!PID: CLK-7600
+!SN: SMT1222G841
+!NAME: "Clock 1 OK Sensor",     DESCR: "OSR-7600 Clock FRU 1 OK Sensor"
+!NAME: "Clock 1 In Using Sensor", DESCR: "OSR-7600 Clock FRU 1 In Using Sensor"
+!NAME: "Container of Clock 2",  DESCR: "Container of Clock"
+!NAME: "CLK-7600 2",            DESCR: "OSR-7600 Clock FRU 2"
+!PID: CLK-7600
+!SN: SMT1222G841
+!NAME: "Clock 2 OK Sensor",     DESCR: "OSR-7600 Clock FRU 2 OK Sensor"
+!NAME: "Clock 2 In Using Sensor", DESCR: "OSR-7600 Clock FRU 2 In Using Sensor"
+!NAME: "Sensor for counting number of OK VTTs", DESCR: "Sensor for counting number of OK VTTs"
+!NAME: "Sensor for counting number of OK Clocks", DESCR: "Sensor for counting number of OK Clocks"
+!NAME: "fan-tray 1 fan-fail Sensor", DESCR: "fan-tray 1 fan-fail Sensor"
+!NAME: "Physical Slot 1",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "1",                     DESCR: "ACE20-MOD-K9 1 ports Application Control Engine Module Rev. 2.4"
+!PID: ACE20-MOD-K9
+!VID: V03
+!SN: SAD123500UL
+!NAME: "module 1 power-output-fail Sensor", DESCR: "module 1 power-output-fail Sensor"
+!NAME: "module 1 insufficient cooling Sensor", DESCR: "module 1 insufficient cooling Sensor"
+!NAME: "module 1 outlet1 temperature Sensor", DESCR: "module 1 outlet1 temperature Sensor"
+!NAME: "module 1 outlet2 temperature Sensor", DESCR: "module 1 outlet2 temperature Sensor"
+!NAME: "Te1/1",                 DESCR: "MultiService Module Te1/1"
+!NAME: "Physical Slot 2",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "2",                     DESCR: "WS-X6748-GE-TX CEF720 48 port 10/100/1000mb Ethernet Rev. 3.0"
+!PID: WS-X6748-GE-TX
+!VID: V03
+!SN: SAL12351QS0
+!NAME: "Switching Engine Container 2", DESCR: "Switching Engine Container 2"
+!NAME: "WS-F6700-CFC Centralized Forwarding Card sub-module of 2", DESCR: "WS-F6700-CFC Centralized Forwarding Card Rev. 4.1"
+!PID: WS-F6700-CFC
+!VID: V06
+!SN: SAL12351N8C
+!NAME: "module 2 power-output-fail Sensor", DESCR: "module 2 power-output-fail Sensor"
+!NAME: "module 2 insufficient cooling Sensor", DESCR: "module 2 insufficient cooling Sensor"
+!NAME: "module 2 outlet temperature Sensor", DESCR: "module 2 outlet temperature Sensor"
+!NAME: "module 2 inlet temperature Sensor", DESCR: "module 2 inlet temperature Sensor"
+!NAME: "CPU of Module 2",       DESCR: "CPU of Module 2"
+!NAME: "Gi2/1",                 DESCR: "10/100/1000BaseT Gi2/1"
+!NAME: "Gi2/2",                 DESCR: "10/100/1000BaseT Gi2/2"
+!NAME: "Gi2/3",                 DESCR: "10/100/1000BaseT Gi2/3"
+!NAME: "Gi2/4",                 DESCR: "10/100/1000BaseT Gi2/4"
+!NAME: "Gi2/5",                 DESCR: "10/100/1000BaseT Gi2/5"
+!NAME: "Gi2/6",                 DESCR: "10/100/1000BaseT Gi2/6"
+!NAME: "Gi2/7",                 DESCR: "10/100/1000BaseT Gi2/7"
+!NAME: "Gi2/8",                 DESCR: "10/100/1000BaseT Gi2/8"
+!NAME: "Gi2/9",                 DESCR: "10/100/1000BaseT Gi2/9"
+!NAME: "Gi2/10",                DESCR: "10/100/1000BaseT Gi2/10"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/11",                DESCR: "10/100/1000BaseT Gi2/11"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/12",                DESCR: "10/100/1000BaseT Gi2/12"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/13",                DESCR: "10/100/1000BaseT Gi2/13"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/14",                DESCR: "10/100/1000BaseT Gi2/14"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/15",                DESCR: "10/100/1000BaseT Gi2/15"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/16",                DESCR: "10/100/1000BaseT Gi2/16"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/17",                DESCR: "10/100/1000BaseT Gi2/17"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/18",                DESCR: "10/100/1000BaseT Gi2/18"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/19",                DESCR: "10/100/1000BaseT Gi2/19"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/20",                DESCR: "10/100/1000BaseT Gi2/20"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/21",                DESCR: "10/100/1000BaseT Gi2/21"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/22",                DESCR: "10/100/1000BaseT Gi2/22"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/23",                DESCR: "10/100/1000BaseT Gi2/23"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/24",                DESCR: "10/100/1000BaseT Gi2/24"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/25",                DESCR: "10/100/1000BaseT Gi2/25"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/26",                DESCR: "10/100/1000BaseT Gi2/26"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/27",                DESCR: "10/100/1000BaseT Gi2/27"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/28",                DESCR: "10/100/1000BaseT Gi2/28"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/29",                DESCR: "10/100/1000BaseT Gi2/29"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/30",                DESCR: "10/100/1000BaseT Gi2/30"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/31",                DESCR: "10/100/1000BaseT Gi2/31"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/32",                DESCR: "10/100/1000BaseT Gi2/32"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/33",                DESCR: "10/100/1000BaseT Gi2/33"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/34",                DESCR: "10/100/1000BaseT Gi2/34"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/35",                DESCR: "10/100/1000BaseT Gi2/35"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/36",                DESCR: "10/100/1000BaseT Gi2/36"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/37",                DESCR: "10/100/1000BaseT Gi2/37"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/38",                DESCR: "10/100/1000BaseT Gi2/38"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/39",                DESCR: "10/100/1000BaseT Gi2/39"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/40",                DESCR: "10/100/1000BaseT Gi2/40"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/41",                DESCR: "10/100/1000BaseT Gi2/41"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/42",                DESCR: "10/100/1000BaseT Gi2/42"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/43",                DESCR: "10/100/1000BaseT Gi2/43"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/44",                DESCR: "10/100/1000BaseT Gi2/44"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/45",                DESCR: "10/100/1000BaseT Gi2/45"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/46",                DESCR: "10/100/1000BaseT Gi2/46"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/47",                DESCR: "10/100/1000BaseT Gi2/47"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi2/48",                DESCR: "10/100/1000BaseT Gi2/48"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Physical Slot 3",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "3",                     DESCR: "WS-X6748-GE-TX CEF720 48 port 10/100/1000mb Ethernet Rev. 3.0"
+!PID: WS-X6748-GE-TX
+!VID: V03
+!SN: SAL123305V8
+!NAME: "Switching Engine Container 3", DESCR: "Switching Engine Container 3"
+!NAME: "WS-F6700-CFC Centralized Forwarding Card sub-module of 3", DESCR: "WS-F6700-CFC Centralized Forwarding Card Rev. 4.1"
+!PID: WS-F6700-CFC
+!VID: V06
+!SN: SAL12351EDT
+!NAME: "module 3 power-output-fail Sensor", DESCR: "module 3 power-output-fail Sensor"
+!NAME: "module 3 insufficient cooling Sensor", DESCR: "module 3 insufficient cooling Sensor"
+!NAME: "module 3 outlet temperature Sensor", DESCR: "module 3 outlet temperature Sensor"
+!NAME: "module 3 inlet temperature Sensor", DESCR: "module 3 inlet temperature Sensor"
+!NAME: "CPU of Module 3",       DESCR: "CPU of Module 3"
+!NAME: "Gi3/1",                 DESCR: "10/100/1000BaseT Gi3/1"
+!NAME: "Gi3/2",                 DESCR: "10/100/1000BaseT Gi3/2"
+!NAME: "Gi3/3",                 DESCR: "10/100/1000BaseT Gi3/3"
+!NAME: "Gi3/4",                 DESCR: "10/100/1000BaseT Gi3/4"
+!NAME: "Gi3/5",                 DESCR: "10/100/1000BaseT Gi3/5"
+!NAME: "Gi3/6",                 DESCR: "10/100/1000BaseT Gi3/6"
+!NAME: "Gi3/7",                 DESCR: "10/100/1000BaseT Gi3/7"
+!NAME: "Gi3/8",                 DESCR: "10/100/1000BaseT Gi3/8"
+!NAME: "Gi3/9",                 DESCR: "10/100/1000BaseT Gi3/9"
+!NAME: "Gi3/10",                DESCR: "10/100/1000BaseT Gi3/10"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/11",                DESCR: "10/100/1000BaseT Gi3/11"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/12",                DESCR: "10/100/1000BaseT Gi3/12"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/13",                DESCR: "10/100/1000BaseT Gi3/13"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/14",                DESCR: "10/100/1000BaseT Gi3/14"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/15",                DESCR: "10/100/1000BaseT Gi3/15"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/16",                DESCR: "10/100/1000BaseT Gi3/16"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/17",                DESCR: "10/100/1000BaseT Gi3/17"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/18",                DESCR: "10/100/1000BaseT Gi3/18"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/19",                DESCR: "10/100/1000BaseT Gi3/19"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/20",                DESCR: "10/100/1000BaseT Gi3/20"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/21",                DESCR: "10/100/1000BaseT Gi3/21"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/22",                DESCR: "10/100/1000BaseT Gi3/22"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/23",                DESCR: "10/100/1000BaseT Gi3/23"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/24",                DESCR: "10/100/1000BaseT Gi3/24"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/25",                DESCR: "10/100/1000BaseT Gi3/25"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/26",                DESCR: "10/100/1000BaseT Gi3/26"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/27",                DESCR: "10/100/1000BaseT Gi3/27"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/28",                DESCR: "10/100/1000BaseT Gi3/28"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/29",                DESCR: "10/100/1000BaseT Gi3/29"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/30",                DESCR: "10/100/1000BaseT Gi3/30"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/31",                DESCR: "10/100/1000BaseT Gi3/31"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/32",                DESCR: "10/100/1000BaseT Gi3/32"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/33",                DESCR: "10/100/1000BaseT Gi3/33"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/34",                DESCR: "10/100/1000BaseT Gi3/34"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/35",                DESCR: "10/100/1000BaseT Gi3/35"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/36",                DESCR: "10/100/1000BaseT Gi3/36"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/37",                DESCR: "10/100/1000BaseT Gi3/37"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/38",                DESCR: "10/100/1000BaseT Gi3/38"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/39",                DESCR: "10/100/1000BaseT Gi3/39"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/40",                DESCR: "10/100/1000BaseT Gi3/40"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/41",                DESCR: "10/100/1000BaseT Gi3/41"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/42",                DESCR: "10/100/1000BaseT Gi3/42"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/43",                DESCR: "10/100/1000BaseT Gi3/43"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/44",                DESCR: "10/100/1000BaseT Gi3/44"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/45",                DESCR: "10/100/1000BaseT Gi3/45"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/46",                DESCR: "10/100/1000BaseT Gi3/46"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/47",                DESCR: "10/100/1000BaseT Gi3/47"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi3/48",                DESCR: "10/100/1000BaseT Gi3/48"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Physical Slot 4",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "4",                     DESCR: "WS-X6748-GE-TX CEF720 48 port 10/100/1000mb Ethernet Rev. 3.0"
+!PID: WS-X6748-GE-TX
+!VID: V03
+!SN: SAL12351QSZ
+!NAME: "Switching Engine Container 4", DESCR: "Switching Engine Container 4"
+!NAME: "WS-F6700-CFC Centralized Forwarding Card sub-module of 4", DESCR: "WS-F6700-CFC Centralized Forwarding Card Rev. 4.1"
+!PID: WS-F6700-CFC
+!VID: V06
+!SN: SAL12351L9U
+!NAME: "module 4 power-output-fail Sensor", DESCR: "module 4 power-output-fail Sensor"
+!NAME: "module 4 insufficient cooling Sensor", DESCR: "module 4 insufficient cooling Sensor"
+!NAME: "module 4 outlet temperature Sensor", DESCR: "module 4 outlet temperature Sensor"
+!NAME: "module 4 inlet temperature Sensor", DESCR: "module 4 inlet temperature Sensor"
+!NAME: "CPU of Module 4",       DESCR: "CPU of Module 4"
+!NAME: "Gi4/1",                 DESCR: "10/100/1000BaseT Gi4/1"
+!NAME: "Gi4/2",                 DESCR: "10/100/1000BaseT Gi4/2"
+!NAME: "Gi4/3",                 DESCR: "10/100/1000BaseT Gi4/3"
+!NAME: "Gi4/4",                 DESCR: "10/100/1000BaseT Gi4/4"
+!NAME: "Gi4/5",                 DESCR: "10/100/1000BaseT Gi4/5"
+!NAME: "Gi4/6",                 DESCR: "10/100/1000BaseT Gi4/6"
+!NAME: "Gi4/7",                 DESCR: "10/100/1000BaseT Gi4/7"
+!NAME: "Gi4/8",                 DESCR: "10/100/1000BaseT Gi4/8"
+!NAME: "Gi4/9",                 DESCR: "10/100/1000BaseT Gi4/9"
+!NAME: "Gi4/10",                DESCR: "10/100/1000BaseT Gi4/10"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/11",                DESCR: "10/100/1000BaseT Gi4/11"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/12",                DESCR: "10/100/1000BaseT Gi4/12"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/13",                DESCR: "10/100/1000BaseT Gi4/13"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/14",                DESCR: "10/100/1000BaseT Gi4/14"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/15",                DESCR: "10/100/1000BaseT Gi4/15"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/16",                DESCR: "10/100/1000BaseT Gi4/16"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/17",                DESCR: "10/100/1000BaseT Gi4/17"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/18",                DESCR: "10/100/1000BaseT Gi4/18"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/19",                DESCR: "10/100/1000BaseT Gi4/19"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/20",                DESCR: "10/100/1000BaseT Gi4/20"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/21",                DESCR: "10/100/1000BaseT Gi4/21"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/22",                DESCR: "10/100/1000BaseT Gi4/22"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/23",                DESCR: "10/100/1000BaseT Gi4/23"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/24",                DESCR: "10/100/1000BaseT Gi4/24"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/25",                DESCR: "10/100/1000BaseT Gi4/25"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/26",                DESCR: "10/100/1000BaseT Gi4/26"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/27",                DESCR: "10/100/1000BaseT Gi4/27"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/28",                DESCR: "10/100/1000BaseT Gi4/28"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/29",                DESCR: "10/100/1000BaseT Gi4/29"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/30",                DESCR: "10/100/1000BaseT Gi4/30"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/31",                DESCR: "10/100/1000BaseT Gi4/31"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/32",                DESCR: "10/100/1000BaseT Gi4/32"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/33",                DESCR: "10/100/1000BaseT Gi4/33"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/34",                DESCR: "10/100/1000BaseT Gi4/34"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/35",                DESCR: "10/100/1000BaseT Gi4/35"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/36",                DESCR: "10/100/1000BaseT Gi4/36"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/37",                DESCR: "10/100/1000BaseT Gi4/37"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/38",                DESCR: "10/100/1000BaseT Gi4/38"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/39",                DESCR: "10/100/1000BaseT Gi4/39"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/40",                DESCR: "10/100/1000BaseT Gi4/40"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/41",                DESCR: "10/100/1000BaseT Gi4/41"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/42",                DESCR: "10/100/1000BaseT Gi4/42"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/43",                DESCR: "10/100/1000BaseT Gi4/43"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/44",                DESCR: "10/100/1000BaseT Gi4/44"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/45",                DESCR: "10/100/1000BaseT Gi4/45"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/46",                DESCR: "10/100/1000BaseT Gi4/46"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/47",                DESCR: "10/100/1000BaseT Gi4/47"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi4/48",                DESCR: "10/100/1000BaseT Gi4/48"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Physical Slot 5",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "5",                     DESCR: "WS-SUP720-3B 2 ports Supervisor Engine 720 Rev. 5.7"
+!PID: WS-SUP720-3B
+!VID: V06
+!SN: SAL12340VRJ
+!NAME: "MSFC Container 5",      DESCR: "MSFC Container 5"
+!NAME: "msfc sub-module of 5",  DESCR: "WS-SUP720 MSFC3 Daughterboard Rev. 3.2"
+!PID: WS-SUP720
+!SN: SAL12330KR8
+!NAME: "module 5 RP outlet temperature Sensor", DESCR: "module 5 RP outlet temperature Sensor"
+!NAME: "module 5 RP inlet temperature Sensor", DESCR: "module 5 RP inlet temperature Sensor"
+!NAME: "CPU of Routing Processor 5", DESCR: "CPU of Routing Processor 5"
+!NAME: "Switching Engine Container 5", DESCR: "Switching Engine Container 5"
+!NAME: "WS-F6K-PFC3B Policy Feature Card 3 sub-module of 5", DESCR: "WS-F6K-PFC3B Policy Feature Card 3 Rev. 2.4"
+!PID: WS-F6K-PFC3B
+!VID: V02
+!SN: SAL12340SVQ
+!NAME: "module 5 EARL outlet temperature Sensor", DESCR: "module 5 EARL outlet temperature Sensor"
+!NAME: "module 5 EARL inlet temperature Sensor", DESCR: "module 5 EARL inlet temperature Sensor"
+!NAME: "Gigabit Port Container 5/1", DESCR: "Gigabit Port Container Gi5/1"
+!NAME: "Gigabit Port Container 5/2", DESCR: "Gigabit Port Container Gi5/2"
+!NAME: "module 5 power-output-fail Sensor", DESCR: "module 5 power-output-fail Sensor"
+!NAME: "module 5 insufficient cooling Sensor", DESCR: "module 5 insufficient cooling Sensor"
+!NAME: "module 5 fan-upgrade required Sensor", DESCR: "module 5 fan-upgrade required Sensor"
+!NAME: "module 5 outlet temperature Sensor", DESCR: "module 5 outlet temperature Sensor"
+!NAME: "module 5 inlet temperature Sensor", DESCR: "module 5 inlet temperature Sensor"
+!NAME: "module 5 device-1 temperature Sensor", DESCR: "module 5 device-1 temperature Sensor"
+!NAME: "module 5 device-2 temperature Sensor", DESCR: "module 5 device-2 temperature Sensor"
+!NAME: "module 5 asic-1 temperature Sensor", DESCR: "module 5 asic-1 temperature Sensor"
+!NAME: "module 5 asic-2 temperature Sensor", DESCR: "module 5 asic-2 temperature Sensor"
+!NAME: "module 5 asic-3 temperature Sensor", DESCR: "module 5 asic-3 temperature Sensor"
+!NAME: "module 5 asic-4 temperature Sensor", DESCR: "module 5 asic-4 temperature Sensor"
+!NAME: "module 5 asic-5 temperature Sensor", DESCR: "module 5 asic-5 temperature Sensor"
+!NAME: "module 5 asic-6 temperature Sensor", DESCR: "module 5 asic-6 temperature Sensor"
+!NAME: "CPU of Switching Processor 5", DESCR: "CPU of Switching Processor 5"
+!NAME: "Gi5/2 10/100/1000BaseT", DESCR: "Gi5/2 10/100/1000BaseT"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Physical Slot 6",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "Physical Slot 7",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "7",                     DESCR: "WS-X6748-GE-TX CEF720 48 port 10/100/1000mb Ethernet Rev. 3.0"
+!PID: WS-X6748-GE-TX
+!VID: V03
+!SN: SAL12351H25
+!NAME: "Switching Engine Container 7", DESCR: "Switching Engine Container 7"
+!NAME: "WS-F6700-CFC Centralized Forwarding Card sub-module of 7", DESCR: "WS-F6700-CFC Centralized Forwarding Card Rev. 4.1"
+!PID: WS-F6700-CFC
+!VID: V06
+!SN: SAL12351EKY
+!NAME: "module 7 power-output-fail Sensor", DESCR: "module 7 power-output-fail Sensor"
+!NAME: "module 7 insufficient cooling Sensor", DESCR: "module 7 insufficient cooling Sensor"
+!NAME: "module 7 outlet temperature Sensor", DESCR: "module 7 outlet temperature Sensor"
+!NAME: "module 7 inlet temperature Sensor", DESCR: "module 7 inlet temperature Sensor"
+!NAME: "CPU of Module 7",       DESCR: "CPU of Module 7"
+!NAME: "Gi7/1",                 DESCR: "10/100/1000BaseT Gi7/1"
+!NAME: "Gi7/2",                 DESCR: "10/100/1000BaseT Gi7/2"
+!NAME: "Gi7/3",                 DESCR: "10/100/1000BaseT Gi7/3"
+!NAME: "Gi7/4",                 DESCR: "10/100/1000BaseT Gi7/4"
+!NAME: "Gi7/5",                 DESCR: "10/100/1000BaseT Gi7/5"
+!NAME: "Gi7/6",                 DESCR: "10/100/1000BaseT Gi7/6"
+!NAME: "Gi7/7",                 DESCR: "10/100/1000BaseT Gi7/7"
+!NAME: "Gi7/8",                 DESCR: "10/100/1000BaseT Gi7/8"
+!NAME: "Gi7/9",                 DESCR: "10/100/1000BaseT Gi7/9"
+!NAME: "Gi7/10",                DESCR: "10/100/1000BaseT Gi7/10"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/11",                DESCR: "10/100/1000BaseT Gi7/11"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/12",                DESCR: "10/100/1000BaseT Gi7/12"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/13",                DESCR: "10/100/1000BaseT Gi7/13"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/14",                DESCR: "10/100/1000BaseT Gi7/14"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/15",                DESCR: "10/100/1000BaseT Gi7/15"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/16",                DESCR: "10/100/1000BaseT Gi7/16"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/17",                DESCR: "10/100/1000BaseT Gi7/17"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/18",                DESCR: "10/100/1000BaseT Gi7/18"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/19",                DESCR: "10/100/1000BaseT Gi7/19"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/20",                DESCR: "10/100/1000BaseT Gi7/20"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/21",                DESCR: "10/100/1000BaseT Gi7/21"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/22",                DESCR: "10/100/1000BaseT Gi7/22"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/23",                DESCR: "10/100/1000BaseT Gi7/23"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/24",                DESCR: "10/100/1000BaseT Gi7/24"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/25",                DESCR: "10/100/1000BaseT Gi7/25"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/26",                DESCR: "10/100/1000BaseT Gi7/26"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/27",                DESCR: "10/100/1000BaseT Gi7/27"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/28",                DESCR: "10/100/1000BaseT Gi7/28"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/29",                DESCR: "10/100/1000BaseT Gi7/29"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/30",                DESCR: "10/100/1000BaseT Gi7/30"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/31",                DESCR: "10/100/1000BaseT Gi7/31"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/32",                DESCR: "10/100/1000BaseT Gi7/32"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/33",                DESCR: "10/100/1000BaseT Gi7/33"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/34",                DESCR: "10/100/1000BaseT Gi7/34"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/35",                DESCR: "10/100/1000BaseT Gi7/35"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/36",                DESCR: "10/100/1000BaseT Gi7/36"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/37",                DESCR: "10/100/1000BaseT Gi7/37"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/38",                DESCR: "10/100/1000BaseT Gi7/38"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/39",                DESCR: "10/100/1000BaseT Gi7/39"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/40",                DESCR: "10/100/1000BaseT Gi7/40"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/41",                DESCR: "10/100/1000BaseT Gi7/41"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/42",                DESCR: "10/100/1000BaseT Gi7/42"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/43",                DESCR: "10/100/1000BaseT Gi7/43"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/44",                DESCR: "10/100/1000BaseT Gi7/44"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/45",                DESCR: "10/100/1000BaseT Gi7/45"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/46",                DESCR: "10/100/1000BaseT Gi7/46"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/47",                DESCR: "10/100/1000BaseT Gi7/47"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Gi7/48",                DESCR: "10/100/1000BaseT Gi7/48"
+!PID: 0x
+!VID: 0x
+!SN: 0x
+!NAME: "Physical Slot 8",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "Physical Slot 9",       DESCR: "Cisco Systems Catalyst 6500 9-slotPhysical Slot"
+!NAME: "9",                     DESCR: "WS-X6708-10GE CEF720 8 port 10GE with DFC Rev. 3.5"
+!PID: WS-X6708-10GE
+!VID: V11
+!SN: SAL1630HK76
+!NAME: "Switching Engine Container 9", DESCR: "Switching Engine Container 9"
+!NAME: "WS-F6700-DFC3C Distributed Forwarding Card 3 sub-module of 9", DESCR: "WS-F6700-DFC3C Distributed Forwarding Card 3 Rev. 1.5"
+!PID: WS-F6700-DFC3C
+!VID: V03
+!SN: SAL1630J3SF
+!NAME: "module 9 EARL outlet temperature Sensor", DESCR: "module 9 EARL outlet temperature Sensor"
+!NAME: "module 9 EARL inlet temperature Sensor", DESCR: "module 9 EARL inlet temperature Sensor"
+!NAME: "10-Gigabit Port Container 9/1", DESCR: "10-Gigabit Port Container Te9/1"
+!NAME: "10-Gigabit Port Container 9/2", DESCR: "10-Gigabit Port Container Te9/2"
+!NAME: "10-Gigabit Port Container 9/3", DESCR: "10-Gigabit Port Container Te9/3"
+!NAME: "10-Gigabit Port Container 9/4", DESCR: "10-Gigabit Port Container Te9/4"
+!NAME: "10-Gigabit Port Container 9/5", DESCR: "10-Gigabit Port Container Te9/5"
+!NAME: "10-Gigabit Port Container 9/6", DESCR: "10-Gigabit Port Container Te9/6"
+!NAME: "10-Gigabit Port Container 9/7", DESCR: "10-Gigabit Port Container Te9/7"
+!NAME: "10-Gigabit Port Container 9/8", DESCR: "10-Gigabit Port Container Te9/8"
+!NAME: "module 9 power-output-fail Sensor", DESCR: "module 9 power-output-fail Sensor"
+!NAME: "module 9 insufficient cooling Sensor", DESCR: "module 9 insufficient cooling Sensor"
+!NAME: "module 9 outlet temperature Sensor", DESCR: "module 9 outlet temperature Sensor"
+!NAME: "module 9 inlet temperature Sensor", DESCR: "module 9 inlet temperature Sensor"
+!NAME: "module 9 aux-1 temperature Sensor", DESCR: "module 9 aux-1 temperature Sensor"
+!NAME: "module 9 aux-2 temperature Sensor", DESCR: "module 9 aux-2 temperature Sensor"
+!NAME: "module 9 asic-1 temperature Sensor", DESCR: "module 9 asic-1 temperature Sensor"
+!NAME: "module 9 asic-2 temperature Sensor", DESCR: "module 9 asic-2 temperature Sensor"
+!NAME: "CPU of Module 9",       DESCR: "CPU of Module 9"
+!NAME: "Container of Fan FRU 1", DESCR: "Container of Fan FRU"
+!NAME: "WS-C6509-E-FAN 1",      DESCR: "Enhanced 9-slot Fan Tray 1"
+!PID: WS-C6509-E-FAN
+!VID: V03
+!SN: DCH12210963
+!NAME: "Container of Container of Power Supply", DESCR: "Container of Container of Power Supply"
+!NAME: "Container of Power Supply 1", DESCR: "Container of Power Supply 1"
+!NAME: "PS 1 WS-CAC-6000W",     DESCR: "AC power supply, 6000 watt 1"
+!PID: WS-CAC-6000W
+!VID: V04
+!SN: AZS11330AAP
+!NAME: "power-supply 1 fan-fail Sensor", DESCR: "power-supply 1 fan-fail Sensor"
+!NAME: "power-supply 1 power-output-fail Sensor", DESCR: "power-supply 1 power-output-fail Sensor"
+!NAME: "power-supply 1 incompatible with fan Sensor", DESCR: "power-supply 1 incompatible with fan Sensor"
+!NAME: "power-supply 1 power-output-mode Sensor", DESCR: "power-supply 1 power-output-mode Sensor"
+!NAME: "power-supply 1 power-input Sensor", DESCR: "power-supply 1 power-input Sensor"
+!NAME: "Container of Power Supply 2", DESCR: "Container of Power Supply 2"
+!NAME: "PS 2 WS-CAC-6000W",     DESCR: "AC power supply, 6000 watt 2"
+!PID: WS-CAC-6000W
+!VID: V05
+!SN: AZS15290BPN
+!NAME: "power-supply 2 fan-fail Sensor", DESCR: "power-supply 2 fan-fail Sensor"
+!NAME: "power-supply 2 power-output-fail Sensor", DESCR: "power-supply 2 power-output-fail Sensor"
+!NAME: "power-supply 2 incompatible with fan Sensor", DESCR: "power-supply 2 incompatible with fan Sensor"
+!NAME: "power-supply 2 power-output-mode Sensor", DESCR: "power-supply 2 power-output-mode Sensor"
+!NAME: "power-supply 2 power-input Sensor", DESCR: "power-supply 2 power-input Sensor"
+!
+!VTP: VTP Version                     : 2
+!VTP: Configuration Revision          : 25
+!VTP: Maximum VLANs supported locally : 1005
+!VTP: Number of existing VLANs        : 28
+!VTP: VTP Operating Mode              : Server
+!VTP: VTP Domain Name                 : 
+!VTP: VTP Pruning Mode                : Disabled
+!VTP: VTP V2 Mode                     : Disabled
+!VTP: VTP Traps Generation            : Disabled
+!VTP: MD5 digest                      : 0x3D 0xC2 0x14 0x84 0x9D 0x10 0xD8 0x11 
+!VTP: Local updater ID is 10.2.8.3 on interface Vl8 (lowest numbered VLAN interface found)
+!
+!VLAN: VLAN Name                             Status    Ports
+!VLAN: ---- -------------------------------- --------- -------------------------------
+!VLAN: 1    default                          active    Gi2/6, Gi2/23, Gi2/26, Gi2/28
+!VLAN:                                                 Gi2/30, Gi2/32, Gi2/34, Gi2/38
+!VLAN:                                                 Gi2/39, Gi2/40, Gi2/41, Gi2/42
+!VLAN:                                                 Gi2/44, Gi2/46, Gi2/47, Gi2/48
+!VLAN:                                                 Gi3/21, Gi3/24, Gi3/38, Gi3/46
+!VLAN:                                                 Gi4/3, Gi4/4, Gi4/5, Gi4/6
+!VLAN:                                                 Gi4/9, Gi4/10, Gi4/11, Gi4/12
+!VLAN:                                                 Gi4/13, Gi4/15, Gi4/16, Gi4/17
+!VLAN:                                                 Gi4/18, Gi4/19, Gi4/21, Gi4/22
+!VLAN:                                                 Gi4/23, Gi4/24, Gi4/25, Gi4/26
+!VLAN:                                                 Gi4/27, Gi4/28, Gi4/29, Gi4/31
+!VLAN:                                                 Gi4/32, Gi4/33, Gi4/34, Gi4/35
+!VLAN:                                                 Gi4/36, Gi4/37, Gi4/38, Gi4/39
+!VLAN:                                                 Gi4/40, Gi4/42, Gi4/44, Gi4/46
+!VLAN:                                                 Gi4/47, Gi7/2, Gi7/5, Gi7/7
+!VLAN:                                                 Gi7/8, Gi7/13, Te9/1, Te9/2
+!VLAN:                                                 Te9/8
+!VLAN: 8    VLAN0008                         active    
+!VLAN: 10   VLAN0010                         active    Gi3/8, Gi3/11, Gi3/13, Gi3/26
+!VLAN:                                                 Gi3/30, Gi3/42, Gi3/44, Gi3/48
+!VLAN: 11   VLAN0011                         active    Gi4/1, Gi7/47, Gi7/48
+!VLAN: 12   VLAN0012                         active    Gi7/3, Gi7/4, Gi7/39, Gi7/40
+!VLAN:                                                 Gi7/41, Gi7/42, Gi7/43, Gi7/44
+!VLAN:                                                 Gi7/45
+!VLAN: 14   VLAN0014                         active    Gi4/41, Gi4/43
+!VLAN: 40   VLAN0040                         active    Gi4/7
+!VLAN: 120  VLAN0120                         active    
+!VLAN: 130  VLAN0130                         active    
+!VLAN: 140  VLAN0140                         active    
+!VLAN: 150  VLAN0150                         active    Gi7/37, Gi7/38
+!VLAN: 200  VLAN0200                         active    Gi2/2, Gi2/4, Gi2/8, Gi2/10
+!VLAN:                                                 Gi2/12
+!VLAN: 201  XenVlan201                       active    Gi3/4, Gi3/6, Gi3/10, Gi3/12
+!VLAN:                                                 Gi3/14, Gi3/28, Gi3/32, Gi3/33
+!VLAN:                                                 Gi3/36, Gi3/40, Gi3/41, Gi3/43
+!VLAN:                                                 Gi3/45, Gi4/2, Gi4/8, Gi4/14
+!VLAN:                                                 Gi4/30, Gi4/45, Gi7/9, Gi7/11
+!VLAN:                                                 Gi7/15, Gi7/17, Gi7/19, Gi7/21
+!VLAN:                                                 Gi7/23, Gi7/25, Gi7/26, Gi7/27
+!VLAN:                                                 Gi7/28, Gi7/29
+!VLAN: 210  VIPVlan                          active    
+!VLAN: 211  VIPVlan2                         active    
+!VLAN: 220  VLAN0220                         active    Gi3/47
+!VLAN: 221  ProxyVlan2                       active    Gi3/16
+!VLAN: 230  VLAN0230                         active    Gi3/5, Gi3/9, Gi3/15, Gi3/17
+!VLAN:                                                 Gi3/19, Gi3/27, Gi3/29, Gi3/31
+!VLAN: 231  AppVlan2                         active    Gi3/18, Gi3/34
+!VLAN: 240  VLAN0240                         active    Gi3/7, Gi3/22, Gi3/23, Gi3/25
+!VLAN:                                                 Gi3/35, Gi3/37, Gi3/39
+!VLAN: 241  SQLVlan2                         active    Gi3/20, Gi4/20
+!VLAN: 251  NFSVlan2                         active    
+!VLAN: 400  VLAN0400                         active    Gi2/37
+!VLAN: 802  NFS1_1G_LAX2                     active    
+!VLAN: 1002 fddi-default                     act/unsup 
+!VLAN: 1003 token-ring-default               act/unsup 
+!VLAN: 1004 fddinet-default                  act/unsup 
+!VLAN: 1005 trnet-default                    act/unsup 
+!VLAN: 1020 lax1TechPlatformProd             active    
+!VLAN: 1022 lax1Management                   active    
+!VLAN: 1024 lax1XenMaster                    active    
+!VLAN: 1026 lax1DoubleHelixProd              active    
+!VLAN: 1028 lax1SpringboardVideoProd         active    
+!VLAN: 1030 lax1AdopsProd                    active    
+!VLAN: 1032 lax1SheKnowsProd                 active    
+!VLAN: 1034 lax1AtomicOnlineProd             active    Gi4/48
+!VLAN: 1036 lax1OriginProd                   active    
+!VLAN: 1120 lax1TechPlatformStage            active    
+!VLAN: 1122 lax1ManagementReserved1          active    
+!VLAN: 1124 lax1XenMasterReserved1           active    
+!VLAN: 1126 lax1DoubleHelixStage             active    
+!VLAN: 1128 lax1SpringboardVideoStage        active    
+!VLAN: 1130 lax1AdopsStage                   active    
+!VLAN: 1132 lax1SheKnowsStage                active    
+!VLAN: 1134 lax1AtomicOnlineStage            active    
+!VLAN: 1136 lax1OriginStage                  active    
+!VLAN: 1220 lax1TechPlatformDev              active    
+!VLAN: 1222 lax1ManagementReserved2          active    
+!VLAN: 1224 lax1XenMasterReserved2           active    
+!VLAN: 1226 lax1DoubleHelixDev               active    
+!VLAN: 1228 lax1SpringboardVideoDev          active    
+!VLAN: 1230 lax1AdopsDev                     active    
+!VLAN: 1232 lax1SheKnowsDev                  active    
+!VLAN: 1234 lax1AtomicOnlineDev              active    
+!VLAN: 1236 lax1OriginDev                    active    
+!VLAN: 2020 lax2TechPlatformProd             active    
+!VLAN: 2022 lax2Management                   active    Gi2/13, Gi2/14, Gi2/15, Gi2/16
+!VLAN:                                                 Gi2/17, Gi2/18, Gi2/19, Gi2/20
+!VLAN:                                                 Gi2/21, Gi2/36, Gi2/43, Gi2/45
+!VLAN:                                                 Gi3/1, Gi3/2, Gi3/3, Gi7/35
+!VLAN:                                                 Gi7/36
+!VLAN: 2024 lax2XenMaster                    active    
+!VLAN: 2026 lax2DoubleHelixProd              active    
+!VLAN: 2028 lax2SpringboardVideoProd         active    
+!VLAN: 2030 lax2AdopsProd                    active    
+!VLAN: 2032 lax2SheKnowsProd                 active    
+!VLAN: 2034 lax2AtomicOnlineProd             active    
+!VLAN: 2036 lax2OriginProd                   active    
+!VLAN: 2120 lax2TechPlatformStage            active    
+!VLAN: 2122 lax2ManagementReserved1          active    
+!VLAN: 2124 lax2XenMasterReserved1           active    
+!VLAN: 2126 lax2DoubleHelixStage             active    
+!VLAN: 2128 lax2SpringboardVideoStage        active    
+!VLAN: 2130 lax2AdopsStage                   active    
+!VLAN: 2132 lax2SheKnowsStage                active    
+!VLAN: 2134 lax2AtomicOnlineStage            active    
+!VLAN: 2136 lax2OriginStage                  active    
+!VLAN: 2220 lax2TechPlatformDev              active    
+!VLAN: 2222 lax2ManagementReserved2          active    
+!VLAN: 2224 lax2XenMasterReserved2           active    
+!VLAN: 2226 lax2DoubleHelixDev               active    
+!VLAN: 2228 lax2SpringboardVideoDev          active    
+!VLAN: 2230 lax2AdopsDev                     active    
+!VLAN: 2232 lax2SheKnowsDev                  active    
+!VLAN: 2234 lax2AtomicOnlineDev              active    
+!VLAN: 2236 lax2OriginDev                    active    
+!VLAN: VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+!VLAN: ---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+!VLAN: 1    enet  100001     1500  -      -      -        -    -        0      0   
+!VLAN: 8    enet  100008     1500  -      -      -        -    -        0      0   
+!VLAN: 10   enet  100010     1500  -      -      -        -    -        0      0   
+!VLAN: 11   enet  100011     1500  -      -      -        -    -        0      0   
+!VLAN: 12   enet  100012     1500  -      -      -        -    -        0      0   
+!VLAN: 14   enet  100014     1500  -      -      -        -    -        0      0   
+!VLAN: 40   enet  100040     1500  -      -      -        -    -        0      0   
+!VLAN: 120  enet  100120     1500  -      -      -        -    -        0      0   
+!VLAN: 130  enet  100130     1500  -      -      -        -    -        0      0   
+!VLAN: 140  enet  100140     1500  -      -      -        -    -        0      0   
+!VLAN: 150  enet  100150     1500  -      -      -        -    -        0      0   
+!VLAN: 200  enet  100200     1500  -      -      -        -    -        0      0   
+!VLAN: 201  enet  100201     1500  -      -      -        -    -        0      0   
+!VLAN: 210  enet  100210     1500  -      -      -        -    -        0      0   
+!VLAN: 211  enet  100211     1500  -      -      -        -    -        0      0   
+!VLAN: 220  enet  100220     1500  -      -      -        -    -        0      0   
+!VLAN: 221  enet  100221     1500  -      -      -        -    -        0      0   
+!VLAN: 230  enet  100230     1500  -      -      -        -    -        0      0   
+!VLAN: 231  enet  100231     1500  -      -      -        -    -        0      0   
+!VLAN: 240  enet  100240     1500  -      -      -        -    -        0      0   
+!VLAN: 241  enet  100241     1500  -      -      -        -    -        0      0   
+!VLAN: 251  enet  100251     1500  -      -      -        -    -        0      0   
+!VLAN: 400  enet  100400     1500  -      -      -        -    -        0      0   
+!VLAN: 802  enet  100802     1500  -      -      -        -    -        0      0   
+!VLAN: 1002 fddi  101002     1500  -      -      -        -    -        0      0   
+!VLAN: 1003 tr    101003     1500  -      -      -        -    -        0      0   
+!VLAN: 1004 fdnet 101004     1500  -      -      -        ieee -        0      0   
+!VLAN: 1005 trnet 101005     1500  -      -      -        ibm  -        0      0   
+!VLAN: 1020 enet  101020     1500  -      -      -        -    -        0      0   
+!VLAN: 1022 enet  101022     1500  -      -      -        -    -        0      0   
+!VLAN: 1024 enet  101024     1500  -      -      -        -    -        0      0   
+!VLAN: 1026 enet  101026     1500  -      -      -        -    -        0      0   
+!VLAN: 1028 enet  101028     1500  -      -      -        -    -        0      0   
+!VLAN: 1030 enet  101030     1500  -      -      -        -    -        0      0   
+!VLAN: 1032 enet  101032     1500  -      -      -        -    -        0      0   
+!VLAN: 1034 enet  101034     1500  -      -      -        -    -        0      0   
+!VLAN: 1036 enet  101036     1500  -      -      -        -    -        0      0   
+!VLAN: 1120 enet  101120     1500  -      -      -        -    -        0      0   
+!VLAN: 1122 enet  101122     1500  -      -      -        -    -        0      0   
+!VLAN: 1124 enet  101124     1500  -      -      -        -    -        0      0   
+!VLAN: 1126 enet  101126     1500  -      -      -        -    -        0      0   
+!VLAN: 1128 enet  101128     1500  -      -      -        -    -        0      0   
+!VLAN: 1130 enet  101130     1500  -      -      -        -    -        0      0   
+!VLAN: 1132 enet  101132     1500  -      -      -        -    -        0      0   
+!VLAN: 1134 enet  101134     1500  -      -      -        -    -        0      0   
+!VLAN: 1136 enet  101136     1500  -      -      -        -    -        0      0   
+!VLAN: 1220 enet  101220     1500  -      -      -        -    -        0      0   
+!VLAN: 1222 enet  101222     1500  -      -      -        -    -        0      0   
+!VLAN: 1224 enet  101224     1500  -      -      -        -    -        0      0   
+!VLAN: 1226 enet  101226     1500  -      -      -        -    -        0      0   
+!VLAN: 1228 enet  101228     1500  -      -      -        -    -        0      0   
+!VLAN: 1230 enet  101230     1500  -      -      -        -    -        0      0   
+!VLAN: 1232 enet  101232     1500  -      -      -        -    -        0      0   
+!VLAN: 1234 enet  101234     1500  -      -      -        -    -        0      0   
+!VLAN: 1236 enet  101236     1500  -      -      -        -    -        0      0   
+!VLAN: 2020 enet  102020     1500  -      -      -        -    -        0      0   
+!VLAN: 2022 enet  102022     1500  -      -      -        -    -        0      0   
+!VLAN: 2024 enet  102024     1500  -      -      -        -    -        0      0   
+!VLAN: 2026 enet  102026     1500  -      -      -        -    -        0      0   
+!VLAN: 2028 enet  102028     1500  -      -      -        -    -        0      0   
+!VLAN: 2030 enet  102030     1500  -      -      -        -    -        0      0   
+!VLAN: 2032 enet  102032     1500  -      -      -        -    -        0      0   
+!VLAN: 2034 enet  102034     1500  -      -      -        -    -        0      0   
+!VLAN: 2036 enet  102036     1500  -      -      -        -    -        0      0   
+!VLAN: 2120 enet  102120     1500  -      -      -        -    -        0      0   
+!VLAN: 2122 enet  102122     1500  -      -      -        -    -        0      0   
+!VLAN: 2124 enet  102124     1500  -      -      -        -    -        0      0   
+!VLAN: 2126 enet  102126     1500  -      -      -        -    -        0      0   
+!VLAN: 2128 enet  102128     1500  -      -      -        -    -        0      0   
+!VLAN: 2130 enet  102130     1500  -      -      -        -    -        0      0   
+!VLAN: 2132 enet  102132     1500  -      -      -        -    -        0      0   
+!VLAN: 2134 enet  102134     1500  -      -      -        -    -        0      0   
+!VLAN: 2136 enet  102136     1500  -      -      -        -    -        0      0   
+!VLAN: 2220 enet  102220     1500  -      -      -        -    -        0      0   
+!VLAN: 2222 enet  102222     1500  -      -      -        -    -        0      0   
+!VLAN: 2224 enet  102224     1500  -      -      -        -    -        0      0   
+!VLAN: 2226 enet  102226     1500  -      -      -        -    -        0      0   
+!VLAN: 2228 enet  102228     1500  -      -      -        -    -        0      0   
+!VLAN: 2230 enet  102230     1500  -      -      -        -    -        0      0   
+!VLAN: 2232 enet  102232     1500  -      -      -        -    -        0      0   
+!VLAN: 2234 enet  102234     1500  -      -      -        -    -        0      0   
+!VLAN: 2236 enet  102236     1500  -      -      -        -    -        0      0   
+!VLAN: Remote SPAN VLANs
+!VLAN: ------------------------------------------------------------------------------
+!VLAN: Primary Secondary Type              Ports
+!VLAN: ------- --------- ----------------- ------------------------------------------
+!
+!
+config-register 0x2102
+!
+upgrade fpd auto
+version 12.2
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service counters max age 5
+!
+hostname swx1.lax2
+!
+boot-start-marker
+boot system flash sup-bootdisk:s72033-ipservicesk9_wan-vz.122-33.SXH4.bin
+boot system flash sup-bootdisk:s72033-ipservicesk9_wan-vz.122-33.SXH3.bin
+boot-end-marker
+!
+no logging console
+enable secret 5 $1$02AO$F8XR/pgXw0akuN4WK3Rso/
+!
+username admin secret 5 $1$thrI$hoM/S6YzgySQYHGcvAf8K0
+username rancid secret 5 $1$Yd9M$HbqciiQqjBt9ObmI0yjpf.
+aaa new-model
+!
+aaa session-id common
+clock timezone PST -8
+clock summer-time PDT recurring
+clock calendar-valid
+svclc multiple-vlan-interfaces
+svclc module 1 vlan-group 1,10,11,12,200,400,1034,
+svclc vlan-group 1  210,211,220,221,230,231,240,241
+svclc vlan-group 10  10
+svclc vlan-group 11  11
+svclc vlan-group 12  12
+svclc vlan-group 200  200
+svclc vlan-group 400  400
+svclc vlan-group 1034  1034
+ip subnet-zero
+!
+no ip domain-lookup
+ip domain-name swx1.lax2.gnmedia.net
+ip multicast-routing 
+!
+ip ssh authentication-retries 2
+ip ssh version 2
+call-home
+ alert-group configuration
+ alert-group diagnostic
+ alert-group environment
+ alert-group inventory
+ alert-group syslog
+ profile "CiscoTAC-1"
+  no active
+  no destination transport-method http
+  destination transport-method email
+  destination address email callhome@cisco.com
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
+  subscribe-to-alert-group diagnostic severity minor 
+  subscribe-to-alert-group environment severity minor 
+  subscribe-to-alert-group syslog severity major pattern ".*"
+  subscribe-to-alert-group configuration periodic monthly 25 9:51
+  subscribe-to-alert-group inventory periodic monthly 25 9:36
+mls netflow interface
+mls flow ip interface-full
+mls nde sender version 5
+mls ip slb purge global
+mls cef error action reset
+!
+power redundancy-mode combined
+fabric timer 15
+diagnostic cns publish cisco.cns.device.diag_results
+diagnostic cns subscribe cisco.cns.device.diag_commands
+!
+redundancy
+ keepalive-enable
+ mode sso
+ main-cpu
+  auto-sync running-config
+!
+spanning-tree mode rapid-pvst
+spanning-tree extend system-id
+spanning-tree vlan 1020-1234,1236,2020-2234,2236 priority 28672
+!
+vlan internal allocation policy ascending
+vlan access-log ratelimit 2000
+!
+vlan 1020
+ name lax1TechPlatformProd
+!
+vlan 1022
+ name lax1Management
+!
+vlan 1024
+ name lax1XenMaster
+!
+vlan 1026
+ name lax1DoubleHelixProd
+!
+vlan 1028
+ name lax1SpringboardVideoProd
+!
+vlan 1030
+ name lax1AdopsProd
+!
+vlan 1032
+ name lax1SheKnowsProd
+!
+vlan 1034
+ name lax1AtomicOnlineProd
+!
+vlan 1036
+ name lax1OriginProd
+!
+vlan 1120
+ name lax1TechPlatformStage
+!
+vlan 1122
+ name lax1ManagementReserved1
+!
+vlan 1124
+ name lax1XenMasterReserved1
+!
+vlan 1126
+ name lax1DoubleHelixStage
+!
+vlan 1128
+ name lax1SpringboardVideoStage
+!
+vlan 1130
+ name lax1AdopsStage
+!
+vlan 1132
+ name lax1SheKnowsStage
+!
+vlan 1134
+ name lax1AtomicOnlineStage
+!
+vlan 1136
+ name lax1OriginStage
+!
+vlan 1220
+ name lax1TechPlatformDev
+!
+vlan 1222
+ name lax1ManagementReserved2
+!
+vlan 1224
+ name lax1XenMasterReserved2
+!
+vlan 1226
+ name lax1DoubleHelixDev
+!
+vlan 1228
+ name lax1SpringboardVideoDev
+!
+vlan 1230
+ name lax1AdopsDev
+!
+vlan 1232
+ name lax1SheKnowsDev
+!
+vlan 1234
+ name lax1AtomicOnlineDev
+!
+vlan 1236
+ name lax1OriginDev
+!
+vlan 2020
+ name lax2TechPlatformProd
+!
+vlan 2022
+ name lax2Management
+!
+vlan 2024
+ name lax2XenMaster
+!
+vlan 2026
+ name lax2DoubleHelixProd
+!
+vlan 2028
+ name lax2SpringboardVideoProd
+!
+vlan 2030
+ name lax2AdopsProd
+!
+vlan 2032
+ name lax2SheKnowsProd
+!
+vlan 2034
+ name lax2AtomicOnlineProd
+!
+vlan 2036
+ name lax2OriginProd
+!
+vlan 2120
+ name lax2TechPlatformStage
+!
+vlan 2122
+ name lax2ManagementReserved1
+!
+vlan 2124
+ name lax2XenMasterReserved1
+!
+vlan 2126
+ name lax2DoubleHelixStage
+!
+vlan 2128
+ name lax2SpringboardVideoStage
+!
+vlan 2130
+ name lax2AdopsStage
+!
+vlan 2132
+ name lax2SheKnowsStage
+!
+vlan 2134
+ name lax2AtomicOnlineStage
+!
+vlan 2136
+ name lax2OriginStage
+!
+vlan 2220
+ name lax2TechPlatformDev
+!
+vlan 2222
+ name lax2ManagementReserved2
+!
+vlan 2224
+ name lax2XenMasterReserved2
+!
+vlan 2226
+ name lax2DoubleHelixDev
+!
+vlan 2228
+ name lax2SpringboardVideoDev
+!
+vlan 2230
+ name lax2AdopsDev
+!
+vlan 2232
+ name lax2SheKnowsDev
+!
+vlan 2234
+ name lax2AtomicOnlineDev
+!
+vlan 2236
+ name lax2OriginDev
+!
+interface Loopback0
+ description lo0-sw2.lax1.gnmedia.net
+ ip address 10.255.255.17 255.255.255.255
+!
+interface Loopback1
+ description lo1-sw1.lax2.gnmedia.net
+ ip address 10.255.255.25 255.255.255.255
+!
+interface Port-channel1
+ description Netapp vif_sql
+ switchport
+ switchport access vlan 240
+ switchport mode access
+!
+interface Port-channel2
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10,130,140,230,240
+ switchport mode trunk
+!
+interface Port-channel4
+ description nx-core01.lax1/2 po4
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 1020-2234
+ switchport mode trunk
+ logging event trunk-status
+ logging event bundle-status
+ spanning-tree guard root
+ spanning-tree cost 1
+!
+interface Port-channel6
+ description nx-5596-1/2 po6
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 1020-2236
+ switchport mode trunk
+ logging event trunk-status
+ logging event bundle-status
+ spanning-tree guard root
+ spanning-tree cost 1
+!
+interface Port-channel10
+ description swx1.lax1 interconnect po10
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 150,500,1020-2236
+ switchport mode trunk
+ logging event trunk-status
+ logging event bundle-status
+ spanning-tree cost 1
+!
+interface Port-channel12
+ description Uplink to core1
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+!
+interface Port-channel20
+ description uplink to lax1
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10,130,140,230,240
+ switchport mode trunk
+!
+interface Port-channel22
+ description Uplink to core2
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,200,400,1020,1026,1028,1030,1032
+ switchport trunk allowed vlan add 1034,1036,1126,1128,1132,1134,1136,1220,1234
+ switchport trunk allowed vlan add 1236,2020,2026,2028,2032,2034,2036,2126,2128
+ switchport trunk allowed vlan add 2132,2134,2136,2220,2232,2234,2236
+ switchport mode trunk
+!
+interface Port-channel50
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 100-400,2000-2234
+ switchport mode trunk
+!
+interface Port-channel82
+ description L2 NFS1.1G.LAX2 - vifb
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 802
+ switchport mode trunk
+ load-interval 30
+!
+interface Port-channel92
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 10
+ switchport trunk allowed vlan 10,130,140,230,240,900,1008-3222
+ switchport mode trunk
+ flowcontrol receive on
+ flowcontrol send on
+!
+interface GigabitEthernet2/1
+ description uplink to core1 po12
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ no vtp
+ channel-protocol lacp
+ channel-group 12 mode active
+!
+interface GigabitEthernet2/2
+ switchport
+ switchport access vlan 200
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet2/3
+ description uplink to core1 po12
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 12 mode active
+!
+interface GigabitEthernet2/4
+ switchport
+ switchport access vlan 200
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet2/5
+ description uplink to core1 po12
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 12 mode active
+!
+interface GigabitEthernet2/6
+ description nx-core01.lax2 e1/1
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 1020-2234
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 4 mode active
+!
+interface GigabitEthernet2/7
+ description uplink to core1 po12
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 12 mode active
+!
+interface GigabitEthernet2/8
+ switchport
+ switchport access vlan 200
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet2/9
+ description uplink to core1 po12
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 12 mode active
+!
+interface GigabitEthernet2/10
+ switchport
+ switchport access vlan 200
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet2/11
+ description uplink to core1 po12
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,130,200,400,1020,1026,1028,1030
+ switchport trunk allowed vlan add 1032,1034,1036,1126,1128,1130,1132,1134,1136
+ switchport trunk allowed vlan add 1220,1234,1236,2020,2026,2028,2030,2032,2034
+ switchport trunk allowed vlan add 2036,2126,2128,2130,2132,2134,2136,2220,2232
+ switchport trunk allowed vlan add 2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 12 mode active
+!
+interface GigabitEthernet2/12
+ switchport
+ switchport access vlan 200
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet2/13
+ description temp.netapp
+ switchport
+ switchport access vlan 2022
+ no logging event link-status
+!
+interface GigabitEthernet2/14
+ description temp.netapp
+ switchport
+ switchport access vlan 2022
+!
+interface GigabitEthernet2/15
+ description temp.netapp
+ switchport
+ switchport access vlan 2022
+ no logging event link-status
+!
+interface GigabitEthernet2/16
+ description temp.netapp
+ switchport
+ switchport access vlan 2022
+!
+interface GigabitEthernet2/17
+ description nsf2.netapp2 e0a
+ switchport
+ switchport access vlan 2022
+!
+interface GigabitEthernet2/18
+ description temp.netapp
+ switchport
+ switchport access vlan 2022
+!
+interface GigabitEthernet2/19
+ description e0a netapp3
+ switchport
+ switchport access vlan 2022
+!
+interface GigabitEthernet2/20
+ description temp.netapp
+ switchport
+ switchport access vlan 2022
+!
+interface GigabitEthernet2/21
+ description e01 netapp3
+ switchport
+ switchport access vlan 2022
+!
+interface GigabitEthernet2/22
+ description swx1.lax1 g2/22
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 150,500,1020-2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 10 mode active
+!
+interface GigabitEthernet2/23
+ switchport
+ channel-protocol lacp
+ channel-group 92 mode active
+!
+interface GigabitEthernet2/24
+ description swx1.lax1 g2/24
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 150,500,1020-2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 10 mode active
+!
+interface GigabitEthernet2/25
+ description uplink to core2 po22
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,200,400,1020,1026,1028,1030,1032
+ switchport trunk allowed vlan add 1034,1036,1126,1128,1132,1134,1136,1220,1234
+ switchport trunk allowed vlan add 1236,2020,2026,2028,2032,2034,2036,2126,2128
+ switchport trunk allowed vlan add 2132,2134,2136,2220,2232,2234,2236
+ switchport mode trunk
+ no vtp
+ channel-protocol lacp
+ channel-group 22 mode active
+!
+interface GigabitEthernet2/26
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 12,400
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet2/27
+ no ip address
+ shutdown
+!
+interface GigabitEthernet2/28
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 12,400
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet2/29
+ description uplink to core2 po22
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,200,400,1020,1026,1028,1030,1032
+ switchport trunk allowed vlan add 1034,1036,1126,1128,1132,1134,1136,1220,1234
+ switchport trunk allowed vlan add 1236,2020,2026,2028,2032,2034,2036,2126,2128
+ switchport trunk allowed vlan add 2132,2134,2136,2220,2232,2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 22 mode active
+!
+interface GigabitEthernet2/30
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 12,400
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet2/31
+ description uplink to core2 po22
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,200,400,1020,1026,1028,1030,1032
+ switchport trunk allowed vlan add 1034,1036,1126,1128,1132,1134,1136,1220,1234
+ switchport trunk allowed vlan add 1236,2020,2026,2028,2032,2034,2036,2126,2128
+ switchport trunk allowed vlan add 2132,2134,2136,2220,2232,2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 22 mode active
+!
+interface GigabitEthernet2/32
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 12,400
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet2/33
+ description uplink to core2 po22
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,200,400,1020,1026,1028,1030,1032
+ switchport trunk allowed vlan add 1034,1036,1126,1128,1132,1134,1136,1220,1234
+ switchport trunk allowed vlan add 1236,2020,2026,2028,2032,2034,2036,2126,2128
+ switchport trunk allowed vlan add 2132,2134,2136,2220,2232,2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 22 mode active
+!
+interface GigabitEthernet2/34
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 12,400
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet2/35
+ description uplink to core2 po22
+ switchport
+ switchport access vlan 10
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10-12,14,40,200,400,1020,1026,1028,1030,1032
+ switchport trunk allowed vlan add 1034,1036,1126,1128,1132,1134,1136,1220,1234
+ switchport trunk allowed vlan add 1236,2020,2026,2028,2032,2034,2036,2126,2128
+ switchport trunk allowed vlan add 2132,2134,2136,2220,2232,2234,2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 22 mode active
+!
+interface GigabitEthernet2/36
+ description RLM-NFS2.NetAPP2
+ switchport
+ switchport access vlan 2022
+ spanning-tree portfast
+!
+interface GigabitEthernet2/37
+ switchport
+ switchport access vlan 400
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet2/38
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 12,400
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet2/39
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 12,400
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet2/40
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 12,400
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet2/41
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 12,200
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet2/42
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 12,400
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet2/43
+ description sp-nfs2.netapp3
+ switchport
+ switchport access vlan 2022
+ spanning-tree portfast
+!
+interface GigabitEthernet2/44
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 12,400
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet2/45
+ switchport
+ switchport access vlan 2022
+ spanning-tree portfast
+!
+interface GigabitEthernet2/46
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 12,400
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet2/47
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 12,400
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet2/48
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 12,400
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet3/1
+ switchport
+ switchport access vlan 2022
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet3/2
+ switchport
+ switchport access vlan 2022
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet3/3
+ switchport
+ switchport access vlan 2022
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet3/4
+ switchport
+ switchport access vlan 201
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet3/5
+ switchport
+ switchport access vlan 230
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet3/6
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,230,240
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet3/7
+ switchport
+ switchport access vlan 240
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet3/8
+ switchport
+ switchport access vlan 10
+ spanning-tree portfast
+!
+interface GigabitEthernet3/9
+ switchport
+ switchport access vlan 230
+ spanning-tree portfast
+!
+interface GigabitEthernet3/10
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,230,231
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet3/11
+ switchport
+ switchport access vlan 10
+ spanning-tree portfast
+!
+interface GigabitEthernet3/12
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,230,240
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet3/13
+ switchport
+ switchport access vlan 10
+ spanning-tree portfast
+!
+interface GigabitEthernet3/14
+ switchport
+ switchport access vlan 201
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet3/15
+ switchport
+ switchport access vlan 230
+ spanning-tree portfast
+!
+interface GigabitEthernet3/16
+ switchport
+ switchport access vlan 221
+ spanning-tree portfast
+!
+interface GigabitEthernet3/17
+ switchport
+ switchport access vlan 230
+ spanning-tree portfast
+!
+interface GigabitEthernet3/18
+ switchport
+ switchport access vlan 231
+ spanning-tree portfast
+!
+interface GigabitEthernet3/19
+ switchport
+ switchport access vlan 230
+ spanning-tree portfast
+!
+interface GigabitEthernet3/20
+ switchport
+ switchport access vlan 241
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 241
+ switchport trunk allowed vlan 231,241
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet3/21
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 240
+ switchport trunk allowed vlan 230,240
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet3/22
+ switchport
+ switchport access vlan 240
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet3/23
+ switchport
+ switchport access vlan 240
+ spanning-tree portfast
+!
+interface GigabitEthernet3/24
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,230,240
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet3/25
+ switchport
+ switchport access vlan 240
+ spanning-tree portfast
+!
+interface GigabitEthernet3/26
+ switchport
+ switchport access vlan 10
+ spanning-tree portfast
+!
+interface GigabitEthernet3/27
+ switchport
+ switchport access vlan 230
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet3/28
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,230,240
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet3/29
+ switchport
+ switchport access vlan 230
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet3/30
+ switchport
+ switchport access vlan 10
+ spanning-tree portfast
+!
+interface GigabitEthernet3/31
+ switchport
+ switchport access vlan 230
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet3/32
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201-251
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet3/33
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,230,240
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet3/34
+ switchport
+ switchport access vlan 231
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 231
+ switchport trunk allowed vlan 201,230,231,240
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet3/35
+ switchport
+ switchport access vlan 240
+ spanning-tree portfast
+!
+interface GigabitEthernet3/36
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201-251
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet3/37
+ switchport
+ switchport access vlan 240
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet3/38
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201-251
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet3/39
+ switchport
+ switchport access vlan 240
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet3/40
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,230,240
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet3/41
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,230,240
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet3/42
+ switchport
+ switchport access vlan 10
+ spanning-tree portfast
+!
+interface GigabitEthernet3/43
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,230,240
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet3/44
+ switchport
+ switchport access vlan 10
+ spanning-tree portfast
+!
+interface GigabitEthernet3/45
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 101,130,900
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet3/46
+ description nx-core01.lax1 e1/3
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 1020-2234
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 4 mode active
+!
+interface GigabitEthernet3/47
+ switchport
+ switchport access vlan 220
+ spanning-tree portfast
+!
+interface GigabitEthernet3/48
+ switchport
+ switchport access vlan 10
+ spanning-tree portfast
+!
+interface GigabitEthernet4/1
+ description mal router
+ switchport
+ switchport access vlan 11
+ spanning-tree portfast
+!
+interface GigabitEthernet4/2
+ switchport
+ switchport access vlan 201
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet4/3
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/4
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/5
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/6
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/7
+ switchport
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet4/8
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,230,240
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet4/9
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/10
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/11
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/12
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/13
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/14
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,230,240
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet4/15
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/16
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/17
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/18
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/19
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/20
+ switchport
+ switchport access vlan 241
+ spanning-tree portfast
+!
+interface GigabitEthernet4/21
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/22
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/23
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/24
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/25
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/26
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/27
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/28
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/29
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/30
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,230,240
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet4/31
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/32
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/33
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/34
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/35
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/36
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/37
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/38
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/39
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/40
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/41
+ switchport
+ switchport access vlan 14
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet4/42
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 100-400,2000-2234
+ switchport mode trunk
+ channel-group 50 mode active
+ spanning-tree portfast
+!
+interface GigabitEthernet4/43
+ switchport
+ switchport access vlan 14
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet4/44
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 100-400,2000-2234
+ switchport mode trunk
+ channel-group 50 mode active
+ spanning-tree portfast
+!
+interface GigabitEthernet4/45
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,230,240
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet4/46
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 1020-3967
+ switchport mode trunk
+ channel-group 50 mode active
+ spanning-tree portfast
+!
+interface GigabitEthernet4/47
+ switchport
+ spanning-tree portfast
+!
+interface GigabitEthernet4/48
+ description 1400-eth2
+ switchport
+ switchport access vlan 1034
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1034
+ switchport trunk allowed vlan 1020-3967
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet5/1
+ no ip address
+ shutdown
+!
+interface GigabitEthernet5/2
+ no ip address
+ shutdown
+!
+interface GigabitEthernet7/1
+ switchport
+ switchport access vlan 11
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 11,2022
+ switchport mode trunk
+!
+interface GigabitEthernet7/2
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 12,400
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet7/3
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/4
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/5
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10,130,140,230,240
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 20 mode active
+!
+interface GigabitEthernet7/6
+ description nx-core01.lax2 e1/2
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 1020-2234
+ switchport mode trunk
+ channel-protocol lacp
+!
+interface GigabitEthernet7/7
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10,130,140,230,240
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 20 mode active
+!
+interface GigabitEthernet7/8
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk allowed vlan 8,10,130,140,230,240
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 20 mode active
+!
+interface GigabitEthernet7/9
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,241
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet7/10
+ no ip address
+ shutdown
+!
+interface GigabitEthernet7/11
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,240
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet7/12
+ no ip address
+ shutdown
+!
+interface GigabitEthernet7/13
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,231
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet7/14
+ no ip address
+ shutdown
+!
+interface GigabitEthernet7/15
+ switchport
+ switchport access vlan 201
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/16
+ no ip address
+ shutdown
+!
+interface GigabitEthernet7/17
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,231
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet7/18
+ no ip address
+ shutdown
+!
+interface GigabitEthernet7/19
+ switchport
+ switchport access vlan 201
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/20
+ no ip address
+ shutdown
+!
+interface GigabitEthernet7/21
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201-241
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet7/22
+ description swx1.lax1 g7/22
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 150,500,1020-2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 10 mode active
+!
+interface GigabitEthernet7/23
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,230
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet7/24
+ description swx1.lax1 g7/24
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 150,500,1020-2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 10 mode active
+!
+interface GigabitEthernet7/25
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,230,240,241
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet7/26
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 12,201
+ switchport mode trunk
+ spanning-tree portfast trunk
+!
+interface GigabitEthernet7/27
+ switchport
+ switchport access vlan 201
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/28
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,241
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet7/29
+ switchport
+ switchport access vlan 201
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 201
+ switchport trunk allowed vlan 201,221,231,241
+ switchport mode trunk
+ spanning-tree portfast
+!
+interface GigabitEthernet7/30
+ no ip address
+ shutdown
+!
+interface GigabitEthernet7/31
+ no ip address
+ shutdown
+!
+interface GigabitEthernet7/32
+ no ip address
+ shutdown
+!
+interface GigabitEthernet7/33
+ no ip address
+ shutdown
+!
+interface GigabitEthernet7/34
+ no ip address
+ shutdown
+!
+interface GigabitEthernet7/35
+ switchport
+ switchport access vlan 2022
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/36
+ switchport
+ switchport access vlan 2022
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/37
+ switchport
+ switchport access vlan 150
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/38
+ switchport
+ switchport access vlan 150
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/39
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/40
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/41
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/42
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/43
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/44
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/45
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ spanning-tree portfast
+!
+interface GigabitEthernet7/46
+ description nx-core01.lax1 e1/4
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 1020-2234
+ switchport mode trunk
+ channel-protocol lacp
+!
+interface GigabitEthernet7/47
+ description sw2-netapp-cluster2
+ switchport
+ switchport access vlan 11
+ spanning-tree portfast
+!
+interface GigabitEthernet7/48
+ description sw1-netapp-cluster2
+ switchport
+ switchport access vlan 11
+ switchport mode access
+ spanning-tree portfast
+!
+interface TenGigabitEthernet9/1
+ description nx-core01.lax1 e1/10
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 1020-2234
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 4 mode active
+!
+interface TenGigabitEthernet9/2
+ description nx-core01.lax2 e1/10
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 1020-2234
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 4 mode active
+!
+interface TenGigabitEthernet9/3
+ description 5596-1 e1/10
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 1020-2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 6 mode active
+!
+interface TenGigabitEthernet9/4
+ description 5592-2 e1/10
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 1020-2236
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 6 mode active
+!
+interface TenGigabitEthernet9/5
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet9/6
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet9/7
+ no ip address
+ shutdown
+!
+interface TenGigabitEthernet9/8
+ description nx-core01.lax2 e1/10
+ switchport
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 1024
+ switchport trunk allowed vlan 1020-2234
+ switchport mode trunk
+ channel-protocol lacp
+ channel-group 4 mode active
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan8
+ description DMZ8
+ ip address 10.2.8.3 255.255.254.0
+ ip flow ingress
+ ip flow egress
+ standby 8 ip 10.2.8.1
+! standby 8 authentication <removed>
+!
+interface Vlan10
+ description DMZ
+ ip address 10.2.10.57 255.255.255.0
+ ip helper-address 10.30.10.170
+ ip flow ingress
+ ip flow egress
+ ip igmp snooping querier
+ standby 10 ip 10.2.10.1
+ standby 10 priority 110
+! standby 10 authentication <removed>
+!
+interface Vlan11
+ description Admin
+ ip address 10.2.11.4 255.255.255.0
+ ip flow ingress
+ ip flow egress
+ standby 11 ip 10.2.11.1
+ standby 11 priority 110
+! standby 11 authentication <removed>
+!
+interface Vlan12
+ description Legacy
+ ip address 10.2.12.7 255.255.254.0
+ ip flow ingress
+ ip flow egress
+ standby 12 ip 10.2.12.1
+ standby 12 priority 110
+! standby 12 authentication <removed>
+!
+interface Vlan150
+ description Corp-IT Network
+ ip address 10.100.10.3 255.255.255.0
+ standby 150 ip 10.100.10.1
+ standby 150 priority 200
+! standby 150 authentication <removed>
+!
+interface Vlan802
+ description NFS1.1G.LAX2 SVI
+ ip address 10.82.10.1 255.255.255.0
+ ip flow ingress
+ ip flow egress
+!
+interface Vlan1020
+ ip address 10.11.20.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1020 ip 10.11.20.1
+ standby 1020 priority 110
+! standby 1020 authentication <removed>
+!
+interface Vlan1022
+ ip address 10.11.22.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1022 ip 10.11.22.1
+ standby 1022 priority 110
+! standby 1022 authentication <removed>
+!
+interface Vlan1024
+ ip address 10.11.24.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1024 ip 10.11.24.1
+ standby 1024 priority 110
+! standby 1024 authentication <removed>
+!
+interface Vlan1026
+ ip address 10.11.26.4 255.255.254.0
+ ip access-group 190 in
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1026 ip 10.11.26.1
+ standby 1026 priority 110
+! standby 1026 authentication <removed>
+!
+interface Vlan1028
+ ip address 10.11.28.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1028 ip 10.11.28.1
+ standby 1028 priority 110
+! standby 1028 authentication <removed>
+!
+interface Vlan1030
+ ip address 10.11.30.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1030 ip 10.11.30.1
+ standby 1030 priority 110
+! standby 1030 authentication <removed>
+!
+interface Vlan1032
+ ip address 10.11.32.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1032 ip 10.11.32.1
+ standby 1032 priority 110
+! standby 1032 authentication <removed>
+!
+interface Vlan1034
+ ip address 10.11.34.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1034 ip 10.11.34.1
+ standby 1034 priority 110
+! standby 1034 authentication <removed>
+!
+interface Vlan1036
+ description lax1OriginProd
+ ip address 10.11.36.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1036 ip 10.11.36.1
+ standby 1036 priority 110
+! standby 1036 authentication <removed>
+!
+interface Vlan1120
+ ip address 10.11.120.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1120 ip 10.11.120.1
+ standby 1120 priority 110
+! standby 1120 authentication <removed>
+!
+interface Vlan1122
+ ip address 10.11.122.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1122 ip 10.11.122.1
+ standby 1122 priority 110
+! standby 1122 authentication <removed>
+!
+interface Vlan1124
+ ip address 10.11.124.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1124 ip 10.11.124.1
+ standby 1124 priority 110
+! standby 1124 authentication <removed>
+!
+interface Vlan1126
+ ip address 10.11.126.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1126 ip 10.11.126.1
+ standby 1126 priority 110
+! standby 1126 authentication <removed>
+!
+interface Vlan1128
+ ip address 10.11.128.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1128 ip 10.11.128.1
+ standby 1128 priority 110
+! standby 1128 authentication <removed>
+!
+interface Vlan1130
+ ip address 10.11.130.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1130 ip 10.11.130.1
+ standby 1130 priority 110
+! standby 1130 authentication <removed>
+!
+interface Vlan1132
+ ip address 10.11.132.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1132 ip 10.11.132.1
+ standby 1132 priority 110
+! standby 1132 authentication <removed>
+!
+interface Vlan1134
+ ip address 10.11.134.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1134 ip 10.11.134.1
+ standby 1134 priority 110
+! standby 1134 authentication <removed>
+!
+interface Vlan1136
+ description lax1OriginStage
+ ip address 10.11.136.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1136 ip 10.11.136.1
+ standby 1136 priority 110
+! standby 1136 authentication <removed>
+!
+interface Vlan1220
+ ip address 10.11.220.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1220 ip 10.11.220.1
+ standby 1220 priority 110
+! standby 1220 authentication <removed>
+!
+interface Vlan1222
+ ip address 10.11.222.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1222 ip 10.11.222.1
+ standby 1222 priority 110
+! standby 1222 authentication <removed>
+!
+interface Vlan1224
+ ip address 10.11.224.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1224 ip 10.11.224.1
+ standby 1224 priority 110
+! standby 1224 authentication <removed>
+!
+interface Vlan1226
+ ip address 10.11.226.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1226 ip 10.11.226.1
+ standby 1226 priority 110
+! standby 1226 authentication <removed>
+!
+interface Vlan1228
+ ip address 10.11.228.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1228 ip 10.11.228.1
+ standby 1228 priority 110
+! standby 1228 authentication <removed>
+!
+interface Vlan1230
+ ip address 10.11.230.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1230 ip 10.11.230.1
+ standby 1230 priority 110
+! standby 1230 authentication <removed>
+!
+interface Vlan1232
+ ip address 10.11.232.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1232 ip 10.11.232.1
+ standby 1232 priority 110
+! standby 1232 authentication <removed>
+!
+interface Vlan1234
+ ip address 10.11.234.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1234 ip 10.11.234.1
+ standby 1234 priority 110
+! standby 1234 authentication <removed>
+!
+interface Vlan1236
+ description lax1OriginDev
+ ip address 10.11.236.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 1236 ip 10.11.236.1
+ standby 1236 priority 110
+! standby 1236 authentication <removed>
+!
+interface Vlan2020
+ description lax2TechPlatformProd
+ ip address 10.12.20.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2020 ip 10.12.20.1
+ standby 2020 priority 110
+! standby 2020 authentication <removed>
+!
+interface Vlan2022
+ description lax2Management
+ ip address 10.12.22.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2022 ip 10.12.22.1
+ standby 2022 priority 110
+! standby 2022 authentication <removed>
+!
+interface Vlan2024
+ description lax2XenMaster
+ ip address 10.12.24.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2024 ip 10.12.24.1
+ standby 2024 priority 110
+! standby 2024 authentication <removed>
+!
+interface Vlan2026
+ description lax2DoubleHelixProd
+ ip address 10.12.26.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2026 ip 10.12.26.1
+ standby 2026 priority 110
+! standby 2026 authentication <removed>
+!
+interface Vlan2028
+ description lax2SpringboardVideoProd
+ ip address 10.12.28.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2028 ip 10.12.28.1
+ standby 2028 priority 110
+! standby 2028 authentication <removed>
+!
+interface Vlan2030
+ description lax2AdopsProd
+ ip address 10.12.30.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2030 ip 10.12.30.1
+ standby 2030 priority 110
+! standby 2030 authentication <removed>
+!
+interface Vlan2032
+ description lax2SheKnowsProd
+ ip address 10.12.32.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2032 ip 10.12.32.1
+ standby 2032 priority 110
+! standby 2032 authentication <removed>
+!
+interface Vlan2034
+ description lax2AtomicOnlineProd
+ ip address 10.12.34.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2034 ip 10.12.34.1
+ standby 2034 priority 110
+! standby 2034 authentication <removed>
+!
+interface Vlan2036
+ description lax2OriginProd
+ ip address 10.12.36.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2036 ip 10.12.36.1
+ standby 2036 priority 110
+! standby 2036 authentication <removed>
+!
+interface Vlan2120
+ description lax2TechPlatformStage
+ ip address 10.12.120.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2120 ip 10.12.120.1
+ standby 2120 priority 110
+! standby 2120 authentication <removed>
+!
+interface Vlan2122
+ description lax2ManagementReserved1
+ ip address 10.12.122.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2122 ip 10.12.122.1
+ standby 2122 priority 110
+! standby 2122 authentication <removed>
+!
+interface Vlan2124
+ description lax2XenMasterReserved1
+ ip address 10.12.124.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2124 ip 10.12.124.1
+ standby 2124 priority 110
+! standby 2124 authentication <removed>
+!
+interface Vlan2126
+ description lax2DoubleHelixStage
+ ip address 10.12.126.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2126 ip 10.12.126.1
+ standby 2126 priority 110
+! standby 2126 authentication <removed>
+!
+interface Vlan2128
+ description lax2SpringboardVideoStage
+ ip address 10.12.128.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2128 ip 10.12.128.1
+ standby 2128 priority 110
+! standby 2128 authentication <removed>
+!
+interface Vlan2130
+ description lax2AdopsStage
+ ip address 10.12.130.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2130 ip 10.12.130.1
+ standby 2130 priority 110
+! standby 2130 authentication <removed>
+!
+interface Vlan2132
+ description lax2SheKnowsStage
+ ip address 10.12.132.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2132 ip 10.12.132.1
+ standby 2132 priority 110
+! standby 2132 authentication <removed>
+!
+interface Vlan2134
+ description lax2AtomicOnlineStage
+ ip address 10.12.134.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2134 ip 10.12.134.1
+ standby 2134 priority 110
+! standby 2134 authentication <removed>
+!
+interface Vlan2136
+ description lax2OriginStage
+ ip address 10.12.136.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2136 ip 10.12.136.1
+ standby 2136 priority 110
+! standby 2136 authentication <removed>
+!
+interface Vlan2220
+ description lax2TechPlatformDev
+ ip address 10.12.220.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2220 ip 10.12.220.1
+ standby 2220 priority 110
+! standby 2220 authentication <removed>
+!
+interface Vlan2222
+ description lax2ManagementReserved2
+ ip address 10.12.222.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2222 ip 10.12.222.1
+ standby 2222 priority 110
+! standby 2222 authentication <removed>
+!
+interface Vlan2224
+ description lax2XenMasterReserved2
+ ip address 10.12.224.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2224 ip 10.12.224.1
+ standby 2224 priority 110
+! standby 2224 authentication <removed>
+!
+interface Vlan2226
+ description lax2DoubleHelixDev
+ ip address 10.12.226.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2226 ip 10.12.226.1
+ standby 2226 priority 110
+! standby 2226 authentication <removed>
+!
+interface Vlan2228
+ description lax2SpringboardVideoDev
+ ip address 10.12.228.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2228 ip 10.12.228.1
+ standby 2228 priority 110
+! standby 2228 authentication <removed>
+!
+interface Vlan2230
+ description lax2AdopsDev
+ ip address 10.12.230.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2230 ip 10.12.230.1
+ standby 2230 priority 110
+! standby 2230 authentication <removed>
+!
+interface Vlan2232
+ description lax2SheKnowsDev
+ ip address 10.12.232.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2232 ip 10.12.232.1
+ standby 2232 priority 110
+! standby 2232 authentication <removed>
+!
+interface Vlan2234
+ description lax2AtomicOnlineDev
+ ip address 10.12.234.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2234 ip 10.12.234.1
+ standby 2234 priority 110
+! standby 2234 authentication <removed>
+!
+interface Vlan2236
+ description lax2OriginDev
+ ip address 10.12.236.4 255.255.254.0
+ ip helper-address 10.11.20.91
+ ip flow ingress
+ ip flow egress
+ standby version 2
+ standby 2236 ip 10.12.236.1
+ standby 2236 priority 110
+! standby 2236 authentication <removed>
+!
+router ospf 1
+ log-adjacency-changes
+ redistribute connected subnets
+ network 10.2.10.0 0.0.0.255 area 0
+ network 10.20.30.0 0.0.0.255 area 0
+ network 10.20.40.0 0.0.0.255 area 0
+!
+router bgp 65002
+ no synchronization
+ bgp log-neighbor-changes
+ network 10.2.15.0 mask 255.255.255.0
+ network 10.2.50.0 mask 255.255.255.0
+ redistribute connected route-map conn2bgp
+ neighbor HQcolo peer-group
+ neighbor HQcolo remote-as 65001
+ neighbor HQcolo ebgp-multihop 255
+ neighbor HQcolo distribute-list 11 in
+ neighbor HQcolo distribute-list 12 out
+ neighbor HQcolo route-map TO-LAX out
+ neighbor 10.255.255.16 remote-as 65002
+ neighbor 10.255.255.16 update-source Loopback0
+ neighbor 10.255.255.18 remote-as 65002
+ neighbor 10.255.255.18 update-source Loopback0
+ neighbor 192.168.253.16 peer-group HQcolo
+ neighbor 192.168.253.16 description lax-core hq via s2s VPN
+ neighbor 192.168.253.16 update-source Loopback0
+ neighbor 192.168.253.24 peer-group HQcolo
+ neighbor 192.168.253.24 update-source Loopback1
+ no auto-summary
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 10.2.10.7
+ip route 72.172.76.139 255.255.255.255 Null0
+ip route 192.168.0.0 255.255.0.0 10.2.11.254
+ip route 192.168.3.0 255.255.255.0 10.2.11.254
+ip route 192.168.253.16 255.255.255.248 10.2.10.254
+ip route 192.168.253.24 255.255.255.248 10.2.11.254
+!
+ip flow-export source Vlan11
+ip flow-export version 5
+ip flow-export destination 10.11.20.35 2055
+ip flow-export destination 10.11.20.26 2055
+!
+no ip http server
+no ip http secure-server
+!
+access-list 11 deny   10.0.0.0 0.255.255.255
+access-list 11 permit any
+access-list 12 deny   10.255.0.0 0.0.255.255
+access-list 12 permit 10.0.0.0 0.255.255.255
+access-list 16 permit 10.20.0.0 0.0.255.255
+access-list 190 deny   tcp host 10.11.26.28 host 10.11.20.91 eq 22
+access-list 190 deny   tcp host 10.11.26.28 host 10.11.226.29 eq 22
+access-list 190 permit ip host 10.11.26.28 host 10.11.20.91
+access-list 190 permit ip host 10.11.26.28 host 10.11.20.81
+access-list 190 permit ip host 10.11.26.28 host 10.11.20.64
+access-list 190 permit ip host 10.11.26.28 host 10.12.20.28
+access-list 190 permit ip host 10.11.26.28 host 10.11.226.29
+access-list 190 permit udp host 10.11.26.28 host 10.11.20.66 eq ntp
+access-list 190 permit udp host 10.11.26.28 host 10.11.20.65 eq ntp
+access-list 190 permit udp host 10.11.26.28 host 10.11.20.67 eq ntp
+access-list 190 permit udp host 10.11.26.28 host 10.11.20.69 eq domain
+access-list 190 permit udp host 10.11.26.28 host 10.11.20.53 eq domain
+access-list 190 permit udp host 10.11.26.28 host 10.11.20.68 eq domain
+access-list 190 permit tcp host 10.11.26.28 host 10.11.20.20
+access-list 190 permit tcp host 10.11.26.28 host 10.11.20.69 eq domain
+access-list 190 permit tcp host 10.11.26.28 host 10.11.20.53 eq domain
+access-list 190 permit tcp host 10.11.26.28 host 10.11.20.68 eq domain
+access-list 190 permit tcp host 10.11.26.28 host 10.12.26.26 eq 3306
+access-list 190 permit tcp host 10.11.26.28 host 10.12.126.28 eq 3306
+access-list 190 permit tcp host 10.11.26.28 host 10.12.20.39 eq 8140
+access-list 190 permit tcp host 10.11.26.28 host 10.11.20.28 eq www
+access-list 190 permit tcp host 10.11.26.28 host 10.11.20.30 eq 443
+access-list 190 permit tcp host 10.11.26.28 host 10.11.20.55 eq 2003
+access-list 190 permit tcp host 10.11.26.28 host 10.11.20.137 eq www
+access-list 190 permit tcp host 10.11.26.28 host 10.11.20.63 eq www
+access-list 190 permit tcp host 10.11.26.28 host 10.11.20.71 eq 389
+access-list 190 permit tcp host 10.11.26.28 host 10.11.20.71 eq 636
+access-list 190 deny   tcp host 10.11.26.29 host 10.11.20.91 eq 22
+access-list 190 deny   tcp host 10.11.26.29 host 10.11.226.29 eq 22
+access-list 190 permit ip host 10.11.26.29 host 10.11.20.91
+access-list 190 permit ip host 10.11.26.29 host 10.11.20.81
+access-list 190 permit ip host 10.11.26.29 host 10.11.20.64
+access-list 190 permit ip host 10.11.26.29 host 10.12.20.28
+access-list 190 permit ip host 10.11.26.29 host 10.11.226.29
+access-list 190 permit udp host 10.11.26.29 host 10.11.20.66 eq ntp
+access-list 190 permit udp host 10.11.26.29 host 10.11.20.65 eq ntp
+access-list 190 permit udp host 10.11.26.29 host 10.11.20.67 eq ntp
+access-list 190 permit udp host 10.11.26.29 host 10.11.20.69 eq domain
+access-list 190 permit udp host 10.11.26.29 host 10.11.20.53 eq domain
+access-list 190 permit udp host 10.11.26.29 host 10.11.20.68 eq domain
+access-list 190 permit tcp host 10.11.26.29 host 10.11.20.20
+access-list 190 permit tcp host 10.11.26.29 host 10.11.20.69 eq domain
+access-list 190 permit tcp host 10.11.26.29 host 10.11.20.53 eq domain
+access-list 190 permit tcp host 10.11.26.29 host 10.11.20.68 eq domain
+access-list 190 permit tcp host 10.11.26.29 host 10.12.26.26 eq 3306
+access-list 190 permit tcp host 10.11.26.29 host 10.12.126.28 eq 3306
+access-list 190 permit tcp host 10.11.26.29 host 10.12.20.39 eq 8140
+access-list 190 permit tcp host 10.11.26.29 host 10.11.20.28 eq www
+access-list 190 permit tcp host 10.11.26.29 host 10.11.20.30 eq 443
+access-list 190 permit tcp host 10.11.26.29 host 10.11.20.55 eq 2003
+access-list 190 permit tcp host 10.11.26.29 host 10.11.20.137 eq www
+access-list 190 permit tcp host 10.11.26.29 host 10.11.20.63 eq www
+access-list 190 permit tcp host 10.11.26.29 host 10.11.20.71 eq 389
+access-list 190 permit tcp host 10.11.26.29 host 10.11.20.71 eq 636
+access-list 190 deny   ip host 10.11.26.28 10.0.0.0 0.255.255.255 log
+access-list 190 deny   ip host 10.11.26.29 10.0.0.0 0.255.255.255 log
+access-list 190 permit ip any any
+access-list 197 deny   tcp host 10.11.26.28 host 10.11.20.91 eq 22
+access-list 197 permit ip host 10.11.26.28 host 10.11.20.91
+access-list 197 permit ip host 10.11.26.28 host 10.11.20.81
+access-list 197 permit ip host 10.11.26.28 host 10.11.20.64
+access-list 197 permit udp host 10.11.26.28 host 10.11.20.66 eq ntp
+access-list 197 permit udp host 10.11.26.28 host 10.11.20.65 eq ntp
+access-list 197 permit udp host 10.11.26.28 host 10.11.20.67 eq ntp
+access-list 197 permit udp host 10.11.26.28 host 10.11.20.69 eq domain
+access-list 197 permit udp host 10.11.26.28 host 10.11.20.53 eq domain
+access-list 197 permit udp host 10.11.26.28 host 10.11.20.68 eq domain
+access-list 197 permit tcp host 10.11.26.28 host 10.11.20.20
+access-list 197 permit tcp host 10.11.26.28 host 10.11.20.69 eq domain
+access-list 197 permit tcp host 10.11.26.28 host 10.11.20.53 eq domain
+access-list 197 permit tcp host 10.11.26.28 host 10.11.20.68 eq domain
+access-list 197 permit tcp host 10.11.26.28 host 10.12.26.26 eq 3306
+access-list 197 permit tcp host 10.11.26.28 host 10.12.126.28 eq 3306
+access-list 197 permit tcp host 10.11.26.28 host 10.12.20.39 eq 8140
+access-list 197 permit tcp host 10.11.26.28 host 10.11.20.28 eq www
+access-list 197 permit tcp host 10.11.26.28 host 10.11.20.30 eq 443
+access-list 197 permit tcp host 10.11.26.28 host 10.11.20.55 eq 2003
+access-list 197 permit tcp host 10.11.26.28 host 10.11.20.137 eq www
+access-list 197 permit tcp host 10.11.26.28 host 10.11.20.63 eq www
+access-list 197 permit tcp host 10.11.26.28 host 10.11.20.71 eq 389
+access-list 197 permit tcp host 10.11.26.28 host 10.11.20.71 eq 636
+access-list 197 deny   tcp host 10.11.26.29 host 10.11.20.91 eq 22
+access-list 197 permit ip host 10.11.26.29 host 10.11.20.91
+access-list 197 permit ip host 10.11.26.29 host 10.11.20.81
+access-list 197 permit ip host 10.11.26.29 host 10.11.20.64
+access-list 197 permit udp host 10.11.26.29 host 10.11.20.66 eq ntp
+access-list 197 permit udp host 10.11.26.29 host 10.11.20.65 eq ntp
+access-list 197 permit udp host 10.11.26.29 host 10.11.20.67 eq ntp
+access-list 197 permit udp host 10.11.26.29 host 10.11.20.69 eq domain
+access-list 197 permit udp host 10.11.26.29 host 10.11.20.53 eq domain
+access-list 197 permit udp host 10.11.26.29 host 10.11.20.68 eq domain
+access-list 197 permit tcp host 10.11.26.29 host 10.11.20.20
+access-list 197 permit tcp host 10.11.26.29 host 10.11.20.69 eq domain
+access-list 197 permit tcp host 10.11.26.29 host 10.11.20.53 eq domain
+access-list 197 permit tcp host 10.11.26.29 host 10.11.20.68 eq domain
+access-list 197 permit tcp host 10.11.26.29 host 10.12.26.26 eq 3306
+access-list 197 permit tcp host 10.11.26.29 host 10.12.126.28 eq 3306
+access-list 197 permit tcp host 10.11.26.29 host 10.12.20.39 eq 8140
+access-list 197 permit tcp host 10.11.26.29 host 10.11.20.28 eq www
+access-list 197 permit tcp host 10.11.26.29 host 10.11.20.30 eq 443
+access-list 197 permit tcp host 10.11.26.29 host 10.11.20.55 eq 2003
+access-list 197 permit tcp host 10.11.26.29 host 10.11.20.137 eq www
+access-list 197 permit tcp host 10.11.26.29 host 10.11.20.63 eq www
+access-list 197 permit tcp host 10.11.26.29 host 10.11.20.71 eq 389
+access-list 197 permit tcp host 10.11.26.29 host 10.11.20.71 eq 636
+access-list 197 deny   ip host 10.11.26.28 10.0.0.0 0.255.255.255 log
+access-list 197 deny   ip host 10.11.26.29 10.0.0.0 0.255.255.255 log
+access-list 197 permit ip any any
+access-list 198 deny   tcp host 10.11.26.28 host 10.11.20.91 eq 22
+access-list 198 permit ip host 10.11.26.28 host 10.11.20.91
+access-list 198 permit ip host 10.11.26.28 host 10.11.20.81
+access-list 198 permit ip host 10.11.26.28 host 10.11.20.64
+access-list 198 permit ip host 10.11.26.28 host 10.12.20.28
+access-list 198 permit udp host 10.11.26.28 host 10.11.20.66 eq ntp
+access-list 198 permit udp host 10.11.26.28 host 10.11.20.65 eq ntp
+access-list 198 permit udp host 10.11.26.28 host 10.11.20.67 eq ntp
+access-list 198 permit udp host 10.11.26.28 host 10.11.20.69 eq domain
+access-list 198 permit udp host 10.11.26.28 host 10.11.20.53 eq domain
+access-list 198 permit udp host 10.11.26.28 host 10.11.20.68 eq domain
+access-list 198 permit tcp host 10.11.26.28 host 10.11.20.20
+access-list 198 permit tcp host 10.11.26.28 host 10.11.20.69 eq domain
+access-list 198 permit tcp host 10.11.26.28 host 10.11.20.53 eq domain
+access-list 198 permit tcp host 10.11.26.28 host 10.11.20.68 eq domain
+access-list 198 permit tcp host 10.11.26.28 host 10.12.26.26 eq 3306
+access-list 198 permit tcp host 10.11.26.28 host 10.12.126.28 eq 3306
+access-list 198 permit tcp host 10.11.26.28 host 10.12.20.39 eq 8140
+access-list 198 permit tcp host 10.11.26.28 host 10.11.20.28 eq www
+access-list 198 permit tcp host 10.11.26.28 host 10.11.20.30 eq 443
+access-list 198 permit tcp host 10.11.26.28 host 10.11.20.55 eq 2003
+access-list 198 permit tcp host 10.11.26.28 host 10.11.20.137 eq www
+access-list 198 permit tcp host 10.11.26.28 host 10.11.20.63 eq www
+access-list 198 permit tcp host 10.11.26.28 host 10.11.20.71 eq 389
+access-list 198 permit tcp host 10.11.26.28 host 10.11.20.71 eq 636
+access-list 198 deny   tcp host 10.11.26.29 host 10.11.20.91 eq 22
+access-list 198 permit ip host 10.11.26.29 host 10.11.20.91
+access-list 198 permit ip host 10.11.26.29 host 10.11.20.81
+access-list 198 permit ip host 10.11.26.29 host 10.11.20.64
+access-list 198 permit ip host 10.11.26.29 host 10.12.20.28
+access-list 198 permit udp host 10.11.26.29 host 10.11.20.66 eq ntp
+access-list 198 permit udp host 10.11.26.29 host 10.11.20.65 eq ntp
+access-list 198 permit udp host 10.11.26.29 host 10.11.20.67 eq ntp
+access-list 198 permit udp host 10.11.26.29 host 10.11.20.69 eq domain
+access-list 198 permit udp host 10.11.26.29 host 10.11.20.53 eq domain
+access-list 198 permit udp host 10.11.26.29 host 10.11.20.68 eq domain
+access-list 198 permit tcp host 10.11.26.29 host 10.11.20.20
+access-list 198 permit tcp host 10.11.26.29 host 10.11.20.69 eq domain
+access-list 198 permit tcp host 10.11.26.29 host 10.11.20.53 eq domain
+access-list 198 permit tcp host 10.11.26.29 host 10.11.20.68 eq domain
+access-list 198 permit tcp host 10.11.26.29 host 10.12.26.26 eq 3306
+access-list 198 permit tcp host 10.11.26.29 host 10.12.126.28 eq 3306
+access-list 198 permit tcp host 10.11.26.29 host 10.12.20.39 eq 8140
+access-list 198 permit tcp host 10.11.26.29 host 10.11.20.28 eq www
+access-list 198 permit tcp host 10.11.26.29 host 10.11.20.30 eq 443
+access-list 198 permit tcp host 10.11.26.29 host 10.11.20.55 eq 2003
+access-list 198 permit tcp host 10.11.26.29 host 10.11.20.137 eq www
+access-list 198 permit tcp host 10.11.26.29 host 10.11.20.63 eq www
+access-list 198 permit tcp host 10.11.26.29 host 10.11.20.71 eq 389
+access-list 198 permit tcp host 10.11.26.29 host 10.11.20.71 eq 636
+access-list 198 deny   ip host 10.11.26.28 10.0.0.0 0.255.255.255 log
+access-list 198 deny   ip host 10.11.26.29 10.0.0.0 0.255.255.255 log
+access-list 198 permit ip any any
+route-map TO-LAX permit 5
+ match ip address 16
+!
+route-map TO-LAX permit 10
+ set as-path prepend 65002 65002
+!
+route-map conn2bgp permit 10
+ match ip address 12
+!
+!snmp-server community <removed> RO
+snmp-server location Net2EZ
+snmp-server contact sysadmins@gorillanation.com
+!snmp-server host 192.168.1.54 version 2c <removed> 
+!
+radius-server source-ports 1645-1646
+!
+control-plane
+!
+dial-peer cor custom
+!
+line con 0
+line vty 0 4
+ exec-timeout 240 0
+ transport input ssh
+line vty 5 15
+ exec-timeout 240 0
+ transport input ssh
+!
+exception core-file 
+mac-address-table aging-time 480
+ntp source Loopback0
+ntp update-calendar
+ntp server 10.2.10.66
+ntp server 10.2.10.79
+ntp server 10.2.10.222
+no event manager policy Mandatory.go_switchbus.tcl type system
+!
+end

@@ -1,0 +1,1336 @@
+#!/usr/bin/perl 
+
+# $Id$
+# $URL$
+
+use strict;
+use warnings;
+use Getopt::Long;
+
+
+## need to put this in mysql db so it can be updated by multiple ppl with out mod the script.
+#my $volNeedSnapshot = "_shared|_ugc|home|_named_data|_log|_data";
+my $volNeedSnapshot = "_shared|_ugc|_named_data";
+my $volNoNeedSnapshot = "stg|dev|sql|home";
+my $zmandaSnapshot = "sql_data";
+
+my ($hasSnap,$needSnap,$skippedVol,$offlineVol,$out) = "";
+my @head = ();
+my $refHashVolSnap = {};
+
+my $ntapHead1 = "nfs1.netapp1";
+my $ntapHead2 = "nfs2.netapp1";
+my $ntapHead3 = "nfs1.lax3";
+
+my $ugc_snap_sched_policy = "1 3 3";
+my $shared_snap_sched_policy = "1 1 0";
+
+my ($switch,$job,$head,$current_head,$use_this_vol,$yn,$work_from_filer);
+
+chkSwitch();
+while($switch eq 'menu' || $switch eq 'report') {
+  if($switch eq 'menu') {
+    $job = printMenu();  
+  } else {
+    @head = ($head);
+    $refHashVolSnap = getData(\@head,$refHashVolSnap);
+    $job = 4;
+  }
+
+  if($job =~ /^(3|10|11)$/) {
+    $yn = getyN("do you wanna work from hostname and path if you don't know the filer name and volume name");
+
+    if($yn eq 'y') {
+      my ($head, $vol, $path) = getHostAndPath("pls enter hostname or FQDN of the src server (ex. app1v-aargyle.tp.dev.lax.gnmedia.net)\n\tor hit enter to skip","pls enter folder (ex. /sql/data)");
+      if($head && $vol && $path) {
+        @head = ($head);
+        $use_this_vol = $vol;
+        print "getting info for this filer and vol: @head, $vol\n";
+        $refHashVolSnap = updateData($head,$vol,$refHashVolSnap);
+        createSnapShot($head,$vol,$path,$refHashVolSnap) if($job == 10);
+        addExportAndMount($head,$vol,$path) if($job == 11); 
+        $work_from_filer = 0;
+      } else {
+        $work_from_filer = 1;
+      }
+    } else { $work_from_filer = 1; }
+
+    if($work_from_filer) {
+      $yn = getYn("do you know filer name and volume name");
+      if($yn eq 'y') {
+        @head = getHead();
+        $use_this_vol = getUserInput("pls enter the volume name (NO WILDCARD) separated by space\n\tie. ao_lax2_dev_sql_log nfs2_ao_lax_prd_app_shared\n\tor hit enter for 'all' volumes");
+        $use_this_vol = ($use_this_vol eq 'all') ? '' : $use_this_vol;
+        if($use_this_vol) {
+          my @vol;
+          if($use_this_vol) { @vol = split / /, $use_this_vol; } 
+          for my $v (@vol) { $refHashVolSnap = updateData($head[0],$v,$refHashVolSnap); }
+        } else { $refHashVolSnap = getData(\@head,$refHashVolSnap); }
+      } else { $use_this_vol = ''; @head = (); print "\ndude!! you have to \'know\' something!!!\n"; }
+    }  
+  } 
+
+  if($#head < 0 && $job !~ /[12]/) {
+    @head = getHead();
+    $refHashVolSnap = getData(\@head,$refHashVolSnap);
+  } 
+
+  if($job == 1) {
+    $volNeedSnapshot = changeVar($volNeedSnapshot,'volNeedSnapshot');
+    $volNoNeedSnapshot = changeVar($volNoNeedSnapshot,'volNoNeedSnapshot');
+    $zmandaSnapshot = changeVar($zmandaSnapshot,'zmandaSnapshot');
+  } elsif($job == 2) { 
+    # get new filer(s), override @head, but don't reset $refHashVolSnap, just update it.
+    @head = getHead();
+    $refHashVolSnap = getData(\@head,$refHashVolSnap);
+  } else {
+    for my $head (@head) {
+      print "\n\t$head\n";
+      if($job == 3) {
+        my @vol;
+        if($use_this_vol) { @vol = split / /, $use_this_vol; } 
+        else { @vol = sort keys %{$refHashVolSnap->{$head}}; }
+        $refHashVolSnap = workOnIt($head,\@vol,$refHashVolSnap,$use_this_vol);  
+        # reset head arr if user pick to work from hostname, so it will ask for new filer
+        if($use_this_vol) {
+          @head = ();
+          $use_this_vol = '';
+        }
+      }
+      elsif($job == 4) { $refHashVolSnap = snapSchdReport($head,$refHashVolSnap); }
+      elsif($job == 5) { $refHashVolSnap = printBigSnapUsage($head,$refHashVolSnap); }
+      elsif($job == 6) { $refHashVolSnap = printDetailByKeyword($head,$refHashVolSnap); }
+      elsif($job == 7) { $refHashVolSnap = printVolUsageLessThanGreaterThan($head,$refHashVolSnap,'lt',0); }
+      elsif($job == 8) { $refHashVolSnap = printVolUsageLessThanGreaterThan($head,$refHashVolSnap,'gt','90'); }
+      elsif($job == 9) { $refHashVolSnap = printZmandaSnapVol($head,$refHashVolSnap); }
+      elsif($job == 10) { 
+        if($use_this_vol) {
+          my @vol = split / /, $use_this_vol;
+          for my $vol (@vol) { 
+            my $path = getUserInput("pls enter path if apply (ex. 'some_server' for /vol/some_lax_app_shared/some_server)\n\thit enter to create snapshot on the base vol (ex. /vol/some_lax_app_shared)");
+            createSnapShot($head,$vol,$path,$refHashVolSnap,'no mount'); 
+          }
+        } else {
+          print "missing volumn...req input for snapshot, skip..\n";
+        }
+      }
+      elsif($job == 11) {
+        my $path = '';
+        if(!$use_this_vol) { 
+          printAllVol($head,$refHashVolSnap);
+          print "\n\tex. ao_lax2_dev_sql_log/sql1v-mal.ao.dev.lax.gnmedia.net\n";
+          $use_this_vol = getUserInput("pls enter the volume name (ie. ao_lax2_dev_sql_log)\n\thit enter 'blank' to skip");
+          $path = getUserInput("pls enter the folder name (ie. sql1v-mal.ao.dev.lax.gnmedia.net\n\thit enter for none");
+        } 
+       
+        if($use_this_vol) { 
+          my @vol = split / /, $use_this_vol; 
+          for my $vol (@vol) { addExportAndMount($head,$vol,$path); }
+        }
+      }
+      else { print "don't know what job $job is\n"; }
+    }
+  }
+  exit if($switch eq 'report');
+}
+
+
+######################################################################
+
+sub getData
+{
+  my ($refArrHead,$refHashVolSnap) = @_;
+  for my $head (@$refArrHead) {
+    print "\tgetting data from $head\n" if($switch eq 'menu');
+    # if data already exist, skip it
+    if(!$refHashVolSnap->{$head}) {
+      chomp(my @rs=`/usr/bin/rnetapp $head volume list -s`);
+      $refHashVolSnap = buildHash(\@rs,$head,$refHashVolSnap);
+      $refHashVolSnap = getSnapSchd($head,$refHashVolSnap);
+    } else {
+      # some job (ie. job == 2) reset head but not reset data, 
+      # so we chk to see if data exist before we get data from netapp.
+      # chk to see if there is more than 10 vol in the hash, 
+      # then we 'assume' we got data, if not, we need to get new data
+      my $count = 0;
+      for my $vol (keys %{$refHashVolSnap->{$head}}) { 
+        $count++;
+        last if($count == 10);
+      }
+      last if($count == 10);
+
+      chomp(my @rs=`/usr/bin/rnetapp $head volume list -s`);
+      $refHashVolSnap = buildHash(\@rs,$head,$refHashVolSnap);
+      $refHashVolSnap = getSnapSchd($head,$refHashVolSnap);
+    }
+  }
+  return $refHashVolSnap;
+}
+
+sub getSnapSchd
+{
+  my ($head,$refHashVolSnap,$vol) = @_;
+  my @ar = ();
+  if($vol) {
+     if($refHashVolSnap->{$head}->{$vol}->{State} ne 'offline') { 
+       chomp(@ar= `/usr/bin/rnetapp $head snapshot sched $vol | sed 's/^Volume //g' | sed 's/\: /\:/g'`); 
+     } else {  $refHashVolSnap->{$head}->{$vol}->{SnapShotSchd} = "none"; return $refHashVolSnap; }
+  } else { chomp(@ar= `/usr/bin/rnetapp $head snapshot sched | sed 's/^Volume //g' | sed 's/\: /\:/g'`); }
+  for my $l (@ar) {
+    $l =~ s/^.*?volume (.*?)\s.*$/$1:none/ if($l =~ /offline/);
+    my ($vol,$sch) = split /\:/, $l;
+    $refHashVolSnap->{$head}->{$vol}->{SnapShotSchd} = "$sch";
+  }
+  for $vol (sort keys %{$refHashVolSnap->{$head}}) {
+    if($refHashVolSnap->{$head}->{$vol}->{State} =~ /offline|restricted/) {
+      $refHashVolSnap->{$head}->{$vol}->{SnapShotSchd} = "none";
+    } 
+  }
+  return $refHashVolSnap;
+}
+
+sub snapSchdReport
+{
+  my ($head,$refHashVolSnap) = @_;
+  my ($vol,$sch,$gotSnap,$needSnap,$noSnap,$skippedVol,$skippedVolNoSnap,$skippedVolNoUsage,$offlineVol,$rs) = "";
+  my (@gotSnap,@needSnap,@noSnap,@skippedVol,@skippedVolNoSnap,@skippedVolNoUsage,@offlineVol);
+  my $refArrColToPrint = ['Volume','Total','Used','Use','SnapResv','SnapUsed','State','SnapShotSchd'];
+
+  for $vol (sort keys %{$refHashVolSnap->{$head}}) {
+    $rs = &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint);
+    if($refHashVolSnap->{$head}->{$vol}->{State} ne 'offline') {
+      if($vol =~ /$volNeedSnapshot/ && $vol !~ /$volNoNeedSnapshot/) {
+        if($refHashVolSnap->{$head}->{$vol}->{SnapShotSchd} eq "0 0 0") { $needSnap .= "$rs\n"; push(@needSnap, $vol); }
+        else { $gotSnap .= "$rs\n"; push(@gotSnap, $vol); }
+      } else {
+        if($refHashVolSnap->{$head}->{$vol}->{Used} eq "0") {
+          $skippedVolNoUsage .= "$rs\n"; push(@skippedVolNoUsage, $vol);
+        } else { 
+          if($refHashVolSnap->{$head}->{$vol}->{SnapUsed} eq "0.00%") {
+            $skippedVolNoSnap .= "$rs\n"; push(@skippedVolNoSnap, $vol); 
+          } else {
+            $skippedVol .= "$rs\n"; push(@skippedVol, $vol); 
+          }
+        }
+      }
+    } else { $offlineVol .= "$rs\n"; push(@offlineVol, $vol); }
+  }
+  print  "\n";
+  printIt(\@needSnap,"vol need snap setup",$needSnap,$refArrColToPrint);
+  printIt(\@gotSnap,"vol with snap setup",$gotSnap,$refArrColToPrint);
+  printIt(\@skippedVol,"skipped vol with zero snap",$skippedVolNoSnap,$refArrColToPrint);
+  printIt(\@skippedVol,"skipped vol with snaps",$skippedVol,$refArrColToPrint);
+  printIt(\@skippedVolNoUsage,"skipped vol with no usage",$skippedVolNoUsage,$refArrColToPrint);
+  printIt(\@offlineVol,"offline vol",$offlineVol,$refArrColToPrint);
+
+  return $refHashVolSnap if($switch eq 'report');
+
+  my $yn = getYn("do you wanna work on any of 'em");
+  if($yn ne 'n') {
+    my $pickone = '';
+    while(!$pickone || $pickone !~ /[1-7]/) {
+      print "\n\tpls select one with number of vol > 0\n\n"; 
+      print "\t1. vol with snap setup : " . ($#gotSnap+1) . "\n"; 
+      print "\t2. vol need snap setup : " . ($#needSnap+1) . "\n"; 
+      print "\t3. skipped vol with no snap: " . ($#skippedVolNoSnap+1) . "\n"; 
+      print "\t4. skipped vol with snaps: " . ($#skippedVol+1) . "\n"; 
+      print "\t5. skipped vol with no usage : " . ($#skippedVolNoUsage+1) . "\n"; 
+      print "\t6. offline vol : " . ($#offlineVol+1) . "\n"; 
+      print "\t7. do nothing\n"; 
+      print "\n\tpls enter number from the menu : ";
+      chomp($pickone = <STDIN>);
+    }
+ 
+    if($pickone == 1 && $#gotSnap > -1) {
+      $refHashVolSnap = workOnIt($head,\@gotSnap,$refHashVolSnap) 
+    } elsif($pickone == 2 && $#needSnap > -1) {
+      $refHashVolSnap = workOnIt($head,\@needSnap,$refHashVolSnap) 
+    } elsif($pickone == 3 && $#skippedVolNoSnap > -1) {
+      $refHashVolSnap = workOnIt($head,\@skippedVolNoSnap,$refHashVolSnap) 
+    } elsif($pickone == 4 && $#skippedVol > -1) {
+      $refHashVolSnap = workOnIt($head,\@skippedVol,$refHashVolSnap) 
+    } elsif($pickone == 5 && $#skippedVolNoUsage > -1) {
+      $refHashVolSnap = workOnIt($head,\@skippedVolNoUsage,$refHashVolSnap) 
+    } elsif($pickone == 6 && $#offlineVol > -1) {
+      $refHashVolSnap = workOnIt($head,\@offlineVol,$refHashVolSnap) 
+    } else {
+      return $refHashVolSnap;
+    }
+  }
+  return $refHashVolSnap;
+}
+
+sub printIt
+{
+  my ($refArr,$msg,$data,$refArrColToPrint) = @_;
+  # ali wanna print even if found = 0
+  #if($#{$refArr} > -1) {
+    print  "\n\n================= $msg =================\n\n";
+    print  printHeader($refArrColToPrint) . "\n";
+    print  "$data\n" if($data);
+    print "found: " . ($#{$refArr}+1) . "\n";
+  #}
+}
+
+sub printBigSnapUsage
+{
+  my ($head,$refHashVolSnap) = @_;
+  my ($vol,$usage,$out,@big_vol,$snap_detail);
+  my $refArrColToPrint = ['Volume','Total','Used','Use','SnapResv','SnapUsed','State','SnapShotSchd'];
+
+  for $vol (sort keys %{$refHashVolSnap->{$head}}) {
+    $usage = $refHashVolSnap->{$head}->{$vol}->{SnapUsed};
+    $usage =~ s/\%//;
+    if($usage > 100) {
+      print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "\n";
+      push(@big_vol,$vol);
+    }
+  }
+  if($out) {
+    print "\n\nVol with > 100\% Usage :\n\n";
+    printHeader();
+    print "$out\n";
+    my $yn = getYn("do you wanna see snap list");
+    if($yn ne 'n') {
+      for my $v (sort @big_vol) {
+        my $dt = runCmd("/usr/bin/rnetapp $head snapshot list $v");
+        $snap_detail .= $dt if($dt);
+      }
+    }
+    $yn = getYn("do you wanna work on any of 'em");
+    $refHashVolSnap = workOnIt($head,\@big_vol,$refHashVolSnap) if($yn ne 'n');
+  } else {
+    print "none of vol has snapshot usage more than 100\%\n";
+  }
+  return $refHashVolSnap;
+}
+
+#workOnIt($head, \@vol, $refHashVolSnap)
+sub workOnIt
+{
+  my($head,$refArrVol,$refHashVolSnap,$noselect) = @_;
+  my ($vol,$dst_server,$do_what,$dt,$invalid_input,$new,$in,$do_du,$junk,$out2,@vol,%chk,@tmp);
+  my $refArrColToPrint = ['Volume','Total','Used','Use','SnapResv','SnapUsed','State','SnapShotSchd'];
+  
+  my $notdone = 'y';
+  while($notdone eq 'y') { 
+
+    print "\n";
+    @vol = @$refArrVol if($noselect);
+    if($#vol > -1) { print "current volumes: \n@vol\n"; } 
+    else { @vol = selectVol($head,$refHashVolSnap,$refArrVol); }
+
+    return $refHashVolSnap if($#vol == -1);
+
+    print "\n";
+
+    $do_what = 100;
+    while(!$do_what || $do_what < 0 || $do_what > 12) {
+      print "\t\t1. volume details\n"; 
+      print "\t\t2. delete selected snap\n"; 
+      print "\t\t3. increase/decrease volume size\n"; 
+      print "\t\t4. increase/decrease snap reserve\n"; 
+      print "\t\t5. apply snap schd policy\n"; 
+      print "\t\t6. update snap schd manually\n"; 
+      print "\t\t7. showmount, find out which servers mount to this volume and option to chk for space usage\n"; 
+      print "\t\t8. show vol usage lt/gt % (this will shows all volumes)\n"; 
+      print "\t\t9. delete volume\n"; 
+      print "\t\t10. snap list\n"; 
+      print "\t\t11. exports add\n"; 
+      print "\t\t12. create snapshot\n"; 
+      print "\t\te. don't wanna do any of these, get me out of here :)\n"; 
+      print "\n\t\tWhat do you wanna do? (enter number here) : ";
+      chomp($do_what = <STDIN>);
+      return $refHashVolSnap if($do_what eq 'e');
+      $do_what = 100 if($do_what =~ /\w/ && $do_what !~ /\d/);
+    }
+
+    print "\n";
+
+    if($do_what == 1) {
+      print printHeader($refArrColToPrint) . "\n";
+    } elsif($do_what == 11) {
+      my $try_again = 'y';
+      while($try_again eq 'y') {
+        $dst_server = getUserInput("pls enter hostname or FQDN of the dest server (ex. app1v-aargyle.tp.dev.lax.gnmedia.net)");
+        if($dst_server) {
+          if(!pingable($dst_server)) {
+            print "$dst_server is not pingable :(\n";
+            $dst_server = '';
+            $try_again = getYn("would you try again");
+          } else { $try_again = 'n'; }
+        } else { $try_again = getYn("hostname or FQDN of the dest server is require, would you try again"); }
+      }
+    }
+
+    for $vol (sort @vol) {
+      if($do_what == 1) {
+        my $rs = &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint);
+        if($rs) { print "$rs\n"; }
+        else { delete $refHashVolSnap->{$head}->{$vol}; }
+      } elsif($do_what == 2) {
+        $refHashVolSnap = snapDelete($head,$vol,$refHashVolSnap,$refArrColToPrint);
+      } elsif($do_what == 3) {
+        print "\n\nworking on $vol\n";
+        print  printHeader($refArrColToPrint);
+        print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint);
+        print "\n";
+        
+        $invalid_input = 1;
+        $new = '' unless($new && $new eq "skip all");
+        while(!$new || $invalid_input) {
+          $new = lc(getUserInput("pls enter size without '.' same format as /usr/bin/rnetapp [+|-]<size>k|m|g|t\n\tex. 300m not 0.3g.  to change from 2.0G to 2.1G, use +100m\n\tenter 'skip' to skip working on this volume\n\tenter 'skip all' to skip working on all volume"));
+          if(($new !~ /\./ && $new =~ /^[+-]?\d{1,3}[kmgt]$/) || $new =~ /^skip/) {
+            $invalid_input = 0;
+          } else { print "\tinvalid input :(\n"; }
+        }
+        if($new !~ /^skip/) { 
+          system("/usr/bin/rnetapp $head volume size $vol $new"); 
+          $refHashVolSnap = updateData($head,$vol,$refHashVolSnap);
+          print  printHeader($refArrColToPrint);
+          print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "\n";
+        } 
+        last if($new eq "skip all");
+      } elsif($do_what == 4) {
+        print "\n\nworking on $vol\n";
+        print  printHeader($refArrColToPrint);
+        print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "\n";
+        $new = getUserInput("pls enter new percentage of reserve space (ex. 15 to set to 15%, or hit enter or 'skip' to skip, 'skip all' to get back to menu)");
+        $new =~ s/\%//g;
+        if($new eq '' || $new eq "skip") {
+          print "skip..\n";
+        } elsif($new eq "skip all") {
+          last;
+        } elsif($new == 0) {
+          if($refHashVolSnap->{$head}->{$vol}->{SnapUsed} eq "0.00%") {
+            runCmd("/usr/bin/rnetapp $head snapshot reserve $vol 0");
+            $refHashVolSnap = updateData($head,$vol,$refHashVolSnap);
+            print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "\n";
+          } else {
+            print "snap usage is not 0.00%\nwill not set setting snap reserve to 0%\n";
+            $refHashVolSnap = snapDelete($head,$vol,$refHashVolSnap,$refArrColToPrint);
+            if($refHashVolSnap->{$head}->{$vol}->{SnapUsed} eq "0.00%") {
+              print "snap usage is 0.00%\nsetting snap reserve to 0%\n";
+              runCmd("/usr/bin/rnetapp $head snapshot reserve $vol 0");
+              $refHashVolSnap = updateData($head,$vol,$refHashVolSnap);
+              print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "\n";
+            }
+          }
+        } elsif($new) {
+          system("/usr/bin/rnetapp $head snapshot reserve $vol $new"); 
+          $refHashVolSnap = updateData($head,$vol,$refHashVolSnap);
+          print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "\n";
+        } else { print "skip..\n"; }
+      } elsif($do_what == 5) {
+        my $updated = 1;
+        my $current_snap_schd = $refHashVolSnap->{$head}->{$vol}->{SnapShotSchd};
+        print "\n\nworking on $vol\n";
+        print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint);
+        print "\n";
+        if($vol =~ /ugc/ && $current_snap_schd ne "$ugc_snap_sched_policy") { 
+          $refHashVolSnap = confirmSnapSchdChange($refHashVolSnap,$head,$vol,"$ugc_snap_sched_policy"); 
+        } elsif($vol =~ /shared/ && $current_snap_schd ne "$shared_snap_sched_policy") { 
+          $refHashVolSnap = confirmSnapSchdChange($refHashVolSnap,$head,$vol,"$shared_snap_sched_policy"); 
+        } elsif($vol =~ /$zmandaSnapshot/ && $current_snap_schd ne "0 0 0") { 
+          $refHashVolSnap = confirmSnapSchdChange($refHashVolSnap,$head,$vol,"0 0 0",20);  # set snap sched to 0 but resr to 20%
+        } elsif($vol =~ /$volNoNeedSnapshot/  && $current_snap_schd ne "0 0 0") { 
+          $refHashVolSnap = confirmSnapSchdChange($refHashVolSnap,$head,$vol,"0 0 0"); 
+        } else { $updated = 0;  print "no change needed\n"; }
+        if($updated) {
+          $refHashVolSnap = updateData($head,$vol,$refHashVolSnap);
+          print  "\nupdated...\n" . &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "\n";
+        }
+      } elsif($do_what == 6) {
+        my $updated = 1;
+        print "\nworking on...\n";
+        print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint);
+        my $again = 'y';
+        my $new_sch = '';
+        while($again eq 'y') {
+          $new_sch = getUserInput("pls enter snap schd (week day hour)\n\tpolicy for ugc is $ugc_snap_sched_policy\n\tpolicy for shared is $shared_snap_sched_policy\n\thit enter 'blank' to skip");
+          last if(!$new_sch);       
+          if($new_sch !~ /^\d \d \d{1,2}/ && !$new_sch) {
+            print "ERROR, $new_sch is bad format...\n";
+            $again = 'y';
+          } else { $again = 'n'; }
+        } 
+        $refHashVolSnap = confirmSnapSchdChange($refHashVolSnap,$head,$vol,$new_sch); 
+        $refHashVolSnap = updateData($head,$vol,$refHashVolSnap);
+        print  "\n" . &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "\n";
+      } elsif($do_what == 7) {
+        if($ENV{USER} eq 'root' || $ENV{USER} eq 'deploy') {
+          $do_du = getyN("wanna do du? (would take longer)") unless($do_du);
+          ($junk,$junk,$out2) = chkIfMountedThenUsage($head,$vol,'verbose',$do_du,$out2); 
+        } else {
+          # if single vol, do du. if not, might take too long unless using root or deploy user (passwdless).
+          if($#vol == 0) { chkIfMountedThenUsage($head,$vol,'vorbose'); }
+          else { doShowMount($head,$vol); }
+        }
+      } elsif($do_what == 8) {
+        $refHashVolSnap = printVolUsageLessThanGreaterThan($head,$refHashVolSnap,'na',0);
+      } elsif($do_what == 9) {
+        $refHashVolSnap = deleteVolume($head,$vol,$refHashVolSnap);
+      } elsif($do_what == 10) {
+        $dt=`/usr/bin/rnetapp $head snapshot list $vol`;
+        print "$vol\n";
+        print $dt =~ /\:/ ? $dt : "no snap file on this volume\n";
+      } elsif($do_what == 11) {
+        my $dt=`/usr/bin/rnetapp $head exports add $vol $dst_server`;
+        print "add vol to $dst_server\n$dt\n\n";
+      } elsif($do_what == 12) {
+        my $path = getUserInput("pls enter path if apply (ex. 'some_server' for /vol/some_lax_app_shared/some_server)\n\thit enter to create snapshot on the base vol (ex. /vol/some_lax_app_shared)");
+        createSnapShot($head,$vol,$path,$refHashVolSnap,'no mont');
+      } else {
+        print "error, don't know what job $do_what is\n";
+      }
+    }
+
+    if($do_what == 7 && $out2 && ($ENV{USER} eq 'root' || $ENV{USER} eq 'deploy')) {
+      print "summery:\n\n$out2\n\n";
+      $out2 = "";
+    }
+
+    $new = '';
+    $notdone = getYn("continue working on these volumes");
+  }
+  return $refHashVolSnap;
+}
+
+sub selectVol
+{
+  my ($head,$refHashVolSnap,$refArrVol) = @_;
+  my ($yn,$in,%chk,$vol,@tmp,$notdone);
+  my @vol = ();
+  $notdone = 'y';
+  while($notdone eq 'y') {
+    my $count = 0;
+    print "\n";
+    %chk = map { $_ => 1 } @$refArrVol;    
+    for $vol (sort @$refArrVol) { print "$vol "; $count++; }
+    print "\n";
+    
+    if($count == 1) {
+      @vol = @$refArrVol;
+    } elsif($count) {
+      my $try_again = 'y';
+      while($try_again eq 'y') {
+        $in = getUserInputAllowWildCard("pls enter volume(s) you wanna work on separated by space (tip: you can c/p from above)\n\tor enter 'all' to select all volumes above\n\twildcard, ex *binlog* *_log* !*proxy* !*sql*\n\tor hit enter (blank) to skip");
+        if(!$in) {
+          $yn = getYn("are you sure you wanna skip and work on none of the volume");
+          if($yn eq 'y') { return @vol; }
+        } else { 
+          $in =~ s/,/ /g;
+          $in =~ s/\s+/ /g;
+
+          if($in eq 'all') {
+            @vol = sort @$refArrVol;
+            $try_again = 'n'; 
+          } elsif($in =~ /\*/) {
+            my $inc_offline = getyN("would you like to include offline volume");
+            my ($not,$inc);
+            my @in = split(/ /, $in);
+            for $in (@in) {
+              if($in =~ /!/) {
+                $in =~ s/!//g;
+                $in =~ s/^\*//g;
+                $in =~ s/\*$//g;
+                $not .= "|$in";
+              } else {
+                $in =~ s/^\*//g;
+                $in =~ s/\*$//g;
+                $inc .= "|$in";
+              }
+            }
+            if($inc) {
+              $inc =~ s/^\|//;
+              $inc =~ s/\*/\.\*/;
+            }
+            if($not) {
+              $not =~ s/^\|//;
+              $not =~ s/\*/\.\*/;
+            }
+
+            my @tmp = ();
+            for $vol (sort @$refArrVol) {
+              if($inc_offline eq 'y') {
+                if($inc && $not) {
+                  if($vol =~ /$inc/ && $vol !~ /$not/) {
+                    push(@tmp,$vol); $try_again = 'n';
+                  }
+                } elsif($inc) {
+                  if($vol =~ /$inc/) {
+                    push(@tmp,$vol); $try_again = 'n';
+                  }
+                } elsif($not) {
+                  if($vol !~ /$not/) {
+                    push(@tmp,$vol); $try_again = 'n';
+                  }
+                }
+              } else {
+                if($refHashVolSnap->{$head}->{$vol}->{State} eq 'online') {
+                  if($inc && $not) {
+                    if($vol =~ /$inc/ && $vol !~ /$not/) {
+                      push(@tmp,$vol); $try_again = 'n';
+                    }
+                  } elsif($inc) {
+                    if($vol =~ /$inc/) {
+                      push(@tmp,$vol); $try_again = 'n';
+                    }
+                  } elsif($not) {
+                    if($vol !~ /$not/) {
+                      push(@tmp,$vol); $try_again = 'n';
+                    }
+                  }
+                }
+              }
+            }
+            @vol = @tmp;
+          } else {
+            @vol = convertVarToArray($in);
+            my @tmp = ();
+            $try_again = 'n'; 
+            for $vol (sort @vol) {
+              if($chk{$vol}) { push(@tmp,$vol); }
+              else { 
+                print "\tERROR!! $vol is not on the list of the above volumes, skip..\n"; 
+                $try_again = 'y';
+              }
+            }
+            @vol = @tmp;
+          }
+        }
+      } 
+    } 
+
+    print "\n\n";
+    if($#vol <= 0 || $in eq 'all') { return @vol; }
+    else {
+      print "\ncurrent volumes: \n";
+      for $vol (sort @vol) { print "$vol "; }
+      print "\n";
+      $refArrVol = \@vol;
+    }
+    $notdone = getyN("continue to filter from these volumes");
+    print "\n";
+  }
+  return @vol;
+}
+
+
+sub confirmSnapSchdChange
+{
+  my ($refHashVolSnap,$head,$vol,$sch,$resv) = @_;
+  my $refArrColToPrint = ['Volume','Total','Used','Use','SnapResv','SnapUsed','State','SnapShotSchd'];
+  if(!$head || !$vol || !$sch) {
+    print "skip...missing either filer, vol or schd\n"; 
+  } else {
+    if($refHashVolSnap->{$head}->{$vol}->{SnapShotSchd} eq "$sch") {
+      print "current snap sched is already match the policy: $sch\n";
+    } else {
+      if($refHashVolSnap->{$head}->{$vol}->{State} eq 'online') {
+        if($sch eq "0 0 0") { 
+          my $yn = getyN("/usr/bin/rnetapp $head snapshot sched $vol $sch");
+          if($yn eq 'y') {
+            print "start updating...\n";
+            if($resv) {
+              runCmd("/usr/bin/rnetapp $head snapshot reserve $vol $resv");
+              runCmd("/usr/bin/rnetapp $head snapshot sched $vol $sch");
+              $refHashVolSnap = updateData($head,$vol,$refHashVolSnap);
+            } elsif($refHashVolSnap->{$head}->{$vol}->{SnapUsed} eq "0.00%") {
+              print "snap usage is 0.00%\nsetting snap reserve to 0%\n";
+              runCmd("/usr/bin/rnetapp $head snapshot reserve $vol 0");
+              runCmd("/usr/bin/rnetapp $head snapshot sched $vol $sch");
+              $refHashVolSnap = updateData($head,$vol,$refHashVolSnap);
+            } else {
+              print "snap usage is not 0.00%\nwill not set setting snap reserve to 0%\n";
+              $refHashVolSnap = snapDelete($head,$vol,$refHashVolSnap,$refArrColToPrint);
+              if($refHashVolSnap->{$head}->{$vol}->{SnapUsed} eq "0.00%") {
+                print "snap usage is 0.00%\nsetting snap reserve to 0%\n";
+                runCmd("/usr/bin/rnetapp $head snapshot reserve $vol 0");
+                runCmd("/usr/bin/rnetapp $head snapshot sched $vol $sch");
+                $refHashVolSnap = updateData($head,$vol,$refHashVolSnap);
+              }
+            }
+          } else { print "skip... update\n"; }
+        } else { # set snap sched NOT 0 0 0 
+          print "current sched:\t$refHashVolSnap->{$head}->{$vol}->{SnapShotSchd}\n";
+          print "new sched:\t$sch\n";
+          my $yn = getyN("/usr/bin/rnetapp $head snapshot sched $vol $sch");
+          if($yn eq 'y') {
+            print "snap usage is 0.00%\nchking current snap reserve\n";
+            my $total = $refHashVolSnap->{$head}->{$vol}->{Total};
+            my $resv = $refHashVolSnap->{$head}->{$vol}->{SnapResv};
+            $total =~ s/G//g;
+            $resv =~ s/G//g;
+            my $perc = ($resv/($resv + $total))*100;
+            if($perc >= 20) {
+              print "keeping current reserve, $perc %\n";
+              runCmd("/usr/bin/rnetapp $head snapshot sched $vol $sch");
+            } else {
+              my $new_size = $total * 1.25;
+              $new_size = ($new_size == int($new_size)) ? $new_size : int($new_size + 1);
+              $new_size = $new_size . "g"; 
+              runCmd("/usr/bin/rnetapp $head volume size $vol $new_size");
+              runCmd("/usr/bin/rnetapp $head snapshot reserve $vol 20");
+              runCmd("/usr/bin/rnetapp $head snapshot sched $vol $sch");
+              $refHashVolSnap = updateData($head,$vol,$refHashVolSnap);
+            }
+          } else { print "skip..\n"; }
+        }
+      } else { print "volume \"$vol\"is offline\n"; }
+    }
+  } 
+  return $refHashVolSnap;
+}
+
+sub runCmd
+{
+  my $cmd = shift;
+  my $out = `$cmd`;
+  print "$cmd\n$out";
+}
+
+sub doShowMount
+{
+  my ($head,$vol) = @_;
+  my ($out,$output);
+
+  chomp($out = `sudo /usr/sbin/showmount -e $head | /bin/grep '/$vol'`);
+  $output = "==================================\n";
+  $output .= "$head:$vol\n";
+  $output .= "showmount\t$out\n\n";
+  print "$output\n";
+}
+
+sub chkIfMountedThenUsage
+{
+  my ($head,$vol,$verbose,$do_du,$out2) = @_;
+  my ($server,$hostname,$cmd,$out,@out,@rs,@server,$output,$tmp,$tmp2,%du,$refHashServer);
+  my $found_mount = 0;
+
+  chomp($out = `sudo /usr/sbin/showmount -e $head | /bin/grep '/$vol'`);
+  $output .= "===================================================================\n";
+  $output .= "$head:$vol\n";
+  if($out) {
+    $output .= "showmount\t$out\n\n";
+    $out =~ s/^.*\s//;
+    if($out =~ /,/) { @server = split(/,/, $out); }
+    else { @server = ("$out"); } 
+    for $server (@server) {
+      if($server =~ /\//) {
+        print "skip.. $server is a network\n";
+        $out2 .= "$head:$vol|skip.. $server is a network\n";
+        next;
+      }
+
+      if(!pingable($server)) {
+        print "$server is not pingable :(\n";
+        $out2 .= "$head:$vol|$server is not pingable :(\n";
+      } else {
+        $output .= "===================================================================\n";
+        $output .= "chking $vol mount on: $server\n\n";
+        $cmd = "/bin/grep '/$vol' /etc/fstab";
+        $out = do_ssh($server,$cmd,5);
+        if($out eq 'timeout') {
+          print "timeout\n";
+          $out2 .= "$head:$vol|$server timeout";
+          last;
+        } elsif($out) {
+          chomp(my @ar = split(/\s+/, $out));
+          if($ar[1]) {
+            $out =~ s/\snfs.*$//g;
+            $tmp = "fstab result\n$out\n";
+            $tmp2 = "fstab yes";
+          }
+        } else {
+          $tmp = "fstab result: none\n";
+          $tmp2 = "fstab no";
+        } 
+        $cmd = "hostname;/bin/grep '/$vol' /etc/mtab | sed 's/ nfs.*\$//g'";
+        @out = split /\n/, do_ssh($server,$cmd,5);
+        $output .= "hostname: $out[0]\n\n$tmp";
+        $out2 .= "$head:$vol|$out[0]|$tmp2|";
+        $hostname = $out[0];
+        my ($mtab,$src,$dst) = '';
+        for my $i (1..$#out) {      
+          ($src,$dst) = split(/ /,$out[$i]);
+          $mtab .= "$src\t$dst\n";
+          if($src !~ /(\.snapshot\/|zrm)/i) {
+            $refHashServer->{$hostname}->{$src} = $dst;     
+            $du{$src} = '';
+          }
+        }
+        if($mtab) {
+          $found_mount++;
+          $output .= "\nmtab result:\n$mtab\n";
+          $tmp2 = "mtab yes";
+        } else {
+          $output .= "\nmtab result: none\n";
+          $tmp2 = "mtab no";
+        }
+        $out2 .= "$tmp2\n"
+      }
+    }
+  } else {
+    $output .= "not found in showmount\n\n";
+    $out2 .= "$head:$vol|not found in showmount\n"
+  }
+ 
+  if($found_mount && $do_du eq 'y') {
+    for my $server (sort keys %{$refHashServer}) {
+      $output .= "$server\n";
+      for my $v (sort keys %{$refHashServer->{$server}}) {
+        if(!$du{$v}) {
+          chomp($out = `ssh $server "du -sh $refHashServer->{$server}->{$v}" 2>/dev/null`);
+          $du{$v} = $out;
+          $output .= "$out\n";
+         } else {
+          $output .= "$du{$v}\n";
+        }
+      }
+    }
+  }
+  
+  $out2 .= "\n";
+  $output .= "\n\n";
+  print $output if($verbose);
+  return ($found_mount,$output,$out2); 
+}
+
+sub updateData
+{
+  my ($head,$vol,$refHashVolSnap) = @_;
+  chomp(my @rs=`/usr/bin/rnetapp $head volume list -s $vol`);
+  my $test = join '\n', @rs;
+  if($test =~ /(usage|exists)/i) {
+    print "ERROR from /usr/bin/rnetapp $head volume list -s $vol\n$test";
+  } else {
+    $refHashVolSnap = buildHash(\@rs,$head,$refHashVolSnap);
+    $refHashVolSnap = getSnapSchd($head,$refHashVolSnap,$vol);
+  }
+  return $refHashVolSnap;
+}
+
+sub printDetailByKeyword
+{
+  my ($head,$refHashVolSnap) = @_;
+  my ($keyword,$vol,$rs,$out,$online,$offline);
+  my $refArrColToPrint = ['Volume','Total','Used','Use','SnapResv','SnapUsed','State','SnapShotSchd'];
+  my @vol = ();
+
+  $keyword = getUserInput("pls enter keyword for the volume(s), (ie. 'binlog')");
+  for $vol (sort keys %{$refHashVolSnap->{$head}}) {
+    if($vol =~ /$keyword/) {
+      $rs = &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint);
+      if($rs) {
+        if($refHashVolSnap->{$head}->{$vol}->{State} eq 'offline') {
+          $offline .= $rs . "\n";
+        } else { $online .= $rs . "\n"; }
+      }
+      push(@vol, $vol);
+    }
+  }
+
+  if($online) {
+    print  "online vol :\n\n";
+    print  printHeader($refArrColToPrint) . "\n";
+    print  "$online\n\n";
+  }
+
+  if($offline) {
+    print  "offline vol :\n\n";
+    print  printHeader($refArrColToPrint) . "\n";
+    print  "$offline\n\n";
+  }
+
+  print "found: " . ($#vol+1) . "\n";
+  if($#vol > -1) {
+    my $yn = getYn("do you wanna work on them");
+    $refHashVolSnap = workOnIt($head, \@vol, $refHashVolSnap) if($yn ne 'n');
+  }
+  return $refHashVolSnap;
+}
+
+sub printVolUsageLessThanGreaterThan 
+{
+  my ($head,$refHashVolSnap,$lt_or_gt,$in,$no_next) = @_;
+  my ($vol,$use,$rs,$out,$online_vol_only,@vol);
+  my $refArrColToPrint = ['Volume','Total','Used','Use','SnapResv','SnapUsed','State','SnapShotSchd'];
+
+  while($lt_or_gt ne 'lt' && $lt_or_gt ne 'gt') {
+    $lt_or_gt = getUserInput("pls enter 'lt' for less than or 'gt' for greater than (lt/gt)");
+  }
+    
+  while($in !~ /[1-99]/ ) {
+    $in = getUserInput("enter the number btw 1-99 (ex. 10 for <= 10%)");
+  }
+
+  $online_vol_only = getYn("show me only 'online' volumes (enter 'n' if you wanna include 'offline' volumes)");
+  print "\n\n";
+  print printHeader($refArrColToPrint) . "\n";
+  for $vol (sort keys %{$refHashVolSnap->{$head}}) {
+    $use = $refHashVolSnap->{$head}->{$vol}->{Use}; 
+    $use =~ s/\%//;
+    if($lt_or_gt eq 'lt') {
+      if($use <= $in) {
+        if($online_vol_only eq 'n') {
+          print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "\n";
+          push(@vol, $vol);
+        } else {
+          if($refHashVolSnap->{$head}->{$vol}->{State} eq 'online') {
+            print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "\n";
+            push(@vol, $vol);
+          }
+        }
+      }
+    } else {
+      if($use >= $in) {
+        if($online_vol_only eq 'n') {
+          print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "\n";
+          push(@vol, $vol);
+        } else {
+          if($refHashVolSnap->{$head}->{$vol}->{State} eq 'online') {
+            print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "\n";
+            push(@vol, $vol);
+          }
+        }
+      }
+    }
+  }
+  print "found: " . ($#vol+1) . "\n";
+  #if($#vol > -1 && $no_next) {
+  if($#vol > -1) {
+    my $yn = getYn("do you wanna work on them");
+    $refHashVolSnap = workOnIt($head, \@vol, $refHashVolSnap) if($yn ne 'n');
+  }
+  return $refHashVolSnap;
+}
+
+sub printZmandaSnapVol
+{
+  my ($head,$refHashVolSnap) = @_;
+  my $refArrColToPrint = ['Volume','Total','Used','Use','SnapResv','SnapUsed','State','SnapShotSchd'];
+  my (@vol,@missing_snap);
+  my $zvol = 0;
+  my $only_zmanda_vol = getYn("scan only zmanda volumes (enter 'n' to scan all volumes)");
+  print  printHeader($refArrColToPrint) . "\n";
+  for my $vol (sort keys %{$refHashVolSnap->{$head}}) {
+    if($only_zmanda_vol eq 'y' && $refHashVolSnap->{$head}->{$vol} =~ /$zmandaSnapshot/) {
+      $zvol++;
+      my $dt=`/usr/bin/rnetapp $head snapshot list $vol`;
+      if($dt =~ /zrm/) {
+        print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "$dt\n";
+        push(@vol, $vol);
+      } else {
+        push(@missing_snap, $vol);
+      }
+    } else {    
+      $zvol++;
+      my $dt=`/usr/bin/rnetapp $head snapshot list $vol`;
+      if($dt =~ /zrm/) {
+        print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "$dt\n";
+        push(@vol, $vol);
+      } else {
+        push(@missing_snap, $vol);
+      }
+    }
+  }
+
+  print "found: " . ($#vol+1) . " out of $zvol matching \($zmandaSnapshot\)\n";
+  if($#vol > -1 || $#missing_snap > -1) {
+    my $yn = getYn("do you wanna work on them");
+    if($yn eq 'y') {
+      my $pickone = '';
+      while(!$pickone || $pickone !~ /[1-3]/) {
+        print "\n\tpls select one with number of vol > 0\n\n";
+        print "\t1. vol with snaps : " . ($#vol+1) . "\n";
+        print "\t2. vol without snaps : " . ($#missing_snap+1) . "\n";
+        print "\t3. do nothing\n";
+        print "\n\tpls enter number from the menu : ";
+        chomp($pickone = <STDIN>);
+      }
+      if($pickone != 3) {
+        @vol = @missing_snap if($pickone == 2);
+        $refHashVolSnap = workOnIt($head, \@vol, $refHashVolSnap);
+      }
+    }
+  }
+  return $refHashVolSnap;
+}
+
+sub createSnapShot
+{
+  my ($head,$vol,$path,$refHashVolSnap,$dontask) = @_;
+  my $refArrColToPrint = ['Volume','Total','Used','Use','SnapResv','SnapUsed','State','SnapShotSchd'];
+  my ($src_server,$dst_server,$folder,$snap_name,$yn);
+  my $dt=`/usr/bin/rnetapp $head snapshot list $vol`;
+  print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "$dt\n";
+  while(!$snap_name) {
+    $snap_name = getUserInput("name of the snapshot you wanna create");
+  }
+  $dt=`/usr/bin/rnetapp $head snapshot create $vol $snap_name`;
+  if($dt =~ /already exists/) {
+    $yn = getYn("snapshot $snap_name is already exist.  do you wanna override");
+    if($yn eq 'y') {
+      runCmd("/usr/bin/rnetapp $head snapshot delete $vol $snap_name");
+      $dt=`/usr/bin/rnetapp $head snapshot create $vol $snap_name`;
+    }
+  }
+  print "$dt\n";
+  $dt=`/usr/bin/rnetapp $head snapshot list $vol`;
+  print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "$dt\n";
+
+  unless($dontask) {
+    $yn = getYn("would you like to mount this to dest server");
+    addExportAndMount($head,$vol,$path,$snap_name) if($yn eq 'y');
+  }
+}
+
+sub deleteVolume {
+  my ($head,$vol,$refHashVolSnap) = @_;
+  my ($yn,$dt);
+  $yn = getyN("are you sure you wanna remove $head:$vol");
+  if($yn eq 'y') {
+    print "let me chk to see if any server mounting to itl\n";
+
+    my($found,$out) = chkIfMountedThenUsage($head,$vol);
+    if($found) {
+      print "$out\n\nthere are servers mounting\nskip...deleting\n"; 
+    } else {
+      my $data = ($refHashVolSnap->{$head}->{$vol}->{Used} eq "0") ? 0 : $refHashVolSnap->{$head}->{$vol}->{Used};
+      print "no server is currently mount to $head:$vol\n";
+      $data = ($data) ? "but there are $data on this vol\n" : "there are no data, 0.00G usage on this vol\n";
+      print "$data";
+      $yn = getyN("are you SURE you really wanna REMOVE $head: $vol");
+      if($yn eq 'y') {
+        $dt=`/usr/bin/rnetapp $head volume delete $vol`;
+        print "$dt\n";
+        delete $refHashVolSnap->{$head}->{$vol};
+      }
+    }
+  }
+  return $refHashVolSnap;
+}
+
+sub addExportAndMount
+{
+  my ($head,$vol,$path,$snap_name) = @_;
+  my $refArrColToPrint = ['Volume','Total','Used','Use','SnapResv','SnapUsed','State','SnapShotSchd'];
+  my ($yn,$server);
+  my $try_again = 'y';
+  if(!$head || !$vol) {
+    print "ERROR!!  missing input, head: $head, vol: $vol\n";
+    return 0;
+  }
+
+  while($try_again eq 'y') {
+    $server = getUserInput("pls enter hostname or FQDN of the dest server (ex. app1v-aargyle.tp.dev.lax.gnmedia.net)");
+    if($server) {
+      if(!pingable($server)) {
+        print "$server is not pingable :(\n";
+        $server = '';
+        $try_again = getYn("would you try again");
+      } else { $try_again = 'n'; }
+    }
+  } 
+  if($server) {
+    my $dt=`/usr/bin/rnetapp $head exports add $vol $server`;
+    print "$dt\n\n";
+    $dt=`/usr/bin/rnetapp $head snapshot list $vol`;
+    print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "$dt\n\n";
+
+    $snap_name = getUserInput("if you would like me to mount the snap for you, pls give me snapname or hit enter to skip") if(!$snap_name);
+
+    if($snap_name) {
+      print "attempt to mount on $server:/mnt/tmp\n";
+      $dt = `ssh $server "/usr/bin/test -d /mnt/tmp || sudo /bin/mkdir -p /mnt/tmp;sudo /bin/umount /mnt/tmp;sudo /bin/mount $head:/vol/$path/.snapshot/$snap_name /mnt/tmp;/bin/df -h /mnt/tmp" 2>/dev/null`;
+      print "$dt\n";
+    }
+  } else {  print "no change on export..\n"; }
+}
+
+sub getHostAndPath
+{
+  my ($get_server_msg,$get_path_msg) = @_;
+  my ($server,$path,$out,$head,$vol,$actual_path);
+
+  while(!$server) {
+    $server = getUserInput("$get_server_msg");
+    if(!$server) { return ($head,$vol,$actual_path); }  # user decide to skip
+    else {
+      if(!pingable($server)) {
+        print "$server is not pingable :(\n";
+        $server = '';
+      }
+    }
+  }
+
+  while(!$out) {
+    $path = getUserInput("$get_path_msg");
+    #$out = `sudo -u root ssh $server "/bin/grep '$path' /etc/fstab" 2>/dev/null`;
+    $out = `ssh $server "/bin/grep '$path' /etc/fstab" 2>/dev/null`;
+    if($out) {
+      $out =~ /^(.*?)\:\/.*?\/(.*?)\s/;
+      $head = $1;
+      $actual_path = $vol = $2;
+
+      # if vol is path like vol_something_share/folder_for_each_server
+      $vol =~ s/\/.*$//;
+    } else {
+      print "couldn't find the path on fstab... :(\n";
+      my $yn = getYn("would you like to try again");
+      $out = '' if($yn eq 'y');
+    }
+  }
+  return ($head,$vol,$actual_path);
+}
+
+sub pingable
+{
+  use Net::Ping;
+
+  #my $p = Net::Ping->new();
+  #my $rtn = $p->ping($_[0]);
+  #$p->close();
+  # workaround bug in net ping; set timeout 2s.
+  return (system("ping -c 1 -W 2 $_[0] 1>/dev/null")) ? 0 : 1;
+}
+
+sub convertVarToArray
+{
+  my $in = shift;
+  $in =~ s/,/ /g;
+  $in =~ s/  / /g;
+  my @ar = split / /, $in;
+  return @ar;
+}
+
+sub chkSwitch
+{
+GetOptions ('gibme=s' => \$switch,
+  	    'head=s' => \$head
+); 
+die <<EOF
+Usage:\t$0 --gibme=menu|report [--head=$ntapHead1|$ntapHead2|$ntapHead3]
+
+if you wanna do "showmount and du -sh" or 
+"want the script to mount vol for you--must be run as root cos deploy can't mkdir in /mnt", 
+run as either root or deploy, so we can do it passwd less
+although, you can still run it as yourself, you would have to enter your ssh key passwd for every ssh
+
+\tsudo $0 --gibme=menu|report [--head=$ntapHead1|$ntapHead2|$ntapHead3]
+\tsudo $0 su deploy --gibme=menu|report [--head=$ntapHead1|$ntapHead2|$ntapHead3]
+
+EOF
+unless($switch);
+}
+
+sub printMenu
+{
+  my $do_what = 100;
+  while(!$do_what || $do_what < 0 || $do_what > 11) {
+    print "\n\n";
+    print "\t1. check/change vars\n"; 
+    print "\t2. select new filer(s)\n";
+    print "\t3. modify volumes (vol list/size/delete, snap reserve/schd/delete, showmount)\n"; 
+    print "\t4. show volume detail and snap schedule\n"; 
+    print "\t5. show snap usage more than 100%\n"; 
+    print "\t6. show detail of 'keyword' volume(s)\n"; 
+    print "\t7. show volumes which space usage is less than or equal to xx % (chk for waste space)\n"; 
+    print "\t8. show volumes which space usage is grater than or equal to 90% (dfm alert)\n"; 
+    print "\t9. show volumes containing zmanda snapshots (snapshot file with zrm* name)\n"; 
+    print "\t10. create a snapshot\n"; 
+    print "\t11. add exports and mount\n"; 
+    print "\te. exit\n\n"; 
+    print "\n\tpls select number from the menu (number or 'e' to exit): ";
+    chomp($do_what = <STDIN>);
+    exit if($do_what eq 'e');
+    $do_what = 100 if($do_what =~ /\w/ && $do_what !~ /\d/);
+  }
+  return $do_what; 
+}
+
+sub getHead
+{
+  my $in = '';
+  my @head = ();
+  while(!$in || $in !~ /[1-4]/) {
+    print "\n\n";
+    print "\t1. $ntapHead1\n"; 
+    print "\t2. $ntapHead2\n"; 
+    print "\t3. $ntapHead3\n"; 
+    #print "\t4. all \n";  # too slow
+    print "\n\tpls select number from the menu : ";
+    chomp($in = <STDIN>);
+  }
+  if($in eq '1') { @head = ($ntapHead1); }
+  elsif($in eq '2') { @head = ($ntapHead2); }
+  elsif($in eq '3') { @head = ($ntapHead3); }
+  #elsif($in eq '4') { @head = ($ntapHead1, $ntapHead2, $ntapHead3); }
+  return @head;
+}
+
+sub printHeader 
+{
+  my $refArr = shift;
+  my $rs = sprintf("%-40s",$refArr->[0]);
+  for my $i (1 .. $#{$refArr}) { $rs .= sprintf("%-10s",$refArr->[$i]); }
+  return $rs .= "\n";
+}
+
+sub printSnapDetail
+{
+  my ($head,$vol,$refHashVolSnap,$refArr) = @_;
+  my $rs = $refHashVolSnap->{$head}->{$vol}->{$refArr->[0]};
+  if($rs) {
+    $rs = sprintf("%-40s",$rs);
+    for my $i (1 .. $#{$refArr}) { $rs .= sprintf("%-10s",$refHashVolSnap->{$head}->{$vol}->{$refArr->[$i]}); }
+  }
+  return $rs;
+}
+
+sub snapDelete
+{
+  my ($head,$vol,$refHashVolSnap,$refArrColToPrint) = @_;
+
+  my $dt=`/usr/bin/rnetapp $head snapshot list $vol`;
+  if($dt =~ /\:/) {
+    print "$dt\n";
+    my $snap_filename = getUserInput("pls enter the name of the snap(s) you would like to delete separated by space or hit enter to do 'nothing'");
+    my @snapToDelete = convertVarToArray($snap_filename);
+    for $snap_filename (@snapToDelete) {
+      print "/usr/bin/rnetapp $head snapshot delete $vol $snap_filename\n";
+      system("/usr/bin/rnetapp $head snapshot delete $vol $snap_filename");
+    }
+    if($snap_filename) {
+      $dt=`/usr/bin/rnetapp $head snapshot list $vol`;
+      print $dt =~ /\:/ ? $dt : "no snap file on this volume\n";
+      $refHashVolSnap = updateData($head,$vol,$refHashVolSnap);
+      print  printHeader($refArrColToPrint);
+      my $rs = &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint);
+      if($rs) { print "$rs\n"; }
+    }
+  } else { print "no snap file on $vol\n"; }
+  return $refHashVolSnap;
+}
+
+sub buildHash
+{
+  my ($refArray,$head,$refHashVolSnap) = @_;
+  my @header = ();
+  my $header = shift(@$refArray);
+
+  if($refArray && $head) {
+    $header =~ s/Volume Name/Volume/;
+    $header =~ s/\s+/\|/g;
+    @header = split /\|/, $header;
+
+    for (@$refArray) {
+      s/\s+/\|/g;
+      my @ar = split /\|/,;
+      for(my $i=0;$i<=$#header;$i++) { $refHashVolSnap->{$head}->{$ar[0]}->{$header[$i]} = $ar[$i]; }
+    }
+    return $refHashVolSnap;
+  } else {  print "missing req args \$refArray: $refArray or \$head: $head\n"; }
+}
+
+sub getYn
+{
+  print "\n\t$_[0]? [Y/n] : ";
+  chomp(my $yn=<STDIN>);
+  $yn = 'y' if(!$yn);
+  $yn = ($yn eq 'y') ? 'y' : 'n';
+  return lc($yn);
+}
+
+sub getyN
+{
+  print "\n\t$_[0]? [y/N] : ";
+  chomp(my $yn=<STDIN>);
+  $yn = 'n' if(!$yn);
+  $yn = ($yn eq 'n') ? 'n' : 'y';
+  return lc($yn);
+}
+
+sub getUserInput
+{
+  print "\n\n\t$_[0]";
+  print "\n\tpls enter your input here : ";
+  chomp(my $in=<STDIN>);
+  print "\n";
+  $in =~ s/[^\|\w\d\s\.\-]+//g;
+  $in =~ s/\s+/ /g;
+  $in =~ s/^\s//g;
+  $in =~ s/\s$//g;
+  return $in;
+}
+
+sub getUserInputAllowWildCard
+{
+  print "\n\n\t$_[0]";
+  print "\n\tpls enter your input here : ";
+  chomp(my $in=<STDIN>);
+  print "\n";
+  $in =~ s/[^\|\w\d\s\.\-\*\!]+//g;
+  $in =~ s/\s+/ /g;
+  $in =~ s/^\s//g;
+  $in =~ s/\s$//g;
+  return $in;
+}
+
+sub printAllVol
+{
+  ($head,$refHashVolSnap) = @_;
+  print "\nvolumes in $head\n";
+  for my $vol (sort keys %{$refHashVolSnap->{$head}}) { print "$vol "; }
+  print "\n";
+}
+
+sub printDebug
+{
+  $refHashVolSnap = shift;
+  my $refArrColToPrint = ['Volume','Total','Used','Use','SnapResv','SnapUsed','State','SnapShotSchd'];
+
+  for my $head (sort keys %$refHashVolSnap) {
+    print "$head\n";
+    for my $vol (sort keys %{$refHashVolSnap->{$head}}) {
+      print  &printSnapDetail($head,$vol,$refHashVolSnap,$refArrColToPrint) . "\n";
+    }
+  }
+}
+
+sub do_ssh
+{
+  my ($server,$cmd,$timeout) = @_;
+  my $out;
+  $timeout = 5 if($timeout);
+  if($server && $cmd) {
+    my $error_timeout=0;
+    eval{
+      local $SIG{ALRM} = sub { die "alarm\n"; };
+      alarm $timeout;
+      chomp($out = `ssh $server "$cmd" 2>/dev/null`);
+      alarm 0;
+    };
+    if($@) {
+      return "timeout";
+      die unless $@ eq "alarm\n";
+    } else {
+      return $out;
+    }
+  }
+}
+
+# this will only stay in the memory til script die, make sure to edit the actual script
+# a better way is to dump into some type of db and re-read it everytime printMenu get called
+# if can't connect to db or value is blank, use default values above.
+sub changeVar
+{
+  my $in = getUserInput("pls enter new value for $_[1] or hit enter to use the current value\n\tcurrent $_[1] is $_[0]");
+  $in =~ s/\s+//g;
+  $in =~ s/^\|//g;
+  $in =~ s/|$//g;
+  $in = ($in =~ /\w/) ? $in : $_[0];
+  return $in;
+}
+1;

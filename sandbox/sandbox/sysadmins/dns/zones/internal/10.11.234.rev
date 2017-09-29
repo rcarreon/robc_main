@@ -1,0 +1,269 @@
+$TTL 3600 ; 1 day
+@      IN      SOA     gnmedia.net. root@gnmedia.net. (
+			2014110401	; Serial
+			36262		; Refresh
+			300		; Retry
+			3600000		; Expire
+			3600 )		; Minimum
+
+	IN	NS	app1v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app2v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app3v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app4v-dns.tp.prd.lax.gnmedia.net.
+
+;1	IN	PTR
+;2	IN	PTR
+;3	IN	PTR
+;4	IN	PTR
+;5	IN	PTR
+;6	IN	PTR
+7	IN	PTR	int-vlan1234.admin.core1.gnmedia.net.
+8	IN	PTR	int-vlan1234.admin.core2.gnmedia.net.
+9	IN	PTR	int-vlan1234.gn1.core1.gnmedia.net.
+10	IN	PTR	int-vlan1234.gn1.core2.gnmedia.net.
+;11	IN	PTR
+;12	IN	PTR
+;13	IN	PTR
+;14	IN	PTR
+;15	IN	PTR	natpool-1-vlan1234-1.10g.lax1.gnmedia.net.
+;16	IN	PTR	natpool-2-vlan1234-1.10g.lax1.gnmedia.net.
+17	IN	PTR	natpool-1-vlan1234-1.admin.core.gnmedia.net.
+18	IN	PTR	natpool-2-vlan1234-1.admin.core.gnmedia.net.
+19	IN	PTR	natpool-1-vlan1234-1.gn1.core.gnmedia.net.
+20	IN	PTR	nfsA-netapp1.ao.dev.lax.gnmedia.net.
+21	IN	PTR	nfsB-netapp1.ao.dev.lax.gnmedia.net.
+22	IN	PTR	natpool-2-vlan1234-1.gn1.core.gnmedia.net.
+;23     IN      PTR
+;24	IN	PTR	int-vlan1234.10g.lax1.gnmedia.net.
+;25	IN	PTR
+26	IN	PTR	uid1v-cchavez.ao.dev.lax.gnmedia.net.
+27	IN	PTR	app1v-sdc.ao.dev.lax.gnmedia.net.
+28	IN	PTR	app2v-sdc.ao.dev.lax.gnmedia.net.
+29	IN	PTR	uid1v-mdillon.ao.dev.lax.gnmedia.net.
+30	IN	PTR	ngx1v-ci.ci.dev.lax.gnmedia.net.
+31	IN	PTR	uid1v-hbeltran.ao.dev.lax.gnmedia.net.
+32	IN	PTR	uid1v-igonzalez.ao.dev.lax.gnmedia.net.
+33	IN	PTR	uid1v-dgrbavcic.ao.dev.lax.gnmedia.net.
+34	IN	PTR	app1v-build.ci.dev.lax.gnmedia.net.
+35	IN	PTR	mem1v-vb.ao.dev.lax.gnmedia.net.
+36	IN	PTR	uid1v-jbecerra.ao.dev.lax.gnmedia.net.
+37	IN	PTR	spx1v-mal.ao.dev.lax.gnmedia.net.
+38	IN	PTR	vip-app-sdc.ao.dev.lax.gnmedia.net.
+39	IN	PTR	vip-app-vb-tfs.ao.dev.lax.gnmedia.net.
+40	IN	PTR	els1v-xf.ao.dev.lax.gnmedia.net.
+41	IN	PTR	uid2v-cchavez.ao.dev.lax.gnmedia.net.
+42	IN	PTR	uid1v-vgilton.ao.dev.lax.gnmedia.net.
+43	IN	PTR	vip-app-xf-psl.ao.dev.lax.gnmedia.net.
+44	IN	PTR	app1v-ci.ci.dev.lax.gnmedia.net.
+45	IN	PTR	uid1v-orivera.ao.dev.lax.gnmedia.net.
+46	IN	PTR	mem1v-xf-psl.ao.dev.lax.gnmedia.net.
+;;47	IN	PTR	vip-app.ao.dev.lax.gnmedia.net.
+48	IN	PTR	els2v-xf.ao.dev.lax.gnmedia.net.
+49	IN	PTR	vip-pxy.ao.dev.lax.gnmedia.net.
+50	IN	PTR	app1v-mal.ao.dev.lax.gnmedia.net.
+51	IN	PTR	app2v-mal.ao.dev.lax.gnmedia.net.
+52	IN	PTR	vip-app-mal.ao.dev.lax.gnmedia.net.
+53	IN	PTR	vip-app-jm.ao.dev.lax.gnmedia.net.
+54	IN	PTR	vip-pxy-jm.ao.dev.lax.gnmedia.net.
+55	IN	PTR	app1v-be-sdc.ao.dev.lax.gnmedia.net.
+56	IN	PTR	vip-els-xf.ao.dev.lax.gnmedia.net.
+57	IN	PTR	uid2v-mdillon.ao.dev.lax.gnmedia.net.
+58	IN	PTR	uid1v-jrodriguez.ci.dev.lax.gnmedia.net.
+59	IN	PTR	mem1v-mal.ao.dev.lax.gnmedia.net.
+60	IN	PTR	app1v-wp.ao.dev.lax.gnmedia.net.
+61	IN	PTR	app2v-wp.ao.dev.lax.gnmedia.net.
+62	IN	PTR	pxy1v-wp.ao.dev.lax.gnmedia.net.
+63	IN	PTR	pxy2v-wp.ao.dev.lax.gnmedia.net.
+64	IN	PTR	vip-pxy-wp.ao.dev.lax.gnmedia.net.
+65	IN	PTR	vip-app-wp.ao.dev.lax.gnmedia.net.
+66	IN	PTR	mem1v-ci.ci.dev.lax.gnmedia.net.
+67	IN	PTR	eng1v-ci.ci.dev.lax.gnmedia.net.
+68	IN	PTR	spx1v-ci.ci.dev.lax.gnmedia.net.
+69	IN	PTR	kes1v-ci.ci.dev.lax.gnmedia.net.
+70	IN	PTR	uid1v-smercado.ao.dev.lax.gnmedia.net.
+71	IN	PTR	app1v-wpbeta.ao.dev.lax.gnmedia.net.
+72	IN	PTR	pxy1v-sdc.ao.dev.lax.gnmedia.net.
+73	IN	PTR	uid1v-uacosta.ci.dev.lax.gnmedia.net.
+74	IN	PTR	uid1v-vtella.ao.dev.lax.gnmedia.net.
+75	IN	PTR	uid1v-dgarcia.ao.dev.lax.gnmedia.net.
+76	IN	PTR	app1v-build.ao.dev.lax.gnmedia.net.
+77	IN	PTR	vip-app-api-cs.ao.dev.lax.gnmedia.net.
+78	IN	PTR	uid1v-ddurand.ci.dev.lax.gnmedia.net.
+79	IN	PTR	uid1v-jurodriguez.ci.dev.lax.gnmedia.net.
+80	IN	PTR	app1v-mgmt.ci.dev.lax.gnmedia.net.
+81	IN	PTR	app1v-mc.ao.dev.lax.gnmedia.net.
+82	IN	PTR	mem1v-wp.ao.dev.lax.gnmedia.net.
+83	IN	PTR	uid2v-igonzalez.ao.dev.lax.gnmedia.net.
+84	IN	PTR	uid1v-efelix.ao.dev.lax.gnmedia.net.
+85	IN	PTR	uid1v-fgonzalez.ci.dev.lax.gnmedia.net.
+86	IN	PTR	uid1v-jcortes.ci.dev.lax.gnmedia.net.
+87	IN	PTR	uid1v-jcrawford.ci.dev.lax.gnmedia.net.
+88	IN	PTR	uid1v-rvicchiullo.ci.dev.lax.gnmedia.net.
+89	IN	PTR	uid1v-ssalazar.ci.dev.lax.gnmedia.net.
+90	IN	PTR	mem2v-wp.ao.dev.lax.gnmedia.net.
+91	IN	PTR	mem2v-xf-psl.ao.dev.lax.gnmedia.net.
+93	IN	PTR	app2v-xf-psl.ao.dev.lax.gnmedia.net.
+94	IN	PTR	app1v-vb-tfs.ao.dev.lax.gnmedia.net.
+95	IN	PTR	uid2v-smercado.ao.dev.lax.gnmedia.net.
+96	IN	PTR	uid2v-vgilton.ao.dev.lax.gnmedia.net.
+97	IN	PTR	uid2v-vtella.ao.dev.lax.gnmedia.net.
+98	IN	PTR	app1v-api-cs.ao.dev.lax.gnmedia.net.
+99	IN	PTR	app2v-api-cs.ao.dev.lax.gnmedia.net.
+100	IN	PTR	mem1v-api-cs.ao.dev.lax.gnmedia.net.
+101	IN	PTR	mem2v-api-cs.ao.dev.lax.gnmedia.net.
+102	IN	PTR	uid2v-dgarcia.ao.dev.lax.gnmedia.net.
+103	IN	PTR	uid2v-hbeltran.ao.dev.lax.gnmedia.net.
+104	IN	PTR	uid2v-jbecerra.ao.dev.lax.gnmedia.net.
+105	IN	PTR	uid3v-vtella.ao.dev.lax.gnmedia.net.
+106	IN	PTR	uid2v-orivera.ao.dev.lax.gnmedia.net.
+107	IN	PTR	app1v-xf-sdc.ao.dev.lax.gnmedia.net.
+108	IN	PTR	app2v-xf-sdc.ao.dev.lax.gnmedia.net.
+109	IN	PTR	mem1v-xf-sdc.ao.dev.lax.gnmedia.net.
+110	IN	PTR	mem2v-xf-sdc.ao.dev.lax.gnmedia.net.
+111	IN	PTR	vip-app-xf-sdc.ao.dev.lax.gnmedia.net.
+112	IN	PTR	uid2v-efelix.ao.dev.lax.gnmedia.net.
+113	IN	PTR	app1v-vb-wz.ao.dev.lax.gnmedia.net.
+114	IN	PTR	app1v-vb-bab.ao.dev.lax.gnmedia.net.
+115	IN	PTR	app1v-vb-hfb.ao.dev.lax.gnmedia.net.
+116	IN	PTR	app1v-vb-sdc.ao.dev.lax.gnmedia.net.
+117	IN	PTR	app1v-vb-shh.ao.dev.lax.gnmedia.net.
+118	IN	PTR	spx1v-vb.ao.dev.lax.gnmedia.net.
+119	IN	PTR	app1v-xf-ae.ao.dev.lax.gnmedia.net.
+120	IN	PTR	app2v-xf-ae.ao.dev.lax.gnmedia.net.
+121	IN	PTR	mem1v-xf-ae.ao.dev.lax.gnmedia.net.
+122	IN	PTR	mem2v-xf-ae.ao.dev.lax.gnmedia.net.
+123	IN	PTR	vip-app-xf-ae.ao.dev.lax.gnmedia.net.
+124	IN	PTR	uid1v-bmireles.ao.dev.lax.gnmedia.net.
+125	IN	PTR	uid2v-bmireles.ao.dev.lax.gnmedia.net.
+;126    IN      PTR
+;127    IN      PTR
+;128    IN      PTR
+;129    IN      PTR
+;130    IN      PTR
+;131    IN      PTR
+;132    IN      PTR
+;133    IN      PTR
+;134    IN      PTR
+;135    IN      PTR
+;136    IN      PTR
+;137    IN      PTR
+;138    IN      PTR
+;139    IN      PTR
+;140    IN      PTR
+;141    IN      PTR
+;142    IN      PTR
+;143    IN      PTR
+;144    IN      PTR
+;145    IN      PTR
+;146    IN      PTR
+;147    IN      PTR
+;148    IN      PTR
+;149    IN      PTR
+;150    IN      PTR
+;151    IN      PTR
+;152    IN      PTR
+;153    IN      PTR
+;154    IN      PTR
+;155    IN      PTR
+;156    IN      PTR
+;157    IN      PTR
+;158    IN      PTR
+;159    IN      PTR
+;160    IN      PTR
+;161    IN      PTR
+;162    IN      PTR
+;163    IN      PTR 
+;164    IN      PTR
+;165    IN      PTR
+;166    IN      PTR
+;167    IN      PTR
+;168    IN      PTR
+;169    IN      PTR
+;170    IN      PTR
+;171    IN      PTR
+;172    IN      PTR
+;173    IN      PTR
+;174    IN      PTR
+;175    IN      PTR
+;176    IN      PTR
+;177    IN      PTR
+;178    IN      PTR
+;179    IN      PTR
+;180    IN      PTR
+;181    IN      PTR
+;182    IN      PTR
+;183    IN      PTR
+;184    IN      PTR
+;185    IN      PTR
+;186    IN      PTR
+;187    IN      PTR
+;188    IN      PTR
+;189    IN      PTR
+;190    IN      PTR
+;191    IN      PTR
+;192    IN      PTR
+;193    IN      PTR
+;194    IN      PTR
+;195    IN      PTR
+;196    IN      PTR
+;197    IN      PTR
+;198    IN      PTR
+;199    IN      PTR
+;200    IN      PTR
+;201    IN      PTR
+;202    IN      PTR
+;203    IN      PTR	
+;204    IN      PTR
+;205    IN      PTR
+;206    IN      PTR
+;207    IN      PTR
+;208    IN      PTR
+;209    IN      PTR
+;210    IN      PTR
+;211    IN      PTR
+;212    IN      PTR
+;213    IN      PTR
+;214    IN      PTR
+;215    IN      PTR
+;216    IN      PTR
+;217    IN      PTR
+;218	IN	PTR
+;219	IN	PTR	nfs1.netapp2.gnmedia.net.
+;220	IN	PTR	nfs2.netapp2.gnmedia.net.
+;221	IN	PTR
+;222	IN	PTR
+;223	IN	PTR
+;224	IN	PTR
+;225	IN	PTR
+;226	IN	PTR
+;227	IN	PTR
+;228	IN	PTR
+;229	IN	PTR
+;231	IN	PTR
+;232	IN	PTR
+;233	IN	PTR
+;234	IN	PTR
+;235	IN	PTR
+;236	IN	PTR
+;237	IN	PTR
+;238	IN	PTR
+;239	IN	PTR
+;240	IN	PTR
+;241	IN	PTR
+;242	IN	PTR
+;243	IN	PTR
+;244    IN      PTR
+;245    IN      PTR
+;246    IN      PTR
+;247    IN      PTR
+;248    IN      PTR
+;249    IN      PTR
+;250    IN      PTR
+;251    IN      PTR
+;252    IN      PTR	
+;253    IN      PTR	
+;254    IN      PTR
+;255    IN      PTR
+;0	IN	PTR	app3v-jm.ao.dev.lax.gnmedia.net.
+47	IN	PTR	app1v-vw.ci.dev.lax.gnmedia.net.
+92	IN	PTR	app1v-xf-psl.ao.dev.lax.gnmedia.net.

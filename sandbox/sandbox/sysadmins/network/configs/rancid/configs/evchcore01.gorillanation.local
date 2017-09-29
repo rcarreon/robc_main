@@ -1,0 +1,346 @@
+!RANCID-CONTENT-TYPE: cisco
+!
+!Chassis type: WS-C3560G-48PS - a 3500XL switch
+!CPU: PowerPC405
+!
+!Memory: main 131072K
+!Serial Number: FOC1645V1LQ
+!Model revision number           : Q0
+!Model number                    : WS-C3560G-48PS-S
+!Motherboard assembly number     : 73-9705-06
+!Motherboard serial number       : FOC16445YE7
+!Motherboard revision number     : A0
+!Power supply part number        : 341-0108-04
+!Power supply serial number      : ALD1632D0K5
+!
+!Processor ID: FOC1645V1LQ
+!
+!
+!Image: Software: C3560-IPBASEK9-M, 12.2(55)SE5, RELEASE SOFTWARE (fc1)
+!Image: Compiled: Thu 09-Feb-12 18:46 by prod_rel_team
+!Image: flash:c3560-ipbasek9-mz.122-55.SE5/c3560-ipbasek9-mz.122-55.SE5.bin
+!
+!BOOTLDR: Version 12.2(44r)SE9, RELEASE SOFTWARE (fc1)
+!
+!
+!Variable: BOOT path-list      : flash:c3560-ipbasek9-mz.122-55.SE5/c3560-ipbasek9-mz.122-55.SE5.bin
+!Variable: Config file         : flash:/config.text
+!Variable: Private Config file : flash:/private-config.text
+!Variable: Enable Break        : no
+!Variable: Manual Boot         : no
+!Variable: HELPER path-list    : 
+!Variable: Auto upgrade        : yes
+!Variable: Auto upgrade path   : 
+!Variable: NVRAM/Config file
+!Variable:       buffer size:   524288
+!Variable: Timeout for Config
+!Variable:           Download:    0 seconds
+!Variable: Config Download 
+!Variable:        via DHCP:       disabled (next boot: disabled)
+!
+!Flash: Directory of flash:/
+!Flash:     4  -rwx        1937   Nov 4 1994 21:45:00 +00:00  private-config.text
+!Flash:     5  -rwx        2858   Nov 4 1994 21:45:00 +00:00  config.text
+!Flash:     6  drwx         192   Mar 1 1993 00:13:54 +00:00  c3560-ipbasek9-mz.122-55.SE5
+!Flash: 32514048 bytes total (17088512 bytes free)
+!
+!Flash: nvram: Directory of nvram:/
+!Flash: nvram:   506  -rw-        2858                    <no date>  startup-config
+!Flash: nvram:   507  ----        1937                    <no date>  private-config
+!Flash: nvram:     1  ----          35                    <no date>  persistent-data
+!Flash: nvram:     2  -rw-           0                    <no date>  ifIndex-table
+!Flash: nvram:     3  -rw-         581                    <no date>  IOS-Self-Sig#3434.cer
+!Flash: nvram: 524288 bytes total (516369 bytes free)
+!
+!
+!NAME: "1",                     DESCR: "WS-C3560G-48PS"
+!PID: WS-C3560G-48PS-S
+!VID: V09
+!SN: FOC1645V1LQ
+!NAME: "WS-C3560G-48PS - Power Supply 0", DESCR: "WS-C3560G-48PS - Power Supply 0"
+!SN: ALD1632D0K5
+!NAME: "WS-C3560G-48PS - Fan 0", DESCR: "WS-C3560G-48PS - Fan 0"
+!NAME: "WS-C3560G-48PS - Sensor 0", DESCR: "WS-C3560G-48PS - Sensor 0"
+!NAME: "WS-C3560G-48PS - Fixed Module 0", DESCR: "WS-C3560G-48PS - Fixed Module 0"
+!NAME: "GigabitEthernet0/49 Container", DESCR: "GigabitEthernet Container"
+!NAME: "GigabitEthernet0/50 Container", DESCR: "GigabitEthernet Container"
+!NAME: "GigabitEthernet0/51 Container", DESCR: "GigabitEthernet Container"
+!NAME: "GigabitEthernet0/52 Container", DESCR: "GigabitEthernet Container"
+!NAME: "GigabitEthernet0/1",    DESCR: "GigabitEthernet0/1"
+!NAME: "GigabitEthernet0/2",    DESCR: "GigabitEthernet0/2"
+!NAME: "GigabitEthernet0/3",    DESCR: "GigabitEthernet0/3"
+!NAME: "GigabitEthernet0/4",    DESCR: "GigabitEthernet0/4"
+!NAME: "GigabitEthernet0/5",    DESCR: "GigabitEthernet0/5"
+!NAME: "GigabitEthernet0/6",    DESCR: "GigabitEthernet0/6"
+!NAME: "GigabitEthernet0/7",    DESCR: "GigabitEthernet0/7"
+!NAME: "GigabitEthernet0/8",    DESCR: "GigabitEthernet0/8"
+!NAME: "GigabitEthernet0/9",    DESCR: "GigabitEthernet0/9"
+!NAME: "GigabitEthernet0/10",   DESCR: "GigabitEthernet0/10"
+!NAME: "GigabitEthernet0/11",   DESCR: "GigabitEthernet0/11"
+!NAME: "GigabitEthernet0/12",   DESCR: "GigabitEthernet0/12"
+!NAME: "GigabitEthernet0/13",   DESCR: "GigabitEthernet0/13"
+!NAME: "GigabitEthernet0/14",   DESCR: "GigabitEthernet0/14"
+!NAME: "GigabitEthernet0/15",   DESCR: "GigabitEthernet0/15"
+!NAME: "GigabitEthernet0/16",   DESCR: "GigabitEthernet0/16"
+!NAME: "GigabitEthernet0/17",   DESCR: "GigabitEthernet0/17"
+!NAME: "GigabitEthernet0/18",   DESCR: "GigabitEthernet0/18"
+!NAME: "GigabitEthernet0/19",   DESCR: "GigabitEthernet0/19"
+!NAME: "GigabitEthernet0/20",   DESCR: "GigabitEthernet0/20"
+!NAME: "GigabitEthernet0/21",   DESCR: "GigabitEthernet0/21"
+!NAME: "GigabitEthernet0/22",   DESCR: "GigabitEthernet0/22"
+!NAME: "GigabitEthernet0/23",   DESCR: "GigabitEthernet0/23"
+!NAME: "GigabitEthernet0/24",   DESCR: "GigabitEthernet0/24"
+!NAME: "GigabitEthernet0/25",   DESCR: "GigabitEthernet0/25"
+!NAME: "GigabitEthernet0/26",   DESCR: "GigabitEthernet0/26"
+!NAME: "GigabitEthernet0/27",   DESCR: "GigabitEthernet0/27"
+!NAME: "GigabitEthernet0/28",   DESCR: "GigabitEthernet0/28"
+!NAME: "GigabitEthernet0/29",   DESCR: "GigabitEthernet0/29"
+!NAME: "GigabitEthernet0/30",   DESCR: "GigabitEthernet0/30"
+!NAME: "GigabitEthernet0/31",   DESCR: "GigabitEthernet0/31"
+!NAME: "GigabitEthernet0/32",   DESCR: "GigabitEthernet0/32"
+!NAME: "GigabitEthernet0/33",   DESCR: "GigabitEthernet0/33"
+!NAME: "GigabitEthernet0/34",   DESCR: "GigabitEthernet0/34"
+!NAME: "GigabitEthernet0/35",   DESCR: "GigabitEthernet0/35"
+!NAME: "GigabitEthernet0/36",   DESCR: "GigabitEthernet0/36"
+!NAME: "GigabitEthernet0/37",   DESCR: "GigabitEthernet0/37"
+!NAME: "GigabitEthernet0/38",   DESCR: "GigabitEthernet0/38"
+!NAME: "GigabitEthernet0/39",   DESCR: "GigabitEthernet0/39"
+!NAME: "GigabitEthernet0/40",   DESCR: "GigabitEthernet0/40"
+!NAME: "GigabitEthernet0/41",   DESCR: "GigabitEthernet0/41"
+!NAME: "GigabitEthernet0/42",   DESCR: "GigabitEthernet0/42"
+!NAME: "GigabitEthernet0/43",   DESCR: "GigabitEthernet0/43"
+!NAME: "GigabitEthernet0/44",   DESCR: "GigabitEthernet0/44"
+!NAME: "GigabitEthernet0/45",   DESCR: "GigabitEthernet0/45"
+!NAME: "GigabitEthernet0/46",   DESCR: "GigabitEthernet0/46"
+!NAME: "GigabitEthernet0/47",   DESCR: "GigabitEthernet0/47"
+!NAME: "GigabitEthernet0/48",   DESCR: "GigabitEthernet0/48"
+!
+!VTP: VTP Version capable             : 1 to 3
+!VTP: VTP version running             : 1
+!VTP: VTP Domain Name                 : 
+!VTP: VTP Pruning Mode                : Disabled
+!VTP: VTP Traps Generation            : Disabled
+!VTP: Device ID                       : 5897.1e5d.7400
+!VTP: Local updater ID is 192.168.5.2 on interface Vl1 (lowest numbered VLAN interface found)
+!VTP: Feature VLAN:
+!VTP: --------------
+!VTP: VTP Operating Mode                : Server
+!VTP: Maximum VLANs supported locally   : 1005
+!VTP: Number of existing VLANs          : 5
+!VTP: Configuration Revision            : 0
+!VTP: MD5 digest                        : 0x57 0xCD 0x40 0x65 0x63 0x59 0x47 0xBD 
+!VTP:                                     0x56 0x9D 0x4A 0x3E 0xA5 0x69 0x35 0xBC 
+!
+!VLAN: VLAN Name                             Status    Ports
+!VLAN: ---- -------------------------------- --------- -------------------------------
+!VLAN: 1    default                          active    Gi0/1, Gi0/2, Gi0/3, Gi0/4
+!VLAN:                                                 Gi0/5, Gi0/6, Gi0/7, Gi0/8
+!VLAN:                                                 Gi0/9, Gi0/10, Gi0/11, Gi0/12
+!VLAN:                                                 Gi0/13, Gi0/14, Gi0/15, Gi0/16
+!VLAN:                                                 Gi0/17, Gi0/18, Gi0/19, Gi0/20
+!VLAN:                                                 Gi0/21, Gi0/22, Gi0/23, Gi0/24
+!VLAN:                                                 Gi0/25, Gi0/26, Gi0/27, Gi0/28
+!VLAN:                                                 Gi0/29, Gi0/30, Gi0/31, Gi0/32
+!VLAN:                                                 Gi0/33, Gi0/34, Gi0/35, Gi0/36
+!VLAN:                                                 Gi0/37, Gi0/38, Gi0/39, Gi0/40
+!VLAN:                                                 Gi0/41, Gi0/42, Gi0/43, Gi0/44
+!VLAN:                                                 Gi0/45, Gi0/46, Gi0/47, Gi0/48
+!VLAN:                                                 Gi0/49, Gi0/50, Gi0/51, Gi0/52
+!VLAN: 1002 fddi-default                     act/unsup 
+!VLAN: 1003 token-ring-default               act/unsup 
+!VLAN: 1004 fddinet-default                  act/unsup 
+!VLAN: 1005 trnet-default                    act/unsup 
+!VLAN: VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+!VLAN: ---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+!VLAN: 1    enet  100001     1500  -      -      -        -    -        0      0   
+!VLAN: 1002 fddi  101002     1500  -      -      -        -    -        0      0   
+!VLAN: 1003 tr    101003     1500  -      -      -        -    -        0      0   
+!VLAN: 1004 fdnet 101004     1500  -      -      -        ieee -        0      0   
+!VLAN: 1005 trnet 101005     1500  -      -      -        ibm  -        0      0   
+!VLAN: Remote SPAN VLANs
+!VLAN: ------------------------------------------------------------------------------
+!VLAN: Primary Secondary Type              Ports
+!VLAN: ------- --------- ----------------- ------------------------------------------
+!
+!
+config-register 0xF
+!
+version 12.2
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+!
+hostname EVCHCORE01
+!
+boot-start-marker
+boot-end-marker
+!
+no logging console
+enable secret 5 $1$8vyd$7QsKEtsjx9XqsHBnjDthh0
+!
+!username cisco password <removed>
+!username rancid password <removed>
+!
+no aaa new-model
+system mtu routing 1500
+ip routing
+!
+crypto pki trustpoint TP-self-signed-509441024
+ enrollment selfsigned
+ subject-name cn=IOS-Self-Signed-Certificate-509441024
+ revocation-check none
+ rsakeypair TP-self-signed-509441024
+!
+crypto pki certificate chain TP-self-signed-509441024
+ certificate self-signed 01
+  30820241 308201AA A0030201 02020101 300D0609 2A864886 F70D0101 04050030 
+  30312E30 2C060355 04031325 494F532D 53656C66 2D536967 6E65642D 43657274 
+  69666963 6174652D 35303934 34313032 34301E17 0D393330 33303130 30303235 
+  325A170D 32303031 30313030 30303030 5A303031 2E302C06 03550403 1325494F 
+  532D5365 6C662D53 69676E65 642D4365 72746966 69636174 652D3530 39343431 
+  30323430 819F300D 06092A86 4886F70D 01010105 0003818D 00308189 02818100 
+  DA9B7B4B DFF64654 6AED617B 71C429B7 699520AA 5109FC50 E49FA186 4B5B91EE 
+  1B315E20 2E9A2C35 F199B682 0A208DC4 3CE29323 58CF99F6 6D11F9F7 E45855AC 
+  8DBDEB09 C94A230F 2E06969D 0ED2D875 F39E38F9 7D5C0821 8164B2D5 AAD992F7 
+  46DBA101 00D13D93 752F2E19 1FC0B137 A59B937C F1950753 B679A939 CD6CF4B1 
+  02030100 01A36B30 69300F06 03551D13 0101FF04 05300301 01FF3016 0603551D 
+  11040F30 0D820B45 56434843 4F524530 312E301F 0603551D 23041830 1680145C 
+  03D7F3C1 157750FC 66DB78C5 C6D829F8 1E013930 1D060355 1D0E0416 04145C03 
+  D7F3C115 7750FC66 DB78C5C6 D829F81E 0139300D 06092A86 4886F70D 01010405 
+  00038181 0055D516 C8FBAD78 224AAA97 92704A79 2A6BC978 8BB1952A 311CA88C 
+  5CDCBEF1 725D6899 D2B7CA18 A6C34B79 F1F842A0 B3F5A0DE F199A520 E3B62E1B 
+  54E371B5 8D4106D8 B4F261B9 52EDF876 9CA75BA3 2AB072C5 BE660FD7 2023FA19 
+  548DB6F0 43552FC6 534218BB B47FB8C3 1A51905E 55A46F8B 06B8A728 CFFAAD93 
+  4C72B66D 8D
+  quit
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+interface GigabitEthernet0/1
+!
+interface GigabitEthernet0/2
+!
+interface GigabitEthernet0/3
+!
+interface GigabitEthernet0/4
+!
+interface GigabitEthernet0/5
+!
+interface GigabitEthernet0/6
+!
+interface GigabitEthernet0/7
+!
+interface GigabitEthernet0/8
+!
+interface GigabitEthernet0/9
+!
+interface GigabitEthernet0/10
+!
+interface GigabitEthernet0/11
+!
+interface GigabitEthernet0/12
+!
+interface GigabitEthernet0/13
+!
+interface GigabitEthernet0/14
+!
+interface GigabitEthernet0/15
+!
+interface GigabitEthernet0/16
+!
+interface GigabitEthernet0/17
+!
+interface GigabitEthernet0/18
+!
+interface GigabitEthernet0/19
+!
+interface GigabitEthernet0/20
+!
+interface GigabitEthernet0/21
+!
+interface GigabitEthernet0/22
+!
+interface GigabitEthernet0/23
+!
+interface GigabitEthernet0/24
+!
+interface GigabitEthernet0/25
+!
+interface GigabitEthernet0/26
+!
+interface GigabitEthernet0/27
+!
+interface GigabitEthernet0/28
+!
+interface GigabitEthernet0/29
+!
+interface GigabitEthernet0/30
+!
+interface GigabitEthernet0/31
+!
+interface GigabitEthernet0/32
+!
+interface GigabitEthernet0/33
+!
+interface GigabitEthernet0/34
+!
+interface GigabitEthernet0/35
+!
+interface GigabitEthernet0/36
+!
+interface GigabitEthernet0/37
+!
+interface GigabitEthernet0/38
+!
+interface GigabitEthernet0/39
+!
+interface GigabitEthernet0/40
+!
+interface GigabitEthernet0/41
+!
+interface GigabitEthernet0/42
+!
+interface GigabitEthernet0/43
+!
+interface GigabitEthernet0/44
+!
+interface GigabitEthernet0/45
+!
+interface GigabitEthernet0/46
+!
+interface GigabitEthernet0/47
+!
+interface GigabitEthernet0/48
+!
+interface GigabitEthernet0/49
+!
+interface GigabitEthernet0/50
+!
+interface GigabitEthernet0/51
+!
+interface GigabitEthernet0/52
+!
+interface Vlan1
+ ip address 192.168.5.2 255.255.255.0
+ ip helper-address 192.168.5.10
+!
+ip default-gateway 192.168.5.1
+ip classless
+ip route 10.0.0.0 255.0.0.0 192.168.5.1
+ip route 192.168.0.0 255.255.0.0 192.168.5.1
+ip http server
+ip http secure-server
+!
+line con 0
+line vty 0 4
+ exec-timeout 0 0
+ login local
+ transport input ssh
+line vty 5 15
+ login
+!
+end

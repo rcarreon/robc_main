@@ -1,0 +1,431 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+
+<head>
+    <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+    <title>QuickTicket</title>
+</head>
+
+<style type="text/css">
+a 	  {text-decoration: none}
+a:hover   {color: #000000; text-decoration: underline}
+
+img {
+	border-width:0px;
+}
+
+body {
+	width: 800px;
+	font-family: verdana;
+	font-size: 10px;
+	margin: auto;
+	position: relative;
+}
+
+.entry {
+	padding: 5px;
+	padding-bottom: 5px;
+	width: 100%;
+	height: auto;
+	overflow: hidden;
+}
+
+.entry .name {
+	font-size: 13px;
+	font-weight: bold;
+	text-align: right;
+	padding-right: 5px;
+	padding-top: 3px;
+}
+
+.entry .required {
+	padding-top: 4px;
+	font-size: 9px;
+	color: red;
+	font-weight: bold;
+	padding-right: 5px;	
+	text-align: right;
+}
+
+.entry .description {
+	font-size: 9px;
+}
+
+.entry .input a {
+	overflow: hidden;
+	font-size: 9px;
+}
+
+.odd {
+	background-color: rgb(220,220,220);
+}
+</style>
+
+<SCRIPT LANGUAGE="JavaScript" SRC="/NoAuth/js/CalendarPopup.js"></SCRIPT>
+<SCRIPT LANGUAGE="JavaScript">
+var cal = new CalendarPopup();
+</SCRIPT>
+
+<script>
+function checkEnter(e){ 
+	var characterCode;
+	if(e && e.which){ //if which property of event object is supported (NN4)
+		e = e;
+		characterCode = e.which; //character code is contained in NN4's which property
+	}
+	else {
+		e = event;
+		characterCode = e.keyCode; //character code is contained in IE's keyCode property
+	}
+
+	if(characterCode == 13){ //if generated character code is equal to ascii 13 (if enter key)
+		document.tick_form.submit(); //submit the form
+		return false; 
+	} else {
+		return true; 
+	}
+}
+
+function openWindow(url) {
+    var objWindow = window.open(url,'Search', 
+                                'height=500,width=450,scrollbars=1');
+    objWindow.focus();
+}
+
+function showNextLevel() {
+	document.getElementById('row').style.display ="block";
+	return true;
+}
+
+function populateNextLevel(object_id, current_id) {
+
+	if (object_id == '') {
+		var el = document.getElementById(current_id + '_select');
+		if (el.selectedIndex != 0) {
+			document.getElementById('mttype').value = el.options[el.selectedIndex].value;
+			document.ticket_form.submit();
+		}
+		return true;
+	}
+
+	document.getElementById('display_form').style.display= "none";
+
+        // Populate subcategory
+        var this_el = document.getElementById(current_id + '_select');
+
+	// Populate subcategory
+	var div_el = document.getElementById(object_id);
+	var dd_el = document.getElementById(object_id + '_select');
+
+        if (this_el.selectedIndex == 0) {
+                         div_el.style.display = "none";
+        }
+
+	var dd_fol_el;
+        var i;
+
+	<TMPL_LOOP NAME=MAIN_JAVA_LOOP>
+
+	if (current_id == '<TMPL_VAR NAME=SUBTYPE>') {
+
+		<TMPL_LOOP NAME=FOLLOWING>
+
+			document.getElementById('<TMPL_VAR NAME=NAME>').style.display = 'none';
+			dd_fol_el = document.getElementById('<TMPL_VAR NAME=NAME>_select');
+                        for(i = dd_fol_el.options.length-1;i>=0;i--) {
+                                dd_fol_el.remove(i);
+                        }
+
+		</TMPL_LOOP>
+
+		<TMPL_LOOP NAME=INDEXCHOICES>
+
+		if (this_el.options[this_el.selectedIndex].value == '<TMPL_VAR NAME=INDEXVALUE>') {
+
+                        document.getElementById('mttype').value = <TMPL_VAR NAME=TTYPE>;
+			<TMPL_VAR NAME=SNIPPET>
+
+        		if (div_el) { 
+                		div_el.style.display = "block";
+        		}
+
+			for(i = dd_el.options.length-1;i>=0;i--)
+			{
+				dd_el.remove(i);
+			}
+
+			<TMPL_LOOP NAME=OPTIONS>
+				dd_el.options[<TMPL_VAR NAME=OPTIONINDEX>] = 
+					new Option("<TMPL_VAR NAME=OPTIONNAME>", <TMPL_VAR NAME=OPTIONVALUE>);
+			</TMPL_LOOP>
+		}
+
+		</TMPL_LOOP>
+	}
+
+	</TMPL_LOOP>
+}
+
+</script>
+
+<body>
+
+<div align="center"><br><br>
+<img src="/NoAuth/img/gnm_name_logo.gif" border="0" alt="Gorilla Nation" title="Gorilla Nation" vspace="0">
+<BR><BR>
+<p><span style="font-size: 11px;"><a target=_blank href="NoAuth/help.html">Click here for instructions</a>
+</span></p>
+</div>
+<!-- Note : Error messages are located here : /usr/lib64/perl5/5.8.8/x86_64-linux-thread-multi/RT/Authen/ExternalAuth.pm -->
+<TMPL_UNLESS NAME=MESSAGE>
+
+	<form style="margin:0px; padding:0px;" method="post" name=dep_form>
+
+        <div style=" text-align:center" class="entry">
+		<div style="width: 700px; overflow:hidden; margin:auto; hight: auto;">
+                	<div style="width: 350px; float: left; text-align: right;">
+				<span class="name">Select general request category:</span>
+			</div>
+                        
+			<div class="input" style="float: left; width: 350px; text-align: left;">
+				<select name="mdtype" onchange="javascript:document.dep_form.submit();">
+				<TMPL_LOOP NAME=DEPARTMENT_LOOP>
+					<option value="<TMPL_VAR NAME=ID>"<TMPL_VAR NAME=SELECTED>>
+					<TMPL_VAR NAME=TITLE></option>
+                		</TMPL_LOOP>
+		                </select>
+			</div>
+        	</div>
+                <input type="hidden" name="debug" value="<TMPL_VAR NAME=debug>">
+	</div>
+
+	</form>
+
+        <form style="margin:0px; padding:0px;" method="post" name=ticket_form>
+      
+        <TMPL_LOOP NAME=SUBCATEGORY_LOOP>
+
+        <div class="entry" style="text-align: center; display:<TMPL_VAR NAME=VISIBILITY>" id="<TMPL_VAR NAME=ID>"> 
+		<div style="width: 700px; overflow:hidden; margin:auto; hight: auto">
+       			<div style="float:left; width: 350px; text-align: right;">
+               			<span class="name"><TMPL_VAR NAME=LABEL>:</span>
+       			</div>
+       			<div class="input" style="float: left; width: 350px; text-align: left;"> 
+       				<select id='<TMPL_VAR NAME=ID>_select' name="<TMPL_VAR NAME=ID>" onchange="javascript:populateNextLevel('<TMPL_VAR NAME=NEXTID>', '<TMPL_VAR NAME=ID>');">
+
+				<TMPL_LOOP NAME=SUBTYPE_LOOP>
+				<option value="<TMPL_VAR NAME=ID>"<TMPL_VAR NAME=SELECTED>>
+                        	<TMPL_VAR NAME=TITLE></option>
+				</TMPL_LOOP>
+				</select>
+       			</div>
+		</div>	
+	</div>
+
+        </TMPL_LOOP>
+
+	<div style="margin:auto; text-align: center; width: 100px; height: 30px">
+		<input type="hidden" id="mttype" name="mttype" value="">
+		<input type="hidden" name="maction" value="tick_templ">
+<!--        	<br><br><div align=center><input type="submit" value="Choose"></div>
+-->        	<input type="hidden" name="mdtype" value="<TMPL_VAR NAME=mdtype>">
+     		<input type="hidden" name="debug" value="<TMPL_VAR NAME=debug>">
+        </div>
+	</form>
+
+</TMPL_UNLESS>
+
+<br><br>
+
+<div id="display_form">
+
+     <table style="width: 800px; text-align: left; vertical-align: middle;" align=center border="0" cellpadding="5" cellspacing="0">
+
+        <TMPL_IF NAME="message">
+        <tr> <td align"center" colspan="2" bordercolor="#000000" style="border-top-width:1; border-top-style: solid; border-bottom-width:1; border-bottom-style: solid; border-top: 1px solid #000000; border-bottom: 1px solid #000000; background-color: #eeffff;">
+             <font size="4" color="#000000">Request Submitted.</td> </tr>
+        <tr> <td align"center" colspan="2">
+             <font size=2 color="#000000"><BR><B><TMPL_VAR NAME=message></B></font></td></tr>
+	</TMPL_IF>
+
+        <TMPL_IF NAME="errormessage">
+        <tr> <td align"center" colspan="2" bordercolor="#000000" style="border-top-width:1; border-top-style: solid; border-bottom-width:1; border-bottom-style: solid; border-top: 1px solid #00000; border-bottom: 1px solid #000000; background-color: #ffeeee;">
+             <font size="4" color="#000000">There were errors.</td> </tr>
+        <tr> <td align"center" colspan="2">
+                <font size=2 color="#800000"><BR><B><TMPL_VAR NAME=errormessage></B></font></td></tr>
+        </TMPL_IF>
+    
+     <TMPL_UNLESS NAME="message">
+</table>
+
+<table align=center border="0" cellpadding="5" cellspacing="0">
+    <TMPL_IF NAME="display_form">
+
+     <form id="tick_form" method="post" enctype="multipart/form-data">
+
+        <TMPL_LOOP NAME=FORWARD_SUBTYPE_LOOP>
+        <input type='hidden' name='<TMPL_VAR NAME=SUBTYPE>' value='<TMPL_VAR NAME=SUBTYPEVALUE>'>
+        </TMPL_LOOP>
+
+     <input type="hidden" name="mttype" value="<TMPL_VAR NAME=mttype>">
+     <input type="hidden" name="mdtype" value="<TMPL_VAR NAME=mdtype>">
+     <input type="hidden" name="debug" value="<TMPL_VAR NAME=debug>">
+     <input type="hidden" name="maction" value="tick_templ">
+     <input type="hidden" name="sessionid" value="<TMPL_VAR NAME=sessionid>">
+     
+       <TMPL_UNLESS NAME="errormessage">
+
+	<TMPL_IF NAME="RESULTS">
+	<tr> <td align="left" colspan="2" bordercolor="#0" style="border-top-width:1; border-top-style: solid; border-bottom-width:1; border-bottom-style: solid; border-top: 1px solid #000000; border-bottom: 1px solid #000000; background-color: #eeeeff;">
+             <font size="4" color="#0"><ul><TMPL_LOOP NAME=RESULTS><li style="font-size: 12px"><TMPL_VAR NAME=MESSAGE></li></TMPL_LOOP></ul></td></tr><tr><td>&nbsp;</td> </tr>
+	</TMPL_IF>
+
+        <TMPL_UNLESS NAME=STOP>
+
+	<tr> <td align="left" colspan="2" bordercolor="#0" style="border-top-width:1; border-top-style: solid; border-bottom-width:1; border-bottom-style: solid; border-top: 1px solid #000000; border-bottom: 1px solid #000000; background-color: #ffffee;">
+             <font size="4" color="#0">Please complete the form below.</td> </tr>
+	</TMPL_UNLESS>
+	</TMPL_UNLESS>
+
+        <tr> <td>&nbsp;</td> </tr>
+
+        <TMPL_LOOP NAME=TICKET_LOOP>
+
+	<tr><td colspan=2>
+
+        <div style="margin-left: 10px; margin-right:10px;">
+
+        <TMPL_IF NAME="SPAN">
+
+	<div class="entry" style="background-color: <TMPL_VAR NAME=COLOR>;">
+		<div style="width: 800px;">
+			<TMPL_VAR NAME=ROWNAME>
+		</div>
+	</div>
+
+         <TMPL_ELSE>
+
+        <div class="entry" style="width: 100%; background-color: <TMPL_VAR NAME=COLOR>;"> 
+                <div style="width: 200px; float: left; height: auto; overflow:hidden; padding-right: 10px;">
+                        <div class="name"><TMPL_VAR NAME=ROWNAME></div>
+                        <TMPL_IF NAME=REQUIRED><div class="required">(required)</div></TMPL_IF>
+                </div>
+                <div style="width: 500px; float: left; height: auto; overflow:hidden;">
+                        <div class="input"><TMPL_VAR NAME=ROWCONT></div>
+                        <div class="description"><TMPL_VAR NAME=ROWDESC></div>
+                </div>
+        </div>
+
+         </TMPL_IF>
+
+	</div>
+
+	</td></tr>
+	</TMPL_LOOP>
+
+	<TMPL_IF NAME=ATTACHMENTS>
+        <tr> <td colspan=2>
+
+        <div style="margin-left: 10px; margin-right:10px;">
+
+        <div class="entry" style="width: 100%; background-color: <TMPL_VAR NAME=COLOR>;">
+                <div style="width: 200px; float: left; height: auto; overflow:hidden; padding-right: 10px;">
+                        <div class="name"><TMPL_VAR NAME=ROWNAME></div>
+                        <TMPL_IF NAME=REQUIRED><div class="required">(required)</div></TMPL_IF>
+                </div>
+                <div style="width: 490px; float: left; height: auto; overflow:hidden;">
+                        <div class="input">
+				<input type=file name="mattach" size=50 onChange="javascript:getElementById('submitfile').disabled=false;"></div>
+ 			<br/><div class="input">
+                		<input id="submitfile" type=submit name="maddmore" value="Add more files" disabled></div>
+                        <div class="description"><TMPL_VAR NAME=ROWDESC></div>
+                </div>
+        </div>
+
+
+        <TMPL_IF NAME=FILE_LOOP>
+        <div class="entry" style="width: 100%; background-color: <TMPL_VAR NAME=COLOR>;">
+               	<div style="width: 200px; float: left; height: auto; overflow:hidden; padding-right: 10px;">
+                        <div class="name">Uploaded files:</div>
+                </div>
+                <div style="width: 490px; float: left; height: auto; overflow:hidden;">
+	    			<TMPL_LOOP NAME=FILE_LOOP>
+			<div class="input">
+            			<input type=checkbox name='ch<TMPL_VAR NAME=FILEID>' onChange="javascript:getElementById('submitfile').disabled=false;"> 
+				<span style="font-weight:bold; font-size: 11px"><TMPL_VAR NAME=FILENAME></span>
+        	   	 	<input type=hidden name='fileids' value='<TMPL_VAR NAME=FILEID>'>
+            			<input type=hidden name='<TMPL_VAR NAME=FILEID>' value='<TMPL_VAR NAME=FILENAME>'>
+	    			</div></TMPL_LOOP>
+			
+                	<div class="description">Check files to delete</div>
+                </div>
+        </div>
+
+	</div>
+
+        </TMPL_IF>
+	</td></tr>
+        </TMPL_IF>
+
+	<TMPL_LOOP NAME=LOGIN_LOOP>
+
+        <tr><td colspan=2>
+
+        <div style="margin-left: 10px; margin-right:10px;">
+
+        <TMPL_IF NAME="SPAN">
+
+        <div class="entry" style="background-color: <TMPL_VAR NAME=COLOR>;">
+                <div style="width: 800px;">
+                        <TMPL_VAR NAME=ROWNAME>
+                </div>
+        </div>
+
+         <TMPL_ELSE>
+
+        <div class="entry" style="width: 100%; background-color: <TMPL_VAR NAME=COLOR>;">
+                <div style="width: 200px; float: left; height: auto; overflow:hidden; padding-right: 10px;">
+                        <div class="name"><TMPL_VAR NAME=ROWNAME></div>
+                        <TMPL_IF NAME=REQUIRED><div class="required">(required)</div></TMPL_IF>
+                </div>
+                <div style="width: 490px; float: left; height: auto; overflow:hidden;">
+                        <div class="input"><TMPL_VAR NAME=ROWCONT></div>
+                        <div class="description"><TMPL_VAR NAME=ROWDESC></div>
+                </div>
+        </div>
+        
+         </TMPL_IF>
+        </div>
+                </td></tr>        </TMPL_LOOP>
+
+
+        <tr> <td> <BR> </td> </tr>
+	<TMPL_UNLESS NAME=STOP>
+	<tr>
+                <td align="center">
+                        <input id='createid' tabindex=500 type=submit name="mcreate" value="Submit">
+                </td>
+	</tr>
+	</TMPL_UNLESS>
+
+        <tr> <td> <BR> </td> </tr>
+
+	<tr style="margin-right:20px"> 
+	<td colspan=2 style="font-size: 10px; color:gray;" >
+	If this system is not working properly, please contact administrator by emailing <a href="mailto: helpdesk@gorillanation.com">helpdesk@gorillanation.com</a>.
+	<br>Javascript must be enabled in your browser for this page to work correctly.	
+	</td></tr> 
+
+    </table>
+ 
+	<br>
+     </form>
+     
+
+     </TMPL_IF>
+     </TMPL_UNLESS>
+  </div>
+
+ </body>
+ 
+</html>

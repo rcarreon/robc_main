@@ -1,0 +1,43 @@
+    htmlheader = '''
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+    <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+                   <head>
+                   <title>VipVis</title>
+                   <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+                     <script type="text/javascript">
+                       function formfocus() {
+                          document.getElementById('element').focus();
+                       }
+                       window.onload = formfocus;
+                    </script>
+            <link rel="stylesheet" href="http://vipvisual.gnmedia.net/content/jscript/jquery.treeview.css" />
+                <link rel="stylesheet" href="http://vipvisual.gnmedia.net/content/jscript/demo/red-treeview.css" />
+            <link rel="stylesheet" href="http://vipvisual.gnmedia.net/content/jscript/demo/screen.css" />
+            <script src="http://vipvisual.gnmedia.net/content/jscript/lib/jquery.js" type="text/javascript"></script>
+            <script src="http://vipvisual.gnmedia.net/content/jscript/lib/jquery.cookie.js" type="text/javascript"></script>
+            <script src="http://vipvisual.gnmedia.net/content/jscript/jquery.treeview.js" type="text/javascript"></script>
+            <script type="text/javascript">
+            $(document).ready(function(){
+                $("#browser").treeview({
+                                collapsed: true,
+                                animated: "fast",
+                                control:"#sidetreecontrol",
+                    toggle: function() {
+                        console.log("%s was toggled.", $(this).find(">span").text());
+                    }
+                });
+                $("#add").click(function() {
+                    var branches =
+                    $("<li><span class='folder'>New Sublist</span><ul>" +
+                        "<li><span class='file'>Item1</span></li>" +
+                        "<li><span class='file'>Item2</span></li></ul></li>").appendTo("#browser");
+                    $("#browser").treeview({
+                        add: branches
+                    });
+                });
+            });
+            </script>
+                </head><body>'''
+    htmlclose = '''</body></html>'''
+

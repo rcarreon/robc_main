@@ -1,0 +1,209 @@
+#!/usr/bin/perl -w
+
+# gstaples @ Gorilla Nation
+# Find a metal machine with high load, identify a VM to move, and move it.
+
+my $threshold=10;  # minimum percent load on metal machine before VMs will be migrated
+my $vmthreshold=.7; # minimum percent load on VMs before it will be migrated
+my $iowaitthreshold=30; # migrate VM if IO wait is above this threshold
+my $usehighestvm=0; # fall back to highest load VM if second highest is insignificant
+my $email='garrick.staples@gorillanation.com';
+
+
+use strict;
+use IO::Socket;
+use JSON;
+use Data::Dumper;
+use Sys::Syslog qw(:standard :macros);
+
+
+print "\n", scalar localtime,": Starting cycle.\n";
+
+# Gather all of the data required (from /usr/local/bin/vmloadtojson)
+my $json = new JSON;
+my $socket = IO::Socket::INET->new
+       (PeerAddr=>"localhost",
+       PeerPort=>1455,
+       Proto=>'tcp',
+       Type=>SOCK_STREAM);
+my $text;
+{
+local $/;
+$text=<$socket>;
+}
+my $data=$json->decode($text);
+
+
+print "Gathering IO wait for prd VMs...";
+open(IOWAIT,q/psh vm@prd,-TechPlatform,-vm.host=~metal-1400 'vmstat 10 2 | tail -1 | awk \{print\ \\\$16\}' |/);
+my %iowaits=();
+while ($_=<IOWAIT>) {
+    my ($vmname, $iowait) =split(": ",$_);
+    next unless ($iowait =~ /^\d/);
+    if ($iowait > $iowaitthreshold) {
+        openlog("metalrebalance", "ndelay,pid", LOG_LOCAL0);
+
+        print STDERR "WARNING: $vmname has very high IO wait: $iowait\n";
+        syslog('notice', "%s", "$vmname has very high IO wait: $iowait");
+        
+        my $newserver=`metalallocator $vmname`;
+        chomp($newserver);
+        print "Preparing to move $vmname to $newserver.\n";
+        syslog('notice', "%s","Migrating $vmname to $newserver because of high IO wait: $iowait." );
+        system("echo the subject said it | mail -s \"Migrating $vmname to $newserver because of high IO wait: $iowait.\" $email");
+        system("rmigrate $vmname $newserver");
+        closelog;
+        exec("/usr/local/bin/metalrebalance");
+    }
+    $iowaits{$vmname}=$iowait;
+}
+close(IOWAIT);
+
+foreach my $metal (keys %{$data}) {
+   foreach my $vm (keys %{$data->{$metal}->{domains}}) {
+      my $vmname=$data->{$metal}->{domains}->{$vm}->{name};
+      if (exists $iowaits{$vmname}) {
+          $data->{$metal}->{domains}->{$vm}->{iowait}=$iowaits{$vmname};
+      }
+  }
+}
+delete $data->{"metal-1400.lax.gnmedia.net"};
+print "done.\n";
+
+# Everything we need to know is now in the big burly data structure: $data
+
+
+
+foreach my $metal (keys %{$data}) {
+   if (!exists $data->{$metal}->{loadavg}) {
+      print "Error: $metal is missing data. Go fix the xinetd/rloadd service.\n";
+      delete $data->{$metal};
+   } else {
+      print "$metal Load: $data->{$metal}->{loadavg} VMs: ",scalar keys %{$data->{$metal}->{domains}},"\n";
+   }
+}
+
+# Some sanity checks...
+# check for split brain and similar VMs on the same metal
+my %vms;
+foreach my $metal (keys %{$data}) {
+   foreach my $vm (keys %{$data->{$metal}->{domains}}) {
+      my $vmname=$data->{$metal}->{domains}->{$vm}->{name};
+      if (exists $vms{$vmname}) { 
+         openlog("metalrebalance", "ndelay,pid", LOG_LOCAL0);
+         print "SPLIT-BRAIN: $vmname on $vms{$vmname} and $metal\n"; 
+         syslog('notice', "%s","WARNING: SPLIT_BRAIN: $vmname on $vms{$vmname} and $metal.");
+         
+         my $correctmetal=`nodels $vmname vm.host`;
+         chomp($correctmetal);
+         print "$correctmetal is correct (but you need to fix it).\n";
+         closelog;
+         exit (1);
+      }
+      $vms{$data->{$metal}->{domains}->{$vm}->{name}}=$metal;
+
+      my $match = $vmname;
+      $match =~ s/[0-9]/\./;
+      foreach my $foo (keys %{$data->{$metal}->{domains}}) {
+         my $test=$data->{$metal}->{domains}->{$foo}->{name};
+         if (($vmname ne $test) && ($test =~ /$match/)) {
+            openlog("metalrebalance", "ndelay,pid", LOG_LOCAL0);
+            print "$vmname and $test are on $metal!\n";
+            syslog('notice', "%s","$vmname and $test are on $metal.");
+            my $newserver=`metalallocator $vmname`;
+            chomp($newserver);
+            print "Preparing to move $vmname from $metal to $newserver.\n";
+            syslog('notice', "%s","Migrating $vmname from $metal to $newserver.");
+            #system("echo foo | mail -s \"rmigrate $vmname $newserver ($test is on same metal)\" $email");
+            system("rmigrate $vmname $newserver");
+            closelog;
+            exec("/usr/local/bin/metalrebalance");
+         }
+      }
+   }
+}
+map { $data->{$_}->{loadavg}||=0 } keys %{$data};
+
+
+
+# Now we start "balancing".
+
+# Identify metal with the highest load
+my $metal=(sort {$data->{$b}->{loadavg} <=> $data->{$a}->{loadavg}} keys %{$data})[0];
+print "highest load: $metal\n";
+my $pload=$data->{$metal}->{loadavg} / $data->{$metal}->{cpus} * 100;
+if ($pload < $threshold) {
+   printf "load avg is only %.2f%%, nothing to do.\n", $pload;
+   exit (0);
+}
+
+print "\n$metal:\n";
+foreach my $vm (keys %{$data->{$metal}->{domains}}) {
+   $data->{$metal}->{domains}->{$vm}->{name}||="unknown";
+   $data->{$metal}->{domains}->{$vm}->{loadavg}||=0;
+   print "  ", $data->{$metal}->{domains}->{$vm}->{name}," ",$data->{$metal}->{domains}->{$vm}->{loadavg},"\n";
+}
+
+
+# Identify VM with second highest load (the sort isn't as complicated as it looks)
+my (@vmsbyload)=sort {$data->{$metal}->{domains}->{$b}->{loadavg} <=> $data->{$metal}->{domains}->{$a}->{loadavg}} keys %{$data->{$metal}->{domains}};
+if (scalar @vmsbyload == 1) {
+  print "Only 1 VM on $metal. Nothing to move.\n";
+  exit(0);
+}
+
+my $targetvmid=$vmsbyload[1];
+my $targetvm=$data->{$metal}->{domains}->{$targetvmid}->{name};
+print "VM with second highest load: $targetvm\n";
+if ($data->{$metal}->{domains}->{$targetvmid}->{loadavg} < $vmthreshold) {
+  if ($usehighestvm == 1) {
+    print "$targetvm has insignificant load. Let's look at the VM with the highest load.\n";
+    $targetvmid=$vmsbyload[0];
+    $targetvm=$data->{$metal}->{domains}->{$targetvmid}->{name};
+    print "VM with highest load: $targetvm\n";
+  }
+  if ($data->{$metal}->{domains}->{$targetvmid}->{loadavg} < $vmthreshold) {
+      print "$targetvm has insignificant load. Nothing to do.\n";
+      exit(0);
+  }
+}
+
+
+# Ask for a new metal machine
+my $newserver=`metalallocator $targetvm`;
+chomp($newserver);
+print "Preparing to move $targetvm from $metal to $newserver.\n";
+
+
+# Check that this move makes sense
+my $msg="";
+$msg=sprintf "\nLoadavg on $metal will drop %.2f from %.2f to %.2f.\n",
+         $data->{$metal}->{domains}->{$targetvmid}->{loadavg}, 
+         $data->{$metal}->{loadavg}, 
+         $data->{$metal}->{loadavg} - $data->{$metal}->{domains}->{$targetvmid}->{loadavg};
+$msg.=sprintf "Loadavg on $newserver will increase from %.2f to %.2f.\n",
+         $data->{$newserver}->{loadavg},
+         $data->{$newserver}->{loadavg}+$data->{$metal}->{domains}->{$targetvmid}->{loadavg};
+
+if (exists $data->{$newserver}->{loadavg}) {
+  if (($data->{$newserver}->{loadavg} + $data->{$metal}->{domains}->{$targetvmid}->{loadavg}) > ($data->{$metal}->{loadavg})) {
+     
+     print $msg;
+     print "Allocated $newserver for $targetvm, but load would be higher. Nothing to do.\n";
+     exit(0);
+  }
+}
+
+
+# Do it!
+$msg.="Migrating $targetvm -> $newserver\n";
+print $msg;
+openlog("metalrebalance", "ndelay,pid", LOG_LOCAL0);
+syslog('notice', "%s","Migrating $targetvm -> $newserver");
+closelog;
+my $out=`rmigrate $targetvm $newserver 2>&1`;
+print $out;
+if (! -t STDIN ) {
+   #system("echo \"$msg$out\" | mail -s \"Rebalancing $targetvm to $newserver\" $email");
+}
+

@@ -1,0 +1,25 @@
+#!/bin/bash
+
+if [ -z "$1" ];then
+    echo "Usage: $0 ip|lifname" 1>&2;
+    exit 1
+fi
+arg="$1"
+
+liflist=$(rnetapp netapp1 lif list -q)
+homenode=$(echo "$liflist" | awk -v arg="$arg" '$1==arg {print $4}')
+if [ -z "$homenode" ];then
+   homenode=$(echo "$liflist" | awk -v arg="$arg" '$2==arg {print $4}')
+fi
+if [ -z "$homenode" ];then
+    ip=$(getent hosts $arg | head -1 | awk '{print $1}')
+    homenode=$(echo "$liflist" | awk -v arg="$ip" '$2==arg {print $4}')
+fi
+
+case $homenode in
+    netapp1-01) echo netapp1_01_aggr1;;
+    netapp1-02) echo netapp1_02_aggr1;;
+    netapp1-03) echo netapp1_03_aggr1;;
+    netapp1-04) echo netapp1_04_aggr1;;
+esac
+

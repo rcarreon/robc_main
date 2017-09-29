@@ -1,0 +1,2952 @@
+!RANCID-CONTENT-TYPE: cisco
+!
+!Chassis type: WS-C4510R-E - a 4500 switch
+!CPU: MPC8548, MPC8548 CPU at 1.33GHz, Supervisor 6-E
+!
+!Memory: main 524288K
+!Memory: nvram 511K
+!
+!Processor ID: SPE122001J0
+!
+!
+!Image: Software: cat4500e-IPBASEK9-M, 12.2(44)SG, RELEASE SOFTWARE (fc1)
+!Image: Compiled: Mon 24-Mar-08 22:51 by prod_rel_team
+!Image: bootflash:cat4500e-ipbasek9-mz.122-44.SG.bin
+!
+!
+!BootFlash: BOOT variable does not exist
+!BootFlash: CONFIG_FILE variable does not exist
+!BootFlash: BOOTLDR variable does not exist
+!BootFlash: Configuration register is 0x2102
+!BootFlash: Standby is not up.
+!
+!Flash: nvram: Directory of nvram:/
+!Flash: nvram:   496  -rw-       12478                    <no date>  startup-config
+!Flash: nvram:   497  ----        1982                    <no date>  private-config
+!Flash: nvram:     1  ----          67                    <no date>  persistent-data
+!Flash: nvram:     2  -rw-        2022                    <no date>  ifIndex-table.gz
+!Flash: nvram:     3  ----           0                    <no date>  rf_cold_starts
+!Flash: nvram: 524284 bytes total (504652 bytes free)
+!
+!Flash: bootflash: Directory of bootflash:/
+!Flash: bootflash:     6  -rw-    19268126   Aug 1 2008 19:49:34 +00:00  cat4500e-ipbasek9-mz.122-44.SG.bin
+!Flash: bootflash: 131436544 bytes total (106799104 bytes free)
+!
+!
+!Slot 1: type 10/100BaseTX (RJ45), 48 ports
+!Slot 1: part WS-X4148-RJ, serial JAE1227NQ5O
+!Slot 1: hvers 3.4, firmware, sw Ok
+!
+!Slot 2: type 10/100BaseTX (RJ45), 48 ports
+!Slot 2: part WS-X4148-RJ, serial JAE1227NQ6U
+!Slot 2: hvers 3.4, firmware, sw Ok
+!
+!Slot 3: type 10/100BaseTX (RJ45), 48 ports
+!Slot 3: part WS-X4148-RJ, serial JAE1227NQ26
+!Slot 3: hvers 3.4, firmware, sw Ok
+!
+!Slot 4: type 10/100BaseTX (RJ45), 48 ports
+!Slot 4: part WS-X4148-RJ, serial JAE1228O960
+!Slot 4: hvers 3.4, firmware, sw Ok
+!
+!Slot 5: type Sup 6-E 10GE (X2), 1000BaseX (SFP), 6 ports
+!Slot 5: part WS-X45-SUP6-E, serial JAE1227NYS1
+!Slot 5: hvers 1.1, firmware 12.2(44r)SG, sw 12.2(44)SG
+!
+!Slot 5/0: type  
+!Slot 5/0: part Active, serial Supervisor
+!Slot 5/0: hvers SSO
+!
+!Slot 7: type 10/100BaseTX (RJ45), 48 ports
+!Slot 7: part WS-X4148-RJ, serial JAE1227NQ24
+!Slot 7: hvers 3.4, firmware, sw Ok
+!
+!Slot 8: type 10/100BaseTX (RJ45)V, Cisco/IEEE, 48 ports
+!Slot 8: part WS-X4248-RJ45V, serial JAE1225MK1P
+!Slot 8: hvers 3.4, firmware, sw Ok
+!
+!NAME: "Switch System",         DESCR: "Cisco Systems, Inc. WS-C4510R-E 10 slot switch "
+!PID: WS-C4510R-E
+!VID: V01
+!SN: SPE122001J0
+!NAME: "Backplane",             DESCR: " WS-C4510R-E 10 slot switch backplane"
+!NAME: "Clock Module",          DESCR: "Clock Module"
+!PID: WS-X4K-CLOCK-E
+!VID: V01
+!SN: JAE1223KZ3G
+!NAME: "Mux Buffer 1 ",         DESCR: "Mux Buffers for Redundancy Logic"
+!PID: WS-X4590-E
+!VID: V01
+!SN: JAE1221J4W4
+!NAME: "Mux Buffer 2 ",         DESCR: "Mux Buffers for Redundancy Logic"
+!PID: WS-X4590-E
+!VID: V01
+!SN: JAE1224LV99
+!NAME: "Mux Buffer 3 ",         DESCR: "Mux Buffers for Redundancy Logic"
+!PID: WS-X4590-E
+!VID: V01
+!SN: JAE1225MPNJ
+!NAME: "Mux Buffer 4 ",         DESCR: "Mux Buffers for Redundancy Logic"
+!PID: WS-X4590-E
+!VID: V01
+!SN: JAE1221J4W1
+!NAME: "Mux Buffer 7 ",         DESCR: "Mux Buffers for Redundancy Logic"
+!PID: WS-X4590-E
+!VID: V01
+!SN: JAE1221J27U
+!NAME: "Mux Buffer 8 ",         DESCR: "Mux Buffers for Redundancy Logic"
+!PID: WS-X4590-E
+!VID: V01
+!SN: JAE1225MPLZ
+!NAME: "Mux Buffer 9 ",         DESCR: "Mux Buffers for Redundancy Logic"
+!PID: WS-X4590-E
+!VID: V01
+!SN: JAE1224LV70
+!NAME: "Mux Buffer 10 ",        DESCR: "Mux Buffers for Redundancy Logic"
+!PID: WS-X4590-E
+!VID: V01
+!SN: JAE1221J5U2
+!NAME: "Slot 1",                DESCR: "WS-C4510R-E 10 slot switch chassis slot"
+!NAME: "Linecard(slot 1)",      DESCR: "10/100BaseTX (RJ45) with 48 10/100 baseT ports"
+!PID: WS-X4148-RJ
+!VID: V06
+!SN: JAE1227NQ5O
+!NAME: "FastEthernet1/1",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/2",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/3",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/4",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/5",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/6",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/7",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/8",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/9",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/10",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/11",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/12",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/13",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/14",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/15",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/16",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/17",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/18",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/19",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/20",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/21",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/22",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/23",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/24",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/25",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/26",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/27",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/28",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/29",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/30",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/31",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/32",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/33",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/34",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/35",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/36",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/37",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/38",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/39",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/40",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/41",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/42",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/43",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/44",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/45",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/46",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/47",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet1/48",      DESCR: "Fast Ethernet Port"
+!NAME: "Slot 2",                DESCR: "WS-C4510R-E 10 slot switch chassis slot"
+!NAME: "Linecard(slot 2)",      DESCR: "10/100BaseTX (RJ45) with 48 10/100 baseT ports"
+!PID: WS-X4148-RJ
+!VID: V06
+!SN: JAE1227NQ6U
+!NAME: "FastEthernet2/1",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/2",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/3",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/4",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/5",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/6",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/7",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/8",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/9",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/10",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/11",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/12",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/13",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/14",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/15",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/16",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/17",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/18",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/19",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/20",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/21",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/22",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/23",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/24",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/25",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/26",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/27",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/28",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/29",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/30",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/31",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/32",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/33",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/34",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/35",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/36",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/37",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/38",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/39",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/40",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/41",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/42",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/43",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/44",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/45",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/46",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/47",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet2/48",      DESCR: "Fast Ethernet Port"
+!NAME: "Slot 3",                DESCR: "WS-C4510R-E 10 slot switch chassis slot"
+!NAME: "Linecard(slot 3)",      DESCR: "10/100BaseTX (RJ45) with 48 10/100 baseT ports"
+!PID: WS-X4148-RJ
+!VID: V06
+!SN: JAE1227NQ26
+!NAME: "FastEthernet3/1",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/2",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/3",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/4",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/5",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/6",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/7",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/8",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/9",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/10",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/11",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/12",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/13",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/14",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/15",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/16",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/17",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/18",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/19",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/20",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/21",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/22",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/23",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/24",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/25",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/26",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/27",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/28",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/29",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/30",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/31",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/32",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/33",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/34",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/35",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/36",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/37",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/38",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/39",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/40",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/41",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/42",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/43",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/44",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/45",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/46",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/47",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet3/48",      DESCR: "Fast Ethernet Port"
+!NAME: "Slot 4",                DESCR: "WS-C4510R-E 10 slot switch chassis slot"
+!NAME: "Linecard(slot 4)",      DESCR: "10/100BaseTX (RJ45) with 48 10/100 baseT ports"
+!PID: WS-X4148-RJ
+!VID: V06
+!SN: JAE1228O960
+!NAME: "FastEthernet4/1",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/2",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/3",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/4",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/5",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/6",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/7",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/8",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/9",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/10",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/11",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/12",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/13",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/14",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/15",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/16",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/17",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/18",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/19",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/20",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/21",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/22",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/23",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/24",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/25",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/26",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/27",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/28",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/29",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/30",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/31",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/32",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/33",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/34",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/35",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/36",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/37",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/38",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/39",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/40",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/41",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/42",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/43",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/44",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/45",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/46",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/47",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet4/48",      DESCR: "Fast Ethernet Port"
+!NAME: "Slot 5",                DESCR: "WS-C4510R-E 10 slot switch chassis slot"
+!NAME: "Linecard(slot 5)",      DESCR: "Supervisor 6-E 10GE (X2), 1000BaseX (SFP) with 2 10GE X2 ports"
+!PID: WS-X45-SUP6-E
+!VID: V02
+!SN: JAE1227NYS1
+!NAME: "Port Container 5/1",    DESCR: "Port Container"
+!NAME: "TwinGig Converter 5/1", DESCR: "TwinGig Converter Module"
+!PID: 800-27645-01
+!VID: A0
+!SN: FDO12270JMS
+!NAME: "Port Container 5/3",    DESCR: "Port Container"
+!NAME: "GigabitEthernet5/3",    DESCR: "1000BaseSX"
+!PID: FTLF8519P2BCL-CS
+!VID: 00
+!SN: FNS12260L2J
+!NAME: "Port Container 5/4",    DESCR: "Port Container"
+!NAME: "GigabitEthernet5/4",    DESCR: "1000BaseSX"
+!PID: FTLF8519P2BCL-CS
+!VID: 00
+!SN: FNS12261U3Y
+!NAME: "Port Container 5/2",    DESCR: "Port Container"
+!NAME: "Slot 6",                DESCR: "WS-C4510R-E 10 slot switch chassis slot"
+!NAME: "Slot 7",                DESCR: "WS-C4510R-E 10 slot switch chassis slot"
+!NAME: "Linecard(slot 7)",      DESCR: "10/100BaseTX (RJ45) with 48 10/100 baseT ports"
+!PID: WS-X4148-RJ
+!VID: V06
+!SN: JAE1227NQ24
+!NAME: "FastEthernet7/1",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/2",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/3",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/4",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/5",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/6",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/7",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/8",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/9",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/10",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/11",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/12",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/13",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/14",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/15",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/16",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/17",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/18",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/19",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/20",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/21",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/22",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/23",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/24",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/25",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/26",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/27",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/28",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/29",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/30",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/31",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/32",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/33",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/34",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/35",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/36",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/37",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/38",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/39",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/40",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/41",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/42",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/43",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/44",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/45",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/46",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/47",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet7/48",      DESCR: "Fast Ethernet Port"
+!NAME: "Slot 8",                DESCR: "WS-C4510R-E 10 slot switch chassis slot"
+!NAME: "Linecard(slot 8)",      DESCR: "10/100BaseTX (RJ45)V with 48 10/100 baseT voice power ports (Cisco/IEEE)"
+!PID: WS-X4248-RJ45V
+!VID: V08
+!SN: JAE1225MK1P
+!NAME: "FastEthernet8/1",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/2",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/3",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/4",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/5",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/6",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/7",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/8",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/9",       DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/10",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/11",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/12",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/13",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/14",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/15",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/16",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/17",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/18",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/19",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/20",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/21",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/22",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/23",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/24",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/25",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/26",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/27",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/28",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/29",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/30",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/31",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/32",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/33",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/34",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/35",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/36",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/37",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/38",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/39",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/40",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/41",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/42",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/43",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/44",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/45",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/46",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/47",      DESCR: "Fast Ethernet Port"
+!NAME: "FastEthernet8/48",      DESCR: "Fast Ethernet Port"
+!NAME: "Slot 9",                DESCR: "WS-C4510R-E 10 slot switch chassis slot"
+!NAME: "Slot 10",               DESCR: "WS-C4510R-E 10 slot switch chassis slot"
+!NAME: "Fan Tray Bay",          DESCR: "Container of Fan Tray"
+!NAME: "Fan",                   DESCR: "FanTray"
+!PID: WS-X4582-E
+!VID: V01
+!SN: SPE122001FL
+!NAME: "Container of Power Supply Bay", DESCR: "Container of Container of Power Supply"
+!NAME: "Power Supply Bay 1 ",   DESCR: "Container of Power Supply"
+!NAME: "Power Supply 1",        DESCR: "Power Supply ( AC 2800W )"
+!PID: PWR-C45-2800ACV
+!VID: V04
+!SN: SNI1221A26V
+!NAME: "Power Supply 1 Fan",    DESCR: "Power Supply Fan Sensor"
+!NAME: "Power Supply Bay 2 ",   DESCR: "Container of Power Supply"
+!NAME: "Power Supply 2",        DESCR: "Power Supply ( AC 2800W )"
+!PID: PWR-C45-2800ACV
+!VID: V04
+!SN: SNI1221A22K
+!NAME: "Power Supply 2 Fan",    DESCR: "Power Supply Fan Sensor"
+!
+!VTP: VTP Version                     : running VTP2
+!VTP: Configuration Revision          : 0
+!VTP: Maximum VLANs supported locally : 1005
+!VTP: Number of existing VLANs        : 13
+!VTP: VTP Operating Mode              : Transparent
+!VTP: VTP Domain Name                 : gnmedia
+!VTP: VTP Pruning Mode                : Disabled
+!VTP: VTP V2 Mode                     : Enabled
+!VTP: VTP Traps Generation            : Enabled
+!VTP: MD5 digest                      : 0xAC 0xD1 0xDA 0x9C 0x60 0x76 0x09 0x41 
+!
+!VLAN: VLAN Name                             Status    Ports
+!VLAN: ---- -------------------------------- --------- -------------------------------
+!VLAN: 1    default                          active    Fa1/10, Fa2/10, Fa2/46, Fa3/1
+!VLAN:                                                 Fa3/20, Fa3/33, Fa3/36, Te5/1
+!VLAN:                                                 Te5/2, Gi5/4, Gi5/5, Gi5/6
+!VLAN:                                                 Fa7/9, Fa7/13, Fa7/16, Fa7/18
+!VLAN: 2    Unknown                          active    
+!VLAN: 10   Voice                            active    
+!VLAN: 20   IT_and_Servers                   active    Fa4/1, Fa4/9, Fa4/10, Fa4/11
+!VLAN:                                                 Fa4/12, Fa4/13, Fa4/14, Fa4/15
+!VLAN:                                                 Fa4/16, Fa4/17, Fa4/18, Fa4/19
+!VLAN:                                                 Fa4/20, Fa4/22, Fa4/26, Fa4/34
+!VLAN:                                                 Fa4/38, Fa4/39, Fa4/40, Fa4/41
+!VLAN:                                                 Fa4/44, Fa4/45, Fa4/46, Fa4/47
+!VLAN:                                                 Fa7/3, Fa7/5, Fa7/6, Fa7/10
+!VLAN:                                                 Fa7/14, Fa7/15, Fa7/17, Fa7/19
+!VLAN:                                                 Fa7/20, Fa7/21, Fa7/22, Fa7/24
+!VLAN:                                                 Fa7/25, Fa7/27, Fa7/28, Fa7/29
+!VLAN:                                                 Fa7/30, Fa7/31, Fa7/32, Fa7/33
+!VLAN:                                                 Fa7/34, Fa7/35, Fa7/36, Fa7/37
+!VLAN:                                                 Fa7/38, Fa7/39, Fa7/40, Fa7/41
+!VLAN:                                                 Fa7/42, Fa7/43, Fa7/44, Fa7/45
+!VLAN:                                                 Fa7/46, Fa7/47
+!VLAN: 30   Dev                              active    Fa3/17, Fa3/24, Fa3/43, Fa3/44
+!VLAN:                                                 Fa3/45, Fa3/46, Fa3/47, Fa3/48
+!VLAN:                                                 Fa4/2, Fa4/3, Fa4/4, Fa4/5
+!VLAN:                                                 Fa4/6, Fa4/7, Fa4/8
+!VLAN: 31   crave                            active    
+!VLAN: 40   3Fl_Office                       active    Fa1/27, Fa1/34, Fa1/35, Fa1/36
+!VLAN:                                                 Fa1/37, Fa1/38, Fa1/39, Fa1/40
+!VLAN:                                                 Fa1/41, Fa1/47, Fa1/48, Fa2/1
+!VLAN:                                                 Fa2/2, Fa2/3, Fa2/6, Fa2/7
+!VLAN:                                                 Fa2/8, Fa2/9, Fa2/11, Fa2/12
+!VLAN:                                                 Fa2/13, Fa2/14, Fa2/15, Fa2/16
+!VLAN:                                                 Fa2/17, Fa2/18, Fa2/19, Fa2/20
+!VLAN:                                                 Fa2/21, Fa2/22, Fa2/23, Fa2/44
+!VLAN:                                                 Fa2/45, Fa2/48, Fa3/2, Fa3/3
+!VLAN:                                                 Fa3/4, Fa3/5, Fa3/6, Fa3/8
+!VLAN:                                                 Fa3/9, Fa3/11, Fa3/12, Fa3/14
+!VLAN:                                                 Fa3/15, Fa3/18, Fa3/19, Fa3/21
+!VLAN:                                                 Fa3/22, Fa3/23, Fa3/25, Fa4/23
+!VLAN:                                                 Fa4/24, Fa4/27, Fa4/29, Fa4/30
+!VLAN:                                                 Fa4/31, Fa4/32, Fa4/33, Fa4/35
+!VLAN:                                                 Fa4/36, Fa4/37, Fa4/42, Fa7/2
+!VLAN:                                                 Fa7/7, Fa7/12, Fa7/23, Fa8/5
+!VLAN:                                                 Fa8/23, Fa8/26
+!VLAN: 50   3Fl_Cubicles                     active    Fa1/1, Fa1/2, Fa1/3, Fa1/4
+!VLAN:                                                 Fa1/5, Fa1/6, Fa1/7, Fa1/9
+!VLAN:                                                 Fa1/11, Fa1/12, Fa1/13, Fa1/14
+!VLAN:                                                 Fa1/16, Fa1/18, Fa1/19, Fa1/20
+!VLAN:                                                 Fa1/21, Fa1/22, Fa1/23, Fa1/25
+!VLAN:                                                 Fa1/26, Fa1/28, Fa1/29, Fa1/30
+!VLAN:                                                 Fa1/31, Fa1/32, Fa1/33, Fa1/43
+!VLAN:                                                 Fa1/44, Fa1/45, Fa1/46, Fa2/4
+!VLAN:                                                 Fa2/5, Fa2/24, Fa2/25, Fa2/26
+!VLAN:                                                 Fa2/27, Fa2/28, Fa2/29, Fa2/30
+!VLAN:                                                 Fa2/31, Fa2/32, Fa2/33, Fa2/34
+!VLAN:                                                 Fa2/35, Fa2/36, Fa2/37, Fa2/38
+!VLAN:                                                 Fa2/39, Fa2/40, Fa2/41, Fa2/42
+!VLAN:                                                 Fa2/43, Fa2/47, Fa3/7, Fa3/10
+!VLAN:                                                 Fa3/13, Fa3/26, Fa3/27, Fa3/28
+!VLAN:                                                 Fa3/29, Fa3/30, Fa3/31, Fa3/32
+!VLAN:                                                 Fa3/34, Fa3/35, Fa3/37, Fa3/38
+!VLAN:                                                 Fa3/39, Fa3/40, Fa3/41, Fa3/42
+!VLAN:                                                 Fa4/21, Fa4/28, Fa4/48, Fa7/4
+!VLAN:                                                 Fa7/8, Fa7/11, Fa7/26, Fa8/4
+!VLAN:                                                 Fa8/6, Fa8/7, Fa8/8, Fa8/9
+!VLAN:                                                 Fa8/10, Fa8/11, Fa8/12, Fa8/13
+!VLAN:                                                 Fa8/14, Fa8/15, Fa8/16, Fa8/17
+!VLAN:                                                 Fa8/18, Fa8/19, Fa8/20, Fa8/21
+!VLAN:                                                 Fa8/22, Fa8/24, Fa8/25, Fa8/27
+!VLAN:                                                 Fa8/28, Fa8/29, Fa8/30, Fa8/31
+!VLAN:                                                 Fa8/32, Fa8/33, Fa8/34, Fa8/35
+!VLAN:                                                 Fa8/36, Fa8/37, Fa8/38, Fa8/39
+!VLAN:                                                 Fa8/40, Fa8/41, Fa8/42, Fa8/43
+!VLAN:                                                 Fa8/44, Fa8/45, Fa8/46, Fa8/47
+!VLAN:                                                 Fa8/48
+!VLAN: 400  VLAN0400                         active    
+!VLAN: 1002 fddi-default                     act/unsup 
+!VLAN: 1003 trcrf-default                    act/unsup 
+!VLAN: 1004 fddinet-default                  act/unsup 
+!VLAN: 1005 trbrf-default                    act/unsup 
+!VLAN: VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+!VLAN: ---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+!VLAN: 1    enet  100001     1500  -      -      -        -    -        0      0   
+!VLAN: 2    enet  100002     1500  -      -      -        -    -        0      0   
+!VLAN: 10   enet  100010     1500  -      -      -        -    -        0      0   
+!VLAN: 20   enet  100020     1500  -      -      -        -    -        0      0   
+!VLAN: 30   enet  100030     1500  -      -      -        -    -        0      0   
+!VLAN: 31   enet  100031     1500  -      -      -        -    -        0      0   
+!VLAN: 40   enet  100040     1500  -      -      -        -    -        0      0   
+!VLAN: 50   enet  100050     1500  -      -      -        -    -        0      0   
+!VLAN: 400  enet  100400     1500  -      -      -        -    -        0      0   
+!VLAN: 1002 fddi  101002     1500  -      -      -        -    -        0      0   
+!VLAN: 1003 trcrf 101003     4472  1005   3276   -        -    srb      0      0   
+!VLAN: 1004 fdnet 101004     1500  -      -      -        ieee -        0      0   
+!VLAN: 1005 trbrf 101005     4472  -      -      15       ibm  -        0      0   
+!VLAN: VLAN AREHops STEHops Backup CRF
+!VLAN: ---- ------- ------- ----------
+!VLAN: 1003 7       7       off
+!VLAN: Remote SPAN VLANs
+!VLAN: ------------------------------------------------------------------------------
+!VLAN: Primary Secondary Type              Ports
+!VLAN: ------- --------- ----------------- ------------------------------------------
+!
+!
+config-register 0x2102
+!
+version 12.2
+no service pad
+service timestamps debug datetime msec localtime show-timezone
+service timestamps log datetime msec localtime show-timezone
+service password-encryption
+service compress-config
+!
+hostname LAX-Dist4510-03
+!
+boot-start-marker
+boot-end-marker
+!
+no logging console
+enable secret 5 $1$8vyd$7QsKEtsjx9XqsHBnjDthh0
+!
+!username Cisco privilege 15 password <removed>
+!username rancid password <removed>
+aaa new-model
+!
+aaa authorization exec default local 
+!
+aaa session-id common
+hw-module module 5 port-group 1 select gigabitethernet
+ip subnet-zero
+ip domain-name gorillanation.local
+!
+ip dhcp-server 192.168.1.70
+vtp domain gnmedia
+vtp mode transparent
+cluster run
+!
+errdisable recovery cause link-flap
+errdisable recovery interval 60
+power redundancy-mode redundant
+!
+spanning-tree mode rapid-pvst
+spanning-tree loopguard default
+spanning-tree extend system-id
+!
+redundancy
+ mode sso
+!
+vlan internal allocation policy ascending
+!
+vlan 2
+ name Unknown
+!
+vlan 10
+ name Voice
+!
+vlan 20
+ name IT_and_Servers
+!
+vlan 30
+ name Dev
+!
+vlan 31
+ name crave
+!
+vlan 40
+ name 3Fl_Office
+!
+vlan 50
+ name 3Fl_Cubicles
+!
+vlan 400 
+!
+interface FastEthernet1/1
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/2
+ description P169 Richard
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/3
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/4
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/5
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/6
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/7
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/8
+ description Rebecca Young
+ switchport trunk native vlan 50
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/9
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet1/10
+ description Alex Wills
+ switchport trunk native vlan 50
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/11
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/12
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/13
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/14
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/15
+ description second floor switch_cube
+ switchport trunk native vlan 50
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/16
+ switchport access vlan 50
+ switchport mode access
+!
+interface FastEthernet1/17
+ description UpLink desk swtich (chris gange) 
+ switchport access vlan 50
+ switchport trunk native vlan 50
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/18
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/19
+ description Amy L.
+ switchport access vlan 50
+ switchport mode access
+ switchport nonegotiate
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/20
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/21
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/22
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/23
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/24
+ description Temp EVLAAP02
+ switchport trunk native vlan 50
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/25
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/26
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/27
+ switchport access vlan 40
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+!
+interface FastEthernet1/28
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/29
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/30
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/31
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/32
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/33
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/34
+ description P34 Jasmine P.
+ switchport access vlan 40
+ switchport mode access
+!
+interface FastEthernet1/35
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/36
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/37
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/38
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/39
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/40
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/41
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/42
+ description Jasmin Oberman's office
+ switchport trunk native vlan 50
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/43
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/44
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/45
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/46
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/47
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet1/48
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/1
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/2
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/3
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/4
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/5
+ description P Angella C. 
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet2/6
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/7
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet2/8
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet2/9
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/10
+ description Tiffany Switch
+ switchport trunk native vlan 40
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/11
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/12
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/13
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet2/14
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/15
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet2/16
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet2/17
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/18
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/19
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/20
+ description P416 Steven W. (AdOps)
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/21
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/22
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet2/23
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/24
+ description P72 ** Open Desk **
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/25
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/26
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/27
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet2/28
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/29
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/30
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/31
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/32
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/33
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/34
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/35
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/36
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/37
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/38
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/39
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/40
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/41
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/42
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/43
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/44
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/45
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/46
+ switchport trunk native vlan 50
+ switchport mode trunk
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet2/47
+ description P95 Lauren Whangbo
+ switchport access vlan 50
+ switchport mode access
+!
+interface FastEthernet2/48
+ description P96 Keith Bon
+ switchport access vlan 40
+ switchport mode access
+!
+interface FastEthernet3/1
+ description BETTY_T_Contractors
+ switchport trunk native vlan 40
+ switchport mode trunk
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/2
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/3
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/4
+ switchport access vlan 40
+ switchport trunk native vlan 40
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/5
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/6
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/7
+ description Sales Print
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/8
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/9
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/10
+ description P106 Brian
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/11
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/12
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/13
+ description P109 Aaron B.
+ switchport access vlan 50
+ switchport mode access
+!
+interface FastEthernet3/14
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/15
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/16
+ description Evan Akashi
+ switchport trunk native vlan 40
+ switchport mode trunk
+ switchport nonegotiate
+!
+interface FastEthernet3/17
+ description Steve W. (AdOps)
+ switchport access vlan 30
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/18
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/19
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/20
+ description P116 Melissa Z. (Dev)
+ switchport trunk native vlan 30
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/21
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/22
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/23
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/24
+ switchport access vlan 30
+ switchport mode access
+!
+interface FastEthernet3/25
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/26
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/27
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/28
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/29
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/30
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/31
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/32
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/33
+ description Willi Fu
+ switchport trunk native vlan 50
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/34
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/35
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/36
+ description DONKEY_KONG
+ switchport trunk native vlan 50
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/37
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/38
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/39
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/40
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/41
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/42
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/43
+ switchport access vlan 30
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/44
+ switchport access vlan 30
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/45
+ switchport access vlan 30
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/46
+ switchport access vlan 30
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/47
+ switchport access vlan 30
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet3/48
+ description Scott 
+ switchport access vlan 30
+ switchport mode access
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/1
+ description A. McNeil
+ switchport access vlan 20
+ switchport mode access
+!
+interface FastEthernet4/2
+ switchport access vlan 30
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/3
+ switchport access vlan 30
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/4
+ switchport access vlan 30
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/5
+ switchport access vlan 30
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/6
+ switchport access vlan 30
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/7
+ switchport access vlan 30
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/8
+ switchport access vlan 30
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/9
+ description P:153 Dougal (NetOps/IT) 192.168.1.54 
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/10
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/11
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/12
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/13
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/14
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/15
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/16
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/17
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/18
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/19
+ description P163
+ switchport access vlan 20
+ switchport mode access
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/20
+ description P164
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/21
+ description P165 Betty T.
+ switchport access vlan 50
+ switchport mode access
+!
+interface FastEthernet4/22
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/23
+ description P167 DebbieSmith
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/24
+ switchport access vlan 40
+ switchport mode access
+!
+interface FastEthernet4/25
+ description P169 Rashawn S.
+ switchport access vlan 40
+ switchport trunk native vlan 40
+ switchport mode trunk
+ switchport nonegotiate
+!
+interface FastEthernet4/26
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/27
+ description P171 Debbie S.
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security violation restrict
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/28
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet4/29
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/30
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/31
+ switchport access vlan 40
+ switchport mode access
+!
+interface FastEthernet4/32
+ switchport access vlan 40
+ switchport mode access
+!
+interface FastEthernet4/33
+ switchport access vlan 40
+ switchport mode access
+!
+interface FastEthernet4/34
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/35
+ switchport access vlan 40
+ switchport mode access
+!
+interface FastEthernet4/36
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/37
+ description P181 Moises M. (Fin)
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/38
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/39
+ switchport access vlan 20
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/40
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/41
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/42
+ description P186 Jessica F (Payroll)
+ switchport access vlan 40
+ switchport mode access
+!
+interface FastEthernet4/43
+ description DONKEY_KONG
+ switchport trunk native vlan 50
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/44
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/45
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/46
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/47
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet4/48
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface TenGigabitEthernet5/1
+!
+interface TenGigabitEthernet5/2
+!
+interface GigabitEthernet5/3
+ description Uplink_to_Corp-DC-Core-01
+ switchport trunk native vlan 20
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree link-type point-to-point
+!
+interface GigabitEthernet5/4
+ shutdown
+!
+interface GigabitEthernet5/5
+!
+interface GigabitEthernet5/6
+!
+interface FastEthernet7/1
+ description Uplink to EVLAAP01
+ switchport trunk native vlan 50
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/2
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/3
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/4
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/5
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/6
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/7
+ switchport access vlan 40
+ switchport mode access
+!
+interface FastEthernet7/8
+ switchport access vlan 50
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/9
+ description EVLAAP05
+ switchport trunk native vlan 50
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/10
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/11
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/12
+ description P192 Moises M. (Fin) Printer
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/13
+ description ELaine Chang
+ switchport trunk native vlan 30
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/14
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/15
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/16
+ switchport trunk native vlan 31
+ switchport mode trunk
+!
+interface FastEthernet7/17
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/18
+ description Danny D.
+ switchport trunk native vlan 50
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/19
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/20
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/21
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/22
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/23
+ switchport access vlan 40
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/24
+ switchport access vlan 20
+ switchport mode access
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/25
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/26
+ description BigBang
+ switchport access vlan 50
+ switchport mode access
+ switchport nonegotiate
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/27
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/28
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/29
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/30
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/31
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/32
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/33
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/34
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/35
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/36
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/37
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/38
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/39
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/40
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/41
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/42
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/43
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/44
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/45
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/46
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/47
+ switchport access vlan 20
+ switchport mode access
+ switchport port-security
+ switchport port-security aging time 2
+ switchport port-security violation restrict
+ switchport port-security aging type inactivity
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet7/48
+ description Crave SG300 Switch
+ switchport trunk native vlan 31
+ switchport mode trunk
+!
+interface FastEthernet8/1
+ description Wireless
+ switchport trunk native vlan 50
+ switchport trunk allowed vlan 1-401,403-4094
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/2
+ description EVLAAP03
+ switchport trunk native vlan 50
+ switchport trunk allowed vlan 1-401,403-4094
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/3
+ description EVLAAP04
+ switchport trunk native vlan 50
+ switchport trunk allowed vlan 1-401,403-4094
+ switchport mode trunk
+ switchport nonegotiate
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/4
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/5
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/6
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/7
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/8
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/9
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/10
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/11
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/12
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/13
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/14
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/15
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/16
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/17
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/18
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/19
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/20
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/21
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/22
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/23
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet8/24
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/25
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/26
+ switchport access vlan 40
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/27
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/28
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/29
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/30
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/31
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+!
+interface FastEthernet8/32
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/33
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/34
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/35
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/36
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/37
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/38
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/39
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/40
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/41
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/42
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/43
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/44
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/45
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/46
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/47
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface FastEthernet8/48
+ switchport access vlan 50
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface Vlan1
+ description Default
+ ip address 192.168.0.6 255.255.255.0
+!
+interface Vlan10
+ description Voice
+ ip address 192.168.10.6 255.255.255.0
+ ip helper-address 192.168.1.70
+ ip helper-address 192.168.1.11
+ shutdown
+!
+interface Vlan20
+ description IT_and_Servers
+ ip address 192.168.1.6 255.255.255.0
+ ip helper-address 192.168.1.70
+ ip helper-address 192.168.1.11
+!
+interface Vlan30
+ description Dev
+ ip address 192.168.30.6 255.255.255.0
+ ip helper-address 192.168.1.70
+ ip helper-address 192.168.1.11
+!
+interface Vlan31
+ description CRAVE
+ ip address 192.168.31.6 255.255.255.0
+ ip helper-address 192.168.1.70
+ ip helper-address 192.168.1.11
+!
+interface Vlan40
+ description Legal_HR_Finance
+ ip address 192.168.40.6 255.255.255.0
+ ip helper-address 192.168.1.70
+ ip helper-address 192.168.1.11
+!
+interface Vlan50
+ description Sales
+ ip address 192.168.50.6 255.255.255.0
+ ip helper-address 192.168.1.70
+ ip helper-address 192.168.1.11
+!
+ip default-gateway 192.168.1.1
+ip route 10.11.20.27 255.255.255.255 192.168.1.1
+ip http server
+no ip http secure-server
+!
+snmp-server engineID local 8000000903000021D8DABB60
+snmp-server user config config v1 
+snmp-server user config config v2c 
+snmp-server user gorilla gorilla v1 
+snmp-server user gorilla gorilla v2c 
+!snmp-server community <removed> RO
+!snmp-server community <removed> RW
+snmp-server user gorilla gorilla v1 
+snmp-server user gorilla gorilla v2c 
+snmp-server location HQ-3rd-floor
+snmp-server contact sysadmins@gorillanation.com
+snmp-server enable traps snmp authentication linkdown linkup coldstart warmstart
+snmp-server enable traps transceiver all
+snmp-server enable traps tty
+snmp-server enable traps eigrp
+snmp-server enable traps fru-ctrl
+snmp-server enable traps entity
+snmp-server enable traps flash insertion removal
+snmp-server enable traps cpu threshold
+snmp-server enable traps rep
+snmp-server enable traps vtp
+snmp-server enable traps vlancreate
+snmp-server enable traps vlandelete
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps port-security
+snmp-server enable traps ethernet cfm cc mep-up mep-down cross-connect loop config
+snmp-server enable traps ethernet cfm crosscheck mep-missing mep-unknown service-up
+snmp-server enable traps ethernet cfm alarm
+snmp-server enable traps event-manager
+snmp-server enable traps rf
+snmp-server enable traps cef resource-failure peer-state-change peer-fib-state-change inconsistency
+snmp-server enable traps config-copy
+snmp-server enable traps config-ctid
+snmp-server enable traps hsrp
+snmp-server enable traps ipmulticast
+snmp-server enable traps pim neighbor-change rp-mapping-change invalid-pim-message
+snmp-server enable traps bridge newroot topologychange
+snmp-server enable traps stpx inconsistency root-inconsistency loop-inconsistency
+snmp-server enable traps syslog
+snmp-server enable traps vlan-membership
+snmp-server enable traps mac-notification change move threshold
+!snmp-server host 192.168.1.54 informs version 2c <removed> 
+!snmp-server host 192.168.1.54 <removed> 
+!snmp-server host 192.168.1.54 <removed> 
+!snmp-server host 192.168.1.178 informs version 2c <removed> 
+!snmp-server host 192.168.1.178 <removed> 
+snmp ifmib ifindex persist
+!
+line con 0
+ stopbits 1
+line vty 0 4
+! password <removed>
+ transport input ssh
+line vty 5 15
+ transport input ssh
+!
+ntp source Vlan20
+ntp update-calendar
+ntp server 164.67.62.194
+ntp server 192.168.1.10
+ntp server 198.123.30.132
+end

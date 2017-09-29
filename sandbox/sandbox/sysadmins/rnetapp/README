@@ -1,0 +1,94 @@
+Rnetapp is an easy way to handle day-to-day tasks on your NetApp filers. It can
+help you manage volumes, exports, snapshots, and retreive NFS counters. It was
+created to deal with extreme laziness and a complete inability to bother with
+continually finding out who is currently logged in to the NetApp.
+
+nfstop is a convienent wrapper for 'rnetapp <filer> nfsstat top'
+
+Rnetapp tries to be "smart" about volume names and path names. For example, one
+should create a volume 'foo', and then export the path '/vol/foo'. Rnetapp does
+its best to convert back and forth between the two forms automatically. This
+requires that your volumes are rooted in '/vol'.
+
+
+EXPORTS
+
+When using the ONTAP API to export subdirectories within a volume, it only
+stores the export to the volume in the exports file. This means that a 'exports
+-r' would suddenly change your exports. This is a bug within ONTAP.
+
+For this reason, rnetapp will not export a subdirectory of a file.  Rnetapp
+automatically converts the path to the subdirectory to the path of the volume.
+
+An example:
+    $ rnetapp filer1 exports add /vol/myvolume/somedir 1.1.1.1
+    Warning: Truncated path to /vol/myvolume.
+    Exported Path: /vol/myvolume (nosuid: true)
+       read-write: 1.1.1.1
+
+
+MANDATORY PREREQUISITE - ONTAPI!
+
+rnetapp requires the ONTAPI Perl modules to be installed. Obtain the "NetApp
+Manageability SDK" from NetApp. The perl modules are in the "/lib/perl"
+directory.  Copy the perl module files into your perl @INC path.
+
+For example, cp -rp netapp-manageability-sdk-4.0/lib/perl/NetApp /usr/lib/perl5/vendor_perl
+
+At the time of this writing, the SDK can be downloaded from NetApp at
+http://now.netapp.com/. After logging in, browse to Downloads->Software and look
+for the "NetApp Manageability SDK" product. You want the one that says "All
+Platforms."
+
+
+MANDATORY PREREQUISITE - Net::IP!
+
+Net::IP is a perl module for basicly doing "math" on IPs and Networks. It
+should be packaged in your favorite distro or install it with cpan.
+
+
+Which perl?
+If you have multiple perl installations, pass the name or path to perl to
+configure, like this: ./configure PERL=/my/special/perl
+
+
+Building an RPM
+This package includes a spec file. Provided your RPM build environment is setup
+correctly, 'rpmbuild -ta rnetapp-version.tar.gz' should work correctly.
+
+
+EXPORTS2 API
+
+With release 1.0, rnetapp now supports the Exports2 API instead of Exports1. It
+is important to note that once you modify your exports with this tool, the
+newer API will write Export2-formatted entries that can not be read/touched by
+Exports1 tools. All older tools will refuse to read/write your exports file.
+Exports2 tools "taint" your entire file. There is no tool to convert your
+exports back to exports1 format.
+
+However, you can easily convert it yourself in a text editor. Just remove the
+"sec" bits and run 'exportfs -r' on your netapp.
+
+
+CLUSTER MODE
+
+With release 2.0. rnetapp 1.28 basic Cluster-Mode support. Most things work,
+but don't expect all of the output to match up exactly. When rnetapp first
+connects to a filer, it requests the ONTAP version which may include the string
+"Cluster-mode". If so, the global variable $CLUSTER_MODE is set and the rest of
+the code has various if($CUSTER_MODE){ } blocks to change it's behavior. Also,
+the command dispatcher looks for functions defined with a "_cmode" appended; if
+the function exists they are used instead of the normal function.
+
+For example, volume_list() and volume_list_cmode() both exist. The later is
+automatically used when rnetapp is connected to a filer in cluster mode.
+
+
+BUGS
+
+Creating a volume 'like' another volume is inaccurate. Determining the correct
+size requires magic.
+
+The snap 'mount/umount' subcommands are silly and fragile. They must be run as root.
+
+

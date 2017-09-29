@@ -1,0 +1,418 @@
+!RANCID-CONTENT-TYPE: cisco
+!
+!Chassis type: ASA5510 - a PIX
+!CPU: Pentium 4 Celeron 1599 MHz
+!Encryption: Cisco ASA-55x0 on-board accelerator (revision 0x0)
+!
+!Memory: 1024 MB RAM
+!Serial Number: JMX1422L525!
+!This platform has a Base license.
+!
+!
+!Image: Compiled: on Fri 06-Jan-12 10:24 by builders
+!Image: disk0:/asa843-k8.bin
+!
+!
+!BootFlash: BOOT variable = disk0:/asa843-k8.bin
+!BootFlash: Current BOOT variable = disk0:/asa843-k8.bin
+!BootFlash: CONFIG_FILE variable = 
+!BootFlash: Current CONFIG_FILE variable = 
+!
+!BootFlash: BOOT variable = disk0:/asa843-k8.bin
+!BootFlash: Current BOOT variable = disk0:/asa843-k8.bin
+!BootFlash: CONFIG_FILE variable = 
+!BootFlash: Current CONFIG_FILE variable = 
+!
+!Flash: --#--  --length--  -----date/time------  path
+!Flash:   110  14240396    Jan 24 2011 18:57:14  asdm-631.bin
+!Flash:   111  4181246     Jan 01 2003 00:06:08  securedesktop-asa-3.2.1.103-k9.pkg
+!Flash:   112  398305      Jan 01 2003 00:06:24  sslclient-win-1.1.0.154.pkg
+!Flash:     5  8192        May 29 2010 17:54:24  crypto_archive
+!Flash:   113  15943680    Jan 31 2011 20:40:18  asa831-k8.bin
+!Flash:   115  14504920    Dec 14 2010 12:56:10  asdm-634-53.bin
+!Flash:   116  13934592    Dec 14 2010 13:08:22  asa805-k8.bin
+!Flash:     2  8192        Dec 14 2010 13:10:40  log
+!Flash:   117  8192        Dec 14 2010 14:15:16  LOCAL-CA-SERVER
+!Flash:   132  0           Dec 14 2010 14:15:16  LOCAL-CA-SERVER/LOCAL-CA-SERVER.udb
+!Flash:   118  15943680    Jan 24 2011 18:44:56  disk0
+!Flash:   119  5548032     Jan 24 2011 18:47:04  asa708-k8.old
+!Flash:   120  6163744     May 29 2010 17:55:56  asdm-508.bin.old
+!Flash:   121  2922        Jan 31 2011 20:45:16  8_0_5_0_startup_cfg.sav
+!Flash:    10  8192        Jan 31 2011 20:45:20  coredumpinfo
+!Flash:    11  59          Feb 21 2012 21:19:10  coredumpinfo/coredump.cfg
+!Flash:   122  1189        Jan 31 2011 20:45:20  upgrade_startup_errors_201101312045.log
+!Flash:   123  17902288    Feb 21 2012 20:57:12  asdm-647.bin
+!Flash:   124  25196544    Feb 21 2012 21:07:36  asa843-k8.bin
+!Flash:    91  0           Feb 21 2012 21:19:06  nat_ident_migrate
+!Flash:   125  9409        Feb 21 2012 21:19:06  8_3_1_0_startup_cfg.sav
+!Flash:   126  324         Feb 21 2012 21:19:12  upgrade_startup_errors_201202212119.log
+!Flash:   127  100         Jun 13 2012 22:19:58  upgrade_startup_errors_201206132219.log
+!Flash: 255426560 bytes total (120848384 bytes free)
+!
+!Flash: disk0: Directory of disk0:/
+!Flash: disk0: 110    -rwx  14240396     18:57:14 Jan 24 2011  asdm-631.bin
+!Flash: disk0: 111    -rwx  4181246      00:06:08 Jan 01 2003  securedesktop-asa-3.2.1.103-k9.pkg
+!Flash: disk0: 112    -rwx  398305       00:06:24 Jan 01 2003  sslclient-win-1.1.0.154.pkg
+!Flash: disk0: 5      drwx  8192         17:54:24 May 29 2010  crypto_archive
+!Flash: disk0: 113    -rwx  15943680     20:40:18 Jan 31 2011  asa831-k8.bin
+!Flash: disk0: 115    -rwx  14504920     12:56:10 Dec 14 2010  asdm-634-53.bin
+!Flash: disk0: 116    -rwx  13934592     13:08:22 Dec 14 2010  asa805-k8.bin
+!Flash: disk0: 2      drwx  8192         13:10:40 Dec 14 2010  log
+!Flash: disk0: 117    drwx  8192         14:15:16 Dec 14 2010  LOCAL-CA-SERVER
+!Flash: disk0: 118    -rwx  15943680     18:44:56 Jan 24 2011  disk0
+!Flash: disk0: 119    -rwx  5548032      18:47:04 Jan 24 2011  asa708-k8.old
+!Flash: disk0: 120    -rwx  6163744      17:55:56 May 29 2010  asdm-508.bin.old
+!Flash: disk0: 121    -rwx  2922         20:45:16 Jan 31 2011  8_0_5_0_startup_cfg.sav
+!Flash: disk0: 10     drwx  8192         20:45:20 Jan 31 2011  coredumpinfo
+!Flash: disk0: 122    -rwx  1189         20:45:20 Jan 31 2011  upgrade_startup_errors_201101312045.log
+!Flash: disk0: 123    -rwx  17902288     20:57:12 Feb 21 2012  asdm-647.bin
+!Flash: disk0: 124    -rwx  25196544     21:07:36 Feb 21 2012  asa843-k8.bin
+!Flash: disk0: 91     -rwx  0            21:19:06 Feb 21 2012  nat_ident_migrate
+!Flash: disk0: 125    -rwx  9409         21:19:06 Feb 21 2012  8_3_1_0_startup_cfg.sav
+!Flash: disk0: 126    -rwx  324          21:19:12 Feb 21 2012  upgrade_startup_errors_201202212119.log
+!Flash: disk0: 127    -rwx  100          22:19:58 Jun 13 2012  upgrade_startup_errors_201206132219.log
+!Flash: disk0: 255426560 bytes total (120848384 bytes free)
+!
+!Slot 0/: type ASA 5510 Adaptive
+!Slot 0/: part Security, serial Appliance
+!Slot 0/: hvers ASA5510
+!Slot 0: hvers 2.0, firmware 1.0(11)5, sw 8.4(3)
+!
+!
+config-register 0x1
+!
+ASA Version 8.4(3) 
+!
+hostname EVSYASA01
+domain-name gorillanation.local
+!enable password <removed>
+!passwd <removed>
+names
+!
+interface Ethernet0/0
+ nameif outside
+ security-level 0
+ ip address 203.122.154.10 255.255.255.252 
+!
+interface Ethernet0/1
+ nameif inside
+ security-level 0
+ ip address 192.168.11.254 255.255.255.0 
+!
+interface Ethernet0/2
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface Ethernet0/3
+ shutdown
+ no nameif
+ no security-level
+ no ip address
+!
+interface Management0/0
+ nameif management
+ security-level 100
+ no ip address
+ management-only
+!
+boot system disk0:/asa843-k8.bin
+ftp mode passive
+dns domain-lookup outside
+dns domain-lookup inside
+dns domain-lookup management
+dns server-group DefaultDNS
+ name-server 192.168.11.10
+ domain-name gorillanation.local
+same-security-traffic permit inter-interface
+same-security-traffic permit intra-interface
+object network obj_any-01
+ subnet 0.0.0.0 0.0.0.0
+object network obj-0.0.0.0
+ host 0.0.0.0
+object network obj_any-02
+ subnet 0.0.0.0 0.0.0.0
+object network obj_any1
+object-group network obj_any
+object-group network LOCAL_VPN
+ network-object 192.168.11.0 255.255.255.0
+ network-object 192.168.0.0 255.255.252.0
+ network-object 10.0.0.0 255.0.0.0
+object-group network REMOTE_VPN
+ network-object 192.168.14.0 255.255.255.0
+access-list global_mpc extended permit ip any any 
+access-list Sydney_LA_to_Melbourne extended permit ip 192.168.11.0 255.255.255.0 192.168.14.0 255.255.255.0 
+access-list Sydney_LA_to_Melbourne extended permit ip 192.168.0.0 255.255.252.0 192.168.14.0 255.255.255.0 
+access-list Sydney_LA_to_Melbourne extended permit ip 10.0.0.0 255.0.0.0 192.168.14.0 255.255.255.0 
+access-list CAPIN extended permit ip host 192.168.14.254 host 192.168.11.10 
+access-list CAPIN extended permit ip host 192.168.11.10 host 192.168.14.254 
+pager lines 24
+logging enable
+logging timestamp
+logging list VPN_Issues level debugging class vpn
+logging asdm informational
+flow-export destination inside 192.168.1.178 2055
+mtu outside 1500
+mtu inside 1500
+mtu management 1500
+ip local pool IP_VPN_POOL 192.168.111.50-192.168.111.80 mask 255.255.255.0
+icmp unreachable rate-limit 1 burst-size 1
+asdm image disk0:/asdm-647.bin
+no asdm history enable
+arp timeout 14400
+nat (inside,outside) source static LOCAL_VPN LOCAL_VPN destination static REMOTE_VPN REMOTE_VPN no-proxy-arp route-lookup
+!
+object network obj_any-02
+ nat (inside,outside) dynamic interface
+route outside 0.0.0.0 0.0.0.0 203.122.154.9 2
+route inside 10.0.0.0 255.0.0.0 192.168.11.2 1
+route inside 192.168.1.0 255.255.255.0 192.168.11.2 1
+route inside 192.168.2.0 255.255.255.0 192.168.11.2 1
+route inside 192.168.3.0 255.255.255.0 192.168.11.2 1
+timeout xlate 3:00:00
+timeout pat-xlate 0:00:30
+timeout conn 1:00:00 half-closed 0:10:00 udp 0:02:00 icmp 0:00:02
+timeout sunrpc 0:10:00 h323 0:05:00 h225 1:00:00 mgcp 0:05:00 mgcp-pat 0:05:00
+timeout sip 0:30:00 sip_media 0:02:00 sip-invite 0:03:00 sip-disconnect 0:02:00
+timeout sip-provisional-media 0:02:00 uauth 0:05:00 absolute
+timeout tcp-proxy-reassembly 0:01:00
+timeout floating-conn 0:00:00
+dynamic-access-policy-record DfltAccessPolicy
+aaa-server Gorilla protocol radius
+aaa-server Gorilla (inside) host 192.168.11.11
+ timeout 5
+! key  <removed> 
+user-identity default-domain LOCAL
+aaa authentication ssh console LOCAL 
+aaa authentication telnet console LOCAL 
+aaa authentication http console Gorilla LOCAL
+http server enable
+http 10.10.11.0 255.255.255.0 management
+http 192.168.1.0 255.255.255.0 inside
+http 192.168.11.0 255.255.255.0 inside
+snmp-server host inside 192.168.1.178 community gorilla version 2c
+snmp-server host inside 192.168.1.54 community gorilla version 2c
+snmp-server location Sydney
+snmp-server contact helpdesk@gorillanation.com
+!snmp-server community <removed>
+snmp-server enable traps snmp authentication linkup linkdown coldstart
+snmp-server enable traps syslog
+snmp-server enable traps entity config-change fru-insert fru-remove
+crypto ipsec ikev1 transform-set ESP-3DES-MD5 esp-3des esp-md5-hmac 
+crypto ipsec ikev1 transform-set 3des esp-3des esp-md5-hmac 
+crypto ipsec ikev1 transform-set ESP-DES-SHA esp-des esp-sha-hmac 
+crypto ipsec ikev1 transform-set ESP-AES-128-SHA esp-aes esp-sha-hmac 
+crypto ipsec ikev1 transform-set ESP-AES-128-MD5 esp-aes esp-md5-hmac 
+crypto ipsec ikev1 transform-set ESP-AES-192-SHA esp-aes-192 esp-sha-hmac 
+crypto ipsec ikev1 transform-set ESP-AES-192-MD5 esp-aes-192 esp-md5-hmac 
+crypto ipsec ikev1 transform-set ESP-AES-256-SHA esp-aes-256 esp-sha-hmac 
+crypto ipsec ikev1 transform-set ESP-AES-256-MD5 esp-aes-256 esp-md5-hmac 
+crypto ipsec ikev1 transform-set ESP-DES-MD5 esp-des esp-md5-hmac 
+crypto ipsec ikev1 transform-set myset esp-aes-256 esp-sha-hmac 
+crypto ipsec ikev1 transform-set ESP-3DES-SHA esp-3des esp-sha-hmac 
+crypto ipsec ikev1 transform-set Melbourne_to_Sydney_vpn esp-3des esp-sha-hmac 
+crypto ipsec ikev2 ipsec-proposal AES256
+ protocol esp encryption aes-256
+ protocol esp integrity sha-1 md5
+crypto ipsec ikev2 ipsec-proposal AES192
+ protocol esp encryption aes-192
+ protocol esp integrity sha-1 md5
+crypto ipsec ikev2 ipsec-proposal AES
+ protocol esp encryption aes
+ protocol esp integrity sha-1 md5
+crypto ipsec ikev2 ipsec-proposal 3DES
+ protocol esp encryption 3des
+ protocol esp integrity sha-1 md5
+crypto ipsec ikev2 ipsec-proposal DES
+ protocol esp encryption des
+ protocol esp integrity sha-1 md5
+crypto map vpn 12 match address Sydney_LA_to_Melbourne
+crypto map vpn 12 set peer 203.122.138.130 
+crypto map vpn 12 set ikev1 transform-set Melbourne_to_Sydney_vpn
+crypto map vpn interface outside
+crypto ca trustpoint ASDM_TrustPoint0
+ enrollment self
+ subject-name CN=EVSYASA01
+ keypair KEY_TEST
+ proxy-ldc-issuer
+ crl configure
+crypto ca trustpoint ASDM_TrustPoint1
+ enrollment terminal
+ subject-name CN=EVSYASA01
+ keypair test_key
+ crl configure
+crypto ca trustpoint ASDM_TrustPoint2
+ enrollment terminal
+ subject-name CN=EVSYASA01
+ crl configure
+crypto ca trustpoint VPN_CERT
+ enrollment terminal
+ subject-name CN=EVSYASA01
+ keypair test_key
+ crl configure
+crypto ca certificate chain ASDM_TrustPoint0
+ certificate 986a434f
+    30820260 308201c9 a0030201 02020498 6a434f30 0d06092a 864886f7 0d010105 
+    05003042 31123010 06035504 03130945 56535941 53413031 312c302a 06092a86 
+    4886f70d 01090216 1d455653 59415341 30312e67 6f72696c 6c616e61 74696f6e 
+    2e6c6f63 616c301e 170d3132 30323231 31303336 35365a17 0d323230 32313831 
+    30333635 365a3042 31123010 06035504 03130945 56535941 53413031 312c302a 
+    06092a86 4886f70d 01090216 1d455653 59415341 30312e67 6f72696c 6c616e61 
+    74696f6e 2e6c6f63 616c3081 9f300d06 092a8648 86f70d01 01010500 03818d00 
+    30818902 818100f4 9c412cf1 83561771 5edcc9dd 5834ec14 8d9d1122 ae9b0a58 
+    0417d847 815a6713 332f2bb8 33be0a70 2c2840ef aeaebcb6 9208dfc8 18b64377 
+    41efddcb f22ce061 3414bf2e 4b492cd8 f1a3c0f1 e461e8b1 6c133ade 898dd746 
+    0f05fa9d 64023265 247ae7f7 4a04544a 4b5cba98 2ddb7d07 30b4cff7 ee76ed76 
+    5cd0bb13 54a67b02 03010001 a3633061 300f0603 551d1301 01ff0405 30030101 
+    ff300e06 03551d0f 0101ff04 04030201 86301f06 03551d23 04183016 8014a0b3 
+    e257b694 3986e1ef d22138ec d54d4405 cf76301d 0603551d 0e041604 14a0b3e2 
+    57b69439 86e1efd2 2138ecd5 4d4405cf 76300d06 092a8648 86f70d01 01050500 
+    03818100 e9eac1a6 ac1e45d7 c66faae2 48a75f6e e695b2ed b2dd8b18 0454ac9e 
+    fdf5a693 cadec0cf 268a6aba 3f12c18c 3fd25a77 9ba0def4 e919e5d5 98c5f2d2 
+    3f8b29b7 4e025d48 60cd9b29 1cd6023e b26d0898 90189921 376a865f 703f7215 
+    7b0015ca ba18ebb2 fc7a52e5 c6347740 5e2a5c84 7c108693 ed3572fa 0ac57c4b 3c12653f
+  quit
+crypto isakmp nat-traversal 33
+crypto isakmp disconnect-notify
+crypto ikev2 policy 1
+ encryption aes-256
+ integrity sha
+ group 5 2
+ prf sha
+ lifetime seconds 86400
+crypto ikev2 policy 10
+ encryption aes-192
+ integrity sha
+ group 5 2
+ prf sha
+ lifetime seconds 86400
+crypto ikev2 policy 20
+ encryption aes
+ integrity sha
+ group 5 2
+ prf sha
+ lifetime seconds 86400
+crypto ikev2 policy 30
+ encryption 3des
+ integrity sha
+ group 5 2
+ prf sha
+ lifetime seconds 86400
+crypto ikev2 policy 40
+ encryption des
+ integrity sha
+ group 5 2
+ prf sha
+ lifetime seconds 86400
+crypto ikev2 enable outside
+crypto ikev1 enable outside
+crypto ikev1 enable inside
+crypto ikev1 policy 1
+ authentication pre-share
+ encryption 3des
+ hash sha
+ group 2
+ lifetime 86400
+crypto ikev1 policy 30
+ authentication pre-share
+ encryption 3des
+ hash md5
+ group 2
+ lifetime 86400
+telnet 192.168.1.0 255.255.255.0 inside
+telnet 192.168.11.10 255.255.255.255 inside
+telnet timeout 5
+ssh 192.168.1.0 255.255.255.0 inside
+ssh 192.168.11.0 255.255.255.0 inside
+ssh 10.0.0.0 255.0.0.0 inside
+ssh 10.11.20.0 255.255.254.0 inside
+ssh timeout 30
+console timeout 0
+management-access inside
+dhcpd address 192.168.11.200-192.168.11.250 inside
+dhcpd dns 192.168.11.10 interface inside
+!
+threat-detection basic-threat
+threat-detection statistics port
+threat-detection statistics protocol
+threat-detection statistics access-list
+no threat-detection statistics tcp-intercept
+ntp server 192.168.11.10 source inside
+ssl encryption aes128-sha1 aes256-sha1 3des-sha1 rc4-sha1
+webvpn
+ enable outside
+ anyconnect image disk0:/sslclient-win-1.1.0.154.pkg 1
+ anyconnect enable
+group-policy Sydney_VPN_Policy internal
+group-policy Sydney_VPN_Policy attributes
+ vpn-tunnel-protocol ikev1 ssl-client ssl-clientless
+ webvpn
+  url-list none
+  anyconnect ask enable
+!username cisco password <removed>
+!username rancid password <removed>
+tunnel-group DefaultL2LGroup ipsec-attributes
+ ikev1 pre-shared-key blahblah
+ ikev2 remote-authentication pre-shared-key blahblah
+ ikev2 local-authentication pre-shared-key blahblah
+tunnel-group DefaultRAGroup general-attributes
+ authentication-server-group Gorilla
+tunnel-group DefaultWEBVPNGroup general-attributes
+ authentication-server-group Gorilla
+tunnel-group VPN_USERS type remote-access
+tunnel-group VPN_USERS general-attributes
+ address-pool IP_VPN_POOL
+ authentication-server-group Gorilla LOCAL
+ default-group-policy Sydney_VPN_Policy
+tunnel-group VPN_USERS webvpn-attributes
+ group-alias Users enable
+tunnel-group 203.122.138.130 type ipsec-l2l
+tunnel-group 203.122.138.130 ipsec-attributes
+ ikev1 pre-shared-key Rid3th3Tub3!
+ isakmp keepalive threshold 10 retry 3
+!
+class-map global-class-netflow
+ match access-list global_mpc
+class-map inspection_default
+ match default-inspection-traffic
+!
+policy-map type inspect dns preset_dns_map
+ parameters
+  message-length maximum 512
+policy-map global_policy
+ description NetFlow
+ class inspection_default
+  inspect dns preset_dns_map 
+  inspect ftp 
+  inspect h323 h225 
+  inspect h323 ras 
+  inspect rsh 
+  inspect rtsp 
+  inspect esmtp 
+  inspect sqlnet 
+  inspect skinny  
+  inspect sunrpc 
+  inspect xdmcp 
+  inspect sip  
+  inspect netbios 
+  inspect tftp 
+  inspect ip-options 
+ class global-class-netflow
+  flow-export event-type all destination 192.168.1.178
+!
+service-policy global_policy global
+prompt hostname context 
+no call-home reporting anonymous
+call-home
+ profile CiscoTAC-1
+  no active
+  destination address http https://tools.cisco.com/its/service/oddce/services/DDCEService
+  destination address email callhome@cisco.com
+  destination transport-method http
+  subscribe-to-alert-group diagnostic
+  subscribe-to-alert-group environment
+  subscribe-to-alert-group inventory periodic monthly
+  subscribe-to-alert-group configuration periodic monthly
+  subscribe-to-alert-group telemetry periodic daily
+: end

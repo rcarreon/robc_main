@@ -1,0 +1,30 @@
+#!/bin/bash
+
+# Print out a list of zones that need stub zones created in AD
+
+# First, get a list of zones and their nameservers
+list=$(for a in *.hosts external/*.hosts;do
+     zone=$(basename $a .hosts);
+     host -t ns $zone 192.168.1.10 | grep "name server" | sort | head -1 | awk '{print $1" "$4}';
+done)
+
+# Second, run through the list and do useful stuff
+echo "$list" | while read line;do
+     zone=$(set -- $line; echo $1)
+     nameserver=$(set -- $line; echo $2)
+
+     # spread the love amoung two different nameservers
+     case $zone in
+         [a-m]*) nameservers="10.11.20.68 10.11.20.69";;
+         *) nameservers="10.11.20.69 10.11.20.68";;
+     esac
+
+     # if we found the external nameserver, then we need to add a forwarder in AD
+     case $nameserver in
+         app?v-dns*);; # echo "$zone is using $nameserver.";;
+         *) echo "$zone not set up in AD... "
+           echo "dnscmd EVLADC01 /ZoneAdd $zone /DsForwarder $nameservers /DP /domain";;
+     esac
+done
+
+# Email this output to q_wa@evolvemediallc.com

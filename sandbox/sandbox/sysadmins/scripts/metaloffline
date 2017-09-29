@@ -1,0 +1,6 @@
+#!/bin/bash
+
+# gstaples @ Gorilla Nation
+
+nodech $1 groups^=online
+

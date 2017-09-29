@@ -1,0 +1,2308 @@
+!RANCID-CONTENT-TYPE: cisco
+!
+!Chassis type: WS-C6509-E - a WS-C6509-E router
+!CPU: R7000, SR71000 CPU at 600Mhz, impl 0x504, Rev 1.2, 512KB L2 Cache
+!
+!Memory: main 458720K/65536K
+!Memory: nvram 1917K
+!Memory: bootflash 65536K
+!
+!Catalyst Chassis type: WS-C6509-E, Catalyst 6500 9-slot backplane
+!Catalyst Chassis S/N: SMC1538006R
+!Catalyst Chassis assembly: 73-9221-07, rev A0, ver 1.5
+!Processor ID: SMC1538006R
+!
+!
+!Image: Software: s72033_rp-IPSERVICESK9_WAN-M, 12.2(18)SXF17b, RELEASE SOFTWARE (fc1)
+!Image: Compiled: Tue 15-Mar-11 21:28 by ccai
+!Image: sup-bootdisk:s72033-ipservicesk9_wan-mz.122-18.SXF17b.bin
+!
+!ROM Bootstrap: Version 12.2(14r)S1, RELEASE SOFTWARE (fc1)
+!BOOTLDR: Version 12.2(18)SXF17b, RELEASE SOFTWARE (fc1)
+!
+!BootFlash: BOOT variable = sup-bootdisk:s72033-ipservicesk9_wan-mz.122-18.SXF17b.bin,1;sup-bootdisk:s72033-ipservices_wan-mz.122-18.SXF13.bin,1;slavesup-bootdisk:s72033-ipservicesk9_wan-mz.122-18.SXF17b.bin,1;
+!BootFlash: CONFIG_FILE variable does not exist
+!BootFlash: BOOTLDR variable does not exist
+!BootFlash: Configuration register is 0x2102
+!BootFlash: Standby is not up.
+!
+!BootFlash: BOOT variable = sup-bootdisk:s72033-ipservicesk9_wan-mz.122-18.SXF17b.bin,1;sup-bootdisk:s72033-ipservices_wan-mz.122-18.SXF13.bin,1;slavesup-bootdisk:s72033-ipservicesk9_wan-mz.122-18.SXF17b.bin,1;
+!BootFlash: CONFIG_FILE variable does not exist
+!BootFlash: BOOTLDR variable does not exist
+!BootFlash: Configuration register is 0x2102
+!BootFlash: Standby is not up.
+!
+!Flash: nvram: Directory of nvram:/
+!Flash: nvram:  1918  -rw-       32389                    <no date>  startup-config
+!Flash: nvram:  1919  ----        1523                    <no date>  private-config
+!Flash: nvram:  1920  -rw-       32389                    <no date>  underlying-config
+!Flash: nvram:     1  ----          49                    <no date>  persistent-data
+!Flash: nvram:     2  ----           4                    <no date>  rf_cold_starts
+!Flash: nvram:     3  -rw-       10600                    <no date>  ifIndex-table
+!Flash: nvram: 1964024 bytes total (1916748 bytes free)
+!
+!Flash: bootflash: Directory of bootflash:/
+!Flash: bootflash:     1  -rw-      269403   Mar 7 2012 21:14:05 +00:00  crashinfo_20120307-211405
+!Flash: bootflash: 65536000 bytes total (65266468 bytes free)
+!
+!Flash: sup-bootflash: Directory of sup-bootdisk:/
+!Flash: sup-bootflash:     1  -rw-    78734852  Nov 11 2011 02:37:40 +00:00  s72033-ipservices_wan-mz.122-18.SXF13.bin
+!Flash: sup-bootflash:     2  -rw-    80232452  Apr 12 2013 18:32:54 +00:00  s72033-ipservicesk9_wan-mz.122-18.SXF17b.bin
+!Flash: sup-bootflash: 1024507904 bytes total (865517568 bytes free)
+!
+!Flash: sup-microcode: Directory of sup-microcode:/
+!Flash: sup-microcode:     0  dr--   <no size>                    <no date>  
+!Flash: sup-microcode:     1  -r--     4212078                    <no date>  CWPA_version_10.10
+!Flash: sup-microcode:     2  -r--     5312978                    <no date>  CWTLC_version_10.10
+!Flash: sup-microcode:     3  -r--     4722162                    <no date>  CWPA2_version_10.10
+!Flash: sup-microcode:     4  -r--     6323510                    <no date>  SIP1_version_10.10
+!Flash: sup-microcode:     5  -r--     7210702                    <no date>  SIP2_version_10.10
+!Flash: sup-microcode:     6  -r--     7403710                    <no date>  SIP10G_version_10.10
+!Flash: sup-microcode:     7  -r--     3628154                    <no date>  SMSC_version_10.10
+!Flash: sup-microcode:     8  -r--    19119718                    <no date>  DRACO2_MP
+!Flash: sup-microcode:     9  -r--     6253034                    <no date>  CHEVYS-LC
+!Flash: sup-microcode:    10  -r--     7499538                    <no date>  C2LC
+!Flash: sup-microcode:    11  -r--      315930                    <no date>  LCP_LX10100
+!Flash: sup-microcode:    12  -r--      378228                    <no date>  LCP_LX1000
+!Flash: sup-microcode:    13  -r--      310426                    <no date>  LCP_AX1000
+!Flash: sup-microcode:    14  -r--      376024                    <no date>  LCP_AX10100
+!Flash: sup-microcode:    15  -r--      356782                    <no date>  LCP_CPFAB
+!Flash: sup-microcode:    16  -r--      693710                    <no date>  LCP_CPGBIT
+!Flash: sup-microcode:    17  -r--      682334                    <no date>  LCP_CP10G
+!Flash: sup-microcode:    18  -r--      748366                    <no date>  LCP_CPMBIT2
+!Flash: sup-microcode:    19  -r--      847118                    <no date>  LCP_CPMBIT
+!Flash: sup-microcode:    20  -r--     1019054                    <no date>  LCP_CPXBIT
+!Flash: sup-microcode:    21  -r--       65318                    <no date>  LCP_ABOOT
+!Flash: sup-microcode:    22  -r--       60490                    <no date>  LCP_BOOT
+!Flash: sup-microcode:    23  -r--     1228834                    <no date>  CWPA2_FPD_version_10.10
+!Flash: sup-microcode: 78768198 bytes total (0 bytes free)
+!
+!
+!Slot 2: type SFM-capable 48 port 10/100/1000mb RJ45, 48 ports
+!Slot 2: part WS-X6548-GE-45AF, serial SAL14502A8Z
+!Slot 2: hvers 12.6, firmware 7.2(1), sw 8.5(0.46)RFW
+!
+!Slot 2/0: type  IEEE Voice Daughter Card   
+!Slot 2/0: part WS-F6K-48-AF, serial SAL1450204G
+!Slot 2/0: hvers 2.5
+!
+!Slot 3: type SFM-capable 48 port 10/100/1000mb RJ45, 48 ports
+!Slot 3: part WS-X6548-GE-45AF, serial SAL145132VZ
+!Slot 3: hvers 12.6, firmware 7.2(1), sw 8.5(0.46)RFW
+!
+!Slot 3/0: type  IEEE Voice Daughter Card   
+!Slot 3/0: part WS-F6K-48-AF, serial SAL14512WSJ
+!Slot 3/0: hvers 2.5
+!
+!Slot 4: type SFM-capable 48 port 10/100/1000mb RJ45, 48 ports
+!Slot 4: part WS-X6548-GE-TX, serial SAL11413P1F
+!Slot 4: hvers 11.3, firmware 7.2(1), sw 8.5(0.46)RFW
+!
+!Slot 5: type Supervisor Engine 720 (Active), 2 ports
+!Slot 5: part WS-SUP720-3B, serial SAL1432Q9Z7
+!Slot 5: hvers 3.1, firmware 8.5(2), sw 12.2(18)SXF1
+!
+!Slot 5/0: type  Policy Feature Card 3      
+!Slot 5/0: part WS-F6K-PFC3B, serial SAL1432AAD8
+!Slot 5/0: hvers 2.2
+!
+!Slot 5/1: type  MSFC3 Daughterboard        
+!Slot 5/1: part WS-SUP720, serial SAL1432AAJA
+!Slot 5/1: hvers 1.2
+!
+!Slot 6: type Supervisor-Other, 0 ports
+!Slot 6: part Unknown, serial Unknown
+!Slot 6: hvers 0.0, firmware Unknown, sw Unknown
+!
+!Slot 7: type SFM-capable 48 port 10/100/1000mb RJ45, 48 ports
+!Slot 7: part WS-X6548-GE-TX, serial SAD082301MY
+!Slot 7: hvers 10.0, firmware 7.2(1), sw 8.5(0.46)RFW
+!
+!Slot 8: type SFM-capable 48 port 10/100/1000mb RJ45, 48 ports
+!Slot 8: part WS-X6548-GE-TX, serial SAL1429NCHU
+!Slot 8: hvers 11.3, firmware 7.2(1), sw 8.5(0.46)RFW
+!
+!NAME: "WS-C6509-E",            DESCR: "Cisco Systems, Inc. Catalyst 6500 9-slot Chassis System"
+!PID: WS-C6509-E
+!VID: V05
+!SN: SMC1538006R
+!NAME: "Backplane",             DESCR: "Cisco Systems, Inc. Catalyst 6500 9-slot backplane"
+!NAME: "Container of VTT 1",    DESCR: "Container of VTT"
+!NAME: "WS-C6K-VTT-E 1",        DESCR: "VTT-E FRU 1"
+!PID: WS-C6K-VTT-E
+!SN: SMT1530B241
+!NAME: "VTT 1 OK Sensor",       DESCR: "VTT-E FRU 1 OK Sensor"
+!NAME: "VTT 1 outlet temperature Sensor", DESCR: "VTT-E FRU 1 outlet temperature Sensor"
+!NAME: "Container of VTT 2",    DESCR: "Container of VTT"
+!NAME: "WS-C6K-VTT-E 2",        DESCR: "VTT-E FRU 2"
+!PID: WS-C6K-VTT-E
+!SN: SMT1530B378
+!NAME: "VTT 2 OK Sensor",       DESCR: "VTT-E FRU 2 OK Sensor"
+!NAME: "VTT 2 outlet temperature Sensor", DESCR: "VTT-E FRU 2 outlet temperature Sensor"
+!NAME: "Container of VTT 3",    DESCR: "Container of VTT"
+!NAME: "WS-C6K-VTT-E 3",        DESCR: "VTT-E FRU 3"
+!PID: WS-C6K-VTT-E
+!SN: SMT1530B370
+!NAME: "VTT 3 OK Sensor",       DESCR: "VTT-E FRU 3 OK Sensor"
+!NAME: "VTT 3 outlet temperature Sensor", DESCR: "VTT-E FRU 3 outlet temperature Sensor"
+!NAME: "Container of Clock 1",  DESCR: "Container of Clock"
+!NAME: "CLK-7600 1",            DESCR: "OSR-7600 Clock FRU 1"
+!PID: CLK-7600
+!SN: SMT1530A268
+!NAME: "Clock 1 OK Sensor",     DESCR: "OSR-7600 Clock FRU 1 OK Sensor"
+!NAME: "Clock 1 In Using Sensor", DESCR: "OSR-7600 Clock FRU 1 In Using Sensor"
+!NAME: "Container of Clock 2",  DESCR: "Container of Clock"
+!NAME: "CLK-7600 2",            DESCR: "OSR-7600 Clock FRU 2"
+!PID: CLK-7600
+!SN: SMT1530A268
+!NAME: "Clock 2 OK Sensor",     DESCR: "OSR-7600 Clock FRU 2 OK Sensor"
+!NAME: "Clock 2 In Using Sensor", DESCR: "OSR-7600 Clock FRU 2 In Using Sensor"
+!NAME: "Sensor for counting number of OK VTTs", DESCR: "Sensor for counting number of OK VTTs"
+!NAME: "Sensor for counting number of OK Clocks", DESCR: "Sensor for counting number of OK Clocks"
+!NAME: "PS 1 Absent High Power Usage Sensor", DESCR: "PS 1 Absent High Power Usage Sensor"
+!NAME: "Physical Slot 1",       DESCR: "Cisco Systems, Inc. Catalyst 6500 9-slot Physical Slot"
+!NAME: "Physical Slot 2",       DESCR: "Cisco Systems, Inc. Catalyst 6500 9-slot Physical Slot"
+!NAME: "2",                     DESCR: "WS-X6548-GE-45AF SFM-capable 48 port 10/100/1000mb RJ45 Rev. 12.6"
+!PID: WS-X6548-GE-45AF
+!VID: V06
+!SN: SAL14502A8Z
+!NAME: "Daughter Card Container 2", DESCR: "Daughter Card Container"
+!NAME: "sub-module of 2",       DESCR: "WS-F6K-48-AF IEEE Voice Daughter Card Rev. 2.5"
+!PID: WS-F6K-48-AF
+!VID: V04
+!SN: SAL1450204G
+!NAME: "module 2 VDB outlet temperature Sensor", DESCR: "module 2 VDB outlet temperature Sensor"
+!NAME: "module 2 VDB inlet temperature Sensor", DESCR: "module 2 VDB inlet temperature Sensor"
+!NAME: "module 2 VDB device-1 temperature Sensor", DESCR: "module 2 VDB device-1 temperature Sensor"
+!NAME: "module 2 power-output-fail Sensor", DESCR: "module 2 power-output-fail Sensor"
+!NAME: "module 2 insufficient cooling Sensor", DESCR: "module 2 insufficient cooling Sensor"
+!NAME: "module 2 outlet temperature Sensor", DESCR: "module 2 outlet temperature Sensor"
+!NAME: "module 2 inlet temperature Sensor", DESCR: "module 2 inlet temperature Sensor"
+!NAME: "module 2 device-1 temperature Sensor", DESCR: "module 2 device-1 temperature Sensor"
+!NAME: "module 2 device-2 temperature Sensor", DESCR: "module 2 device-2 temperature Sensor"
+!NAME: "Gi2/1",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/2",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/3",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/4",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/5",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/6",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/7",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/8",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/9",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/10",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/11",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/12",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/13",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/14",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/15",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/16",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/17",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/18",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/19",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/20",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/21",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/22",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/23",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/24",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/25",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/26",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/27",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/28",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/29",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/30",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/31",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/32",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/33",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/34",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/35",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/36",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/37",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/38",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/39",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/40",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/41",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/42",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/43",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/44",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/45",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/46",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/47",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi2/48",                DESCR: "10/100/1000BaseT"
+!NAME: "Physical Slot 3",       DESCR: "Cisco Systems, Inc. Catalyst 6500 9-slot Physical Slot"
+!NAME: "3",                     DESCR: "WS-X6548-GE-45AF SFM-capable 48 port 10/100/1000mb RJ45 Rev. 12.6"
+!PID: WS-X6548-GE-45AF
+!VID: V06
+!SN: SAL145132VZ
+!NAME: "Daughter Card Container 3", DESCR: "Daughter Card Container"
+!NAME: "sub-module of 3",       DESCR: "WS-F6K-48-AF IEEE Voice Daughter Card Rev. 2.5"
+!PID: WS-F6K-48-AF
+!VID: V04
+!SN: SAL14512WSJ
+!NAME: "module 3 VDB outlet temperature Sensor", DESCR: "module 3 VDB outlet temperature Sensor"
+!NAME: "module 3 VDB inlet temperature Sensor", DESCR: "module 3 VDB inlet temperature Sensor"
+!NAME: "module 3 VDB device-1 temperature Sensor", DESCR: "module 3 VDB device-1 temperature Sensor"
+!NAME: "module 3 power-output-fail Sensor", DESCR: "module 3 power-output-fail Sensor"
+!NAME: "module 3 insufficient cooling Sensor", DESCR: "module 3 insufficient cooling Sensor"
+!NAME: "module 3 outlet temperature Sensor", DESCR: "module 3 outlet temperature Sensor"
+!NAME: "module 3 inlet temperature Sensor", DESCR: "module 3 inlet temperature Sensor"
+!NAME: "module 3 device-1 temperature Sensor", DESCR: "module 3 device-1 temperature Sensor"
+!NAME: "module 3 device-2 temperature Sensor", DESCR: "module 3 device-2 temperature Sensor"
+!NAME: "Gi3/1",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/2",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/3",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/4",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/5",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/6",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/7",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/8",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/9",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/10",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/11",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/12",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/13",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/14",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/15",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/16",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/17",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/18",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/19",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/20",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/21",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/22",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/23",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/24",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/25",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/26",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/27",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/28",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/29",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/30",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/31",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/32",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/33",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/34",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/35",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/36",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/37",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/38",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/39",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/40",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/41",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/42",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/43",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/44",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/45",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/46",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/47",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi3/48",                DESCR: "10/100/1000BaseT"
+!NAME: "Physical Slot 4",       DESCR: "Cisco Systems, Inc. Catalyst 6500 9-slot Physical Slot"
+!NAME: "4",                     DESCR: "WS-X6548-GE-TX SFM-capable 48 port 10/100/1000mb RJ45 Rev. 11.3"
+!PID: WS-X6548-GE-TX
+!VID: V02
+!SN: SAL11413P1F
+!NAME: "module 4 power-output-fail Sensor", DESCR: "module 4 power-output-fail Sensor"
+!NAME: "module 4 insufficient cooling Sensor", DESCR: "module 4 insufficient cooling Sensor"
+!NAME: "module 4 outlet temperature Sensor", DESCR: "module 4 outlet temperature Sensor"
+!NAME: "module 4 inlet temperature Sensor", DESCR: "module 4 inlet temperature Sensor"
+!NAME: "module 4 device-1 temperature Sensor", DESCR: "module 4 device-1 temperature Sensor"
+!NAME: "module 4 device-2 temperature Sensor", DESCR: "module 4 device-2 temperature Sensor"
+!NAME: "Gi4/1",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/2",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/3",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/4",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/5",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/6",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/7",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/8",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/9",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/10",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/11",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/12",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/13",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/14",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/15",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/16",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/17",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/18",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/19",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/20",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/21",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/22",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/23",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/24",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/25",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/26",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/27",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/28",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/29",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/30",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/31",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/32",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/33",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/34",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/35",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/36",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/37",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/38",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/39",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/40",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/41",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/42",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/43",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/44",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/45",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/46",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/47",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi4/48",                DESCR: "10/100/1000BaseT"
+!NAME: "Physical Slot 5",       DESCR: "Cisco Systems, Inc. Catalyst 6500 9-slot Physical Slot"
+!NAME: "5",                     DESCR: "WS-SUP720-3B 2 ports Supervisor Engine 720 Rev. 3.1"
+!PID: WS-SUP720-3B
+!VID: V03
+!SN: SAL1432Q9Z7
+!NAME: "MSFC Container 5",      DESCR: "MSFC Container"
+!NAME: "msfc sub-module of 5",  DESCR: "WS-SUP720 MSFC3 Daughterboard Rev. 1.2"
+!PID: WS-SUP720
+!SN: SAL1432AAJA
+!NAME: "module 5 RP outlet temperature Sensor", DESCR: "module 5 RP outlet temperature Sensor"
+!NAME: "module 5 RP inlet temperature Sensor", DESCR: "module 5 RP inlet temperature Sensor"
+!NAME: "CPU of Routing Processor 5", DESCR: "CPU of Routing Processor"
+!NAME: "Switching Engine Container 5", DESCR: "Switching Engine Container"
+!NAME: "switching engine sub-module of 5", DESCR: "WS-F6K-PFC3B Policy Feature Card 3 Rev. 2.2"
+!PID: WS-F6K-PFC3B
+!VID: V01
+!SN: SAL1432AAD8
+!NAME: "module 5 EARL outlet temperature Sensor", DESCR: "module 5 EARL outlet temperature Sensor"
+!NAME: "module 5 EARL inlet temperature Sensor", DESCR: "module 5 EARL inlet temperature Sensor"
+!NAME: "Gigabit Port Container 5/1", DESCR: "Gigabit Port Container"
+!NAME: "Gi5/1",                 DESCR: "1000BaseSX"
+!SN: AGM14181AJL
+!NAME: "Gigabit Port Container 5/2", DESCR: "Gigabit Port Container"
+!NAME: "Gi5/2",                 DESCR: "1000BaseSX"
+!SN: AGM14021DSU
+!NAME: "module 5 power-output-fail Sensor", DESCR: "Supervisor module 5 power-output-fail Sensor"
+!NAME: "module 5 insufficient cooling Sensor", DESCR: "Supervisor module 5 insufficient cooling Sensor"
+!NAME: "module 5 fan-upgrade required Sensor", DESCR: "Supervisor module 5 fan-upgrade required Sensor"
+!NAME: "module 5 outlet temperature Sensor", DESCR: "Supervisor module 5 outlet temperature Sensor"
+!NAME: "module 5 inlet temperature Sensor", DESCR: "Supervisor module 5 inlet temperature Sensor"
+!NAME: "module 5 device-1 temperature Sensor", DESCR: "Supervisor module 5 device-1 temperature Sensor"
+!NAME: "module 5 device-2 temperature Sensor", DESCR: "Supervisor module 5 device-2 temperature Sensor"
+!NAME: "module 5 asic 1 temperature Sensor", DESCR: "Supervisor module 5 asic 1 temperature Sensor"
+!NAME: "module 5 asic 2 temperature Sensor", DESCR: "Supervisor module 5 asic 2 temperature Sensor"
+!NAME: "module 5 asic 3 temperature Sensor", DESCR: "Supervisor module 5 asic 3 temperature Sensor"
+!NAME: "module 5 asic 4 temperature Sensor", DESCR: "Supervisor module 5 asic 4 temperature Sensor"
+!NAME: "module 5 asic 5 temperature Sensor", DESCR: "Supervisor module 5 asic 5 temperature Sensor"
+!NAME: "module 5 asic 6 temperature Sensor", DESCR: "Supervisor module 5 asic 6 temperature Sensor"
+!NAME: "CPU of Switching Processor 5", DESCR: "CPU of Switching Processor"
+!NAME: "Gi5/2 10/100/1000BaseT", DESCR: "10/100/1000BaseT"
+!NAME: "Physical Slot 6",       DESCR: "Cisco Systems, Inc. Catalyst 6500 9-slot Physical Slot"
+!NAME: "6",                     DESCR: "WS-SUP720-3B 2 ports Supervisor Engine 720 Rev. 3.1"
+!PID: WS-SUP720-3B
+!VID: V03
+!SN: SAL1432Q9Z7
+!NAME: "Physical Slot 7",       DESCR: "Cisco Systems, Inc. Catalyst 6500 9-slot Physical Slot"
+!NAME: "7",                     DESCR: "WS-X6548-GE-TX SFM-capable 48 port 10/100/1000mb RJ45 Rev. 10.0"
+!PID: WS-X6548-GE-TX
+!SN: SAD082301MY
+!NAME: "module 7 power-output-fail Sensor", DESCR: "module 7 power-output-fail Sensor"
+!NAME: "module 7 insufficient cooling Sensor", DESCR: "module 7 insufficient cooling Sensor"
+!NAME: "module 7 outlet temperature Sensor", DESCR: "module 7 outlet temperature Sensor"
+!NAME: "module 7 inlet temperature Sensor", DESCR: "module 7 inlet temperature Sensor"
+!NAME: "module 7 device-1 temperature Sensor", DESCR: "module 7 device-1 temperature Sensor"
+!NAME: "module 7 device-2 temperature Sensor", DESCR: "module 7 device-2 temperature Sensor"
+!NAME: "Gi7/1",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/2",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/3",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/4",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/5",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/6",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/7",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/8",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/9",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/10",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/11",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/12",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/13",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/14",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/15",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/16",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/17",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/18",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/19",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/20",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/21",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/22",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/23",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/24",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/25",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/26",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/27",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/28",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/29",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/30",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/31",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/32",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/33",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/34",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/35",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/36",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/37",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/38",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/39",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/40",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/41",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/42",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/43",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/44",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/45",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/46",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/47",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi7/48",                DESCR: "10/100/1000BaseT"
+!NAME: "Physical Slot 8",       DESCR: "Cisco Systems, Inc. Catalyst 6500 9-slot Physical Slot"
+!NAME: "8",                     DESCR: "WS-X6548-GE-TX SFM-capable 48 port 10/100/1000mb RJ45 Rev. 11.3"
+!PID: WS-X6548-GE-TX
+!VID: V02
+!SN: SAL1429NCHU
+!NAME: "module 8 power-output-fail Sensor", DESCR: "module 8 power-output-fail Sensor"
+!NAME: "module 8 insufficient cooling Sensor", DESCR: "module 8 insufficient cooling Sensor"
+!NAME: "module 8 outlet temperature Sensor", DESCR: "module 8 outlet temperature Sensor"
+!NAME: "module 8 inlet temperature Sensor", DESCR: "module 8 inlet temperature Sensor"
+!NAME: "module 8 device-1 temperature Sensor", DESCR: "module 8 device-1 temperature Sensor"
+!NAME: "module 8 device-2 temperature Sensor", DESCR: "module 8 device-2 temperature Sensor"
+!NAME: "Gi8/1",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/2",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/3",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/4",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/5",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/6",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/7",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/8",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/9",                 DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/10",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/11",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/12",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/13",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/14",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/15",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/16",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/17",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/18",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/19",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/20",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/21",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/22",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/23",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/24",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/25",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/26",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/27",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/28",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/29",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/30",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/31",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/32",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/33",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/34",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/35",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/36",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/37",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/38",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/39",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/40",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/41",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/42",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/43",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/44",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/45",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/46",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/47",                DESCR: "10/100/1000BaseT"
+!NAME: "Gi8/48",                DESCR: "10/100/1000BaseT"
+!NAME: "Physical Slot 9",       DESCR: "Cisco Systems, Inc. Catalyst 6500 9-slot Physical Slot"
+!NAME: "Container of Fan FRU 1", DESCR: "Container of Fan FRU"
+!NAME: "WS-C6509-E-FAN 1",      DESCR: "Enhanced 9-slot Fan Tray 1"
+!PID: WS-C6509-E-FAN
+!VID: V04
+!SN: DCH1533014M
+!NAME: "Fan-tray 1 Status Sensor", DESCR: "Enhanced 9-slot Fan Tray 1 Status Sensor"
+!NAME: "Container of Container of Power Supply", DESCR: "Container of Container of Power Supply"
+!NAME: "Container of Power Supply 1", DESCR: "Container of Power Supply"
+!NAME: "PS 1 WS-CAC-3000W",     DESCR: "AC power supply, 3000 watt 1"
+!PID: WS-CAC-3000W
+!VID: V02
+!SN: AZS15160BWQ
+!NAME: "power-supply 1 fan-fail Sensor", DESCR: "power-supply 1 fan-fail Sensor"
+!NAME: "power-supply 1 power-output-fail Sensor", DESCR: "power-supply 1 power-output-fail Sensor"
+!NAME: "power-supply 1 incompatible with fan Sensor", DESCR: "power-supply 1 incompatible with fan Sensor"
+!NAME: "power-supply 1 power-output-mode Sensor", DESCR: "power-supply 1 power-output-mode Sensor"
+!NAME: "power-supply 1 power-input Sensor", DESCR: "power-supply 1 power-input Sensor"
+!NAME: "Container of Power Supply 2", DESCR: "Container of Power Supply"
+!NAME: "PS 2 WS-CAC-3000W",     DESCR: "AC power supply, 3000 watt 2"
+!PID: WS-CAC-3000W
+!VID: V02
+!SN: AZS15160BWW
+!NAME: "power-supply 2 fan-fail Sensor", DESCR: "power-supply 2 fan-fail Sensor"
+!NAME: "power-supply 2 power-output-fail Sensor", DESCR: "power-supply 2 power-output-fail Sensor"
+!NAME: "power-supply 2 incompatible with fan Sensor", DESCR: "power-supply 2 incompatible with fan Sensor"
+!NAME: "power-supply 2 power-output-mode Sensor", DESCR: "power-supply 2 power-output-mode Sensor"
+!NAME: "power-supply 2 power-input Sensor", DESCR: "power-supply 2 power-input Sensor"
+!
+!VTP: VTP Version                     : 2
+!VTP: Configuration Revision          : 0
+!VTP: Maximum VLANs supported locally : 1005
+!VTP: Number of existing VLANs        : 10
+!VTP: VTP Operating Mode              : Transparent
+!VTP: VTP Domain Name                 : gnmedia
+!VTP: VTP Pruning Mode                : Enabled
+!VTP: VTP V2 Mode                     : Enabled
+!VTP: VTP Traps Generation            : Enabled
+!VTP: MD5 digest                      : 0x56 0xCD 0x0B 0xF2 0x94 0x7F 0x39 0x25 
+!
+!VLAN: VLAN Name                             Status    Ports
+!VLAN: ---- -------------------------------- --------- -------------------------------
+!VLAN: 1    default                          active    Gi4/48
+!VLAN: 12   computers                        active    Gi2/14, Gi3/29, Gi3/30, Gi3/31
+!VLAN:                                                 Gi3/32, Gi3/33, Gi3/34, Gi3/35
+!VLAN:                                                 Gi3/36, Gi3/37, Gi3/38, Gi3/39
+!VLAN:                                                 Gi3/40, Gi3/41, Gi3/42, Gi3/43
+!VLAN:                                                 Gi3/44, Gi3/45, Gi3/46, Gi3/47
+!VLAN:                                                 Gi3/48, Gi4/1, Gi4/2, Gi4/3
+!VLAN:                                                 Gi4/4, Gi4/5, Gi4/6, Gi4/7
+!VLAN:                                                 Gi4/8, Gi4/9, Gi4/10, Gi4/11
+!VLAN:                                                 Gi4/12, Gi4/13, Gi4/14, Gi4/15
+!VLAN:                                                 Gi4/16, Gi4/17, Gi4/18, Gi4/19
+!VLAN:                                                 Gi4/20, Gi4/21, Gi4/22, Gi4/23
+!VLAN:                                                 Gi4/24, Gi4/25, Gi4/26, Gi4/27
+!VLAN:                                                 Gi4/29, Gi4/30, Gi4/31, Gi4/32
+!VLAN:                                                 Gi4/33, Gi4/34, Gi4/35, Gi4/36
+!VLAN:                                                 Gi4/37, Gi4/38, Gi4/39, Gi4/40
+!VLAN:                                                 Gi4/41, Gi4/42, Gi4/43, Gi4/44
+!VLAN:                                                 Gi4/45, Gi7/1, Gi7/2, Gi7/3
+!VLAN:                                                 Gi7/4, Gi7/5, Gi7/6, Gi7/7
+!VLAN:                                                 Gi7/8, Gi7/9, Gi7/10, Gi7/11
+!VLAN:                                                 Gi7/12, Gi7/13, Gi7/14, Gi7/15
+!VLAN:                                                 Gi7/16, Gi7/17, Gi7/18, Gi7/19
+!VLAN:                                                 Gi7/20, Gi7/21, Gi7/22, Gi7/23
+!VLAN:                                                 Gi7/24, Gi7/25, Gi7/26, Gi7/27
+!VLAN:                                                 Gi7/28, Gi7/29, Gi7/30, Gi7/31
+!VLAN:                                                 Gi7/32, Gi7/33, Gi7/34, Gi7/35
+!VLAN:                                                 Gi7/36, Gi7/37, Gi7/38, Gi7/39
+!VLAN:                                                 Gi7/40, Gi7/41, Gi7/42, Gi7/43
+!VLAN:                                                 Gi7/44, Gi7/45, Gi7/46, Gi7/47
+!VLAN:                                                 Gi8/1, Gi8/2, Gi8/3, Gi8/4
+!VLAN:                                                 Gi8/5, Gi8/6, Gi8/7, Gi8/8
+!VLAN:                                                 Gi8/9, Gi8/10, Gi8/11, Gi8/12
+!VLAN:                                                 Gi8/13, Gi8/14, Gi8/15, Gi8/16
+!VLAN:                                                 Gi8/17, Gi8/18, Gi8/19, Gi8/20
+!VLAN:                                                 Gi8/21, Gi8/22, Gi8/23, Gi8/24
+!VLAN: 13   VLAN0013                         active    Gi8/40, Gi8/41, Gi8/42, Gi8/43
+!VLAN:                                                 Gi8/44, Gi8/45, Gi8/46, Gi8/47
+!VLAN:                                                 Gi8/48
+!VLAN: 60   tet                              active    
+!VLAN: 112  wireless                         active    Gi2/1, Gi2/2, Gi2/3, Gi2/4
+!VLAN:                                                 Gi2/5, Gi2/6, Gi2/7, Gi2/8
+!VLAN:                                                 Gi2/9, Gi2/10, Gi2/11, Gi2/12
+!VLAN:                                                 Gi2/13, Gi2/15, Gi2/16, Gi2/17
+!VLAN:                                                 Gi2/18, Gi2/19, Gi2/20, Gi2/21
+!VLAN:                                                 Gi2/22, Gi2/23, Gi2/24, Gi2/25
+!VLAN:                                                 Gi2/26, Gi2/27, Gi2/28, Gi2/29
+!VLAN:                                                 Gi2/30, Gi2/31, Gi2/32, Gi2/33
+!VLAN:                                                 Gi2/34, Gi2/35, Gi2/36, Gi2/37
+!VLAN:                                                 Gi2/38, Gi2/39, Gi2/40, Gi2/41
+!VLAN:                                                 Gi2/42, Gi2/43, Gi2/44, Gi2/45
+!VLAN:                                                 Gi2/46, Gi2/47, Gi2/48, Gi3/1
+!VLAN:                                                 Gi3/2, Gi3/3, Gi3/4, Gi3/5
+!VLAN:                                                 Gi3/6, Gi3/7, Gi3/8, Gi3/9
+!VLAN:                                                 Gi3/10, Gi3/11, Gi3/12, Gi3/13
+!VLAN:                                                 Gi3/14, Gi3/15, Gi3/16, Gi3/17
+!VLAN:                                                 Gi3/18, Gi3/19, Gi3/20, Gi3/21
+!VLAN:                                                 Gi3/22, Gi3/23, Gi3/24, Gi3/25
+!VLAN:                                                 Gi3/26, Gi3/27, Gi3/28, Gi4/28
+!VLAN:                                                 Gi8/25, Gi8/26, Gi8/27, Gi8/28
+!VLAN:                                                 Gi8/29, Gi8/30, Gi8/31, Gi8/32
+!VLAN:                                                 Gi8/33, Gi8/34, Gi8/35, Gi8/36
+!VLAN: 212  VPN                              active    Gi7/48
+!VLAN: 1002 fddi-default                     act/unsup 
+!VLAN: 1003 trcrf-default                    act/unsup 
+!VLAN: 1004 fddinet-default                  act/unsup 
+!VLAN: 1005 trbrf-default                    act/unsup 
+!VLAN: VLAN Type  SAID       MTU   Parent RingNo BridgeNo Stp  BrdgMode Trans1 Trans2
+!VLAN: ---- ----- ---------- ----- ------ ------ -------- ---- -------- ------ ------
+!VLAN: 1    enet  100001     1500  -      -      -        -    -        0      0   
+!VLAN: 12   enet  100012     1500  -      -      -        -    -        0      0   
+!VLAN: 13   enet  100013     1500  -      -      -        -    -        0      0   
+!VLAN: 60   enet  100060     1500  -      -      -        -    -        0      0   
+!VLAN: 112  enet  100112     1500  -      -      -        -    -        0      0   
+!VLAN: 212  enet  100212     1500  -      -      -        -    -        0      0   
+!VLAN: 1002 fddi  101002     1500  -      -      -        -    -        0      0   
+!VLAN: 1003 trcrf 101003     4472  1005   3276   -        -    srb      0      0   
+!VLAN: 1004 fdnet 101004     1500  -      -      -        ieee -        0      0   
+!VLAN: 1005 trbrf 101005     4472  -      -      15       ibm  -        0      0   
+!VLAN: VLAN AREHops STEHops Backup CRF
+!VLAN: ---- ------- ------- ----------
+!VLAN: 1003 7       7       off
+!VLAN: Remote SPAN VLANs
+!VLAN: ------------------------------------------------------------------------------
+!VLAN: Primary Secondary Type              Ports
+!VLAN: ------- --------- ----------------- ------------------------------------------
+!
+!
+config-register 0x2102
+!
+upgrade fpd auto
+version 12.2
+service timestamps debug datetime msec
+service timestamps log datetime msec
+service password-encryption
+service counters max age 5
+!
+hostname EVHOCORE01
+!
+boot system flash sup-bootdisk:s72033-ipservicesk9_wan-mz.122-18.SXF17b.bin
+boot system flash sup-bootdisk:s72033-ipservices_wan-mz.122-18.SXF13.bin
+boot system flash slavesup-bootdisk:s72033-ipservicesk9_wan-mz.122-18.SXF17b.bin
+no logging console
+enable secret 5 $1$8vyd$7QsKEtsjx9XqsHBnjDthh0
+!enable password <removed>
+!
+!username cisco password <removed>
+!username rancid password <removed>
+no aaa new-model
+clock timezone GMT 0
+clock calendar-valid
+ip subnet-zero
+!
+ip flow-cache timeout active 1
+ip domain-name gorillanation.local
+vtp domain gnmedia
+vtp mode transparent
+mls ip multicast flow-stat-timer 9
+no mls flow ip
+no mls flow ipv6
+no mls acl tcam share-global
+mls cef error action freeze
+!
+redundancy
+ mode rpr
+ main-cpu
+  auto-sync running-config
+!
+spanning-tree mode rapid-pvst
+spanning-tree loopguard default
+spanning-tree extend system-id
+!
+power redundancy-mode combined
+diagnostic bootup level minimal
+diagnostic cns publish cisco.cns.device.diag_results
+diagnostic cns subscribe cisco.cns.device.diag_commands
+errdisable recovery cause link-flap
+errdisable recovery interval 60
+fabric timer 15
+!
+vlan internal allocation policy ascending
+vlan access-log ratelimit 2000
+!
+vlan 12
+ name computers
+!
+vlan 13 
+!
+vlan 60
+ name tet
+!
+vlan 112
+ name wireless
+!
+vlan 212
+ name VPN
+!
+class-map match-all P2P
+  match protocol fasttrack
+  match protocol gnutella
+  match protocol edonkey
+  match protocol kazaa2
+  match protocol napster
+  match protocol winmx
+!
+interface GigabitEthernet2/1
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/2
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/3
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/4
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/5
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/6
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/7
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/8
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/9
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/10
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/11
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/12
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/13
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/14
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/15
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/16
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/17
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/18
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/19
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/20
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/21
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/22
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/23
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/24
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/25
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/26
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/27
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/28
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/29
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/30
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/31
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/32
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/33
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/34
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/35
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/36
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/37
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/38
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/39
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/40
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/41
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/42
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/43
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/44
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/45
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/46
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet2/47
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+ shutdown
+!
+interface GigabitEthernet2/48
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/1
+ description AP UNITS
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/2
+ description AP UNITS
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/3
+ description AP UNITS
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/4
+ description AP UNITS
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/5
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/6
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/7
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/8
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/9
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/10
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/11
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/12
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/13
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/14
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/15
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/16
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/17
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/18
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/19
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/20
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/21
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/22
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/23
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/24
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/25
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/26
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/27
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/28
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/29
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/30
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/31
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/32
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/33
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/34
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/35
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/36
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/37
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/38
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/39
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/40
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/41
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/42
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/43
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/44
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/45
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/46
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/47
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet3/48
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/1
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+ shutdown
+!
+interface GigabitEthernet4/2
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/3
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/4
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/5
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/6
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/7
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/8
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/9
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/10
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/11
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/12
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/13
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/14
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/15
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/16
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/17
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/18
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/19
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/20
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/21
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/22
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/23
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/24
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/25
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/26
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/27
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/28
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/29
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/30
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/31
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/32
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/33
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/34
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/35
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/36
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/37
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/38
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/39
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/40
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/41
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/42
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/43
+ description PRINTER
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/44
+ description EVHODC01
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/45
+ description EVHOESX01
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet4/46
+ description WLC
+ switchport
+ switchport trunk native vlan 12
+ switchport trunk allowed vlan 12,112
+ switchport mode trunk
+ switchport nonegotiate
+ no ip address
+!
+interface GigabitEthernet4/47
+ description MPLS UPLINK
+ switchport
+ switchport trunk native vlan 12
+ switchport trunk allowed vlan 12,112
+ switchport mode trunk
+ switchport nonegotiate
+ no ip address
+!
+interface GigabitEthernet4/48
+ description ASA UPLINK
+ switchport
+ switchport trunk native vlan 12
+ switchport trunk allowed vlan 12,112
+ switchport mode trunk
+ switchport nonegotiate
+ no ip address
+!
+interface GigabitEthernet5/1
+ no ip address
+ shutdown
+!
+interface GigabitEthernet5/2
+ no ip address
+ shutdown
+!
+interface GigabitEthernet6/1
+ no ip address
+ shutdown
+!
+interface GigabitEthernet6/2
+ no ip address
+ shutdown
+!
+interface GigabitEthernet7/1
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/2
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/3
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/4
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/5
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/6
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/7
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/8
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/9
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/10
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/11
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/12
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/13
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/14
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/15
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/16
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/17
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/18
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/19
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/20
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/21
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/22
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/23
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/24
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/25
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/26
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/27
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/28
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/29
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/30
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/31
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/32
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/33
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/34
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/35
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/36
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/37
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/38
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/39
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/40
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/41
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/42
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/43
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/44
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/45
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/46
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/47
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet7/48
+ switchport
+ switchport access vlan 212
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/1
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/2
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/3
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/4
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/5
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/6
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/7
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/8
+ description EVHOESX01
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/9
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/10
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/11
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/12
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/13
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/14
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/15
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/16
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/17
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/18
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/19
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/20
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/21
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/22
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/23
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/24
+ switchport
+ switchport access vlan 12
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/25
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/26
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/27
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/28
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/29
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/30
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/31
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/32
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/33
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/34
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/35
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/36
+ switchport
+ switchport access vlan 112
+ switchport mode access
+ no ip address
+!
+interface GigabitEthernet8/37
+ no ip address
+ shutdown
+!
+interface GigabitEthernet8/38
+ no ip address
+ shutdown
+!
+interface GigabitEthernet8/39
+ no ip address
+ shutdown
+!
+interface GigabitEthernet8/40
+ description DSL_Interent_Int
+ switchport
+ switchport access vlan 13
+ no ip address
+!
+interface GigabitEthernet8/41
+ description backup_network
+ switchport
+ switchport access vlan 13
+ no ip address
+!
+interface GigabitEthernet8/42
+ description backup_network
+ switchport
+ switchport access vlan 13
+ no ip address
+!
+interface GigabitEthernet8/43
+ description backup_network
+ switchport
+ switchport access vlan 13
+ no ip address
+!
+interface GigabitEthernet8/44
+ description backup_network
+ switchport
+ switchport access vlan 13
+ no ip address
+!
+interface GigabitEthernet8/45
+ description backup_network
+ switchport
+ switchport access vlan 13
+ no ip address
+!
+interface GigabitEthernet8/46
+ description backup_network
+ switchport
+ switchport access vlan 13
+ no ip address
+!
+interface GigabitEthernet8/47
+ description backup_network
+ switchport
+ switchport access vlan 13
+ no ip address
+!
+interface GigabitEthernet8/48
+ description backup_network
+ switchport
+ switchport access vlan 13
+ no ip address
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan12
+ description IT_and_Servers
+ ip address 192.168.12.1 255.255.255.0
+ ip helper-address 192.168.12.10
+ ip flow ingress
+ ip route-cache flow
+!
+interface Vlan13
+ description IT_backup_Net
+ ip address 192.168.13.254 255.255.255.0
+ ip helper-address 192.168.13.1
+!
+interface Vlan60
+ ip address 192.168.60.1 255.255.255.0
+!
+interface Vlan112
+ description Wireless
+ ip address 192.168.112.1 255.255.255.0
+ ip helper-address 192.168.12.10
+ ip flow ingress
+!
+interface Vlan212
+ description Wireless
+ ip address 192.168.212.1 255.255.255.0
+ ip flow ingress
+!
+ip classless
+ip route 0.0.0.0 0.0.0.0 192.168.12.254
+!
+ip flow-export source Vlan12
+ip flow-export version 5
+ip flow-export destination 192.168.1.178 2055
+no ip http server
+!
+!snmp-server community <removed> RO
+!snmp-server community <removed> RW
+snmp-server ifindex persist
+snmp-server location HMO_Core
+snmp-server contact sysadmins@gorillanation.com
+snmp-server enable traps snmp authentication linkdown linkup coldstart warmstart
+snmp-server enable traps chassis
+snmp-server enable traps module
+snmp-server enable traps transceiver all
+snmp-server enable traps casa
+snmp-server enable traps tty
+snmp-server enable traps ospf state-change
+snmp-server enable traps ospf errors
+snmp-server enable traps ospf retransmit
+snmp-server enable traps ospf lsa
+snmp-server enable traps ospf cisco-specific state-change nssa-trans-change
+snmp-server enable traps ospf cisco-specific errors
+snmp-server enable traps ospf cisco-specific retransmit
+snmp-server enable traps ospf cisco-specific lsa
+snmp-server enable traps bgp
+snmp-server enable traps config-copy
+snmp-server enable traps config
+snmp-server enable traps event-manager
+snmp-server enable traps frame-relay
+snmp-server enable traps hsrp
+snmp-server enable traps ipmulticast
+snmp-server enable traps MAC-Notification move threshold
+snmp-server enable traps msdp
+snmp-server enable traps pim neighbor-change rp-mapping-change invalid-pim-message
+snmp-server enable traps rf
+snmp-server enable traps rtr
+snmp-server enable traps slb real virtual csrp
+snmp-server enable traps bridge newroot topologychange
+snmp-server enable traps stpx inconsistency root-inconsistency loop-inconsistency
+snmp-server enable traps syslog
+snmp-server enable traps flex-links status
+snmp-server enable traps sonet
+snmp-server enable traps dial
+snmp-server enable traps entity
+snmp-server enable traps rsvp
+snmp-server enable traps csg agent quota database
+snmp-server enable traps srp
+snmp-server enable traps vtp
+snmp-server enable traps vlancreate
+snmp-server enable traps vlandelete
+snmp-server enable traps flash insertion removal
+snmp-server enable traps c6kxbar intbus-crcexcd intbus-crcrcvrd swbus
+snmp-server enable traps envmon fan shutdown supply temperature status
+snmp-server enable traps port-security
+snmp-server enable traps vlan-mac-limit
+!snmp-server host 192.168.1.54 inform version 2c <removed> 
+!snmp-server host 192.168.1.54 <removed> tty bgp
+!snmp-server host 192.168.1.54 version 2c <removed> 
+!snmp-server host 192.168.1.178 inform version 2c <removed> 
+!snmp-server host 192.168.1.178 <removed> 
+!
+control-plane
+!
+dial-peer cor custom
+!
+line con 0
+ logging synchronous
+line vty 0 4
+ exec-timeout 30 0
+ logging synchronous
+ login local
+ transport input ssh
+line vty 5 15
+ logging synchronous
+ login local
+!
+ntp update-calendar
+ntp server 164.67.62.194
+ntp server 192.168.1.10
+ntp server 198.123.30.132
+no cns aaa enable
+end

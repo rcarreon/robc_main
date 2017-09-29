@@ -1,0 +1,108 @@
+#!/bin/bash
+#Modified for GIT
+
+usage() {
+   echo "Usage: $0 domain"
+   echo "       --test: will display the git diff and not commit"
+   echo "       --commit: will commit the git diff without prompting"
+   echo "       --batch dir: operate on existing git checkout without commit"
+   exit 1
+}
+
+commit=ask
+batch=no
+while
+case "$1" in
+   --commit) commit=yes;;
+   --test) commit=no;;
+   --batch) batch=$2;shift;;
+   --*) echo "unknown option";usage;;
+   *) false;;
+esac;do shift;done
+
+domain=$1
+
+if [ -z "$domain" ];then
+  usage
+fi
+if [ "$batch" != no -a ! -d "$batch" ];then
+   echo "--batch takes a directory"
+   usage
+fi
+
+: ${PAGER:=less}
+if [ "$batch" == no ];then
+   tmpdir=/tmp/dnsnewzone.$$.$RANDOM
+   rm -rf $tmpdir
+   mkdir  $tmpdir
+   cd $tmpdir
+#   svn co https://svn.gnmedia.net/sysadmins/trunk/dns>/dev/null || exit 1
+   git clone git@bitbucket.org:/evolvemediallc/tp_dns dns>/dev/null || exit 1
+   cd dns || exit 1
+else
+   cd $batch
+fi
+
+if [ ! -d zones ];then
+   echo "Wrong directory (looking for zones)"
+   exit 1
+fi
+
+
+   hostzonefile=$domain.hosts
+
+   if [ -f zones/external/$hostzonefile -o -f zones/internal/$hostzonefile ];then
+      echo zones/*/$hostzonefile "already exists"
+      exit 1
+   fi
+   if [ ! -f zones/$hostzonefile ];then
+      cp hostzonetemplate zones/$hostzonefile
+#      svn add zones/$hostzonefile
+      git add zones/$hostzonefile
+      dnsupdateserial zones/$hostzonefile
+   fi
+   
+   sed -i -e "s/HOSTZONENAME/$domain/g" -e "s/HOSTZONEFILE/$hostzonefile/"  zones/$hostzonefile
+
+
+
+if [ "$batch" != no ];then
+   exit 0
+fi
+
+continue() {
+   read -p "${1:-Continue?} [Y/n] " reply
+   if test -z "$reply" -o "${reply:0:1}" = Y -o "${reply:0:1}" = y ; then
+      return 0
+   else
+      return 1
+   fi
+}
+
+if [ "$commit" = "ask" ];then
+   read -p "Please confirm DNS changes (enter to view in $PAGER)... "
+   git diff | $PAGER
+   if continue "Commit changes?" ;then
+      git add .
+      git commit -m "Adding $domain"
+      git push
+      /usr/local/bin/r53newzone $domain
+   else
+      echo "Dropping to a shell..."
+      echo "You can edit, svn commit, and exit when you are done..."
+      (export PS1="dnsnewzone> "
+      pwd
+      $SHELL)
+   fi
+elif [ "$commit" = "yes" ];then
+   git add .
+   git commit -m "Adding $domain"
+   git push
+   /usr/local/bin/r53newzone $domain
+else
+   git diff
+   echo "Changes were not committed."
+fi
+cd
+rm -rf $tmpdir
+

@@ -1,0 +1,87 @@
+#!/bin/bash
+
+   fqdn=$1
+
+if [ -z "$fqdn" ];then
+   echo "Usage: $0 FQDN" 1>&2
+   exit 1
+fi
+
+# test for fd3
+echo TEST 2>/dev/null 1>&3 || exec 3>&1
+
+puppetgiturl=git@git.gnmedia.net:
+
+tmpdir=/tmp/automycnf.$$.$RANDOM
+rm -rf $tmpdir
+mkdir  $tmpdir
+cd $tmpdir
+
+
+# Come up with a template name, sets $mycnftype and $mycnftmpl
+mycnftmpl=$(echo $fqdn | sed -e 's/.gnmedia.net//' -e 's/^[^-]*-//')
+echo "Please choose a template: " 1>&3
+echo "  1) $mycnftmpl-master" 1>&3
+echo "  2) $mycnftmpl-slave" 1>&3
+echo "  3) $mycnftmpl-standalone" 1>&3
+response=""
+while [ "$response" == "" ];do
+   read -p " 1/2/3: " response
+   case $response in
+     1) mycnftype=master; mycnftmpl=$mycnftmpl-master;;
+     2) mycnftype=slave;  mycnftmpl=$mycnftmpl-slave;;
+     3) mycnftype=standalone; mycnftmpl=$mycnftmpl-standalone;;
+     *) response="";;
+   esac
+done
+
+
+   # Get a list of mysqld template directories to ask the user
+   git clone $puppetgiturl/puppet-templates $tmpdir/puppet-templates 1>&3
+   declare -a myversions
+   myversions=( $(cd $tmpdir/puppet-templates; git ls-tree -d HEAD mysqld/ | awk '{print $NF}' | sed 's/mysqld\///g') )
+   echo "Please choose a mysql version: " 1>&3
+   for a in $(eval echo {1..${#myversions[@]}}); do
+      echo "  $a)" ${myversions[$a-1]} 1>&3
+   done
+   response=""
+   while [ "$response" == "" ];do
+      read -p " X: " response
+      if [ -n ${myversions[$response-1]} ];then
+         mysqlversion=${myversions[$response-1]}
+      else
+         response="";
+      fi
+   done
+
+   mycnfpath=$tmpdir/puppet-templates/mysqld/$mysqlversion/my.cnf-$mycnftmpl.erb
+   if ! [[ -f $mycnfpath ]]; then
+      echo "$mycnfpath does not exist... creating..." 1>&3
+
+      case $mysqlversion in
+         5527)
+      git archive --format=zip --remote=git@git.gnmedia.net:/puppet-modules HEAD:mysqld/templates/${mysqlversion} my.cnf-${mysqlversion}-default-${mycnftype}.erb | gunzip 2>/dev/null > ${mycnfpath}
+             ;;
+         *)
+      git archive --format=zip --remote=git@git.gnmedia.net:/puppet-modules HEAD:mysqld${mysqlversion}/templates my.cnf-${mysqlversion}-default-${mycnftype}.erb | gunzip 2>/dev/null > ${mycnfpath}
+             ;;
+      esac
+
+
+      cd $tmpdir/puppet-templates
+      git add $mycnfpath 1>&3
+      git config user.name `whoami` 1>&3
+      git commit -m "Initial my.cnf template from default $mycnftype template" 1>&3
+      git push 1>&3
+      cd - 1>&3
+   fi
+
+echo "This line goes in your manifest:" 1>&3
+case $mysqlversion in
+   5527) echo "mysqld::server::v${mysqlversion}::install {\"$mycnftmpl\":}" ;;
+   *) echo "class {\"mysqld${mysqlversion}\": template=>\"$mycnftmpl\"}" ;;
+esac
+
+cd
+rm -rf $tmpdir
+                                                               

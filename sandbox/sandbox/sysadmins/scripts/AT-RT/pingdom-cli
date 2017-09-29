@@ -1,0 +1,240 @@
+#!/usr/bin/python
+
+import os
+import re
+import sys
+import pingdom
+try:
+    import simplejson as json
+except ImportError:
+    import json
+
+# Default Pingdom credentials
+PINGDOM_USERNAME = 'username'
+PINGDOM_PASSWORD = 'password'
+PINGDOM_APPKEY = 'appkey'
+
+# JSON file with Pingdom credentials
+PINGDOM_AUTHFILE = 'auth.json'
+
+def auth():
+    global PINGDOM_USERNAME
+    global PINGDOM_PASSWORD
+    global PINGDOM_APPKEY
+    if os.path.exists(PINGDOM_AUTHFILE):
+        auth_data = json.loads(open(PINGDOM_AUTHFILE).read())
+        PINGDOM_USERNAME = auth_data['PINGDOM_USERNAME']
+        PINGDOM_PASSWORD = auth_data['PINGDOM_PASSWORD']
+        PINGDOM_APPKEY = auth_data['PINGDOM_APPKEY']
+    try:
+        return pingdom.Pingdom(username=PINGDOM_USERNAME, password=PINGDOM_PASSWORD, appkey=PINGDOM_APPKEY)
+    except Exception, err:
+        sys.stderr.write(str(err)+"\n")
+        sys.exit(1)
+
+
+def validate_id(ident):
+    ident = str(ident)
+    matchObj = re.match(r"^\d+$", ident)
+
+    if matchObj:
+        return True
+    else:
+        print "Invalid id: %s" % ident
+        return False
+
+
+def get_check_id(name):
+    try:
+        check = pingdom_connection.check_by_name(name)
+    except Exception, err:
+        sys.stderr.write(str(err)+"\n")
+        print err.read()
+        sys.exit(1)
+
+    if len(check) != 0:
+        return check[0]['id']
+    else:
+        print "%s check not found" % name
+        return None
+
+
+def usage():
+    print "usage: %s COMMAND CHECK_NAME [PARAMS]\n" % sys.argv[0]
+    print "    Commands:"
+    print "        add          - add a check"
+    print "        delete       - delete a check by name"
+    print "        info         - get JSON dump of check info"
+    print "        modify       - modify a check"
+    print "        modifyheader - modify a custom header"
+    print "        listnames    - list all check names"
+    print "        listcontacts - list all contacts"
+    print "        listids      - list all check ids"
+    print "        listsites    - list all HTTP checks"
+    print "        credits      - return info on remaining checks and credits"
+    print ""
+
+
+def pingdom_api_call(command, method, params=None):
+    if params != None and not(isinstance(params, dict)):
+        try:
+            params = json.loads(str(params))
+        except ValueError, err:
+            err_msg = str(err) + ": %s\n" % params
+            sys.stderr.write(err_msg)
+            sys.exit(1)
+        
+    try:
+        res = pingdom_connection.method(command, method, params)
+        return res
+    except Exception, err:
+        sys.stderr.write(str(err)+"\n")
+        print err.read()
+        sys.exit(1)
+
+
+def get_credits():
+    res = pingdom_api_call('credits', 'GET')
+    print json.dumps(res, sort_keys=True, indent=4)
+
+
+def list_check_names():
+    checks = pingdom_api_call("checks", "GET")
+    for check in checks['checks']:
+        print check['name']
+
+
+def list_sites():
+    checks = pingdom_api_call("checks", "GET")
+    for check in checks['checks']:
+        if check['type'] == "http":
+            print check['name']
+
+
+def list_check_ids():
+    checks = pingdom_api_call("checks", "GET")
+    for check in checks['checks']:
+        print check['id']
+
+
+def list_contacts():
+    contacts = pingdom_api_call("contacts", "GET")
+    for contact in contacts['contacts']:
+        print "%s: %s" % (contact['id'], contact['name'])
+
+def add_site_check(site_name, params=None):
+    matchObj = re.match(r"^[\w.-]+$", site_name)
+
+    if params == None:
+        params = {"name": site_name,
+                  "host": site_name,
+                  "type": "http",
+                  "resolution": 1,
+                  "sendtoemail": True,
+                  "sendtosms": True,
+                  "sendnotificationwhendown": 2,
+                  "notifyagainevery": 120}
+
+    if matchObj:
+        print "Adding %s" % site_name
+        print pingdom_api_call("checks", "POST", params)
+    else:
+        print "Invalid site name: %s" % site_name
+
+
+def delete_check(check_id):
+    check_id = str(check_id)
+
+    if validate_id(check_id):
+        print "Deleting check %s" % check_id
+        print pingdom_api_call("checks/" + check_id, "DELETE")
+
+
+def delete_site_check(site_name):
+    check_id = get_check_id(site_name)
+    if check_id != None:
+        delete_check(check_id)
+
+
+def check_info(check_id):
+    check_id = str(check_id)
+
+    if validate_id(check_id):
+        res = pingdom_api_call("checks/" + check_id, "GET")
+        print json.dumps(res, sort_keys=True, indent=4)
+
+
+def get_site_check_info(site_name):
+    check_id = get_check_id(site_name)
+    if check_id != None:
+        check_info(check_id)
+
+
+
+def modify_custom_header(check_id, params):
+    check_id = str(check_id)
+    print pingdom_api_call("checks/" + check_id, "PUT", params)
+
+
+def modify_header(site_name, params):
+    check_id = get_check_id(site_name)
+    if check_id != None:
+       modify_custom_header(check_id, params)
+
+
+def modify_check(check_id, params=None):
+    check_id = str(check_id)
+    if params != None:
+        try:
+            params = json.loads(str(params))
+        except ValueError, err:
+            err_msg = str(err) + ": %s" % params
+            sys.stderr.write(err_msg)
+            sys.exit(1)
+
+    if validate_id(check_id):
+        res = pingdom_api_call("checks/" + check_id, "PUT", params)
+        print res
+
+
+def modify_site_check(site_name, params=None):
+    check_id = get_check_id(site_name)
+    if check_id != None:
+        modify_check(check_id, params)
+
+
+if (len(sys.argv) >= 2):
+    pingdom_connection = auth()
+    command = sys.argv[1]
+    site_name = None
+    params = None
+
+    if len(sys.argv) >= 3:
+        site_name = sys.argv[2]
+    if len(sys.argv) == 4:
+        params = sys.argv[3]
+
+    if command == 'add':
+        add_site_check(site_name, params)
+    elif command == 'delete':
+        delete_site_check(site_name)
+    elif command == 'info':
+        get_site_check_info(site_name)
+    elif command == 'modify':
+        modify_site_check(site_name, params)
+    elif command == 'modifyheader':
+        modify_header(site_name, params)
+    elif command == 'listnames':
+        list_check_names()
+    elif command == 'listsites':
+        list_sites()
+    elif command == 'listids':
+        list_check_ids()
+    elif command == 'listcontacts':
+        list_contacts()
+    elif command == 'credits':
+        get_credits()
+    else:
+        usage()
+else:
+    usage()

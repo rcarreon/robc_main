@@ -1,0 +1,120 @@
+!RANCID-CONTENT-TYPE: cisco
+!
+!Chassis type: PIX-515E - a PIX
+!CPU: Pentium II 433 MHz
+!
+!Memory: 64 MB RAM
+!Memory: Flash 16MB
+!Serial Number: 809272329 (0x303c8409)!
+!This PIX has a Restricted (R) license.
+!Key: 0xa153c71c 0xb09dbe6b 0xd7509a37 0x2d1ed515 
+!
+!Image: Compiled: on Thu 04-Aug-05 21:40 by morlee
+!
+!Flash: flash file system:  version:3  magic:0x12345679
+!Flash:   file 0: origin:       0 length:1990656
+!Flash:   file 1: origin: 2097152 length:3854
+!Flash:   file 2: origin: 2228224 length:1923
+!Flash:   file 3: origin:       0 length:0
+!Flash:   file 4: origin: 2359296 length:131072
+!Flash:   file 5: origin:16646144 length:308
+!
+:
+PIX Version 6.3(5)
+interface ethernet0 auto
+interface ethernet1 auto
+interface ethernet2 auto shutdown
+nameif ethernet0 outside security0
+nameif ethernet1 inside security100
+nameif ethernet2 intf2 security4
+!enable password <removed>
+!passwd <removed>
+hostname chicago-pix
+domain-name gnmedia.net
+fixup protocol dns maximum-length 512
+fixup protocol ftp 21
+fixup protocol h323 h225 1720
+fixup protocol h323 ras 1718-1719
+fixup protocol http 80
+fixup protocol rsh 514
+fixup protocol rtsp 554
+fixup protocol sip 5060
+fixup protocol sip udp 5060
+fixup protocol skinny 2000
+fixup protocol smtp 25
+fixup protocol sqlnet 1521
+fixup protocol tftp 69
+names
+access-list inbound permit icmp any any 
+access-list inbound permit icmp any any echo-reply 
+access-list inbound permit icmp any any unreachable 
+access-list inbound permit icmp any any time-exceeded 
+access-list inbound permit icmp any any source-quench 
+access-list inbound permit icmp any any parameter-problem 
+access-list NONAT permit ip 192.168.5.0 255.255.255.0 192.168.1.0 255.255.255.0 
+access-list NONAT permit ip 192.168.5.0 255.255.255.0 192.168.2.0 255.255.255.0 
+access-list NONAT permit ip 192.168.5.0 255.255.255.0 192.168.30.0 255.255.255.0 
+access-list NONAT permit ip 192.168.5.0 255.255.255.0 192.168.40.0 255.255.255.0 
+access-list NONAT permit ip 192.168.5.0 255.255.255.0 192.168.50.0 255.255.255.0 
+access-list toLAX permit ip 192.168.5.0 255.255.255.0 192.168.1.0 255.255.255.0 
+access-list toLAX permit ip 192.168.5.0 255.255.255.0 192.168.2.0 255.255.255.0 
+access-list toLAX permit ip 192.168.5.0 255.255.255.0 192.168.30.0 255.255.255.0 
+access-list toLAX permit ip 192.168.5.0 255.255.255.0 192.168.40.0 255.255.255.0 
+access-list toLAX permit ip 192.168.5.0 255.255.255.0 192.168.50.0 255.255.255.0 
+pager lines 24
+icmp permit any outside
+icmp permit any inside
+mtu outside 1500
+mtu inside 1500
+mtu intf2 1500
+ip address outside 74.9.232.162 255.255.255.248
+ip address inside 192.168.5.254 255.255.255.0
+no ip address intf2
+ip audit info action alarm
+ip audit attack action alarm
+pdm history enable
+arp timeout 14400
+global (outside) 1 interface
+nat (inside) 0 access-list NONAT
+nat (inside) 1 192.168.5.0 255.255.255.0 0 0
+nat (inside) 1 0.0.0.0 0.0.0.0 0 0
+access-group inbound in interface outside
+route outside 0.0.0.0 0.0.0.0 74.9.232.161 1
+route inside 10.0.0.0 255.0.0.0 192.168.5.1 1
+route inside 192.168.1.0 255.255.255.0 192.168.5.1 1
+timeout xlate 3:00:00
+timeout conn 1:00:00 half-closed 0:10:00 udp 0:02:00 rpc 0:10:00 h225 1:00:00
+timeout h323 0:05:00 mgcp 0:05:00 sip 0:30:00 sip_media 0:02:00
+timeout sip-disconnect 0:02:00 sip-invite 0:03:00
+timeout uauth 0:05:00 absolute
+aaa-server TACACS+ protocol tacacs+ 
+aaa-server TACACS+ max-failed-attempts 3 
+aaa-server TACACS+ deadtime 10 
+aaa-server RADIUS protocol radius 
+aaa-server RADIUS max-failed-attempts 3 
+aaa-server RADIUS deadtime 10 
+aaa-server LOCAL protocol local 
+aaa authentication ssh console LOCAL
+snmp-server location chicago
+snmp-server contact it-dg@gorillanation.com
+!snmp-server community <removed>
+no snmp-server enable traps
+floodguard enable
+sysopt connection permit-ipsec
+telnet 192.168.5.0 255.255.255.0 inside
+telnet 192.168.1.0 255.255.255.0 inside
+telnet 10.0.0.0 255.0.0.0 inside
+telnet timeout 30
+ssh 209.151.238.100 255.255.255.255 outside
+ssh 63.139.86.3 255.255.255.255 outside
+ssh 192.168.5.0 255.255.255.0 inside
+ssh 192.168.1.0 255.255.255.0 inside
+ssh 192.168.1.92 255.255.255.255 inside
+ssh 10.0.0.0 255.0.0.0 inside
+ssh timeout 30
+management-access inside
+console timeout 0
+!username cisco password <removed>
+!username rancid password <removed>
+terminal width 80
+: end

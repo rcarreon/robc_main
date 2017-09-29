@@ -1,0 +1,267 @@
+$TTL 3600 ; 1 day
+@      IN      SOA     gnmedia.net. root@gnmedia.net. (
+			2014052100	; Serial
+			36262		; Refresh
+			300		; Retry
+			3600000		; Expire
+			3600 )		; Minimum
+
+	IN	NS	app1v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app2v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app3v-dns.tp.prd.lax.gnmedia.net.
+	IN	NS	app4v-dns.tp.prd.lax.gnmedia.net.
+
+;1	IN	PTR	core1 fwsm
+2	IN	PTR	int-vlan12.admin.core1.gnmedia.net.
+;3	IN	PTR	core2 fwsm
+;4	IN	PTR	core2 ace admin context
+;5	IN	PTR	silo1 msfc
+6	IN	PTR	int-vlan12.admin.lax1.gnmedia.net.
+;7	IN	PTR	silo2 msfc
+8	IN	PTR	int-vlan12.admin.lax2.gnmedia.net.
+;9	IN	PTR	silo3 msfc
+10	IN	PTR	int-vlan12.admin.lax3.gnmedia.net.
+;11	IN	PTR	int-vlan12.legacy.core1.gnmedia.net.
+;12	IN	PTR	ops2.lax3-vlan12.gnmedia.net.
+;13	IN	PTR	int-vlan12.sb.lax1.gnmedia.net.
+;14	IN	PTR	int-vlan12.sb.lax2.gnmedia.net.
+;15	IN	PTR	ops2.lax1
+;16	IN	PTR	ops2.lax2
+;;17	IN	PTR	int-vlan12.legacy.lax3.gnmedia.net.
+;18	IN	PTR	springboard pxy interal vip
+;19	IN	PTR	int-vlan12.sb.core1.gnmedia.net.
+;20	IN	PTR	www-lax-001.actiontrip.com. ;decomm
+;21	IN	PTR	www-lax-002.actiontrip.com. ;decomm
+;22	IN	PTR	sql-lax-001.actiontrip.com. ;decomm
+;23	IN	PTR	natpool-1-vlan12-1.10g.lax1.gnmedia.net.
+;24	IN	PTR	int-vlan12.10g.lax1.gnmedia.net.
+;25	IN	PTR	sql-lax-002.gamerevolution.com.
+;26	IN	PTR	www-lax-001.gamerevolution.com.
+;27	IN	PTR	www-lax-002.gamerevolution.com.
+;28	IN	PTR	dev-out.gnmedia.net.
+;29	IN	PTR	sql-lax-001.forums.a.gnmedia.net.
+;30	IN	PTR	sql-lax-002.forums.a.gnmedia.net.
+;31	IN	PTR	www-lax-001.forums.a.gnmedia.net. ;decomm
+;32	IN	PTR	www-lax-002.forums.a.gnmedia.net. ;decomm
+;33	IN	PTR	www-lax-004.forums.a.gnmedia.net. ;decomm
+;34	IN	PTR	www-lax-005.forums.a.gnmedia.net. ;decomm
+;35	IN	PTR	www-lax-003.forums.a.gnmedia.net. ;decomm
+;36	IN	PTR	search-lax-001.forums.a.gnmedia.net. ;decomm
+;37	IN	PTR	sql-xen12.lax1.gnmedia.net. ;decomm
+;38	IN	PTR
+;39	IN	PTR	pxy1v-ico.ao.lax3.gnmedia.net. ;decomm
+;40	IN	PTR     pxy1v-ico.ao.lax1.gnmedia.net. ;decomm
+;41	IN	PTR
+;42	IN	PTR	admin.craveonline.com.
+;43	IN	PTR	www-lax-001.iconator.com. ;decomm
+;44	IN	PTR	www-lax-002.iconator.com. ;decomm
+;45	IN	PTR	www-lax-003.iconator.com. ;decomm
+;46	IN	PTR	www-lax-004.iconator.com.	; does not exist
+;47	IN	PTR	www-lax-005.iconator.com. ;decomm
+;48	IN	PTR	sql-lax-001.iconator.com. ;decomm
+;49	IN	PTR	sql-lax-002.iconator.com. ;decomm
+;50	IN	PTR	sql-lax-003.iconator.com.
+;51	IN	PTR	sql-lax-004.iconator.com.
+;52	IN	PTR	sql-lax-005.iconator.com.
+;53	IN	PTR	sql-lax-006.iconator.com.
+;54	IN	PTR	sql-lax-007.iconator.com.	; does not exist
+;55	IN	PTR	sql-lax-008.iconator.com.
+;56	IN	PTR	sql-lax-009.iconator.com.	; does not exist
+;57	IN	PTR	sql-lax-010.iconator.com.
+;58	IN	PTR	sql-lax-011.iconator.com.
+;59	IN	PTR	img-lax-001.iconator.com. ;decomm
+;60	IN	PTR	img-lax-002.iconator.com. ;decomm
+;61	IN	PTR	sql.iconator.com.
+;62	IN	PTR	vlan12.nfs1.lax3.gnmedia.net.
+;63	IN	PTR	search-lax-001.iconator.com. ;decomm
+;64	IN	PTR	dev-lax-001.iconator.com. ;decomm
+;65	IN	PTR	dev-lax-002.iconator.com.
+;66	IN	PTR	www-lax-001.sherdog.net. ;decomm
+;67	IN	PTR	www-lax-002.sherdog.net.
+;68	IN	PTR	www-lax-003.sherdog.net. ;decomm
+;69	IN	PTR	www-lax-004.sherdog.net. ;decomm
+;70	IN	PTR	www-lax-005.sherdog.net. ;decomm
+;71	IN	PTR	sql1v-sd.lax2.gnmedia.net. ;decomm
+;72	IN	PTR	sql-lax-002.sherdog.net. ;decomm
+;73	IN	PTR	int-vlan12.legacy.core2.gnmedia.net.
+;74	IN	PTR	sql-lax-001.sheknows.com.
+;75	IN	PTR	www-lax-001a.sheknows.com.
+;76	IN	PTR	www-lax-001b.sheknows.com.
+;77	IN	PTR	www-lax-002.sheknows.com. ;decomm
+;78	IN	PTR	www-lax-003.sheknows.com.
+;79	IN	PTR	www-lax-004a.sheknows.com.
+;80	IN	PTR	www-lax-004b.sheknows.com.
+;81	IN	PTR	www-lax-005a.sheknows.com.
+;82	IN	PTR	www-lax-005b.sheknows.com.
+;83	IN	PTR	dev-lax-002a.sheknows.com.
+;84	IN	PTR	dev-lax-002b.sheknows.com.
+;85	IN	PTR	nas.sheknows.com.
+;86	IN	PTR	search-lax-001.sheknows.com.
+;87	IN	PTR	www-lax-001.sherdog.com. ;decomm
+;88	IN	PTR	www-lax-002.sherdog.com. ;decomm
+;89	IN	PTR	www-lax-003.sherdog.com. ;decomm
+;90	IN	PTR	www-lax-004.sherdog.com. ;decomm
+;91	IN	PTR	www-lax-005.sherdog.com. ;decomm
+;92	IN	PTR	sql-lax-001.sherdog.com. ;decomm
+;93	IN	PTR	admin.sherdog.com.
+;94	IN	PTR	sql-lax-004.sherdog.net.
+;95	IN	PTR	natpool-1-vlan12-1.legacy.core.gnmedia.net.
+;96	IN	PTR	sql-lax-001.search.atomiconline.com.
+;97	IN	PTR	www-lax-001.search.atomiconline.com.
+;98	IN	PTR	www-lax-002.search.atomiconline.com.
+;99	IN	PTR	admin1v-spx.sb.lax3.gnmedia.net. ;decomm
+;100	IN	PTR	int-vlan12.sb.ace1.gnmedia.net.
+;101	IN	PTR	www-lax-001.soaps.com.	
+;102	IN	PTR	www-lax-003.soaps.com. ;decomm
+;103	IN	PTR	www-lax-001.dollwizard.com.	 ;decomm
+;104	IN	PTR	nfs-lax-001.gnmedia.net.
+;105	IN	PTR	video2.craveonline.com.
+;106	IN	PTR	video3.craveonline.com.
+;107	IN	PTR	video4.craveonline.com.
+;108	IN	PTR	video5.craveonline.com.
+;109	IN	PTR	video8.craveonline.com.
+;110	IN	PTR	video10.craveonline.com.
+;111	IN	PTR	file1.craveonline.com.
+;112	IN	PTR	file2.craveonline.com.
+;113	IN	PTR	file3.craveonline.com.
+;114	IN	PTR	file4.craveonline.com.
+;115	IN	PTR	fs-lax-001.gorillanation.com.
+;116	IN	PTR	fs-lax-002.gorillanation.com.
+;117	IN	PTR	img-lax-001.craveonline.com.
+;118	IN	PTR	img-lax-002.craveonline.com.
+;119	IN	PTR	video6.craveonline.com.
+;120	IN	PTR	nfs-lax-001.craveonline.com. ;decomm
+;121	IN	PTR	www-lax-001.craveonline.com. ;decomm
+;122	IN	PTR	www-lax-002.craveonline.com. ;decomm
+;123	IN	PTR	www-lax-003.craveonline.com. ;decomm
+;124	IN	PTR	sql-lax-001.craveonline.com. ;decomm
+;125	IN	PTR	
+;126	IN	PTR	www2.forums.gnmedia.net. ;decomm
+;127	IN	PTR	beta2.craveonline.com.
+;128	IN	PTR	dev-lax-001.craveonline.com.
+;129	IN	PTR	
+;130    IN      PTR	nfs-lax-003.gnmedia.net.
+;131    IN      PTR	upl-lax-002.craveonline.com.
+;132    IN      PTR	xen-lax-011.gnmedia.net. ;decomm
+;133    IN      PTR	dev-adops-lax-001v.gnmedia.net.	
+;134    IN      PTR	dev-lax-001v.springboard.gorillanation.com.
+;135    IN      PTR	dev-www-search-001v.atomiconline.com. ;decomm
+;136	IN	PTR	fs-lax-001v.dev.springboard.gorillanation.com. ;decomm
+;137	IN	PTR	fs-lax-001v.test.springboard.gorillanation.com. ;decomm
+;138	IN	PTR	wiki.gnmedia.net.	
+;139	IN	PTR	forums.lax3.dvdfile.com.	
+;140	IN	PTR	dev.gnmedia.net.
+;141	IN	PTR	www-lax-001.gorillanation.com. ;decomm
+;142	IN	PTR	munin.gnmedia.net.
+;143	IN	PTR	trac.gnmedia.net.
+;144	IN	PTR	mta-lax-001.gnmedia.net.
+;145	IN	PTR	mta-lax-002.gnmedia.net.
+;146	IN	PTR	dev-out.gnmedia.net.
+;147	IN	PTR	cacti.gorillanation.com.
+;148	IN	PTR	www-lax-002.gorillanation.com.
+149	IN	PTR	int-vlan12.admin.core2.gnmedia.net.
+;150	IN	PTR	int-vlan12.sb.core2.gnmedia.net.
+151	IN	PTR	int-vlan12.gn1.core1.gnmedia.net.
+152	IN	PTR	int-vlan12.gn1.core2.gnmedia.net.
+153	IN	PTR	natpool-1-vlan12-1.gn1.core.gnmedia.net.	
+154	IN	PTR	natpool-1-vlan12-2.gn1.core.gnmedia.net.
+;155	IN	PTR
+;156	IN	PTR
+;157	IN	PTR
+;158	IN	PTR
+;159	IN	PTR
+;160	IN	PTR	app3v-ci.lax3.gnmedia.net. ;decomm
+;161	IN	PTR	app4v-ci.lax3.gnmedia.net. ;decomm
+;162	IN	PTR
+;163	IN	PTR
+;164	IN	PTR
+;165    IN      PTR
+;166    IN      PTR
+;167	IN	PTR
+;168    IN      PTR
+;169	IN	PTR
+;170	IN	PTR
+;171	IN	PTR
+;172	IN	PTR
+;173	IN	PTR
+;174	IN	PTR
+;175	IN	PTR
+;176	IN	PTR
+;177	IN	PTR
+;178	IN	PTR
+;179	IN	PTR
+;180	IN	PTR
+;181	IN	PTR
+;182	IN	PTR
+;183	IN	PTR
+;184	IN	PTR
+;185	IN	PTR
+;186	IN	PTR
+;187	IN	PTR
+;188	IN	PTR
+;189	IN	PTR
+;190	IN	PTR
+;191	IN	PTR
+;192	IN	PTR
+;193	IN	PTR
+;194	IN	PTR
+;195	IN	PTR
+;196	IN	PTR
+;197	IN	PTR
+;198	IN	PTR
+;199	IN	PTR
+;200	IN	PTR
+;201	IN	PTR
+;202	IN	PTR
+;203	IN	PTR
+;204	IN	PTR
+;205	IN	PTR
+;206	IN	PTR
+;207	IN	PTR
+;208	IN	PTR
+;209	IN	PTR
+;210	IN	PTR
+;211	IN	PTR
+;212	IN	PTR
+;213	IN	PTR
+;214	IN	PTR
+;215	IN	PTR
+;216	IN	PTR
+;217	IN	PTR
+;218	IN	PTR
+;219	IN	PTR
+;220	IN	PTR
+;221	IN	PTR
+;222	IN	PTR
+;223	IN	PTR
+;224	IN	PTR
+;225	IN	PTR
+;226	IN	PTR
+;227	IN	PTR
+;228	IN	PTR
+;229	IN	PTR
+;231	IN	PTR
+;232	IN	PTR
+;233	IN	PTR
+;234	IN	PTR
+;235	IN	PTR
+;236	IN	PTR
+;237	IN	PTR
+;238	IN	PTR
+;239	IN	PTR
+;240	IN	PTR
+;241	IN	PTR	natpool-3-vlan12-1.legacy.core.gnmedia.net.
+;242	IN	PTR	natpool-3-vlan12-2.legacy.core.gnmedia.net.
+;243	IN	PTR	natpool-3-vlan12-3.legacy.core.gnmedia.net.
+;244	IN	PTR	natpool-3-vlan12-4.legacy.core.gnmedia.net.
+;245	IN	PTR	natpool-3-vlan12-5.legacy.core.gnmedia.net.
+;246	IN	PTR	natpool-3-vlan12-6.legacy.core.gnmedia.net.
+;247	IN	PTR	natpool-3-vlan12-7.legacy.core.gnmedia.net.
+;248	IN	PTR	natpool-3-vlan12-8.legacy.core.gnmedia.net.
+;249	IN	PTR	natpool-3-vlan12-9.legacy.core.gnmedia.net.
+;250	IN	PTR	natpool-3-vlan12-10.legacy.core.gnmedia.net.
+;251    IN      PTR
+;252    IN      PTR	vlan12 nat-pool.
+;253	IN	PTR	natpool-2-vlan12-1.legacy.core.gnmedia.net.
+;254    IN      PTR
+;255    IN      PTR

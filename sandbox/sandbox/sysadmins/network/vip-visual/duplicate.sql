@@ -1,0 +1,2 @@
+use servers;
+FLUSH TABLES WITH READ LOCK;

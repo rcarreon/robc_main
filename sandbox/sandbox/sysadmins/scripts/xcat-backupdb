@@ -1,0 +1,42 @@
+#!/bin/bash
+
+PATH=$PATH:/opt/xcat/sbin/
+HOME=/root
+
+if [ "$1" != "force" -a $(date +%H) == 03 ];then
+   exit 0  # At 3am, subversion is shutdown for backup... so don't bother here
+fi
+cd /opt/xcat-dbbackup
+
+status=$(git status)
+if echo "$status" | grep -q "On branch master" ;then
+   # Ok, on the right branch, proceed...
+
+   stashout=$(git stash 2>&1)
+   stashret=$?
+   echo "$stashout" | grep -v "No local changes to save"
+   if [ $stashret != 0 ];then
+      echo "Git stash errored. Aborting."
+      exit 1
+   fi
+     
+   for a in /etc/xcat/*.sqlite;do
+      db=$(basename $a .sqlite)
+      case $db in
+         auditlog) continue;;
+         kvm_nodedata) continue;;
+      esac
+      if [ $a -nt $db.csv -o "$1" == "force" ];then
+         echo $db
+         tabdump $db > $db.csv
+      fi
+   done
+
+   if [ $(git diff | wc -l) -gt 0 ] ;then
+       git add * 
+       git diff --cached </dev/null | cat
+       git commit -m 'cronned commit after DB dump...'
+       git push --mirror
+   fi
+   git stash pop 2>&1 | grep -v "No stash found"
+fi

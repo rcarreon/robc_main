@@ -1,0 +1,237 @@
+    <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <meta http-equiv="content-type" content="text/html;charset=utf-8" />
+
+        <title>Jarmon - customisable, Javascript generated charts from
+        Collectd RRD data</title>
+
+        <link rel="stylesheet" type="text/css" href="assets/css/style.css" />
+        <link rel="stylesheet" type="text/css" href="assets/css/tabs-no-images.css" />
+        <link rel="stylesheet" type="text/css" href="assets/css/jquerytools.dateinput.skin1.css" />
+
+        <script type="text/javascript" src="assets/js/dependencies.js"></script>
+
+        <script type="text/javascript" src="jarmon.js"></script>
+        <script type="text/javascript" src="docs/jarmon_example_recipes.js"></script>
+        <script type="text/javascript">
+        // Recipes for the charts on this page
+        var application_recipes = [
+            {
+                title: 'Jarmon Webserver TCP Stats',
+                data: [
+                    ['tcpconns-8080-local/tcp_connections-CLOSE_WAIT.rrd', 0, 'CLOSE_WAIT', ''],
+                    ['tcpconns-8080-local/tcp_connections-SYN_RECV.rrd', 0, 'SYN_RECV', ''],
+                    ['tcpconns-8080-local/tcp_connections-TIME_WAIT.rrd', 0, 'TIME_WAIT', ''],
+                    ['tcpconns-8080-local/tcp_connections-CLOSED.rrd', 0, 'CLOSED', ''],
+                    ['tcpconns-8080-local/tcp_connections-FIN_WAIT2.rrd', 0, 'FIN_WAIT2', ''],
+                    ['tcpconns-8080-local/tcp_connections-FIN_WAIT1.rrd', 0, 'FIN_WAIT1', ''],
+                    ['tcpconns-8080-local/tcp_connections-ESTABLISHED.rrd', 0, 'ESTABLISHED', ''],
+                    ['tcpconns-8080-local/tcp_connections-LAST_ACK.rrd', 0, 'LAST_ACK', ''],
+                    ['tcpconns-8080-local/tcp_connections-LISTEN.rrd', 0, 'LISTEN', ''],
+                    ['tcpconns-8080-local/tcp_connections-SYN_SENT.rrd', 0, 'SYN_SENT', ''],
+                    ['tcpconns-8080-local/tcp_connections-CLOSING.rrd', 0, 'CLOSING', '']
+                ],
+                options: jQuery.extend(true, {yaxis: {tickDecimals: 0}}, jarmon.Chart.BASE_OPTIONS, jarmon.Chart.STACKED_OPTIONS)
+            },
+        ];
+
+
+        function initialiseCharts(rrdUrlList) {
+            /**
+             * Setup chart date range controls and all charts
+             **/
+
+            var p = new jarmon.Parallimiter(1);
+            function serialDownloader(url) {
+                return p.addCallable(
+                    function() {
+                        return jarmon.downloadBinary(url);
+                    });
+            }
+
+            // Extract the chart template from the page
+            var chartTemplate = $('.chart-container').remove();
+
+            function templateFactory(parentEl) {
+                return function() {
+                    // The chart template must be appended to the page early, so
+                    // that flot can calculate chart dimensions etc.
+                    return chartTemplate.clone().appendTo(parentEl);
+                }
+            }
+
+            var cc = new jarmon.ChartCoordinator($('.chartRangeControl'));
+            var t;
+            // Initialise tabs and update charts when tab is clicked
+            $(".css-tabs:first").bind('click', function(i) {
+                // XXX: Hack to give the tab just enough time to become visible
+                // so that flot can calculate chart dimensions.
+                window.clearTimeout(t);
+                t = window.setTimeout(function() { cc.update(); }, 100);
+            });
+
+            cc.charts = [].concat(
+                jarmon.Chart.fromRecipe(
+                    rrdUrlList,
+                    [].concat(
+                        jarmon.COLLECTD_RECIPES.cpu,
+                        jarmon.COLLECTD_RECIPES.memory,
+                        jarmon.COLLECTD_RECIPES.load),
+                    templateFactory('.system-charts'), serialDownloader),
+                jarmon.Chart.fromRecipe(
+                    rrdUrlList,
+                    jarmon.COLLECTD_RECIPES.interface,
+                    templateFactory('.network-charts'), serialDownloader),
+                jarmon.Chart.fromRecipe(
+                    rrdUrlList,
+                    jarmon.COLLECTD_RECIPES.dns,
+                    templateFactory('.dns-charts'), serialDownloader),
+                jarmon.Chart.fromRecipe(
+                    rrdUrlList,
+                    application_recipes,
+                    templateFactory('.application-charts'), serialDownloader)
+            );
+
+            // Show a loading icon when a chart is being redrawn
+            $('.chart-container').live('chart_loading', function(e) {
+                $(this).find('.title').addClass('loading');
+            });
+
+            $('.chart-container').live('chart_loaded', function(e) {
+                $(this).find('.title').removeClass('loading');
+            });
+
+            // Initialise all the charts
+            cc.init();
+        }
+
+        $(function() {
+            // Download a list of available rrd files and use it to generate
+            // any viable chart recipes
+            // A static json file containing a list of rrd urls
+            $.getJSON('rrd_list.json', initialiseCharts);
+
+            // Alternatively use a dynamically generated list of rrd urls
+            //$.getJSON('rrd_finder.rpy', initialiseCharts);
+
+            // Add dhtml calendars to the date input fields
+            $(".timerange_control img")
+                .dateinput({
+                    'format': 'dd mmm yyyy 00:00:00',
+                    'max': +1,
+                    'css': {'input': 'jquerytools_date'}})
+                .bind('onBeforeShow', function(e) {
+                    var classes = $(this).attr('class').split(' ');
+                    var currentDate, input_selector;
+                    for(var i=0; i<=classes.length; i++) {
+                        input_selector = '[name="' + classes[i] + '"]';
+                        // Look for a neighboring input element whose name matches the
+                        // class name of this calendar
+                        // Parse the value as a date if the returned date.getTime
+                        // returns NaN we know it's an invalid date
+                        // XXX: is there a better way to check for valid date?
+                        currentDate = new Date($(this).siblings(input_selector).val());
+                        if(currentDate.getTime() != NaN) {
+                            $(this).data('dateinput')._input_selector = input_selector;
+                            $(this).data('dateinput')._initial_val = currentDate.getTime();
+                            $(this).data('dateinput').setValue(currentDate);
+                            break;
+                        }
+                    }
+                })
+                .bind('onHide', function(e) {
+                    // Called after a calendar date has been chosen by the user.
+
+                    // Use the sibling selector that we generated above before opening
+                    // the calendar
+                    var input_selector = $(this).data('dateinput')._input_selector;
+                    var oldStamp = $(this).data('dateinput')._initial_val;
+                    var newDate = $(this).data('dateinput').getValue();
+                    // Only update the form field if the date has changed.
+                    if(oldStamp != newDate.getTime()) {
+                        $(this).siblings(input_selector).val(
+                            newDate.toString().split(' ').slice(1,5).join(' '));
+                        // Trigger a change event which should automatically update the
+                        // graphs and change the timerange drop down selector to
+                        // "custom"
+                        $(this).siblings(input_selector).trigger('change');
+                    }
+                });
+
+            // Avoid overlaps between the calendars
+            // XXX: This is a bit of hack, what if there's more than one set of calendar
+            // controls on a page?
+            $(".timerange_control img.from_custom").bind('onBeforeShow',
+                function() {
+                    var otherVal = new Date(
+                        $('.timerange_control [name="to_custom"]').val());
+
+                    $(this).data('dateinput').setMax(otherVal);
+                }
+            );
+            $(".timerange_control img.to_custom").bind('onBeforeShow',
+                function() {
+                    var otherVal = new Date(
+                        $('.timerange_control [name="from_custom"]').val());
+
+                    $(this).data('dateinput').setMin(otherVal);
+                }
+            );
+
+            // Setup dhtml tabs
+            $(".css-tabs").tabs(".css-panes > div", {history: true});
+        });
+        </script>
+    </head>
+
+    <body>
+        <div class="chartRangeControl">
+            <form>
+                <div>
+                    <span class="timerange_control custom">
+                        <img src="assets/icons/calendar.png" width="16" height="16" alt="calendar" class="from_custom"
+                             title="Click to choose a custom start date" />
+                        <input name="from_custom" type="text" readonly="readonly"
+                               title="Time range start" />
+                        <img src="assets/icons/calendar.png" width="16" height="16" alt="calendar" class="to_custom"
+                             title="Click to choose a custom end date" />
+                        <input name="to_custom" type="text" readonly="readonly"
+                               title="Time range end" />
+                    </span>
+                    <span class="timerange_control standard">
+                        <select name="from_standard"
+                                title="Time range shortcuts - click to select an alternative time range" >
+                            <option>custom</option>
+                        </select>
+                    </span>
+                    <input name="from" type="hidden"  />
+                    <input name="to" type="hidden"  />
+                    <select name="tzoffset"
+                            title="Timezone offset - click to choose a custom timezone offset" ></select>
+                    <input name="action" value="Update" type="button"
+                           title="Graph update - click to update all graphs" />
+                </div>
+                <div class="range-preview"
+                     title="Time range preview - click and drag to select a custom timerange" ></div>
+            </form>
+            <ul class="css-tabs">
+                <li><a href="#system">System</a></li>
+                <li><a href="#network">Network</a></li>
+                <li><a href="#dns">DNS</a></li>
+                <li><a href="#application">Application</a></li>
+            </ul>
+            <div class="css-panes charts">
+                <div class="system-charts"></div>
+                <div class="network-charts"></div>
+                <div class="dns-charts"></div>
+                <div class="application-charts"></div>
+            </div>
+            <div class="chart-container">
+                <h2 class="title"></h2>
+                <div class="chart"></div>
+            </div>
+        </div>
+    </body>
+</html>

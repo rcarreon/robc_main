@@ -1,0 +1,50 @@
+#!/bin/bash
+
+cd $(dirname $0)
+if [ ! -d app1v-dnsint ];then
+   echo "Where is the app1v-dnsint directory?" 1>&2
+   exit 1
+fi
+
+generateslave() {
+  area=$1
+  master=$2
+
+  for file in $(cd ../../zones/;echo *.rev *.hosts $area/*.rev $area/*.hosts);do
+     if [ ! -f ../../zones/$file ];then # ignore a weird symlink, not that this has happened
+         continue;
+     fi
+
+     case $file in
+        *.hosts) zone=$(basename ${file%.hosts}).;;
+        *.rev) zone=$(IFS=. ; set -- ${file#*/}; echo $3.$2.$1.in-addr.arpa);;
+     esac
+
+     zone=${zone%.}
+     cat <<-__EOF__
+	zone "$zone." IN {
+	        type slave;
+	        file "slaves/$zone.zone";
+	        masters { $master; };
+	        allow-query { any; };
+	};
+
+	__EOF__
+  done
+}
+
+
+cd app1v-dnsint
+generateslave internal 10.11.20.78 > ../internal-slaves/named-slaves-generated.conf
+cd ..
+cd app1v-dnsext
+generateslave external 72.172.76.16 > ../external-slaves/named-slaves-generated.conf
+cd ..
+
+#zone "20.50.10.in-addr.arpa" IN {
+        #type slave;
+        #file "slaves/10.50.20.rev";
+        #masters { 72.172.76.16; };  <-- external master
+        #allow-query { any; };
+#};
+

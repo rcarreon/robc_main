@@ -1,0 +1,10 @@
+<VirtualHost *:80>
+    ServerAdmin n00b@gnmedia.net
+    ServerName crucialmonthlyreport.gnmedia.net
+    ServerAlias *.crucialmonthlyreport.gnmedia.net
+    DocumentRoot /mnt/docroots/crucialmonthlyreport.gnmedia.net
+    ErrorLog  /app/log/crucialmonthlyreport.gnmedia.net.error.log
+    CustomLog /app/log/crucialmonthlyreport.gnmedia.net.access.log combined
+
+</VirtualHost>
+

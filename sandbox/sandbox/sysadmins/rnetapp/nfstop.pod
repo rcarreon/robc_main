@@ -1,0 +1,38 @@
+=pod
+
+=head1 NAME
+
+nfstop - show top talkers for your NetApp
+
+=head1 SYNOPSIS
+
+B<nfstop> B<filer> B<[-cd]> (-c clears stats) (-n display inet numbers)
+
+=head1 DESCRIPTION
+
+nfstop is a convienent wrapper for rnetapp's nfsstats command.
+
+=head1 CONFIGURATION
+
+See rnetapp(1) for configuration details.
+
+=head1 ENVIRONMENT
+
+NETAPP_USERNAME
+
+NETAPP_PASSWORD
+
+=head1 BUGS
+
+Report bugs to garrick.staples@gorillanation.com.
+
+=head1 AUTHOR
+
+Garrick Staples, Gorilla Nation, LLC.
+    
+=head1 SEE ALSO
+
+The NetApp SDK Documentation, rnetapp(1)
+
+=cut
+

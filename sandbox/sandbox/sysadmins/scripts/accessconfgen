@@ -1,0 +1,89 @@
+#!/bin/bash
+
+usage() {
+   echo "Usage: $0 [options]"
+   echo "       --test: will display the git diff and not commit"
+   echo "       --commit: will commit the git diff without prompting"
+   echo "       --batch dir: operate on existing git checkout without commit"
+   echo "       -m msg: set the git log message"
+   exit 1
+}
+   
+commit=ask
+batch=no
+while 
+case "$1" in
+   --commit) commit=yes;;
+   --test) commit=no;;
+   --batch) batch=$2;shift;;
+   -m) msg=$2;shift;;
+   --*) echo "unknown option";usage;;
+   *) false;;
+esac;do shift;done
+
+if [ "$batch" != no -a ! -d "$batch" ];then
+   echo "--batch takes a directory"
+   usage
+fi
+
+: ${PAGER:=less}
+if [ "$batch" == no ];then
+   tmpdir=/tmp/mkaccessconf.$$.$RANDOM
+   rm -rf $tmpdir
+   mkdir  $tmpdir
+   cd $tmpdir
+   git clone git@git.gnmedia.net:/puppet-templates >/dev/null || exit
+   cd puppet-templates/auth || exit
+   git config user.name `whoami`
+else
+   cd $batch
+fi
+
+if [ ! -f access.conf.erb ];then
+   echo "Wrong directory (looking for access.conf.erb)"
+   exit 1
+fi
+
+mkaccessconferb > access.conf.erb || exit
+
+
+if [ "$batch" != no ];then
+   exit 0
+fi
+
+continue() {
+   read -p "${1:-Continue?} [Y/n] " reply
+   if test -z "$reply" -o "${reply:0:1}" = Y -o "${reply:0:1}" = y ; then
+      return 0
+   else
+      return 1
+   fi
+}
+
+if [ -z "$(git diff)" ] ;then
+	echo "no differences, we good"
+   exit
+fi
+if [ "$commit" = "ask" ];then
+   read -p "Please confirm changes (enter to view in $PAGER)... "
+   git diff | $PAGER
+   if continue "Commit changes?" ;then
+      [ -z "$msg" ] && read -p "git log message? " msg
+      git commit -a -m "${msg:=Adding $host/$ip}"
+      git push
+   else
+      echo "Dropping to a shell..."
+      echo "You can edit, git commit/push, and exit when you are done..."
+      (export PS1="mkaccessconf> "
+      pwd
+      $SHELL)
+   fi
+elif [ "$commit" = "yes" ];then
+   git commit -a -m "${msg:=Generated access.conf.erb}"
+   git push
+else
+   git diff
+   echo "Changes were not committed."
+fi
+cd 
+rm -rf $tmpdir
